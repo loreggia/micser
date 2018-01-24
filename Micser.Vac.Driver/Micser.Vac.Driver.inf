@@ -1,0 +1,79 @@
+;
+; Micser.Vac.Driver.inf
+;
+
+[Version]
+Signature="$WINDOWS NT$"
+Class=MEDIA ; DONE: edit Class
+ClassGuid={4d36e96c-e325-11ce-bfc1-08002be10318} ; DONE: edit ClassGuid 
+Provider=%ManufacturerName%
+CatalogFile=Micser.Vac.Driver.cat
+DriverVer= 01/24/2018, 1.0.0.0; DONE: set DriverVer in stampinf property pages
+
+[DestinationDirs]
+DefaultDestDir = 12
+Micser.Vac.Driver_Device_CoInstaller_CopyFiles = 11
+
+; ================= Class section =====================
+
+[SourceDisksNames]
+1 = %DiskName%,,,""
+
+[SourceDisksFiles]
+Micser.Vac.Driver.sys  = 1,,
+WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll=1 ; make sure the number matches with SourceDisksNames
+
+;*****************************************
+; Install Section
+;*****************************************
+
+[Manufacturer]
+%ManufacturerName%=Standard,NT$ARCH$
+
+[Standard.NT$ARCH$]
+%Micser.Vac.Driver.DeviceDesc%=Micser.Vac.Driver_Device, Root\Micser.Vac.Driver ; done: edit hw-id
+
+[Micser.Vac.Driver_Device.NT]
+CopyFiles=Drivers_Dir
+
+[Drivers_Dir]
+Micser.Vac.Driver.sys
+
+;-------------- Service installation
+[Micser.Vac.Driver_Device.NT.Services]
+AddService = Micser.Vac.Driver,%SPSVCINST_ASSOCSERVICE%, Micser.Vac.Driver_Service_Inst
+
+; -------------- Micser.Vac.Driver driver install sections
+[Micser.Vac.Driver_Service_Inst]
+DisplayName    = %Micser.Vac.Driver.SVCDESC%
+ServiceType    = 1               ; SERVICE_KERNEL_DRIVER
+StartType      = 3               ; SERVICE_DEMAND_START
+ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
+ServiceBinary  = %12%\Micser.Vac.Driver.sys
+
+;
+;--- Micser.Vac.Driver_Device Coinstaller installation ------
+;
+
+[Micser.Vac.Driver_Device.NT.CoInstallers]
+AddReg=Micser.Vac.Driver_Device_CoInstaller_AddReg
+CopyFiles=Micser.Vac.Driver_Device_CoInstaller_CopyFiles
+
+[Micser.Vac.Driver_Device_CoInstaller_AddReg]
+HKR,,CoInstallers32,0x00010000, "WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll,WdfCoInstaller"
+
+[Micser.Vac.Driver_Device_CoInstaller_CopyFiles]
+WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll
+
+[Micser.Vac.Driver_Device.NT.Wdf]
+KmdfService =  Micser.Vac.Driver, Micser.Vac.Driver_wdfsect
+[Micser.Vac.Driver_wdfsect]
+KmdfLibraryVersion = $KMDFVERSION$
+
+[Strings]
+SPSVCINST_ASSOCSERVICE= 0x00000002
+ManufacturerName="Micser" ; DONE: Replace with your manufacturer name
+ClassName="Micser" ; DONE: edit ClassName
+DiskName = "Micser.Vac.Driver Installation Disk"
+Micser.Vac.Driver.DeviceDesc = "Micser.Vac.Driver Device"
+Micser.Vac.Driver.SVCDESC = "Micser.Vac.Driver Service"
