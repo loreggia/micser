@@ -1,24 +1,19 @@
-﻿using System;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Documents;
 using System.Windows.Input;
 
 namespace Micser.Core.Controls
 {
-    public class EditableTextBlock : Control
+    public class EditableTextBlock : TextBlock
     {
-        public const string PartTextBlockName = "PART_TextBlock";
-        public const string PartTextBoxName = "PART_TextBox";
-
         public static readonly DependencyProperty IsEditingProperty = DependencyProperty.Register(
-            nameof(IsEditing), typeof(bool), typeof(EditableTextBlock), new PropertyMetadata(false));
+            nameof(IsEditing), typeof(bool), typeof(EditableTextBlock), new PropertyMetadata(false, IsEditingPropertyChanged));
 
-        public static readonly DependencyProperty TextProperty = DependencyProperty.Register(
-            nameof(Text), typeof(string), typeof(EditableTextBlock), new PropertyMetadata(null));
+        public static readonly DependencyProperty MaxLengthProperty = DependencyProperty.Register(
+            nameof(MaxLength), typeof(int), typeof(EditableTextBlock), new PropertyMetadata(0));
 
-        private string _previousText;
-        private TextBlock _textBlock;
-        private TextBox _textBox;
+        private EditableTextBlockAdorner _adorner;
 
         static EditableTextBlock()
         {
@@ -31,64 +26,55 @@ namespace Micser.Core.Controls
             set => SetValue(IsEditingProperty, value);
         }
 
-        public string Text
+        public int MaxLength
         {
-            get => (string)GetValue(TextProperty);
-            set => SetValue(TextProperty, value);
+            get => (int)GetValue(MaxLengthProperty);
+            set => SetValue(MaxLengthProperty, value);
         }
 
-        public override void OnApplyTemplate()
+        protected override void OnMouseDown(MouseButtonEventArgs e)
         {
-            base.OnApplyTemplate();
-
-            if (_textBlock != null)
-            {
-                _textBlock.MouseLeftButtonDown -= OnTextBlockMouseLeftButtonDown;
-            }
-            if (_textBox != null)
-            {
-                _textBox.KeyDown -= OnTextBoxKeyDown;
-            }
-
-            _textBlock = GetTemplateChild(PartTextBlockName) as TextBlock;
-            _textBox = GetTemplateChild(PartTextBoxName) as TextBox;
-
-            if (_textBlock == null || _textBox == null)
-            {
-                throw new InvalidOperationException("Invalid template.");
-            }
-
-            _textBlock.MouseLeftButtonDown += OnTextBlockMouseLeftButtonDown;
-            _textBox.KeyDown += OnTextBoxKeyDown;
-        }
-
-        private void OnTextBlockMouseLeftButtonDown(object sender, MouseButtonEventArgs args)
-        {
-            if (args.ClickCount == 2)
+            if (e.ClickCount == 2)
             {
                 IsEditing = true;
-                _textBox.SelectAll();
-                _previousText = Text;
-
-                Dispatcher.BeginInvoke(new Func<bool>(() => _textBox.Focus()));
             }
         }
 
-        private void OnTextBoxKeyDown(object sender, KeyEventArgs e)
+        private static void IsEditingPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (!IsEditing)
-            {
-                return;
-            }
+            var textBlock = (EditableTextBlock)d;
 
-            if (e.Key == Key.Enter)
+            //Get the adorner layer of the uielement (here TextBlock)
+            var layer = AdornerLayer.GetAdornerLayer(textBlock);
+
+            //If the IsInEditMode set to true means the user has enabled the edit mode then
+            //add the adorner to the adorner layer of the TextBlock.
+            if (textBlock.IsEditing)
             {
-                IsEditing = false;
+                if (textBlock._adorner == null)
+                {
+                    textBlock._adorner = new EditableTextBlockAdorner(textBlock);
+                }
+                layer.Add(textBlock._adorner);
             }
-            else if (e.Key == Key.Escape)
+            else
             {
-                IsEditing = false;
-                Text = _previousText;
+                //Remove the adorner from the adorner layer.
+                var adorners = layer.GetAdorners(textBlock);
+                if (adorners != null)
+                {
+                    foreach (var adorner in adorners)
+                    {
+                        if (adorner is EditableTextBlockAdorner)
+                        {
+                            layer.Remove(adorner);
+                        }
+                    }
+                }
+
+                //Update the textblock's text binding.
+                var expression = textBlock.GetBindingExpression(TextProperty);
+                expression?.UpdateTarget();
             }
         }
     }

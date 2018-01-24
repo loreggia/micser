@@ -1,18 +1,17 @@
-﻿<Window x:Class="Micser.Core.Views.MainView"
+﻿<views:View x:Class="Micser.Core.Views.MainView"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:i8N="clr-namespace:Micser.Core.I8n"
         xmlns:viewModels="clr-namespace:Micser.Core.ViewModels"
-        xmlns:controls="clr-namespace:Micser.Core.Controls"
         xmlns:themes="clr-namespace:Micser.Core.Themes"
-        mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="800">
+        xmlns:views="clr-namespace:Micser.Core.Views"
+        mc:Ignorable="d">
 
-    <Window.DataContext>
+    <views:View.DataContext>
         <viewModels:MainViewModel />
-    </Window.DataContext>
+    </views:View.DataContext>
 
     <ScrollViewer Padding="10">
         <Grid>
@@ -26,7 +25,7 @@
             <ItemsControl Grid.Row="1" ItemsSource="{Binding InputChannels}" BorderThickness="0">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="{x:Type viewModels:InputChannelViewModel}">
-                        <controls:InputChannelControl ChannelName="{Binding Name}" />
+                        <views:InputChannelView DataContext="{Binding}" Width="Auto" Margin="0,0,5,5" />
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
                 <ItemsControl.ItemsPanel>
@@ -37,4 +36,4 @@
             </ItemsControl>
         </Grid>
     </ScrollViewer>
-</Window>
+</views:View>
