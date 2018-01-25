@@ -1,0 +1,38 @@
+﻿<infrastructure:View
+    x:Class="Micser.Core.Views.MainView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:viewModels="clr-namespace:Micser.Main.ViewModels"
+    xmlns:infrastructure="clr-namespace:Micser.Infrastructure;assembly=Micser.Infrastructure"
+    xmlns:p="clr-namespace:Micser.Main.Properties"
+    xmlns:themes="clr-namespace:Micser.Infrastructure.Themes;assembly=Micser.Infrastructure"
+    xmlns:views="clr-namespace:Micser.Main.Views"
+    mc:Ignorable="d"
+    d:DataContext="{d:DesignInstance viewModels:MainViewModel}">
+
+    <ScrollViewer>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <TextBlock Grid.Row="0" Text="{x:Static p:Resources.Inputs}" Style="{DynamicResource {themes:GenericThemeKey Title}}" />
+
+            <ItemsControl Grid.Row="1" ItemsSource="{Binding InputChannels}" BorderThickness="0">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type viewModels:InputChannelViewModel}">
+                        <views:InputChannelView DataContext="{Binding}" Width="Auto" Margin="0,0,5,5" />
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ItemsControl>
+        </Grid>
+    </ScrollViewer>
+</infrastructure:View>
