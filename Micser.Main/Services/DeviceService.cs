@@ -5,10 +5,10 @@ namespace Micser.Main.Services
 {
     public class DeviceService
     {
-        public IEnumerable<DeviceDescription> GetInputDevices()
+        public IEnumerable<DeviceDescription> GetDevices(DeviceType type)
         {
             var deviceEnumerator = new MMDeviceEnumerator();
-            foreach (var audioEndPoint in deviceEnumerator.EnumerateAudioEndPoints(DataFlow.Capture, DeviceState.Active))
+            foreach (var audioEndPoint in deviceEnumerator.EnumerateAudioEndPoints(type == DeviceType.Input ? DataFlow.Capture : DataFlow.Render, DeviceState.Active))
             {
                 yield return new DeviceDescription
                 {
@@ -16,7 +16,7 @@ namespace Micser.Main.Services
                     Name = audioEndPoint.FriendlyName,
                     IconPath = audioEndPoint.IconPath,
                     IsActive = audioEndPoint.State == DeviceState.Active,
-                    Type = DeviceType.Input
+                    Type = type
                 };
             }
         }

@@ -2,7 +2,8 @@
 {
     public enum GenericThemeKey
     {
-        Title
+        BackgroundBrush,
+        TitleStyle
     }
 
     public class GenericThemeKeyExtension : ThemeKeyExtension<GenericThemeKey>

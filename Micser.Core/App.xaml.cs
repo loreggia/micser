@@ -1,13 +1,10 @@
-﻿using System;
-using System.Linq;
-using System.Windows;
+﻿using System.Windows;
 using CommonServiceLocator;
 using Micser.Infrastructure;
+using Micser.Infrastructure.Themes;
 using Micser.Main;
 using Prism.Ioc;
 using Prism.Modularity;
-using Prism.Unity;
-using Unity;
 
 namespace Micser.Core
 {
@@ -34,20 +31,13 @@ namespace Micser.Core
         {
             base.InitializeModules();
 
-            var resourceModules = Container.GetContainer().ResolveAll(typeof(IModuleWithResources))?.Cast<IModuleWithResources>().ToArray();
-            if (resourceModules != null)
+            var resourceRegistry = ServiceLocator.Current.GetInstance<IResourceRegistry>();
+            foreach (var uri in resourceRegistry.Items)
             {
-                foreach (var module in resourceModules)
+                Current.Resources.MergedDictionaries.Add(new ResourceDictionary
                 {
-                    var resources = module.ResourcePaths;
-                    foreach (var resource in resources)
-                    {
-                        Current.Resources.MergedDictionaries.Add(new ResourceDictionary
-                        {
-                            Source = new Uri(resource, UriKind.Relative)
-                        });
-                    }
-                }
+                    Source = uri
+                });
             }
         }
 

@@ -19,7 +19,7 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="0" Text="{x:Static p:Resources.Inputs}" Style="{DynamicResource {themes:GenericThemeKey Title}}" />
+            <TextBlock Grid.Row="0" Text="{x:Static p:Resources.Inputs}" Style="{DynamicResource {themes:GenericThemeKey TitleStyle}}" />
 
             <ItemsControl Grid.Row="1" ItemsSource="{Binding InputChannels}" BorderThickness="0">
                 <ItemsControl.ItemTemplate>

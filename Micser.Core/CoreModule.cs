@@ -1,4 +1,6 @@
-﻿using Prism.Modularity;
+﻿using Micser.Infrastructure.Menu;
+using Micser.Infrastructure.Themes;
+using Prism.Modularity;
 using Unity;
 
 namespace Micser.Core
@@ -14,6 +16,8 @@ namespace Micser.Core
 
         public void Initialize()
         {
+            _container.RegisterSingleton<IResourceRegistry, ResourceRegistry>();
+            _container.RegisterSingleton<IMenuItemRegistry, MenuItemRegistry>();
         }
     }
 }
