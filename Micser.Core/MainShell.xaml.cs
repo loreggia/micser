@@ -1,4 +1,6 @@
-﻿namespace Micser.Core
+﻿using System.Windows.Input;
+
+namespace Micser.Core
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -8,6 +10,11 @@
         public MainShell()
         {
             InitializeComponent();
+        }
+
+        private void CloseCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        {
+            Close();
         }
     }
 }

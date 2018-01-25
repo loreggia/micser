@@ -10,9 +10,13 @@
 
     <Window.Resources>
         <Style x:Key="RegionStyle" TargetType="ContentControl">
-            <Setter Property="Margin" Value="5" />
+            <Setter Property="Background" Value="Transparent" />
         </Style>
     </Window.Resources>
+
+    <Window.CommandBindings>
+        <CommandBinding Command="ApplicationCommands.Close" Executed="CloseCommand_Executed" />
+    </Window.CommandBindings>
 
     <Grid>
         <Grid.RowDefinitions>
@@ -23,6 +27,6 @@
 
         <ContentControl Grid.Row="0" x:Name="MenuRegion" regions:RegionManager.RegionName="MenuRegion" Style="{StaticResource RegionStyle}" />
         <ContentControl Grid.Row="1" x:Name="MainRegion" regions:RegionManager.RegionName="MainRegion" Style="{StaticResource RegionStyle}" />
-        <ContentControl Grid.Row="1" x:Name="StatusRegion" regions:RegionManager.RegionName="StatusRegion" Style="{StaticResource RegionStyle}" />
+        <ContentControl Grid.Row="2" x:Name="StatusRegion" regions:RegionManager.RegionName="StatusRegion" Style="{StaticResource RegionStyle}" />
     </Grid>
 </Window>

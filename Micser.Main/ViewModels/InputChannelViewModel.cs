@@ -47,7 +47,7 @@ namespace Micser.Main.ViewModels
         private void UpdateDeviceDescriptions()
         {
             var deviceService = new DeviceService();
-            DeviceDescriptions = deviceService.GetInputDevices().ToArray();
+            DeviceDescriptions = deviceService.GetDevices(DeviceType.Input).ToArray();
         }
     }
 }
