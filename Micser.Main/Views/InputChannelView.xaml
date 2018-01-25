@@ -1,0 +1,35 @@
+﻿<infrastructure:View x:Class="Micser.Main.Views.InputChannelView"
+             x:Name="Control"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:viewModels="clr-namespace:Micser.Main.ViewModels"
+             xmlns:infrastructure="clr-namespace:Micser.Infrastructure;assembly=Micser.Infrastructure"
+             xmlns:controls="clr-namespace:Micser.Infrastructure.Controls;assembly=Micser.Infrastructure"
+             xmlns:p="clr-namespace:Micser.Main.Properties"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance viewModels:InputChannelViewModel}"
+             Width="Auto"
+             MaxWidth="200"
+             Height="Auto"
+             MaxHeight="400"
+             Background="Transparent">
+    <Grid>
+        <Border Padding="5" CornerRadius="1" BorderThickness="1" BorderBrush="Silver">
+            <StackPanel Orientation="Vertical">
+                <StackPanel Orientation="Horizontal">
+                    <Label Target="{Binding ElementName=TxtName}" Content="{x:Static p:Resources.Name}" />
+                    <controls:EditableTextBlock x:Name="TxtName" Text="{Binding Name, Mode=TwoWay}" MinWidth="100" />
+                </StackPanel>
+
+                <StackPanel Orientation="Horizontal">
+                    <Label Target="{Binding ElementName=CbxDevice}" Content="{x:Static p:Resources.Device}" />
+                    <ComboBox x:Name="CbxDevice" MinWidth="100" ItemsSource="{Binding DeviceDescriptions}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedDeviceDescription}" />
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <Button x:Name="BtnRemove" Content="X" VerticalAlignment="Top" HorizontalAlignment="Right" Command="{Binding RemoveCommand}" BorderThickness="0" Margin="1" />
+    </Grid>
+</infrastructure:View>
