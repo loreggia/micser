@@ -6,7 +6,9 @@
         xmlns:regions="http://prismlibrary.com/"
         xmlns:p="clr-namespace:Micser.Core.Properties"
         xmlns:tb="http://www.hardcodet.net/taskbar"
+        xmlns:infrastructure="clr-namespace:Micser.Infrastructure;assembly=Micser.Infrastructure"
         mc:Ignorable="d"
+        x:Name="Window"
         Title="{x:Static p:Resources.ApplicationTitle}" Height="600" Width="800">
 
     <Window.Resources>
@@ -16,7 +18,9 @@
     </Window.Resources>
 
     <Window.CommandBindings>
-        <CommandBinding Command="ApplicationCommands.Close" Executed="CloseCommand_Executed" />
+        <CommandBinding Command="infrastructure:CustomApplicationCommands.Close" Executed="CloseCommand_Executed" />
+        <CommandBinding Command="infrastructure:CustomApplicationCommands.Exit" Executed="ExitCommand_Executed" />
+        <CommandBinding Command="infrastructure:CustomApplicationCommands.Restore" Executed="RestoreCommand_Executed" />
     </Window.CommandBindings>
 
     <Grid>
@@ -28,13 +32,16 @@
         </Grid.RowDefinitions>
 
         <ContentControl Grid.Row="0" x:Name="MenuRegion" regions:RegionManager.RegionName="MenuRegion" Style="{StaticResource RegionStyle}" />
-        <ContentControl Grid.Row="1" x:Name="MainRegion" regions:RegionManager.RegionName="MainRegion" Style="{StaticResource RegionStyle}" />
+        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+            <ContentControl x:Name="MainRegion" regions:RegionManager.RegionName="MainRegion" Style="{StaticResource RegionStyle}" />
+        </ScrollViewer>
         <ContentControl Grid.Row="2" x:Name="StatusRegion" regions:RegionManager.RegionName="StatusRegion" Style="{StaticResource RegionStyle}" />
 
-        <tb:TaskbarIcon Grid.Row="3" x:Name="TaskbarIcon" MenuActivation="RightClick" ToolTipText="{x:Static p:Resources.ApplicationTitle}" TrayMouseDoubleClick="OnRestoreWindow">
+        <tb:TaskbarIcon Grid.Row="3" x:Name="TaskbarIcon" MenuActivation="RightClick" ToolTipText="{x:Static p:Resources.ApplicationTitle}" TrayMouseDoubleClick="OnTrayMouseDoubleClick">
             <tb:TaskbarIcon.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="Restore" Click="OnRestoreWindow" />
+                    <MenuItem Header="Restore" Click="TaskbarIconRestoreClick" />
+                    <MenuItem Header="Exit" Click="TaskbarIconExitClick" />
                 </ContextMenu>
             </tb:TaskbarIcon.ContextMenu>
         </tb:TaskbarIcon>
