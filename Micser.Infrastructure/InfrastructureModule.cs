@@ -35,7 +35,7 @@ namespace Micser.Infrastructure
             _menuItemRegistry.Add(new MenuItemDescription { Header = "_Tools", Id = "Tools" });
             _menuItemRegistry.Add(new MenuItemDescription { Header = "_Help", Id = "Help" });
 
-            _menuItemRegistry.Add(new MenuItemDescription { Header = "E_xit", Id = "Exit", ParentId = "File", Command = ApplicationCommands.Close });
+            _menuItemRegistry.Add(new MenuItemDescription { Header = "E_xit", Id = "Exit", ParentId = "File", Command = CustomApplicationCommands.Exit });
             _menuItemRegistry.Add(new MenuItemDescription { Header = "_Options", Id = "Options", ParentId = "Tools" });
             _menuItemRegistry.Add(new MenuItemDescription { Header = "_About", Id = "About", ParentId = "Help" });
 
