@@ -15,8 +15,8 @@ namespace Micser.Infrastructure
         public T Item { get; }
         public TreeNode<T> Parent { get; set; }
 
-        public static IEnumerable<TreeNode<T>> CreateTree(IEnumerable<T> source, Func<T, object> idSelector,
-            Func<T, object> parentIdSelector, Func<T, object> orderFunc)
+        public static IEnumerable<TreeNode<T>> CreateTree<TId>(IEnumerable<T> source, Func<T, TId> idSelector,
+            Func<T, TId> parentIdSelector, Func<T, object> orderFunc)
         {
             var treeNodeList = source.Select(x => new TreeNode<T>(x)).ToArray();
 
@@ -29,7 +29,7 @@ namespace Micser.Infrastructure
                 }
             }
 
-            return treeNodeList.Where(x => x.Parent == null);
+            return treeNodeList.Where(x => x.Parent == null).OrderBy(x => orderFunc(x.Item));
         }
     }
 }
