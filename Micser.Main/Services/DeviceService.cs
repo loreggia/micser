@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Micser.Main.Audio;
 using NAudio.CoreAudioApi;
 
 namespace Micser.Main.Services

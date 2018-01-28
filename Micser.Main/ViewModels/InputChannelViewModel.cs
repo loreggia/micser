@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Windows.Input;
 using Micser.Infrastructure;
+using Micser.Main.Audio;
 using Micser.Main.Services;
 using Prism.Commands;
 using Prism.Regions;

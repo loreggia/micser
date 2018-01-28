@@ -1,4 +1,4 @@
-﻿namespace Micser.Main.Services
+﻿namespace Micser.Main.Audio
 {
     public class DeviceDescription
     {
