@@ -9,7 +9,8 @@
         xmlns:infrastructure="clr-namespace:Micser.Infrastructure;assembly=Micser.Infrastructure"
         mc:Ignorable="d"
         x:Name="Window"
-        Title="{x:Static p:Resources.ApplicationTitle}" Height="600" Width="800">
+        Title="{x:Static p:Resources.ApplicationTitle}" Height="600" Width="800"
+        Icon="icon.ico">
 
     <Window.Resources>
         <Style x:Key="RegionStyle" TargetType="ContentControl">
@@ -37,7 +38,7 @@
         </ScrollViewer>
         <ContentControl Grid.Row="2" x:Name="StatusRegion" regions:RegionManager.RegionName="StatusRegion" Style="{StaticResource RegionStyle}" />
 
-        <tb:TaskbarIcon Grid.Row="3" x:Name="TaskbarIcon" MenuActivation="RightClick" ToolTipText="{x:Static p:Resources.ApplicationTitle}" TrayMouseDoubleClick="OnTrayMouseDoubleClick">
+        <tb:TaskbarIcon Grid.Row="3" x:Name="TaskbarIcon" MenuActivation="RightClick" ToolTipText="{x:Static p:Resources.ApplicationTitle}" TrayMouseDoubleClick="OnTrayMouseDoubleClick" IconSource="icon.ico">
             <tb:TaskbarIcon.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Restore" Click="TaskbarIconRestoreClick" />
