@@ -5,8 +5,10 @@ namespace Micser.Main.Audio
 {
     public class DeviceInput : AudioChainLink
     {
+        private BufferedWaveProvider _buffer;
         private WasapiCapture _capture;
         private DeviceDescription _deviceDescription;
+        private ISampleProvider _sampleProvider;
 
         public DeviceDescription DeviceDescription
         {
@@ -35,7 +37,13 @@ namespace Micser.Main.Audio
 
         private void Capture_DataAvailable(object sender, WaveInEventArgs e)
         {
-            OnDataAvailable(new AudioInputEventArgs(e));
+            _buffer.AddSamples(e.Buffer, 0, e.BytesRecorded);
+            var outputBuffer = new float[e.BytesRecorded / 4];
+            int numSamples = outputBuffer.Length;
+            while ((numSamples = _sampleProvider.Read(outputBuffer, 0, numSamples)) > 0)
+            {
+                OnDataAvailable(new AudioInputEventArgs(outputBuffer, numSamples));
+            }
         }
 
         private void DisposeCapture()
@@ -71,6 +79,9 @@ namespace Micser.Main.Audio
                     ShareMode = AudioClientShareMode.Shared
                 };
                 _capture.DataAvailable += Capture_DataAvailable;
+
+                _buffer = new BufferedWaveProvider(_capture.WaveFormat);
+                _sampleProvider = _buffer.ToSampleProvider();
 
                 _capture.StartRecording();
             }

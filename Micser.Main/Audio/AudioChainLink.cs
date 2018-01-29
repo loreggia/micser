@@ -8,6 +8,8 @@ namespace Micser.Main.Audio
 
         public event EventHandler<AudioInputEventArgs> DataAvailable;
 
+        public event EventHandler InputChanged;
+
         public IAudioChainLink Input
         {
             get => _input;
@@ -17,10 +19,14 @@ namespace Micser.Main.Audio
                 {
                     _input.DataAvailable -= OnInputDataAvailable;
                 }
-                _input = value;
-                if (_input != null)
+                if (_input != value)
                 {
-                    _input.DataAvailable += OnInputDataAvailable;
+                    _input = value;
+                    if (_input != null)
+                    {
+                        _input.DataAvailable += OnInputDataAvailable;
+                    }
+                    OnInputChanged();
                 }
             }
         }
@@ -39,6 +45,11 @@ namespace Micser.Main.Audio
         protected virtual void OnDataAvailable(AudioInputEventArgs e)
         {
             DataAvailable?.Invoke(this, e);
+        }
+
+        protected virtual void OnInputChanged()
+        {
+            InputChanged?.Invoke(this, EventArgs.Empty);
         }
 
         protected virtual void OnInputDataAvailable(object sender, AudioInputEventArgs e)
