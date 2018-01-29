@@ -8,6 +8,7 @@ namespace Micser.Main.Test.Audio
     public class DeviceOutputTest
     {
         [TestMethod]
+        [TestCategory("SkipWhenLiveUnitTesting")]
         public void PlaySineWave()
         {
             var deviceOutput = new DeviceOutput();
