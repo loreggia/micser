@@ -1,5 +1,4 @@
 ﻿using System;
-using NAudio.Wave;
 
 namespace Micser.Main.Audio
 {
@@ -34,6 +33,7 @@ namespace Micser.Main.Audio
 
         protected virtual void Dispose(bool disposing)
         {
+            _input = null;
         }
 
         protected virtual void OnDataAvailable(AudioInputEventArgs e)

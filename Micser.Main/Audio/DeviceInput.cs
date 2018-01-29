@@ -29,9 +29,7 @@ namespace Micser.Main.Audio
 
             if (disposing)
             {
-                _capture.StopRecording();
-                _capture.Dispose();
-                _capture = null;
+                DisposeCapture();
             }
         }
 
@@ -40,8 +38,21 @@ namespace Micser.Main.Audio
             OnDataAvailable(new AudioInputEventArgs(e));
         }
 
+        private void DisposeCapture()
+        {
+            if (_capture != null)
+            {
+                _capture.DataAvailable -= Capture_DataAvailable;
+                _capture.StopRecording();
+                _capture.Dispose();
+                _capture = null;
+            }
+        }
+
         private void InitializeDevice()
         {
+            DisposeCapture();
+
             if (DeviceDescription == null)
             {
                 return;
