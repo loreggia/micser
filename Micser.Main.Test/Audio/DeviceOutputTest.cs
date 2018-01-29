@@ -25,9 +25,9 @@ namespace Micser.Main.Test.Audio
 
             sineGenerator.Start();
 
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < 100; i++)
             {
-                Thread.Sleep(1000);
+                Thread.Sleep(10);
             }
 
             sineGenerator.Stop();
