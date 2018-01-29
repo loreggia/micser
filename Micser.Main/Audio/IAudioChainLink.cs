@@ -6,6 +6,8 @@ namespace Micser.Main.Audio
     {
         event EventHandler<AudioInputEventArgs> DataAvailable;
 
+        event EventHandler InputChanged;
+
         IAudioChainLink Input { get; set; }
     }
 }
