@@ -7,7 +7,6 @@ namespace Micser.Main.Audio
     {
         private WasapiCapture _capture;
         private DeviceDescription _deviceDescription;
-        private BufferedWaveProvider _outputBuffer;
 
         public DeviceDescription DeviceDescription
         {
@@ -38,23 +37,21 @@ namespace Micser.Main.Audio
 
         private void Capture_DataAvailable(object sender, WaveInEventArgs e)
         {
-            _outputBuffer.AddSamples(e.Buffer, 0, e.BytesRecorded);
+            OnDataAvailable(new AudioInputEventArgs(e));
         }
 
         private void InitializeDevice()
         {
             if (DeviceDescription == null)
             {
-                Output = null;
                 return;
             }
 
             using (var deviceEnumerator = new MMDeviceEnumerator())
             {
                 var device = deviceEnumerator.GetDevice(DeviceDescription.Id);
-                if (device.DataFlow == DataFlow.Render)
+                if (!device.DataFlow.HasFlag(DataFlow.Capture))
                 {
-                    Output = null;
                     return;
                 }
 
@@ -63,9 +60,6 @@ namespace Micser.Main.Audio
                     ShareMode = AudioClientShareMode.Shared
                 };
                 _capture.DataAvailable += Capture_DataAvailable;
-
-                _outputBuffer = new BufferedWaveProvider(_capture.WaveFormat);
-                Output = _outputBuffer;
 
                 _capture.StartRecording();
             }

@@ -5,10 +5,26 @@ namespace Micser.Main.Audio
 {
     public abstract class AudioChainLink : IAudioChainLink, IDisposable
     {
-        public event EventHandler<WaveInEventArgs> DataAvailable;
+        private IAudioChainLink _input;
 
-        public IAudioChainLink Input { get; set; }
-        public IAudioChainLink Output { get; protected set; }
+        public event EventHandler<AudioInputEventArgs> DataAvailable;
+
+        public IAudioChainLink Input
+        {
+            get => _input;
+            set
+            {
+                if (_input != null)
+                {
+                    _input.DataAvailable -= OnInputDataAvailable;
+                }
+                _input = value;
+                if (_input != null)
+                {
+                    _input.DataAvailable += OnInputDataAvailable;
+                }
+            }
+        }
 
         public void Dispose()
         {
@@ -20,9 +36,14 @@ namespace Micser.Main.Audio
         {
         }
 
-        protected virtual void OnDataAvailable(WaveInEventArgs e)
+        protected virtual void OnDataAvailable(AudioInputEventArgs e)
         {
             DataAvailable?.Invoke(this, e);
+        }
+
+        protected virtual void OnInputDataAvailable(object sender, AudioInputEventArgs e)
+        {
+            OnDataAvailable(e);
         }
     }
 }

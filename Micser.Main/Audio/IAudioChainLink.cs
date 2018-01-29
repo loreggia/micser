@@ -1,8 +1,11 @@
-﻿namespace Micser.Main.Audio
+﻿using System;
+
+namespace Micser.Main.Audio
 {
     public interface IAudioChainLink
     {
+        event EventHandler<AudioInputEventArgs> DataAvailable;
+
         IAudioChainLink Input { get; set; }
-        IAudioChainLink Output { get; set; }
     }
 }

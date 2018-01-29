@@ -49,7 +49,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Audio\DeviceInputTest.cs" />
+    <Compile Include="Audio\DeviceOutputTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\DeviceServiceTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
