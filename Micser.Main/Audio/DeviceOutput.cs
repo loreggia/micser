@@ -3,10 +3,11 @@ using NAudio.Wave;
 
 namespace Micser.Main.Audio
 {
-    public class DeviceInput : AudioChainLink
+    public class DeviceOutput : AudioChainLink
     {
-        private WasapiCapture _capture;
         private DeviceDescription _deviceDescription;
+        private WasapiOut _output;
+        private BufferedWaveProvider _outputBuffer;
 
         public DeviceDescription DeviceDescription
         {
@@ -29,15 +30,16 @@ namespace Micser.Main.Audio
 
             if (disposing)
             {
-                _capture.StopRecording();
-                _capture.Dispose();
-                _capture = null;
+                _output?.Stop();
+                _output?.Dispose();
+                _output = null;
+                _outputBuffer = null;
             }
         }
 
-        private void Capture_DataAvailable(object sender, WaveInEventArgs e)
+        protected override void OnInputDataAvailable(object sender, AudioInputEventArgs e)
         {
-            OnDataAvailable(new AudioInputEventArgs(e));
+            _outputBuffer?.AddSamples(e.Buffer, 0, e.Count);
         }
 
         private void InitializeDevice()
@@ -50,18 +52,16 @@ namespace Micser.Main.Audio
             using (var deviceEnumerator = new MMDeviceEnumerator())
             {
                 var device = deviceEnumerator.GetDevice(DeviceDescription.Id);
-                if (!device.DataFlow.HasFlag(DataFlow.Capture))
+                if (!device.DataFlow.HasFlag(DataFlow.Render))
                 {
                     return;
                 }
 
-                _capture = new WasapiCapture(device)
-                {
-                    ShareMode = AudioClientShareMode.Shared
-                };
-                _capture.DataAvailable += Capture_DataAvailable;
-
-                _capture.StartRecording();
+                // todo
+                _output = new WasapiOut(device, AudioClientShareMode.Shared, true, 50);
+                _outputBuffer = new BufferedWaveProvider(_output.OutputWaveFormat);
+                _output.Init(_outputBuffer);
+                _output.Play();
             }
         }
     }
