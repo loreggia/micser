@@ -2,34 +2,15 @@
 
 namespace Micser.Main.Audio
 {
-    public abstract class AudioChainLink : IAudioChainLink, IDisposable
+    public class AudioChainLink : IAudioChainLink, IDisposable
     {
-        private IAudioChainLink _input;
-
-        public event EventHandler<AudioInputEventArgs> DataAvailable;
-
-        public event EventHandler InputChanged;
-
-        public IAudioChainLink Input
+        public AudioChainLink()
         {
-            get => _input;
-            set
-            {
-                if (_input != null)
-                {
-                    _input.DataAvailable -= OnInputDataAvailable;
-                }
-                if (_input != value)
-                {
-                    _input = value;
-                    if (_input != null)
-                    {
-                        _input.DataAvailable += OnInputDataAvailable;
-                    }
-                    OnInputChanged();
-                }
-            }
+            Volume = 1f;
         }
+
+        public IAudioChainLink Input { get; set; }
+        public float Volume { get; set; }
 
         public void Dispose()
         {
@@ -37,24 +18,34 @@ namespace Micser.Main.Audio
             GC.SuppressFinalize(this);
         }
 
+        public int Read(float[] buffer, int offset, int count)
+        {
+            var read = ReadInternal(buffer, offset, count);
+            ApplyVolume(buffer, offset, read);
+            return read;
+        }
+
+        protected void ApplyVolume(float[] buffer, int offset, int count)
+        {
+            if (Volume == 1f)
+            {
+                return;
+            }
+
+            for (int i = 0; i < count; i++)
+            {
+                buffer[offset + i] *= Volume;
+            }
+        }
+
         protected virtual void Dispose(bool disposing)
         {
-            _input = null;
+            Input = null;
         }
 
-        protected virtual void OnDataAvailable(AudioInputEventArgs e)
+        protected virtual int ReadInternal(float[] buffer, int offset, int count)
         {
-            DataAvailable?.Invoke(this, e);
-        }
-
-        protected virtual void OnInputChanged()
-        {
-            InputChanged?.Invoke(this, EventArgs.Empty);
-        }
-
-        protected virtual void OnInputDataAvailable(object sender, AudioInputEventArgs e)
-        {
-            OnDataAvailable(e);
+            return Input?.Read(buffer, offset, count) ?? 0;
         }
     }
 }

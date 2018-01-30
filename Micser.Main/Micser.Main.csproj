@@ -84,12 +84,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Audio\AudioChainLink.cs" />
+    <Compile Include="Audio\AudioChainLinkSampleProvider.cs" />
     <Compile Include="Audio\AudioInputEventArgs.cs" />
     <Compile Include="Audio\DeviceInput.cs" />
     <Compile Include="Audio\DeviceOutput.cs" />
     <Compile Include="Audio\IAudioChainLink.cs" />
-    <Compile Include="Audio\SineGenerator.cs" />
-    <Compile Include="Audio\VolumeChanger.cs" />
+    <Compile Include="Audio\Mixer.cs" />
+    <Compile Include="Audio\WaveGenerator.cs" />
     <Compile Include="MainModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">

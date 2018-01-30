@@ -8,7 +8,6 @@ namespace Micser.Main.Audio
         private DeviceDescription _deviceDescription;
         private int _latency;
         private WasapiOut _output;
-        private BufferedWaveProvider _outputBuffer;
 
         public DeviceOutput()
         {
@@ -59,11 +58,6 @@ namespace Micser.Main.Audio
             }
         }
 
-        protected override void OnInputDataAvailable(object sender, AudioInputEventArgs e)
-        {
-            _outputBuffer?.AddSamples(e.Buffer, 0, e.Count);
-        }
-
         private void DisposeOutput()
         {
             if (_output != null)
@@ -71,7 +65,6 @@ namespace Micser.Main.Audio
                 _output.Stop();
                 _output.Dispose();
                 _output = null;
-                _outputBuffer = null;
             }
         }
 
@@ -79,7 +72,7 @@ namespace Micser.Main.Audio
         {
             DisposeOutput();
 
-            if (DeviceDescription == null)
+            if (string.IsNullOrEmpty(DeviceDescription?.Id))
             {
                 return;
             }
@@ -92,10 +85,8 @@ namespace Micser.Main.Audio
                     return;
                 }
 
-                // todo
                 _output = new WasapiOut(device, AudioClientShareMode.Shared, true, Latency);
-                _outputBuffer = new BufferedWaveProvider(_output.OutputWaveFormat);
-                _output.Init(_outputBuffer);
+                _output.Init(new AudioChainLinkSampleProvider { Input = this });
                 _output.Play();
             }
         }
