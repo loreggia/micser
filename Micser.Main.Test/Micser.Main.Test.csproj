@@ -50,6 +50,7 @@
   <ItemGroup>
     <Compile Include="Audio\DeviceInputTest.cs" />
     <Compile Include="Audio\DeviceOutputTest.cs" />
+    <Compile Include="Audio\MixerTest.cs" />
     <Compile Include="Audio\VolumeChangeTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\DeviceServiceTest.cs" />
