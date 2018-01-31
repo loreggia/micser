@@ -13,7 +13,7 @@
 
     <controls:WidgetPanel>
         <controls:Widget Header="This is the header">
-            <TextBlock Text="Here is some content and shit and stuff\r\nBlablablablabla"></TextBlock>
+            <TextBlock Text="Here is some content and shit and stuff\r\nBlablablablabla" HorizontalAlignment="Stretch" TextWrapping="Wrap" />
         </controls:Widget>
     </controls:WidgetPanel>
 </infrastructure:View>

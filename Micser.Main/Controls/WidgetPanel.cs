@@ -1,92 +1,34 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Media3D;
+using System.Windows.Controls.Primitives;
 using Micser.Infrastructure.Extensions;
 
 namespace Micser.Main.Controls
 {
     public class WidgetPanel : Canvas
     {
-        public const string PartNameCanvas = "PART_Canvas";
-
-        public static readonly DependencyProperty AllowDraggingProperty = DependencyProperty.Register(
-            nameof(AllowDragging), typeof(bool), typeof(WidgetPanel), new PropertyMetadata(true));
-
-        public static readonly DependencyProperty IsDraggingProperty = DependencyProperty.Register(
-            nameof(IsDragging), typeof(bool), typeof(WidgetPanel), new PropertyMetadata(false));
+        public static readonly DependencyProperty IsWidgetLayoutChangingProperty = DependencyProperty.Register(
+            nameof(IsWidgetLayoutChanging), typeof(bool), typeof(WidgetPanel), new PropertyMetadata(false));
 
         public static readonly DependencyProperty RasterSizeProperty = DependencyProperty.Register(
             nameof(RasterSize), typeof(double), typeof(WidgetPanel), new PropertyMetadata(25d));
-
-        private UIElement _draggedElement;
-
-        private Point _originalCursorLocation;
-
-        private double _originalLeft;
-
-        private double _originalTop;
 
         static WidgetPanel()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(WidgetPanel), new FrameworkPropertyMetadata(typeof(WidgetPanel)));
         }
 
-        public bool AllowDragging
+        public WidgetPanel()
         {
-            get => (bool)GetValue(AllowDraggingProperty);
-            set => SetValue(AllowDraggingProperty, value);
+            AddHandler(Thumb.DragCompletedEvent, new DragCompletedEventHandler(OnWidgetLayoutChanged));
+            AddHandler(Thumb.DragStartedEvent, new DragStartedEventHandler(OnWidgetLayoutChanging));
         }
 
-        /// <summary>
-        /// Returns the UIElement currently being dragged, or null.
-        /// </summary>
-        /// <remarks>
-        /// Note to inheritors: This property exposes a protected
-        /// setter which should be used to modify the drag element.
-        /// </remarks>
-        public UIElement DraggingElement
+        public bool IsWidgetLayoutChanging
         {
-            get
-            {
-                if (!AllowDragging)
-                {
-                    return null;
-                }
-
-                return _draggedElement;
-            }
-            protected set
-            {
-                _draggedElement?.ReleaseMouseCapture();
-
-                if (!AllowDragging)
-                {
-                    _draggedElement = null;
-                }
-                else
-                {
-                    if (value != null)
-                    {
-                        _draggedElement = value;
-                        _draggedElement.CaptureMouse();
-                    }
-                    else
-                    {
-                        _draggedElement = null;
-                    }
-                }
-
-                IsDragging = _draggedElement != null;
-            }
-        }
-
-        public bool IsDragging
-        {
-            get => (bool)GetValue(IsDraggingProperty);
-            set => SetValue(IsDraggingProperty, value);
+            get => (bool)GetValue(IsWidgetLayoutChangingProperty);
+            set => SetValue(IsWidgetLayoutChangingProperty, value);
         }
 
         public double RasterSize
@@ -98,6 +40,7 @@ namespace Micser.Main.Controls
         protected override Size MeasureOverride(Size constraint)
         {
             base.MeasureOverride(constraint);
+
             var desiredSize = new Size();
             foreach (UIElement child in Children)
             {
@@ -113,139 +56,63 @@ namespace Micser.Main.Controls
             return desiredSize;
         }
 
-        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
+        private void OnWidgetLayoutChanged(object sender, DragCompletedEventArgs e)
         {
-            base.OnMouseLeftButtonDown(e);
-
-            _originalCursorLocation = e.GetPosition(this);
-
-            DraggingElement = FindCanvasChild(e.Source as DependencyObject);
-
-            if (DraggingElement == null)
+            if (e.Source is Widget widget)
             {
-                return;
+                SnapToGrid(widget);
+                InvalidateMeasure();
             }
 
-            DraggingElement.EnsureCanvasTopLeft();
-
-            _originalLeft = GetLeft(DraggingElement);
-            _originalTop = GetTop(DraggingElement);
-
-            e.Handled = true;
-
-            IsDragging = true;
+            IsWidgetLayoutChanging = false;
         }
 
-        protected override void OnPreviewMouseMove(MouseEventArgs e)
+        private void OnWidgetLayoutChanging(object sender, DragStartedEventArgs e)
         {
-            base.OnPreviewMouseMove(e);
-
-            if (DraggingElement == null || !IsDragging)
+            if (e.Source is Widget)
             {
-                return;
-            }
-
-            var cursorLocation = e.GetPosition(this);
-
-            var newLeft = _originalLeft + (cursorLocation.X - _originalCursorLocation.X);
-            var newTop = _originalTop + (cursorLocation.Y - _originalCursorLocation.Y);
-
-            if (newLeft < 0)
-            {
-                newLeft = 0;
-            }
-
-            if (newTop < 0)
-            {
-                newTop = 0;
-            }
-
-            SetLeft(DraggingElement, newLeft);
-            SetTop(DraggingElement, newTop);
-
-            // calling this updates the size of the canvas and lets the surrounding scroll viewer show the scroll bars.
-            InvalidateMeasure();
-        }
-
-        protected override void OnPreviewMouseUp(MouseButtonEventArgs e)
-        {
-            base.OnPreviewMouseUp(e);
-
-            // setting DraggedElement to null calls OnPreviewMouseMove, so we need to cache the element for snapping afterwards
-            var element = DraggingElement;
-            DraggingElement = null;
-            SnapToGrid(element);
-        }
-
-        protected override void OnVisualChildrenChanged(DependencyObject visualAdded, DependencyObject visualRemoved)
-        {
-            base.OnVisualChildrenChanged(visualAdded, visualRemoved);
-
-            if (visualAdded is Widget widget)
-            {
+                IsWidgetLayoutChanging = true;
             }
         }
 
-        private UIElement FindCanvasChild(DependencyObject depObj)
-        {
-            while (depObj != null)
-            {
-                // If the current object is a UIElement which is a child of the Canvas, exit the loop and return it.
-                if (depObj is UIElement elem && Children.Contains(elem))
-                {
-                    break;
-                }
-
-                // VisualTreeHelper works with objects of type Visual or Visual3D.
-                // If the current object is not derived from Visual or Visual3D, then use the LogicalTreeHelper to find the parent element.
-                if (depObj is Visual || depObj is Visual3D)
-                {
-                    depObj = VisualTreeHelper.GetParent(depObj);
-                }
-                else
-                {
-                    depObj = LogicalTreeHelper.GetParent(depObj);
-                }
-            }
-            return depObj as UIElement;
-        }
-
-        private void SnapToGrid(UIElement element)
+        private void SnapToGrid(FrameworkElement element)
         {
             if (element == null)
             {
                 return;
             }
 
+            // snap position
             var left = GetLeft(element);
             var top = GetTop(element);
-
-            var xSnap = left % RasterSize;
-            var ySnap = top % RasterSize;
-
-            if (xSnap <= RasterSize / 2d)
-            {
-                xSnap *= -1;
-            }
-            else
-            {
-                xSnap = RasterSize - xSnap;
-            }
-
-            if (ySnap <= RasterSize / 2d)
-            {
-                ySnap *= -1;
-            }
-            else
-            {
-                ySnap = RasterSize - ySnap;
-            }
-
-            left += xSnap;
-            top += ySnap;
-
+            SnapToRasterSize(ref left);
+            SnapToRasterSize(ref top);
             SetLeft(element, left);
             SetTop(element, top);
+
+            // snap size
+            var width = element.ActualWidth;
+            var height = element.ActualHeight;
+            SnapToRasterSize(ref width);
+            SnapToRasterSize(ref height);
+            element.Width = width;
+            element.Height = height;
+        }
+
+        private void SnapToRasterSize(ref double value)
+        {
+            var snap = value % RasterSize;
+
+            if (snap <= RasterSize / 2d)
+            {
+                snap *= -1;
+            }
+            else
+            {
+                snap = RasterSize - snap;
+            }
+
+            value += snap;
         }
     }
 }
