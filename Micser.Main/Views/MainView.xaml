@@ -12,8 +12,8 @@
     d:DataContext="{d:DesignInstance viewModels:MainViewModel}">
 
     <controls:WidgetPanel>
-        <controls:Widget>
-            <TextBlock Text="test"></TextBlock>
+        <controls:Widget Header="This is the header">
+            <TextBlock Text="Here is some content and shit and stuff\r\nBlablablablabla"></TextBlock>
         </controls:Widget>
     </controls:WidgetPanel>
 </infrastructure:View>

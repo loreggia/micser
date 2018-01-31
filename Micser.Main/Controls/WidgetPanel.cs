@@ -1,19 +1,16 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Media3D;
+using Micser.Infrastructure.Extensions;
 
 namespace Micser.Main.Controls
 {
     public class WidgetPanel : Canvas
     {
         public const string PartNameCanvas = "PART_Canvas";
-
-        public static readonly DependencyProperty AllowDraggingOutsideProperty = DependencyProperty.Register(
-            nameof(AllowDraggingOutside), typeof(bool), typeof(WidgetPanel), new PropertyMetadata(true));
 
         public static readonly DependencyProperty AllowDraggingProperty = DependencyProperty.Register(
             nameof(AllowDragging), typeof(bool), typeof(WidgetPanel), new PropertyMetadata(true));
@@ -26,15 +23,11 @@ namespace Micser.Main.Controls
 
         private UIElement _draggedElement;
 
-        private bool _modifyLeftOffset;
-
-        private bool _modifyTopOffset;
-
         private Point _originalCursorLocation;
 
-        private double _originalHorizontalOffset;
+        private double _originalLeft;
 
-        private double _originalVerticalOffset;
+        private double _originalTop;
 
         static WidgetPanel()
         {
@@ -47,12 +40,6 @@ namespace Micser.Main.Controls
             set => SetValue(AllowDraggingProperty, value);
         }
 
-        public bool AllowDraggingOutside
-        {
-            get => (bool)GetValue(AllowDraggingOutsideProperty);
-            set => SetValue(AllowDraggingOutsideProperty, value);
-        }
-
         /// <summary>
         /// Returns the UIElement currently being dragged, or null.
         /// </summary>
@@ -60,7 +47,7 @@ namespace Micser.Main.Controls
         /// Note to inheritors: This property exposes a protected
         /// setter which should be used to modify the drag element.
         /// </remarks>
-        public UIElement DraggedElement
+        public UIElement DraggingElement
         {
             get
             {
@@ -114,36 +101,35 @@ namespace Micser.Main.Controls
             var desiredSize = new Size();
             foreach (UIElement child in Children)
             {
-                var horizontalOffset = ResolveOffset(GetLeft(child), GetRight(child), out var left);
-                var verticalOffset = ResolveOffset(GetTop(child), GetBottom(child), out var top);
+                child.EnsureCanvasTopLeft();
+
+                var left = GetLeft(child);
+                var top = GetTop(child);
 
                 desiredSize = new Size(
-                    Math.Max(desiredSize.Width, left ? horizontalOffset + child.DesiredSize.Width : horizontalOffset),
-                    Math.Max(desiredSize.Height, top ? verticalOffset + child.DesiredSize.Height : verticalOffset));
+                    Math.Max(desiredSize.Width, left + child.DesiredSize.Width),
+                    Math.Max(desiredSize.Height, top + child.DesiredSize.Height));
             }
             return desiredSize;
         }
 
-        protected override void OnPreviewMouseLeftButtonDown(MouseButtonEventArgs e)
+        protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {
-            base.OnPreviewMouseLeftButtonDown(e);
+            base.OnMouseLeftButtonDown(e);
 
             _originalCursorLocation = e.GetPosition(this);
 
-            DraggedElement = FindCanvasChild(e.Source as DependencyObject);
+            DraggingElement = FindCanvasChild(e.Source as DependencyObject);
 
-            if (DraggedElement == null)
+            if (DraggingElement == null)
             {
                 return;
             }
 
-            var left = GetLeft(DraggedElement);
-            var right = GetRight(DraggedElement);
-            var top = GetTop(DraggedElement);
-            var bottom = GetBottom(DraggedElement);
+            DraggingElement.EnsureCanvasTopLeft();
 
-            _originalHorizontalOffset = ResolveOffset(left, right, out _modifyLeftOffset);
-            _originalVerticalOffset = ResolveOffset(top, bottom, out _modifyTopOffset);
+            _originalLeft = GetLeft(DraggingElement);
+            _originalTop = GetTop(DraggingElement);
 
             e.Handled = true;
 
@@ -154,99 +140,28 @@ namespace Micser.Main.Controls
         {
             base.OnPreviewMouseMove(e);
 
-            if (DraggedElement == null || !IsDragging)
+            if (DraggingElement == null || !IsDragging)
             {
                 return;
             }
 
             var cursorLocation = e.GetPosition(this);
 
-            double newHorizontalOffset, newVerticalOffset;
+            var newLeft = _originalLeft + (cursorLocation.X - _originalCursorLocation.X);
+            var newTop = _originalTop + (cursorLocation.Y - _originalCursorLocation.Y);
 
-            #region Calculate Offsets
-
-            // Determine the horizontal offset.
-            if (_modifyLeftOffset)
+            if (newLeft < 0)
             {
-                newHorizontalOffset = _originalHorizontalOffset + (cursorLocation.X - _originalCursorLocation.X);
-            }
-            else
-            {
-                newHorizontalOffset = _originalHorizontalOffset - (cursorLocation.X - _originalCursorLocation.X);
+                newLeft = 0;
             }
 
-            // Determine the vertical offset.
-            if (_modifyTopOffset)
+            if (newTop < 0)
             {
-                newVerticalOffset = _originalVerticalOffset + (cursorLocation.Y - _originalCursorLocation.Y);
-            }
-            else
-            {
-                newVerticalOffset = _originalVerticalOffset - (cursorLocation.Y - _originalCursorLocation.Y);
+                newTop = 0;
             }
 
-            #endregion Calculate Offsets
-
-            #region Verify Drag Element Location
-
-            if (!AllowDraggingOutside)
-            {
-                // Get the bounding rect of the drag element.
-                var elemRect = CalculateDragElementRect(newHorizontalOffset, newVerticalOffset);
-
-                // If the element is being dragged out of the viewable area, determine the ideal rect location, so that the element is within the edge(s) of the canvas.
-                var leftAlign = elemRect.Left < 0;
-                var rightAlign = elemRect.Right > ActualWidth;
-
-                if (leftAlign)
-                {
-                    newHorizontalOffset = _modifyLeftOffset ? 0 : ActualWidth - elemRect.Width;
-                }
-                else if (rightAlign)
-                {
-                    newHorizontalOffset = _modifyLeftOffset ? ActualWidth - elemRect.Width : 0;
-                }
-
-                var topAlign = elemRect.Top < 0;
-                var bottomAlign = elemRect.Bottom > ActualHeight;
-
-                if (topAlign)
-                {
-                    newVerticalOffset = _modifyTopOffset ? 0 : ActualHeight - elemRect.Height;
-                }
-                else if (bottomAlign)
-                {
-                    newVerticalOffset = _modifyTopOffset ? ActualHeight - elemRect.Height : 0;
-                }
-            }
-
-            #endregion Verify Drag Element Location
-
-            #region Move Drag Element
-
-            if (_modifyLeftOffset)
-            {
-                Debug.WriteLine($"SetLeft {newHorizontalOffset}");
-                SetLeft(DraggedElement, newHorizontalOffset);
-            }
-            else
-            {
-                Debug.WriteLine($"SetRight {newHorizontalOffset}");
-                SetRight(DraggedElement, newHorizontalOffset);
-            }
-
-            if (_modifyTopOffset)
-            {
-                Debug.WriteLine($"SetTop {newVerticalOffset}");
-                SetTop(DraggedElement, newVerticalOffset);
-            }
-            else
-            {
-                Debug.WriteLine($"SetBottom {newVerticalOffset}");
-                SetBottom(DraggedElement, newVerticalOffset);
-            }
-
-            #endregion Move Drag Element
+            SetLeft(DraggingElement, newLeft);
+            SetTop(DraggingElement, newTop);
 
             // calling this updates the size of the canvas and lets the surrounding scroll viewer show the scroll bars.
             InvalidateMeasure();
@@ -257,85 +172,18 @@ namespace Micser.Main.Controls
             base.OnPreviewMouseUp(e);
 
             // setting DraggedElement to null calls OnPreviewMouseMove, so we need to cache the element for snapping afterwards
-            var element = DraggedElement;
-            DraggedElement = null;
+            var element = DraggingElement;
+            DraggingElement = null;
             SnapToGrid(element);
         }
 
-        /// <summary>
-        /// Determines one component of a UIElement's location within a Canvas (either the horizontal or vertical offset).
-        /// </summary>
-        /// <param name="side1">
-        /// The value of an offset relative to a default side of the Canvas (i.e. top or left).
-        /// </param>
-        /// <param name="side2">
-        /// The value of the offset relative to the other side of the Canvas (i.e. bottom or right).
-        /// </param>
-        /// <param name="useSide1">
-        /// Will be set to true if the returned value should be used for the offset from the side represented by the 'side1' parameter. Otherwise, it will be set to false.
-        /// </param>
-        private static double ResolveOffset(double side1, double side2, out bool useSide1)
+        protected override void OnVisualChildrenChanged(DependencyObject visualAdded, DependencyObject visualRemoved)
         {
-            // If the Canvas.Left and Canvas.Right attached properties are specified for an element, the 'Left' value is honored.
-            // The 'Top' value is honored if both Canvas.Top and Canvas.Bottom are set on the same element. If one of those attached properties is not set on an element, the default value is Double.NaN.
-            useSide1 = true;
-            double result;
-            if (double.IsNaN(side1))
-            {
-                if (double.IsNaN(side2))
-                {
-                    // Both sides have no value, so set the
-                    // first side to a value of zero.
-                    result = 0;
-                }
-                else
-                {
-                    result = side2;
-                    useSide1 = false;
-                }
-            }
-            else
-            {
-                result = side1;
-            }
-            return result;
-        }
+            base.OnVisualChildrenChanged(visualAdded, visualRemoved);
 
-        /// <summary>
-        /// Returns a Rect which describes the bounds of the element being dragged.
-        /// </summary>
-        private Rect CalculateDragElementRect(double newHorizOffset, double newVertOffset)
-        {
-            if (DraggedElement == null)
+            if (visualAdded is Widget widget)
             {
-                throw new InvalidOperationException("DraggedElement is null.");
             }
-
-            var elemSize = DraggedElement.RenderSize;
-
-            double x, y;
-
-            if (_modifyLeftOffset)
-            {
-                x = newHorizOffset;
-            }
-            else
-            {
-                x = ActualWidth - newHorizOffset - elemSize.Width;
-            }
-
-            if (_modifyTopOffset)
-            {
-                y = newVertOffset;
-            }
-            else
-            {
-                y = ActualHeight - newVertOffset - elemSize.Height;
-            }
-
-            var elemLoc = new Point(x, y);
-
-            return new Rect(elemLoc, elemSize);
         }
 
         private UIElement FindCanvasChild(DependencyObject depObj)
@@ -369,20 +217,13 @@ namespace Micser.Main.Controls
                 return;
             }
 
-            var horizontalOffset = ResolveOffset(GetLeft(element), GetRight(element), out var isLeft);
-            var verticalOffset = ResolveOffset(GetTop(element), GetBottom(element), out var isTop);
+            var left = GetLeft(element);
+            var top = GetTop(element);
 
-            var xPos = isLeft ? horizontalOffset : horizontalOffset - element.DesiredSize.Width;
-            var yPos = isTop ? verticalOffset : verticalOffset - element.DesiredSize.Height;
+            var xSnap = left % RasterSize;
+            var ySnap = top % RasterSize;
 
-            var xSnap = xPos % RasterSize;
-            var ySnap = yPos % RasterSize;
-
-            // If it's less than half the grid size, snap left/up
-            // (by subtracting the remainder),
-            // otherwise move it the remaining distance of the grid size right/down
-            // (by adding the remaining distance to the next grid point).
-            if (xSnap <= RasterSize / 2.0)
+            if (xSnap <= RasterSize / 2d)
             {
                 xSnap *= -1;
             }
@@ -391,7 +232,7 @@ namespace Micser.Main.Controls
                 xSnap = RasterSize - xSnap;
             }
 
-            if (ySnap <= RasterSize / 2.0)
+            if (ySnap <= RasterSize / 2d)
             {
                 ySnap *= -1;
             }
@@ -400,13 +241,11 @@ namespace Micser.Main.Controls
                 ySnap = RasterSize - ySnap;
             }
 
-            xPos += xSnap;
-            yPos += ySnap;
+            left += xSnap;
+            top += ySnap;
 
-            Debug.WriteLine($"SetLeft {xPos}");
-            SetLeft(element, xPos);
-            Debug.WriteLine($"SetTop {yPos}");
-            SetTop(element, yPos);
+            SetLeft(element, left);
+            SetTop(element, top);
         }
     }
 }

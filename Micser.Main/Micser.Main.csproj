@@ -92,6 +92,8 @@
     <Compile Include="Audio\IAudioChainLink.cs" />
     <Compile Include="Audio\Mixer.cs" />
     <Compile Include="Audio\WaveGenerator.cs" />
+    <Compile Include="Controls\MoveThumb.cs" />
+    <Compile Include="Controls\ResizeThumb.cs" />
     <Compile Include="Controls\Widget.cs" />
     <Compile Include="Controls\WidgetPanel.cs" />
     <Compile Include="MainModule.cs" />

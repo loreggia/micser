@@ -14,12 +14,21 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type controls:Widget}">
-                    <Border Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="5">
-                        <ContentControl Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" />
-                    </Border>
+                    <Grid>
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="5">
+                            <StackPanel>
+                                <ContentControl Content="{TemplateBinding Header}" Background="LightGray" />
+                                <ContentControl Margin="2" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}" />
+                            </StackPanel>
+                        </Border>
+                        <controls:ResizeThumb HorizontalAlignment="Left" VerticalAlignment="Stretch" Cursor="SizeWE" Width="2" DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
+                        <controls:ResizeThumb HorizontalAlignment="Right" VerticalAlignment="Stretch" Cursor="SizeWE" Width="2" DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
+                        <controls:ResizeThumb HorizontalAlignment="Stretch" VerticalAlignment="Top" Cursor="SizeNS" Height="2" DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
+                        <controls:ResizeThumb HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Cursor="SizeNS" Height="2" DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
+                    </Grid>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
