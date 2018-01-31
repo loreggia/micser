@@ -20,14 +20,17 @@
                                 BorderThickness="{TemplateBinding BorderThickness}"
                                 CornerRadius="5">
                             <StackPanel>
-                                <ContentControl Content="{TemplateBinding Header}" Background="LightGray" />
-                                <ContentControl Margin="2" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}" />
+                                <Grid>
+                                    <ContentControl Margin="3" Content="{TemplateBinding Header}" Background="LightBlue" />
+                                    <controls:MoveThumb DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
+                                </Grid>
+                                <ContentControl Margin="3" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}" />
                             </StackPanel>
                         </Border>
-                        <controls:ResizeThumb HorizontalAlignment="Left" VerticalAlignment="Stretch" Cursor="SizeWE" Width="2" DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
-                        <controls:ResizeThumb HorizontalAlignment="Right" VerticalAlignment="Stretch" Cursor="SizeWE" Width="2" DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
-                        <controls:ResizeThumb HorizontalAlignment="Stretch" VerticalAlignment="Top" Cursor="SizeNS" Height="2" DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
-                        <controls:ResizeThumb HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Cursor="SizeNS" Height="2" DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
+                        <controls:ResizeThumb HorizontalAlignment="Left" VerticalAlignment="Stretch" Cursor="SizeWE" Width="3" DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
+                        <controls:ResizeThumb HorizontalAlignment="Right" VerticalAlignment="Stretch" Cursor="SizeWE" Width="3" DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
+                        <controls:ResizeThumb HorizontalAlignment="Stretch" VerticalAlignment="Top" Cursor="SizeNS" Height="3" DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
+                        <controls:ResizeThumb HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Cursor="SizeNS" Height="3" DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>

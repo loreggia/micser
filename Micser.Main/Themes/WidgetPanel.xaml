@@ -9,7 +9,7 @@
         <Setter Property="Background" Value="Gray" />
 
         <Style.Triggers>
-            <Trigger Property="IsDragging" Value="True">
+            <Trigger Property="IsWidgetLayoutChanging" Value="True">
                 <Setter Property="Background">
                     <Setter.Value>
                         <DrawingBrush TileMode="Tile" Viewport="{Binding RasterSize, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:WidgetPanel}, Converter={converter:DoubleToRectConverter}}" ViewportUnits="Absolute">
