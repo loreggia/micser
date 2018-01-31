@@ -2,7 +2,7 @@
 
 namespace Micser.Infrastructure
 {
-    public class ViewModel : Bindable, IViewModel
+    public abstract class ViewModel : Bindable, IViewModel
     {
         public virtual bool IsNavigationTarget(NavigationContext navigationContext)
         {
