@@ -7,8 +7,13 @@
     xmlns:viewModels="clr-namespace:Micser.Main.ViewModels"
     xmlns:infrastructure="clr-namespace:Micser.Infrastructure;assembly=Micser.Infrastructure"
     xmlns:controls="clr-namespace:Micser.Main.Controls"
+    xmlns:views="clr-namespace:Micser.Main.Views"
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance viewModels:MainViewModel}">
 
-    <controls:WidgetPanel />
+    <controls:WidgetPanel>
+        <Button Content="asldf" HorizontalAlignment="Left" VerticalAlignment="Top"></Button>
+        <Button Content="blkjbalsdkbf" HorizontalAlignment="Left" VerticalAlignment="Top"></Button>
+        <views:InputChannelView />
+    </controls:WidgetPanel>
 </infrastructure:View>
