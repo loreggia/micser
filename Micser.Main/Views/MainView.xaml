@@ -12,8 +12,8 @@
     d:DataContext="{d:DesignInstance viewModels:MainViewModel}">
 
     <controls:WidgetPanel>
-        <Button Content="asldf" HorizontalAlignment="Left" VerticalAlignment="Top"></Button>
-        <Button Content="blkjbalsdkbf" HorizontalAlignment="Left" VerticalAlignment="Top"></Button>
-        <views:InputChannelView />
+        <controls:Widget>
+            <TextBlock Text="test"></TextBlock>
+        </controls:Widget>
     </controls:WidgetPanel>
 </infrastructure:View>
