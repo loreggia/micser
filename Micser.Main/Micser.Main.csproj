@@ -106,10 +106,12 @@
     <Compile Include="Audio\DeviceDescription.cs" />
     <Compile Include="Services\DeviceService.cs" />
     <Compile Include="Audio\DeviceType.cs" />
-    <Compile Include="ViewModels\InputChannelViewModel.cs" />
+    <Compile Include="ViewModels\Widgets\AudioChainLinkViewModel.cs" />
+    <Compile Include="ViewModels\Widgets\DeviceInputViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
-    <Compile Include="Views\InputChannelView.xaml.cs">
-      <DependentUpon>InputChannelView.xaml</DependentUpon>
+    <Compile Include="ViewModels\Widgets\WidgetViewModel.cs" />
+    <Compile Include="Views\Widgets\DeviceInputWidget.xaml.cs">
+      <DependentUpon>DeviceInputWidget.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\MainView.xaml.cs">
       <DependentUpon>MainView.xaml</DependentUpon>
@@ -135,7 +137,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Views\InputChannelView.xaml">
+    <Page Include="Views\Widgets\DeviceInputWidget.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

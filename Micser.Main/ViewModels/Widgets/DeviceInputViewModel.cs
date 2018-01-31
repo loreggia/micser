@@ -1,19 +1,21 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Windows.Input;
-using Micser.Infrastructure;
 using Micser.Main.Audio;
 using Micser.Main.Services;
-using Prism.Commands;
 using Prism.Regions;
 
-namespace Micser.Main.ViewModels
+namespace Micser.Main.ViewModels.Widgets
 {
-    public class InputChannelViewModel : ViewModel
+    public class DeviceInputViewModel : AudioChainLinkViewModel
     {
+        private readonly DeviceInput _deviceInput;
         private IEnumerable<DeviceDescription> _deviceDescriptions;
-        private string _name;
         private DeviceDescription _selectedDeviceDescription;
+
+        public DeviceInputViewModel()
+        {
+            _deviceInput = new DeviceInput();
+        }
 
         public IEnumerable<DeviceDescription> DeviceDescriptions
         {
@@ -21,28 +23,21 @@ namespace Micser.Main.ViewModels
             set => SetProperty(ref _deviceDescriptions, value);
         }
 
-        public string Name
-        {
-            get => _name;
-            set => SetProperty(ref _name, value);
-        }
-
-        public ICommand RemoveCommand => new DelegateCommand(Remove);
-
         public DeviceDescription SelectedDeviceDescription
         {
             get => _selectedDeviceDescription;
-            set => SetProperty(ref _selectedDeviceDescription, value);
+            set
+            {
+                if (SetProperty(ref _selectedDeviceDescription, value))
+                {
+                    _deviceInput.DeviceDescription = value;
+                }
+            }
         }
 
         public override void OnNavigatedTo(NavigationContext navigationContext)
         {
             UpdateDeviceDescriptions();
-        }
-
-        private void Remove()
-        {
-            // todo
         }
 
         private void UpdateDeviceDescriptions()
