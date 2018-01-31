@@ -87,6 +87,7 @@
     <Compile Include="Converter\BooleanConverter.cs" />
     <Compile Include="Converter\BooleanToVisibilityConverter.cs" />
     <Compile Include="Converter\ConverterExtension.cs" />
+    <Compile Include="Converter\DoubleToRectConverter.cs" />
     <Compile Include="CustomApplicationCommands.cs" />
     <Compile Include="Extensions\ContainerExtensions.cs" />
     <Compile Include="Extensions\EnumerableExtensions.cs" />

@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Globalization;
-using System.Windows.Data;
 
 namespace Micser.Infrastructure.Converter
 {
-    public class BooleanConverter<T> : ConverterExtension, IValueConverter
+    public class BooleanConverter<T> : ConverterExtension
     {
         public BooleanConverter(T trueValue, T falseValue)
         {
@@ -15,7 +14,7 @@ namespace Micser.Infrastructure.Converter
         public T FalseValue { get; set; }
         public T TrueValue { get; set; }
 
-        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is bool b)
             {
@@ -24,7 +23,7 @@ namespace Micser.Infrastructure.Converter
             return FalseValue;
         }
 
-        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        public override object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is T t)
             {
