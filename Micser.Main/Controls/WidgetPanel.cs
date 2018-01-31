@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -15,10 +16,7 @@ namespace Micser.Main.Controls
             nameof(AllowDraggingOutside), typeof(bool), typeof(WidgetPanel), new PropertyMetadata(true));
 
         public static readonly DependencyProperty AllowDraggingProperty = DependencyProperty.Register(
-                    nameof(AllowDragging), typeof(bool), typeof(WidgetPanel), new PropertyMetadata(true));
-
-        public static readonly DependencyProperty IsDraggingEnabledProperty = DependencyProperty.RegisterAttached(
-            "IsDraggingEnabled", typeof(bool), typeof(WidgetPanel), new PropertyMetadata(true));
+            nameof(AllowDragging), typeof(bool), typeof(WidgetPanel), new PropertyMetadata(true));
 
         public static readonly DependencyProperty IsDraggingProperty = DependencyProperty.Register(
             nameof(IsDragging), typeof(bool), typeof(WidgetPanel), new PropertyMetadata(false));
@@ -83,7 +81,7 @@ namespace Micser.Main.Controls
                 }
                 else
                 {
-                    if (value != null && GetIsDraggingEnabled(value))
+                    if (value != null)
                     {
                         _draggedElement = value;
                         _draggedElement.CaptureMouse();
@@ -108,16 +106,6 @@ namespace Micser.Main.Controls
         {
             get => (double)GetValue(RasterSizeProperty);
             set => SetValue(RasterSizeProperty, value);
-        }
-
-        public static bool GetIsDraggingEnabled(DependencyObject element)
-        {
-            return (bool)element.GetValue(IsDraggingEnabledProperty);
-        }
-
-        public static void SetIsDraggingEnabled(DependencyObject element, bool value)
-        {
-            element.SetValue(IsDraggingEnabledProperty, value);
         }
 
         protected override Size MeasureOverride(Size constraint)
@@ -238,24 +226,29 @@ namespace Micser.Main.Controls
 
             if (_modifyLeftOffset)
             {
+                Debug.WriteLine($"SetLeft {newHorizontalOffset}");
                 SetLeft(DraggedElement, newHorizontalOffset);
             }
             else
             {
+                Debug.WriteLine($"SetRight {newHorizontalOffset}");
                 SetRight(DraggedElement, newHorizontalOffset);
             }
 
             if (_modifyTopOffset)
             {
+                Debug.WriteLine($"SetTop {newVerticalOffset}");
                 SetTop(DraggedElement, newVerticalOffset);
             }
             else
             {
+                Debug.WriteLine($"SetBottom {newVerticalOffset}");
                 SetBottom(DraggedElement, newVerticalOffset);
             }
 
             #endregion Move Drag Element
 
+            // calling this updates the size of the canvas and lets the surrounding scroll viewer show the scroll bars.
             InvalidateMeasure();
         }
 
@@ -263,8 +256,10 @@ namespace Micser.Main.Controls
         {
             base.OnPreviewMouseUp(e);
 
-            // Reset the field whether the left or right mouse button was released, in case a context menu was opened on the drag element.
+            // setting DraggedElement to null calls OnPreviewMouseMove, so we need to cache the element for snapping afterwards
+            var element = DraggedElement;
             DraggedElement = null;
+            SnapToGrid(element);
         }
 
         /// <summary>
@@ -365,6 +360,53 @@ namespace Micser.Main.Controls
                 }
             }
             return depObj as UIElement;
+        }
+
+        private void SnapToGrid(UIElement element)
+        {
+            if (element == null)
+            {
+                return;
+            }
+
+            var horizontalOffset = ResolveOffset(GetLeft(element), GetRight(element), out var isLeft);
+            var verticalOffset = ResolveOffset(GetTop(element), GetBottom(element), out var isTop);
+
+            var xPos = isLeft ? horizontalOffset : horizontalOffset - element.DesiredSize.Width;
+            var yPos = isTop ? verticalOffset : verticalOffset - element.DesiredSize.Height;
+
+            var xSnap = xPos % RasterSize;
+            var ySnap = yPos % RasterSize;
+
+            // If it's less than half the grid size, snap left/up
+            // (by subtracting the remainder),
+            // otherwise move it the remaining distance of the grid size right/down
+            // (by adding the remaining distance to the next grid point).
+            if (xSnap <= RasterSize / 2.0)
+            {
+                xSnap *= -1;
+            }
+            else
+            {
+                xSnap = RasterSize - xSnap;
+            }
+
+            if (ySnap <= RasterSize / 2.0)
+            {
+                ySnap *= -1;
+            }
+            else
+            {
+                ySnap = RasterSize - ySnap;
+            }
+
+            xPos += xSnap;
+            yPos += ySnap;
+
+            Debug.WriteLine($"SetLeft {xPos}");
+            SetLeft(element, xPos);
+            Debug.WriteLine($"SetTop {yPos}");
+            SetTop(element, yPos);
         }
     }
 }
