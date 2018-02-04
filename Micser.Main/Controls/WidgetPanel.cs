@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Specialized;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using Micser.Infrastructure.Extensions;
 using Micser.Main.Themes;
 using Micser.Main.ViewModels.Widgets;
+using Micser.Main.Views.Widgets;
 
 namespace Micser.Main.Controls
 {
@@ -18,8 +20,11 @@ namespace Micser.Main.Controls
         public static readonly DependencyProperty RasterSizeProperty = DependencyProperty.Register(
             nameof(RasterSize), typeof(double), typeof(WidgetPanel), new PropertyMetadata(25d));
 
+        public static readonly DependencyProperty WidgetFactoryProperty = DependencyProperty.Register(
+            nameof(WidgetFactory), typeof(IWidgetFactory), typeof(WidgetPanel), new PropertyMetadata(null, OnWidgetFactoryPropertyChanged));
+
         public static readonly DependencyProperty WidgetsProperty = DependencyProperty.Register(
-            nameof(Widgets), typeof(IEnumerable), typeof(WidgetPanel), new PropertyMetadata(null, OnWidgetsPropertyChanged));
+                    nameof(Widgets), typeof(IEnumerable), typeof(WidgetPanel), new PropertyMetadata(null, OnWidgetsPropertyChanged));
 
         static WidgetPanel()
         {
@@ -44,6 +49,12 @@ namespace Micser.Main.Controls
         {
             get => (double)GetValue(RasterSizeProperty);
             set => SetValue(RasterSizeProperty, value);
+        }
+
+        public IWidgetFactory WidgetFactory
+        {
+            get => (IWidgetFactory)GetValue(WidgetFactoryProperty);
+            set => SetValue(WidgetFactoryProperty, value);
         }
 
         public IEnumerable Widgets
@@ -71,27 +82,53 @@ namespace Micser.Main.Controls
             return desiredSize;
         }
 
-        private static void OnWidgetsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private static void OnWidgetFactoryPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
+            var panel = (WidgetPanel)d;
+            panel.CreateWidgets();
         }
 
         private static void OnWidgetsPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
+            var panel = (WidgetPanel)d;
+
             if (e.OldValue is INotifyCollectionChanged oldValue)
             {
-                oldValue.CollectionChanged -= OnWidgetsCollectionChanged;
+                oldValue.CollectionChanged -= panel.OnWidgetsCollectionChanged;
             }
 
             if (e.NewValue is INotifyCollectionChanged newValue)
             {
-                newValue.CollectionChanged += OnWidgetsCollectionChanged;
+                newValue.CollectionChanged += panel.OnWidgetsCollectionChanged;
             }
 
-            if (e.NewValue is IEnumerable enumerable)
+            panel.CreateWidgets();
+        }
+
+        private void AddWidget(WidgetViewModel vm)
+        {
+            if (vm == null || WidgetFactory == null)
             {
-                foreach (WidgetViewModel wvm in enumerable)
-                {
-                }
+                return;
+            }
+
+            if (!Children.OfType<Widget>().Any(w => w.DataContext == vm))
+            {
+                Children.Add(WidgetFactory.CreateWidget(vm));
+                vm.OnNavigatedTo(null);
+            }
+        }
+
+        private void CreateWidgets()
+        {
+            if (WidgetFactory == null || Widgets == null)
+            {
+                return;
+            }
+
+            foreach (WidgetViewModel wvm in Widgets)
+            {
+                AddWidget(wvm);
             }
         }
 
@@ -111,6 +148,39 @@ namespace Micser.Main.Controls
             if (e.Source is Widget)
             {
                 IsWidgetLayoutChanging = true;
+            }
+        }
+
+        private void OnWidgetsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (e.Action == NotifyCollectionChangedAction.Add)
+            {
+                foreach (WidgetViewModel item in e.NewItems)
+                {
+                    AddWidget(item);
+                }
+            }
+            else if (e.Action == NotifyCollectionChangedAction.Remove)
+            {
+                foreach (WidgetViewModel item in e.OldItems)
+                {
+                    RemoveWidget(item);
+                }
+            }
+        }
+
+        private void RemoveWidget(WidgetViewModel vm)
+        {
+            if (vm == null)
+            {
+                return;
+            }
+
+            var widget = Children.OfType<Widget>().FirstOrDefault(w => w.DataContext == vm);
+            if (widget != null)
+            {
+                vm.OnNavigatedFrom(null);
+                Children.Remove(widget);
             }
         }
 
