@@ -9,11 +9,20 @@
     xmlns:controls="clr-namespace:Micser.Main.Controls"
     xmlns:views="clr-namespace:Micser.Main.Views"
     mc:Ignorable="d"
-    d:DataContext="{d:DesignInstance viewModels:MainViewModel}">
+    d:DataContext="{d:DesignInstance viewModels:MainViewModel}"
+    d:DesignWidth="300"
+    d:DesignHeight="200"
+    HorizontalAlignment="Stretch"
+    VerticalAlignment="Stretch">
 
-    <controls:WidgetPanel>
-        <controls:Widget Header="This is the header">
-            <TextBlock Text="Here is some content and shit and stuff\r\nBlablablablabla" HorizontalAlignment="Stretch" TextWrapping="Wrap" />
-        </controls:Widget>
-    </controls:WidgetPanel>
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0"></Grid>
+
+        <controls:WidgetPanel Grid.Row="1" x:Name="WidgetPanel" Widgets="{Binding Widgets}"></controls:WidgetPanel>
+    </Grid>
 </infrastructure:View>

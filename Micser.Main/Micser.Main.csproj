@@ -106,6 +106,7 @@
     <Compile Include="Audio\DeviceDescription.cs" />
     <Compile Include="Services\DeviceService.cs" />
     <Compile Include="Audio\DeviceType.cs" />
+    <Compile Include="Themes\ResourceManager.cs" />
     <Compile Include="ViewModels\Widgets\AudioChainLinkViewModel.cs" />
     <Compile Include="ViewModels\Widgets\DeviceInputViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
@@ -119,6 +120,8 @@
     <Compile Include="Views\SettingsView.xaml.cs">
       <DependentUpon>SettingsView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Widgets\IWidgetFactory.cs" />
+    <Compile Include="Views\Widgets\WidgetFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
