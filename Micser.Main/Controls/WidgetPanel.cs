@@ -1,8 +1,12 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Specialized;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using Micser.Infrastructure.Extensions;
+using Micser.Main.Themes;
+using Micser.Main.ViewModels.Widgets;
 
 namespace Micser.Main.Controls
 {
@@ -14,6 +18,9 @@ namespace Micser.Main.Controls
         public static readonly DependencyProperty RasterSizeProperty = DependencyProperty.Register(
             nameof(RasterSize), typeof(double), typeof(WidgetPanel), new PropertyMetadata(25d));
 
+        public static readonly DependencyProperty WidgetsProperty = DependencyProperty.Register(
+            nameof(Widgets), typeof(IEnumerable), typeof(WidgetPanel), new PropertyMetadata(null, OnWidgetsPropertyChanged));
+
         static WidgetPanel()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(WidgetPanel), new FrameworkPropertyMetadata(typeof(WidgetPanel)));
@@ -21,6 +28,8 @@ namespace Micser.Main.Controls
 
         public WidgetPanel()
         {
+            Resources.MergedDictionaries.Add(ResourceManager.SharedDictionary);
+
             AddHandler(Thumb.DragCompletedEvent, new DragCompletedEventHandler(OnWidgetLayoutChanged));
             AddHandler(Thumb.DragStartedEvent, new DragStartedEventHandler(OnWidgetLayoutChanging));
         }
@@ -35,6 +44,12 @@ namespace Micser.Main.Controls
         {
             get => (double)GetValue(RasterSizeProperty);
             set => SetValue(RasterSizeProperty, value);
+        }
+
+        public IEnumerable Widgets
+        {
+            get => (IEnumerable)GetValue(WidgetsProperty);
+            set => SetValue(WidgetsProperty, value);
         }
 
         protected override Size MeasureOverride(Size constraint)
@@ -54,6 +69,30 @@ namespace Micser.Main.Controls
                     Math.Max(desiredSize.Height, top + child.DesiredSize.Height));
             }
             return desiredSize;
+        }
+
+        private static void OnWidgetsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+        }
+
+        private static void OnWidgetsPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (e.OldValue is INotifyCollectionChanged oldValue)
+            {
+                oldValue.CollectionChanged -= OnWidgetsCollectionChanged;
+            }
+
+            if (e.NewValue is INotifyCollectionChanged newValue)
+            {
+                newValue.CollectionChanged += OnWidgetsCollectionChanged;
+            }
+
+            if (e.NewValue is IEnumerable enumerable)
+            {
+                foreach (WidgetViewModel wvm in enumerable)
+                {
+                }
+            }
         }
 
         private void OnWidgetLayoutChanged(object sender, DragCompletedEventArgs e)

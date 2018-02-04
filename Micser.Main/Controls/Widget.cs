@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using Micser.Main.Themes;
 
 namespace Micser.Main.Controls
 {
@@ -13,9 +14,14 @@ namespace Micser.Main.Controls
             DefaultStyleKeyProperty.OverrideMetadata(typeof(Widget), new FrameworkPropertyMetadata(typeof(Widget)));
         }
 
+        public Widget()
+        {
+            Resources.MergedDictionaries.Add(ResourceManager.SharedDictionary);
+        }
+
         public object Header
         {
-            get => (object)GetValue(HeaderProperty);
+            get => GetValue(HeaderProperty);
             set => SetValue(HeaderProperty, value);
         }
     }
