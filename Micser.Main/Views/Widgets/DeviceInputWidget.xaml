@@ -10,27 +10,26 @@
     xmlns:widgets="clr-namespace:Micser.Main.ViewModels.Widgets"
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance widgets:DeviceInputViewModel}"
-    Width="Auto"
-    MaxWidth="200"
-    Height="Auto"
-    MaxHeight="400"
-    Background="Transparent">
+    Width="200"
+    Height="100"
+    Header="Device Input">
 
-    <Grid>
-        <Border Padding="5" CornerRadius="1" BorderThickness="1" BorderBrush="Silver">
-            <StackPanel Orientation="Vertical">
-                <StackPanel Orientation="Horizontal">
-                    <Label Target="{Binding ElementName=TxtName}" Content="{x:Static p:Resources.Name}" />
-                    <controls1:EditableTextBlock x:Name="TxtName" Text="{Binding Name, Mode=TwoWay}" MinWidth="100" />
-                </StackPanel>
+    <controls:Widget.Content>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
-                <StackPanel Orientation="Horizontal">
-                    <Label Target="{Binding ElementName=CbxDevice}" Content="{x:Static p:Resources.Device}" />
-                    <ComboBox x:Name="CbxDevice" MinWidth="100" ItemsSource="{Binding DeviceDescriptions}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedDeviceDescription}" />
-                </StackPanel>
-            </StackPanel>
-        </Border>
+            <Label Grid.Row="0" Grid.Column="0" Target="{Binding ElementName=TxtName}" Content="{x:Static p:Resources.Name}" VerticalAlignment="Center" />
+            <controls1:EditableTextBlock Grid.Row="0" Grid.Column="1" x:Name="TxtName" Text="{Binding Name, Mode=TwoWay}" MinWidth="100" VerticalAlignment="Center" HorizontalAlignment="Stretch" />
 
-        <Button x:Name="BtnRemove" Content="X" VerticalAlignment="Top" HorizontalAlignment="Right" Command="{Binding RemoveCommand}" BorderThickness="0" Margin="1" />
-    </Grid>
+            <Label Grid.Row="1" Grid.Column="0" Target="{Binding ElementName=CbxDevice}" Content="{x:Static p:Resources.Device}" VerticalAlignment="Center" />
+            <ComboBox Grid.Row="1" Grid.Column="1" x:Name="CbxDevice" MinWidth="100" ItemsSource="{Binding DeviceDescriptions}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedDeviceDescription}" HorizontalAlignment="Stretch" />
+        </Grid>
+    </controls:Widget.Content>
 </controls:Widget>

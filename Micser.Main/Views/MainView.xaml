@@ -8,6 +8,7 @@
     xmlns:infrastructure="clr-namespace:Micser.Infrastructure;assembly=Micser.Infrastructure"
     xmlns:controls="clr-namespace:Micser.Main.Controls"
     xmlns:views="clr-namespace:Micser.Main.Views"
+    xmlns:widgets="clr-namespace:Micser.Main.Views.Widgets"
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance viewModels:MainViewModel}"
     d:DesignWidth="300"
@@ -21,8 +22,12 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0"></Grid>
+        <Grid Grid.Row="0">
+        </Grid>
 
-        <controls:WidgetPanel Grid.Row="1" x:Name="WidgetPanel" Widgets="{Binding Widgets}"></controls:WidgetPanel>
+        <controls:WidgetPanel Grid.Row="1" x:Name="WidgetPanel" WidgetFactory="{Binding WidgetFactory}" Widgets="{Binding Widgets}">
+            <widgets:DeviceInputWidget Canvas.Top="50" />
+            <controls:Widget></controls:Widget>
+        </controls:WidgetPanel>
     </Grid>
 </infrastructure:View>

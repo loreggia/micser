@@ -12,11 +12,12 @@
             <Trigger Property="IsWidgetLayoutChanging" Value="True">
                 <Setter Property="Background">
                     <Setter.Value>
-                        <DrawingBrush TileMode="Tile" Viewport="{Binding RasterSize, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:WidgetPanel}, Converter={converter:DoubleToRectConverter}}" ViewportUnits="Absolute">
+                        <!--{Binding RasterSize, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:WidgetPanel}, Converter={converter:DoubleToRectConverter}}-->
+                        <DrawingBrush TileMode="Tile" Viewport="0,0,25,25" ViewportUnits="Absolute">
                             <DrawingBrush.Drawing>
                                 <GeometryDrawing Brush="Gray">
                                     <GeometryDrawing.Geometry>
-                                        <RectangleGeometry Rect="{Binding RasterSize, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:WidgetPanel}, Converter={converter:DoubleToRectConverter}}" />
+                                        <RectangleGeometry Rect="0,0,25,25" />
                                     </GeometryDrawing.Geometry>
                                     <GeometryDrawing.Pen>
                                         <Pen Brush="DarkGray" Thickness="0.5" />
