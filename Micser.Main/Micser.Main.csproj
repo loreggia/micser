@@ -109,6 +109,7 @@
     <Compile Include="Audio\DeviceType.cs" />
     <Compile Include="Themes\ResourceManager.cs" />
     <Compile Include="ViewModels\Widgets\AudioChainLinkViewModel.cs" />
+    <Compile Include="ViewModels\Widgets\DeviceOutputViewModel.cs" />
     <Compile Include="ViewModels\Widgets\DeviceInputViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\Widgets\WidgetViewModel.cs" />
@@ -118,7 +119,12 @@
     <Compile Include="Views\SettingsView.xaml.cs">
       <DependentUpon>SettingsView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Widgets\DeviceInputWidget.cs" />
+    <Compile Include="Views\Widgets\DeviceOutputWidget.xaml.cs">
+      <DependentUpon>DeviceOutputWidget.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\Widgets\DeviceInputWidget.xaml.cs">
+      <DependentUpon>DeviceInputWidget.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\Widgets\IWidgetFactory.cs" />
     <Compile Include="Views\Widgets\WidgetFactory.cs" />
   </ItemGroup>
@@ -128,10 +134,6 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="Themes\Generic.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Themes\Widgets.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -148,6 +150,14 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\SettingsView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Views\Widgets\DeviceOutputWidget.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\Widgets\DeviceInputWidget.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

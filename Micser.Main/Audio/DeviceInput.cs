@@ -80,6 +80,7 @@ namespace Micser.Main.Audio
                 _capture.DataAvailable += Capture_DataAvailable;
 
                 _buffer = new BufferedWaveProvider(_capture.WaveFormat);
+                _buffer.DiscardOnBufferOverflow = true;
                 _bufferSampleProvider = _buffer.ToSampleProvider();
 
                 _capture.StartRecording();
