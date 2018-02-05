@@ -24,7 +24,7 @@ namespace Micser.Main.ViewModels
         {
             base.OnNavigatedTo(navigationContext);
 
-            //_widgets.Add(new DeviceInputViewModel());
+            _widgets.Add(new DeviceInputViewModel());
         }
     }
 }
