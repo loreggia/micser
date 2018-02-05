@@ -46,6 +46,17 @@ namespace Micser.Main.ViewModels.Widgets
             _deviceInput.DeviceDescription = SelectedDeviceDescription;
         }
 
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+
+            if (disposing)
+            {
+                _deviceInput.Dispose();
+                _deviceInput = null;
+            }
+        }
+
         private void UpdateDeviceDescriptions()
         {
             var deviceService = new DeviceService();
