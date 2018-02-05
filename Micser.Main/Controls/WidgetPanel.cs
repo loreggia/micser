@@ -24,7 +24,7 @@ namespace Micser.Main.Controls
             nameof(WidgetFactory), typeof(IWidgetFactory), typeof(WidgetPanel), new PropertyMetadata(null, OnWidgetFactoryPropertyChanged));
 
         public static readonly DependencyProperty WidgetsProperty = DependencyProperty.Register(
-                    nameof(Widgets), typeof(IEnumerable), typeof(WidgetPanel), new PropertyMetadata(null, OnWidgetsPropertyChanged));
+            nameof(Widgets), typeof(IEnumerable), typeof(WidgetPanel), new PropertyMetadata(null, OnWidgetsPropertyChanged));
 
         static WidgetPanel()
         {
@@ -37,6 +37,8 @@ namespace Micser.Main.Controls
 
             AddHandler(Thumb.DragCompletedEvent, new DragCompletedEventHandler(OnWidgetLayoutChanged));
             AddHandler(Thumb.DragStartedEvent, new DragStartedEventHandler(OnWidgetLayoutChanging));
+
+            Unloaded += OnUnloaded;
         }
 
         public bool IsWidgetLayoutChanging
@@ -129,6 +131,17 @@ namespace Micser.Main.Controls
             foreach (WidgetViewModel wvm in Widgets)
             {
                 AddWidget(wvm);
+            }
+        }
+
+        private void OnUnloaded(object sender, RoutedEventArgs e)
+        {
+            if (Widgets != null)
+            {
+                foreach (WidgetViewModel vm in Widgets)
+                {
+                    vm.OnNavigatedFrom(null);
+                }
             }
         }
 
