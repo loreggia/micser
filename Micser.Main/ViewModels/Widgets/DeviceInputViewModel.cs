@@ -8,14 +8,9 @@ namespace Micser.Main.ViewModels.Widgets
 {
     public class DeviceInputViewModel : AudioChainLinkViewModel
     {
-        private readonly DeviceInput _deviceInput;
         private IEnumerable<DeviceDescription> _deviceDescriptions;
+        private DeviceInput _deviceInput;
         private DeviceDescription _selectedDeviceDescription;
-
-        public DeviceInputViewModel()
-        {
-            _deviceInput = new DeviceInput();
-        }
 
         public IEnumerable<DeviceDescription> DeviceDescriptions
         {
@@ -35,9 +30,20 @@ namespace Micser.Main.ViewModels.Widgets
             }
         }
 
+        public override void OnNavigatedFrom(NavigationContext navigationContext)
+        {
+            base.OnNavigatedFrom(navigationContext);
+            _deviceInput.Dispose();
+            _deviceInput = null;
+        }
+
         public override void OnNavigatedTo(NavigationContext navigationContext)
         {
+            base.OnNavigatedTo(navigationContext);
+            _deviceInput = new DeviceInput();
             UpdateDeviceDescriptions();
+
+            _deviceInput.DeviceDescription = SelectedDeviceDescription;
         }
 
         private void UpdateDeviceDescriptions()
