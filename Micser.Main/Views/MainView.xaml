@@ -26,7 +26,7 @@
         </Grid>
 
         <controls:WidgetPanel Grid.Row="1" x:Name="WidgetPanel" WidgetFactory="{Binding WidgetFactory}" Widgets="{Binding Widgets}">
-            <widgets:DeviceInputWidget Canvas.Top="50" Height="59" Width="131" />
+            <widgets:DeviceInputWidget Canvas.Top="50" />
             <controls:Widget></controls:Widget>
         </controls:WidgetPanel>
     </Grid>

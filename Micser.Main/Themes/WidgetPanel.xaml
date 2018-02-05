@@ -13,11 +13,11 @@
                 <Setter Property="Background">
                     <Setter.Value>
                         <!--{Binding RasterSize, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:WidgetPanel}, Converter={converter:DoubleToRectConverter}}-->
-                        <DrawingBrush TileMode="Tile" Viewport="0,0,25,25" ViewportUnits="Absolute">
+                        <DrawingBrush TileMode="Tile" Viewport="{Binding RasterSize, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:WidgetPanel}, Converter={converter:DoubleToRectConverter}}" ViewportUnits="Absolute">
                             <DrawingBrush.Drawing>
                                 <GeometryDrawing Brush="Gray">
                                     <GeometryDrawing.Geometry>
-                                        <RectangleGeometry Rect="0,0,25,25" />
+                                        <RectangleGeometry Rect="{Binding RasterSize, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:WidgetPanel}, Converter={converter:DoubleToRectConverter}}" />
                                     </GeometryDrawing.Geometry>
                                     <GeometryDrawing.Pen>
                                         <Pen Brush="DarkGray" Thickness="0.5" />

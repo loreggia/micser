@@ -5,8 +5,14 @@
                     xmlns:p="clr-namespace:Micser.Main.Properties"
                     xmlns:controls1="clr-namespace:Micser.Infrastructure.Controls;assembly=Micser.Infrastructure">
 
-    <Style TargetType="{x:Type widgets:DeviceInputWidget}">
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="Widget.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
+    <Style TargetType="{x:Type widgets:DeviceInputWidget}" BasedOn="{StaticResource DefaultWidgetStyle}">
         <Setter Property="Header" Value="Device Input" />
+        <Setter Property="Width" Value="Auto" />
+        <Setter Property="Height" Value="Auto" />
         <Setter Property="ContentTemplate">
             <Setter.Value>
                 <DataTemplate DataType="{x:Type widgets1:DeviceInputViewModel}">
