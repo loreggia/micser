@@ -4,11 +4,8 @@ using Micser.Main.Themes;
 
 namespace Micser.Main.Controls
 {
-    public class Widget : Control
+    public class Widget : ContentControl
     {
-        public static readonly DependencyProperty ContentProperty = DependencyProperty.Register(
-            nameof(Content), typeof(object), typeof(Widget), new PropertyMetadata(null));
-
         public static readonly DependencyProperty HeaderProperty = DependencyProperty.Register(
             nameof(Header), typeof(object), typeof(Widget), new PropertyMetadata(null));
 
@@ -20,12 +17,6 @@ namespace Micser.Main.Controls
         public Widget()
         {
             Resources.MergedDictionaries.Add(ResourceManager.SharedDictionary);
-        }
-
-        public object Content
-        {
-            get => GetValue(ContentProperty);
-            set => SetValue(ContentProperty, value);
         }
 
         public object Header

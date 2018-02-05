@@ -21,10 +21,10 @@
                                 CornerRadius="5">
                             <StackPanel>
                                 <Grid>
-                                    <ContentPresenter Margin="3" Content="{TemplateBinding Header}" />
+                                    <ContentControl Margin="3" Content="{TemplateBinding Header}" />
                                     <controls:MoveThumb DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
                                 </Grid>
-                                <ContentPresenter Margin="3" Content="{TemplateBinding Content}" />
+                                <ContentPresenter Margin="3" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}" />
                             </StackPanel>
                         </Border>
                         <controls:ResizeThumb HorizontalAlignment="Left" VerticalAlignment="Stretch" Cursor="SizeWE" Width="3" DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
