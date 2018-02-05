@@ -1,10 +1,10 @@
 ﻿using System;
-using Micser.Core.Views;
 using Micser.Infrastructure.Extensions;
 using Micser.Infrastructure.Themes;
 using Micser.Main.Extensions;
 using Micser.Main.ViewModels;
 using Micser.Main.ViewModels.Widgets;
+using Micser.Main.Views;
 using Micser.Main.Views.Widgets;
 using Prism.Modularity;
 using Prism.Regions;

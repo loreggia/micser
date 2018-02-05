@@ -10,6 +10,8 @@ namespace Micser.Core
     /// </summary>
     public partial class MainShell
     {
+        private bool _isExiting;
+
         public MainShell()
         {
             InitializeComponent();
@@ -18,9 +20,12 @@ namespace Micser.Core
 
         protected override void OnClosing(CancelEventArgs e)
         {
-            e.Cancel = true;
+            e.Cancel = !_isExiting;
             base.OnClosing(e);
-            Hide();
+            if (!_isExiting)
+            {
+                Hide();
+            }
         }
 
         private void CloseCommand_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -30,6 +35,7 @@ namespace Micser.Core
 
         private void ExitCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            _isExiting = true;
             Application.Current.Shutdown();
         }
 

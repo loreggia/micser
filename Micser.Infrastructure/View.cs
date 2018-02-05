@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using Micser.Infrastructure.Controls;
@@ -15,6 +16,9 @@ namespace Micser.Infrastructure
         public View()
         {
             Loaded += OnViewLoaded;
+            Unloaded += OnViewUnloaded;
+
+            Dispatcher.ShutdownStarted += OnDispatcherShutdownStarted;
         }
 
         public bool IsBusy
@@ -22,6 +26,8 @@ namespace Micser.Infrastructure
             get => (bool)GetValue(IsBusyProperty);
             set => SetValue(IsBusyProperty, value);
         }
+
+        public ViewModel ViewModel => DataContext as ViewModel;
 
         protected virtual async void OnViewLoaded(object sender, RoutedEventArgs e)
         {
@@ -63,6 +69,15 @@ namespace Micser.Infrastructure
                     }
                 }
             }
+        }
+
+        private void OnDispatcherShutdownStarted(object sender, EventArgs e)
+        {
+            ViewModel?.Dispose();
+        }
+
+        private void OnViewUnloaded(object sender, RoutedEventArgs e)
+        {
         }
     }
 }
