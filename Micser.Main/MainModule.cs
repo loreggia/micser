@@ -30,10 +30,10 @@ namespace Micser.Main
             _resourceRegistry.Add(new Uri("Micser.Main;component/Themes/Generic.xaml", UriKind.Relative));
             _resourceRegistry.Add(new Uri("Micser.Main;component/Themes/WidgetPanel.xaml", UriKind.Relative));
             _resourceRegistry.Add(new Uri("Micser.Main;component/Themes/Widget.xaml", UriKind.Relative));
-            _resourceRegistry.Add(new Uri("Micser.Main;component/Themes/Widgets.xaml", UriKind.Relative));
 
             _container.RegisterSingleton<IWidgetFactory, WidgetFactory>();
             _container.RegisterWidget<DeviceInputWidget, DeviceInputViewModel>();
+            _container.RegisterWidget<DeviceOutputWidget, DeviceOutputViewModel>();
 
             _container.RegisterView<MainView, MainViewModel>("MainRegion");
 

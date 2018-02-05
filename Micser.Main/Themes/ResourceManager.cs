@@ -17,11 +17,9 @@ namespace Micser.Main.Themes
                     var generic = (ResourceDictionary)Application.LoadComponent(new Uri("/Micser.Main;component/Themes/Generic.xaml", UriKind.Relative));
                     var widget = (ResourceDictionary)Application.LoadComponent(new Uri("/Micser.Main;component/Themes/Widget.xaml", UriKind.Relative));
                     var widgetPanel = (ResourceDictionary)Application.LoadComponent(new Uri("/Micser.Main;component/Themes/WidgetPanel.xaml", UriKind.Relative));
-                    var widgets = (ResourceDictionary)Application.LoadComponent(new Uri("/Micser.Main;component/Themes/Widgets.xaml", UriKind.Relative));
                     _sharedDictionary.MergedDictionaries.Add(generic);
                     _sharedDictionary.MergedDictionaries.Add(widget);
                     _sharedDictionary.MergedDictionaries.Add(widgetPanel);
-                    _sharedDictionary.MergedDictionaries.Add(widgets);
                 }
 
                 return _sharedDictionary;
