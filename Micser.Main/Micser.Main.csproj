@@ -95,6 +95,7 @@
     <Compile Include="Controls\MoveThumb.cs" />
     <Compile Include="Controls\ResizeThumb.cs" />
     <Compile Include="Controls\Widget.cs" />
+    <Compile Include="Controls\WidgetLink.cs" />
     <Compile Include="Controls\WidgetPanel.cs" />
     <Compile Include="Extensions\ContainerExtensions.cs" />
     <Compile Include="MainModule.cs" />
