@@ -6,10 +6,13 @@ using Micser.Main.ViewModels.Widgets;
 
 namespace Micser.Main.Controls
 {
-    public class Widget : ContentControl
+    public class Widget : ContentControl, ISelectable
     {
         public static readonly DependencyProperty HeaderProperty = DependencyProperty.Register(
             nameof(Header), typeof(object), typeof(Widget), new PropertyMetadata(null));
+
+        public static readonly DependencyProperty IsSelectedProperty = DependencyProperty.Register(
+            nameof(IsSelected), typeof(bool), typeof(Widget), new PropertyMetadata(false));
 
         static Widget()
         {
@@ -26,6 +29,12 @@ namespace Micser.Main.Controls
         {
             get => GetValue(HeaderProperty);
             set => SetValue(HeaderProperty, value);
+        }
+
+        public bool IsSelected
+        {
+            get => (bool)GetValue(IsSelectedProperty);
+            set => SetValue(IsSelectedProperty, value);
         }
 
         public WidgetViewModel ViewModel => DataContext as WidgetViewModel;
