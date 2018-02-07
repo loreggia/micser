@@ -1,10 +1,13 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Documents;
+using System.Windows.Input;
 using Micser.Infrastructure.Extensions;
 using Micser.Main.Themes;
 using Micser.Main.ViewModels.Widgets;
@@ -12,6 +15,7 @@ using Micser.Main.Views.Widgets;
 
 namespace Micser.Main.Controls
 {
+    // https://www.codeproject.com/Articles/23871/WPF-Diagram-Designer-Part
     public class WidgetPanel : Canvas
     {
         public static readonly DependencyProperty IsWidgetLayoutChangingProperty = DependencyProperty.Register(
@@ -26,6 +30,8 @@ namespace Micser.Main.Controls
         public static readonly DependencyProperty WidgetsProperty = DependencyProperty.Register(
             nameof(Widgets), typeof(IEnumerable), typeof(WidgetPanel), new PropertyMetadata(null, OnWidgetsPropertyChanged));
 
+        private Point? _rubberbandSelectionStartPoint;
+
         static WidgetPanel()
         {
             DefaultStyleKeyProperty.OverrideMetadata(typeof(WidgetPanel), new FrameworkPropertyMetadata(typeof(WidgetPanel)));
@@ -33,6 +39,10 @@ namespace Micser.Main.Controls
 
         public WidgetPanel()
         {
+            AllowDrop = true;
+
+            SelectedItems = new List<ISelectable>();
+
             Resources.MergedDictionaries.Add(ResourceManager.SharedDictionary);
 
             AddHandler(Thumb.DragCompletedEvent, new DragCompletedEventHandler(OnWidgetLayoutChanged));
@@ -52,6 +62,8 @@ namespace Micser.Main.Controls
             get => (double)GetValue(RasterSizeProperty);
             set => SetValue(RasterSizeProperty, value);
         }
+
+        public IList<ISelectable> SelectedItems { get; }
 
         public IWidgetFactory WidgetFactory
         {
@@ -82,6 +94,50 @@ namespace Micser.Main.Controls
                     Math.Max(desiredSize.Height, top + child.DesiredSize.Height));
             }
             return desiredSize;
+        }
+
+        protected override void OnMouseDown(MouseButtonEventArgs e)
+        {
+            base.OnMouseDown(e);
+            if (Equals(e.Source, this))
+            {
+                // in case that this click is the start for a
+                // drag operation we cache the start point
+                _rubberbandSelectionStartPoint = e.GetPosition(this);
+
+                // if you click directly on the canvas all
+                // selected items are 'de-selected'
+                foreach (var item in SelectedItems)
+                {
+                    item.IsSelected = false;
+                }
+
+                SelectedItems.Clear();
+
+                e.Handled = true;
+            }
+        }
+
+        protected override void OnMouseMove(MouseEventArgs e)
+        {
+            base.OnMouseMove(e);
+
+            if (e.LeftButton != MouseButtonState.Pressed)
+            {
+                _rubberbandSelectionStartPoint = null;
+            }
+
+            if (_rubberbandSelectionStartPoint.HasValue)
+            {
+                // create rubberband adorner
+                var adornerLayer = AdornerLayer.GetAdornerLayer(this);
+                if (adornerLayer != null)
+                {
+                    var adorner = new RubberbandAdorner(this, _rubberbandSelectionStartPoint.Value);
+                    adornerLayer.Add(adorner);
+                }
+            }
+            e.Handled = true;
         }
 
         private static void OnWidgetFactoryPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
