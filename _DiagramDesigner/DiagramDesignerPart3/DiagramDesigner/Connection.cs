@@ -43,7 +43,7 @@ namespace DiagramDesigner
             "SourceAnchorAngle", typeof(double), typeof(Connection), new PropertyMetadata(default(double)));
 
         public static readonly DependencyProperty SourceAnchorPositionProperty = DependencyProperty.Register(
-            "SourceAnchorPosition", typeof(Point), typeof(Connection), new PropertyMetadata(default(Point)));
+            "SourceAnchorPosition", typeof(Point), typeof(Connection), new PropertyMetadata(default(Point), OnSourceAnchorPositionPropertyChanged));
 
         public static readonly DependencyProperty SourceArrowSymbolProperty = DependencyProperty.Register(
             "SourceArrowSymbol", typeof(ArrowSymbol), typeof(Connection), new PropertyMetadata(ArrowSymbol.None));
@@ -65,20 +65,20 @@ namespace DiagramDesigner
 
         public bool IsSelected
         {
-            get { return (bool)GetValue(IsSelectedProperty); }
-            set { SetValue(IsSelectedProperty, value); }
+            get => (bool)GetValue(IsSelectedProperty);
+            set => SetValue(IsSelectedProperty, value);
         }
 
         public Point LabelPosition
         {
-            get { return (Point)GetValue(LabelPositionProperty); }
-            set { SetValue(LabelPositionProperty, value); }
+            get => (Point)GetValue(LabelPositionProperty);
+            set => SetValue(LabelPositionProperty, value);
         }
 
         public PathGeometry PathGeometry
         {
-            get { return (PathGeometry)GetValue(PathGeometryProperty); }
-            set { SetValue(PathGeometryProperty, value); }
+            get => (PathGeometry)GetValue(PathGeometryProperty);
+            set => SetValue(PathGeometryProperty, value);
         }
 
         public Connector Sink
@@ -89,14 +89,14 @@ namespace DiagramDesigner
 
         public double SinkAnchorAngle
         {
-            get { return (double)GetValue(SinkAnchorAngleProperty); }
-            set { SetValue(SinkAnchorAngleProperty, value); }
+            get => (double)GetValue(SinkAnchorAngleProperty);
+            set => SetValue(SinkAnchorAngleProperty, value);
         }
 
         public Point SinkAnchorPosition
         {
-            get { return (Point)GetValue(SinkAnchorPositionProperty); }
-            set { SetValue(SinkAnchorPositionProperty, value); }
+            get => (Point)GetValue(SinkAnchorPositionProperty);
+            set => SetValue(SinkAnchorPositionProperty, value);
         }
 
         public ArrowSymbol SinkArrowSymbol
@@ -113,32 +113,34 @@ namespace DiagramDesigner
 
         public double SourceAnchorAngle
         {
-            get { return (double)GetValue(SourceAnchorAngleProperty); }
-            set { SetValue(SourceAnchorAngleProperty, value); }
+            get => (double)GetValue(SourceAnchorAngleProperty);
+            set => SetValue(SourceAnchorAngleProperty, value);
         }
 
         public Point SourceAnchorPosition
         {
-            get { return (Point)GetValue(SourceAnchorPositionProperty); }
-            set { SetValue(SourceAnchorPositionProperty, value); }
+            get => (Point)GetValue(SourceAnchorPositionProperty);
+            set => SetValue(SourceAnchorPositionProperty, value);
         }
 
         public ArrowSymbol SourceArrowSymbol
         {
-            get { return (ArrowSymbol)GetValue(SourceArrowSymbolProperty); }
-            set { SetValue(SourceArrowSymbolProperty, value); }
+            get => (ArrowSymbol)GetValue(SourceArrowSymbolProperty);
+            set => SetValue(SourceArrowSymbolProperty, value);
         }
 
         public DoubleCollection StrokeDashArray
         {
-            get { return (DoubleCollection)GetValue(StrokeDashArrayProperty); }
-            set { SetValue(StrokeDashArrayProperty, value); }
+            get => (DoubleCollection)GetValue(StrokeDashArrayProperty);
+            set => SetValue(StrokeDashArrayProperty, value);
         }
 
         internal void HideAdorner()
         {
             if (_connectionAdorner != null)
+            {
                 _connectionAdorner.Visibility = Visibility.Collapsed;
+            }
         }
 
         protected override void OnMouseDown(MouseButtonEventArgs e)
@@ -147,7 +149,9 @@ namespace DiagramDesigner
 
             // usual selection business
             if (VisualTreeHelper.GetParent(this) is WidgetPanel panel)
+            {
                 if ((Keyboard.Modifiers & (ModifierKeys.Shift | ModifierKeys.Control)) != ModifierKeys.None)
+                {
                     if (IsSelected)
                     {
                         IsSelected = false;
@@ -158,15 +162,20 @@ namespace DiagramDesigner
                         IsSelected = true;
                         panel.SelectedItems.Add(this);
                     }
+                }
                 else if (!IsSelected)
                 {
                     foreach (var item in panel.SelectedItems)
+                    {
                         item.IsSelected = false;
+                    }
 
                     panel.SelectedItems.Clear();
                     IsSelected = true;
                     panel.SelectedItems.Add(this);
                 }
+            }
+
             e.Handled = false;
         }
 
@@ -209,6 +218,10 @@ namespace DiagramDesigner
             connection.UpdateAnchorPosition();
         }
 
+        private static void OnSourceAnchorPositionPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+        }
+
         private void Connection_Unloaded(object sender, RoutedEventArgs e)
         {
             // do some housekeeping when Connection is unloaded
@@ -237,16 +250,6 @@ namespace DiagramDesigner
         private void OnConnectorPositionChanged(object sender, EventArgs e)
         {
             UpdatePathGeometry();
-        }
-
-        private void OnConnectorPositionChanged(object sender, PropertyChangedEventArgs e)
-        {
-            // whenever the 'Position' property of the source or sink Connector
-            // changes we must update the connection path geometry
-            if (e.PropertyName.Equals("Position"))
-            {
-                UpdatePathGeometry();
-            }
         }
 
         private void ShowAdorner()
@@ -291,17 +294,19 @@ namespace DiagramDesigner
         {
             if (Source != null && Sink != null)
             {
-                PathGeometry geometry = new PathGeometry();
-                List<Point> linePoints = PathFinder.GetConnectionLine(Source.GetInfo(), Sink.GetInfo(), true);
+                var geometry = new PathGeometry();
+                var linePoints = PathFinder.GetConnectionLine(Source.GetInfo(), Sink.GetInfo(), true);
                 if (linePoints.Count > 0)
                 {
-                    PathFigure figure = new PathFigure();
-                    figure.StartPoint = linePoints[0];
+                    var figure = new PathFigure
+                    {
+                        StartPoint = linePoints[0]
+                    };
                     linePoints.Remove(linePoints[0]);
                     figure.Segments.Add(new PolyLineSegment(linePoints, true));
                     geometry.Figures.Add(figure);
 
-                    this.PathGeometry = geometry;
+                    PathGeometry = geometry;
                 }
             }
         }
