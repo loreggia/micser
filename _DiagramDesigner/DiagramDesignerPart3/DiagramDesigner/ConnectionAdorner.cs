@@ -35,21 +35,17 @@ namespace DiagramDesigner
 
             InitializeDragThumbs();
 
-            _drawingPen = new Pen(Brushes.LightSlateGray, 1);
-            _drawingPen.LineJoin = PenLineJoin.Round;
+            _drawingPen = new Pen(Brushes.LightSlateGray, 1)
+            {
+                LineJoin = PenLineJoin.Round
+            };
         }
 
-        protected override int VisualChildrenCount
-        {
-            get
-            {
-                return this._visualChildren.Count;
-            }
-        }
+        protected override int VisualChildrenCount => _visualChildren.Count;
 
         private Connector HitConnector
         {
-            get { return _hitConnector; }
+            get => _hitConnector;
             set
             {
                 if (_hitConnector != value)
@@ -67,45 +63,49 @@ namespace DiagramDesigner
                 if (_hitWidget != value)
                 {
                     if (_hitWidget != null)
+                    {
                         _hitWidget.IsDragConnectionOver = false;
+                    }
 
                     _hitWidget = value;
 
                     if (_hitWidget != null)
+                    {
                         _hitWidget.IsDragConnectionOver = true;
+                    }
                 }
             }
         }
 
         protected override Size ArrangeOverride(Size finalSize)
         {
-            _adornerCanvas.Arrange(new Rect(0, 0, this._widgetPanel.ActualWidth, this._widgetPanel.ActualHeight));
+            _adornerCanvas.Arrange(new Rect(0, 0, _widgetPanel.ActualWidth, _widgetPanel.ActualHeight));
             return finalSize;
         }
 
         protected override Visual GetVisualChild(int index)
         {
-            return this._visualChildren[index];
+            return _visualChildren[index];
         }
 
         protected override void OnRender(DrawingContext dc)
         {
             base.OnRender(dc);
-            dc.DrawGeometry(null, _drawingPen, this._pathGeometry);
+            dc.DrawGeometry(null, _drawingPen, _pathGeometry);
         }
 
         private void AnchorPositionChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName.Equals("AnchorPositionSource"))
             {
-                Canvas.SetLeft(_sourceDragThumb, _connection.AnchorPositionSource.X);
-                Canvas.SetTop(_sourceDragThumb, _connection.AnchorPositionSource.Y);
+                Canvas.SetLeft(_sourceDragThumb, _connection.SourceAnchorPosition.X);
+                Canvas.SetTop(_sourceDragThumb, _connection.SourceAnchorPosition.Y);
             }
 
             if (e.PropertyName.Equals("AnchorPositionSink"))
             {
-                Canvas.SetLeft(_sinkDragThumb, _connection.AnchorPositionSink.X);
-                Canvas.SetTop(_sinkDragThumb, _connection.AnchorPositionSink.Y);
+                Canvas.SetLeft(_sinkDragThumb, _connection.SinkAnchorPosition.X);
+                Canvas.SetTop(_sinkDragThumb, _connection.SinkAnchorPosition.Y);
             }
         }
 
@@ -115,7 +115,7 @@ namespace DiagramDesigner
 
             DependencyObject hitObject = _widgetPanel.InputHitTest(hitPoint) as DependencyObject;
             while (hitObject != null &&
-                   hitObject != _fixConnector.ParentWidget &&
+                   !Equals(hitObject, _fixConnector.ParentWidget) &&
                    hitObject.GetType() != typeof(WidgetPanel))
             {
                 if (hitObject is Connector)
@@ -128,7 +128,10 @@ namespace DiagramDesigner
                 {
                     HitWidget = hitObject as Widget;
                     if (!hitConnectorFlag)
+                    {
                         HitConnector = null;
+                    }
+
                     return;
                 }
                 hitObject = VisualTreeHelper.GetParent(hitObject);
@@ -144,27 +147,31 @@ namespace DiagramDesigner
 
             //source drag thumb
             _sourceDragThumb = new Thumb();
-            Canvas.SetLeft(_sourceDragThumb, _connection.AnchorPositionSource.X);
-            Canvas.SetTop(_sourceDragThumb, _connection.AnchorPositionSource.Y);
-            this._adornerCanvas.Children.Add(_sourceDragThumb);
+            Canvas.SetLeft(_sourceDragThumb, _connection.SourceAnchorPosition.X);
+            Canvas.SetTop(_sourceDragThumb, _connection.SourceAnchorPosition.Y);
+            _adornerCanvas.Children.Add(_sourceDragThumb);
             if (dragThumbStyle != null)
+            {
                 _sourceDragThumb.Style = dragThumbStyle;
+            }
 
-            _sourceDragThumb.DragDelta += new DragDeltaEventHandler(thumbDragThumb_DragDelta);
-            _sourceDragThumb.DragStarted += new DragStartedEventHandler(thumbDragThumb_DragStarted);
-            _sourceDragThumb.DragCompleted += new DragCompletedEventHandler(thumbDragThumb_DragCompleted);
+            _sourceDragThumb.DragDelta += thumbDragThumb_DragDelta;
+            _sourceDragThumb.DragStarted += thumbDragThumb_DragStarted;
+            _sourceDragThumb.DragCompleted += thumbDragThumb_DragCompleted;
 
             // sink drag thumb
             _sinkDragThumb = new Thumb();
-            Canvas.SetLeft(_sinkDragThumb, _connection.AnchorPositionSink.X);
-            Canvas.SetTop(_sinkDragThumb, _connection.AnchorPositionSink.Y);
-            this._adornerCanvas.Children.Add(_sinkDragThumb);
+            Canvas.SetLeft(_sinkDragThumb, _connection.SinkAnchorPosition.X);
+            Canvas.SetTop(_sinkDragThumb, _connection.SinkAnchorPosition.Y);
+            _adornerCanvas.Children.Add(_sinkDragThumb);
             if (dragThumbStyle != null)
+            {
                 _sinkDragThumb.Style = dragThumbStyle;
+            }
 
-            _sinkDragThumb.DragDelta += new DragDeltaEventHandler(thumbDragThumb_DragDelta);
-            _sinkDragThumb.DragStarted += new DragStartedEventHandler(thumbDragThumb_DragStarted);
-            _sinkDragThumb.DragCompleted += new DragCompletedEventHandler(thumbDragThumb_DragCompleted);
+            _sinkDragThumb.DragDelta += thumbDragThumb_DragDelta;
+            _sinkDragThumb.DragStarted += thumbDragThumb_DragStarted;
+            _sinkDragThumb.DragCompleted += thumbDragThumb_DragCompleted;
         }
 
         private void thumbDragThumb_DragCompleted(object sender, DragCompletedEventArgs e)
@@ -173,35 +180,39 @@ namespace DiagramDesigner
             {
                 if (_connection != null)
                 {
-                    if (_connection.Source == _fixConnector)
-                        _connection.Sink = this.HitConnector;
+                    if (Equals(_connection.Source, _fixConnector))
+                    {
+                        _connection.Sink = HitConnector;
+                    }
                     else
-                        _connection.Source = this.HitConnector;
+                    {
+                        _connection.Source = HitConnector;
+                    }
                 }
             }
 
-            this.HitWidget = null;
-            this.HitConnector = null;
-            this._pathGeometry = null;
-            this._connection.StrokeDashArray = null;
-            this.InvalidateVisual();
+            HitWidget = null;
+            HitConnector = null;
+            _pathGeometry = null;
+            _connection.StrokeDashArray = null;
+            InvalidateVisual();
         }
 
         private void thumbDragThumb_DragDelta(object sender, DragDeltaEventArgs e)
         {
             Point currentPosition = Mouse.GetPosition(this);
-            this.HitTesting(currentPosition);
-            this._pathGeometry = UpdatePathGeometry(currentPosition);
-            this.InvalidateVisual();
+            HitTesting(currentPosition);
+            _pathGeometry = UpdatePathGeometry(currentPosition);
+            InvalidateVisual();
         }
 
         private void thumbDragThumb_DragStarted(object sender, DragStartedEventArgs e)
         {
-            this.HitWidget = null;
-            this.HitConnector = null;
-            this._pathGeometry = null;
-            this.Cursor = Cursors.Cross;
-            this._connection.StrokeDashArray = new DoubleCollection(new double[] { 1, 2 });
+            HitWidget = null;
+            HitConnector = null;
+            _pathGeometry = null;
+            Cursor = Cursors.Cross;
+            _connection.StrokeDashArray = new DoubleCollection(new double[] { 1, 2 });
 
             if (sender == _sourceDragThumb)
             {
@@ -217,20 +228,18 @@ namespace DiagramDesigner
 
         private PathGeometry UpdatePathGeometry(Point position)
         {
-            PathGeometry geometry = new PathGeometry();
+            var geometry = new PathGeometry();
 
-            ConnectorOrientation targetOrientation;
-            if (HitConnector != null)
-                targetOrientation = HitConnector.Orientation;
-            else
-                targetOrientation = _dragConnector.Orientation;
+            var targetOrientation = HitConnector?.Orientation ?? _dragConnector.Orientation;
 
-            List<Point> linePoints = PathFinder.GetConnectionLine(_fixConnector.GetInfo(), position, targetOrientation);
+            var linePoints = PathFinder.GetConnectionLine(_fixConnector.GetInfo(), position, targetOrientation);
 
             if (linePoints.Count > 0)
             {
-                PathFigure figure = new PathFigure();
-                figure.StartPoint = linePoints[0];
+                var figure = new PathFigure
+                {
+                    StartPoint = linePoints[0]
+                };
                 linePoints.Remove(linePoints[0]);
                 figure.Segments.Add(new PolyLineSegment(linePoints, true));
                 geometry.Figures.Add(figure);
