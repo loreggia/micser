@@ -10,24 +10,24 @@ namespace DiagramDesigner.Controls
     {
         public DragThumb()
         {
-            base.DragDelta += new DragDeltaEventHandler(DragThumb_DragDelta);
+            DragDelta += DragThumb_DragDelta;
         }
 
-        void DragThumb_DragDelta(object sender, DragDeltaEventArgs e)
+        private void DragThumb_DragDelta(object sender, DragDeltaEventArgs e)
         {
-            DesignerItem designerItem = this.DataContext as DesignerItem;
-            DesignerCanvas designer = VisualTreeHelper.GetParent(designerItem) as DesignerCanvas;
-            if (designerItem != null && designer != null && designerItem.IsSelected)
+            Widget widget = DataContext as Widget;
+            WidgetPanel panel = VisualTreeHelper.GetParent(widget) as WidgetPanel;
+            if (widget != null && panel != null && widget.IsSelected)
             {
                 double minLeft = double.MaxValue;
                 double minTop = double.MaxValue;
 
-                // we only move DesignerItems
-                var designerItems = from item in designer.SelectedItems
-                                    where item is DesignerItem
-                                    select item;
+                // we only move Widgets
+                var widgets = from item in panel.SelectedItems
+                              where item is Widget
+                              select item;
 
-                foreach (DesignerItem item in designerItems)
+                foreach (Widget item in widgets)
                 {
                     double left = Canvas.GetLeft(item);
                     double top = Canvas.GetTop(item);
@@ -39,7 +39,7 @@ namespace DiagramDesigner.Controls
                 double deltaHorizontal = Math.Max(-minLeft, e.HorizontalChange);
                 double deltaVertical = Math.Max(-minTop, e.VerticalChange);
 
-                foreach (DesignerItem item in designerItems)
+                foreach (Widget item in widgets)
                 {
                     double left = Canvas.GetLeft(item);
                     double top = Canvas.GetTop(item);
@@ -51,7 +51,7 @@ namespace DiagramDesigner.Controls
                     Canvas.SetTop(item, top + deltaVertical);
                 }
 
-                designer.InvalidateMeasure();
+                panel.InvalidateMeasure();
                 e.Handled = true;
             }
         }

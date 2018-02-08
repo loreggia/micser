@@ -553,10 +553,10 @@ namespace DiagramDesigner
 
         private static Rect GetRectWithMargin(ConnectorInfo connectorThumb, double margin)
         {
-            Rect rect = new Rect(connectorThumb.DesignerItemLeft,
-                                 connectorThumb.DesignerItemTop,
-                                 connectorThumb.DesignerItemSize.Width,
-                                 connectorThumb.DesignerItemSize.Height);
+            Rect rect = new Rect(connectorThumb.WidgetLeft,
+                                 connectorThumb.WidgetTop,
+                                 connectorThumb.WidgetSize.Width,
+                                 connectorThumb.WidgetSize.Height);
 
             rect.Inflate(margin, margin);
 
