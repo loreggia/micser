@@ -1,8 +1,6 @@
-﻿using System.Windows;
-
-namespace DiagramDesigner
+﻿namespace DiagramDesigner
 {
-    public partial class App : Application
+    public partial class App
     {
     }
 }
