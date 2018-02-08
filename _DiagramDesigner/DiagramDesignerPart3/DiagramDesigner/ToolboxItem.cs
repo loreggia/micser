@@ -43,7 +43,7 @@ namespace DiagramDesigner
                 WrapPanel panel = VisualTreeHelper.GetParent(this) as WrapPanel;
                 if (panel != null)
                 {
-                    // desired size for DesignerCanvas is the stretched Toolbox item size
+                    // desired size for WidgetPanel is the stretched Toolbox item size
                     double scale = 1.3;
                     dataObject.DesiredSize = new Size(panel.ItemWidth * scale, panel.ItemHeight * scale);
                 }
@@ -61,8 +61,8 @@ namespace DiagramDesigner
         // Xaml string that represents the serialized content
         public String Xaml { get; set; }
 
-        // Defines width and height of the DesignerItem
-        // when this DragObject is dropped on the DesignerCanvas
+        // Defines width and height of the Widget
+        // when this DragObject is dropped on the WidgetPanel
         public Size? DesiredSize { get; set; }
     }
 }

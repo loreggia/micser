@@ -11,178 +11,208 @@ namespace DiagramDesigner
 {
     public class ConnectionAdorner : Adorner
     {
-        private DesignerCanvas designerCanvas;
-        private Canvas adornerCanvas;
-        private Connection connection;
-        private PathGeometry pathGeometry;
-        private Connector fixConnector, dragConnector;
-        private Thumb sourceDragThumb, sinkDragThumb;
-        private Pen drawingPen;
+        private readonly Canvas _adornerCanvas;
+        private readonly Connection _connection;
+        private readonly Pen _drawingPen;
+        private readonly VisualCollection _visualChildren;
+        private readonly WidgetPanel _widgetPanel;
+        private Connector _fixConnector, _dragConnector;
+        private Connector _hitConnector;
+        private Widget _hitWidget;
+        private PathGeometry _pathGeometry;
+        private Thumb _sourceDragThumb, _sinkDragThumb;
 
-        private DesignerItem hitDesignerItem;
-        private DesignerItem HitDesignerItem
+        public ConnectionAdorner(WidgetPanel panel, Connection connection)
+            : base(panel)
         {
-            get { return hitDesignerItem; }
-            set
-            {
-                if (hitDesignerItem != value)
-                {
-                    if (hitDesignerItem != null)
-                        hitDesignerItem.IsDragConnectionOver = false;
+            _widgetPanel = panel;
+            _adornerCanvas = new Canvas();
+            _visualChildren = new VisualCollection(this);
+            _visualChildren.Add(_adornerCanvas);
 
-                    hitDesignerItem = value;
+            _connection = connection;
+            _connection.PropertyChanged += new PropertyChangedEventHandler(AnchorPositionChanged);
 
-                    if (hitDesignerItem != null)
-                        hitDesignerItem.IsDragConnectionOver = true;
-                }
-            }
+            InitializeDragThumbs();
+
+            _drawingPen = new Pen(Brushes.LightSlateGray, 1);
+            _drawingPen.LineJoin = PenLineJoin.Round;
         }
 
-        private Connector hitConnector;
-        private Connector HitConnector
-        {
-            get { return hitConnector; }
-            set
-            {
-                if (hitConnector != value)
-                {
-                    hitConnector = value;
-                }
-            }
-        }
-
-        private VisualCollection visualChildren;
         protected override int VisualChildrenCount
         {
             get
             {
-                return this.visualChildren.Count;
+                return this._visualChildren.Count;
             }
+        }
+
+        private Connector HitConnector
+        {
+            get { return _hitConnector; }
+            set
+            {
+                if (_hitConnector != value)
+                {
+                    _hitConnector = value;
+                }
+            }
+        }
+
+        private Widget HitWidget
+        {
+            get { return _hitWidget; }
+            set
+            {
+                if (_hitWidget != value)
+                {
+                    if (_hitWidget != null)
+                        _hitWidget.IsDragConnectionOver = false;
+
+                    _hitWidget = value;
+
+                    if (_hitWidget != null)
+                        _hitWidget.IsDragConnectionOver = true;
+                }
+            }
+        }
+
+        protected override Size ArrangeOverride(Size finalSize)
+        {
+            _adornerCanvas.Arrange(new Rect(0, 0, this._widgetPanel.ActualWidth, this._widgetPanel.ActualHeight));
+            return finalSize;
         }
 
         protected override Visual GetVisualChild(int index)
         {
-            return this.visualChildren[index];
-        }
-
-        public ConnectionAdorner(DesignerCanvas designer, Connection connection)
-            : base(designer)
-        {
-            this.designerCanvas = designer;
-            adornerCanvas = new Canvas();
-            this.visualChildren = new VisualCollection(this);
-            this.visualChildren.Add(adornerCanvas);
-
-            this.connection = connection;
-            this.connection.PropertyChanged += new PropertyChangedEventHandler(AnchorPositionChanged);
-
-            InitializeDragThumbs();
-
-            drawingPen = new Pen(Brushes.LightSlateGray, 1);
-            drawingPen.LineJoin = PenLineJoin.Round;
-        }
-
-        private void InitializeDragThumbs()
-        {
-            Style dragThumbStyle = connection.FindResource("ConnectionAdornerThumbStyle") as Style;
-
-            //source drag thumb
-            sourceDragThumb = new Thumb();
-            Canvas.SetLeft(sourceDragThumb, connection.AnchorPositionSource.X);
-            Canvas.SetTop(sourceDragThumb, connection.AnchorPositionSource.Y);
-            this.adornerCanvas.Children.Add(sourceDragThumb);
-            if (dragThumbStyle != null)
-                sourceDragThumb.Style = dragThumbStyle;
-
-            sourceDragThumb.DragDelta += new DragDeltaEventHandler(thumbDragThumb_DragDelta);
-            sourceDragThumb.DragStarted += new DragStartedEventHandler(thumbDragThumb_DragStarted);
-            sourceDragThumb.DragCompleted += new DragCompletedEventHandler(thumbDragThumb_DragCompleted);
-
-            // sink drag thumb
-            sinkDragThumb = new Thumb();
-            Canvas.SetLeft(sinkDragThumb, connection.AnchorPositionSink.X);
-            Canvas.SetTop(sinkDragThumb, connection.AnchorPositionSink.Y);
-            this.adornerCanvas.Children.Add(sinkDragThumb);
-            if (dragThumbStyle != null)
-                sinkDragThumb.Style = dragThumbStyle;
-
-            sinkDragThumb.DragDelta += new DragDeltaEventHandler(thumbDragThumb_DragDelta);
-            sinkDragThumb.DragStarted += new DragStartedEventHandler(thumbDragThumb_DragStarted);
-            sinkDragThumb.DragCompleted += new DragCompletedEventHandler(thumbDragThumb_DragCompleted);
-        }
-        void AnchorPositionChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName.Equals("AnchorPositionSource"))
-            {
-                Canvas.SetLeft(sourceDragThumb, connection.AnchorPositionSource.X);
-                Canvas.SetTop(sourceDragThumb, connection.AnchorPositionSource.Y);
-            }
-
-            if (e.PropertyName.Equals("AnchorPositionSink"))
-            {
-                Canvas.SetLeft(sinkDragThumb, connection.AnchorPositionSink.X);
-                Canvas.SetTop(sinkDragThumb, connection.AnchorPositionSink.Y);
-            }
-        }
-
-        void thumbDragThumb_DragCompleted(object sender, DragCompletedEventArgs e)
-        {
-            if (HitConnector != null)
-            {
-                if (connection != null)
-                {
-                    if (connection.Source == fixConnector)
-                        connection.Sink = this.HitConnector;
-                    else
-                        connection.Source = this.HitConnector;
-                }
-            }
-
-            this.HitDesignerItem = null;
-            this.HitConnector = null;
-            this.pathGeometry = null;
-            this.connection.StrokeDashArray = null;
-            this.InvalidateVisual();
-        }
-
-        void thumbDragThumb_DragStarted(object sender, DragStartedEventArgs e)
-        {
-            this.HitDesignerItem = null;
-            this.HitConnector = null;
-            this.pathGeometry = null;
-            this.Cursor = Cursors.Cross;
-            this.connection.StrokeDashArray = new DoubleCollection(new double[] { 1, 2 });
-
-            if (sender == sourceDragThumb)
-            {
-                fixConnector = connection.Sink;
-                dragConnector = connection.Source;
-            }
-            else if (sender == sinkDragThumb)
-            {
-                dragConnector = connection.Sink;
-                fixConnector = connection.Source;
-            }
-        }
-
-        void thumbDragThumb_DragDelta(object sender, DragDeltaEventArgs e)
-        {
-            Point currentPosition = Mouse.GetPosition(this);
-            this.HitTesting(currentPosition);
-            this.pathGeometry = UpdatePathGeometry(currentPosition);
-            this.InvalidateVisual();
+            return this._visualChildren[index];
         }
 
         protected override void OnRender(DrawingContext dc)
         {
             base.OnRender(dc);
-            dc.DrawGeometry(null, drawingPen, this.pathGeometry);
+            dc.DrawGeometry(null, _drawingPen, this._pathGeometry);
         }
 
-        protected override Size ArrangeOverride(Size finalSize)
+        private void AnchorPositionChanged(object sender, PropertyChangedEventArgs e)
         {
-            adornerCanvas.Arrange(new Rect(0, 0, this.designerCanvas.ActualWidth, this.designerCanvas.ActualHeight));
-            return finalSize;
+            if (e.PropertyName.Equals("AnchorPositionSource"))
+            {
+                Canvas.SetLeft(_sourceDragThumb, _connection.AnchorPositionSource.X);
+                Canvas.SetTop(_sourceDragThumb, _connection.AnchorPositionSource.Y);
+            }
+
+            if (e.PropertyName.Equals("AnchorPositionSink"))
+            {
+                Canvas.SetLeft(_sinkDragThumb, _connection.AnchorPositionSink.X);
+                Canvas.SetTop(_sinkDragThumb, _connection.AnchorPositionSink.Y);
+            }
+        }
+
+        private void HitTesting(Point hitPoint)
+        {
+            bool hitConnectorFlag = false;
+
+            DependencyObject hitObject = _widgetPanel.InputHitTest(hitPoint) as DependencyObject;
+            while (hitObject != null &&
+                   hitObject != _fixConnector.ParentWidget &&
+                   hitObject.GetType() != typeof(WidgetPanel))
+            {
+                if (hitObject is Connector)
+                {
+                    HitConnector = hitObject as Connector;
+                    hitConnectorFlag = true;
+                }
+
+                if (hitObject is Widget)
+                {
+                    HitWidget = hitObject as Widget;
+                    if (!hitConnectorFlag)
+                        HitConnector = null;
+                    return;
+                }
+                hitObject = VisualTreeHelper.GetParent(hitObject);
+            }
+
+            HitConnector = null;
+            HitWidget = null;
+        }
+
+        private void InitializeDragThumbs()
+        {
+            Style dragThumbStyle = _connection.FindResource("ConnectionAdornerThumbStyle") as Style;
+
+            //source drag thumb
+            _sourceDragThumb = new Thumb();
+            Canvas.SetLeft(_sourceDragThumb, _connection.AnchorPositionSource.X);
+            Canvas.SetTop(_sourceDragThumb, _connection.AnchorPositionSource.Y);
+            this._adornerCanvas.Children.Add(_sourceDragThumb);
+            if (dragThumbStyle != null)
+                _sourceDragThumb.Style = dragThumbStyle;
+
+            _sourceDragThumb.DragDelta += new DragDeltaEventHandler(thumbDragThumb_DragDelta);
+            _sourceDragThumb.DragStarted += new DragStartedEventHandler(thumbDragThumb_DragStarted);
+            _sourceDragThumb.DragCompleted += new DragCompletedEventHandler(thumbDragThumb_DragCompleted);
+
+            // sink drag thumb
+            _sinkDragThumb = new Thumb();
+            Canvas.SetLeft(_sinkDragThumb, _connection.AnchorPositionSink.X);
+            Canvas.SetTop(_sinkDragThumb, _connection.AnchorPositionSink.Y);
+            this._adornerCanvas.Children.Add(_sinkDragThumb);
+            if (dragThumbStyle != null)
+                _sinkDragThumb.Style = dragThumbStyle;
+
+            _sinkDragThumb.DragDelta += new DragDeltaEventHandler(thumbDragThumb_DragDelta);
+            _sinkDragThumb.DragStarted += new DragStartedEventHandler(thumbDragThumb_DragStarted);
+            _sinkDragThumb.DragCompleted += new DragCompletedEventHandler(thumbDragThumb_DragCompleted);
+        }
+
+        private void thumbDragThumb_DragCompleted(object sender, DragCompletedEventArgs e)
+        {
+            if (HitConnector != null)
+            {
+                if (_connection != null)
+                {
+                    if (_connection.Source == _fixConnector)
+                        _connection.Sink = this.HitConnector;
+                    else
+                        _connection.Source = this.HitConnector;
+                }
+            }
+
+            this.HitWidget = null;
+            this.HitConnector = null;
+            this._pathGeometry = null;
+            this._connection.StrokeDashArray = null;
+            this.InvalidateVisual();
+        }
+
+        private void thumbDragThumb_DragDelta(object sender, DragDeltaEventArgs e)
+        {
+            Point currentPosition = Mouse.GetPosition(this);
+            this.HitTesting(currentPosition);
+            this._pathGeometry = UpdatePathGeometry(currentPosition);
+            this.InvalidateVisual();
+        }
+
+        private void thumbDragThumb_DragStarted(object sender, DragStartedEventArgs e)
+        {
+            this.HitWidget = null;
+            this.HitConnector = null;
+            this._pathGeometry = null;
+            this.Cursor = Cursors.Cross;
+            this._connection.StrokeDashArray = new DoubleCollection(new double[] { 1, 2 });
+
+            if (sender == _sourceDragThumb)
+            {
+                _fixConnector = _connection.Sink;
+                _dragConnector = _connection.Source;
+            }
+            else if (sender == _sinkDragThumb)
+            {
+                _dragConnector = _connection.Sink;
+                _fixConnector = _connection.Source;
+            }
         }
 
         private PathGeometry UpdatePathGeometry(Point position)
@@ -193,9 +223,9 @@ namespace DiagramDesigner
             if (HitConnector != null)
                 targetOrientation = HitConnector.Orientation;
             else
-                targetOrientation = dragConnector.Orientation;
+                targetOrientation = _dragConnector.Orientation;
 
-            List<Point> linePoints = PathFinder.GetConnectionLine(fixConnector.GetInfo(), position, targetOrientation);
+            List<Point> linePoints = PathFinder.GetConnectionLine(_fixConnector.GetInfo(), position, targetOrientation);
 
             if (linePoints.Count > 0)
             {
@@ -207,35 +237,6 @@ namespace DiagramDesigner
             }
 
             return geometry;
-        }
-
-        private void HitTesting(Point hitPoint)
-        {
-            bool hitConnectorFlag = false;
-
-            DependencyObject hitObject = designerCanvas.InputHitTest(hitPoint) as DependencyObject;
-            while (hitObject != null &&
-                   hitObject != fixConnector.ParentDesignerItem &&
-                   hitObject.GetType() != typeof(DesignerCanvas))
-            {
-                if (hitObject is Connector)
-                {
-                    HitConnector = hitObject as Connector;
-                    hitConnectorFlag = true;
-                }
-
-                if (hitObject is DesignerItem)
-                {
-                    HitDesignerItem = hitObject as DesignerItem;
-                    if (!hitConnectorFlag)
-                        HitConnector = null;
-                    return;
-                }
-                hitObject = VisualTreeHelper.GetParent(hitObject);
-            }
-
-            HitConnector = null;
-            HitDesignerItem = null;
         }
     }
 }

@@ -52,12 +52,12 @@
             Stroke="#AAFF8C00"
             StrokeThickness="3"
             Data="M 9,2 11,7 17,7 12,10 14,15 9,12 4,15 6,10 1,7 7,7 Z">
-        <s:DesignerItem.DragThumbTemplate>
+        <s:Widget.DragThumbTemplate>
           <ControlTemplate>
             <Path Fill="Transparent" Stretch="Fill" Data="M 9,2 11,7 17,7 12,10 14,15 9,12 4,15 6,10 1,7 7,7 Z"/>
           </ControlTemplate>
-        </s:DesignerItem.DragThumbTemplate>
-        <s:DesignerItem.ConnectorDecoratorTemplate>
+        </s:Widget.DragThumbTemplate>
+        <s:Widget.ConnectorDecoratorTemplate>
           <ControlTemplate>
             <c:RelativePositionPanel Margin="-4">
               <s:Connector Orientation="Top" c:RelativePositionPanel.RelativePosition="0.5,0"/>
@@ -67,7 +67,7 @@
               <s:Connector Orientation="Bottom" c:RelativePositionPanel.RelativePosition="0.815,1"/>
             </c:RelativePositionPanel>
           </ControlTemplate>
-        </s:DesignerItem.ConnectorDecoratorTemplate>
+        </s:Widget.ConnectorDecoratorTemplate>
       </Path>
       
     </ItemsControl.Items>

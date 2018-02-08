@@ -18,166 +18,85 @@ namespace DiagramDesigner
 
     public class Connection : Control, ISelectable
     {
+        public static readonly DependencyProperty IsSelectedProperty = DependencyProperty.Register(
+            "IsSelected", typeof(bool), typeof(Connection), new PropertyMetadata(false, OnIsSelectedPropertyChanged));
+
+        public static readonly DependencyProperty LabelPositionProperty = DependencyProperty.Register(
+            "LabelPosition", typeof(Point), typeof(Connection), new PropertyMetadata(default(Point)));
+
+        public static readonly DependencyProperty PathGeometryProperty = DependencyProperty.Register(
+            "PathGeometry", typeof(PathGeometry), typeof(Connection), new PropertyMetadata(null, OnPathGeometryPropertyChanged));
+
         public static readonly DependencyProperty SinkAnchorAngleProperty = DependencyProperty.Register(
             "SinkAnchorAngle", typeof(double), typeof(Connection), new PropertyMetadata(default(double)));
 
+        public static readonly DependencyProperty SinkAnchorPositionProperty = DependencyProperty.Register(
+            "SinkAnchorPosition", typeof(Point), typeof(Connection), new PropertyMetadata(default(Point)));
+
         public static readonly DependencyProperty SinkArrowSymbolProperty = DependencyProperty.Register(
-                    nameof(SinkArrowSymbol), typeof(ArrowSymbol), typeof(Connection), new PropertyMetadata(ArrowSymbol.Arrow));
+            nameof(SinkArrowSymbol), typeof(ArrowSymbol), typeof(Connection), new PropertyMetadata(ArrowSymbol.Arrow));
 
-        // slope of the path at the anchor position
-        // needed for the rotation angle of the arrow
-        private double anchorAngleSource = 0;
+        public static readonly DependencyProperty SinkProperty = DependencyProperty.Register(
+            nameof(Sink), typeof(Connector), typeof(Connection), new PropertyMetadata(null, OnConnectorPropertyChanged));
 
-        // analogue to source side
-        private Point anchorPositionSink;
+        public static readonly DependencyProperty SourceAnchorAngleProperty = DependencyProperty.Register(
+            "SourceAnchorAngle", typeof(double), typeof(Connection), new PropertyMetadata(default(double)));
 
-        // between source connector position and the beginning
-        // of the path geometry we leave some space for visual reasons;
-        // so the anchor position source really marks the beginning
-        // of the path geometry on the source side
-        private Point anchorPositionSource;
+        public static readonly DependencyProperty SourceAnchorPositionProperty = DependencyProperty.Register(
+            "SourceAnchorPosition", typeof(Point), typeof(Connection), new PropertyMetadata(default(Point)));
 
-        private Adorner connectionAdorner;
+        public static readonly DependencyProperty SourceArrowSymbolProperty = DependencyProperty.Register(
+            "SourceArrowSymbol", typeof(ArrowSymbol), typeof(Connection), new PropertyMetadata(ArrowSymbol.None));
 
-        // if connected, the ConnectionAdorner becomes visible
-        private bool isSelected;
+        public static readonly DependencyProperty SourceProperty = DependencyProperty.Register(
+            nameof(Source), typeof(Connector), typeof(Connection), new PropertyMetadata(null, OnConnectorPropertyChanged));
 
-        // specifies a point at half path length
-        private Point labelPosition;
+        public static readonly DependencyProperty StrokeDashArrayProperty = DependencyProperty.Register(
+            "StrokeDashArray", typeof(DoubleCollection), typeof(Connection), new PropertyMetadata(default(DoubleCollection)));
 
-        // connection path geometry
-        private PathGeometry pathGeometry;
-
-        // sink connector
-        private Connector sink;
-
-        // source connector
-        private Connector source;
-
-        private ArrowSymbol sourceArrowSymbol = ArrowSymbol.None;
-
-        // pattern of dashes and gaps that is used to outline the connection path
-        private DoubleCollection strokeDashArray;
+        private Adorner _connectionAdorner;
 
         public Connection(Connector source, Connector sink)
         {
-            this.Source = source;
-            this.Sink = sink;
-            base.Unloaded += new RoutedEventHandler(Connection_Unloaded);
-        }
-
-        public double AnchorAngleSource
-        {
-            get { return anchorAngleSource; }
-            set
-            {
-                if (anchorAngleSource != value)
-                {
-                    anchorAngleSource = value;
-                    OnPropertyChanged("AnchorAngleSource");
-                }
-            }
-        }
-
-        public Point AnchorPositionSink
-        {
-            get { return anchorPositionSink; }
-            set
-            {
-                if (anchorPositionSink != value)
-                {
-                    anchorPositionSink = value;
-                    OnPropertyChanged("AnchorPositionSink");
-                }
-            }
-        }
-
-        public Point AnchorPositionSource
-        {
-            get { return anchorPositionSource; }
-            set
-            {
-                if (anchorPositionSource != value)
-                {
-                    anchorPositionSource = value;
-                    OnPropertyChanged("AnchorPositionSource");
-                }
-            }
+            Source = source;
+            Sink = sink;
+            Unloaded += Connection_Unloaded;
         }
 
         public bool IsSelected
         {
-            get { return isSelected; }
-            set
-            {
-                if (isSelected != value)
-                {
-                    isSelected = value;
-                    OnPropertyChanged("IsSelected");
-                    if (isSelected)
-                        ShowAdorner();
-                    else
-                        HideAdorner();
-                }
-            }
+            get { return (bool)GetValue(IsSelectedProperty); }
+            set { SetValue(IsSelectedProperty, value); }
         }
 
         public Point LabelPosition
         {
-            get { return labelPosition; }
-            set
-            {
-                if (labelPosition != value)
-                {
-                    labelPosition = value;
-                    OnPropertyChanged("LabelPosition");
-                }
-            }
+            get { return (Point)GetValue(LabelPositionProperty); }
+            set { SetValue(LabelPositionProperty, value); }
         }
 
         public PathGeometry PathGeometry
         {
-            get { return pathGeometry; }
-            set
-            {
-                if (pathGeometry != value)
-                {
-                    pathGeometry = value;
-                    UpdateAnchorPosition();
-                    OnPropertyChanged("PathGeometry");
-                }
-            }
+            get { return (PathGeometry)GetValue(PathGeometryProperty); }
+            set { SetValue(PathGeometryProperty, value); }
         }
 
         public Connector Sink
         {
-            get { return sink; }
-            set
-            {
-                if (sink != value)
-                {
-                    if (sink != null)
-                    {
-                        sink.PropertyChanged -= new PropertyChangedEventHandler(OnConnectorPositionChanged);
-                        sink.Connections.Remove(this);
-                    }
-
-                    sink = value;
-
-                    if (sink != null)
-                    {
-                        sink.Connections.Add(this);
-                        sink.PropertyChanged += new PropertyChangedEventHandler(OnConnectorPositionChanged);
-                    }
-                    UpdatePathGeometry();
-                }
-            }
+            get => (Connector)GetValue(SinkProperty);
+            set => SetValue(SinkProperty, value);
         }
 
         public double SinkAnchorAngle
         {
             get { return (double)GetValue(SinkAnchorAngleProperty); }
             set { SetValue(SinkAnchorAngleProperty, value); }
+        }
+
+        public Point SinkAnchorPosition
+        {
+            get { return (Point)GetValue(SinkAnchorPositionProperty); }
+            set { SetValue(SinkAnchorPositionProperty, value); }
         }
 
         public ArrowSymbol SinkArrowSymbol
@@ -188,96 +107,106 @@ namespace DiagramDesigner
 
         public Connector Source
         {
-            get
-            {
-                return source;
-            }
-            set
-            {
-                if (source != value)
-                {
-                    if (source != null)
-                    {
-                        source.PropertyChanged -= new PropertyChangedEventHandler(OnConnectorPositionChanged);
-                        source.Connections.Remove(this);
-                    }
+            get => (Connector)GetValue(SourceProperty);
+            set => SetValue(SourceProperty, value);
+        }
 
-                    source = value;
+        public double SourceAnchorAngle
+        {
+            get { return (double)GetValue(SourceAnchorAngleProperty); }
+            set { SetValue(SourceAnchorAngleProperty, value); }
+        }
 
-                    if (source != null)
-                    {
-                        source.Connections.Add(this);
-                        source.PropertyChanged += new PropertyChangedEventHandler(OnConnectorPositionChanged);
-                    }
-
-                    UpdatePathGeometry();
-                }
-            }
+        public Point SourceAnchorPosition
+        {
+            get { return (Point)GetValue(SourceAnchorPositionProperty); }
+            set { SetValue(SourceAnchorPositionProperty, value); }
         }
 
         public ArrowSymbol SourceArrowSymbol
         {
-            get { return sourceArrowSymbol; }
-            set
-            {
-                if (sourceArrowSymbol != value)
-                {
-                    sourceArrowSymbol = value;
-                    OnPropertyChanged("SourceArrowSymbol");
-                }
-            }
+            get { return (ArrowSymbol)GetValue(SourceArrowSymbolProperty); }
+            set { SetValue(SourceArrowSymbolProperty, value); }
         }
 
         public DoubleCollection StrokeDashArray
         {
-            get
-            {
-                return strokeDashArray;
-            }
-            set
-            {
-                if (strokeDashArray != value)
-                {
-                    strokeDashArray = value;
-                    OnPropertyChanged("StrokeDashArray");
-                }
-            }
+            get { return (DoubleCollection)GetValue(StrokeDashArrayProperty); }
+            set { SetValue(StrokeDashArrayProperty, value); }
         }
 
         internal void HideAdorner()
         {
-            if (this.connectionAdorner != null)
-                this.connectionAdorner.Visibility = Visibility.Collapsed;
+            if (_connectionAdorner != null)
+                _connectionAdorner.Visibility = Visibility.Collapsed;
         }
 
-        protected override void OnMouseDown(System.Windows.Input.MouseButtonEventArgs e)
+        protected override void OnMouseDown(MouseButtonEventArgs e)
         {
             base.OnMouseDown(e);
 
             // usual selection business
-            DesignerCanvas designer = VisualTreeHelper.GetParent(this) as DesignerCanvas;
-            if (designer != null)
+            if (VisualTreeHelper.GetParent(this) is WidgetPanel panel)
                 if ((Keyboard.Modifiers & (ModifierKeys.Shift | ModifierKeys.Control)) != ModifierKeys.None)
-                    if (this.IsSelected)
+                    if (IsSelected)
                     {
-                        this.IsSelected = false;
-                        designer.SelectedItems.Remove(this);
+                        IsSelected = false;
+                        panel.SelectedItems.Remove(this);
                     }
                     else
                     {
-                        this.IsSelected = true;
-                        designer.SelectedItems.Add(this);
+                        IsSelected = true;
+                        panel.SelectedItems.Add(this);
                     }
-                else if (!this.IsSelected)
+                else if (!IsSelected)
                 {
-                    foreach (ISelectable item in designer.SelectedItems)
+                    foreach (var item in panel.SelectedItems)
                         item.IsSelected = false;
 
-                    designer.SelectedItems.Clear();
-                    this.IsSelected = true;
-                    designer.SelectedItems.Add(this);
+                    panel.SelectedItems.Clear();
+                    IsSelected = true;
+                    panel.SelectedItems.Add(this);
                 }
             e.Handled = false;
+        }
+
+        private static void OnConnectorPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var connection = (Connection)d;
+            var positionPropertyDescriptor = DependencyPropertyDescriptor.FromProperty(Connector.PositionProperty, typeof(Connector));
+
+            if (e.OldValue is Connector oldConnector)
+            {
+                positionPropertyDescriptor.RemoveValueChanged(oldConnector, connection.OnConnectorPositionChanged);
+                oldConnector.Connections.Remove(connection);
+            }
+
+            if (e.NewValue is Connector newConnector)
+            {
+                positionPropertyDescriptor.AddValueChanged(newConnector, connection.OnConnectorPositionChanged);
+                newConnector.Connections.Add(connection);
+            }
+
+            connection.UpdatePathGeometry();
+        }
+
+        private static void OnIsSelectedPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var connection = (Connection)d;
+            if (e.NewValue as bool? == true)
+            {
+                connection.ShowAdorner();
+            }
+            else
+            {
+                connection.HideAdorner();
+            }
+        }
+
+        private static void OnPathGeometryPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var connection = (Connection)d;
+            connection.UpdateAnchorPosition();
         }
 
         private void Connection_Unloaded(object sender, RoutedEventArgs e)
@@ -285,21 +214,29 @@ namespace DiagramDesigner
             // do some housekeeping when Connection is unloaded
 
             // remove event handler
-            source.PropertyChanged -= new PropertyChangedEventHandler(OnConnectorPositionChanged);
-            sink.PropertyChanged -= new PropertyChangedEventHandler(OnConnectorPositionChanged);
+            Source = null;
+            Sink = null;
 
             // remove adorner
-            if (this.connectionAdorner != null)
+            if (_connectionAdorner != null)
             {
-                DesignerCanvas designer = VisualTreeHelper.GetParent(this) as DesignerCanvas;
-
-                AdornerLayer adornerLayer = AdornerLayer.GetAdornerLayer(designer);
-                if (adornerLayer != null)
+                var panel = (WidgetPanel)VisualTreeHelper.GetParent(this);
+                if (panel != null)
                 {
-                    adornerLayer.Remove(this.connectionAdorner);
-                    this.connectionAdorner = null;
+                    var adornerLayer = AdornerLayer.GetAdornerLayer(panel);
+
+                    if (adornerLayer != null)
+                    {
+                        adornerLayer.Remove(_connectionAdorner);
+                        _connectionAdorner = null;
+                    }
                 }
             }
+        }
+
+        private void OnConnectorPositionChanged(object sender, EventArgs e)
+        {
+            UpdatePathGeometry();
         }
 
         private void OnConnectorPositionChanged(object sender, PropertyChangedEventArgs e)
@@ -315,43 +252,39 @@ namespace DiagramDesigner
         private void ShowAdorner()
         {
             // the ConnectionAdorner is created once for each Connection
-            if (this.connectionAdorner == null)
+            if (_connectionAdorner == null)
             {
-                DesignerCanvas designer = VisualTreeHelper.GetParent(this) as DesignerCanvas;
+                var panel = VisualTreeHelper.GetParent(this) as WidgetPanel;
 
-                AdornerLayer adornerLayer = AdornerLayer.GetAdornerLayer(designer);
+                var adornerLayer = AdornerLayer.GetAdornerLayer(panel);
                 if (adornerLayer != null)
                 {
-                    this.connectionAdorner = new ConnectionAdorner(designer, this);
-                    adornerLayer.Add(this.connectionAdorner);
+                    _connectionAdorner = new ConnectionAdorner(panel, this);
+                    adornerLayer.Add(_connectionAdorner);
                 }
             }
-            this.connectionAdorner.Visibility = Visibility.Visible;
+            _connectionAdorner.Visibility = Visibility.Visible;
         }
 
         private void UpdateAnchorPosition()
         {
-            Point pathStartPoint, pathTangentAtStartPoint;
-            Point pathEndPoint, pathTangentAtEndPoint;
-            Point pathMidPoint, pathTangentAtMidPoint;
-
             // the PathGeometry.GetPointAtFractionLength method gets the point and a tangent vector
             // on PathGeometry at the specified fraction of its length
-            this.PathGeometry.GetPointAtFractionLength(0, out pathStartPoint, out pathTangentAtStartPoint);
-            this.PathGeometry.GetPointAtFractionLength(1, out pathEndPoint, out pathTangentAtEndPoint);
-            this.PathGeometry.GetPointAtFractionLength(0.5, out pathMidPoint, out pathTangentAtMidPoint);
+            PathGeometry.GetPointAtFractionLength(0, out var pathStartPoint, out var pathTangentAtStartPoint);
+            PathGeometry.GetPointAtFractionLength(1, out var pathEndPoint, out var pathTangentAtEndPoint);
+            PathGeometry.GetPointAtFractionLength(0.5, out var pathMidPoint, out _);
 
             // get angle from tangent vector
-            this.AnchorAngleSource = Math.Atan2(-pathTangentAtStartPoint.Y, -pathTangentAtStartPoint.X) * (180 / Math.PI);
-            this.AnchorAngleSink = Math.Atan2(pathTangentAtEndPoint.Y, pathTangentAtEndPoint.X) * (180 / Math.PI);
+            SourceAnchorAngle = Math.Atan2(-pathTangentAtStartPoint.Y, -pathTangentAtStartPoint.X) * (180 / Math.PI);
+            SinkAnchorAngle = Math.Atan2(pathTangentAtEndPoint.Y, pathTangentAtEndPoint.X) * (180 / Math.PI);
 
             // add some margin on source and sink side for visual reasons only
             pathStartPoint.Offset(-pathTangentAtStartPoint.X * 5, -pathTangentAtStartPoint.Y * 5);
             pathEndPoint.Offset(pathTangentAtEndPoint.X * 5, pathTangentAtEndPoint.Y * 5);
 
-            this.AnchorPositionSource = pathStartPoint;
-            this.AnchorPositionSink = pathEndPoint;
-            this.LabelPosition = pathMidPoint;
+            SourceAnchorPosition = pathStartPoint;
+            SinkAnchorPosition = pathEndPoint;
+            LabelPosition = pathMidPoint;
         }
 
         private void UpdatePathGeometry()

@@ -74,7 +74,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="Resources\DesignerItem.xaml">
+    <Page Include="Resources\Widget.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -143,8 +143,8 @@
     <Compile Include="Controls\DragThumb.cs" />
     <Compile Include="Controls\RelativePositionPanel.cs" />
     <Compile Include="Controls\ResizeThumb.cs" />
-    <Compile Include="DesignerCanvas.cs" />
-    <Compile Include="DesignerItem.cs" />
+    <Compile Include="WidgetPanel.cs" />
+    <Compile Include="Widget.cs" />
     <Compile Include="ISelectable.cs" />
     <Compile Include="PathFinder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">

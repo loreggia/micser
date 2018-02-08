@@ -12,12 +12,12 @@ namespace DiagramDesigner
         private Point? endPoint;
         private Pen rubberbandPen;
 
-        private DesignerCanvas designerCanvas;
+        private WidgetPanel _widgetPanel;
 
-        public RubberbandAdorner(DesignerCanvas designerCanvas, Point? dragStartPoint)
-            : base(designerCanvas)
+        public RubberbandAdorner(WidgetPanel widgetPanel, Point? dragStartPoint)
+            : base(widgetPanel)
         {
-            this.designerCanvas = designerCanvas;
+            this._widgetPanel = widgetPanel;
             this.startPoint = dragStartPoint;
             rubberbandPen = new Pen(Brushes.LightSlateGray, 1);
             rubberbandPen.DashStyle = new DashStyle(new double[] { 2 }, 1);
@@ -48,7 +48,7 @@ namespace DiagramDesigner
             if (this.IsMouseCaptured) this.ReleaseMouseCapture();
 
             // remove this adorner from adorner layer
-            AdornerLayer adornerLayer = AdornerLayer.GetAdornerLayer(this.designerCanvas);
+            AdornerLayer adornerLayer = AdornerLayer.GetAdornerLayer(this._widgetPanel);
             if (adornerLayer != null)
                 adornerLayer.Remove(this);
 
@@ -70,21 +70,21 @@ namespace DiagramDesigner
 
         private void UpdateSelection()
         {
-            foreach (ISelectable item in designerCanvas.SelectedItems)
+            foreach (ISelectable item in _widgetPanel.SelectedItems)
                 item.IsSelected = false;
-            designerCanvas.SelectedItems.Clear();
+            _widgetPanel.SelectedItems.Clear();
 
             Rect rubberBand = new Rect(startPoint.Value, endPoint.Value);
-            foreach (Control item in designerCanvas.Children)
+            foreach (Control item in _widgetPanel.Children)
             {
                 Rect itemRect = VisualTreeHelper.GetDescendantBounds(item);
-                Rect itemBounds = item.TransformToAncestor(designerCanvas).TransformBounds(itemRect);
+                Rect itemBounds = item.TransformToAncestor(_widgetPanel).TransformBounds(itemRect);
 
                 if (rubberBand.Contains(itemBounds) && item is ISelectable)
                 {
                     ISelectable selectableItem = item as ISelectable;
                     selectableItem.IsSelected = true;
-                    designerCanvas.SelectedItems.Add(selectableItem);
+                    _widgetPanel.SelectedItems.Add(selectableItem);
                 }
             }
         }
