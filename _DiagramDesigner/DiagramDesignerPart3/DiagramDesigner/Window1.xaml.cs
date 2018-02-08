@@ -1,12 +1,10 @@
-﻿using System.Windows;
-
-namespace DiagramDesigner
+﻿namespace DiagramDesigner
 {
-    public partial class Window1 : Window
+    public partial class Window1
     {
         public Window1()
         {
-            InitializeComponent();                        
-        }        
+            InitializeComponent();
+        }
     }
 }

@@ -140,9 +140,9 @@
     <Compile Include="Connection.cs" />
     <Compile Include="ConnectorAdorner.cs" />
     <Compile Include="Connector.cs" />
-    <Compile Include="Controls\DragThumb.cs" />
-    <Compile Include="Controls\RelativePositionPanel.cs" />
-    <Compile Include="Controls\ResizeThumb.cs" />
+    <Compile Include="DragThumb.cs" />
+    <Compile Include="RelativePositionPanel.cs" />
+    <Compile Include="ResizeThumb.cs" />
     <Compile Include="WidgetPanel.cs" />
     <Compile Include="Widget.cs" />
     <Compile Include="ISelectable.cs" />
@@ -194,6 +194,7 @@
   <ItemGroup>
     <Resource Include="Resources\Images\software.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
