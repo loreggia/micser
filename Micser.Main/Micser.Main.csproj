@@ -97,6 +97,7 @@
     <Compile Include="Controls\ConnectorAdorner.cs" />
     <Compile Include="Controls\ISelectable.cs" />
     <Compile Include="Controls\MoveThumb.cs" />
+    <Compile Include="Controls\PathFinder.cs" />
     <Compile Include="Controls\ResizeThumb.cs" />
     <Compile Include="Controls\RubberbandAdorner.cs" />
     <Compile Include="Controls\Widget.cs" />

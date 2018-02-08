@@ -11,6 +11,9 @@ namespace Micser.Main.Controls
         public static readonly DependencyProperty HeaderProperty = DependencyProperty.Register(
             nameof(Header), typeof(object), typeof(Widget), new PropertyMetadata(null));
 
+        public static readonly DependencyProperty IsDragConnectionOverProperty = DependencyProperty.Register(
+            nameof(IsDragConnectionOver), typeof(bool), typeof(Widget), new PropertyMetadata(false));
+
         public static readonly DependencyProperty IsSelectedProperty = DependencyProperty.Register(
             nameof(IsSelected), typeof(bool), typeof(Widget), new PropertyMetadata(false));
 
@@ -29,6 +32,12 @@ namespace Micser.Main.Controls
         {
             get => GetValue(HeaderProperty);
             set => SetValue(HeaderProperty, value);
+        }
+
+        public bool IsDragConnectionOver
+        {
+            get => (bool)GetValue(IsDragConnectionOverProperty);
+            set => SetValue(IsDragConnectionOverProperty, value);
         }
 
         public bool IsSelected
