@@ -6,83 +6,27 @@ using DiagramDesigner.Controls;
 
 namespace DiagramDesigner
 {
-    //These attributes identify the types of the named parts that are used for templating
     [TemplatePart(Name = "PART_DragThumb", Type = typeof(DragThumb))]
     [TemplatePart(Name = "PART_ResizeDecorator", Type = typeof(Control))]
     [TemplatePart(Name = "PART_ConnectorDecorator", Type = typeof(Control))]
     [TemplatePart(Name = "PART_ContentPresenter", Type = typeof(ContentPresenter))]
     public class Widget : ContentControl, ISelectable
     {
-        #region IsSelected Property
+        /// <summary>
+        /// Can be used to replace the default template for the ConnectorDecorator.
+        /// </summary>
+        public static readonly DependencyProperty ConnectorDecoratorTemplateProperty = DependencyProperty.RegisterAttached("ConnectorDecoratorTemplate", typeof(ControlTemplate), typeof(Widget));
 
-        public static readonly DependencyProperty IsSelectedProperty =
-          DependencyProperty.Register("IsSelected",
-                                       typeof(bool),
-                                       typeof(Widget),
-                                       new FrameworkPropertyMetadata(false));
+        /// <summary>
+        /// Can be used to replace the default template for the DragThumb.
+        /// </summary>
+        public static readonly DependencyProperty DragThumbTemplateProperty = DependencyProperty.RegisterAttached("DragThumbTemplate", typeof(ControlTemplate), typeof(Widget));
 
-        public bool IsSelected
-        {
-            get { return (bool)GetValue(IsSelectedProperty); }
-            set { SetValue(IsSelectedProperty, value); }
-        }
+        public static readonly DependencyProperty IsDragConnectionOverProperty = DependencyProperty.Register(
+            nameof(IsDragConnectionOver), typeof(bool), typeof(Widget), new FrameworkPropertyMetadata(false));
 
-        #endregion IsSelected Property
-
-        #region DragThumbTemplate Property
-
-        // can be used to replace the default template for the DragThumb
-        public static readonly DependencyProperty DragThumbTemplateProperty =
-            DependencyProperty.RegisterAttached("DragThumbTemplate", typeof(ControlTemplate), typeof(Widget));
-
-        public static ControlTemplate GetDragThumbTemplate(UIElement element)
-        {
-            return (ControlTemplate)element.GetValue(DragThumbTemplateProperty);
-        }
-
-        public static void SetDragThumbTemplate(UIElement element, ControlTemplate value)
-        {
-            element.SetValue(DragThumbTemplateProperty, value);
-        }
-
-        #endregion DragThumbTemplate Property
-
-        #region ConnectorDecoratorTemplate Property
-
-        // can be used to replace the default template for the ConnectorDecorator
-        public static readonly DependencyProperty ConnectorDecoratorTemplateProperty =
-            DependencyProperty.RegisterAttached("ConnectorDecoratorTemplate", typeof(ControlTemplate), typeof(Widget));
-
-        public static ControlTemplate GetConnectorDecoratorTemplate(UIElement element)
-        {
-            return (ControlTemplate)element.GetValue(ConnectorDecoratorTemplateProperty);
-        }
-
-        public static void SetConnectorDecoratorTemplate(UIElement element, ControlTemplate value)
-        {
-            element.SetValue(ConnectorDecoratorTemplateProperty, value);
-        }
-
-        #endregion ConnectorDecoratorTemplate Property
-
-        #region IsDragConnectionOver
-
-        public static readonly DependencyProperty IsDragConnectionOverProperty =
-                    DependencyProperty.Register("IsDragConnectionOver",
-                                                 typeof(bool),
-                                                 typeof(Widget),
-                                                 new FrameworkPropertyMetadata(false));
-
-        // while drag connection procedure is ongoing and the mouse moves over
-        // this item this value is true; if true the ConnectorDecorator is triggered
-        // to be visible, see template
-        public bool IsDragConnectionOver
-        {
-            get { return (bool)GetValue(IsDragConnectionOverProperty); }
-            set { SetValue(IsDragConnectionOverProperty, value); }
-        }
-
-        #endregion IsDragConnectionOver
+        public static readonly DependencyProperty IsSelectedProperty = DependencyProperty.Register(
+            nameof(IsSelected), typeof(bool), typeof(Widget), new FrameworkPropertyMetadata(false));
 
         static Widget()
         {
@@ -94,33 +38,74 @@ namespace DiagramDesigner
             Loaded += OnWidgetLoaded;
         }
 
+        /// <summary>
+        /// While drag connection procedure is ongoing and the mouse moves over this item this value is true; if true the ConnectorDecorator is triggered to be visible, see template.
+        /// </summary>
+        public bool IsDragConnectionOver
+        {
+            get => (bool)GetValue(IsDragConnectionOverProperty);
+            set => SetValue(IsDragConnectionOverProperty, value);
+        }
+
+        public bool IsSelected
+        {
+            get => (bool)GetValue(IsSelectedProperty);
+            set => SetValue(IsSelectedProperty, value);
+        }
+
+        public static ControlTemplate GetConnectorDecoratorTemplate(UIElement element)
+        {
+            return (ControlTemplate)element.GetValue(ConnectorDecoratorTemplateProperty);
+        }
+
+        public static ControlTemplate GetDragThumbTemplate(UIElement element)
+        {
+            return (ControlTemplate)element.GetValue(DragThumbTemplateProperty);
+        }
+
+        public static void SetConnectorDecoratorTemplate(UIElement element, ControlTemplate value)
+        {
+            element.SetValue(ConnectorDecoratorTemplateProperty, value);
+        }
+
+        public static void SetDragThumbTemplate(UIElement element, ControlTemplate value)
+        {
+            element.SetValue(DragThumbTemplateProperty, value);
+        }
+
         protected override void OnPreviewMouseDown(MouseButtonEventArgs e)
         {
             base.OnPreviewMouseDown(e);
-            WidgetPanel panel = VisualTreeHelper.GetParent(this) as WidgetPanel;
 
             // update selection
-            if (panel != null)
+            if (VisualTreeHelper.GetParent(this) is WidgetPanel panel)
+            {
                 if ((Keyboard.Modifiers & (ModifierKeys.Shift | ModifierKeys.Control)) != ModifierKeys.None)
-                    if (this.IsSelected)
+                {
+                    if (IsSelected)
                     {
-                        this.IsSelected = false;
+                        IsSelected = false;
                         panel.SelectedItems.Remove(this);
                     }
                     else
                     {
-                        this.IsSelected = true;
+                        IsSelected = true;
                         panel.SelectedItems.Add(this);
                     }
-                else if (!this.IsSelected)
+                }
+                else if (!IsSelected)
                 {
-                    foreach (ISelectable item in panel.SelectedItems)
+                    foreach (var item in panel.SelectedItems)
+                    {
                         item.IsSelected = false;
+                    }
 
                     panel.SelectedItems.Clear();
-                    this.IsSelected = true;
+                    IsSelected = true;
                     panel.SelectedItems.Add(this);
                 }
+            }
+
             e.Handled = false;
         }
 
@@ -131,32 +116,26 @@ namespace DiagramDesigner
             // Note: this method is only executed when the Loaded event is fired, so
             // setting DragThumbTemplate or ConnectorDecoratorTemplate properties after
             // will have no effect.
-            if (base.Template != null)
+            if (Template?.FindName("PART_ContentPresenter", this) is ContentPresenter contentPresenter)
             {
-                ContentPresenter contentPresenter =
-                    this.Template.FindName("PART_ContentPresenter", this) as ContentPresenter;
-                if (contentPresenter != null)
+                if (VisualTreeHelper.GetChild(contentPresenter, 0) is UIElement contentVisual)
                 {
-                    UIElement contentVisual = VisualTreeHelper.GetChild(contentPresenter, 0) as UIElement;
-                    if (contentVisual != null)
+                    var thumb = Template.FindName("PART_DragThumb", this) as DragThumb;
+                    var connectorDecorator = Template.FindName("PART_ConnectorDecorator", this) as Control;
+
+                    if (thumb != null)
                     {
-                        DragThumb thumb = this.Template.FindName("PART_DragThumb", this) as DragThumb;
-                        Control connectorDecorator = this.Template.FindName("PART_ConnectorDecorator", this) as Control;
-
-                        if (thumb != null)
+                        if (GetDragThumbTemplate(contentVisual) is ControlTemplate template)
                         {
-                            ControlTemplate template =
-                                Widget.GetDragThumbTemplate(contentVisual) as ControlTemplate;
-                            if (template != null)
-                                thumb.Template = template;
+                            thumb.Template = template;
                         }
+                    }
 
-                        if (connectorDecorator != null)
+                    if (connectorDecorator != null)
+                    {
+                        if (GetConnectorDecoratorTemplate(contentVisual) is ControlTemplate template)
                         {
-                            ControlTemplate template =
-                                Widget.GetConnectorDecoratorTemplate(contentVisual) as ControlTemplate;
-                            if (template != null)
-                                connectorDecorator.Template = template;
+                            connectorDecorator.Template = template;
                         }
                     }
                 }

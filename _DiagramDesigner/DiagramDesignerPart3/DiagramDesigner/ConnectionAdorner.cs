@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
@@ -31,7 +31,12 @@ namespace DiagramDesigner
             _visualChildren.Add(_adornerCanvas);
 
             _connection = connection;
-            _connection.PropertyChanged += new PropertyChangedEventHandler(AnchorPositionChanged);
+
+            var spd = DependencyPropertyDescriptor.FromProperty(Connection.SourceAnchorPositionProperty, typeof(Connection));
+            spd.AddValueChanged(_connection, SourceAnchorPositionChanged);
+
+            spd = DependencyPropertyDescriptor.FromProperty(Connection.SinkAnchorPositionProperty, typeof(Connection));
+            spd.AddValueChanged(_connection, SinkAnchorPositionChanged);
 
             InitializeDragThumbs();
 
@@ -92,21 +97,6 @@ namespace DiagramDesigner
         {
             base.OnRender(dc);
             dc.DrawGeometry(null, _drawingPen, _pathGeometry);
-        }
-
-        private void AnchorPositionChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName.Equals("AnchorPositionSource"))
-            {
-                Canvas.SetLeft(_sourceDragThumb, _connection.SourceAnchorPosition.X);
-                Canvas.SetTop(_sourceDragThumb, _connection.SourceAnchorPosition.Y);
-            }
-
-            if (e.PropertyName.Equals("AnchorPositionSink"))
-            {
-                Canvas.SetLeft(_sinkDragThumb, _connection.SinkAnchorPosition.X);
-                Canvas.SetTop(_sinkDragThumb, _connection.SinkAnchorPosition.Y);
-            }
         }
 
         private void HitTesting(Point hitPoint)
@@ -172,6 +162,18 @@ namespace DiagramDesigner
             _sinkDragThumb.DragDelta += thumbDragThumb_DragDelta;
             _sinkDragThumb.DragStarted += thumbDragThumb_DragStarted;
             _sinkDragThumb.DragCompleted += thumbDragThumb_DragCompleted;
+        }
+
+        private void SinkAnchorPositionChanged(object sender, EventArgs e)
+        {
+            Canvas.SetLeft(_sinkDragThumb, _connection.SinkAnchorPosition.X);
+            Canvas.SetTop(_sinkDragThumb, _connection.SinkAnchorPosition.Y);
+        }
+
+        private void SourceAnchorPositionChanged(object sender, EventArgs e)
+        {
+            Canvas.SetLeft(_sourceDragThumb, _connection.SourceAnchorPosition.X);
+            Canvas.SetTop(_sourceDragThumb, _connection.SourceAnchorPosition.Y);
         }
 
         private void thumbDragThumb_DragCompleted(object sender, DragCompletedEventArgs e)

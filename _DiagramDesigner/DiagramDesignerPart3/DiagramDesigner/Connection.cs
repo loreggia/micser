@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
@@ -19,19 +18,19 @@ namespace DiagramDesigner
     public class Connection : Control, ISelectable
     {
         public static readonly DependencyProperty IsSelectedProperty = DependencyProperty.Register(
-            "IsSelected", typeof(bool), typeof(Connection), new PropertyMetadata(false, OnIsSelectedPropertyChanged));
+            nameof(IsSelected), typeof(bool), typeof(Connection), new PropertyMetadata(false, OnIsSelectedPropertyChanged));
 
         public static readonly DependencyProperty LabelPositionProperty = DependencyProperty.Register(
-            "LabelPosition", typeof(Point), typeof(Connection), new PropertyMetadata(default(Point)));
+            nameof(LabelPosition), typeof(Point), typeof(Connection), new PropertyMetadata(default(Point)));
 
         public static readonly DependencyProperty PathGeometryProperty = DependencyProperty.Register(
-            "PathGeometry", typeof(PathGeometry), typeof(Connection), new PropertyMetadata(null, OnPathGeometryPropertyChanged));
+            nameof(PathGeometry), typeof(PathGeometry), typeof(Connection), new PropertyMetadata(null, OnPathGeometryPropertyChanged));
 
         public static readonly DependencyProperty SinkAnchorAngleProperty = DependencyProperty.Register(
-            "SinkAnchorAngle", typeof(double), typeof(Connection), new PropertyMetadata(default(double)));
+            nameof(SinkAnchorAngle), typeof(double), typeof(Connection), new PropertyMetadata(0d));
 
         public static readonly DependencyProperty SinkAnchorPositionProperty = DependencyProperty.Register(
-            "SinkAnchorPosition", typeof(Point), typeof(Connection), new PropertyMetadata(default(Point)));
+            nameof(SinkAnchorPosition), typeof(Point), typeof(Connection), new PropertyMetadata(default(Point)));
 
         public static readonly DependencyProperty SinkArrowSymbolProperty = DependencyProperty.Register(
             nameof(SinkArrowSymbol), typeof(ArrowSymbol), typeof(Connection), new PropertyMetadata(ArrowSymbol.Arrow));
@@ -40,19 +39,19 @@ namespace DiagramDesigner
             nameof(Sink), typeof(Connector), typeof(Connection), new PropertyMetadata(null, OnConnectorPropertyChanged));
 
         public static readonly DependencyProperty SourceAnchorAngleProperty = DependencyProperty.Register(
-            "SourceAnchorAngle", typeof(double), typeof(Connection), new PropertyMetadata(default(double)));
+            nameof(SourceAnchorAngle), typeof(double), typeof(Connection), new PropertyMetadata(0d));
 
         public static readonly DependencyProperty SourceAnchorPositionProperty = DependencyProperty.Register(
-            "SourceAnchorPosition", typeof(Point), typeof(Connection), new PropertyMetadata(default(Point), OnSourceAnchorPositionPropertyChanged));
+            nameof(SourceAnchorPosition), typeof(Point), typeof(Connection), new PropertyMetadata(default(Point)));
 
         public static readonly DependencyProperty SourceArrowSymbolProperty = DependencyProperty.Register(
-            "SourceArrowSymbol", typeof(ArrowSymbol), typeof(Connection), new PropertyMetadata(ArrowSymbol.None));
+            nameof(SourceArrowSymbol), typeof(ArrowSymbol), typeof(Connection), new PropertyMetadata(ArrowSymbol.None));
 
         public static readonly DependencyProperty SourceProperty = DependencyProperty.Register(
             nameof(Source), typeof(Connector), typeof(Connection), new PropertyMetadata(null, OnConnectorPropertyChanged));
 
         public static readonly DependencyProperty StrokeDashArrayProperty = DependencyProperty.Register(
-            "StrokeDashArray", typeof(DoubleCollection), typeof(Connection), new PropertyMetadata(default(DoubleCollection)));
+            nameof(StrokeDashArray), typeof(DoubleCollection), typeof(Connection), new PropertyMetadata(null));
 
         private Adorner _connectionAdorner;
 
@@ -218,10 +217,6 @@ namespace DiagramDesigner
             connection.UpdateAnchorPosition();
         }
 
-        private static void OnSourceAnchorPositionPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-        }
-
         private void Connection_Unloaded(object sender, RoutedEventArgs e)
         {
             // do some housekeeping when Connection is unloaded
@@ -257,16 +252,21 @@ namespace DiagramDesigner
             // the ConnectionAdorner is created once for each Connection
             if (_connectionAdorner == null)
             {
-                var panel = VisualTreeHelper.GetParent(this) as WidgetPanel;
-
-                var adornerLayer = AdornerLayer.GetAdornerLayer(panel);
-                if (adornerLayer != null)
+                if (VisualTreeHelper.GetParent(this) is WidgetPanel panel)
                 {
-                    _connectionAdorner = new ConnectionAdorner(panel, this);
-                    adornerLayer.Add(_connectionAdorner);
+                    var adornerLayer = AdornerLayer.GetAdornerLayer(panel);
+                    if (adornerLayer != null)
+                    {
+                        _connectionAdorner = new ConnectionAdorner(panel, this);
+                        adornerLayer.Add(_connectionAdorner);
+                    }
                 }
             }
-            _connectionAdorner.Visibility = Visibility.Visible;
+
+            if (_connectionAdorner != null)
+            {
+                _connectionAdorner.Visibility = Visibility.Visible;
+            }
         }
 
         private void UpdateAnchorPosition()

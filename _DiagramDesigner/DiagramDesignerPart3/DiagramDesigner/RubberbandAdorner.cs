@@ -8,49 +8,55 @@ namespace DiagramDesigner
 {
     public class RubberbandAdorner : Adorner
     {
-        private Point? startPoint;
-        private Point? endPoint;
-        private Pen rubberbandPen;
-
-        private WidgetPanel _widgetPanel;
+        private readonly Pen _rubberbandPen;
+        private readonly WidgetPanel _widgetPanel;
+        private Point? _endPoint;
+        private Point? _startPoint;
 
         public RubberbandAdorner(WidgetPanel widgetPanel, Point? dragStartPoint)
             : base(widgetPanel)
         {
-            this._widgetPanel = widgetPanel;
-            this.startPoint = dragStartPoint;
-            rubberbandPen = new Pen(Brushes.LightSlateGray, 1);
-            rubberbandPen.DashStyle = new DashStyle(new double[] { 2 }, 1);
+            _widgetPanel = widgetPanel;
+            _startPoint = dragStartPoint;
+            _rubberbandPen = new Pen(Brushes.LightSlateGray, 1);
+            _rubberbandPen.DashStyle = new DashStyle(new double[] { 2 }, 1);
         }
 
-        protected override void OnMouseMove(System.Windows.Input.MouseEventArgs e)
+        protected override void OnMouseMove(MouseEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed)
             {
-                if (!this.IsMouseCaptured)
-                    this.CaptureMouse();
+                if (!IsMouseCaptured)
+                {
+                    CaptureMouse();
+                }
 
-                endPoint = e.GetPosition(this);
+                _endPoint = e.GetPosition(this);
                 UpdateSelection();
-                this.InvalidateVisual();
+                InvalidateVisual();
             }
             else
             {
-                if (this.IsMouseCaptured) this.ReleaseMouseCapture();
+                if (IsMouseCaptured)
+                {
+                    ReleaseMouseCapture();
+                }
             }
 
             e.Handled = true;
         }
 
-        protected override void OnMouseUp(System.Windows.Input.MouseButtonEventArgs e)
+        protected override void OnMouseUp(MouseButtonEventArgs e)
         {
             // release mouse capture
-            if (this.IsMouseCaptured) this.ReleaseMouseCapture();
+            if (IsMouseCaptured)
+            {
+                ReleaseMouseCapture();
+            }
 
             // remove this adorner from adorner layer
-            AdornerLayer adornerLayer = AdornerLayer.GetAdornerLayer(this._widgetPanel);
-            if (adornerLayer != null)
-                adornerLayer.Remove(this);
+            var adornerLayer = AdornerLayer.GetAdornerLayer(_widgetPanel);
+            adornerLayer?.Remove(this);
 
             e.Handled = true;
         }
@@ -64,25 +70,34 @@ namespace DiagramDesigner
             // the ConnectionAdorner does.
             dc.DrawRectangle(Brushes.Transparent, null, new Rect(RenderSize));
 
-            if (this.startPoint.HasValue && this.endPoint.HasValue)
-                dc.DrawRectangle(Brushes.Transparent, rubberbandPen, new Rect(this.startPoint.Value, this.endPoint.Value));
+            if (_startPoint.HasValue && _endPoint.HasValue)
+            {
+                dc.DrawRectangle(Brushes.Transparent, _rubberbandPen, new Rect(_startPoint.Value, _endPoint.Value));
+            }
         }
 
         private void UpdateSelection()
         {
-            foreach (ISelectable item in _widgetPanel.SelectedItems)
+            foreach (var item in _widgetPanel.SelectedItems)
+            {
                 item.IsSelected = false;
+            }
+
             _widgetPanel.SelectedItems.Clear();
 
-            Rect rubberBand = new Rect(startPoint.Value, endPoint.Value);
+            if (_startPoint == null || _endPoint == null)
+            {
+                return;
+            }
+
+            var rubberBand = new Rect(_startPoint.Value, _endPoint.Value);
             foreach (Control item in _widgetPanel.Children)
             {
-                Rect itemRect = VisualTreeHelper.GetDescendantBounds(item);
-                Rect itemBounds = item.TransformToAncestor(_widgetPanel).TransformBounds(itemRect);
+                var itemRect = VisualTreeHelper.GetDescendantBounds(item);
+                var itemBounds = item.TransformToAncestor(_widgetPanel).TransformBounds(itemRect);
 
-                if (rubberBand.Contains(itemBounds) && item is ISelectable)
+                if (rubberBand.Contains(itemBounds) && item is ISelectable selectableItem)
                 {
-                    ISelectable selectableItem = item as ISelectable;
                     selectableItem.IsSelected = true;
                     _widgetPanel.SelectedItems.Add(selectableItem);
                 }

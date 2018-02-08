@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -18,9 +17,10 @@ namespace DiagramDesigner
         Bottom
     }
 
-    // provides compact info about a connector; used for the
-    // routing algorithm, instead of hand over a full fledged Connector
-    internal struct ConnectorInfo
+    /// <summary>
+    /// Provides compact info about a connector; used for the routing algorithm, instead of hand over a full fledged Connector.
+    /// </summary>
+    public struct ConnectorInfo
     {
         public ConnectorOrientation Orientation { get; set; }
         public Point Position { get; set; }
@@ -41,9 +41,8 @@ namespace DiagramDesigner
 
         public Connector()
         {
-            // fired when layout changes
-            LayoutUpdated += Connector_LayoutUpdated;
             Connections = new List<Connection>();
+            LayoutUpdated += Connector_LayoutUpdated;
         }
 
         public List<Connection> Connections { get; }
