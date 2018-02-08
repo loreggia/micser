@@ -9,10 +9,12 @@
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="Resources/Thumbs.xaml" />
+                <ResourceDictionary Source="Resources/Connection.xaml" />
+                <ResourceDictionary Source="Resources/Connector.xaml" />
                 <ResourceDictionary Source="Resources/Widget.xaml" />
                 <ResourceDictionary Source="Resources/ToolboxItem.xaml" />
                 <ResourceDictionary Source="Resources/Toolbox.xaml" />
-                <ResourceDictionary Source="Resources/Connection.xaml" />
                 <ResourceDictionary Source="Resources/Stencils/FlowChartStencils.xaml" />
                 <ResourceDictionary Source="Resources/Stencils/ShapeStencils.xaml" />
                 <ResourceDictionary Source="Resources/Stencils/SymbolStencils.xaml" />
