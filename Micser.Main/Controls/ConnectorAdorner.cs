@@ -1,45 +1,50 @@
-﻿using System.Collections.Generic;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using Micser.Infrastructure;
 
 namespace Micser.Main.Controls
 {
     public class ConnectorAdorner : Adorner
     {
-        public static readonly DependencyProperty HitConnectorProperty = DependencyProperty.Register(
-            nameof(HitConnector), typeof(Connector), typeof(ConnectorAdorner), new PropertyMetadata(null));
-
-        public static readonly DependencyProperty HitWidgetProperty = DependencyProperty.Register(
-                    nameof(HitWidget), typeof(Widget), typeof(ConnectorAdorner), new PropertyMetadata(null, OnHitWidgetPropertyChanged));
-
         private readonly Pen _drawingPen;
         private readonly Connector _sourceConnector;
         private readonly WidgetPanel _widgetPanel;
+        private Widget _hitWidget;
         private PathGeometry _pathGeometry;
 
-        public ConnectorAdorner(WidgetPanel widgetPanel, Connector sourceConnector)
-            : base(widgetPanel)
+        public ConnectorAdorner(WidgetPanel panel, Connector sourceConnector)
+            : base(panel)
         {
-            _widgetPanel = widgetPanel;
+            _widgetPanel = panel;
             _sourceConnector = sourceConnector;
-            _drawingPen = new Pen(Brushes.LightSlateGray, 1);
-            _drawingPen.LineJoin = PenLineJoin.Round;
-
+            _drawingPen = new Pen(Brushes.LightSlateGray, 1)
+            {
+                LineJoin = PenLineJoin.Round
+            };
             Cursor = Cursors.Cross;
         }
 
-        public Connector HitConnector
-        {
-            get => (Connector)GetValue(HitConnectorProperty);
-            set => SetValue(HitConnectorProperty, value);
-        }
+        private Connector HitConnector { get; set; }
 
-        public Widget HitWidget
+        private Widget HitWidget
         {
-            get => (Widget)GetValue(HitWidgetProperty);
-            set => SetValue(HitWidgetProperty, value);
+            get => _hitWidget;
+            set
+            {
+                if (_hitWidget != null)
+                {
+                    _hitWidget.IsDragConnectionOver = false;
+                }
+
+                _hitWidget = value;
+
+                if (_hitWidget != null)
+                {
+                    _hitWidget.IsDragConnectionOver = true;
+                }
+            }
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
@@ -55,9 +60,12 @@ namespace Micser.Main.Controls
                 _pathGeometry = GetPathGeometry(e.GetPosition(this));
                 InvalidateVisual();
             }
-            else if (IsMouseCaptured)
+            else
             {
-                ReleaseMouseCapture();
+                if (IsMouseCaptured)
+                {
+                    ReleaseMouseCapture();
+                }
             }
         }
 
@@ -77,10 +85,7 @@ namespace Micser.Main.Controls
                 HitWidget.IsDragConnectionOver = false;
             }
 
-            if (IsMouseCaptured)
-            {
-                ReleaseMouseCapture();
-            }
+            if (IsMouseCaptured) ReleaseMouseCapture();
 
             var adornerLayer = AdornerLayer.GetAdornerLayer(_widgetPanel);
             adornerLayer?.Remove(this);
@@ -97,39 +102,20 @@ namespace Micser.Main.Controls
             dc.DrawRectangle(Brushes.Transparent, null, new Rect(RenderSize));
         }
 
-        private static void OnHitWidgetPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            if (e.OldValue is Widget oldWidget)
-            {
-                oldWidget.IsDragConnectionOver = false;
-            }
-
-            if (e.NewValue is Widget newWidget)
-            {
-                newWidget.IsDragConnectionOver = true;
-            }
-        }
-
         private PathGeometry GetPathGeometry(Point position)
         {
             var geometry = new PathGeometry();
 
-            ConnectorOrientation targetOrientation;
-            if (HitConnector != null)
-            {
-                targetOrientation = HitConnector.Orientation;
-            }
-            else
-            {
-                targetOrientation = ConnectorOrientation.None;
-            }
+            var targetOrientation = HitConnector?.Orientation ?? ConnectorOrientation.None;
 
-            List<Point> pathPoints = PathFinder.GetConnectionLine(sourceConnector.GetInfo(), position, targetOrientation);
+            var pathPoints = PathFinder.GetConnectionLine(_sourceConnector.GetInfo(), position, targetOrientation);
 
             if (pathPoints.Count > 0)
             {
-                PathFigure figure = new PathFigure();
-                figure.StartPoint = pathPoints[0];
+                var figure = new PathFigure
+                {
+                    StartPoint = pathPoints[0]
+                };
                 pathPoints.Remove(pathPoints[0]);
                 figure.Segments.Add(new PolyLineSegment(pathPoints, true));
                 geometry.Figures.Add(figure);
@@ -140,12 +126,12 @@ namespace Micser.Main.Controls
 
         private void HitTesting(Point hitPoint)
         {
-            bool hitConnectorFlag = false;
+            var hitConnectorFlag = false;
 
-            DependencyObject hitObject = designerCanvas.InputHitTest(hitPoint) as DependencyObject;
+            var hitObject = _widgetPanel.InputHitTest(hitPoint) as DependencyObject;
             while (hitObject != null &&
-                   hitObject != sourceConnector.ParentDesignerItem &&
-                   hitObject.GetType() != typeof(DesignerCanvas))
+                   !Equals(hitObject, _sourceConnector.ParentWidget) &&
+                   hitObject.GetType() != typeof(WidgetPanel))
             {
                 if (hitObject is Connector)
                 {
@@ -153,18 +139,21 @@ namespace Micser.Main.Controls
                     hitConnectorFlag = true;
                 }
 
-                if (hitObject is DesignerItem)
+                if (hitObject is Widget)
                 {
-                    HitDesignerItem = hitObject as DesignerItem;
+                    HitWidget = hitObject as Widget;
                     if (!hitConnectorFlag)
+                    {
                         HitConnector = null;
+                    }
+
                     return;
                 }
                 hitObject = VisualTreeHelper.GetParent(hitObject);
             }
 
             HitConnector = null;
-            HitDesignerItem = null;
+            HitWidget = null;
         }
     }
 }

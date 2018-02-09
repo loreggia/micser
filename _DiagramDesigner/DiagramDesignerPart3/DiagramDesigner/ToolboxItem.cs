@@ -7,7 +7,9 @@ using System.Windows.Media;
 
 namespace DiagramDesigner
 {
-    // Wraps info of the dragged object into a class
+    /// <summary>
+    /// Wraps info of the dragged object into a class.
+    /// </summary>
     public class DragObject
     {
         // Defines width and height of the Widget
@@ -18,7 +20,9 @@ namespace DiagramDesigner
         public String Xaml { get; set; }
     }
 
-    // Represents a selectable item in the Toolbox/>.
+    /// <summary>
+    /// Represents a selectable item in the Toolbox.
+    /// </summary>
     public class ToolboxItem : ContentControl
     {
         // caches the start point of the drag operation

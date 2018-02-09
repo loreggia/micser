@@ -1,104 +1,111 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Collections.Specialized;
-using System.Linq;
+using System.IO;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using System.Windows.Input;
-using Micser.Infrastructure.Extensions;
-using Micser.Main.Themes;
-using Micser.Main.ViewModels.Widgets;
-using Micser.Main.Views.Widgets;
+using System.Windows.Markup;
+using System.Xml;
+using Micser.Infrastructure;
+using Micser.Infrastructure.Controls;
 
 namespace Micser.Main.Controls
 {
-    // https://www.codeproject.com/Articles/23871/WPF-Diagram-Designer-Part
     public class WidgetPanel : Canvas
     {
-        public static readonly DependencyProperty IsWidgetLayoutChangingProperty = DependencyProperty.Register(
-            nameof(IsWidgetLayoutChanging), typeof(bool), typeof(WidgetPanel), new PropertyMetadata(false));
-
-        public static readonly DependencyProperty RasterSizeProperty = DependencyProperty.Register(
-            nameof(RasterSize), typeof(double), typeof(WidgetPanel), new PropertyMetadata(25d));
-
-        public static readonly DependencyProperty WidgetFactoryProperty = DependencyProperty.Register(
-            nameof(WidgetFactory), typeof(IWidgetFactory), typeof(WidgetPanel), new PropertyMetadata(null, OnWidgetFactoryPropertyChanged));
-
-        public static readonly DependencyProperty WidgetsProperty = DependencyProperty.Register(
-            nameof(Widgets), typeof(IEnumerable), typeof(WidgetPanel), new PropertyMetadata(null, OnWidgetsPropertyChanged));
-
+        // start point of the rubberband drag operation
         private Point? _rubberbandSelectionStartPoint;
-
-        static WidgetPanel()
-        {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(WidgetPanel), new FrameworkPropertyMetadata(typeof(WidgetPanel)));
-        }
 
         public WidgetPanel()
         {
             AllowDrop = true;
-
             SelectedItems = new List<ISelectable>();
-
-            Resources.MergedDictionaries.Add(ResourceManager.SharedDictionary);
-
-            AddHandler(Thumb.DragCompletedEvent, new DragCompletedEventHandler(OnWidgetLayoutChanged));
-            AddHandler(Thumb.DragStartedEvent, new DragStartedEventHandler(OnWidgetLayoutChanging));
-
-            Unloaded += OnUnloaded;
-        }
-
-        public bool IsWidgetLayoutChanging
-        {
-            get => (bool)GetValue(IsWidgetLayoutChangingProperty);
-            set => SetValue(IsWidgetLayoutChangingProperty, value);
-        }
-
-        public double RasterSize
-        {
-            get => (double)GetValue(RasterSizeProperty);
-            set => SetValue(RasterSizeProperty, value);
         }
 
         public IList<ISelectable> SelectedItems { get; }
 
-        public IWidgetFactory WidgetFactory
-        {
-            get => (IWidgetFactory)GetValue(WidgetFactoryProperty);
-            set => SetValue(WidgetFactoryProperty, value);
-        }
-
-        public IEnumerable Widgets
-        {
-            get => (IEnumerable)GetValue(WidgetsProperty);
-            set => SetValue(WidgetsProperty, value);
-        }
-
         protected override Size MeasureOverride(Size constraint)
         {
-            base.MeasureOverride(constraint);
+            var size = new Size();
 
-            var desiredSize = new Size();
-            foreach (UIElement child in Children)
+            foreach (UIElement element in Children)
             {
-                child.EnsureCanvasTopLeft();
+                var left = GetLeft(element);
+                var top = GetTop(element);
+                left = double.IsNaN(left) ? 0 : left;
+                top = double.IsNaN(top) ? 0 : top;
 
-                var left = GetLeft(child);
-                var top = GetTop(child);
+                //measure desired size for each child
+                element.Measure(constraint);
 
-                desiredSize = new Size(
-                    Math.Max(desiredSize.Width, left + child.DesiredSize.Width),
-                    Math.Max(desiredSize.Height, top + child.DesiredSize.Height));
+                var desiredSize = element.DesiredSize;
+                if (!double.IsNaN(desiredSize.Width) && !double.IsNaN(desiredSize.Height))
+                {
+                    size.Width = Math.Max(size.Width, left + desiredSize.Width);
+                    size.Height = Math.Max(size.Height, top + desiredSize.Height);
+                }
             }
-            return desiredSize;
+
+            // add margin
+            size.Width += 10;
+            size.Height += 10;
+            return size;
+        }
+
+        protected override void OnDrop(DragEventArgs e)
+        {
+            base.OnDrop(e);
+
+            if (e.Data.GetData(typeof(DragObject)) is DragObject dragObject && !string.IsNullOrEmpty(dragObject.Xaml))
+            {
+                var content = XamlReader.Load(XmlReader.Create(new StringReader(dragObject.Xaml)));
+
+                if (content != null)
+                {
+                    var newItem = new Widget
+                    {
+                        Content = content
+                    };
+
+                    var position = e.GetPosition(this);
+
+                    if (dragObject.DesiredSize.HasValue)
+                    {
+                        var desiredSize = dragObject.DesiredSize.Value;
+                        newItem.Width = desiredSize.Width;
+                        newItem.Height = desiredSize.Height;
+
+                        SetLeft(newItem, Math.Max(0, position.X - newItem.Width / 2));
+                        SetTop(newItem, Math.Max(0, position.Y - newItem.Height / 2));
+                    }
+                    else
+                    {
+                        SetLeft(newItem, Math.Max(0, position.X));
+                        SetTop(newItem, Math.Max(0, position.Y));
+                    }
+
+                    Children.Add(newItem);
+
+                    //update selection
+                    foreach (var item in SelectedItems)
+                    {
+                        item.IsSelected = false;
+                    }
+
+                    SelectedItems.Clear();
+                    newItem.IsSelected = true;
+                    SelectedItems.Add(newItem);
+                }
+
+                e.Handled = true;
+            }
         }
 
         protected override void OnMouseDown(MouseButtonEventArgs e)
         {
             base.OnMouseDown(e);
+
             if (Equals(e.Source, this))
             {
                 // in case that this click is the start for a
@@ -122,175 +129,25 @@ namespace Micser.Main.Controls
         {
             base.OnMouseMove(e);
 
+            // if mouse button is not pressed we have no drag operation, ...
             if (e.LeftButton != MouseButtonState.Pressed)
             {
                 _rubberbandSelectionStartPoint = null;
             }
 
+            // ... but if mouse button is pressed and start
+            // point value is set we do have one
             if (_rubberbandSelectionStartPoint.HasValue)
             {
                 // create rubberband adorner
                 var adornerLayer = AdornerLayer.GetAdornerLayer(this);
                 if (adornerLayer != null)
                 {
-                    var adorner = new RubberbandAdorner(this, _rubberbandSelectionStartPoint.Value);
+                    var adorner = new RubberbandAdorner(this, _rubberbandSelectionStartPoint);
                     adornerLayer.Add(adorner);
                 }
             }
             e.Handled = true;
-        }
-
-        private static void OnWidgetFactoryPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var panel = (WidgetPanel)d;
-            panel.CreateWidgets();
-        }
-
-        private static void OnWidgetsPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var panel = (WidgetPanel)d;
-
-            if (e.OldValue is INotifyCollectionChanged oldValue)
-            {
-                oldValue.CollectionChanged -= panel.OnWidgetsCollectionChanged;
-            }
-
-            if (e.NewValue is INotifyCollectionChanged newValue)
-            {
-                newValue.CollectionChanged += panel.OnWidgetsCollectionChanged;
-            }
-
-            panel.CreateWidgets();
-        }
-
-        private void AddWidget(WidgetViewModel vm)
-        {
-            if (vm == null || WidgetFactory == null)
-            {
-                return;
-            }
-
-            if (!Children.OfType<Widget>().Any(w => w.DataContext == vm))
-            {
-                Children.Add(WidgetFactory.CreateWidget(vm));
-                vm.OnNavigatedTo(null);
-            }
-        }
-
-        private void CreateWidgets()
-        {
-            if (WidgetFactory == null || Widgets == null)
-            {
-                return;
-            }
-
-            foreach (WidgetViewModel wvm in Widgets)
-            {
-                AddWidget(wvm);
-            }
-        }
-
-        private void OnUnloaded(object sender, RoutedEventArgs e)
-        {
-            if (Widgets != null)
-            {
-                foreach (WidgetViewModel vm in Widgets)
-                {
-                    vm.OnNavigatedFrom(null);
-                }
-            }
-        }
-
-        private void OnWidgetLayoutChanged(object sender, DragCompletedEventArgs e)
-        {
-            if (e.Source is Widget widget)
-            {
-                SnapToGrid(widget);
-                InvalidateMeasure();
-            }
-
-            IsWidgetLayoutChanging = false;
-        }
-
-        private void OnWidgetLayoutChanging(object sender, DragStartedEventArgs e)
-        {
-            if (e.Source is Widget)
-            {
-                IsWidgetLayoutChanging = true;
-            }
-        }
-
-        private void OnWidgetsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            if (e.Action == NotifyCollectionChangedAction.Add)
-            {
-                foreach (WidgetViewModel item in e.NewItems)
-                {
-                    AddWidget(item);
-                }
-            }
-            else if (e.Action == NotifyCollectionChangedAction.Remove)
-            {
-                foreach (WidgetViewModel item in e.OldItems)
-                {
-                    RemoveWidget(item);
-                }
-            }
-        }
-
-        private void RemoveWidget(WidgetViewModel vm)
-        {
-            if (vm == null)
-            {
-                return;
-            }
-
-            var widget = Children.OfType<Widget>().FirstOrDefault(w => w.DataContext == vm);
-            if (widget != null)
-            {
-                vm.OnNavigatedFrom(null);
-                Children.Remove(widget);
-            }
-        }
-
-        private void SnapToGrid(FrameworkElement element)
-        {
-            if (element == null)
-            {
-                return;
-            }
-
-            // snap position
-            var left = GetLeft(element);
-            var top = GetTop(element);
-            SnapToRasterSize(ref left);
-            SnapToRasterSize(ref top);
-            SetLeft(element, left);
-            SetTop(element, top);
-
-            // snap size
-            var width = element.ActualWidth;
-            var height = element.ActualHeight;
-            SnapToRasterSize(ref width);
-            SnapToRasterSize(ref height);
-            element.Width = width;
-            element.Height = height;
-        }
-
-        private void SnapToRasterSize(ref double value)
-        {
-            var snap = value % RasterSize;
-
-            if (snap <= RasterSize / 2d)
-            {
-                snap *= -1;
-            }
-            else
-            {
-                snap = RasterSize - snap;
-            }
-
-            value += snap;
         }
     }
 }

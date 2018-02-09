@@ -5,69 +5,51 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using Micser.Infrastructure;
 
 namespace Micser.Main.Controls
 {
-    public enum ConnectorOrientation
-    {
-        None,
-        Left,
-        Top,
-        Right,
-        Bottom
-    }
-
-    /// <summary>
-    /// Provides compact info about a connector; used for the routing algorithm, instead of hand over a full fledged Connector.
-    /// </summary>
-    public struct ConnectorInfo
-    {
-        public double DesignerItemLeft { get; set; }
-        public Size DesignerItemSize { get; set; }
-        public double DesignerItemTop { get; set; }
-        public ConnectorOrientation Orientation { get; set; }
-        public Point Position { get; set; }
-    }
-
     public class Connector : Control
     {
-        public static readonly DependencyProperty OrientationProperty = DependencyProperty.Register(
-            nameof(Orientation), typeof(ConnectorOrientation), typeof(Connector), new PropertyMetadata(ConnectorOrientation.None));
-
         public static readonly DependencyProperty PositionProperty = DependencyProperty.Register(
             nameof(Position), typeof(Point), typeof(Connector), new PropertyMetadata(default(Point)));
 
+        // drag start point, relative to the WidgetPanel
         private Point? _dragStartPoint;
+
+        private Widget _parentWidget;
 
         public Connector()
         {
             Connections = new List<Connection>();
-            LayoutUpdated += OnLayoutUpdated;
+            LayoutUpdated += Connector_LayoutUpdated;
         }
 
-        public IList<Connection> Connections { get; }
+        public List<Connection> Connections { get; }
 
-        public ConnectorOrientation Orientation
-        {
-            get => (ConnectorOrientation)GetValue(OrientationProperty);
-            set => SetValue(OrientationProperty, value);
-        }
+        public ConnectorOrientation Orientation { get; set; }
 
-        public Widget ParentWidget => DataContext as Widget;
+        /// <summary>
+        /// The Widget this Connector belongs to; retrieved from DataContext, which is set in the Widget template
+        /// </summary>
+        public Widget ParentWidget => _parentWidget ?? (_parentWidget = DataContext as Widget);
 
+        /// <summary>
+        /// Center position of this Connector relative to the WidgetPanel.
+        /// </summary>
         public Point Position
         {
             get => (Point)GetValue(PositionProperty);
             set => SetValue(PositionProperty, value);
         }
 
-        public ConnectorInfo GetInfo()
+        internal ConnectorInfo GetInfo()
         {
             var info = new ConnectorInfo
             {
-                DesignerItemLeft = Canvas.GetLeft(ParentWidget),
-                DesignerItemTop = Canvas.GetTop(ParentWidget),
-                DesignerItemSize = new Size(ParentWidget.ActualWidth, ParentWidget.ActualHeight),
+                ParentLeft = Canvas.GetLeft(ParentWidget),
+                ParentTop = Canvas.GetTop(ParentWidget),
+                ParentSize = new Size(ParentWidget.ActualWidth, ParentWidget.ActualHeight),
                 Orientation = Orientation,
                 Position = Position
             };
@@ -77,10 +59,11 @@ namespace Micser.Main.Controls
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {
             base.OnMouseLeftButtonDown(e);
+
             var canvas = GetWidgetPanel(this);
             if (canvas != null)
             {
-                // position relative to DesignerCanvas
+                // position relative to WidgetPanel
                 _dragStartPoint = e.GetPosition(canvas);
                 e.Handled = true;
             }
@@ -90,6 +73,7 @@ namespace Micser.Main.Controls
         {
             base.OnMouseMove(e);
 
+            // if mouse button is not pressed we have no drag operation, ...
             if (e.LeftButton != MouseButtonState.Pressed)
             {
                 _dragStartPoint = null;
@@ -99,13 +83,13 @@ namespace Micser.Main.Controls
             if (_dragStartPoint.HasValue)
             {
                 // create connection adorner
-                var panel = GetWidgetPanel(this);
-                if (panel != null)
+                var canvas = GetWidgetPanel(this);
+                if (canvas != null)
                 {
-                    var adornerLayer = AdornerLayer.GetAdornerLayer(panel);
+                    var adornerLayer = AdornerLayer.GetAdornerLayer(canvas);
                     if (adornerLayer != null)
                     {
-                        var adorner = new ConnectorAdorner(panel, this);
+                        var adorner = new ConnectorAdorner(canvas, this);
                         adornerLayer.Add(adorner);
                         e.Handled = true;
                     }
@@ -113,7 +97,8 @@ namespace Micser.Main.Controls
             }
         }
 
-        private WidgetPanel GetWidgetPanel(DependencyObject element)
+        // iterate through visual tree to get parent WidgetPanel
+        private static WidgetPanel GetWidgetPanel(DependencyObject element)
         {
             while (element != null && !(element is WidgetPanel))
             {
@@ -123,13 +108,14 @@ namespace Micser.Main.Controls
             return element as WidgetPanel;
         }
 
-        private void OnLayoutUpdated(object sender, EventArgs e)
+        // when the layout changes we update the position property
+        private void Connector_LayoutUpdated(object sender, EventArgs e)
         {
-            var designer = GetWidgetPanel(this);
-            if (designer != null)
+            var panel = GetWidgetPanel(this);
+            if (panel != null)
             {
-                //get centre position of this Connector relative to the DesignerCanvas
-                Position = TransformToAncestor(designer).Transform(new Point(Width / 2d, Height / 2d));
+                //get centre position of this Connector relative to the WidgetPanel
+                Position = TransformToAncestor(panel).Transform(new Point(Width / 2, Height / 2));
             }
         }
     }

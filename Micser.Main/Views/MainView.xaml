@@ -23,7 +23,8 @@
         <Grid Grid.Row="0">
         </Grid>
 
-        <controls:WidgetPanel Grid.Row="1" x:Name="WidgetPanel" WidgetFactory="{Binding WidgetFactory}" Widgets="{Binding Widgets}">
+        <!--WidgetFactory="{Binding WidgetFactory}" Widgets="{Binding Widgets}"-->
+        <controls:WidgetPanel Grid.Row="1" x:Name="WidgetPanel">
         </controls:WidgetPanel>
     </Grid>
 </infrastructure:View>
