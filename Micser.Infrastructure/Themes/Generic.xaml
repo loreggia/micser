@@ -4,6 +4,11 @@
                     xmlns:controls="clr-namespace:Micser.Infrastructure.Controls"
                     xmlns:themes="clr-namespace:Micser.Infrastructure.Themes">
 
+    <ResourceDictionary.MergedDictionaries>
+        <ResourceDictionary Source="Toolbox.xaml" />
+        <ResourceDictionary Source="ToolboxItem.xaml" />
+    </ResourceDictionary.MergedDictionaries>
+
     <!--todo-->
     <!--<SolidColorBrush x:Key="{themes:GenericThemeKey BackgroundBrush}" Color="DimGray" />
 

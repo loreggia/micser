@@ -6,7 +6,8 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:viewModels="clr-namespace:Micser.Main.ViewModels"
     xmlns:infrastructure="clr-namespace:Micser.Infrastructure;assembly=Micser.Infrastructure"
-    xmlns:controls="clr-namespace:Micser.Main.Controls"
+    xmlns:c="clr-namespace:Micser.Main.Controls"
+    xmlns:ci="clr-namespace:Micser.Infrastructure.Controls;assembly=Micser.Infrastructure"
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance viewModels:MainViewModel}"
     d:DesignWidth="300"
@@ -18,13 +19,46 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0">
         </Grid>
 
         <!--WidgetFactory="{Binding WidgetFactory}" Widgets="{Binding Widgets}"-->
-        <controls:WidgetPanel Grid.Row="1" x:Name="WidgetPanel">
-        </controls:WidgetPanel>
+        <c:WidgetPanel Grid.Row="1" x:Name="WidgetPanel">
+        </c:WidgetPanel>
+
+        <Expander Grid.Row="2" Header="Widgets" IsExpanded="True">
+            <ci:Toolbox ItemSize="50,50">
+                <ci:Toolbox.Items>
+                    <Path Stretch="Fill" IsHitTestVisible="false"
+                          StrokeLineJoin="Round"
+                          Fill="Green"
+                          Stroke="#AAFF8C00"
+                          StrokeThickness="3"
+                          Data="M 9,2 11,7 17,7 12,10 14,15 9,12 4,15 6,10 1,7 7,7 Z">
+                        <c:Widget.DragThumbTemplate>
+                            <ControlTemplate>
+                                <Path Fill="Transparent" Stretch="Fill" Data="M 9,2 11,7 17,7 12,10 14,15 9,12 4,15 6,10 1,7 7,7 Z" />
+                            </ControlTemplate>
+                        </c:Widget.DragThumbTemplate>
+                        <c:Widget.ConnectorDecoratorTemplate>
+                            <ControlTemplate>
+                                <c:RelativePositionPanel Margin="-4">
+                                    <c:Connector Orientation="Top" c:RelativePositionPanel.RelativePosition="0.5,0" />
+                                    <c:Connector Orientation="Left" c:RelativePositionPanel.RelativePosition="0,0.385" />
+                                    <c:Connector Orientation="Right" c:RelativePositionPanel.RelativePosition="1,0.385" />
+                                    <c:Connector Orientation="Bottom" c:RelativePositionPanel.RelativePosition="0.185,1" />
+                                    <c:Connector Orientation="Bottom" c:RelativePositionPanel.RelativePosition="0.815,1" />
+                                </c:RelativePositionPanel>
+                            </ControlTemplate>
+                        </c:Widget.ConnectorDecoratorTemplate>
+                    </Path>
+                    <!--<w:DeviceInputWidget />
+                    <w:DeviceOutputWidget />-->
+                </ci:Toolbox.Items>
+            </ci:Toolbox>
+        </Expander>
     </Grid>
 </infrastructure:View>
