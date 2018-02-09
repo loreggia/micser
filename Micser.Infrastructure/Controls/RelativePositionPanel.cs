@@ -3,7 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 
-namespace Micser.Main.Controls
+namespace Micser.Infrastructure.Controls
 {
     public class RelativePositionPanel : Panel
     {

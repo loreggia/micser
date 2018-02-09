@@ -3,8 +3,9 @@ using System.Linq;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
+using Micser.Infrastructure.Extensions;
 
-namespace Micser.Main.Controls
+namespace Micser.Infrastructure.Controls
 {
     public class DragThumb : Thumb
     {
@@ -13,9 +14,12 @@ namespace Micser.Main.Controls
             DragDelta += DragThumb_DragDelta;
         }
 
+        private Widget ParentWidget => this.GetParentOfType<Widget>();
+
         private void DragThumb_DragDelta(object sender, DragDeltaEventArgs e)
         {
-            if (!(DataContext is Widget widget))
+            var widget = ParentWidget;
+            if (widget == null)
             {
                 return;
             }

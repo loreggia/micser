@@ -1,19 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Markup;
 using System.Xml;
-using Micser.Infrastructure;
-using Micser.Infrastructure.Controls;
 
-namespace Micser.Main.Controls
+namespace Micser.Infrastructure.Controls
 {
     public class WidgetPanel : Canvas
     {
+        public static readonly DependencyProperty RasterSizeProperty = DependencyProperty.Register(
+            nameof(RasterSize), typeof(double), typeof(WidgetPanel), new PropertyMetadata(25d));
+
         // start point of the rubberband drag operation
         private Point? _rubberbandSelectionStartPoint;
 
@@ -21,6 +23,12 @@ namespace Micser.Main.Controls
         {
             AllowDrop = true;
             SelectedItems = new List<ISelectable>();
+        }
+
+        public double RasterSize
+        {
+            get => (double)GetValue(RasterSizeProperty);
+            set => SetValue(RasterSizeProperty, value);
         }
 
         public IList<ISelectable> SelectedItems { get; }
@@ -148,6 +156,57 @@ namespace Micser.Main.Controls
                 }
             }
             e.Handled = true;
+        }
+
+        protected override void OnMouseUp(MouseButtonEventArgs e)
+        {
+            base.OnMouseUp(e);
+
+            var widgets = SelectedItems.OfType<Widget>();
+            foreach (var widget in widgets)
+            {
+                SnapToGrid(widget);
+            }
+        }
+
+        private void SnapToGrid(FrameworkElement element)
+        {
+            if (element == null)
+            {
+                return;
+            }
+
+            // snap position
+            var left = GetLeft(element);
+            var top = GetTop(element);
+            SnapToRasterSize(ref left);
+            SnapToRasterSize(ref top);
+            SetLeft(element, left);
+            SetTop(element, top);
+
+            // snap size
+            var width = element.ActualWidth;
+            var height = element.ActualHeight;
+            SnapToRasterSize(ref width);
+            SnapToRasterSize(ref height);
+            element.Width = width;
+            element.Height = height;
+        }
+
+        private void SnapToRasterSize(ref double value)
+        {
+            var snap = value % RasterSize;
+
+            if (snap <= RasterSize / 2d)
+            {
+                snap *= -1;
+            }
+            else
+            {
+                snap = RasterSize - snap;
+            }
+
+            value += snap;
         }
     }
 }

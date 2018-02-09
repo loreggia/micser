@@ -10,6 +10,7 @@ namespace Micser.Main.Test.Services
     public class DeviceServiceTest
     {
         [TestMethod]
+        [TestCategory("Sound")]
         public void GetInputDevicesTest()
         {
             var service = new DeviceService();
@@ -24,6 +25,7 @@ namespace Micser.Main.Test.Services
         }
 
         [TestMethod]
+        [TestCategory("Sound")]
         public void GetOutputDevicesTest()
         {
             var service = new DeviceService();

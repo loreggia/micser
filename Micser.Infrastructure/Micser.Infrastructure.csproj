@@ -84,16 +84,27 @@
     <Compile Include="Bindable.cs" />
     <Compile Include="ConnectorInfo.cs" />
     <Compile Include="Controls\BusyAdorner.cs" />
+    <Compile Include="Controls\Connection.cs" />
+    <Compile Include="Controls\ConnectionAdorner.cs" />
+    <Compile Include="Controls\Connector.cs" />
+    <Compile Include="Controls\ConnectorAdorner.cs" />
+    <Compile Include="Controls\DragThumb.cs" />
     <Compile Include="Controls\EditableTextBlock.cs" />
     <Compile Include="Controls\EditableTextBlockAdorner.cs" />
+    <Compile Include="Controls\RelativePositionPanel.cs" />
+    <Compile Include="Controls\ResizeThumb.cs" />
+    <Compile Include="Controls\RubberbandAdorner.cs" />
     <Compile Include="Controls\Toolbox.cs" />
     <Compile Include="Controls\ToolboxItem.cs" />
+    <Compile Include="Controls\Widget.cs" />
+    <Compile Include="Controls\WidgetPanel.cs" />
     <Compile Include="Converter\BooleanConverter.cs" />
     <Compile Include="Converter\BooleanToVisibilityConverter.cs" />
     <Compile Include="Converter\ConverterExtension.cs" />
     <Compile Include="Converter\DoubleToRectConverter.cs" />
     <Compile Include="CustomApplicationCommands.cs" />
     <Compile Include="Extensions\ContainerExtensions.cs" />
+    <Compile Include="Extensions\DependencyObjectExtensions.cs" />
     <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="Extensions\PropertyExtensions.cs" />
     <Compile Include="Extensions\UIElementExtensions.cs" />
@@ -116,15 +127,29 @@
     <Compile Include="ViewModel.cs" />
     <Compile Include="ViewModels\MainMenuViewModel.cs" />
     <Compile Include="ViewModels\MainStatusBarViewModel.cs" />
+    <Compile Include="ViewModels\WidgetViewModel.cs" />
     <Compile Include="Views\MainMenuView.xaml.cs">
       <DependentUpon>MainMenuView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\MainStatusBarView.xaml.cs">
       <DependentUpon>MainStatusBarView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="WidgetDescription.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Themes\Connection.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\Connector.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Themes\Generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\Thumbs.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -135,6 +160,14 @@
     <Page Include="Themes\ToolboxItem.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\Widget.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\WidgetPanel.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Views\MainMenuView.xaml">
       <SubType>Designer</SubType>

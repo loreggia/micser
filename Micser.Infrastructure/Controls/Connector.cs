@@ -4,10 +4,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using Micser.Infrastructure;
+using Micser.Infrastructure.Extensions;
 
-namespace Micser.Main.Controls
+namespace Micser.Infrastructure.Controls
 {
     public class Connector : Control
     {
@@ -30,9 +29,9 @@ namespace Micser.Main.Controls
         public ConnectorOrientation Orientation { get; set; }
 
         /// <summary>
-        /// The Widget this Connector belongs to; retrieved from DataContext, which is set in the Widget template
+        /// The Widget this Connector belongs to.
         /// </summary>
-        public Widget ParentWidget => _parentWidget ?? (_parentWidget = DataContext as Widget);
+        public Widget ParentWidget => _parentWidget ?? this.GetParentOfType<Widget>();
 
         /// <summary>
         /// Center position of this Connector relative to the WidgetPanel.
@@ -42,6 +41,8 @@ namespace Micser.Main.Controls
             get => (Point)GetValue(PositionProperty);
             set => SetValue(PositionProperty, value);
         }
+
+        private WidgetPanel ParentPanel => this.GetParentOfType<WidgetPanel>();
 
         internal ConnectorInfo GetInfo()
         {
@@ -60,11 +61,11 @@ namespace Micser.Main.Controls
         {
             base.OnMouseLeftButtonDown(e);
 
-            var canvas = GetWidgetPanel(this);
-            if (canvas != null)
+            var panel = ParentPanel;
+            if (panel != null)
             {
                 // position relative to WidgetPanel
-                _dragStartPoint = e.GetPosition(canvas);
+                _dragStartPoint = e.GetPosition(panel);
                 e.Handled = true;
             }
         }
@@ -83,13 +84,13 @@ namespace Micser.Main.Controls
             if (_dragStartPoint.HasValue)
             {
                 // create connection adorner
-                var canvas = GetWidgetPanel(this);
-                if (canvas != null)
+                var panel = ParentPanel;
+                if (panel != null)
                 {
-                    var adornerLayer = AdornerLayer.GetAdornerLayer(canvas);
+                    var adornerLayer = AdornerLayer.GetAdornerLayer(panel);
                     if (adornerLayer != null)
                     {
-                        var adorner = new ConnectorAdorner(canvas, this);
+                        var adorner = new ConnectorAdorner(panel, this);
                         adornerLayer.Add(adorner);
                         e.Handled = true;
                     }
@@ -97,21 +98,10 @@ namespace Micser.Main.Controls
             }
         }
 
-        // iterate through visual tree to get parent WidgetPanel
-        private static WidgetPanel GetWidgetPanel(DependencyObject element)
-        {
-            while (element != null && !(element is WidgetPanel))
-            {
-                element = VisualTreeHelper.GetParent(element);
-            }
-
-            return element as WidgetPanel;
-        }
-
         // when the layout changes we update the position property
         private void Connector_LayoutUpdated(object sender, EventArgs e)
         {
-            var panel = GetWidgetPanel(this);
+            var panel = ParentPanel;
             if (panel != null)
             {
                 //get centre position of this Connector relative to the WidgetPanel
