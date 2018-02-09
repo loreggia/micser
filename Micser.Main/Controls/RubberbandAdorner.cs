@@ -3,23 +3,26 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using Micser.Infrastructure;
 
 namespace Micser.Main.Controls
 {
     public class RubberbandAdorner : Adorner
     {
-        private readonly Pen _pen;
+        private readonly Pen _rubberbandPen;
         private readonly WidgetPanel _widgetPanel;
         private Point? _endPoint;
         private Point? _startPoint;
 
-        public RubberbandAdorner(WidgetPanel adornedElement, Point startPoint)
-            : base(adornedElement)
+        public RubberbandAdorner(WidgetPanel widgetPanel, Point? dragStartPoint)
+            : base(widgetPanel)
         {
-            _widgetPanel = adornedElement;
-            _startPoint = startPoint;
-            _pen = new Pen(Brushes.LightSlateGray, 1);
-            _pen.DashStyle = new DashStyle(new double[] { 2 }, 1);
+            _widgetPanel = widgetPanel;
+            _startPoint = dragStartPoint;
+            _rubberbandPen = new Pen(Brushes.LightSlateGray, 1)
+            {
+                DashStyle = new DashStyle(new double[] { 2 }, 1)
+            };
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
@@ -72,7 +75,7 @@ namespace Micser.Main.Controls
 
             if (_startPoint.HasValue && _endPoint.HasValue)
             {
-                dc.DrawRectangle(Brushes.Transparent, _pen, new Rect(_startPoint.Value, _endPoint.Value));
+                dc.DrawRectangle(Brushes.Transparent, _rubberbandPen, new Rect(_startPoint.Value, _endPoint.Value));
             }
         }
 
@@ -85,21 +88,21 @@ namespace Micser.Main.Controls
 
             _widgetPanel.SelectedItems.Clear();
 
-            if (_startPoint.HasValue && _endPoint.HasValue)
+            if (_startPoint == null || _endPoint == null)
             {
-                var rubberBand = new Rect(_startPoint.Value, _endPoint.Value);
+                return;
+            }
 
-                foreach (Control item in _widgetPanel.Children)
+            var rubberBand = new Rect(_startPoint.Value, _endPoint.Value);
+            foreach (Control item in _widgetPanel.Children)
+            {
+                var itemRect = VisualTreeHelper.GetDescendantBounds(item);
+                var itemBounds = item.TransformToAncestor(_widgetPanel).TransformBounds(itemRect);
+
+                if (rubberBand.Contains(itemBounds) && item is ISelectable selectableItem)
                 {
-                    var itemRect = VisualTreeHelper.GetDescendantBounds(item);
-                    var itemBounds = item.TransformToAncestor(_widgetPanel).TransformBounds(itemRect);
-
-                    if (rubberBand.Contains(itemBounds) && item is ISelectable)
-                    {
-                        var selectableItem = item as ISelectable;
-                        selectableItem.IsSelected = true;
-                        _widgetPanel.SelectedItems.Add(selectableItem);
-                    }
+                    selectableItem.IsSelected = true;
+                    _widgetPanel.SelectedItems.Add(selectableItem);
                 }
             }
         }

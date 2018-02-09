@@ -95,9 +95,8 @@
     <Compile Include="Controls\ConnectionAdorner.cs" />
     <Compile Include="Controls\Connector.cs" />
     <Compile Include="Controls\ConnectorAdorner.cs" />
-    <Compile Include="Controls\ISelectable.cs" />
-    <Compile Include="Controls\MoveThumb.cs" />
-    <Compile Include="Controls\PathFinder.cs" />
+    <Compile Include="Controls\DragThumb.cs" />
+    <Compile Include="Controls\RelativePositionPanel.cs" />
     <Compile Include="Controls\ResizeThumb.cs" />
     <Compile Include="Controls\RubberbandAdorner.cs" />
     <Compile Include="Controls\Widget.cs" />
@@ -140,9 +139,21 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Themes\Connection.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\Connector.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\Thumbs.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Themes\Widget.xaml">
       <Generator>MSBuild:Compile</Generator>

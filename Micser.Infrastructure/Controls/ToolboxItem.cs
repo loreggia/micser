@@ -5,7 +5,7 @@ using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
 
-namespace DiagramDesigner
+namespace Micser.Infrastructure.Controls
 {
     /// <summary>
     /// Wraps info of the dragged object into a class.
@@ -17,7 +17,7 @@ namespace DiagramDesigner
         public Size? DesiredSize { get; set; }
 
         // Xaml string that represents the serialized content
-        public String Xaml { get; set; }
+        public string Xaml { get; set; }
     }
 
     /// <summary>

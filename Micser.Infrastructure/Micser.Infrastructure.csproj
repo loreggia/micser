@@ -11,6 +11,7 @@
     <AssemblyName>Micser.Infrastructure</AssemblyName>
     <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -81,9 +82,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bindable.cs" />
+    <Compile Include="ConnectorInfo.cs" />
     <Compile Include="Controls\BusyAdorner.cs" />
     <Compile Include="Controls\EditableTextBlock.cs" />
     <Compile Include="Controls\EditableTextBlockAdorner.cs" />
+    <Compile Include="Controls\Toolbox.cs" />
+    <Compile Include="Controls\ToolboxItem.cs" />
     <Compile Include="Converter\BooleanConverter.cs" />
     <Compile Include="Converter\BooleanToVisibilityConverter.cs" />
     <Compile Include="Converter\ConverterExtension.cs" />
@@ -95,11 +99,13 @@
     <Compile Include="Extensions\UIElementExtensions.cs" />
     <Compile Include="IItemRegistry.cs" />
     <Compile Include="InfrastructureModule.cs" />
+    <Compile Include="ISelectable.cs" />
     <Compile Include="ItemRegistry.cs" />
     <Compile Include="IViewModel.cs" />
     <Compile Include="Menu\IMenuItemRegistry.cs" />
     <Compile Include="Menu\MenuItemDescription.cs" />
     <Compile Include="Menu\MenuItemRegistry.cs" />
+    <Compile Include="PathFinder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Themes\GenericThemeKeyExtension.cs" />
     <Compile Include="Themes\IResourceRegistry.cs" />
@@ -121,6 +127,14 @@
     <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\Toolbox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\ToolboxItem.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\MainMenuView.xaml">
       <SubType>Designer</SubType>

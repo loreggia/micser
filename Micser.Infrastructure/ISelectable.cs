@@ -1,4 +1,4 @@
-﻿namespace Micser.Main.Controls
+﻿namespace Micser.Infrastructure
 {
     public interface ISelectable
     {

@@ -8,11 +8,13 @@
         <Setter Property="VerticalAlignment" Value="Stretch" />
         <Setter Property="Background" Value="Gray" />
 
-        <Style.Triggers>
+        <!--<Style.Triggers>
             <Trigger Property="IsWidgetLayoutChanging" Value="True">
                 <Setter Property="Background">
                     <Setter.Value>
-                        <!--{Binding RasterSize, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:WidgetPanel}, Converter={converter:DoubleToRectConverter}}-->
+                        -->
+        <!--{Binding RasterSize, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:WidgetPanel}, Converter={converter:DoubleToRectConverter}}-->
+        <!--
                         <DrawingBrush TileMode="Tile" Viewport="{Binding RasterSize, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:WidgetPanel}, Converter={converter:DoubleToRectConverter}}" ViewportUnits="Absolute">
                             <DrawingBrush.Drawing>
                                 <GeometryDrawing Brush="Gray">
@@ -28,6 +30,6 @@
                     </Setter.Value>
                 </Setter>
             </Trigger>
-        </Style.Triggers>
+        </Style.Triggers>-->
     </Style>
 </ResourceDictionary>

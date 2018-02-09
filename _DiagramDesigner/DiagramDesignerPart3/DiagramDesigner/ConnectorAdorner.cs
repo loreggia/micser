@@ -11,7 +11,6 @@ namespace DiagramDesigner
         private readonly Pen _drawingPen;
         private readonly Connector _sourceConnector;
         private readonly WidgetPanel _widgetPanel;
-        private Connector _hitConnector;
         private Widget _hitWidget;
         private PathGeometry _pathGeometry;
 
@@ -20,37 +19,30 @@ namespace DiagramDesigner
         {
             _widgetPanel = panel;
             _sourceConnector = sourceConnector;
-            _drawingPen = new Pen(Brushes.LightSlateGray, 1);
-            _drawingPen.LineJoin = PenLineJoin.Round;
+            _drawingPen = new Pen(Brushes.LightSlateGray, 1)
+            {
+                LineJoin = PenLineJoin.Round
+            };
             Cursor = Cursors.Cross;
         }
 
-        private Connector HitConnector
-        {
-            get { return _hitConnector; }
-            set
-            {
-                if (_hitConnector != value)
-                {
-                    _hitConnector = value;
-                }
-            }
-        }
+        private Connector HitConnector { get; set; }
 
         private Widget HitWidget
         {
-            get { return _hitWidget; }
+            get => _hitWidget;
             set
             {
-                if (_hitWidget != value)
+                if (_hitWidget != null)
                 {
-                    if (_hitWidget != null)
-                        _hitWidget.IsDragConnectionOver = false;
+                    _hitWidget.IsDragConnectionOver = false;
+                }
 
-                    _hitWidget = value;
+                _hitWidget = value;
 
-                    if (_hitWidget != null)
-                        _hitWidget.IsDragConnectionOver = true;
+                if (_hitWidget != null)
+                {
+                    _hitWidget.IsDragConnectionOver = true;
                 }
             }
         }
@@ -59,14 +51,21 @@ namespace DiagramDesigner
         {
             if (e.LeftButton == MouseButtonState.Pressed)
             {
-                if (!this.IsMouseCaptured) this.CaptureMouse();
+                if (!IsMouseCaptured)
+                {
+                    CaptureMouse();
+                }
+
                 HitTesting(e.GetPosition(this));
-                this._pathGeometry = GetPathGeometry(e.GetPosition(this));
-                this.InvalidateVisual();
+                _pathGeometry = GetPathGeometry(e.GetPosition(this));
+                InvalidateVisual();
             }
             else
             {
-                if (this.IsMouseCaptured) this.ReleaseMouseCapture();
+                if (IsMouseCaptured)
+                {
+                    ReleaseMouseCapture();
+                }
             }
         }
 
@@ -74,31 +73,28 @@ namespace DiagramDesigner
         {
             if (HitConnector != null)
             {
-                Connector sourceConnector = this._sourceConnector;
-                Connector sinkConnector = this.HitConnector;
-                Connection newConnection = new Connection(sourceConnector, sinkConnector);
+                var sourceConnector = _sourceConnector;
+                var sinkConnector = HitConnector;
+                var newConnection = new Connection(sourceConnector, sinkConnector);
 
                 // connections are added with z-index of zero
-                this._widgetPanel.Children.Insert(0, newConnection);
+                _widgetPanel.Children.Insert(0, newConnection);
             }
             if (HitWidget != null)
             {
-                this.HitWidget.IsDragConnectionOver = false;
+                HitWidget.IsDragConnectionOver = false;
             }
 
-            if (this.IsMouseCaptured) this.ReleaseMouseCapture();
+            if (IsMouseCaptured) ReleaseMouseCapture();
 
-            AdornerLayer adornerLayer = AdornerLayer.GetAdornerLayer(this._widgetPanel);
-            if (adornerLayer != null)
-            {
-                adornerLayer.Remove(this);
-            }
+            var adornerLayer = AdornerLayer.GetAdornerLayer(_widgetPanel);
+            adornerLayer?.Remove(this);
         }
 
         protected override void OnRender(DrawingContext dc)
         {
             base.OnRender(dc);
-            dc.DrawGeometry(null, _drawingPen, this._pathGeometry);
+            dc.DrawGeometry(null, _drawingPen, _pathGeometry);
 
             // without a background the OnMouseMove event would not be fired
             // Alternative: implement a Canvas as a child of this adorner, like
@@ -108,20 +104,18 @@ namespace DiagramDesigner
 
         private PathGeometry GetPathGeometry(Point position)
         {
-            PathGeometry geometry = new PathGeometry();
+            var geometry = new PathGeometry();
 
-            ConnectorOrientation targetOrientation;
-            if (HitConnector != null)
-                targetOrientation = HitConnector.Orientation;
-            else
-                targetOrientation = ConnectorOrientation.None;
+            var targetOrientation = HitConnector?.Orientation ?? ConnectorOrientation.None;
 
-            List<Point> pathPoints = PathFinder.GetConnectionLine(_sourceConnector.GetInfo(), position, targetOrientation);
+            var pathPoints = PathFinder.GetConnectionLine(_sourceConnector.GetInfo(), position, targetOrientation);
 
             if (pathPoints.Count > 0)
             {
-                PathFigure figure = new PathFigure();
-                figure.StartPoint = pathPoints[0];
+                var figure = new PathFigure
+                {
+                    StartPoint = pathPoints[0]
+                };
                 pathPoints.Remove(pathPoints[0]);
                 figure.Segments.Add(new PolyLineSegment(pathPoints, true));
                 geometry.Figures.Add(figure);
@@ -132,11 +126,11 @@ namespace DiagramDesigner
 
         private void HitTesting(Point hitPoint)
         {
-            bool hitConnectorFlag = false;
+            var hitConnectorFlag = false;
 
-            DependencyObject hitObject = _widgetPanel.InputHitTest(hitPoint) as DependencyObject;
+            var hitObject = _widgetPanel.InputHitTest(hitPoint) as DependencyObject;
             while (hitObject != null &&
-                   hitObject != _sourceConnector.ParentWidget &&
+                   !Equals(hitObject, _sourceConnector.ParentWidget) &&
                    hitObject.GetType() != typeof(WidgetPanel))
             {
                 if (hitObject is Connector)
@@ -149,7 +143,10 @@ namespace DiagramDesigner
                 {
                     HitWidget = hitObject as Widget;
                     if (!hitConnectorFlag)
+                    {
                         HitConnector = null;
+                    }
+
                     return;
                 }
                 hitObject = VisualTreeHelper.GetParent(hitObject);
