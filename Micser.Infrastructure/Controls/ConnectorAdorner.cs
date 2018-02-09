@@ -2,9 +2,8 @@
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using Micser.Infrastructure;
 
-namespace Micser.Main.Controls
+namespace Micser.Infrastructure.Controls
 {
     public class ConnectorAdorner : Adorner
     {
@@ -85,7 +84,10 @@ namespace Micser.Main.Controls
                 HitWidget.IsDragConnectionOver = false;
             }
 
-            if (IsMouseCaptured) ReleaseMouseCapture();
+            if (IsMouseCaptured)
+            {
+                ReleaseMouseCapture();
+            }
 
             var adornerLayer = AdornerLayer.GetAdornerLayer(_widgetPanel);
             adornerLayer?.Remove(this);

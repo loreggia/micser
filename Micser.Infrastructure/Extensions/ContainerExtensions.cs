@@ -1,4 +1,6 @@
 ﻿using System.Windows;
+using Micser.Infrastructure.Controls;
+using Micser.Infrastructure.ViewModels;
 using Prism.Regions;
 using Unity;
 using Unity.Injection;
@@ -27,6 +29,18 @@ namespace Micser.Infrastructure.Extensions
                 var regionManager = container.Resolve<IRegionManager>();
                 regionManager.RegisterViewWithRegion(regionName, typeof(TView));
             }
+        }
+
+        public static void RegisterWidget<TWidget, TViewModel>(this IUnityContainer container)
+            where TWidget : Widget
+            where TViewModel : WidgetViewModel
+        {
+            container.RegisterType<Widget>(typeof(TViewModel).Name, new InjectionFactory(c =>
+            {
+                var widget = c.Resolve<TWidget>();
+                //widget.DataContext = c.Resolve<TViewModel>();
+                return widget;
+            }));
         }
     }
 }

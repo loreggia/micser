@@ -6,9 +6,8 @@ using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using Micser.Infrastructure;
 
-namespace Micser.Main.Controls
+namespace Micser.Infrastructure.Controls
 {
     public class ConnectionAdorner : Adorner
     {

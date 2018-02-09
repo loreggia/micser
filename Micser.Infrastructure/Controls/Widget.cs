@@ -3,10 +3,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using Micser.Infrastructure;
-using Micser.Main.ViewModels.Widgets;
+using Micser.Infrastructure.ViewModels;
 
-namespace Micser.Main.Controls
+namespace Micser.Infrastructure.Controls
 {
     [TemplatePart(Name = "PART_DragThumb", Type = typeof(DragThumb))]
     [TemplatePart(Name = "PART_ResizeDecorator", Type = typeof(Control))]

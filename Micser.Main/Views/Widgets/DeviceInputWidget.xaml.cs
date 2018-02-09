@@ -1,4 +1,4 @@
-﻿using Micser.Main.Controls;
+﻿using Micser.Infrastructure.Controls;
 
 namespace Micser.Main.Views.Widgets
 {

@@ -9,6 +9,7 @@ namespace Micser.Main.Test.Audio
     public class DeviceOutputTest
     {
         [TestMethod]
+        [TestCategory("Sound")]
         [TestCategory("SkipWhenLiveUnitTesting")]
         public void PlaySineWave()
         {
@@ -31,6 +32,7 @@ namespace Micser.Main.Test.Audio
         }
 
         [TestMethod]
+        [TestCategory("Sound")]
         [TestCategory("SkipWhenLiveUnitTesting")]
         public void PlaySquareWave()
         {
@@ -60,6 +62,7 @@ namespace Micser.Main.Test.Audio
         /// This should not create a sound!
         /// </summary>
         [TestMethod]
+        [TestCategory("Sound")]
         public void SetDescriptionToNullResetsOutput()
         {
             var deviceOutput = new DeviceOutput();
@@ -86,6 +89,7 @@ namespace Micser.Main.Test.Audio
         /// TODO specific exception?
         /// </summary>
         [TestMethod]
+        [TestCategory("Sound")]
         [ExpectedException(typeof(ArgumentException))]
         public void SetInvalidDescriptionInvalidIdThrowsException()
         {
@@ -100,6 +104,7 @@ namespace Micser.Main.Test.Audio
         }
 
         [TestMethod]
+        [TestCategory("Sound")]
         public void SetInvalidDescriptionNullIdDoesNothing()
         {
             var deviceOutput = new DeviceOutput();

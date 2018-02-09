@@ -5,9 +5,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
-using Micser.Infrastructure;
+using Micser.Infrastructure.Extensions;
 
-namespace Micser.Main.Controls
+namespace Micser.Infrastructure.Controls
 {
     public class ResizeThumb : Thumb
     {
@@ -15,6 +15,8 @@ namespace Micser.Main.Controls
         {
             DragDelta += ResizeThumb_DragDelta;
         }
+
+        private Widget ParentWidget => this.GetParentOfType<Widget>();
 
         private static void CalculateDragLimits(IEnumerable<ISelectable> selectedItems, out double minLeft, out double minTop, out double minDeltaHorizontal, out double minDeltaVertical)
         {
@@ -42,7 +44,8 @@ namespace Micser.Main.Controls
 
         private void ResizeThumb_DragDelta(object sender, DragDeltaEventArgs e)
         {
-            if (!(DataContext is Widget widget))
+            var widget = ParentWidget;
+            if (widget == null)
             {
                 return;
             }

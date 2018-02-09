@@ -29,6 +29,11 @@ namespace Micser.Infrastructure
         public void Initialize()
         {
             _resourceRegistry.Add(new Uri("Micser.Infrastructure;component/Themes/Generic.xaml", UriKind.Relative));
+            _resourceRegistry.Add(new Uri("Micser.Infrastructure;component/Themes/Connection.xaml", UriKind.Relative));
+            _resourceRegistry.Add(new Uri("Micser.Infrastructure;component/Themes/Connector.xaml", UriKind.Relative));
+            _resourceRegistry.Add(new Uri("Micser.Infrastructure;component/Themes/Thumbs.xaml", UriKind.Relative));
+            _resourceRegistry.Add(new Uri("Micser.Infrastructure;component/Themes/WidgetPanel.xaml", UriKind.Relative));
+            _resourceRegistry.Add(new Uri("Micser.Infrastructure;component/Themes/Widget.xaml", UriKind.Relative));
 
             // top level menu items
             _menuItemRegistry.Add(new MenuItemDescription { Header = "_File", Id = "File" });

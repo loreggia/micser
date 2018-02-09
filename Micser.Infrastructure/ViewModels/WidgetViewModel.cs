@@ -1,6 +1,4 @@
-﻿using Micser.Infrastructure;
-
-namespace Micser.Main.ViewModels.Widgets
+﻿namespace Micser.Infrastructure.ViewModels
 {
     public abstract class WidgetViewModel : ViewModel
     {

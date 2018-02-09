@@ -92,16 +92,6 @@
     <Compile Include="Audio\IAudioChainLink.cs" />
     <Compile Include="Audio\Mixer.cs" />
     <Compile Include="Audio\WaveGenerator.cs" />
-    <Compile Include="Controls\ConnectionAdorner.cs" />
-    <Compile Include="Controls\Connector.cs" />
-    <Compile Include="Controls\ConnectorAdorner.cs" />
-    <Compile Include="Controls\DragThumb.cs" />
-    <Compile Include="Controls\RelativePositionPanel.cs" />
-    <Compile Include="Controls\ResizeThumb.cs" />
-    <Compile Include="Controls\RubberbandAdorner.cs" />
-    <Compile Include="Controls\Widget.cs" />
-    <Compile Include="Controls\Connection.cs" />
-    <Compile Include="Controls\WidgetPanel.cs" />
     <Compile Include="Extensions\ContainerExtensions.cs" />
     <Compile Include="MainModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -118,7 +108,6 @@
     <Compile Include="ViewModels\Widgets\DeviceOutputViewModel.cs" />
     <Compile Include="ViewModels\Widgets\DeviceInputViewModel.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
-    <Compile Include="ViewModels\Widgets\WidgetViewModel.cs" />
     <Compile Include="Views\MainView.xaml.cs">
       <DependentUpon>MainView.xaml</DependentUpon>
     </Compile>
@@ -139,29 +128,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Themes\Connection.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Themes\Connector.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Themes\Thumbs.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="Themes\Widget.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Themes\WidgetPanel.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Views\MainView.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -192,6 +161,8 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Controls\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

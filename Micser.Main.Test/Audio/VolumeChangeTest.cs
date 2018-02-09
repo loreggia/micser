@@ -8,6 +8,7 @@ namespace Micser.Main.Test.Audio
     public class VolumeChangeTest
     {
         [TestMethod]
+        [TestCategory("Sound")]
         [TestCategory("SkipWhenLiveUnitTesting")]
         public void ChangeVolumeOfSineGeneratorToDeviceOutput()
         {

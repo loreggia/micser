@@ -1,9 +1,9 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:controls="clr-namespace:Micser.Main.Controls"
-                    xmlns:converter="clr-namespace:Micser.Infrastructure.Converter;assembly=Micser.Infrastructure">
+                    xmlns:converter="clr-namespace:Micser.Infrastructure.Converter;assembly=Micser.Infrastructure"
+                    xmlns:c="clr-namespace:Micser.Infrastructure.Controls">
 
-    <Style TargetType="{x:Type controls:WidgetPanel}">
+    <Style TargetType="{x:Type c:WidgetPanel}">
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="VerticalAlignment" Value="Stretch" />
         <Setter Property="Background" Value="White" />

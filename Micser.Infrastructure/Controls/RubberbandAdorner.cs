@@ -3,9 +3,8 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using Micser.Infrastructure;
 
-namespace Micser.Main.Controls
+namespace Micser.Infrastructure.Controls
 {
     public class RubberbandAdorner : Adorner
     {

@@ -8,6 +8,7 @@ namespace Micser.Main.Test.Audio
     public class MixerTest
     {
         [TestMethod]
+        [TestCategory("Sound")]
         [TestCategory("SkipWhenLiveUnitTesting")]
         public void MixSineWavesToDeviceOutput()
         {

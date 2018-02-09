@@ -8,6 +8,7 @@ namespace Micser.Main.Test.Audio
     public class DeviceInputTest
     {
         [TestMethod]
+        [TestCategory("Sound")]
         public void SetDeviceDescriptionStartsRecording()
         {
             var deviceInput = new DeviceInput();
