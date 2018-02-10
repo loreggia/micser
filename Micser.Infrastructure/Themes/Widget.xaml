@@ -20,53 +20,44 @@
         </Grid>
     </ControlTemplate>
 
-    <!-- DragThumb Default Template -->
-    <Style TargetType="{x:Type s:DragThumb}">
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type s:DragThumb}">
-                    <Rectangle Fill="Transparent" />
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
     <!-- Widget Style -->
     <Style TargetType="{x:Type s:Widget}">
+        <Setter Property="HorizontalAlignment" Value="Left" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="Background" Value="White" />
+        <Setter Property="BorderBrush" Value="Black" />
+        <Setter Property="BorderThickness" Value="1" />
         <Setter Property="MinWidth" Value="25" />
         <Setter Property="MinHeight" Value="25" />
+        <Setter Property="Width" Value="Auto" />
+        <Setter Property="Height" Value="Auto" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type s:Widget}">
                     <Grid>
-                        <!-- PART_DragThumb -->
-                        <s:DragThumb x:Name="PART_DragThumb" Cursor="SizeAll" />
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="5">
+                            <StackPanel>
+                                <Grid Background="LightGray">
+                                    <ContentControl Margin="3" Content="{TemplateBinding Header}" />
+                                    <s:DragThumb DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
+                                </Grid>
+                                <ContentPresenter Margin="3" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}" />
+                            </StackPanel>
+                        </Border>
 
-                        <!-- PART_ResizeDecorator -->
-                        <Control x:Name="PART_ResizeDecorator" Visibility="Collapsed" Template="{StaticResource ResizeDecoratorTemplate}" />
-
-                        <!-- PART_ContentPresenter -->
-                        <ContentPresenter x:Name="PART_ContentPresenter"
-                              HorizontalAlignment="Stretch"
-                              VerticalAlignment="Stretch"
-                              Content="{TemplateBinding ContentControl.Content}"
-                              Margin="{TemplateBinding ContentControl.Padding}" />
-
-                        <!-- PART_ConnectorDecorator -->
-                        <Control x:Name="PART_ConnectorDecorator" Visibility="Hidden" Template="{StaticResource ConnectorDecoratorTemplate}" />
+                        <s:ResizeThumb HorizontalAlignment="Left" VerticalAlignment="Stretch" Cursor="SizeWE" Width="3" DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
+                        <s:ResizeThumb HorizontalAlignment="Right" VerticalAlignment="Stretch" Cursor="SizeWE" Width="3" DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
+                        <s:ResizeThumb HorizontalAlignment="Stretch" VerticalAlignment="Top" Cursor="SizeNS" Height="3" DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
+                        <s:ResizeThumb HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Cursor="SizeNS" Height="3" DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
+                        <s:ResizeThumb HorizontalAlignment="Left" VerticalAlignment="Top" Cursor="SizeNWSE" Width="4" Height="4" DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
+                        <s:ResizeThumb HorizontalAlignment="Right" VerticalAlignment="Top" Cursor="SizeNESW" Width="4" Height="4" DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
+                        <s:ResizeThumb HorizontalAlignment="Left" VerticalAlignment="Bottom" Cursor="SizeNESW" Width="4" Height="4" DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
+                        <s:ResizeThumb HorizontalAlignment="Right" VerticalAlignment="Bottom" Cursor="SizeNWSE" Width="4" Height="4" DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
                     </Grid>
-                    <ControlTemplate.Triggers>
-                        <DataTrigger Value="True" Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsSelected}">
-                            <Setter TargetName="PART_ResizeDecorator" Property="Visibility" Value="Visible" />
-                        </DataTrigger>
-                        <Trigger Property="IsMouseOver" Value="true">
-                            <Setter TargetName="PART_ConnectorDecorator" Property="Visibility" Value="Visible" />
-                        </Trigger>
-                        <DataTrigger Value="True" Binding="{Binding RelativeSource={RelativeSource Self}, Path=IsDragConnectionOver}">
-                            <Setter TargetName="PART_ConnectorDecorator" Property="Visibility" Value="Visible" />
-                        </DataTrigger>
-                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

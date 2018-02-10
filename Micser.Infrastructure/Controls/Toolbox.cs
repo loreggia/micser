@@ -1,5 +1,6 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
+using Micser.Infrastructure.Themes;
 
 namespace Micser.Infrastructure.Controls
 {
@@ -7,6 +8,11 @@ namespace Micser.Infrastructure.Controls
     {
         public static readonly DependencyProperty ItemSizeProperty = DependencyProperty.Register(
             nameof(ItemSize), typeof(Size), typeof(Toolbox), new PropertyMetadata(new Size(50, 50)));
+
+        public Toolbox()
+        {
+            ResourceRegistry.RegisterResourcesFor(this);
+        }
 
         /// <summary>
         /// Defines the ItemHeight and ItemWidth properties of the WrapPanel used for this Toolbox.

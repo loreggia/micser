@@ -8,6 +8,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Markup;
 using System.Xml;
+using Micser.Infrastructure.Themes;
 
 namespace Micser.Infrastructure.Controls
 {
@@ -21,6 +22,8 @@ namespace Micser.Infrastructure.Controls
 
         public WidgetPanel()
         {
+            ResourceRegistry.RegisterResourcesFor(this);
+
             AllowDrop = true;
             SelectedItems = new List<ISelectable>();
         }
