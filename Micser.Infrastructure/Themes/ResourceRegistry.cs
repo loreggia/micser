@@ -5,12 +5,20 @@ using System.Windows;
 
 namespace Micser.Infrastructure.Themes
 {
-    public class ResourceRegistry : ItemRegistry<Uri>, IResourceRegistry
+    public class ResourceRegistry : ItemRegistry<ResourceDictionary>, IResourceRegistry
     {
         private static IEnumerable<ResourceDictionary> _infrastructureResources;
 
-        public static IEnumerable<ResourceDictionary> InfrastructureResources => _infrastructureResources ?? (_infrastructureResources = new[]
+        public ResourceRegistry()
         {
+            foreach (var infrastructureResource in InfrastructureResources)
+            {
+                Add(infrastructureResource);
+            }
+        }
+
+        public static IEnumerable<ResourceDictionary> InfrastructureResources => _infrastructureResources ?? (_infrastructureResources = new[]
+                {
             new ResourceDictionary{Source = new Uri("Micser.Infrastructure;component/Themes/Generic.xaml", UriKind.Relative)},
             new ResourceDictionary{Source = new Uri("Micser.Infrastructure;component/Themes/Connection.xaml",UriKind.Relative)},
             new ResourceDictionary{Source = new Uri("Micser.Infrastructure;component/Themes/Connector.xaml",UriKind.Relative)},

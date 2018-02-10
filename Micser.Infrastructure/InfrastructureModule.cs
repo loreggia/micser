@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Windows.Input;
 using Micser.Infrastructure.Extensions;
 using Micser.Infrastructure.Menu;
-using Micser.Infrastructure.Themes;
 using Micser.Infrastructure.ViewModels;
 using Micser.Infrastructure.Views;
 using Prism.Modularity;
@@ -16,25 +14,16 @@ namespace Micser.Infrastructure
         private readonly IUnityContainer _container;
         private readonly IMenuItemRegistry _menuItemRegistry;
         private readonly IRegionManager _regionManager;
-        private readonly IResourceRegistry _resourceRegistry;
 
-        public InfrastructureModule(IUnityContainer container, IRegionManager regionManager, IResourceRegistry resourceRegistry, IMenuItemRegistry menuItemRegistry)
+        public InfrastructureModule(IUnityContainer container, IRegionManager regionManager, IMenuItemRegistry menuItemRegistry)
         {
             _container = container;
             _regionManager = regionManager;
-            _resourceRegistry = resourceRegistry;
             _menuItemRegistry = menuItemRegistry;
         }
 
         public void Initialize()
         {
-            _resourceRegistry.Add(new Uri("Micser.Infrastructure;component/Themes/Generic.xaml", UriKind.Relative));
-            _resourceRegistry.Add(new Uri("Micser.Infrastructure;component/Themes/Connection.xaml", UriKind.Relative));
-            _resourceRegistry.Add(new Uri("Micser.Infrastructure;component/Themes/Connector.xaml", UriKind.Relative));
-            _resourceRegistry.Add(new Uri("Micser.Infrastructure;component/Themes/Thumbs.xaml", UriKind.Relative));
-            _resourceRegistry.Add(new Uri("Micser.Infrastructure;component/Themes/WidgetPanel.xaml", UriKind.Relative));
-            _resourceRegistry.Add(new Uri("Micser.Infrastructure;component/Themes/Widget.xaml", UriKind.Relative));
-
             // top level menu items
             _menuItemRegistry.Add(new MenuItemDescription { Header = "_File", Id = "File" });
             _menuItemRegistry.Add(new MenuItemDescription { Header = "_Tools", Id = "Tools" });

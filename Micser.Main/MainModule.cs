@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Windows;
 using Micser.Infrastructure.Extensions;
 using Micser.Infrastructure.Themes;
-using Micser.Main.Extensions;
 using Micser.Main.ViewModels;
 using Micser.Main.ViewModels.Widgets;
 using Micser.Main.Views;
@@ -27,7 +27,7 @@ namespace Micser.Main
 
         public void Initialize()
         {
-            _resourceRegistry.Add(new Uri("Micser.Main;component/Themes/Generic.xaml", UriKind.Relative));
+            _resourceRegistry.Add(new ResourceDictionary { Source = new Uri("Micser.Main;component/Themes/Generic.xaml", UriKind.Relative) });
 
             _container.RegisterSingleton<IWidgetFactory, WidgetFactory>();
             _container.RegisterWidget<DeviceInputWidget, DeviceInputViewModel>();

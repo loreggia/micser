@@ -37,12 +37,9 @@ namespace Micser.Core
             base.InitializeModules();
 
             var resourceRegistry = ServiceLocator.Current.GetInstance<IResourceRegistry>();
-            foreach (var uri in resourceRegistry.Items)
+            foreach (var dictionary in resourceRegistry.Items)
             {
-                Current.Resources.MergedDictionaries.Add(new ResourceDictionary
-                {
-                    Source = uri
-                });
+                Current.Resources.MergedDictionaries.Add(dictionary);
             }
         }
 
