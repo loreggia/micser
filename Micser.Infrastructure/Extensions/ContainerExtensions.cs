@@ -31,16 +31,21 @@ namespace Micser.Infrastructure.Extensions
             }
         }
 
-        public static void RegisterWidget<TWidget, TViewModel>(this IUnityContainer container)
+        public static void RegisterWidget<TWidget, TViewModel>(this IUnityContainer container, string defaultName = null)
             where TWidget : Widget
             where TViewModel : WidgetViewModel
         {
-            container.RegisterType<Widget>(typeof(TViewModel).Name, new InjectionFactory(c =>
+            container.RegisterType<Widget>(typeof(TWidget).FullName, new InjectionFactory(c =>
             {
                 var widget = c.Resolve<TWidget>();
-                //widget.DataContext = c.Resolve<TViewModel>();
+                widget.DataContext = c.Resolve<TViewModel>();
                 return widget;
             }));
+            container.RegisterInstance(typeof(TWidget).FullName, new WidgetDescription
+            {
+                Name = defaultName,
+                Type = typeof(TWidget)
+            });
         }
     }
 }

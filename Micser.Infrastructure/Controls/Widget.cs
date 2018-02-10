@@ -8,24 +8,13 @@ using Micser.Infrastructure.ViewModels;
 
 namespace Micser.Infrastructure.Controls
 {
-    [TemplatePart(Name = "PART_DragThumb", Type = typeof(DragThumb))]
-    [TemplatePart(Name = "PART_ResizeDecorator", Type = typeof(Control))]
-    [TemplatePart(Name = "PART_ConnectorDecorator", Type = typeof(Control))]
-    [TemplatePart(Name = "PART_ContentPresenter", Type = typeof(ContentPresenter))]
     public class Widget : ContentControl, ISelectable
     {
-        /// <summary>
-        /// Can be used to replace the default template for the ConnectorDecorator.
-        /// </summary>
-        public static readonly DependencyProperty ConnectorDecoratorTemplateProperty = DependencyProperty.RegisterAttached("ConnectorDecoratorTemplate", typeof(ControlTemplate), typeof(Widget));
-
-        /// <summary>
-        /// Can be used to replace the default template for the DragThumb.
-        /// </summary>
-        public static readonly DependencyProperty DragThumbTemplateProperty = DependencyProperty.RegisterAttached("DragThumbTemplate", typeof(ControlTemplate), typeof(Widget));
-
         public static readonly DependencyProperty HeaderProperty = DependencyProperty.Register(
             nameof(Header), typeof(object), typeof(Widget), new PropertyMetadata(null));
+
+        public static readonly DependencyProperty HeaderTemplateProperty = DependencyProperty.Register(
+            nameof(HeaderTemplate), typeof(DataTemplate), typeof(Widget), new PropertyMetadata(null));
 
         public static readonly DependencyProperty IsDragConnectionOverProperty = DependencyProperty.Register(
             nameof(IsDragConnectionOver), typeof(bool), typeof(Widget), new FrameworkPropertyMetadata(false));
@@ -43,7 +32,6 @@ namespace Micser.Infrastructure.Controls
             ResourceRegistry.RegisterResourcesFor(this);
 
             Loaded += OnWidgetLoaded;
-
             Dispatcher.ShutdownStarted += OnDispatcherShutdownStarted;
         }
 
@@ -51,6 +39,12 @@ namespace Micser.Infrastructure.Controls
         {
             get => GetValue(HeaderProperty);
             set => SetValue(HeaderProperty, value);
+        }
+
+        public DataTemplate HeaderTemplate
+        {
+            get => (DataTemplate)GetValue(HeaderTemplateProperty);
+            set => SetValue(HeaderTemplateProperty, value);
         }
 
         /// <summary>
@@ -69,26 +63,6 @@ namespace Micser.Infrastructure.Controls
         }
 
         public WidgetViewModel ViewModel => DataContext as WidgetViewModel;
-
-        public static ControlTemplate GetConnectorDecoratorTemplate(UIElement element)
-        {
-            return (ControlTemplate)element.GetValue(ConnectorDecoratorTemplateProperty);
-        }
-
-        public static ControlTemplate GetDragThumbTemplate(UIElement element)
-        {
-            return (ControlTemplate)element.GetValue(DragThumbTemplateProperty);
-        }
-
-        public static void SetConnectorDecoratorTemplate(UIElement element, ControlTemplate value)
-        {
-            element.SetValue(ConnectorDecoratorTemplateProperty, value);
-        }
-
-        public static void SetDragThumbTemplate(UIElement element, ControlTemplate value)
-        {
-            element.SetValue(DragThumbTemplateProperty, value);
-        }
 
         protected override void OnPreviewMouseDown(MouseButtonEventArgs e)
         {
@@ -133,35 +107,7 @@ namespace Micser.Infrastructure.Controls
 
         private void OnWidgetLoaded(object sender, RoutedEventArgs e)
         {
-            // if DragThumbTemplate and ConnectorDecoratorTemplate properties of this class
-            // are set these templates are applied;
-            // Note: this method is only executed when the Loaded event is fired, so
-            // setting DragThumbTemplate or ConnectorDecoratorTemplate properties after
-            // will have no effect.
-            if (Template?.FindName("PART_ContentPresenter", this) is ContentPresenter contentPresenter)
-            {
-                if (VisualTreeHelper.GetChild(contentPresenter, 0) is UIElement contentVisual)
-                {
-                    var thumb = Template.FindName("PART_DragThumb", this) as DragThumb;
-                    var connectorDecorator = Template.FindName("PART_ConnectorDecorator", this) as Control;
-
-                    if (thumb != null)
-                    {
-                        if (GetDragThumbTemplate(contentVisual) is ControlTemplate template)
-                        {
-                            thumb.Template = template;
-                        }
-                    }
-
-                    if (connectorDecorator != null)
-                    {
-                        if (GetConnectorDecoratorTemplate(contentVisual) is ControlTemplate template)
-                        {
-                            connectorDecorator.Template = template;
-                        }
-                    }
-                }
-            }
+            ViewModel?.Initialize();
         }
     }
 }

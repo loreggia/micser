@@ -119,8 +119,6 @@
     <Compile Include="Views\Widgets\DeviceInputWidget.xaml.cs">
       <DependentUpon>DeviceInputWidget.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Widgets\IWidgetFactory.cs" />
-    <Compile Include="Views\Widgets\WidgetFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />

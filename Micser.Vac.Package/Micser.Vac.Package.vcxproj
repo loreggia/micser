@@ -154,7 +154,7 @@
     <VerifyProjectOutput>True</VerifyProjectOutput>
     <VerifyDrivers />
     <VerifyFlags>133563</VerifyFlags>
-    <OutDir>$(SolutionDir)Bin\$(ConfigurationName)\Driver\Package</OutDir>
+    <OutDir>$(SolutionDir)Bin\$(ConfigurationName)\Driver\Package\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>

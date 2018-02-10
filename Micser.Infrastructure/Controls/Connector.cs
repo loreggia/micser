@@ -31,7 +31,7 @@ namespace Micser.Infrastructure.Controls
         /// <summary>
         /// The Widget this Connector belongs to.
         /// </summary>
-        public Widget ParentWidget => _parentWidget ?? this.GetParentOfType<Widget>();
+        public Widget ParentWidget => _parentWidget ?? (_parentWidget = this.GetParentOfType<Widget>());
 
         /// <summary>
         /// Center position of this Connector relative to the WidgetPanel.

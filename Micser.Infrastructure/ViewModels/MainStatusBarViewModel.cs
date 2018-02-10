@@ -3,7 +3,7 @@ using System.Windows.Controls.Primitives;
 
 namespace Micser.Infrastructure.ViewModels
 {
-    public class MainStatusBarViewModel : ViewModel
+    public class MainStatusBarViewModel : ViewModelNavigationAware
     {
         private IEnumerable<StatusBarItem> _statusItems;
 

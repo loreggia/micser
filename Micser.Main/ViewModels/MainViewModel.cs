@@ -3,21 +3,21 @@ using System.Collections.ObjectModel;
 using Micser.Infrastructure;
 using Micser.Infrastructure.ViewModels;
 using Micser.Main.ViewModels.Widgets;
-using Micser.Main.Views.Widgets;
 using Prism.Regions;
 
 namespace Micser.Main.ViewModels
 {
-    public class MainViewModel : ViewModel
+    public class MainViewModel : ViewModelNavigationAware
     {
         private readonly IList<WidgetViewModel> _widgets;
-
         private IEnumerable<WidgetDescription> _availableWidgets;
 
-        public MainViewModel(IWidgetFactory widgetFactory)
+        public MainViewModel(IWidgetFactory widgetFactory, IEnumerable<WidgetDescription> availableWidgets)
         {
-            WidgetFactory = widgetFactory;
             _widgets = new ObservableCollection<WidgetViewModel>();
+
+            WidgetFactory = widgetFactory;
+            AvailableWidgets = availableWidgets;
         }
 
         public IEnumerable<WidgetDescription> AvailableWidgets

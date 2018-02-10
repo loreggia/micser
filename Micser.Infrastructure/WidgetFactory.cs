@@ -1,9 +1,7 @@
 ﻿using Micser.Infrastructure.Controls;
-using Micser.Infrastructure.ViewModels;
-using Micser.Main.ViewModels.Widgets;
 using Unity;
 
-namespace Micser.Main.Views.Widgets
+namespace Micser.Infrastructure
 {
     public class WidgetFactory : IWidgetFactory
     {
@@ -14,10 +12,10 @@ namespace Micser.Main.Views.Widgets
             _container = container;
         }
 
-        public virtual Widget CreateWidget(WidgetViewModel viewModel)
+        public virtual Widget CreateWidget(WidgetDescription description)
         {
-            var widget = _container.Resolve<Widget>(viewModel.GetType().Name);
-            widget.DataContext = viewModel;
+            var widget = _container.Resolve<Widget>(description.Type.FullName);
+            widget.Header = description.Name;
             return widget;
         }
     }
