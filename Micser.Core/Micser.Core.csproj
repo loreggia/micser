@@ -20,7 +20,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\Bin\Debug\App\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -29,7 +29,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\Bin\Release\App\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -147,10 +147,6 @@
     <ProjectReference Include="..\Micser.Infrastructure\Micser.Infrastructure.csproj">
       <Project>{e14431b4-f54a-4d36-b505-1d3407252430}</Project>
       <Name>Micser.Infrastructure</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Micser.Main\Micser.Main.csproj">
-      <Project>{278DA3CA-5758-4C71-8A77-EDE249167CC3}</Project>
-      <Name>Micser.Main</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
