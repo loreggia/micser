@@ -15,9 +15,6 @@ namespace Micser.Infrastructure
 
         public View()
         {
-            Loaded += OnViewLoaded;
-            Unloaded += OnViewUnloaded;
-
             Dispatcher.ShutdownStarted += OnDispatcherShutdownStarted;
         }
 
@@ -28,22 +25,6 @@ namespace Micser.Infrastructure
         }
 
         public ViewModel ViewModel => DataContext as ViewModel;
-
-        protected virtual async void OnViewLoaded(object sender, RoutedEventArgs e)
-        {
-            //if (DataContext is IViewModel vm)
-            //{
-            //    try
-            //    {
-            //        IsBusy = true;
-            //        await vm.InitializeAsync();
-            //    }
-            //    finally
-            //    {
-            //        IsBusy = false;
-            //    }
-            //}
-        }
 
         private static void IsBusyPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
@@ -74,10 +55,6 @@ namespace Micser.Infrastructure
         private void OnDispatcherShutdownStarted(object sender, EventArgs e)
         {
             ViewModel?.Dispose();
-        }
-
-        private void OnViewUnloaded(object sender, RoutedEventArgs e)
-        {
         }
     }
 }

@@ -94,8 +94,8 @@
     <Compile Include="Controls\RelativePositionPanel.cs" />
     <Compile Include="Controls\ResizeThumb.cs" />
     <Compile Include="Controls\RubberbandAdorner.cs" />
-    <Compile Include="Controls\Toolbox.cs" />
-    <Compile Include="Controls\ToolboxItem.cs" />
+    <Compile Include="Controls\WidgetToolbox.cs" />
+    <Compile Include="Controls\WidgetToolboxItem.cs" />
     <Compile Include="Controls\Widget.cs" />
     <Compile Include="Controls\WidgetPanel.cs" />
     <Compile Include="Converter\BooleanConverter.cs" />
@@ -113,6 +113,7 @@
     <Compile Include="ISelectable.cs" />
     <Compile Include="ItemRegistry.cs" />
     <Compile Include="IViewModel.cs" />
+    <Compile Include="IWidgetFactory.cs" />
     <Compile Include="Menu\IMenuItemRegistry.cs" />
     <Compile Include="Menu\MenuItemDescription.cs" />
     <Compile Include="Menu\MenuItemRegistry.cs" />
@@ -125,6 +126,7 @@
     <Compile Include="TreeNode.cs" />
     <Compile Include="View.cs" />
     <Compile Include="ViewModel.cs" />
+    <Compile Include="ViewModelNavigationAware.cs" />
     <Compile Include="ViewModels\MainMenuViewModel.cs" />
     <Compile Include="ViewModels\MainStatusBarViewModel.cs" />
     <Compile Include="ViewModels\WidgetViewModel.cs" />
@@ -135,6 +137,7 @@
       <DependentUpon>MainStatusBarView.xaml</DependentUpon>
     </Compile>
     <Compile Include="WidgetDescription.cs" />
+    <Compile Include="WidgetFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="Themes\Connection.xaml">

@@ -4,7 +4,7 @@ using Prism.Regions;
 
 namespace Micser.Infrastructure.ViewModels
 {
-    public class MainMenuViewModel : ViewModel
+    public class MainMenuViewModel : ViewModelNavigationAware
     {
         private readonly IMenuItemRegistry _menuItemRegistry;
         private IEnumerable<TreeNode<MenuItemDescription>> _menuItems;

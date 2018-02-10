@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Markup;
-using System.Xml;
 using Micser.Infrastructure.Themes;
 
 namespace Micser.Infrastructure.Controls
@@ -16,6 +13,9 @@ namespace Micser.Infrastructure.Controls
     {
         public static readonly DependencyProperty RasterSizeProperty = DependencyProperty.Register(
             nameof(RasterSize), typeof(double), typeof(WidgetPanel), new PropertyMetadata(25d));
+
+        public static readonly DependencyProperty WidgetFactoryProperty = DependencyProperty.Register(
+            nameof(WidgetFactory), typeof(IWidgetFactory), typeof(WidgetPanel), new PropertyMetadata(default(IWidgetFactory)));
 
         // start point of the rubberband drag operation
         private Point? _rubberbandSelectionStartPoint;
@@ -35,6 +35,12 @@ namespace Micser.Infrastructure.Controls
         }
 
         public IList<ISelectable> SelectedItems { get; }
+
+        public IWidgetFactory WidgetFactory
+        {
+            get => (IWidgetFactory)GetValue(WidgetFactoryProperty);
+            set => SetValue(WidgetFactoryProperty, value);
+        }
 
         protected override Size MeasureOverride(Size constraint)
         {
@@ -68,46 +74,30 @@ namespace Micser.Infrastructure.Controls
         {
             base.OnDrop(e);
 
-            if (e.Data.GetData(typeof(DragObject)) is DragObject dragObject && !string.IsNullOrEmpty(dragObject.Xaml))
+            if (e.Data.GetData(typeof(WidgetDescription)) is WidgetDescription description)
             {
-                var content = XamlReader.Load(XmlReader.Create(new StringReader(dragObject.Xaml)));
-
-                if (content != null)
+                if (WidgetFactory == null)
                 {
-                    var newItem = new Widget
-                    {
-                        Content = content
-                    };
-
-                    var position = e.GetPosition(this);
-
-                    if (dragObject.DesiredSize.HasValue)
-                    {
-                        var desiredSize = dragObject.DesiredSize.Value;
-                        newItem.Width = desiredSize.Width;
-                        newItem.Height = desiredSize.Height;
-
-                        SetLeft(newItem, Math.Max(0, position.X - newItem.Width / 2));
-                        SetTop(newItem, Math.Max(0, position.Y - newItem.Height / 2));
-                    }
-                    else
-                    {
-                        SetLeft(newItem, Math.Max(0, position.X));
-                        SetTop(newItem, Math.Max(0, position.Y));
-                    }
-
-                    Children.Add(newItem);
-
-                    //update selection
-                    foreach (var item in SelectedItems)
-                    {
-                        item.IsSelected = false;
-                    }
-
-                    SelectedItems.Clear();
-                    newItem.IsSelected = true;
-                    SelectedItems.Add(newItem);
+                    throw new InvalidOperationException("No widget factory available.");
                 }
+
+                var widget = WidgetFactory.CreateWidget(description);
+
+                Children.Add(widget);
+
+                var position = e.GetPosition(this);
+                SetTop(widget, position.Y);
+                SetLeft(widget, position.X);
+
+                //update selection
+                foreach (var item in SelectedItems)
+                {
+                    item.IsSelected = false;
+                }
+
+                SelectedItems.Clear();
+                widget.IsSelected = true;
+                SelectedItems.Add(widget);
 
                 e.Handled = true;
             }

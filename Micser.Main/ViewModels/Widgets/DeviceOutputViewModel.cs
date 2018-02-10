@@ -2,7 +2,6 @@
 using System.Linq;
 using Micser.Main.Audio;
 using Micser.Main.Services;
-using Prism.Regions;
 
 namespace Micser.Main.ViewModels.Widgets
 {
@@ -30,16 +29,9 @@ namespace Micser.Main.ViewModels.Widgets
             }
         }
 
-        public override void OnNavigatedFrom(NavigationContext navigationContext)
+        public override void Initialize()
         {
-            base.OnNavigatedFrom(navigationContext);
-            _deviceOutput.Dispose();
-            _deviceOutput = null;
-        }
-
-        public override void OnNavigatedTo(NavigationContext navigationContext)
-        {
-            base.OnNavigatedTo(navigationContext);
+            base.Initialize();
             _deviceOutput = new DeviceOutput();
             UpdateDeviceDescriptions();
 
@@ -51,7 +43,7 @@ namespace Micser.Main.ViewModels.Widgets
             base.Dispose(disposing);
             if (disposing)
             {
-                _deviceOutput.Dispose();
+                _deviceOutput?.Dispose();
                 _deviceOutput = null;
             }
         }
