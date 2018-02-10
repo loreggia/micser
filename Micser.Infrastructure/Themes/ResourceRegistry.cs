@@ -17,15 +17,42 @@ namespace Micser.Infrastructure.Themes
             }
         }
 
-        public static IEnumerable<ResourceDictionary> InfrastructureResources => _infrastructureResources ?? (_infrastructureResources = new[]
+        public static IEnumerable<ResourceDictionary> InfrastructureResources =>
+            _infrastructureResources ?? (_infrastructureResources = new[]
+            {
+                new ResourceDictionary
                 {
-            new ResourceDictionary{Source = new Uri("Micser.Infrastructure;component/Themes/Generic.xaml", UriKind.Relative)},
-            new ResourceDictionary{Source = new Uri("Micser.Infrastructure;component/Themes/Connection.xaml",UriKind.Relative)},
-            new ResourceDictionary{Source = new Uri("Micser.Infrastructure;component/Themes/Connector.xaml",UriKind.Relative)},
-            new ResourceDictionary{Source = new Uri("Micser.Infrastructure;component/Themes/Thumbs.xaml",UriKind.Relative)},
-            new ResourceDictionary{Source = new Uri("Micser.Infrastructure;component/Themes/WidgetPanel.xaml",UriKind.Relative)},
-            new ResourceDictionary{Source = new Uri("Micser.Infrastructure;component/Themes/Widget.xaml",UriKind.Relative)}
-        });
+                    Source = new Uri("Micser.Infrastructure;component/Themes/Generic.xaml", UriKind.Relative)
+                },
+                new ResourceDictionary
+                {
+                    Source = new Uri("Micser.Infrastructure;component/Themes/Connection.xaml", UriKind.Relative)
+                },
+                new ResourceDictionary
+                {
+                    Source = new Uri("Micser.Infrastructure;component/Themes/Connector.xaml", UriKind.Relative)
+                },
+                new ResourceDictionary
+                {
+                    Source = new Uri("Micser.Infrastructure;component/Themes/Thumbs.xaml", UriKind.Relative)
+                },
+                new ResourceDictionary
+                {
+                    Source = new Uri("Micser.Infrastructure;component/Themes/Widget.xaml", UriKind.Relative)
+                },
+                new ResourceDictionary
+                {
+                    Source = new Uri("Micser.Infrastructure;component/Themes/WidgetPanel.xaml", UriKind.Relative)
+                },
+                new ResourceDictionary
+                {
+                    Source = new Uri("Micser.Infrastructure;component/Themes/WidgetToolboxItem.xaml", UriKind.Relative)
+                },
+                new ResourceDictionary
+                {
+                    Source = new Uri("Micser.Infrastructure;component/Themes/WidgetToolbox.xaml", UriKind.Relative)
+                },
+            });
 
         public static void RegisterResourcesFor(FrameworkElement element)
         {

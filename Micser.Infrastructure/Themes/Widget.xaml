@@ -5,7 +5,7 @@
     <DataTemplate x:Key="DefaultHeaderTemplate">
         <Grid MinHeight="16">
             <Border CornerRadius="5,5,0,0" Background="LightGray" />
-            <ContentPresenter Content="{Binding}" />
+            <ContentPresenter Margin="3" Content="{Binding}" />
             <s:DragThumb />
         </Grid>
     </DataTemplate>
@@ -30,34 +30,36 @@
                         <Border Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="5" />
+                                CornerRadius="5">
+                            <Grid>
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
 
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="*" />
-                            </Grid.RowDefinitions>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
+                                    <ContentControl Grid.Row="0" Grid.ColumnSpan="3" Content="{TemplateBinding Header}" ContentTemplate="{TemplateBinding HeaderTemplate}" />
 
-                            <ContentControl Grid.Row="0" Grid.ColumnSpan="3" Content="{TemplateBinding Header}" ContentTemplate="{TemplateBinding HeaderTemplate}" />
+                                    <ItemsControl Grid.Row="1" Grid.Column="0" ItemsSource="{Binding InputConnectors, RelativeSource={RelativeSource TemplatedParent}}" />
+                                    <ContentPresenter Grid.Row="1" Grid.Column="1" Margin="3" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}" />
+                                    <ItemsControl Grid.Row="1" Grid.Column="2" ItemsSource="{Binding InputConnectors, RelativeSource={RelativeSource TemplatedParent}}" />
+                                </Grid>
 
-                            <ItemsControl Grid.Row="1" Grid.Column="0" ItemsSource="{Binding InputConnectors, RelativeSource={RelativeSource TemplatedParent}}" />
-                            <ContentPresenter Grid.Row="1" Grid.Column="1" Margin="3" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}" />
-                            <ItemsControl Grid.Row="1" Grid.Column="2" ItemsSource="{Binding InputConnectors, RelativeSource={RelativeSource TemplatedParent}}" />
-                        </Grid>
-
-                        <s:ResizeThumb HorizontalAlignment="Left" VerticalAlignment="Stretch" Cursor="SizeWE" Width="3" />
-                        <s:ResizeThumb HorizontalAlignment="Right" VerticalAlignment="Stretch" Cursor="SizeWE" Width="3" />
-                        <s:ResizeThumb HorizontalAlignment="Stretch" VerticalAlignment="Top" Cursor="SizeNS" Height="3" />
-                        <s:ResizeThumb HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Cursor="SizeNS" Height="3" />
-                        <s:ResizeThumb HorizontalAlignment="Left" VerticalAlignment="Top" Cursor="SizeNWSE" Width="4" Height="4" />
-                        <s:ResizeThumb HorizontalAlignment="Right" VerticalAlignment="Top" Cursor="SizeNESW" Width="4" Height="4" />
-                        <s:ResizeThumb HorizontalAlignment="Left" VerticalAlignment="Bottom" Cursor="SizeNESW" Width="4" Height="4" />
-                        <s:ResizeThumb HorizontalAlignment="Right" VerticalAlignment="Bottom" Cursor="SizeNWSE" Width="4" Height="4" />
+                                <s:ResizeThumb HorizontalAlignment="Left" VerticalAlignment="Stretch" Cursor="SizeWE" Width="3" />
+                                <s:ResizeThumb HorizontalAlignment="Right" VerticalAlignment="Stretch" Cursor="SizeWE" Width="3" />
+                                <s:ResizeThumb HorizontalAlignment="Stretch" VerticalAlignment="Top" Cursor="SizeNS" Height="3" />
+                                <s:ResizeThumb HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Cursor="SizeNS" Height="3" />
+                                <s:ResizeThumb HorizontalAlignment="Left" VerticalAlignment="Top" Cursor="SizeNWSE" Width="4" Height="4" />
+                                <s:ResizeThumb HorizontalAlignment="Right" VerticalAlignment="Top" Cursor="SizeNESW" Width="4" Height="4" />
+                                <s:ResizeThumb HorizontalAlignment="Left" VerticalAlignment="Bottom" Cursor="SizeNESW" Width="4" Height="4" />
+                                <s:ResizeThumb HorizontalAlignment="Right" VerticalAlignment="Bottom" Cursor="SizeNWSE" Width="4" Height="4" />
+                            </Grid>
+                        </Border>
                     </Grid>
                 </ControlTemplate>
             </Setter.Value>

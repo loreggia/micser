@@ -3,11 +3,6 @@
                     xmlns:controls="clr-namespace:Micser.Infrastructure.Controls"
                     xmlns:themes="clr-namespace:Micser.Infrastructure.Themes">
 
-    <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="Toolbox.xaml" />
-        <ResourceDictionary Source="ToolboxItem.xaml" />
-    </ResourceDictionary.MergedDictionaries>
-
     <SolidColorBrush x:Key="ConnectorBrush" Color="Gray" />
 
     <Style TargetType="{x:Type Label}">

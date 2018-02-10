@@ -70,6 +70,24 @@ namespace Micser.Main.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Device Input.
+        /// </summary>
+        public static string DeviceInputWidgetName {
+            get {
+                return ResourceManager.GetString("DeviceInputWidgetName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Device Output.
+        /// </summary>
+        public static string DeviceOutputWidgetName {
+            get {
+                return ResourceManager.GetString("DeviceOutputWidgetName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Inputs.
         /// </summary>
         public static string Inputs {
