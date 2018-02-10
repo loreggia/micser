@@ -103,7 +103,6 @@
     <Compile Include="Audio\DeviceDescription.cs" />
     <Compile Include="Services\DeviceService.cs" />
     <Compile Include="Audio\DeviceType.cs" />
-    <Compile Include="Themes\ResourceManager.cs" />
     <Compile Include="ViewModels\Widgets\AudioChainLinkViewModel.cs" />
     <Compile Include="ViewModels\Widgets\DeviceOutputViewModel.cs" />
     <Compile Include="ViewModels\Widgets\DeviceInputViewModel.cs" />

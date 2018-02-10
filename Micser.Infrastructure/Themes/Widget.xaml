@@ -2,26 +2,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:s="clr-namespace:Micser.Infrastructure.Controls">
 
-    <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="Connector.xaml" />
-    </ResourceDictionary.MergedDictionaries>
-
-    <!-- ResizeDecorator Default Template -->
-    <ControlTemplate x:Key="ResizeDecoratorTemplate" TargetType="{x:Type Control}">
-        <Grid Opacity="0.7" SnapsToDevicePixels="true">
-            <s:ResizeThumb Height="3" Cursor="SizeNS" Margin="0 -4 0 0" VerticalAlignment="Top" HorizontalAlignment="Stretch" />
-            <s:ResizeThumb Width="3" Cursor="SizeWE" Margin="-4 0 0 0" VerticalAlignment="Stretch" HorizontalAlignment="Left" />
-            <s:ResizeThumb Width="3" Cursor="SizeWE" Margin="0 0 -4 0" VerticalAlignment="Stretch" HorizontalAlignment="Right" />
-            <s:ResizeThumb Height="3" Cursor="SizeNS" Margin="0 0 0 -4" VerticalAlignment="Bottom" HorizontalAlignment="Stretch" />
-            <s:ResizeThumb Width="7" Height="7" Cursor="SizeNWSE" Margin="-6 -6 0 0" VerticalAlignment="Top" HorizontalAlignment="Left" />
-            <s:ResizeThumb Width="7" Height="7" Cursor="SizeNESW" Margin="0 -6 -6 0" VerticalAlignment="Top" HorizontalAlignment="Right" />
-            <s:ResizeThumb Width="7" Height="7" Cursor="SizeNESW" Margin="-6 0 0 -6" VerticalAlignment="Bottom" HorizontalAlignment="Left" />
-            <s:ResizeThumb Width="7" Height="7" Cursor="SizeNWSE" Margin="0 0 -6 -6" VerticalAlignment="Bottom" HorizontalAlignment="Right" />
-        </Grid>
-    </ControlTemplate>
-
     <!-- Widget Style -->
-    <Style TargetType="{x:Type s:Widget}">
+    <Style x:Key="DefaultWidgetStyle" TargetType="{x:Type s:Widget}">
         <Setter Property="HorizontalAlignment" Value="Left" />
         <Setter Property="VerticalAlignment" Value="Top" />
         <Setter Property="Background" Value="White" />
@@ -41,7 +23,8 @@
                                 BorderThickness="{TemplateBinding BorderThickness}"
                                 CornerRadius="5">
                             <StackPanel>
-                                <Grid Background="LightGray">
+                                <Grid MinHeight="16">
+                                    <Border CornerRadius="5,5,0,0" Background="LightGray"></Border>
                                     <ContentControl Margin="3" Content="{TemplateBinding Header}" />
                                     <s:DragThumb DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
                                 </Grid>
@@ -63,42 +46,5 @@
         </Setter>
     </Style>
 
-    <Style x:Key="DefaultWidgetStyle" TargetType="{x:Type s:Widget}">
-        <Setter Property="HorizontalAlignment" Value="Left" />
-        <Setter Property="VerticalAlignment" Value="Top" />
-        <Setter Property="Background" Value="White" />
-        <Setter Property="BorderBrush" Value="Black" />
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="MinWidth" Value="25" />
-        <Setter Property="MinHeight" Value="25" />
-        <Setter Property="Width" Value="Auto" />
-        <Setter Property="Height" Value="Auto" />
-
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="{x:Type s:Widget}">
-                    <Grid>
-                        <Border Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="5">
-                            <StackPanel>
-                                <Grid>
-                                    <ContentControl Margin="3" Content="{TemplateBinding Header}" />
-                                    <s:DragThumb DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
-                                </Grid>
-                                <ContentPresenter Margin="3" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}" />
-                            </StackPanel>
-                        </Border>
-                        <s:ResizeThumb HorizontalAlignment="Left" VerticalAlignment="Stretch" Cursor="SizeWE" Width="3" DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
-                        <s:ResizeThumb HorizontalAlignment="Right" VerticalAlignment="Stretch" Cursor="SizeWE" Width="3" DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
-                        <s:ResizeThumb HorizontalAlignment="Stretch" VerticalAlignment="Top" Cursor="SizeNS" Height="3" DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
-                        <s:ResizeThumb HorizontalAlignment="Stretch" VerticalAlignment="Bottom" Cursor="SizeNS" Height="3" DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}" />
-                    </Grid>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-    </Style>
-
-    <!--<Style TargetType="{x:Type s:Widget}" BasedOn="{StaticResource DefaultWidgetStyle}"></Style>-->
+    <Style TargetType="{x:Type s:Widget}" BasedOn="{StaticResource DefaultWidgetStyle}"></Style>
 </ResourceDictionary>
