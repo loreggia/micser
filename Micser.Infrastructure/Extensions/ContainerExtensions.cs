@@ -9,7 +9,7 @@ namespace Micser.Infrastructure.Extensions
 {
     public static class ContainerExtensions
     {
-        public static void RegisterView<TView, TViewModel>(this IUnityContainer container, string regionName = null)
+        public static void RegisterView<TView, TViewModel>(this IUnityContainer container, string regionName)
             where TView : FrameworkElement
             where TViewModel : IViewModel
         {
@@ -31,7 +31,7 @@ namespace Micser.Infrastructure.Extensions
             }
         }
 
-        public static void RegisterWidget<TWidget, TViewModel>(this IUnityContainer container, string defaultName = null)
+        public static void RegisterWidget<TWidget, TViewModel>(this IUnityContainer container, string defaultName)
             where TWidget : Widget
             where TViewModel : WidgetViewModel
         {

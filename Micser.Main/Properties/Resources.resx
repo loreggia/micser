@@ -120,6 +120,12 @@
   <data name="Device" xml:space="preserve">
     <value>Device</value>
   </data>
+  <data name="DeviceInputWidgetName" xml:space="preserve">
+    <value>Device Input</value>
+  </data>
+  <data name="DeviceOutputWidgetName" xml:space="preserve">
+    <value>Device Output</value>
+  </data>
   <data name="Inputs" xml:space="preserve">
     <value>Inputs</value>
   </data>
