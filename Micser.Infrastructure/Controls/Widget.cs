@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using Micser.Infrastructure.Themes;
 using Micser.Infrastructure.ViewModels;
 
 namespace Micser.Infrastructure.Controls
@@ -39,6 +40,8 @@ namespace Micser.Infrastructure.Controls
 
         public Widget()
         {
+            ResourceRegistry.RegisterResourcesFor(this);
+
             Loaded += OnWidgetLoaded;
 
             Dispatcher.ShutdownStarted += OnDispatcherShutdownStarted;

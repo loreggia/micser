@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Markup;
 using System.Windows.Media;
+using Micser.Infrastructure.Themes;
 
 namespace Micser.Infrastructure.Controls
 {
@@ -32,6 +33,11 @@ namespace Micser.Infrastructure.Controls
         {
             // set the key to reference the style for this control
             DefaultStyleKeyProperty.OverrideMetadata(typeof(ToolboxItem), new FrameworkPropertyMetadata(typeof(ToolboxItem)));
+        }
+
+        public ToolboxItem()
+        {
+            ResourceRegistry.RegisterResourcesFor(this);
         }
 
         protected override void OnMouseMove(MouseEventArgs e)
