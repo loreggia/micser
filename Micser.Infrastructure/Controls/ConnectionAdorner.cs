@@ -178,6 +178,13 @@ namespace Micser.Infrastructure.Controls
                     }
                 }
             }
+            else
+            {
+                // remove connection
+                _connection.Sink = null;
+                _connection.Source = null;
+                _widgetPanel.Children.Remove(_connection);
+            }
 
             HitWidget = null;
             HitConnector = null;

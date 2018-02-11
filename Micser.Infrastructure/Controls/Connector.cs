@@ -16,6 +16,7 @@ namespace Micser.Infrastructure.Controls
         // drag start point, relative to the WidgetPanel
         private Point? _dragStartPoint;
 
+        private WidgetPanel _parentPanel;
         private Widget _parentWidget;
 
         public Connector()
@@ -42,7 +43,7 @@ namespace Micser.Infrastructure.Controls
             set => SetValue(PositionProperty, value);
         }
 
-        private WidgetPanel ParentPanel => this.GetParentOfType<WidgetPanel>();
+        private WidgetPanel ParentPanel => _parentPanel ?? (_parentPanel = this.GetParentOfType<WidgetPanel>());
 
         internal ConnectorInfo GetInfo()
         {
