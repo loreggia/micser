@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Micser.Infrastructure;
 using Micser.Main.Audio;
 using Micser.Main.Services;
 
@@ -9,6 +10,7 @@ namespace Micser.Main.ViewModels.Widgets
     {
         private IEnumerable<DeviceDescription> _deviceDescriptions;
         private DeviceOutput _deviceOutput;
+        private ConnectorViewModel _inputViewModel;
         private DeviceDescription _selectedDeviceDescription;
 
         public IEnumerable<DeviceDescription> DeviceDescriptions
@@ -32,6 +34,9 @@ namespace Micser.Main.ViewModels.Widgets
         public override void Initialize()
         {
             base.Initialize();
+
+            _inputViewModel = AddInput(_deviceOutput);
+
             _deviceOutput = new DeviceOutput();
             UpdateDeviceDescriptions();
 
@@ -45,6 +50,16 @@ namespace Micser.Main.ViewModels.Widgets
             {
                 _deviceOutput?.Dispose();
                 _deviceOutput = null;
+            }
+        }
+
+        protected override void OnInputConnectionChanged(object sender, ConnectionChangedEventArgs e)
+        {
+            base.OnInputConnectionChanged(sender, e);
+
+            if (e.NewConnection?.Source?.Data is IAudioChainLink audioChainLink)
+            {
+                _deviceOutput.Input = audioChainLink;
             }
         }
 

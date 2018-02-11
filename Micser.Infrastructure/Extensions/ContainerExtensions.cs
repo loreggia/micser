@@ -38,7 +38,9 @@ namespace Micser.Infrastructure.Extensions
             container.RegisterType<Widget>(typeof(TWidget).FullName, new InjectionFactory(c =>
             {
                 var widget = c.Resolve<TWidget>();
-                widget.DataContext = c.Resolve<TViewModel>();
+                var viewModel = c.Resolve<TViewModel>();
+                widget.DataContext = viewModel;
+                viewModel.Initialize();
                 return widget;
             }));
             container.RegisterInstance(typeof(TWidget).FullName, new WidgetDescription

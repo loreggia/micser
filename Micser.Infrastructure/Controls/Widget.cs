@@ -1,10 +1,10 @@
 ﻿using System;
+using System.Collections;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using Micser.Infrastructure.Themes;
-using Micser.Infrastructure.ViewModels;
 
 namespace Micser.Infrastructure.Controls
 {
@@ -16,11 +16,23 @@ namespace Micser.Infrastructure.Controls
         public static readonly DependencyProperty HeaderTemplateProperty = DependencyProperty.Register(
             nameof(HeaderTemplate), typeof(DataTemplate), typeof(Widget), new PropertyMetadata(null));
 
+        public static readonly DependencyProperty InputConnectorsProperty = DependencyProperty.Register(
+            nameof(InputConnectors), typeof(IEnumerable), typeof(Widget), new PropertyMetadata(null));
+
+        public static readonly DependencyProperty InputConnectorTemplateProperty = DependencyProperty.Register(
+            nameof(InputConnectorTemplate), typeof(DataTemplate), typeof(Widget), new PropertyMetadata(null));
+
         public static readonly DependencyProperty IsDragConnectionOverProperty = DependencyProperty.Register(
             nameof(IsDragConnectionOver), typeof(bool), typeof(Widget), new FrameworkPropertyMetadata(false));
 
         public static readonly DependencyProperty IsSelectedProperty = DependencyProperty.Register(
             nameof(IsSelected), typeof(bool), typeof(Widget), new FrameworkPropertyMetadata(false));
+
+        public static readonly DependencyProperty OutputConnectorsProperty = DependencyProperty.Register(
+            nameof(OutputConnectors), typeof(IEnumerable), typeof(Widget), new PropertyMetadata(null));
+
+        public static readonly DependencyProperty OutputConnectorTemplateProperty = DependencyProperty.Register(
+            nameof(OutputConnectorTemplate), typeof(DataTemplate), typeof(Widget), new PropertyMetadata(null));
 
         static Widget()
         {
@@ -47,6 +59,18 @@ namespace Micser.Infrastructure.Controls
             set => SetValue(HeaderTemplateProperty, value);
         }
 
+        public IEnumerable InputConnectors
+        {
+            get => (IEnumerable)GetValue(InputConnectorsProperty);
+            set => SetValue(InputConnectorsProperty, value);
+        }
+
+        public DataTemplate InputConnectorTemplate
+        {
+            get => (DataTemplate)GetValue(InputConnectorTemplateProperty);
+            set => SetValue(InputConnectorTemplateProperty, value);
+        }
+
         /// <summary>
         /// While drag connection procedure is ongoing and the mouse moves over this item this value is true; if true the ConnectorDecorator is triggered to be visible, see template.
         /// </summary>
@@ -62,7 +86,17 @@ namespace Micser.Infrastructure.Controls
             set => SetValue(IsSelectedProperty, value);
         }
 
-        public WidgetViewModel ViewModel => DataContext as WidgetViewModel;
+        public IEnumerable OutputConnectors
+        {
+            get => (IEnumerable)GetValue(OutputConnectorsProperty);
+            set => SetValue(OutputConnectorsProperty, value);
+        }
+
+        public DataTemplate OutputConnectorTemplate
+        {
+            get => (DataTemplate)GetValue(OutputConnectorTemplateProperty);
+            set => SetValue(OutputConnectorTemplateProperty, value);
+        }
 
         protected override void OnPreviewMouseDown(MouseButtonEventArgs e)
         {
@@ -102,12 +136,15 @@ namespace Micser.Infrastructure.Controls
 
         private void OnDispatcherShutdownStarted(object sender, EventArgs e)
         {
-            ViewModel?.Dispose();
+            if (DataContext is IDisposable disposable)
+            {
+                disposable.Dispose();
+            }
         }
 
         private void OnWidgetLoaded(object sender, RoutedEventArgs e)
         {
-            ViewModel?.Initialize();
+            //ViewModel?.Initialize();
         }
     }
 }
