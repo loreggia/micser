@@ -23,6 +23,22 @@
         <Setter Property="Height" Value="Auto" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="HeaderTemplate" Value="{StaticResource DefaultHeaderTemplate}" />
+        <Setter Property="InputConnectors" Value="{Binding InputConnectors}" />
+        <Setter Property="OutputConnectors" Value="{Binding OutputConnectors}" />
+        <Setter Property="InputConnectorTemplate">
+            <Setter.Value>
+                <DataTemplate>
+                    <s:Connector Orientation="Left" Margin="3,3,0,0" />
+                </DataTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="OutputConnectorTemplate">
+            <Setter.Value>
+                <DataTemplate>
+                    <s:Connector Orientation="Right" Margin="0,3,3,0" />
+                </DataTemplate>
+            </Setter.Value>
+        </Setter>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type s:Widget}">
@@ -45,9 +61,9 @@
 
                                     <ContentControl Grid.Row="0" Grid.ColumnSpan="3" Content="{TemplateBinding Header}" ContentTemplate="{TemplateBinding HeaderTemplate}" />
 
-                                    <ItemsControl Grid.Row="1" Grid.Column="0" ItemsSource="{Binding InputConnectors, RelativeSource={RelativeSource TemplatedParent}}" />
+                                    <ItemsControl Grid.Row="1" Grid.Column="0" ItemsSource="{Binding InputConnectors, RelativeSource={RelativeSource TemplatedParent}}" ItemTemplate="{TemplateBinding InputConnectorTemplate}" />
                                     <ContentPresenter Grid.Row="1" Grid.Column="1" Margin="3" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}" />
-                                    <ItemsControl Grid.Row="1" Grid.Column="2" ItemsSource="{Binding InputConnectors, RelativeSource={RelativeSource TemplatedParent}}" />
+                                    <ItemsControl Grid.Row="1" Grid.Column="2" ItemsSource="{Binding OutputConnectors, RelativeSource={RelativeSource TemplatedParent}}" ItemTemplate="{TemplateBinding OutputConnectorTemplate}" />
                                 </Grid>
 
                                 <s:ResizeThumb HorizontalAlignment="Left" VerticalAlignment="Stretch" Cursor="SizeWE" Width="3" />

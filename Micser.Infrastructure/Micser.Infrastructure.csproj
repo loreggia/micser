@@ -82,7 +82,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bindable.cs" />
+    <Compile Include="ConnectionChangedEventHandler.cs" />
+    <Compile Include="ConnectorChangedEventHandler.cs" />
     <Compile Include="ConnectorInfo.cs" />
+    <Compile Include="ConnectionViewModel.cs" />
+    <Compile Include="ConnectorViewModel.cs" />
     <Compile Include="Controls\BusyAdorner.cs" />
     <Compile Include="Controls\Connection.cs" />
     <Compile Include="Controls\ConnectionAdorner.cs" />
@@ -129,7 +133,7 @@
     <Compile Include="ViewModelNavigationAware.cs" />
     <Compile Include="ViewModels\MainMenuViewModel.cs" />
     <Compile Include="ViewModels\MainStatusBarViewModel.cs" />
-    <Compile Include="ViewModels\WidgetViewModel.cs" />
+    <Compile Include="WidgetViewModel.cs" />
     <Compile Include="Views\MainMenuView.xaml.cs">
       <DependentUpon>MainMenuView.xaml</DependentUpon>
     </Compile>
