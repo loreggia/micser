@@ -135,15 +135,15 @@ namespace Micser.Infrastructure.Controls
                    !Equals(hitObject, _sourceConnector.ParentWidget) &&
                    hitObject.GetType() != typeof(WidgetPanel))
             {
-                if (hitObject is Connector)
+                if (hitObject is Connector connector)
                 {
-                    HitConnector = hitObject as Connector;
+                    HitConnector = connector;
                     hitConnectorFlag = true;
                 }
 
-                if (hitObject is Widget)
+                if (hitObject is Widget widget)
                 {
-                    HitWidget = hitObject as Widget;
+                    HitWidget = widget;
                     if (!hitConnectorFlag)
                     {
                         HitConnector = null;

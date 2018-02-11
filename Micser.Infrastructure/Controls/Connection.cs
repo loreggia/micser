@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using Micser.Infrastructure.Extensions;
 
 namespace Micser.Infrastructure.Controls
 {
@@ -54,6 +55,7 @@ namespace Micser.Infrastructure.Controls
             nameof(StrokeDashArray), typeof(DoubleCollection), typeof(Connection), new PropertyMetadata(null));
 
         private Adorner _connectionAdorner;
+        private WidgetPanel _parentPanel;
 
         public Connection(Connector source, Connector sink)
         {
@@ -134,6 +136,8 @@ namespace Micser.Infrastructure.Controls
             set => SetValue(StrokeDashArrayProperty, value);
         }
 
+        private WidgetPanel ParentPanel => _parentPanel ?? (_parentPanel = this.GetParentOfType<WidgetPanel>());
+
         internal void HideAdorner()
         {
             if (_connectionAdorner != null)
@@ -147,7 +151,8 @@ namespace Micser.Infrastructure.Controls
             base.OnMouseDown(e);
 
             // usual selection business
-            if (VisualTreeHelper.GetParent(this) is WidgetPanel panel)
+            var panel = ParentPanel;
+            if (panel != null)
             {
                 if ((Keyboard.Modifiers & (ModifierKeys.Shift | ModifierKeys.Control)) != ModifierKeys.None)
                 {
@@ -228,7 +233,7 @@ namespace Micser.Infrastructure.Controls
             // remove adorner
             if (_connectionAdorner != null)
             {
-                var panel = (WidgetPanel)VisualTreeHelper.GetParent(this);
+                var panel = ParentPanel;
                 if (panel != null)
                 {
                     var adornerLayer = AdornerLayer.GetAdornerLayer(panel);
@@ -252,7 +257,8 @@ namespace Micser.Infrastructure.Controls
             // the ConnectionAdorner is created once for each Connection
             if (_connectionAdorner == null)
             {
-                if (VisualTreeHelper.GetParent(this) is WidgetPanel panel)
+                var panel = ParentPanel;
+                if (panel != null)
                 {
                     var adornerLayer = AdornerLayer.GetAdornerLayer(panel);
                     if (adornerLayer != null)
