@@ -53,7 +53,7 @@ namespace Micser.Infrastructure.Controls
             if (VisualTreeHelper.GetParent(widget) is WidgetPanel panel && widget.IsSelected)
             {
                 // only resize Widgets
-                var selectedItems = panel.SelectedItems.OfType<Widget>().ToArray();
+                var selectedItems = panel.Widgets.Where(w => w.IsSelected).ToArray();
 
                 CalculateDragLimits(selectedItems, out var minLeft, out var minTop, out var minDeltaHorizontal, out var minDeltaVertical);
 

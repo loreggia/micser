@@ -30,7 +30,7 @@ namespace Micser.Infrastructure.Controls
                 var minTop = double.MaxValue;
 
                 // we only move Widgets
-                var widgets = panel.SelectedItems.OfType<Widget>().ToArray();
+                var widgets = panel.Widgets.Where(w => w.IsSelected).ToArray();
 
                 foreach (var item in widgets)
                 {

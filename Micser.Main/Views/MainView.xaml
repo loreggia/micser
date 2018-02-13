@@ -26,7 +26,7 @@
         </Grid>
 
         <!-- Widgets="{Binding Widgets}"-->
-        <c:WidgetPanel Grid.Row="1" x:Name="WidgetPanel" WidgetFactory="{Binding WidgetFactory}">
+        <c:WidgetPanel Grid.Row="1" x:Name="WidgetPanel" WidgetFactory="{Binding WidgetFactory}" ItemsSource="{Binding Widgets}">
         </c:WidgetPanel>
 
         <Expander Grid.Row="2" Header="Widgets" IsExpanded="True">

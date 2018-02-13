@@ -13,6 +13,11 @@ namespace Micser.Main.ViewModels.Widgets
         private ConnectorViewModel _inputViewModel;
         private DeviceDescription _selectedDeviceDescription;
 
+        public DeviceOutputViewModel()
+        {
+            _inputViewModel = AddInput(_deviceOutput);
+        }
+
         public IEnumerable<DeviceDescription> DeviceDescriptions
         {
             get => _deviceDescriptions;
@@ -34,8 +39,6 @@ namespace Micser.Main.ViewModels.Widgets
         public override void Initialize()
         {
             base.Initialize();
-
-            _inputViewModel = AddInput(_deviceOutput);
 
             _deviceOutput = new DeviceOutput();
             UpdateDeviceDescriptions();
