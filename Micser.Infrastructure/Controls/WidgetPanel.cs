@@ -17,6 +17,9 @@ namespace Micser.Infrastructure.Controls
         public static readonly DependencyProperty WidgetFactoryProperty = DependencyProperty.Register(
             nameof(WidgetFactory), typeof(IWidgetFactory), typeof(WidgetPanel), new PropertyMetadata(default(IWidgetFactory)));
 
+        public static readonly DependencyProperty WidgetsProperty = DependencyProperty.Register(
+            nameof(Widgets), typeof(IEnumerable<WidgetViewModel>), typeof(WidgetPanel), new PropertyMetadata(null, OnWidgetsPropertyChanged));
+
         // start point of the rubberband drag operation
         private Point? _rubberbandSelectionStartPoint;
 
@@ -40,6 +43,12 @@ namespace Micser.Infrastructure.Controls
         {
             get => (IWidgetFactory)GetValue(WidgetFactoryProperty);
             set => SetValue(WidgetFactoryProperty, value);
+        }
+
+        public IEnumerable<WidgetViewModel> Widgets
+        {
+            get => (IEnumerable<WidgetViewModel>)GetValue(WidgetsProperty);
+            set => SetValue(WidgetsProperty, value);
         }
 
         protected override Size MeasureOverride(Size constraint)
@@ -160,6 +169,11 @@ namespace Micser.Infrastructure.Controls
             {
                 SnapToGrid(widget);
             }
+        }
+
+        private static void OnWidgetsPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         private void SnapToGrid(FrameworkElement element)
