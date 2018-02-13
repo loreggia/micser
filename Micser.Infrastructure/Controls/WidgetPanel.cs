@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -11,24 +14,34 @@ namespace Micser.Infrastructure.Controls
 {
     public class WidgetPanel : Canvas
     {
+        public static readonly DependencyProperty ItemsSourceProperty = DependencyProperty.Register(
+            nameof(ItemsSource), typeof(IEnumerable), typeof(WidgetPanel), new PropertyMetadata(null, OnItemsSourcePropertyChanged));
+
         public static readonly DependencyProperty RasterSizeProperty = DependencyProperty.Register(
             nameof(RasterSize), typeof(double), typeof(WidgetPanel), new PropertyMetadata(25d));
 
         public static readonly DependencyProperty WidgetFactoryProperty = DependencyProperty.Register(
-            nameof(WidgetFactory), typeof(IWidgetFactory), typeof(WidgetPanel), new PropertyMetadata(default(IWidgetFactory)));
+            nameof(WidgetFactory), typeof(IWidgetFactory), typeof(WidgetPanel), new PropertyMetadata(null));
 
-        public static readonly DependencyProperty WidgetsProperty = DependencyProperty.Register(
-            nameof(Widgets), typeof(IEnumerable<WidgetViewModel>), typeof(WidgetPanel), new PropertyMetadata(null, OnWidgetsPropertyChanged));
+        private readonly ObservableCollection<Widget> _widgets;
 
         // start point of the rubberband drag operation
         private Point? _rubberbandSelectionStartPoint;
 
         public WidgetPanel()
         {
+            _widgets = new ObservableCollection<Widget>();
+            _widgets.CollectionChanged += WidgetsCollectionChanged;
+
             ResourceRegistry.RegisterResourcesFor(this);
 
             AllowDrop = true;
-            SelectedItems = new List<ISelectable>();
+        }
+
+        public IEnumerable ItemsSource
+        {
+            get => (IEnumerable)GetValue(ItemsSourceProperty);
+            set => SetValue(ItemsSourceProperty, value);
         }
 
         public double RasterSize
@@ -37,18 +50,20 @@ namespace Micser.Infrastructure.Controls
             set => SetValue(RasterSizeProperty, value);
         }
 
-        public IList<ISelectable> SelectedItems { get; }
-
         public IWidgetFactory WidgetFactory
         {
             get => (IWidgetFactory)GetValue(WidgetFactoryProperty);
             set => SetValue(WidgetFactoryProperty, value);
         }
 
-        public IEnumerable<WidgetViewModel> Widgets
+        public IEnumerable<Widget> Widgets => _widgets;
+
+        public void ClearSelection()
         {
-            get => (IEnumerable<WidgetViewModel>)GetValue(WidgetsProperty);
-            set => SetValue(WidgetsProperty, value);
+            foreach (ISelectable selectable in Children)
+            {
+                selectable.IsSelected = false;
+            }
         }
 
         protected override Size MeasureOverride(Size constraint)
@@ -91,23 +106,10 @@ namespace Micser.Infrastructure.Controls
                 }
 
                 var widget = WidgetFactory.CreateWidget(description);
-
-                Children.Add(widget);
-
                 var position = e.GetPosition(this);
                 SetTop(widget, position.Y);
                 SetLeft(widget, position.X);
-
-                //update selection
-                foreach (var item in SelectedItems)
-                {
-                    item.IsSelected = false;
-                }
-
-                SelectedItems.Clear();
-                widget.IsSelected = true;
-                SelectedItems.Add(widget);
-
+                _widgets.Add(widget);
                 e.Handled = true;
             }
         }
@@ -124,12 +126,10 @@ namespace Micser.Infrastructure.Controls
 
                 // if you click directly on the canvas all
                 // selected items are 'de-selected'
-                foreach (var item in SelectedItems)
+                foreach (var widget in _widgets)
                 {
-                    item.IsSelected = false;
+                    widget.IsSelected = false;
                 }
-
-                SelectedItems.Clear();
 
                 e.Handled = true;
             }
@@ -164,16 +164,106 @@ namespace Micser.Infrastructure.Controls
         {
             base.OnMouseUp(e);
 
-            var widgets = SelectedItems.OfType<Widget>();
-            foreach (var widget in widgets)
+            // todo snapping
+            //var widgets = SelectedItems.OfType<Widget>();
+            //foreach (var widget in widgets)
+            //{
+            //    SnapToGrid(widget);
+            //}
+        }
+
+        private static void OnItemsSourcePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var panel = (WidgetPanel)d;
+
+            if (e.OldValue is INotifyCollectionChanged oldCollection)
             {
-                SnapToGrid(widget);
+                oldCollection.CollectionChanged -= panel.ItemsSourceCollectionChanged;
+            }
+
+            if (e.NewValue is INotifyCollectionChanged newCollection)
+            {
+                newCollection.CollectionChanged += panel.ItemsSourceCollectionChanged;
+            }
+
+            panel.ClearWidgets();
+
+            if (e.NewValue is IEnumerable enumerable && panel.WidgetFactory != null)
+            {
+                foreach (var item in enumerable)
+                {
+                    panel.AddWidget(panel.WidgetFactory.CreateWidget(item));
+                }
             }
         }
 
-        private static void OnWidgetsPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private void AddWidget(Widget widget)
         {
-            throw new NotImplementedException();
+            Children.Add(widget);
+
+            //update selection
+            foreach (var w in _widgets)
+            {
+                w.IsSelected = false;
+            }
+
+            widget.IsSelected = true;
+        }
+
+        private void ClearWidgets()
+        {
+            _widgets.Clear();
+            Children.Clear();
+        }
+
+        private void ItemsSourceCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    if (WidgetFactory != null)
+                    {
+                        foreach (var item in e.NewItems)
+                        {
+                            AddWidget(WidgetFactory.CreateWidget(item));
+                        }
+                    }
+                    break;
+
+                case NotifyCollectionChangedAction.Remove:
+                    foreach (var item in e.OldItems)
+                    {
+                        RemoveWidget(_widgets.FirstOrDefault(w => w.DataContext == item));
+                    }
+                    break;
+
+                case NotifyCollectionChangedAction.Replace:
+                    foreach (var item in e.OldItems)
+                    {
+                        RemoveWidget(_widgets.FirstOrDefault(w => w.DataContext == item));
+                    }
+
+                    foreach (var item in e.NewItems)
+                    {
+                        AddWidget(WidgetFactory.CreateWidget(item));
+                    }
+                    break;
+
+                case NotifyCollectionChangedAction.Move:
+                    break;
+
+                case NotifyCollectionChangedAction.Reset:
+                    ClearWidgets();
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        private void RemoveWidget(Widget widget)
+        {
+            _widgets.Remove(widget);
         }
 
         private void SnapToGrid(FrameworkElement element)
@@ -214,6 +304,48 @@ namespace Micser.Infrastructure.Controls
             }
 
             value += snap;
+        }
+
+        private void WidgetsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    foreach (Widget widget in e.NewItems)
+                    {
+                        Children.Add(widget);
+                    }
+                    break;
+
+                case NotifyCollectionChangedAction.Remove:
+                    foreach (Widget widget in e.OldItems)
+                    {
+                        Children.Remove(widget);
+                    }
+                    break;
+
+                case NotifyCollectionChangedAction.Replace:
+                    foreach (Widget widget in e.OldItems)
+                    {
+                        Children.Remove(widget);
+                    }
+
+                    foreach (Widget widget in e.NewItems)
+                    {
+                        Children.Add(widget);
+                    }
+                    break;
+
+                case NotifyCollectionChangedAction.Move:
+                    break;
+
+                case NotifyCollectionChangedAction.Reset:
+                    Children.Clear();
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
     }
 }

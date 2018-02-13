@@ -159,24 +159,16 @@ namespace Micser.Infrastructure.Controls
                     if (IsSelected)
                     {
                         IsSelected = false;
-                        panel.SelectedItems.Remove(this);
                     }
                     else
                     {
                         IsSelected = true;
-                        panel.SelectedItems.Add(this);
                     }
                 }
                 else if (!IsSelected)
                 {
-                    foreach (var item in panel.SelectedItems)
-                    {
-                        item.IsSelected = false;
-                    }
-
-                    panel.SelectedItems.Clear();
+                    panel.ClearSelection();
                     IsSelected = true;
-                    panel.SelectedItems.Add(this);
                 }
             }
 

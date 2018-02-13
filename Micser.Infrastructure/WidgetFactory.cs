@@ -12,11 +12,20 @@ namespace Micser.Infrastructure
             _container = container;
         }
 
-        public virtual Widget CreateWidget(WidgetDescription description)
+        public virtual Widget CreateWidget(object dataContext)
         {
-            var widget = _container.Resolve<Widget>(description.Type.FullName);
-            widget.Header = description.Name;
-            return widget;
+            Widget result = null;
+
+            if (dataContext is WidgetDescription d)
+            {
+                result = _container.Resolve<Widget>(d.Type.FullName);
+            }
+            else if (dataContext is WidgetViewModel vm)
+            {
+                result = _container.Resolve<Widget>(vm.GetType().FullName);
+            }
+
+            return result;
         }
     }
 }

@@ -80,12 +80,7 @@ namespace Micser.Infrastructure.Controls
 
         private void UpdateSelection()
         {
-            foreach (var item in _widgetPanel.SelectedItems)
-            {
-                item.IsSelected = false;
-            }
-
-            _widgetPanel.SelectedItems.Clear();
+            _widgetPanel.ClearSelection();
 
             if (_startPoint == null || _endPoint == null)
             {
@@ -101,7 +96,6 @@ namespace Micser.Infrastructure.Controls
                 if (rubberBand.Contains(itemBounds) && item is ISelectable selectableItem)
                 {
                     selectableItem.IsSelected = true;
-                    _widgetPanel.SelectedItems.Add(selectableItem);
                 }
             }
         }

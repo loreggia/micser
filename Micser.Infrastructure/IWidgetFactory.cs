@@ -4,6 +4,6 @@ namespace Micser.Infrastructure
 {
     public interface IWidgetFactory
     {
-        Widget CreateWidget(WidgetDescription description);
+        Widget CreateWidget(object dataContext);
     }
 }
