@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows;
 using Micser.Infrastructure;
 using Micser.Main.ViewModels.Widgets;
 using Prism.Regions;
@@ -36,8 +37,8 @@ namespace Micser.Main.ViewModels
         {
             base.OnNavigatedTo(navigationContext);
 
-            var input = new DeviceInputViewModel();
-            var output = new DeviceOutputViewModel();
+            var input = new DeviceInputViewModel { Position = new Point(10, 10) };
+            var output = new DeviceOutputViewModel { Position = new Point(10, 100) };
 
             var source = input.OutputConnectors.First();
             var sink = output.InputConnectors.First();

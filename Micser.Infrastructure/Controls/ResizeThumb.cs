@@ -29,16 +29,15 @@ namespace Micser.Infrastructure.Controls
             // calculate min value for each parameter for each item
             var widgets = selectedItems.OfType<Widget>();
 
-            foreach (var item in widgets)
+            foreach (var widget in widgets)
             {
-                var left = Canvas.GetLeft(item);
-                var top = Canvas.GetTop(item);
+                var position = widget.Position;
 
-                minLeft = double.IsNaN(left) ? 0 : Math.Min(left, minLeft);
-                minTop = double.IsNaN(top) ? 0 : Math.Min(top, minTop);
+                minLeft = Math.Min(position.X, minLeft);
+                minTop = Math.Min(position.Y, minTop);
 
-                minDeltaVertical = Math.Min(minDeltaVertical, item.ActualHeight - item.MinHeight);
-                minDeltaHorizontal = Math.Min(minDeltaHorizontal, item.ActualWidth - item.MinWidth);
+                minDeltaVertical = Math.Min(minDeltaVertical, widget.ActualHeight - widget.MinHeight);
+                minDeltaHorizontal = Math.Min(minDeltaHorizontal, widget.ActualWidth - widget.MinWidth);
             }
         }
 
@@ -52,14 +51,13 @@ namespace Micser.Infrastructure.Controls
 
             if (VisualTreeHelper.GetParent(widget) is WidgetPanel panel && widget.IsSelected)
             {
-                // only resize Widgets
-                var selectedItems = panel.Widgets.Where(w => w.IsSelected).ToArray();
+                var widgets = panel.Widgets.Where(w => w.IsSelected).ToArray();
 
-                CalculateDragLimits(selectedItems, out var minLeft, out var minTop, out var minDeltaHorizontal, out var minDeltaVertical);
+                CalculateDragLimits(widgets, out var minLeft, out var minTop, out var minDeltaHorizontal, out var minDeltaVertical);
 
-                foreach (var item in selectedItems)
+                foreach (var w in widgets)
                 {
-                    if (item == null)
+                    if (w == null)
                     {
                         continue;
                     }
@@ -69,14 +67,15 @@ namespace Micser.Infrastructure.Controls
                     {
                         case VerticalAlignment.Bottom:
                             dragDeltaVertical = Math.Min(-e.VerticalChange, minDeltaVertical);
-                            item.Height = item.ActualHeight - dragDeltaVertical;
+                            w.Height = w.ActualHeight - dragDeltaVertical;
                             break;
 
                         case VerticalAlignment.Top:
-                            var top = Canvas.GetTop(item);
+                            var position = w.Position;
                             dragDeltaVertical = Math.Min(Math.Max(-minTop, e.VerticalChange), minDeltaVertical);
-                            Canvas.SetTop(item, top + dragDeltaVertical);
-                            item.Height = item.ActualHeight - dragDeltaVertical;
+                            position.Y += dragDeltaVertical;
+                            w.Position = position;
+                            w.Height = w.ActualHeight - dragDeltaVertical;
                             break;
                     }
 
@@ -84,15 +83,16 @@ namespace Micser.Infrastructure.Controls
                     switch (HorizontalAlignment)
                     {
                         case HorizontalAlignment.Left:
-                            var left = Canvas.GetLeft(item);
+                            var position = w.Position;
                             dragDeltaHorizontal = Math.Min(Math.Max(-minLeft, e.HorizontalChange), minDeltaHorizontal);
-                            Canvas.SetLeft(item, left + dragDeltaHorizontal);
-                            item.Width = item.ActualWidth - dragDeltaHorizontal;
+                            position.X += dragDeltaHorizontal;
+                            w.Position = position;
+                            w.Width = w.ActualWidth - dragDeltaHorizontal;
                             break;
 
                         case HorizontalAlignment.Right:
                             dragDeltaHorizontal = Math.Min(-e.HorizontalChange, minDeltaHorizontal);
-                            item.Width = item.ActualWidth - dragDeltaHorizontal;
+                            w.Width = w.ActualWidth - dragDeltaHorizontal;
                             break;
                     }
                 }
