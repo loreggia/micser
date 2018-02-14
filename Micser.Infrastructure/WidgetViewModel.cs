@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
+using System.Windows;
 
 namespace Micser.Infrastructure
 {
@@ -9,6 +11,7 @@ namespace Micser.Infrastructure
         private readonly ObservableCollection<ConnectorViewModel> _outputConnectors;
         private string _header;
         private string _name;
+        private Point _position;
 
         protected WidgetViewModel()
         {
@@ -31,6 +34,16 @@ namespace Micser.Infrastructure
         }
 
         public IEnumerable<ConnectorViewModel> OutputConnectors => _outputConnectors;
+
+        public Point Position
+        {
+            get => _position;
+            set
+            {
+                SetProperty(ref _position, value);
+                Debug.WriteLine($"WidgetViewModel.Position.set(): {value}");
+            }
+        }
 
         public virtual void Initialize()
         {

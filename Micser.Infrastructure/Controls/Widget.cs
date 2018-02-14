@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -33,6 +34,9 @@ namespace Micser.Infrastructure.Controls
 
         public static readonly DependencyProperty OutputConnectorTemplateProperty = DependencyProperty.Register(
             nameof(OutputConnectorTemplate), typeof(DataTemplate), typeof(Widget), new PropertyMetadata(null));
+
+        public static readonly DependencyProperty PositionProperty = DependencyProperty.Register(
+            nameof(Position), typeof(Point), typeof(Widget), new PropertyMetadata(default(Point), OnPositionPropertyChanged));
 
         static Widget()
         {
@@ -98,6 +102,12 @@ namespace Micser.Infrastructure.Controls
             set => SetValue(OutputConnectorTemplateProperty, value);
         }
 
+        public Point Position
+        {
+            get => (Point)GetValue(PositionProperty);
+            set => SetValue(PositionProperty, value);
+        }
+
         protected override void OnPreviewMouseDown(MouseButtonEventArgs e)
         {
             base.OnPreviewMouseDown(e);
@@ -126,6 +136,17 @@ namespace Micser.Infrastructure.Controls
             e.Handled = false;
         }
 
+        private static void OnPositionPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var widget = (Widget)d;
+            if (e.NewValue is Point point)
+            {
+                Debug.WriteLine($"Widget.OnPositionPropertyChanged: {point}");
+                Canvas.SetLeft(widget, point.X);
+                Canvas.SetTop(widget, point.Y);
+            }
+        }
+
         private void OnDispatcherShutdownStarted(object sender, EventArgs e)
         {
             if (DataContext is IDisposable disposable)
@@ -137,6 +158,7 @@ namespace Micser.Infrastructure.Controls
         private void OnWidgetLoaded(object sender, RoutedEventArgs e)
         {
             //ViewModel?.Initialize();
+            GetBindingExpression(PositionProperty)?.UpdateTarget();
         }
     }
 }

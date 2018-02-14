@@ -112,7 +112,6 @@
     <Compile Include="Extensions\DependencyObjectExtensions.cs" />
     <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="Extensions\PropertyExtensions.cs" />
-    <Compile Include="Extensions\UIElementExtensions.cs" />
     <Compile Include="IItemRegistry.cs" />
     <Compile Include="InfrastructureModule.cs" />
     <Compile Include="ISelectable.cs" />

@@ -26,8 +26,10 @@ namespace Micser.Infrastructure.Controls
         {
             _widgetPanel = panel;
             _adornerCanvas = new Canvas();
-            _visualChildren = new VisualCollection(this);
-            _visualChildren.Add(_adornerCanvas);
+            _visualChildren = new VisualCollection(this)
+            {
+                _adornerCanvas
+            };
 
             _connection = connection;
 
@@ -85,6 +87,65 @@ namespace Micser.Infrastructure.Controls
             dc.DrawGeometry(null, _drawingPen, _pathGeometry);
         }
 
+        private void DragThumb_DragCompleted(object sender, DragCompletedEventArgs e)
+        {
+            if (HitConnector != null)
+            {
+                if (_connection != null)
+                {
+                    if (Equals(_connection.Source, _fixConnector))
+                    {
+                        _connection.Sink = HitConnector;
+                    }
+                    else
+                    {
+                        _connection.Source = HitConnector;
+                    }
+                }
+            }
+            else
+            {
+                // remove connection
+                _connection.Sink = null;
+                _connection.Source = null;
+                _widgetPanel.Children.Remove(_connection);
+            }
+
+            HitWidget = null;
+            HitConnector = null;
+            _pathGeometry = null;
+            _connection.StrokeDashArray = null;
+            InvalidateVisual();
+        }
+
+        private void DragThumb_DragDelta(object sender, DragDeltaEventArgs e)
+        {
+            Point currentPosition = Mouse.GetPosition(this);
+            HitTesting(currentPosition);
+            _pathGeometry = UpdatePathGeometry(currentPosition);
+            InvalidateVisual();
+        }
+
+        private void DragThumb_DragStarted(object sender, DragStartedEventArgs e)
+        {
+            HitWidget = null;
+            HitConnector = null;
+            _pathGeometry = null;
+            Cursor = Cursors.Cross;
+            _connection.StrokeDashArray = new DoubleCollection(new double[] { 1, 2 });
+
+            if (sender == _sourceDragThumb)
+            {
+                _fixConnector = _connection.Sink;
+                _dragConnector = _connection.Source;
+            }
+            else if (sender == _sinkDragThumb)
+            {
+                _dragConnector = _connection.Sink;
+                _fixConnector = _connection.Source;
+            }
+        }
+
         private void HitTesting(Point hitPoint)
         {
             bool hitConnectorFlag = false;
@@ -131,9 +192,9 @@ namespace Micser.Infrastructure.Controls
                 _sourceDragThumb.Style = dragThumbStyle;
             }
 
-            _sourceDragThumb.DragDelta += thumbDragThumb_DragDelta;
-            _sourceDragThumb.DragStarted += thumbDragThumb_DragStarted;
-            _sourceDragThumb.DragCompleted += thumbDragThumb_DragCompleted;
+            _sourceDragThumb.DragDelta += DragThumb_DragDelta;
+            _sourceDragThumb.DragStarted += DragThumb_DragStarted;
+            _sourceDragThumb.DragCompleted += DragThumb_DragCompleted;
 
             // sink drag thumb
             _sinkDragThumb = new Thumb();
@@ -145,9 +206,9 @@ namespace Micser.Infrastructure.Controls
                 _sinkDragThumb.Style = dragThumbStyle;
             }
 
-            _sinkDragThumb.DragDelta += thumbDragThumb_DragDelta;
-            _sinkDragThumb.DragStarted += thumbDragThumb_DragStarted;
-            _sinkDragThumb.DragCompleted += thumbDragThumb_DragCompleted;
+            _sinkDragThumb.DragDelta += DragThumb_DragDelta;
+            _sinkDragThumb.DragStarted += DragThumb_DragStarted;
+            _sinkDragThumb.DragCompleted += DragThumb_DragCompleted;
         }
 
         private void SinkAnchorPositionChanged(object sender, EventArgs e)
@@ -160,65 +221,6 @@ namespace Micser.Infrastructure.Controls
         {
             Canvas.SetLeft(_sourceDragThumb, _connection.SourceAnchorPosition.X);
             Canvas.SetTop(_sourceDragThumb, _connection.SourceAnchorPosition.Y);
-        }
-
-        private void thumbDragThumb_DragCompleted(object sender, DragCompletedEventArgs e)
-        {
-            if (HitConnector != null)
-            {
-                if (_connection != null)
-                {
-                    if (Equals(_connection.Source, _fixConnector))
-                    {
-                        _connection.Sink = HitConnector;
-                    }
-                    else
-                    {
-                        _connection.Source = HitConnector;
-                    }
-                }
-            }
-            else
-            {
-                // remove connection
-                _connection.Sink = null;
-                _connection.Source = null;
-                _widgetPanel.Children.Remove(_connection);
-            }
-
-            HitWidget = null;
-            HitConnector = null;
-            _pathGeometry = null;
-            _connection.StrokeDashArray = null;
-            InvalidateVisual();
-        }
-
-        private void thumbDragThumb_DragDelta(object sender, DragDeltaEventArgs e)
-        {
-            Point currentPosition = Mouse.GetPosition(this);
-            HitTesting(currentPosition);
-            _pathGeometry = UpdatePathGeometry(currentPosition);
-            InvalidateVisual();
-        }
-
-        private void thumbDragThumb_DragStarted(object sender, DragStartedEventArgs e)
-        {
-            HitWidget = null;
-            HitConnector = null;
-            _pathGeometry = null;
-            Cursor = Cursors.Cross;
-            _connection.StrokeDashArray = new DoubleCollection(new double[] { 1, 2 });
-
-            if (sender == _sourceDragThumb)
-            {
-                _fixConnector = _connection.Sink;
-                _dragConnector = _connection.Source;
-            }
-            else if (sender == _sinkDragThumb)
-            {
-                _dragConnector = _connection.Sink;
-                _fixConnector = _connection.Source;
-            }
         }
 
         private PathGeometry UpdatePathGeometry(Point position)

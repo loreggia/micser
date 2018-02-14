@@ -21,7 +21,7 @@ namespace Micser.Infrastructure.Controls
             nameof(RasterSize), typeof(double), typeof(WidgetPanel), new PropertyMetadata(25d));
 
         public static readonly DependencyProperty WidgetFactoryProperty = DependencyProperty.Register(
-            nameof(WidgetFactory), typeof(IWidgetFactory), typeof(WidgetPanel), new PropertyMetadata(null));
+            nameof(WidgetFactory), typeof(IWidgetFactory), typeof(WidgetPanel), new PropertyMetadata(null, OnWidgetFactoryPropertyChanged));
 
         private readonly ObservableCollection<Widget> _widgets;
 
@@ -31,7 +31,7 @@ namespace Micser.Infrastructure.Controls
         public WidgetPanel()
         {
             _widgets = new ObservableCollection<Widget>();
-            _widgets.CollectionChanged += WidgetsCollectionChanged;
+            _widgets.CollectionChanged += Widgets_CollectionChanged;
 
             ResourceRegistry.RegisterResourcesFor(this);
 
@@ -106,9 +106,7 @@ namespace Micser.Infrastructure.Controls
                 }
 
                 var widget = WidgetFactory.CreateWidget(description);
-                var position = e.GetPosition(this);
-                SetTop(widget, position.Y);
-                SetLeft(widget, position.X);
+                widget.Position = e.GetPosition(this);
                 _widgets.Add(widget);
                 e.Handled = true;
             }
@@ -178,45 +176,38 @@ namespace Micser.Infrastructure.Controls
 
             if (e.OldValue is INotifyCollectionChanged oldCollection)
             {
-                oldCollection.CollectionChanged -= panel.ItemsSourceCollectionChanged;
+                oldCollection.CollectionChanged -= panel.ItemsSource_CollectionChanged;
             }
 
             if (e.NewValue is INotifyCollectionChanged newCollection)
             {
-                newCollection.CollectionChanged += panel.ItemsSourceCollectionChanged;
+                newCollection.CollectionChanged += panel.ItemsSource_CollectionChanged;
             }
 
-            panel.ClearWidgets();
+            panel._widgets.Clear();
 
             if (e.NewValue is IEnumerable enumerable && panel.WidgetFactory != null)
             {
                 foreach (var item in enumerable)
                 {
-                    panel.AddWidget(panel.WidgetFactory.CreateWidget(item));
+                    panel._widgets.Add(panel.WidgetFactory.CreateWidget(item));
                 }
             }
         }
 
-        private void AddWidget(Widget widget)
+        private static void OnWidgetFactoryPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            Children.Add(widget);
-
-            //update selection
-            foreach (var w in _widgets)
+            var panel = (WidgetPanel)d;
+            if (e.NewValue is IWidgetFactory factory && !panel._widgets.Any() && panel.ItemsSource != null)
             {
-                w.IsSelected = false;
+                foreach (var item in panel.ItemsSource)
+                {
+                    panel._widgets.Add(factory.CreateWidget(item));
+                }
             }
-
-            widget.IsSelected = true;
         }
 
-        private void ClearWidgets()
-        {
-            _widgets.Clear();
-            Children.Clear();
-        }
-
-        private void ItemsSourceCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void ItemsSource_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             switch (e.Action)
             {
@@ -225,7 +216,7 @@ namespace Micser.Infrastructure.Controls
                     {
                         foreach (var item in e.NewItems)
                         {
-                            AddWidget(WidgetFactory.CreateWidget(item));
+                            _widgets.Add(WidgetFactory.CreateWidget(item));
                         }
                     }
                     break;
@@ -233,37 +224,44 @@ namespace Micser.Infrastructure.Controls
                 case NotifyCollectionChangedAction.Remove:
                     foreach (var item in e.OldItems)
                     {
-                        RemoveWidget(_widgets.FirstOrDefault(w => w.DataContext == item));
+                        var widget = _widgets.FirstOrDefault(w => w.DataContext == item);
+                        if (widget != null)
+                        {
+                            _widgets.Remove(widget);
+                        }
                     }
                     break;
 
                 case NotifyCollectionChangedAction.Replace:
                     foreach (var item in e.OldItems)
                     {
-                        RemoveWidget(_widgets.FirstOrDefault(w => w.DataContext == item));
+                        var widget = _widgets.FirstOrDefault(w => w.DataContext == item);
+                        if (widget != null)
+                        {
+                            _widgets.Remove(widget);
+                        }
                     }
 
-                    foreach (var item in e.NewItems)
+                    if (WidgetFactory != null)
                     {
-                        AddWidget(WidgetFactory.CreateWidget(item));
+                        foreach (var item in e.NewItems)
+                        {
+                            _widgets.Add(WidgetFactory.CreateWidget(item));
+                        }
                     }
+
                     break;
 
                 case NotifyCollectionChangedAction.Move:
                     break;
 
                 case NotifyCollectionChangedAction.Reset:
-                    ClearWidgets();
+                    _widgets.Clear();
                     break;
 
                 default:
                     throw new ArgumentOutOfRangeException();
             }
-        }
-
-        private void RemoveWidget(Widget widget)
-        {
-            _widgets.Remove(widget);
         }
 
         private void SnapToGrid(FrameworkElement element)
@@ -306,14 +304,19 @@ namespace Micser.Infrastructure.Controls
             value += snap;
         }
 
-        private void WidgetsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void Widgets_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
+            ClearSelection();
+
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
                     foreach (Widget widget in e.NewItems)
                     {
+                        var position = widget.Position;
                         Children.Add(widget);
+                        widget.Position = position;
+                        widget.IsSelected = true;
                     }
                     break;
 
@@ -332,7 +335,10 @@ namespace Micser.Infrastructure.Controls
 
                     foreach (Widget widget in e.NewItems)
                     {
+                        var position = widget.Position;
                         Children.Add(widget);
+                        widget.Position = position;
+                        //Dispatcher.BeginInvoke(new Func<Point>(() => widget.Position = position));
                     }
                     break;
 

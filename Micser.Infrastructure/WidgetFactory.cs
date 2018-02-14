@@ -18,7 +18,7 @@ namespace Micser.Infrastructure
 
             if (dataContext is WidgetDescription d)
             {
-                result = _container.Resolve<Widget>(d.Type.FullName);
+                result = _container.Resolve<Widget>(d.ViewModelType.FullName);
             }
             else if (dataContext is WidgetViewModel vm)
             {

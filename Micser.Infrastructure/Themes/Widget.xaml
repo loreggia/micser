@@ -25,6 +25,7 @@
         <Setter Property="HeaderTemplate" Value="{StaticResource DefaultHeaderTemplate}" />
         <Setter Property="InputConnectors" Value="{Binding InputConnectors}" />
         <Setter Property="OutputConnectors" Value="{Binding OutputConnectors}" />
+        <Setter Property="Position" Value="{Binding Position, Mode=TwoWay}" />
         <Setter Property="InputConnectorTemplate">
             <Setter.Value>
                 <DataTemplate>
@@ -77,6 +78,12 @@
                             </Grid>
                         </Border>
                     </Grid>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsSelected" Value="True">
+                            <Setter Property="BorderBrush" Value="Coral" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

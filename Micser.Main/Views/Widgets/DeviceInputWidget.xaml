@@ -9,7 +9,8 @@
              mc:Ignorable="d"
                  d:DataContext="{d:DesignInstance w:DeviceInputViewModel}"
                  MinWidth="175"
-                 MinHeight="75">
+                 MinHeight="75"
+          Position="{Binding Position, Mode=TwoWay}">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />

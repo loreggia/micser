@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
@@ -32,35 +33,23 @@ namespace Micser.Infrastructure.Controls
                 // we only move Widgets
                 var widgets = panel.Widgets.Where(w => w.IsSelected).ToArray();
 
-                foreach (var item in widgets)
+                foreach (var w in widgets)
                 {
-                    var left = Canvas.GetLeft(item);
-                    var top = Canvas.GetTop(item);
+                    var position = w.Position;
 
-                    minLeft = double.IsNaN(left) ? 0 : Math.Min(left, minLeft);
-                    minTop = double.IsNaN(top) ? 0 : Math.Min(top, minTop);
+                    minLeft = Math.Min(position.X, minLeft);
+                    minTop = Math.Min(position.Y, minTop);
                 }
 
                 var deltaHorizontal = Math.Max(-minLeft, e.HorizontalChange);
                 var deltaVertical = Math.Max(-minTop, e.VerticalChange);
 
-                foreach (var item in widgets)
+                foreach (var w in widgets)
                 {
-                    var left = Canvas.GetLeft(item);
-                    var top = Canvas.GetTop(item);
-
-                    if (double.IsNaN(left))
-                    {
-                        left = 0;
-                    }
-
-                    if (double.IsNaN(top))
-                    {
-                        top = 0;
-                    }
-
-                    Canvas.SetLeft(item, left + deltaHorizontal);
-                    Canvas.SetTop(item, top + deltaVertical);
+                    var position = w.Position;
+                    position.X += deltaHorizontal;
+                    position.Y += deltaVertical;
+                    w.Position = position;
                 }
 
                 panel.InvalidateMeasure();
