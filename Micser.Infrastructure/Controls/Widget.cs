@@ -138,12 +138,11 @@ namespace Micser.Infrastructure.Controls
 
         private static void OnPositionPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var widget = (Widget)d;
-            if (e.NewValue is Point point)
+            if (e.NewValue is Point point && d is UIElement element)
             {
                 Debug.WriteLine($"Widget.OnPositionPropertyChanged: {point}");
-                Canvas.SetLeft(widget, point.X);
-                Canvas.SetTop(widget, point.Y);
+                Canvas.SetLeft(element, point.X);
+                Canvas.SetTop(element, point.Y);
             }
         }
 
