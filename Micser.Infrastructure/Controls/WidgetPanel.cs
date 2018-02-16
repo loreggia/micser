@@ -106,7 +106,8 @@ namespace Micser.Infrastructure.Controls
                 }
 
                 var widget = WidgetFactory.CreateWidget(description);
-                widget.Position = e.GetPosition(this);
+                var vm = (WidgetViewModel)widget.DataContext;
+                vm.Position = e.GetPosition(this);
                 _widgets.Add(widget);
                 e.Handled = true;
             }
