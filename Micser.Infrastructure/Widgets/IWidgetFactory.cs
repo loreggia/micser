@@ -1,6 +1,4 @@
-﻿using Micser.Infrastructure.Controls;
-
-namespace Micser.Infrastructure
+﻿namespace Micser.Infrastructure.Widgets
 {
     public interface IWidgetFactory
     {

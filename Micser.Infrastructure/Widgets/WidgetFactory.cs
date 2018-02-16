@@ -1,7 +1,6 @@
-﻿using Micser.Infrastructure.Controls;
-using Unity;
+﻿using Unity;
 
-namespace Micser.Infrastructure
+namespace Micser.Infrastructure.Widgets
 {
     public class WidgetFactory : IWidgetFactory
     {

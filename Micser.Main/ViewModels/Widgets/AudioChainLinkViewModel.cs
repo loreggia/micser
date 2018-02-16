@@ -1,4 +1,5 @@
 ﻿using Micser.Infrastructure;
+using Micser.Infrastructure.Widgets;
 using Micser.Main.Audio;
 
 namespace Micser.Main.ViewModels.Widgets

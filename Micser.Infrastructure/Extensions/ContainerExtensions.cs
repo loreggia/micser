@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using Micser.Infrastructure.Controls;
 using Micser.Infrastructure.ViewModels;
+using Micser.Infrastructure.Widgets;
 using Prism.Regions;
 using Unity;
 using Unity.Injection;

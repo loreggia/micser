@@ -3,7 +3,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Windows;
 
-namespace Micser.Infrastructure
+namespace Micser.Infrastructure.Widgets
 {
     public abstract class WidgetViewModel : ViewModel
     {

@@ -10,7 +10,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using Micser.Infrastructure.Themes;
 
-namespace Micser.Infrastructure.Controls
+namespace Micser.Infrastructure.Widgets
 {
     public class WidgetPanel : Canvas
     {

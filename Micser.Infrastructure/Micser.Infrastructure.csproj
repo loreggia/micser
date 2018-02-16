@@ -82,26 +82,26 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bindable.cs" />
-    <Compile Include="ConnectionChangedEventHandler.cs" />
-    <Compile Include="ConnectorChangedEventHandler.cs" />
-    <Compile Include="ConnectorInfo.cs" />
-    <Compile Include="ConnectionViewModel.cs" />
-    <Compile Include="ConnectorViewModel.cs" />
+    <Compile Include="Widgets\ConnectionChangedEventHandler.cs" />
+    <Compile Include="Widgets\ConnectorChangedEventHandler.cs" />
+    <Compile Include="Widgets\ConnectorInfo.cs" />
+    <Compile Include="Widgets\ConnectionViewModel.cs" />
+    <Compile Include="Widgets\ConnectorViewModel.cs" />
     <Compile Include="Controls\BusyAdorner.cs" />
-    <Compile Include="Controls\Connection.cs" />
-    <Compile Include="Controls\ConnectionAdorner.cs" />
-    <Compile Include="Controls\Connector.cs" />
-    <Compile Include="Controls\ConnectorAdorner.cs" />
-    <Compile Include="Controls\DragThumb.cs" />
+    <Compile Include="Widgets\Connection.cs" />
+    <Compile Include="Widgets\ConnectionAdorner.cs" />
+    <Compile Include="Widgets\Connector.cs" />
+    <Compile Include="Widgets\ConnectorAdorner.cs" />
+    <Compile Include="Widgets\DragThumb.cs" />
     <Compile Include="Controls\EditableTextBlock.cs" />
     <Compile Include="Controls\EditableTextBlockAdorner.cs" />
     <Compile Include="Controls\RelativePositionPanel.cs" />
-    <Compile Include="Controls\ResizeThumb.cs" />
-    <Compile Include="Controls\RubberbandAdorner.cs" />
-    <Compile Include="Controls\WidgetToolbox.cs" />
-    <Compile Include="Controls\WidgetToolboxItem.cs" />
-    <Compile Include="Controls\Widget.cs" />
-    <Compile Include="Controls\WidgetPanel.cs" />
+    <Compile Include="Widgets\ResizeThumb.cs" />
+    <Compile Include="Widgets\RubberbandAdorner.cs" />
+    <Compile Include="Widgets\WidgetToolbox.cs" />
+    <Compile Include="Widgets\WidgetToolboxItem.cs" />
+    <Compile Include="Widgets\Widget.cs" />
+    <Compile Include="Widgets\WidgetPanel.cs" />
     <Compile Include="Converter\BooleanConverter.cs" />
     <Compile Include="Converter\BooleanToVisibilityConverter.cs" />
     <Compile Include="Converter\ConverterExtension.cs" />
@@ -116,7 +116,7 @@
     <Compile Include="ISelectable.cs" />
     <Compile Include="ItemRegistry.cs" />
     <Compile Include="IViewModel.cs" />
-    <Compile Include="IWidgetFactory.cs" />
+    <Compile Include="Widgets\IWidgetFactory.cs" />
     <Compile Include="Menu\IMenuItemRegistry.cs" />
     <Compile Include="Menu\MenuItemDescription.cs" />
     <Compile Include="Menu\MenuItemRegistry.cs" />
@@ -132,15 +132,15 @@
     <Compile Include="ViewModelNavigationAware.cs" />
     <Compile Include="ViewModels\MainMenuViewModel.cs" />
     <Compile Include="ViewModels\MainStatusBarViewModel.cs" />
-    <Compile Include="WidgetViewModel.cs" />
+    <Compile Include="Widgets\WidgetViewModel.cs" />
     <Compile Include="Views\MainMenuView.xaml.cs">
       <DependentUpon>MainMenuView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\MainStatusBarView.xaml.cs">
       <DependentUpon>MainStatusBarView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="WidgetDescription.cs" />
-    <Compile Include="WidgetFactory.cs" />
+    <Compile Include="Widgets\WidgetDescription.cs" />
+    <Compile Include="Widgets\WidgetFactory.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="Themes\Connection.xaml">
