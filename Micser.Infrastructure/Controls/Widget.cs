@@ -157,7 +157,7 @@ namespace Micser.Infrastructure.Controls
         private void OnWidgetLoaded(object sender, RoutedEventArgs e)
         {
             //ViewModel?.Initialize();
-            GetBindingExpression(PositionProperty)?.UpdateTarget();
+            //GetBindingExpression(PositionProperty)?.UpdateTarget();
         }
     }
 }
