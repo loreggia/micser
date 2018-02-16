@@ -6,7 +6,7 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using Micser.Infrastructure.Extensions;
 
-namespace Micser.Infrastructure.Controls
+namespace Micser.Infrastructure.Widgets
 {
     public class Connector : Control
     {

@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using Micser.Infrastructure;
+using Micser.Infrastructure.Widgets;
 using Micser.Main.ViewModels.Widgets;
 using Prism.Regions;
 

@@ -8,6 +8,7 @@
     xmlns:i="clr-namespace:Micser.Infrastructure;assembly=Micser.Infrastructure"
     xmlns:c="clr-namespace:Micser.Infrastructure.Controls;assembly=Micser.Infrastructure"
     xmlns:w="clr-namespace:Micser.Main.Views.Widgets"
+    xmlns:widgets="clr-namespace:Micser.Infrastructure.Widgets;assembly=Micser.Infrastructure"
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance v:MainViewModel}"
     d:DesignWidth="300"
@@ -27,11 +28,11 @@
 
         <!-- Widgets="{Binding Widgets}"-->
         <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-            <c:WidgetPanel x:Name="WidgetPanel" WidgetFactory="{Binding WidgetFactory}" ItemsSource="{Binding Widgets}" />
+            <widgets:WidgetPanel x:Name="WidgetPanel" WidgetFactory="{Binding WidgetFactory}" ItemsSource="{Binding Widgets}" />
         </ScrollViewer>
 
         <Expander Grid.Row="2" Header="Widgets" IsExpanded="True">
-            <c:WidgetToolbox ItemsSource="{Binding AvailableWidgets}" />
+            <widgets:WidgetToolbox ItemsSource="{Binding AvailableWidgets}" />
         </Expander>
     </Grid>
 </i:View>

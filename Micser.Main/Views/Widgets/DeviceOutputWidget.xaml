@@ -1,4 +1,4 @@
-﻿<c:Widget x:Class="Micser.Main.Views.Widgets.DeviceOutputWidget"
+﻿<widgets:Widget x:Class="Micser.Main.Views.Widgets.DeviceOutputWidget"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -6,6 +6,7 @@
                  xmlns:p="clr-namespace:Micser.Main.Properties"
              xmlns:c="clr-namespace:Micser.Infrastructure.Controls;assembly=Micser.Infrastructure"
              xmlns:w="clr-namespace:Micser.Main.ViewModels.Widgets"
+             xmlns:widgets="clr-namespace:Micser.Infrastructure.Widgets;assembly=Micser.Infrastructure"
              mc:Ignorable="d"
                  d:DataContext="{d:DesignInstance w:DeviceOutputViewModel}"
                  MinWidth="175"
@@ -26,4 +27,4 @@
         <Label Grid.Row="1" Grid.Column="0" Target="{Binding ElementName=CbxDevice}" Content="{x:Static p:Resources.Device}" VerticalAlignment="Center" />
         <ComboBox Grid.Row="1" Grid.Column="1" x:Name="CbxDevice" MinWidth="100" ItemsSource="{Binding DeviceDescriptions}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedDeviceDescription}" HorizontalAlignment="Stretch" />
     </Grid>
-</c:Widget>
+</widgets:Widget>

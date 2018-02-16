@@ -3,6 +3,7 @@ using System.Windows;
 using Micser.Infrastructure;
 using Micser.Infrastructure.Extensions;
 using Micser.Infrastructure.Themes;
+using Micser.Infrastructure.Widgets;
 using Micser.Main.Properties;
 using Micser.Main.ViewModels;
 using Micser.Main.ViewModels.Widgets;

@@ -7,7 +7,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using Micser.Infrastructure.Extensions;
 
-namespace Micser.Infrastructure.Controls
+namespace Micser.Infrastructure.Widgets
 {
     public enum ArrowSymbol
     {

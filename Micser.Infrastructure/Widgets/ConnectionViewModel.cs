@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Micser.Infrastructure
+namespace Micser.Infrastructure.Widgets
 {
     public class ConnectionViewModel : ViewModel
     {

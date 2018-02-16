@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace Micser.Infrastructure
+namespace Micser.Infrastructure.Widgets
 {
     public enum ConnectorOrientation
     {

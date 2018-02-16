@@ -3,7 +3,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using Micser.Infrastructure.Themes;
 
-namespace Micser.Infrastructure.Controls
+namespace Micser.Infrastructure.Widgets
 {
     /// <summary>
     /// Represents a selectable item in the Toolbox.

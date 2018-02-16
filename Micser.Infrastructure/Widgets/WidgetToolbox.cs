@@ -2,7 +2,7 @@
 using System.Windows.Controls;
 using Micser.Infrastructure.Themes;
 
-namespace Micser.Infrastructure.Controls
+namespace Micser.Infrastructure.Widgets
 {
     public class WidgetToolbox : ItemsControl
     {
