@@ -14,8 +14,8 @@ namespace Micser.Infrastructure.Widgets
 {
     public class WidgetPanel : Canvas
     {
-        public static readonly DependencyProperty ItemsSourceProperty = DependencyProperty.Register(
-            nameof(ItemsSource), typeof(IEnumerable), typeof(WidgetPanel), new PropertyMetadata(null, OnItemsSourcePropertyChanged));
+        public static readonly DependencyProperty ConnectionsSourceProperty = DependencyProperty.Register(
+            nameof(ConnectionsSource), typeof(IEnumerable<ConnectionViewModel>), typeof(WidgetPanel), new PropertyMetadata(null, OnConnectionsSourcePropertyChanged));
 
         public static readonly DependencyProperty RasterSizeProperty = DependencyProperty.Register(
             nameof(RasterSize), typeof(double), typeof(WidgetPanel), new PropertyMetadata(25d));
@@ -23,6 +23,10 @@ namespace Micser.Infrastructure.Widgets
         public static readonly DependencyProperty WidgetFactoryProperty = DependencyProperty.Register(
             nameof(WidgetFactory), typeof(IWidgetFactory), typeof(WidgetPanel), new PropertyMetadata(null, OnWidgetFactoryPropertyChanged));
 
+        public static readonly DependencyProperty WidgetsSourceProperty = DependencyProperty.Register(
+            nameof(WidgetsSource), typeof(IEnumerable<WidgetViewModel>), typeof(WidgetPanel), new PropertyMetadata(null, OnWidgetsSourcePropertyChanged));
+
+        private readonly ObservableCollection<Connection> _connections;
         private readonly ObservableCollection<Widget> _widgets;
 
         // start point of the rubberband drag operation
@@ -32,16 +36,18 @@ namespace Micser.Infrastructure.Widgets
         {
             _widgets = new ObservableCollection<Widget>();
             _widgets.CollectionChanged += Widgets_CollectionChanged;
+            _connections = new ObservableCollection<Connection>();
+            _connections.CollectionChanged += Connections_CollectionChanged;
 
             ResourceRegistry.RegisterResourcesFor(this);
 
             AllowDrop = true;
         }
 
-        public IEnumerable ItemsSource
+        public IEnumerable<ConnectionViewModel> ConnectionsSource
         {
-            get => (IEnumerable)GetValue(ItemsSourceProperty);
-            set => SetValue(ItemsSourceProperty, value);
+            get => (IEnumerable<ConnectionViewModel>)GetValue(ConnectionsSourceProperty);
+            set => SetValue(ConnectionsSourceProperty, value);
         }
 
         public double RasterSize
@@ -57,6 +63,12 @@ namespace Micser.Infrastructure.Widgets
         }
 
         public IEnumerable<Widget> Widgets => _widgets;
+
+        public IEnumerable<WidgetViewModel> WidgetsSource
+        {
+            get => (IEnumerable<WidgetViewModel>)GetValue(WidgetsSourceProperty);
+            set => SetValue(WidgetsSourceProperty, value);
+        }
 
         public void ClearSelection()
         {
@@ -171,18 +183,47 @@ namespace Micser.Infrastructure.Widgets
             //}
         }
 
-        private static void OnItemsSourcePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private static void OnConnectionsSourcePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var panel = (WidgetPanel)d;
 
             if (e.OldValue is INotifyCollectionChanged oldCollection)
             {
-                oldCollection.CollectionChanged -= panel.ItemsSource_CollectionChanged;
+                oldCollection.CollectionChanged -= panel.ConnectionsSource_CollectionChanged;
             }
 
             if (e.NewValue is INotifyCollectionChanged newCollection)
             {
-                newCollection.CollectionChanged += panel.ItemsSource_CollectionChanged;
+                newCollection.CollectionChanged += panel.ConnectionsSource_CollectionChanged;
+            }
+
+            panel.RefreshConnections();
+        }
+
+        private static void OnWidgetFactoryPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var panel = (WidgetPanel)d;
+            if (e.NewValue is IWidgetFactory factory && !panel._widgets.Any() && panel.WidgetsSource != null)
+            {
+                foreach (var item in panel.WidgetsSource)
+                {
+                    panel._widgets.Add(factory.CreateWidget(item));
+                }
+            }
+        }
+
+        private static void OnWidgetsSourcePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var panel = (WidgetPanel)d;
+
+            if (e.OldValue is INotifyCollectionChanged oldCollection)
+            {
+                oldCollection.CollectionChanged -= panel.WidgetsSource_CollectionChanged;
+            }
+
+            if (e.NewValue is INotifyCollectionChanged newCollection)
+            {
+                newCollection.CollectionChanged += panel.WidgetsSource_CollectionChanged;
             }
 
             panel._widgets.Clear();
@@ -196,59 +237,90 @@ namespace Micser.Infrastructure.Widgets
             }
         }
 
-        private static void OnWidgetFactoryPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        private void Connections_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            var panel = (WidgetPanel)d;
-            if (e.NewValue is IWidgetFactory factory && !panel._widgets.Any() && panel.ItemsSource != null)
-            {
-                foreach (var item in panel.ItemsSource)
-                {
-                    panel._widgets.Add(factory.CreateWidget(item));
-                }
-            }
-        }
+            ClearSelection();
 
-        private void ItemsSource_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
-                    if (WidgetFactory != null)
+                    foreach (Connection connection in e.NewItems)
                     {
-                        foreach (var item in e.NewItems)
-                        {
-                            _widgets.Add(WidgetFactory.CreateWidget(item));
-                        }
+                        Children.Add(connection);
+                        connection.IsSelected = true;
                     }
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
-                    foreach (var item in e.OldItems)
+                    foreach (Connection connection in e.OldItems)
                     {
-                        var widget = _widgets.FirstOrDefault(w => w.DataContext == item);
-                        if (widget != null)
+                        Children.Remove(connection);
+                    }
+                    break;
+
+                case NotifyCollectionChangedAction.Replace:
+                    foreach (Connection connection in e.OldItems)
+                    {
+                        Children.Remove(connection);
+                    }
+
+                    foreach (Connection connection in e.NewItems)
+                    {
+                        Children.Add(connection);
+                    }
+                    break;
+
+                case NotifyCollectionChangedAction.Move:
+                    break;
+
+                case NotifyCollectionChangedAction.Reset:
+                    var connections = Children.OfType<Connection>().ToArray();
+                    foreach (var connection in connections)
+                    {
+                        Children.Remove(connection);
+                    }
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        private void ConnectionsSource_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    foreach (ConnectionViewModel item in e.NewItems)
+                    {
+                        CreateConnection(item);
+                    }
+                    break;
+
+                case NotifyCollectionChangedAction.Remove:
+                    foreach (ConnectionViewModel item in e.OldItems)
+                    {
+                        var connection = _connections.FirstOrDefault(c => c.DataContext == item);
+                        if (connection != null)
                         {
-                            _widgets.Remove(widget);
+                            _connections.Remove(connection);
                         }
                     }
                     break;
 
                 case NotifyCollectionChangedAction.Replace:
-                    foreach (var item in e.OldItems)
+                    foreach (ConnectionViewModel item in e.OldItems)
                     {
-                        var widget = _widgets.FirstOrDefault(w => w.DataContext == item);
-                        if (widget != null)
+                        var connection = _connections.FirstOrDefault(c => c.DataContext == item);
+                        if (connection != null)
                         {
-                            _widgets.Remove(widget);
+                            _connections.Remove(connection);
                         }
                     }
 
-                    if (WidgetFactory != null)
+                    foreach (ConnectionViewModel item in e.NewItems)
                     {
-                        foreach (var item in e.NewItems)
-                        {
-                            _widgets.Add(WidgetFactory.CreateWidget(item));
-                        }
+                        CreateConnection(item);
                     }
 
                     break;
@@ -257,11 +329,38 @@ namespace Micser.Infrastructure.Widgets
                     break;
 
                 case NotifyCollectionChangedAction.Reset:
-                    _widgets.Clear();
+                    _connections.Clear();
                     break;
 
                 default:
                     throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        private void CreateConnection(ConnectionViewModel vm)
+        {
+            var source = _widgets
+                .SelectMany(w => w.OutputConnectors)
+                .FirstOrDefault(c => c.DataContext == vm.Source);
+            var sink = _widgets
+                .SelectMany(w => w.InputConnectors)
+                .FirstOrDefault(c => c.DataContext == vm.Sink);
+
+            if (source != null && sink != null && !_connections.Any(c => ReferenceEquals(c.Source, source) && ReferenceEquals(c.Sink, sink)))
+            {
+                _connections.Add(new Connection(source, sink));
+            }
+        }
+
+        private void RefreshConnections()
+        {
+            _connections.Clear();
+            if (ConnectionsSource != null)
+            {
+                foreach (var vm in ConnectionsSource)
+                {
+                    CreateConnection(vm);
+                }
             }
         }
 
@@ -343,6 +442,63 @@ namespace Micser.Infrastructure.Widgets
 
                 case NotifyCollectionChangedAction.Reset:
                     Children.Clear();
+                    break;
+
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
+        }
+
+        private void WidgetsSource_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    if (WidgetFactory != null)
+                    {
+                        foreach (var item in e.NewItems)
+                        {
+                            _widgets.Add(WidgetFactory.CreateWidget(item));
+                        }
+                    }
+                    break;
+
+                case NotifyCollectionChangedAction.Remove:
+                    foreach (var item in e.OldItems)
+                    {
+                        var widget = _widgets.FirstOrDefault(w => w.DataContext == item);
+                        if (widget != null)
+                        {
+                            _widgets.Remove(widget);
+                        }
+                    }
+                    break;
+
+                case NotifyCollectionChangedAction.Replace:
+                    foreach (var item in e.OldItems)
+                    {
+                        var widget = _widgets.FirstOrDefault(w => w.DataContext == item);
+                        if (widget != null)
+                        {
+                            _widgets.Remove(widget);
+                        }
+                    }
+
+                    if (WidgetFactory != null)
+                    {
+                        foreach (var item in e.NewItems)
+                        {
+                            _widgets.Add(WidgetFactory.CreateWidget(item));
+                        }
+                    }
+
+                    break;
+
+                case NotifyCollectionChangedAction.Move:
+                    break;
+
+                case NotifyCollectionChangedAction.Reset:
+                    _widgets.Clear();
                     break;
 
                 default:

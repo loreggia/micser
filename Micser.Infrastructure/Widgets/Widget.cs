@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
@@ -18,7 +18,7 @@ namespace Micser.Infrastructure.Widgets
             nameof(HeaderTemplate), typeof(DataTemplate), typeof(Widget), new PropertyMetadata(null));
 
         public static readonly DependencyProperty InputConnectorsProperty = DependencyProperty.Register(
-            nameof(InputConnectors), typeof(IEnumerable), typeof(Widget), new PropertyMetadata(null));
+            nameof(InputConnectors), typeof(IEnumerable<Connector>), typeof(Widget), new PropertyMetadata(null));
 
         public static readonly DependencyProperty InputConnectorTemplateProperty = DependencyProperty.Register(
             nameof(InputConnectorTemplate), typeof(DataTemplate), typeof(Widget), new PropertyMetadata(null));
@@ -30,7 +30,7 @@ namespace Micser.Infrastructure.Widgets
             nameof(IsSelected), typeof(bool), typeof(Widget), new FrameworkPropertyMetadata(false));
 
         public static readonly DependencyProperty OutputConnectorsProperty = DependencyProperty.Register(
-            nameof(OutputConnectors), typeof(IEnumerable), typeof(Widget), new PropertyMetadata(null));
+            nameof(OutputConnectors), typeof(IEnumerable<Connector>), typeof(Widget), new PropertyMetadata(null));
 
         public static readonly DependencyProperty OutputConnectorTemplateProperty = DependencyProperty.Register(
             nameof(OutputConnectorTemplate), typeof(DataTemplate), typeof(Widget), new PropertyMetadata(null));
@@ -63,9 +63,9 @@ namespace Micser.Infrastructure.Widgets
             set => SetValue(HeaderTemplateProperty, value);
         }
 
-        public IEnumerable InputConnectors
+        public IEnumerable<Connector> InputConnectors
         {
-            get => (IEnumerable)GetValue(InputConnectorsProperty);
+            get => (IEnumerable<Connector>)GetValue(InputConnectorsProperty);
             set => SetValue(InputConnectorsProperty, value);
         }
 
@@ -90,9 +90,9 @@ namespace Micser.Infrastructure.Widgets
             set => SetValue(IsSelectedProperty, value);
         }
 
-        public IEnumerable OutputConnectors
+        public IEnumerable<Connector> OutputConnectors
         {
-            get => (IEnumerable)GetValue(OutputConnectorsProperty);
+            get => (IEnumerable<Connector>)GetValue(OutputConnectorsProperty);
             set => SetValue(OutputConnectorsProperty, value);
         }
 
@@ -140,7 +140,6 @@ namespace Micser.Infrastructure.Widgets
         {
             if (e.NewValue is Point point && d is UIElement element)
             {
-                Debug.WriteLine($"Widget.OnPositionPropertyChanged: {point}");
                 Canvas.SetLeft(element, point.X);
                 Canvas.SetTop(element, point.Y);
             }
