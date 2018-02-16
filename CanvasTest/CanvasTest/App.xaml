@@ -16,7 +16,7 @@
             </Setter>
         </Style>
 
-        <Style TargetType="{x:Type local:Widget}">
+        <Style x:Key="DefaultWidgetStyle" TargetType="{x:Type local:Widget}">
             <Setter Property="Width" Value="50" />
             <Setter Property="Height" Value="50" />
             <Setter Property="Background" Value="Green" />
@@ -39,5 +39,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
+
+        <Style BasedOn="{StaticResource DefaultWidgetStyle}" TargetType="{x:Type local:Widget}"></Style>
     </Application.Resources>
 </Application>
