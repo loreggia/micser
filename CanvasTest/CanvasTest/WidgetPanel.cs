@@ -125,9 +125,9 @@ namespace CanvasTest
                 case NotifyCollectionChangedAction.Add:
                     foreach (Widget widget in e.NewItems)
                     {
-                        var position = widget.Position;
+                        //var position = widget.Position;
                         Children.Add(widget);
-                        widget.Position = position;
+                        //widget.Position = position;
                         //widget.IsSelected = true;
                     }
                     break;
@@ -147,9 +147,9 @@ namespace CanvasTest
 
                     foreach (Widget widget in e.NewItems)
                     {
-                        var position = widget.Position;
+                        //var position = widget.Position;
                         Children.Add(widget);
-                        widget.Position = position;
+                        //widget.Position = position;
                         //Dispatcher.BeginInvoke(new Func<Point>(() => widget.Position = position));
                     }
                     break;

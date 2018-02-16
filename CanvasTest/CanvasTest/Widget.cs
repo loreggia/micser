@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Diagnostics;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace CanvasTest
@@ -26,6 +27,7 @@ namespace CanvasTest
         {
             if (e.NewValue is Point p && d is UIElement element)
             {
+                Debug.WriteLine($"Widget.OnPositionPropertyChanged: {p}");
                 Canvas.SetLeft(element, p.X);
                 Canvas.SetTop(element, p.Y);
             }
