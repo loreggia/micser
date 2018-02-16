@@ -38,11 +38,7 @@ namespace Micser.Infrastructure.Widgets
         public Point Position
         {
             get => _position;
-            set
-            {
-                SetProperty(ref _position, value);
-                Debug.WriteLine($"WidgetViewModel.Position.set(): {value}");
-            }
+            set => SetProperty(ref _position, value);
         }
 
         public virtual void Initialize()

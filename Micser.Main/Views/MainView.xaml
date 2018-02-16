@@ -28,7 +28,7 @@
 
         <!-- Widgets="{Binding Widgets}"-->
         <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-            <widgets:WidgetPanel x:Name="WidgetPanel" WidgetFactory="{Binding WidgetFactory}" ItemsSource="{Binding Widgets}" />
+            <widgets:WidgetPanel x:Name="WidgetPanel" WidgetFactory="{Binding WidgetFactory}" WidgetsSource="{Binding Widgets}" />
         </ScrollViewer>
 
         <Expander Grid.Row="2" Header="Widgets" IsExpanded="True">
