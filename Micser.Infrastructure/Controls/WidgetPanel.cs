@@ -313,9 +313,7 @@ namespace Micser.Infrastructure.Controls
                 case NotifyCollectionChangedAction.Add:
                     foreach (Widget widget in e.NewItems)
                     {
-                        var position = widget.Position;
                         Children.Add(widget);
-                        widget.Position = position;
                         widget.IsSelected = true;
                     }
                     break;
@@ -335,10 +333,7 @@ namespace Micser.Infrastructure.Controls
 
                     foreach (Widget widget in e.NewItems)
                     {
-                        var position = widget.Position;
                         Children.Add(widget);
-                        widget.Position = position;
-                        //Dispatcher.BeginInvoke(new Func<Point>(() => widget.Position = position));
                     }
                     break;
 
