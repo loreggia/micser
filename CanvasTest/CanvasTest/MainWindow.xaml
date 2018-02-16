@@ -18,6 +18,6 @@
 
         <Button Click="ButtonClick">Add</Button>
 
-        <Canvas Grid.Row="1" x:Name="Canvas"></Canvas>
+        <local:WidgetPanel Grid.Row="1" x:Name="Canvas" ItemsSource="{Binding Widgets}"></local:WidgetPanel>
     </Grid>
 </Window>

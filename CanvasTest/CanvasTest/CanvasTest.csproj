@@ -61,6 +61,7 @@
     </Compile>
     <Compile Include="DragThumb.cs" />
     <Compile Include="Widget.cs" />
+    <Compile Include="WidgetPanel.cs" />
     <Compile Include="WidgetViewModel.cs" />
     <Page Include="DerivedWidget.xaml">
       <SubType>Designer</SubType>
