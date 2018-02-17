@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Micser.Infrastructure;
 using Micser.Infrastructure.Widgets;
 using Micser.Main.Audio;
 using Micser.Main.Services;
@@ -16,6 +15,7 @@ namespace Micser.Main.ViewModels.Widgets
 
         public DeviceOutputViewModel()
         {
+            Header = "Device Output";
             _inputViewModel = AddInput(_deviceOutput);
         }
 

@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
+using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -9,6 +9,8 @@ using Micser.Infrastructure.Themes;
 
 namespace Micser.Infrastructure.Widgets
 {
+    [TemplatePart(Name = PartNameInputConnectors, Type = typeof(ItemsControl))]
+    [TemplatePart(Name = PartNameOutputConnectors, Type = typeof(ItemsControl))]
     public class Widget : ContentControl, ISelectable
     {
         public static readonly DependencyProperty HeaderProperty = DependencyProperty.Register(
@@ -17,8 +19,8 @@ namespace Micser.Infrastructure.Widgets
         public static readonly DependencyProperty HeaderTemplateProperty = DependencyProperty.Register(
             nameof(HeaderTemplate), typeof(DataTemplate), typeof(Widget), new PropertyMetadata(null));
 
-        public static readonly DependencyProperty InputConnectorsProperty = DependencyProperty.Register(
-            nameof(InputConnectors), typeof(IEnumerable<Connector>), typeof(Widget), new PropertyMetadata(null));
+        public static readonly DependencyProperty InputConnectorsSourceProperty = DependencyProperty.Register(
+            nameof(InputConnectorsSource), typeof(IEnumerable<ConnectorViewModel>), typeof(Widget), new PropertyMetadata(null));
 
         public static readonly DependencyProperty InputConnectorTemplateProperty = DependencyProperty.Register(
             nameof(InputConnectorTemplate), typeof(DataTemplate), typeof(Widget), new PropertyMetadata(null));
@@ -29,14 +31,19 @@ namespace Micser.Infrastructure.Widgets
         public static readonly DependencyProperty IsSelectedProperty = DependencyProperty.Register(
             nameof(IsSelected), typeof(bool), typeof(Widget), new FrameworkPropertyMetadata(false));
 
-        public static readonly DependencyProperty OutputConnectorsProperty = DependencyProperty.Register(
-            nameof(OutputConnectors), typeof(IEnumerable<Connector>), typeof(Widget), new PropertyMetadata(null));
+        public static readonly DependencyProperty OutputConnectorsSourceProperty = DependencyProperty.Register(
+            nameof(OutputConnectorsSource), typeof(IEnumerable<ConnectorViewModel>), typeof(Widget), new PropertyMetadata(null));
 
         public static readonly DependencyProperty OutputConnectorTemplateProperty = DependencyProperty.Register(
             nameof(OutputConnectorTemplate), typeof(DataTemplate), typeof(Widget), new PropertyMetadata(null));
 
         public static readonly DependencyProperty PositionProperty = DependencyProperty.Register(
             nameof(Position), typeof(Point), typeof(Widget), new PropertyMetadata(default(Point), OnPositionPropertyChanged));
+
+        internal const string PartNameInputConnectors = "PART_InputConnectors";
+        internal const string PartNameOutputConnectors = "PART_OutputConnectors";
+        private ItemsControl _inputConnectorsControl;
+        private ItemsControl _outputConnectorsControl;
 
         static Widget()
         {
@@ -63,10 +70,12 @@ namespace Micser.Infrastructure.Widgets
             set => SetValue(HeaderTemplateProperty, value);
         }
 
-        public IEnumerable<Connector> InputConnectors
+        public IEnumerable<Connector> InputConnectors => _inputConnectorsControl.Items.SourceCollection.Cast<Connector>();
+
+        public IEnumerable<ConnectorViewModel> InputConnectorsSource
         {
-            get => (IEnumerable<Connector>)GetValue(InputConnectorsProperty);
-            set => SetValue(InputConnectorsProperty, value);
+            get => (IEnumerable<ConnectorViewModel>)GetValue(InputConnectorsSourceProperty);
+            set => SetValue(InputConnectorsSourceProperty, value);
         }
 
         public DataTemplate InputConnectorTemplate
@@ -90,10 +99,12 @@ namespace Micser.Infrastructure.Widgets
             set => SetValue(IsSelectedProperty, value);
         }
 
-        public IEnumerable<Connector> OutputConnectors
+        public IEnumerable<Connector> OutputConnectors => _inputConnectorsControl.Items.SourceCollection.Cast<Connector>();
+
+        public IEnumerable<ConnectorViewModel> OutputConnectorsSource
         {
-            get => (IEnumerable<Connector>)GetValue(OutputConnectorsProperty);
-            set => SetValue(OutputConnectorsProperty, value);
+            get => (IEnumerable<ConnectorViewModel>)GetValue(OutputConnectorsSourceProperty);
+            set => SetValue(OutputConnectorsSourceProperty, value);
         }
 
         public DataTemplate OutputConnectorTemplate
@@ -106,6 +117,14 @@ namespace Micser.Infrastructure.Widgets
         {
             get => (Point)GetValue(PositionProperty);
             set => SetValue(PositionProperty, value);
+        }
+
+        public override void OnApplyTemplate()
+        {
+            base.OnApplyTemplate();
+
+            _inputConnectorsControl = (ItemsControl)GetTemplateChild(PartNameInputConnectors);
+            _outputConnectorsControl = (ItemsControl)GetTemplateChild(PartNameInputConnectors);
         }
 
         protected override void OnPreviewMouseDown(MouseButtonEventArgs e)
