@@ -17,6 +17,7 @@ namespace Micser.Main.ViewModels.Widgets
 
         public DeviceInputViewModel()
         {
+            Header = "Device Input";
             _outputViewModel = AddOutput(_deviceInput);
         }
 
