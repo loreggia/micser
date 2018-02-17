@@ -74,11 +74,14 @@ namespace Micser.Infrastructure.Widgets
             {
                 var sourceConnector = _sourceConnector;
                 var sinkConnector = HitConnector;
-                var newConnection = new Connection(sourceConnector, sinkConnector);
 
-                // connections are added with z-index of zero
-                _widgetPanel.Children.Insert(0, newConnection);
+                // TODO
+                //var newConnection = new Connection(sourceConnector, sinkConnector);
+
+                //// connections are added with z-index of zero
+                //_widgetPanel.Children.Insert(0, newConnection);
             }
+
             if (HitWidget != null)
             {
                 HitWidget.IsDragConnectionOver = false;

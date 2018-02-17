@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -10,6 +9,9 @@ namespace Micser.Infrastructure.Widgets
 {
     public class Connector : Control
     {
+        public static readonly DependencyProperty ConnectionProperty = DependencyProperty.Register(
+            nameof(Connection), typeof(Connection), typeof(Connector), new PropertyMetadata(null));
+
         public static readonly DependencyProperty PositionProperty = DependencyProperty.Register(
             nameof(Position), typeof(Point), typeof(Connector), new PropertyMetadata(default(Point)));
 
@@ -21,11 +23,14 @@ namespace Micser.Infrastructure.Widgets
 
         public Connector()
         {
-            Connections = new List<Connection>();
             LayoutUpdated += Connector_LayoutUpdated;
         }
 
-        public List<Connection> Connections { get; }
+        public Connection Connection
+        {
+            get => (Connection)GetValue(ConnectionProperty);
+            set => SetValue(ConnectionProperty, value);
+        }
 
         public ConnectorOrientation Orientation { get; set; }
 

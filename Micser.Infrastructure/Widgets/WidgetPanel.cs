@@ -339,6 +339,7 @@ namespace Micser.Infrastructure.Widgets
 
         private void CreateConnection(ConnectionViewModel vm)
         {
+            return;
             var source = _widgets
                 .SelectMany(w => w.OutputConnectors)
                 .FirstOrDefault(c => c.DataContext == vm.Source);

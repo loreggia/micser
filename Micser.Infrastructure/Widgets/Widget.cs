@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -42,7 +43,9 @@ namespace Micser.Infrastructure.Widgets
 
         internal const string PartNameInputConnectors = "PART_InputConnectors";
         internal const string PartNameOutputConnectors = "PART_OutputConnectors";
+        private ObservableCollection<Connector> _inputConnectors;
         private ItemsControl _inputConnectorsControl;
+        private ObservableCollection<Connector> _outputConnectors;
         private ItemsControl _outputConnectorsControl;
 
         static Widget()
@@ -52,6 +55,9 @@ namespace Micser.Infrastructure.Widgets
 
         public Widget()
         {
+            _inputConnectors = new ObservableCollection<Connector>();
+            _outputConnectors = new ObservableCollection<Connector>();
+
             ResourceRegistry.RegisterResourcesFor(this);
 
             Loaded += OnWidgetLoaded;
