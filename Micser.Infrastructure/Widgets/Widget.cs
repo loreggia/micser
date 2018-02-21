@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using Micser.Infrastructure.Extensions;
 using Micser.Infrastructure.Themes;
 
 namespace Micser.Infrastructure.Widgets
@@ -22,7 +20,7 @@ namespace Micser.Infrastructure.Widgets
             nameof(HeaderTemplate), typeof(DataTemplate), typeof(Widget), new PropertyMetadata(null));
 
         public static readonly DependencyProperty InputConnectorsSourceProperty = DependencyProperty.Register(
-            nameof(InputConnectorsSource), typeof(IEnumerable<ConnectorViewModel>), typeof(Widget), new PropertyMetadata(null, OnInputConnectorsSourcePropertyChanged));
+            nameof(InputConnectorsSource), typeof(IEnumerable<ConnectorViewModel>), typeof(Widget), new PropertyMetadata(null));
 
         public static readonly DependencyProperty InputConnectorTemplateProperty = DependencyProperty.Register(
             nameof(InputConnectorTemplate), typeof(DataTemplate), typeof(Widget), new PropertyMetadata(null));
@@ -34,7 +32,7 @@ namespace Micser.Infrastructure.Widgets
             nameof(IsSelected), typeof(bool), typeof(Widget), new FrameworkPropertyMetadata(false));
 
         public static readonly DependencyProperty OutputConnectorsSourceProperty = DependencyProperty.Register(
-            nameof(OutputConnectorsSource), typeof(IEnumerable<ConnectorViewModel>), typeof(Widget), new PropertyMetadata(null, OnOutputConnectorsSourcePropertyChanged));
+            nameof(OutputConnectorsSource), typeof(IEnumerable<ConnectorViewModel>), typeof(Widget), new PropertyMetadata(null));
 
         public static readonly DependencyProperty OutputConnectorTemplateProperty = DependencyProperty.Register(
             nameof(OutputConnectorTemplate), typeof(DataTemplate), typeof(Widget), new PropertyMetadata(null));
@@ -45,10 +43,6 @@ namespace Micser.Infrastructure.Widgets
         internal const string PartNameInputConnectors = "PART_InputConnectors";
 
         internal const string PartNameOutputConnectors = "PART_OutputConnectors";
-
-        private readonly ObservableCollection<Connector> _inputConnectors;
-
-        private readonly ObservableCollection<Connector> _outputConnectors;
 
         private ItemsControl _inputConnectorsControl;
 
@@ -61,11 +55,6 @@ namespace Micser.Infrastructure.Widgets
 
         public Widget()
         {
-            _inputConnectors = new ObservableCollection<Connector>();
-            _inputConnectors.CollectionChanged += InputConnectors_CollectionChanged;
-            _outputConnectors = new ObservableCollection<Connector>();
-            _outputConnectors.CollectionChanged += OutputConnectors_CollectionChanged;
-
             ResourceRegistry.RegisterResourcesFor(this);
 
             Loaded += OnWidgetLoaded;
@@ -84,7 +73,7 @@ namespace Micser.Infrastructure.Widgets
             set => SetValue(HeaderTemplateProperty, value);
         }
 
-        public IEnumerable<Connector> InputConnectors => _inputConnectors;
+        public IEnumerable<Connector> InputConnectors => _inputConnectorsControl?.GetItemsChildren<Connector>();
 
         public IEnumerable<ConnectorViewModel> InputConnectorsSource
         {
@@ -113,7 +102,7 @@ namespace Micser.Infrastructure.Widgets
             set => SetValue(IsSelectedProperty, value);
         }
 
-        public IEnumerable<Connector> OutputConnectors => _outputConnectors;
+        public IEnumerable<Connector> OutputConnectors => _outputConnectorsControl?.GetItemsChildren<Connector>();
 
         public IEnumerable<ConnectorViewModel> OutputConnectorsSource
         {
@@ -138,7 +127,7 @@ namespace Micser.Infrastructure.Widgets
             base.OnApplyTemplate();
 
             _inputConnectorsControl = (ItemsControl)GetTemplateChild(PartNameInputConnectors);
-            _outputConnectorsControl = (ItemsControl)GetTemplateChild(PartNameInputConnectors);
+            _outputConnectorsControl = (ItemsControl)GetTemplateChild(PartNameOutputConnectors);
         }
 
         protected override void OnPreviewMouseDown(MouseButtonEventArgs e)
@@ -169,32 +158,6 @@ namespace Micser.Infrastructure.Widgets
             e.Handled = false;
         }
 
-        private static void OnInputConnectorsSourcePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var widget = (Widget)d;
-
-            if (e.OldValue is INotifyCollectionChanged oldCollection)
-            {
-            }
-
-            if (e.NewValue is INotifyCollectionChanged newCollection)
-            {
-            }
-        }
-
-        private static void OnOutputConnectorsSourcePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            var widget = (Widget)d;
-
-            if (e.OldValue is INotifyCollectionChanged oldCollection)
-            {
-            }
-
-            if (e.NewValue is INotifyCollectionChanged newCollection)
-            {
-            }
-        }
-
         private static void OnPositionPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             if (e.NewValue is Point point && d is UIElement element)
@@ -202,10 +165,6 @@ namespace Micser.Infrastructure.Widgets
                 Canvas.SetLeft(element, point.X);
                 Canvas.SetTop(element, point.Y);
             }
-        }
-
-        private void InputConnectors_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
         }
 
         private void OnDispatcherShutdownStarted(object sender, EventArgs e)
@@ -220,10 +179,6 @@ namespace Micser.Infrastructure.Widgets
         {
             //ViewModel?.Initialize();
             //GetBindingExpression(PositionProperty)?.UpdateTarget();
-        }
-
-        private void OutputConnectors_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
         }
     }
 }
