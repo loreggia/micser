@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
-VisualStudioVersion = 15.0.27130.2026
+VisualStudioVersion = 15.0.27130.2027
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Micser.Core", "Micser.Core\Micser.Core.csproj", "{80AA2402-DE97-422B-8D56-9C709F38925C}"
 	ProjectSection(ProjectDependencies) = postProject
@@ -203,7 +203,6 @@ Global
 		{EBD5C65E-69EC-47D4-835A-AE4E18A36C56}.Release|x86.ActiveCfg = Release|Any CPU
 		{EBD5C65E-69EC-47D4-835A-AE4E18A36C56}.Release|x86.Build.0 = Release|Any CPU
 		{C9A243E5-6443-4A00-ACAC-C20A61286264}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C9A243E5-6443-4A00-ACAC-C20A61286264}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C9A243E5-6443-4A00-ACAC-C20A61286264}.Debug|ARM.ActiveCfg = Debug|Any CPU
 		{C9A243E5-6443-4A00-ACAC-C20A61286264}.Debug|ARM.Build.0 = Debug|Any CPU
 		{C9A243E5-6443-4A00-ACAC-C20A61286264}.Debug|ARM64.ActiveCfg = Debug|Any CPU

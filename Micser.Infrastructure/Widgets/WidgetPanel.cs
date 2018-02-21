@@ -339,12 +339,12 @@ namespace Micser.Infrastructure.Widgets
 
         private void CreateConnection(ConnectionViewModel vm)
         {
-            return;
+            //return;
             var source = _widgets
-                .SelectMany(w => w.OutputConnectors)
+                .SelectMany(w => w.OutputConnectors ?? new Connector[0])
                 .FirstOrDefault(c => c.DataContext == vm.Source);
             var sink = _widgets
-                .SelectMany(w => w.InputConnectors)
+                .SelectMany(w => w.InputConnectors ?? new Connector[0])
                 .FirstOrDefault(c => c.DataContext == vm.Sink);
 
             if (source != null && sink != null && !_connections.Any(c => ReferenceEquals(c.Source, source) && ReferenceEquals(c.Sink, sink)))

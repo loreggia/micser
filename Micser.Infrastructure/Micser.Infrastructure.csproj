@@ -82,6 +82,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bindable.cs" />
+    <Compile Include="Extensions\ItemsControlExtensions.cs" />
     <Compile Include="Widgets\ConnectionChangedEventHandler.cs" />
     <Compile Include="Widgets\ConnectorChangedEventHandler.cs" />
     <Compile Include="Widgets\ConnectorInfo.cs" />
