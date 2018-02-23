@@ -24,6 +24,7 @@ namespace Micser.Infrastructure.Widgets
         public Connector()
         {
             LayoutUpdated += Connector_LayoutUpdated;
+            Loaded += Connector_Loaded;
         }
 
         public Connection Connection
@@ -113,6 +114,11 @@ namespace Micser.Infrastructure.Widgets
                 //get centre position of this Connector relative to the WidgetPanel
                 Position = TransformToAncestor(panel).Transform(new Point(Width / 2, Height / 2));
             }
+        }
+
+        private void Connector_Loaded(object sender, RoutedEventArgs e)
+        {
+            _parentPanel.UpdateConnections();
         }
     }
 }

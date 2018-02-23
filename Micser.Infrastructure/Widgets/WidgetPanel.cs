@@ -78,6 +78,17 @@ namespace Micser.Infrastructure.Widgets
             }
         }
 
+        public void UpdateConnections()
+        {
+            if (ConnectionsSource != null)
+            {
+                foreach (var connectionViewModel in ConnectionsSource)
+                {
+                    CreateConnection(connectionViewModel);
+                }
+            }
+        }
+
         protected override Size MeasureOverride(Size constraint)
         {
             var size = new Size();
