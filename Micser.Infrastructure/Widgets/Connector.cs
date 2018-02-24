@@ -12,6 +12,9 @@ namespace Micser.Infrastructure.Widgets
         public static readonly DependencyProperty ConnectionProperty = DependencyProperty.Register(
             nameof(Connection), typeof(Connection), typeof(Connector), new PropertyMetadata(null));
 
+        public static readonly DependencyProperty IsConnectionSourceProperty = DependencyProperty.Register(
+            nameof(IsConnectionSource), typeof(bool), typeof(Connector), new PropertyMetadata(true));
+
         public static readonly DependencyProperty PositionProperty = DependencyProperty.Register(
             nameof(Position), typeof(Point), typeof(Connector), new PropertyMetadata(default(Point)));
 
@@ -31,6 +34,12 @@ namespace Micser.Infrastructure.Widgets
         {
             get => (Connection)GetValue(ConnectionProperty);
             set => SetValue(ConnectionProperty, value);
+        }
+
+        public bool IsConnectionSource
+        {
+            get => (bool)GetValue(IsConnectionSourceProperty);
+            set => SetValue(IsConnectionSourceProperty, value);
         }
 
         public ConnectorOrientation Orientation { get; set; }
@@ -67,6 +76,11 @@ namespace Micser.Infrastructure.Widgets
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {
             base.OnMouseLeftButtonDown(e);
+
+            if (!IsConnectionSource)
+            {
+                return;
+            }
 
             var panel = ParentPanel;
             if (panel != null)
