@@ -30,7 +30,7 @@
         <Setter Property="InputConnectorTemplate">
             <Setter.Value>
                 <DataTemplate>
-                    <widgets:Connector Orientation="Left" Margin="3,3,0,0" />
+                    <widgets:Connector Orientation="Left" Margin="3,3,0,0" IsConnectionSource="False" />
                 </DataTemplate>
             </Setter.Value>
         </Setter>
