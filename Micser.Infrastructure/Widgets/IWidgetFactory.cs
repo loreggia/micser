@@ -1,7 +1,13 @@
-﻿namespace Micser.Infrastructure.Widgets
+﻿using System;
+
+namespace Micser.Infrastructure.Widgets
 {
     public interface IWidgetFactory
     {
-        Widget CreateWidget(object dataContext);
+        WidgetViewModel CreateViewModel(Type widgetVmType);
+
+        Widget CreateWidget(WidgetViewModel viewModel);
+
+        Widget CreateWidget(WidgetDescription description);
     }
 }

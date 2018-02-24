@@ -1,4 +1,6 @@
-﻿using Unity;
+﻿using System;
+using System.Windows;
+using Unity;
 
 namespace Micser.Infrastructure.Widgets
 {
@@ -11,29 +13,32 @@ namespace Micser.Infrastructure.Widgets
             _container = container;
         }
 
-        public virtual Widget CreateWidget(object dataContext)
+        public virtual WidgetViewModel CreateViewModel(Type widgetVmType)
         {
-            Widget result = null;
-            WidgetViewModel vm = null;
+            return (WidgetViewModel)_container.Resolve(widgetVmType);
+        }
 
-            if (dataContext is WidgetDescription d)
-            {
-                result = _container.Resolve<Widget>(d.ViewModelType.FullName);
-                vm = (WidgetViewModel)_container.Resolve(d.ViewModelType);
-            }
-            else if (dataContext is WidgetViewModel)
-            {
-                vm = (WidgetViewModel)dataContext;
-                result = _container.Resolve<Widget>(vm.GetType().FullName);
-            }
-
-            if (result != null)
-            {
-                result.DataContext = vm;
-                result.Loaded += (s, e) => { vm?.Initialize(); };
-            }
-
+        public virtual Widget CreateWidget(WidgetViewModel viewModel)
+        {
+            var result = _container.Resolve<Widget>(viewModel.GetType().FullName);
+            result.DataContext = viewModel;
+            result.Loaded += OnWidgetLoaded;
             return result;
+        }
+
+        public virtual Widget CreateWidget(WidgetDescription d)
+        {
+            var result = _container.Resolve<Widget>(d.ViewModelType.FullName);
+            result.DataContext = (WidgetViewModel)_container.Resolve(d.ViewModelType);
+            result.Loaded += OnWidgetLoaded;
+            return result;
+        }
+
+        protected virtual void OnWidgetLoaded(object sender, RoutedEventArgs e)
+        {
+            var widget = (Widget)sender;
+            var viewModel = widget.DataContext as WidgetViewModel;
+            viewModel?.Initialize();
         }
     }
 }

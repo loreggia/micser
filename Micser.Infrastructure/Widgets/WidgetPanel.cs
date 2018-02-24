@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -128,10 +127,20 @@ namespace Micser.Infrastructure.Widgets
                     throw new InvalidOperationException("No widget factory available.");
                 }
 
-                var widget = WidgetFactory.CreateWidget(description);
-                var vm = (WidgetViewModel)widget.DataContext;
+                var vm = WidgetFactory.CreateViewModel(description.ViewModelType);
                 vm.Position = e.GetPosition(this);
-                _widgets.Add(widget);
+
+                if (WidgetsSource is ICollection<WidgetViewModel> collection)
+                {
+                    collection.Add(vm);
+                }
+
+                if (!(WidgetsSource is INotifyCollectionChanged))
+                {
+                    var widget = WidgetFactory.CreateWidget(vm);
+                    _widgets.Add(widget);
+                }
+
                 e.Handled = true;
             }
         }
@@ -239,7 +248,7 @@ namespace Micser.Infrastructure.Widgets
 
             panel._widgets.Clear();
 
-            if (e.NewValue is IEnumerable enumerable && panel.WidgetFactory != null)
+            if (e.NewValue is IEnumerable<WidgetViewModel> enumerable && panel.WidgetFactory != null)
             {
                 foreach (var item in enumerable)
                 {
@@ -468,7 +477,7 @@ namespace Micser.Infrastructure.Widgets
                 case NotifyCollectionChangedAction.Add:
                     if (WidgetFactory != null)
                     {
-                        foreach (var item in e.NewItems)
+                        foreach (WidgetViewModel item in e.NewItems)
                         {
                             _widgets.Add(WidgetFactory.CreateWidget(item));
                         }
@@ -476,7 +485,7 @@ namespace Micser.Infrastructure.Widgets
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
-                    foreach (var item in e.OldItems)
+                    foreach (WidgetViewModel item in e.OldItems)
                     {
                         var widget = _widgets.FirstOrDefault(w => w.DataContext == item);
                         if (widget != null)
@@ -487,7 +496,7 @@ namespace Micser.Infrastructure.Widgets
                     break;
 
                 case NotifyCollectionChangedAction.Replace:
-                    foreach (var item in e.OldItems)
+                    foreach (WidgetViewModel item in e.OldItems)
                     {
                         var widget = _widgets.FirstOrDefault(w => w.DataContext == item);
                         if (widget != null)
@@ -498,7 +507,7 @@ namespace Micser.Infrastructure.Widgets
 
                     if (WidgetFactory != null)
                     {
-                        foreach (var item in e.NewItems)
+                        foreach (WidgetViewModel item in e.NewItems)
                         {
                             _widgets.Add(WidgetFactory.CreateWidget(item));
                         }
