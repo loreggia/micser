@@ -69,6 +69,31 @@ namespace Micser.Infrastructure.Widgets
             set => SetValue(WidgetsSourceProperty, value);
         }
 
+        public void AddConnection(Connector sourceConnector, Connector sinkConnector)
+        {
+            if (sourceConnector.DataContext is ConnectorViewModel sourceVm &&
+                sinkConnector.DataContext is ConnectorViewModel sinkVm &&
+                ConnectionsSource != null &&
+                !ConnectionsSource.Any(c => c.Source == sourceVm && c.Sink == sinkVm))
+            {
+                var vm = new ConnectionViewModel
+                {
+                    Source = sourceVm,
+                    Sink = sinkVm
+                };
+
+                if (ConnectionsSource is ICollection<ConnectionViewModel> collection)
+                {
+                    collection.Add(vm);
+                }
+
+                if (!(ConnectionsSource is INotifyCollectionChanged))
+                {
+                    CreateConnection(vm);
+                }
+            }
+        }
+
         public void ClearSelection()
         {
             foreach (ISelectable selectable in Children)

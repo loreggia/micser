@@ -75,11 +75,7 @@ namespace Micser.Infrastructure.Widgets
                 var sourceConnector = _sourceConnector;
                 var sinkConnector = HitConnector;
 
-                // TODO
-                //var newConnection = new Connection(sourceConnector, sinkConnector);
-
-                //// connections are added with z-index of zero
-                //_widgetPanel.Children.Insert(0, newConnection);
+                _widgetPanel.AddConnection(sourceConnector, sinkConnector);
             }
 
             if (HitWidget != null)
