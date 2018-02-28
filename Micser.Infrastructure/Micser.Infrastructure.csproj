@@ -82,7 +82,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bindable.cs" />
+    <Compile Include="ConfigurationService.cs" />
     <Compile Include="Extensions\ItemsControlExtensions.cs" />
+    <Compile Include="IConfigurationService.cs" />
     <Compile Include="Widgets\ConnectionChangedEventHandler.cs" />
     <Compile Include="Widgets\ConnectorChangedEventHandler.cs" />
     <Compile Include="Widgets\ConnectorInfo.cs" />
@@ -99,6 +101,7 @@
     <Compile Include="Controls\RelativePositionPanel.cs" />
     <Compile Include="Widgets\ResizeThumb.cs" />
     <Compile Include="Widgets\RubberbandAdorner.cs" />
+    <Compile Include="Widgets\WidgetState.cs" />
     <Compile Include="Widgets\WidgetToolbox.cs" />
     <Compile Include="Widgets\WidgetToolboxItem.cs" />
     <Compile Include="Widgets\Widget.cs" />

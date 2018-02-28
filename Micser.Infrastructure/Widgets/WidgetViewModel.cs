@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.Windows;
 
 namespace Micser.Infrastructure.Widgets
@@ -54,5 +53,9 @@ namespace Micser.Infrastructure.Widgets
         {
             _outputConnectors.Add(output);
         }
+
+        protected abstract void LoadState(WidgetState state);
+
+        protected abstract void SaveState(WidgetState state);
     }
 }
