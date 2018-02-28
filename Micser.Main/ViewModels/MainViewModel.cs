@@ -11,12 +11,16 @@ namespace Micser.Main.ViewModels
 {
     public class MainViewModel : ViewModelNavigationAware
     {
+        public const string WidgetsConfigurationKey = "Widgets";
+
+        private readonly IConfigurationService _configurationService;
         private readonly IList<ConnectionViewModel> _connections;
         private readonly IList<WidgetViewModel> _widgets;
         private IEnumerable<WidgetDescription> _availableWidgets;
 
-        public MainViewModel(IWidgetFactory widgetFactory, IEnumerable<WidgetDescription> availableWidgets)
+        public MainViewModel(IConfigurationService configurationService, IWidgetFactory widgetFactory, IEnumerable<WidgetDescription> availableWidgets)
         {
+            _configurationService = configurationService;
             _widgets = new ObservableCollection<WidgetViewModel>();
             _connections = new ObservableCollection<ConnectionViewModel>();
 
@@ -34,9 +38,24 @@ namespace Micser.Main.ViewModels
         public IWidgetFactory WidgetFactory { get; }
         public IEnumerable<WidgetViewModel> Widgets => _widgets;
 
+        public override void OnNavigatedFrom(NavigationContext navigationContext)
+        {
+            base.OnNavigatedFrom(navigationContext);
+
+            var widgetStates = new List<WidgetState>();
+
+            foreach (var vm in Widgets)
+            {
+            }
+
+            _configurationService.SetSetting(WidgetsConfigurationKey, );
+        }
+
         public override void OnNavigatedTo(NavigationContext navigationContext)
         {
             base.OnNavigatedTo(navigationContext);
+
+            var widgetStates = _configurationService.GetSetting<IEnumerable<WidgetState>>(WidgetsConfigurationKey);
 
             var input = new DeviceInputViewModel { Position = new Point(10, 10) };
             var output = new DeviceOutputViewModel { Position = new Point(10, 100) };

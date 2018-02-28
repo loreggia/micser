@@ -69,7 +69,15 @@ namespace Micser.Infrastructure.Widgets
             set => SetValue(WidgetsSourceProperty, value);
         }
 
-        public void AddConnection(Connector sourceConnector, Connector sinkConnector)
+        public void ClearSelection()
+        {
+            foreach (ISelectable selectable in Children)
+            {
+                selectable.IsSelected = false;
+            }
+        }
+
+        public void CreateConnection(Connector sourceConnector, Connector sinkConnector)
         {
             if (sourceConnector.DataContext is ConnectorViewModel sourceVm &&
                 sinkConnector.DataContext is ConnectorViewModel sinkVm &&
@@ -89,16 +97,8 @@ namespace Micser.Infrastructure.Widgets
 
                 if (!(ConnectionsSource is INotifyCollectionChanged))
                 {
-                    CreateConnection(vm);
+                    AddConnection(vm);
                 }
-            }
-        }
-
-        public void ClearSelection()
-        {
-            foreach (ISelectable selectable in Children)
-            {
-                selectable.IsSelected = false;
             }
         }
 
@@ -108,7 +108,7 @@ namespace Micser.Infrastructure.Widgets
             {
                 foreach (var connectionViewModel in ConnectionsSource)
                 {
-                    CreateConnection(connectionViewModel);
+                    AddConnection(connectionViewModel);
                 }
             }
         }
@@ -282,6 +282,22 @@ namespace Micser.Infrastructure.Widgets
             }
         }
 
+        private void AddConnection(ConnectionViewModel vm)
+        {
+            //return;
+            var source = _widgets
+                .SelectMany(w => w.OutputConnectors ?? new Connector[0])
+                .FirstOrDefault(c => c.DataContext == vm.Source);
+            var sink = _widgets
+                .SelectMany(w => w.InputConnectors ?? new Connector[0])
+                .FirstOrDefault(c => c.DataContext == vm.Sink);
+
+            if (source != null && sink != null && !_connections.Any(c => ReferenceEquals(c.Source, source) && ReferenceEquals(c.Sink, sink)))
+            {
+                _connections.Add(new Connection(source, sink));
+            }
+        }
+
         private void Connections_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             ClearSelection();
@@ -338,7 +354,7 @@ namespace Micser.Infrastructure.Widgets
                 case NotifyCollectionChangedAction.Add:
                     foreach (ConnectionViewModel item in e.NewItems)
                     {
-                        CreateConnection(item);
+                        AddConnection(item);
                     }
                     break;
 
@@ -365,7 +381,7 @@ namespace Micser.Infrastructure.Widgets
 
                     foreach (ConnectionViewModel item in e.NewItems)
                     {
-                        CreateConnection(item);
+                        AddConnection(item);
                     }
 
                     break;
@@ -382,22 +398,6 @@ namespace Micser.Infrastructure.Widgets
             }
         }
 
-        private void CreateConnection(ConnectionViewModel vm)
-        {
-            //return;
-            var source = _widgets
-                .SelectMany(w => w.OutputConnectors ?? new Connector[0])
-                .FirstOrDefault(c => c.DataContext == vm.Source);
-            var sink = _widgets
-                .SelectMany(w => w.InputConnectors ?? new Connector[0])
-                .FirstOrDefault(c => c.DataContext == vm.Sink);
-
-            if (source != null && sink != null && !_connections.Any(c => ReferenceEquals(c.Source, source) && ReferenceEquals(c.Sink, sink)))
-            {
-                _connections.Add(new Connection(source, sink));
-            }
-        }
-
         private void RefreshConnections()
         {
             _connections.Clear();
@@ -405,7 +405,7 @@ namespace Micser.Infrastructure.Widgets
             {
                 foreach (var vm in ConnectionsSource)
                 {
-                    CreateConnection(vm);
+                    AddConnection(vm);
                 }
             }
         }
