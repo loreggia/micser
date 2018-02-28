@@ -46,9 +46,18 @@ namespace Micser.Main.ViewModels
 
             foreach (var vm in Widgets)
             {
+                var state = new WidgetState
+                {
+                    Id = vm.Id,
+                    Name = vm.Name,
+                    Position = vm.Position,
+                    ViewModelType = vm.GetType()
+                };
+                vm.SaveState(state);
+                widgetStates.Add(state);
             }
 
-            _configurationService.SetSetting(WidgetsConfigurationKey, );
+            _configurationService.SetSetting(WidgetsConfigurationKey, widgetStates);
         }
 
         public override void OnNavigatedTo(NavigationContext navigationContext)

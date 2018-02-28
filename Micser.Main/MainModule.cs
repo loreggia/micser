@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Windows;
-using Micser.Infrastructure;
 using Micser.Infrastructure.Extensions;
 using Micser.Infrastructure.Themes;
 using Micser.Infrastructure.Widgets;

@@ -24,7 +24,7 @@ namespace Micser.Infrastructure
 
         public void Initialize()
         {
-            _container.RegisterSingleton<IConfigurationService, ConfigurationService>();
+            //_container.RegisterSingleton<IConfigurationService, ConfigurationService>();
 
             // top level menu items
             _menuItemRegistry.Add(new MenuItemDescription { Header = "_File", Id = "File" });
