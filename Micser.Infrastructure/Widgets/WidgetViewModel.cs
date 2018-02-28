@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows;
 
@@ -9,11 +10,14 @@ namespace Micser.Infrastructure.Widgets
         private readonly ObservableCollection<ConnectorViewModel> _inputConnectors;
         private readonly ObservableCollection<ConnectorViewModel> _outputConnectors;
         private string _header;
+        private Guid _id;
         private string _name;
         private Point _position;
 
         protected WidgetViewModel()
         {
+            Id = Guid.NewGuid();
+
             _inputConnectors = new ObservableCollection<ConnectorViewModel>();
             _outputConnectors = new ObservableCollection<ConnectorViewModel>();
         }
@@ -22,6 +26,12 @@ namespace Micser.Infrastructure.Widgets
         {
             get => _header;
             set => SetProperty(ref _header, value);
+        }
+
+        public Guid Id
+        {
+            get => _id;
+            set => SetProperty(ref _id, value);
         }
 
         public IEnumerable<ConnectorViewModel> InputConnectors => _inputConnectors;
@@ -44,6 +54,14 @@ namespace Micser.Infrastructure.Widgets
         {
         }
 
+        public virtual void LoadState(WidgetState state)
+        {
+        }
+
+        public virtual void SaveState(WidgetState state)
+        {
+        }
+
         protected virtual void AddInput(ConnectorViewModel input)
         {
             _inputConnectors.Add(input);
@@ -53,9 +71,5 @@ namespace Micser.Infrastructure.Widgets
         {
             _outputConnectors.Add(output);
         }
-
-        protected abstract void LoadState(WidgetState state);
-
-        protected abstract void SaveState(WidgetState state);
     }
 }

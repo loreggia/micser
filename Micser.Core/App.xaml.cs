@@ -34,6 +34,9 @@ namespace Micser.Core
 
         protected override void InitializeModules()
         {
+            var configurationService = ServiceLocator.Current.GetInstance<IConfigurationService>();
+            configurationService.Load();
+
             base.InitializeModules();
 
             var resourceRegistry = ServiceLocator.Current.GetInstance<IResourceRegistry>();
@@ -45,6 +48,7 @@ namespace Micser.Core
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
+            containerRegistry.RegisterSingleton<IConfigurationService, ConfigurationService>();
         }
 
         private static void LoadDynamicModules(IModuleCatalog moduleCatalog)
