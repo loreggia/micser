@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Windows;
 using Micser.Infrastructure;
 using Micser.Infrastructure.Widgets;
 using Micser.Main.ViewModels.Widgets;
+using Newtonsoft.Json.Linq;
 using Prism.Regions;
 
 namespace Micser.Main.ViewModels
@@ -64,17 +66,26 @@ namespace Micser.Main.ViewModels
         {
             base.OnNavigatedTo(navigationContext);
 
-            var widgetStates = _configurationService.GetSetting<IEnumerable<WidgetState>>(WidgetsConfigurationKey);
+            var widgetStates = _configurationService.GetSetting(WidgetsConfigurationKey, null, a => a.Select(o => o.ToObject<WidgetState>()));
 
-            var input = new DeviceInputViewModel { Position = new Point(10, 10) };
-            var output = new DeviceOutputViewModel { Position = new Point(10, 100) };
+            foreach (var widgetState in widgetStates)
+            {
+                var vm = WidgetFactory.CreateViewModel(widgetState.ViewModelType);
+                vm.Id = widgetState.Id;
+                vm.Name = widgetState.Name;
+                vm.Position = widgetState.Position;
+                _widgets.Add(vm);
+            }
 
-            var source = input.OutputConnectors.First();
-            var sink = output.InputConnectors.First();
+            //var input = new DeviceInputViewModel { Position = new Point(10, 10) };
+            //var output = new DeviceOutputViewModel { Position = new Point(10, 100) };
 
-            _widgets.Add(input);
-            _widgets.Add(output);
-            _connections.Add(new ConnectionViewModel { Source = source, Sink = sink });
+            //var source = input.OutputConnectors.First();
+            //var sink = output.InputConnectors.First();
+
+            //_widgets.Add(input);
+            //_widgets.Add(output);
+            //_connections.Add(new ConnectionViewModel { Source = source, Sink = sink });
         }
     }
 }
