@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
 namespace Micser.Infrastructure
 {
@@ -15,10 +16,30 @@ namespace Micser.Infrastructure
             _configuration = new ConcurrentDictionary<string, object>();
         }
 
-        public T GetSetting<T>(string key, T defaultValue)
+        public T GetSetting<T>(string key, T defaultValue = default(T), Func<JObject, T> deserializer = null)
         {
             if (_configuration.TryGetValue(key, out var result))
             {
+                if (deserializer != null && result is JObject jObject)
+                {
+                    return deserializer(jObject);
+                }
+
+                return (T)result;
+            }
+
+            return defaultValue;
+        }
+
+        public T GetSetting<T>(string key, T defaultValue = default(T), Func<JArray, T> deserializer = null)
+        {
+            if (_configuration.TryGetValue(key, out var result))
+            {
+                if (deserializer != null && result is JArray jArray)
+                {
+                    return deserializer(jArray);
+                }
+
                 return (T)result;
             }
 
