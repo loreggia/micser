@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -31,19 +32,19 @@ namespace Micser.Infrastructure
             return defaultValue;
         }
 
-        public T GetSetting<T>(string key, T defaultValue = default(T), Func<JArray, T> deserializer = null)
+        public IEnumerable<T> GetSettingEnumerable<T>(string key)
         {
             if (_configuration.TryGetValue(key, out var result))
             {
-                if (deserializer != null && result is JArray jArray)
+                if (result is JArray jArray)
                 {
-                    return deserializer(jArray);
+                    return jArray.Select(x => x.ToObject<T>());
                 }
 
-                return (T)result;
+                return (IEnumerable<T>)result;
             }
 
-            return defaultValue;
+            return null;
         }
 
         public bool Load(string fileName = null)

@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Micser.Infrastructure;
 using Micser.Infrastructure.Widgets;
 using Micser.Main.Audio;
 using Micser.Main.Services;
@@ -9,6 +8,8 @@ namespace Micser.Main.ViewModels.Widgets
 {
     public class DeviceInputViewModel : AudioChainLinkViewModel
     {
+        public const string OutputConnectorName = "Output1";
+
         private IAudioChainLink _currentOutputLink;
         private IEnumerable<DeviceDescription> _deviceDescriptions;
         private DeviceInput _deviceInput;
@@ -18,7 +19,8 @@ namespace Micser.Main.ViewModels.Widgets
         public DeviceInputViewModel()
         {
             Header = "Device Input";
-            _outputViewModel = AddOutput(_deviceInput);
+            _deviceInput = new DeviceInput();
+            _outputViewModel = AddOutput(OutputConnectorName, _deviceInput);
         }
 
         public IEnumerable<DeviceDescription> DeviceDescriptions
@@ -43,7 +45,6 @@ namespace Micser.Main.ViewModels.Widgets
         {
             base.Initialize();
 
-            _deviceInput = new DeviceInput();
             UpdateDeviceDescriptions();
 
             _deviceInput.DeviceDescription = SelectedDeviceDescription;

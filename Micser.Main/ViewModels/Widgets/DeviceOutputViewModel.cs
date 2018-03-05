@@ -8,6 +8,8 @@ namespace Micser.Main.ViewModels.Widgets
 {
     public class DeviceOutputViewModel : AudioChainLinkViewModel
     {
+        public const string InputConnectorName = "Input1";
+
         private IEnumerable<DeviceDescription> _deviceDescriptions;
         private DeviceOutput _deviceOutput;
         private ConnectorViewModel _inputViewModel;
@@ -16,7 +18,8 @@ namespace Micser.Main.ViewModels.Widgets
         public DeviceOutputViewModel()
         {
             Header = "Device Output";
-            _inputViewModel = AddInput(_deviceOutput);
+            _deviceOutput = new DeviceOutput();
+            _inputViewModel = AddInput(InputConnectorName, _deviceOutput);
         }
 
         public IEnumerable<DeviceDescription> DeviceDescriptions
@@ -41,7 +44,6 @@ namespace Micser.Main.ViewModels.Widgets
         {
             base.Initialize();
 
-            _deviceOutput = new DeviceOutput();
             UpdateDeviceDescriptions();
 
             _deviceOutput.DeviceDescription = SelectedDeviceDescription;

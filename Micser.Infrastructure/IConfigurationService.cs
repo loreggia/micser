@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 
 namespace Micser.Infrastructure
@@ -7,7 +8,7 @@ namespace Micser.Infrastructure
     {
         T GetSetting<T>(string key, T defaultValue = default(T), Func<JObject, T> deserializer = null);
 
-        T GetSetting<T>(string key, T defaultValue = default(T), Func<JArray, T> deserializer = null);
+        IEnumerable<T> GetSettingEnumerable<T>(string key);
 
         bool Load(string fileName = null);
 
