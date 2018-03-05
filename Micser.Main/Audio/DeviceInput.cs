@@ -37,7 +37,12 @@ namespace Micser.Main.Audio
 
         protected override int ReadInternal(float[] buffer, int offset, int count)
         {
-            return _bufferSampleProvider.Read(buffer, offset, count);
+            if (_bufferSampleProvider != null)
+            {
+                return _bufferSampleProvider.Read(buffer, offset, count);
+            }
+
+            return 0;
         }
 
         private void Capture_DataAvailable(object sender, WaveInEventArgs e)

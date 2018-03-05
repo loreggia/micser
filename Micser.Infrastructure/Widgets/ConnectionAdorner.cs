@@ -91,17 +91,21 @@ namespace Micser.Infrastructure.Widgets
         {
             if (HitConnector != null)
             {
-                if (_connection != null)
+                var connectionVm = (ConnectionViewModel)_connection.DataContext;
+                var connectorVm = (ConnectorViewModel)HitConnector.DataContext;
+
+                if (Equals(_connection.Source, _fixConnector))
                 {
-                    if (Equals(_connection.Source, _fixConnector))
-                    {
-                        _connection.Sink = HitConnector;
-                    }
-                    else
-                    {
-                        _connection.Source = HitConnector;
-                    }
+                    _connection.Sink = HitConnector;
+                    connectionVm.Sink = connectorVm;
                 }
+                else
+                {
+                    _connection.Source = HitConnector;
+                    connectionVm.Source = connectorVm;
+                }
+
+                connectorVm.Connection = connectionVm;
             }
             else
             {

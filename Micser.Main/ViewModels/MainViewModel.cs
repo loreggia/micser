@@ -1,18 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Windows;
 using Micser.Infrastructure;
 using Micser.Infrastructure.Widgets;
-using Micser.Main.ViewModels.Widgets;
-using Newtonsoft.Json.Linq;
+using Micser.Main.Views;
 using Prism.Regions;
 
 namespace Micser.Main.ViewModels
 {
     public class MainViewModel : ViewModelNavigationAware
     {
+        public const string ConnectionsConfigurationKey = "Connections";
         public const string WidgetsConfigurationKey = "Widgets";
 
         private readonly IConfigurationService _configurationService;
@@ -44,6 +42,12 @@ namespace Micser.Main.ViewModels
         {
             base.OnNavigatedFrom(navigationContext);
 
+            if (navigationContext.Uri.OriginalString == typeof(MainView).Name)
+            {
+                // TODO why is this method called at startup
+                return;
+            }
+
             var widgetStates = new List<WidgetState>();
 
             foreach (var vm in Widgets)
@@ -60,32 +64,64 @@ namespace Micser.Main.ViewModels
             }
 
             _configurationService.SetSetting(WidgetsConfigurationKey, widgetStates);
+
+            var connections = new List<ConnectionInfo>();
+            foreach (var connection in Connections)
+            {
+                connections.Add(new ConnectionInfo
+                {
+                    SourceWidgetId = connection.Source.Widget.Id,
+                    SourceConnectorName = connection.Source.Name,
+                    SinkWidgetId = connection.Sink.Widget.Id,
+                    SinkConnectorName = connection.Sink.Name
+                });
+            }
+            _configurationService.SetSetting(ConnectionsConfigurationKey, connections);
         }
 
         public override void OnNavigatedTo(NavigationContext navigationContext)
         {
             base.OnNavigatedTo(navigationContext);
 
-            var widgetStates = _configurationService.GetSetting(WidgetsConfigurationKey, null, a => a.Select(o => o.ToObject<WidgetState>()));
+            var widgetStates = _configurationService.GetSettingEnumerable<WidgetState>(WidgetsConfigurationKey);
 
-            foreach (var widgetState in widgetStates)
+            if (widgetStates != null)
             {
-                var vm = WidgetFactory.CreateViewModel(widgetState.ViewModelType);
-                vm.Id = widgetState.Id;
-                vm.Name = widgetState.Name;
-                vm.Position = widgetState.Position;
-                _widgets.Add(vm);
+                foreach (var widgetState in widgetStates)
+                {
+                    var vm = WidgetFactory.CreateViewModel(widgetState.ViewModelType);
+                    vm.Id = widgetState.Id;
+                    vm.Name = widgetState.Name;
+                    vm.Position = widgetState.Position;
+                    _widgets.Add(vm);
+                }
             }
 
-            //var input = new DeviceInputViewModel { Position = new Point(10, 10) };
-            //var output = new DeviceOutputViewModel { Position = new Point(10, 100) };
+            var connections = _configurationService.GetSettingEnumerable<ConnectionInfo>(ConnectionsConfigurationKey);
 
-            //var source = input.OutputConnectors.First();
-            //var sink = output.InputConnectors.First();
+            if (connections != null)
+            {
+                foreach (var connectionInfo in connections)
+                {
+                    var sourceWidget = Widgets.FirstOrDefault(w => w.Id == connectionInfo.SourceWidgetId);
+                    var sinkWidget = Widgets.FirstOrDefault(w => w.Id == connectionInfo.SinkWidgetId);
 
-            //_widgets.Add(input);
-            //_widgets.Add(output);
-            //_connections.Add(new ConnectionViewModel { Source = source, Sink = sink });
+                    var source = sourceWidget?.OutputConnectors.FirstOrDefault(c => c.Name == connectionInfo.SourceConnectorName);
+                    var sink = sinkWidget?.InputConnectors.FirstOrDefault(c => c.Name == connectionInfo.SinkConnectorName);
+
+                    if (source != null && sink != null)
+                    {
+                        var cvm = new ConnectionViewModel
+                        {
+                            Source = source,
+                            Sink = sink
+                        };
+                        _connections.Add(cvm);
+                        source.Connection = cvm;
+                        sink.Connection = cvm;
+                    }
+                }
+            }
         }
     }
 }

@@ -1,17 +1,14 @@
-﻿using System;
-
-namespace Micser.Infrastructure.Widgets
+﻿namespace Micser.Infrastructure.Widgets
 {
     public class ConnectorViewModel : ViewModel
     {
         private ConnectionViewModel _connection;
-        private Guid _id;
 
-        public ConnectorViewModel(WidgetViewModel widget, object data)
+        public ConnectorViewModel(string name, WidgetViewModel widget, object data)
         {
+            Name = name;
             Widget = widget;
             Data = data;
-            Id = Guid.NewGuid();
         }
 
         public event ConnectionChangedEventHandler ConnectionChanged;
@@ -30,13 +27,7 @@ namespace Micser.Infrastructure.Widgets
         }
 
         public object Data { get; }
-
-        public Guid Id
-        {
-            get => _id;
-            set => SetProperty(ref _id, value);
-        }
-
+        public string Name { get; }
         public WidgetViewModel Widget { get; }
 
         protected virtual void OnConnectionChanged(ConnectionChangedEventArgs e)

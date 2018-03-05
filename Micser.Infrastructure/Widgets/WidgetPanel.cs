@@ -294,7 +294,7 @@ namespace Micser.Infrastructure.Widgets
 
             if (source != null && sink != null && !_connections.Any(c => ReferenceEquals(c.Source, source) && ReferenceEquals(c.Sink, sink)))
             {
-                _connections.Add(new Connection(source, sink));
+                _connections.Add(new Connection(source, sink) { DataContext = vm });
             }
         }
 

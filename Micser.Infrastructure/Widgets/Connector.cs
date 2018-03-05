@@ -18,7 +18,6 @@ namespace Micser.Infrastructure.Widgets
         public static readonly DependencyProperty PositionProperty = DependencyProperty.Register(
             nameof(Position), typeof(Point), typeof(Connector), new PropertyMetadata(default(Point)));
 
-        // drag start point, relative to the WidgetPanel
         private Point? _dragStartPoint;
 
         private WidgetPanel _parentPanel;

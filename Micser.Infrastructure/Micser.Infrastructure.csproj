@@ -89,6 +89,7 @@
     <Compile Include="Extensions\ItemsControlExtensions.cs" />
     <Compile Include="IConfigurationService.cs" />
     <Compile Include="Widgets\ConnectionChangedEventHandler.cs" />
+    <Compile Include="Widgets\ConnectionInfo.cs" />
     <Compile Include="Widgets\ConnectorChangedEventHandler.cs" />
     <Compile Include="Widgets\ConnectorInfo.cs" />
     <Compile Include="Widgets\ConnectionViewModel.cs" />

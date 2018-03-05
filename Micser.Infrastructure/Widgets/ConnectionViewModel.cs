@@ -1,27 +1,13 @@
-﻿using System;
-
-namespace Micser.Infrastructure.Widgets
+﻿namespace Micser.Infrastructure.Widgets
 {
     public class ConnectionViewModel : ViewModel
     {
-        private Guid _id;
         private ConnectorViewModel _sink;
         private ConnectorViewModel _source;
-
-        public ConnectionViewModel()
-        {
-            Id = Guid.NewGuid();
-        }
 
         public event ConnectorChangedEventHandler SinkChanged;
 
         public event ConnectorChangedEventHandler SourceChanged;
-
-        public Guid Id
-        {
-            get => _id;
-            set => SetProperty(ref _id, value);
-        }
 
         public ConnectorViewModel Sink
         {
