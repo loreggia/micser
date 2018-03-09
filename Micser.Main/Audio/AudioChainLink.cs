@@ -4,12 +4,34 @@ namespace Micser.Main.Audio
 {
     public class AudioChainLink : IAudioChainLink, IDisposable
     {
+        private IAudioChainLink _input;
+
         public AudioChainLink()
         {
             Volume = 1f;
         }
 
-        public IAudioChainLink Input { get; set; }
+        public event AudioDataEventHandler DataAvailable;
+
+        public virtual IAudioChainLink Input
+        {
+            get => _input;
+            set
+            {
+                if (_input != null)
+                {
+                    _input.DataAvailable -= OnInputDataAvailable;
+                }
+
+                _input = value;
+
+                if (_input != null)
+                {
+                    _input.DataAvailable += OnInputDataAvailable;
+                }
+            }
+        }
+
         public float Volume { get; set; }
 
         public void Dispose()
@@ -18,14 +40,7 @@ namespace Micser.Main.Audio
             GC.SuppressFinalize(this);
         }
 
-        public int Read(float[] buffer, int offset, int count)
-        {
-            var read = ReadInternal(buffer, offset, count);
-            ApplyVolume(buffer, offset, read);
-            return read;
-        }
-
-        protected void ApplyVolume(float[] buffer, int offset, int count)
+        protected void ApplyVolume(float[] buffer, int count)
         {
             if (Volume == 1f)
             {
@@ -34,7 +49,7 @@ namespace Micser.Main.Audio
 
             for (int i = 0; i < count; i++)
             {
-                buffer[offset + i] *= Volume;
+                buffer[i] *= Volume;
             }
         }
 
@@ -43,9 +58,20 @@ namespace Micser.Main.Audio
             Input = null;
         }
 
-        protected virtual int ReadInternal(float[] buffer, int offset, int count)
+        protected virtual void OnDataAvailable(float[] buffer, int count)
         {
-            return Input?.Read(buffer, offset, count) ?? 0;
+            DataAvailable?.Invoke(this, new AudioDataEventArgs(buffer, count));
+        }
+
+        protected virtual void OnInputDataAvailable(object sender, AudioDataEventArgs e)
+        {
+            // make a copy
+            var buffer = new float[e.Count];
+            Array.Copy(e.Buffer, buffer, buffer.Length);
+
+            ApplyVolume(buffer, buffer.Length);
+
+            OnDataAvailable(buffer, buffer.Length);
         }
     }
 }

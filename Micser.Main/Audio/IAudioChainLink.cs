@@ -1,12 +1,10 @@
-﻿using NAudio.Wave;
-
-namespace Micser.Main.Audio
+﻿namespace Micser.Main.Audio
 {
     public interface IAudioChainLink
     {
+        event AudioDataEventHandler DataAvailable;
+
         IAudioChainLink Input { get; set; }
         float Volume { get; set; }
-
-        int Read(float[] buffer, int offset, int count);
     }
 }

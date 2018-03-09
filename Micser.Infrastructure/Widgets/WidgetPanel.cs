@@ -181,10 +181,15 @@ namespace Micser.Infrastructure.Widgets
                 _rubberbandSelectionStartPoint = e.GetPosition(this);
 
                 // if you click directly on the canvas all
-                // selected items are 'de-selected'
+                // selected items are deselected
                 foreach (var widget in _widgets)
                 {
                     widget.IsSelected = false;
+                }
+
+                foreach (var connection in _connections)
+                {
+                    connection.IsSelected = false;
                 }
 
                 e.Handled = true;
