@@ -1,12 +1,11 @@
-﻿using NAudio.CoreAudioApi;
+﻿using System;
+using NAudio.CoreAudioApi;
 using NAudio.Wave;
 
 namespace Micser.Main.Audio
 {
     public class DeviceInput : AudioChainLink
     {
-        private BufferedWaveProvider _buffer;
-        private ISampleProvider _bufferSampleProvider;
         private WasapiCapture _capture;
         private DeviceDescription _deviceDescription;
 
@@ -25,6 +24,12 @@ namespace Micser.Main.Audio
             }
         }
 
+        public override IAudioChainLink Input
+        {
+            get => null;
+            set => throw new NotImplementedException();
+        }
+
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
@@ -33,16 +38,6 @@ namespace Micser.Main.Audio
             {
                 DisposeCapture();
             }
-        }
-
-        protected override int ReadInternal(float[] buffer, int offset, int count)
-        {
-            if (_bufferSampleProvider != null)
-            {
-                return _bufferSampleProvider.Read(buffer, offset, count);
-            }
-
-            return 0;
         }
 
         private void Capture_DataAvailable(object sender, WaveInEventArgs e)
@@ -83,11 +78,6 @@ namespace Micser.Main.Audio
                     ShareMode = AudioClientShareMode.Shared
                 };
                 _capture.DataAvailable += Capture_DataAvailable;
-
-                _buffer = new BufferedWaveProvider(_capture.WaveFormat);
-                _buffer.DiscardOnBufferOverflow = true;
-                _bufferSampleProvider = _buffer.ToSampleProvider();
-
                 _capture.StartRecording();
             }
         }

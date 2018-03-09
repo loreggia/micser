@@ -88,8 +88,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Audio\AudioChainLink.cs" />
-    <Compile Include="Audio\AudioChainLinkSampleProvider.cs" />
-    <Compile Include="Audio\AudioInputEventArgs.cs" />
+    <Compile Include="Audio\AudioDataEventArgs.cs" />
     <Compile Include="Audio\DeviceInput.cs" />
     <Compile Include="Audio\DeviceOutput.cs" />
     <Compile Include="Audio\IAudioChainLink.cs" />
