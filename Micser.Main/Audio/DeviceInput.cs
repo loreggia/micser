@@ -8,6 +8,7 @@ namespace Micser.Main.Audio
     {
         private WasapiCapture _capture;
         private DeviceDescription _deviceDescription;
+        private InputToFloatDataConverter _inputConverter;
 
         public DeviceDescription DeviceDescription
         {
@@ -42,7 +43,8 @@ namespace Micser.Main.Audio
 
         private void Capture_DataAvailable(object sender, WaveInEventArgs e)
         {
-            _buffer.AddSamples(e.Buffer, 0, e.BytesRecorded);
+            var floatBuffer = _inputConverter.ConvertData(e.Buffer, e.BytesRecorded);
+            OnDataAvailable(floatBuffer, floatBuffer.Length);
         }
 
         private void DisposeCapture()
@@ -77,6 +79,7 @@ namespace Micser.Main.Audio
                 {
                     ShareMode = AudioClientShareMode.Shared
                 };
+                _inputConverter.WaveFormat = _capture.WaveFormat;
                 _capture.DataAvailable += Capture_DataAvailable;
                 _capture.StartRecording();
             }
