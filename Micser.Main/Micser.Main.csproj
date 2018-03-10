@@ -92,6 +92,7 @@
     <Compile Include="Audio\DeviceInput.cs" />
     <Compile Include="Audio\DeviceOutput.cs" />
     <Compile Include="Audio\IAudioChainLink.cs" />
+    <Compile Include="Audio\InputToFloatDataConverter.cs" />
     <Compile Include="Audio\Mixer.cs" />
     <Compile Include="Audio\WaveGenerator.cs" />
     <Compile Include="Extensions\ContainerExtensions.cs" />
