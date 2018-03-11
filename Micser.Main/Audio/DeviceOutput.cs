@@ -1,5 +1,6 @@
 ﻿using NAudio.CoreAudioApi;
 using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
 
 namespace Micser.Main.Audio
 {
@@ -8,6 +9,7 @@ namespace Micser.Main.Audio
         private DeviceDescription _deviceDescription;
         private int _latency;
         private WasapiOut _output;
+        private BufferedWaveProvider _outputBuffer;
 
         public DeviceOutput()
         {
@@ -58,10 +60,17 @@ namespace Micser.Main.Audio
             }
         }
 
+        protected override void OnInputDataAvailable(object sender, AudioDataEventArgs e)
+        {
+            new WaveBuffer()
+            _outputBuffer.AddSamples();
+        }
+
         private void DisposeOutput()
         {
             if (_output != null)
             {
+                _outputBuffer = null;
                 _output.Stop();
                 _output.Dispose();
                 _output = null;
@@ -86,7 +95,8 @@ namespace Micser.Main.Audio
                 }
 
                 _output = new WasapiOut(device, AudioClientShareMode.Shared, true, Latency);
-                _output.Init(new AudioChainLinkSampleProvider { Input = this });
+                _outputBuffer = new BufferedWaveProvider(_output.OutputWaveFormat);
+                _output.Init(_outputBuffer);
                 _output.Play();
             }
         }
