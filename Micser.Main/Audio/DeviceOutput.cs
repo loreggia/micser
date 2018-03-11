@@ -1,6 +1,7 @@
 ﻿using System;
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
 
 namespace Micser.Main.Audio
 {
@@ -67,6 +68,8 @@ namespace Micser.Main.Audio
                 return;
             }
 
+            var inputData = FillChannels(e.Buffer, e.Count, e.ChannelCount, out var count);
+
             byte[] buffer = null;
 
             if (_output.OutputWaveFormat.Encoding == WaveFormatEncoding.Pcm)
@@ -82,20 +85,20 @@ namespace Micser.Main.Audio
                         break;
                 }
             }
-            else if (_output.OutputWaveFormat.Encoding == WaveFormatEncoding.IeeeFloat)
+            else if (_output.OutputWaveFormat.Encoding == WaveFormatEncoding.IeeeFloat || _output.OutputWaveFormat.Encoding == WaveFormatEncoding.Extensible)
             {
                 switch (_output.OutputWaveFormat.BitsPerSample)
                 {
                     case 32:
-                        buffer = new byte[e.Count * 4];
-                        Buffer.BlockCopy(e.Buffer, 0, buffer, 0, buffer.Length);
+                        buffer = new byte[count * 4];
+                        Buffer.BlockCopy(inputData, 0, buffer, 0, buffer.Length);
                         break;
 
                     case 64:
-                        buffer = new byte[e.Count * 8];
-                        for (int i = 0; i < e.Count; i++)
+                        buffer = new byte[count * 8];
+                        for (int i = 0; i < count; i++)
                         {
-                            var bytes = BitConverter.GetBytes(e.Buffer[i]);
+                            var bytes = BitConverter.GetBytes(inputData[i]);
                             Array.Copy(bytes, 0, buffer, i * 8, bytes.Length);
                         }
                         break;
@@ -117,6 +120,28 @@ namespace Micser.Main.Audio
                 _output.Dispose();
                 _output = null;
             }
+        }
+
+        private float[] FillChannels(float[] buffer, int count, int inputChannelCount, out int outputCount)
+        {
+            var outputChannelCount = _output.OutputWaveFormat.Channels;
+
+            if (inputChannelCount == outputChannelCount)
+            {
+                outputCount = count;
+                return buffer;
+            }
+
+            // todo reuse array
+            var result = new float[count / inputChannelCount * outputChannelCount];
+
+            for (int i = 0; i < count; i++)
+            {
+                Array.Copy(buffer, i * inputChannelCount, result, i * outputChannelCount, Math.Min(inputChannelCount, outputChannelCount));
+            }
+
+            outputCount = result.Length;
+            return result;
         }
 
         private void InitializeDevice()

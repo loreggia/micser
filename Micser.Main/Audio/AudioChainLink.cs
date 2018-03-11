@@ -58,9 +58,9 @@ namespace Micser.Main.Audio
             Input = null;
         }
 
-        protected virtual void OnDataAvailable(float[] buffer, int count)
+        protected virtual void OnDataAvailable(float[] buffer, int count, int channelCount)
         {
-            DataAvailable?.Invoke(this, new AudioDataEventArgs(buffer, count));
+            DataAvailable?.Invoke(this, new AudioDataEventArgs(buffer, count, channelCount));
         }
 
         protected virtual void OnInputDataAvailable(object sender, AudioDataEventArgs e)
@@ -71,7 +71,7 @@ namespace Micser.Main.Audio
 
             ApplyVolume(buffer, buffer.Length);
 
-            OnDataAvailable(buffer, buffer.Length);
+            OnDataAvailable(buffer, buffer.Length, e.ChannelCount);
         }
     }
 }
