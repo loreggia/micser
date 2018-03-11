@@ -1,29 +1,44 @@
 ﻿using System;
+using Micser.Main.Extensions;
 using NAudio.Wave;
 
 namespace Micser.Main.Audio
 {
     public class InputToFloatDataConverter
     {
+        private float[] _sharedBuffer;
+
+        public InputToFloatDataConverter()
+        {
+            // default buffer size of one second dual channel 44100Hz audio
+            _sharedBuffer = new float[88200];
+        }
+
         public WaveFormat WaveFormat { get; set; }
 
-        public float[] ConvertData(byte[] buffer, int count)
+        public float[] ConvertData(byte[] inputBuffer, int inputCount, out int outputCount)
         {
+            outputCount = 0;
+
             if (WaveFormat.Encoding == WaveFormatEncoding.Pcm)
             {
                 switch (WaveFormat.BitsPerSample)
                 {
                     case 8:
-                        return ConvertPcm8Bit(buffer, count);
+                        ConvertPcm8Bit(inputBuffer, inputCount, out outputCount);
+                        break;
 
                     case 16:
-                        return ConvertPcm16Bit(buffer, count);
+                        ConvertPcm16Bit(inputBuffer, inputCount, out outputCount);
+                        break;
 
                     case 24:
-                        return ConvertPcm24Bit(buffer, count);
+                        ConvertPcm24Bit(inputBuffer, inputCount, out outputCount);
+                        break;
 
                     case 32:
-                        return ConvertPcm32Bit(buffer, count);
+                        ConvertPcm32Bit(inputBuffer, inputCount, out outputCount);
+                        break;
 
                     default:
                         throw new InvalidOperationException(
@@ -36,10 +51,12 @@ namespace Micser.Main.Audio
                 switch (WaveFormat.BitsPerSample)
                 {
                     case 32:
-                        return ConvertSingle(buffer, count);
+                        ConvertSingle(inputBuffer, inputCount, out outputCount);
+                        break;
 
                     case 64:
-                        return ConvertDouble(buffer, count);
+                        ConvertDouble(inputBuffer, inputCount, out outputCount);
+                        break;
 
                     default:
                         throw new InvalidOperationException(
@@ -47,80 +64,91 @@ namespace Micser.Main.Audio
                 }
             }
 
-            throw new InvalidOperationException($"The input uses an unsupported format: {WaveFormat}");
+            Clamp(outputCount);
+            return _sharedBuffer;
         }
 
-        private static float[] ConvertDouble(byte[] buffer, int count)
+        private void Clamp(int count)
         {
-            var result = new float[count / 8];
-
-            for (int i = 0; i < result.Length; i++)
+            for (int i = 0; i < count; i++)
             {
-                result[i] = (float)BitConverter.ToDouble(buffer, i * 8);
+                _sharedBuffer[i] = _sharedBuffer[i].Clamp(-1f, 1f);
             }
-
-            return result;
         }
 
-        private static float[] ConvertPcm16Bit(byte[] buffer, int count)
+        private void ConvertDouble(byte[] buffer, int count, out int outputCount)
         {
-            var result = new float[count / 2];
+            outputCount = count / 8;
+            EnsureBuffer(outputCount);
 
-            for (int i = 0; i < result.Length; i++)
+            for (int i = 0; i < outputCount; i++)
             {
-                result[i] = (float)(BitConverter.ToInt16(buffer, i * 2) / 32767d);
+                _sharedBuffer[i] = (float)BitConverter.ToDouble(buffer, i * 8);
             }
-
-            return result;
         }
 
-        private static float[] ConvertPcm24Bit(byte[] buffer, int count)
+        private void ConvertPcm16Bit(byte[] buffer, int count, out int outputCount)
         {
-            var result = new float[count / 3];
+            outputCount = count / 2;
+            EnsureBuffer(outputCount);
 
-            for (int i = 0; i < result.Length; i++)
+            for (int i = 0; i < outputCount; i++)
+            {
+                _sharedBuffer[i] = (float)(BitConverter.ToInt16(buffer, i * 2) / 32767d);
+            }
+        }
+
+        private void ConvertPcm24Bit(byte[] buffer, int count, out int outputCount)
+        {
+            outputCount = count / 3;
+            EnsureBuffer(outputCount);
+
+            for (int i = 0; i < outputCount; i++)
             {
                 var sourceIndex = i * 3;
-                result[i] = (float)((buffer[sourceIndex + 2] << 16 | buffer[sourceIndex + 1] << 8 | buffer[sourceIndex]) / 8388608d);
+                _sharedBuffer[i] = (float)((buffer[sourceIndex + 2] << 16 | buffer[sourceIndex + 1] << 8 | buffer[sourceIndex]) / 8388608d);
             }
-
-            return result;
         }
 
-        private static float[] ConvertPcm32Bit(byte[] buffer, int count)
+        private void ConvertPcm32Bit(byte[] buffer, int count, out int outputCount)
         {
-            var result = new float[count / 4];
+            outputCount = count / 4;
+            EnsureBuffer(outputCount);
 
-            for (int i = 0; i < result.Length; i++)
+            for (int i = 0; i < outputCount; i++)
             {
-                result[i] = (float)(BitConverter.ToInt32(buffer, i * 4) / (double)int.MaxValue);
+                _sharedBuffer[i] = (float)(BitConverter.ToInt32(buffer, i * 4) / (double)int.MaxValue);
             }
-
-            return result;
         }
 
-        private static float[] ConvertPcm8Bit(byte[] buffer, int count)
+        private void ConvertPcm8Bit(byte[] buffer, int count, out int outputCount)
         {
-            var result = new float[count];
+            outputCount = count;
+            EnsureBuffer(outputCount);
 
-            for (int i = 0; i < result.Length; i++)
+            for (int i = 0; i < outputCount; i++)
             {
-                result[i] = (float)(buffer[i] / 128d - 1.0d);
+                _sharedBuffer[i] = (float)(buffer[i] / 128d - 1.0d);
             }
-
-            return result;
         }
 
-        private static float[] ConvertSingle(byte[] buffer, int count)
+        private void ConvertSingle(byte[] buffer, int count, out int outputCount)
         {
-            var result = new float[count / 4];
+            outputCount = count / 4;
+            EnsureBuffer(outputCount);
 
-            for (int i = 0; i < result.Length; i++)
+            for (int i = 0; i < outputCount; i++)
             {
-                result[i] = BitConverter.ToSingle(buffer, i * 4);
+                _sharedBuffer[i] = BitConverter.ToSingle(buffer, i * 4);
             }
+        }
 
-            return result;
+        private void EnsureBuffer(int size)
+        {
+            if (_sharedBuffer == null || _sharedBuffer.Length < size)
+            {
+                _sharedBuffer = new float[size];
+            }
         }
     }
 }

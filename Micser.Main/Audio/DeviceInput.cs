@@ -1,14 +1,18 @@
-﻿using System;
-using NAudio.CoreAudioApi;
+﻿using NAudio.CoreAudioApi;
 using NAudio.Wave;
 
 namespace Micser.Main.Audio
 {
     public class DeviceInput : AudioChainLink
     {
+        private readonly InputToFloatDataConverter _inputConverter;
         private WasapiCapture _capture;
         private DeviceDescription _deviceDescription;
-        private InputToFloatDataConverter _inputConverter;
+
+        public DeviceInput()
+        {
+            _inputConverter = new InputToFloatDataConverter();
+        }
 
         public DeviceDescription DeviceDescription
         {
@@ -25,12 +29,6 @@ namespace Micser.Main.Audio
             }
         }
 
-        public override IAudioChainLink Input
-        {
-            get => null;
-            set => throw new NotImplementedException();
-        }
-
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);
@@ -43,8 +41,8 @@ namespace Micser.Main.Audio
 
         private void Capture_DataAvailable(object sender, WaveInEventArgs e)
         {
-            var floatBuffer = _inputConverter.ConvertData(e.Buffer, e.BytesRecorded);
-            OnDataAvailable(floatBuffer, floatBuffer.Length);
+            var floatBuffer = _inputConverter.ConvertData(e.Buffer, e.BytesRecorded, out var count);
+            OnDataAvailable(floatBuffer, count, _capture.WaveFormat.Channels);
         }
 
         private void DisposeCapture()
@@ -79,9 +77,12 @@ namespace Micser.Main.Audio
                 {
                     ShareMode = AudioClientShareMode.Shared
                 };
-                _inputConverter.WaveFormat = _capture.WaveFormat;
-                _capture.DataAvailable += Capture_DataAvailable;
                 _capture.StartRecording();
+                var defaultFormat = _capture.WaveFormat;
+                var newFormat = WaveFormat.CreateIeeeFloatWaveFormat(48000, defaultFormat.Channels);
+                _capture.WaveFormat = newFormat;
+                _inputConverter.WaveFormat = newFormat;
+                _capture.DataAvailable += Capture_DataAvailable;
             }
         }
     }
