@@ -1,6 +1,6 @@
-﻿using NAudio.CoreAudioApi;
+﻿using System;
+using NAudio.CoreAudioApi;
 using NAudio.Wave;
-using NAudio.Wave.SampleProviders;
 
 namespace Micser.Main.Audio
 {
@@ -62,8 +62,50 @@ namespace Micser.Main.Audio
 
         protected override void OnInputDataAvailable(object sender, AudioDataEventArgs e)
         {
-            new WaveBuffer()
-            _outputBuffer.AddSamples();
+            if (_output == null || _outputBuffer == null)
+            {
+                return;
+            }
+
+            byte[] buffer = null;
+
+            if (_output.OutputWaveFormat.Encoding == WaveFormatEncoding.Pcm)
+            {
+                switch (_output.OutputWaveFormat.BitsPerSample)
+                {
+                    case 8:
+                    case 16:
+                    case 24:
+                    case 32:
+                    case 64:
+                    default:
+                        break;
+                }
+            }
+            else if (_output.OutputWaveFormat.Encoding == WaveFormatEncoding.IeeeFloat)
+            {
+                switch (_output.OutputWaveFormat.BitsPerSample)
+                {
+                    case 32:
+                        buffer = new byte[e.Count * 4];
+                        Buffer.BlockCopy(e.Buffer, 0, buffer, 0, buffer.Length);
+                        break;
+
+                    case 64:
+                        buffer = new byte[e.Count * 8];
+                        for (int i = 0; i < e.Count; i++)
+                        {
+                            var bytes = BitConverter.GetBytes(e.Buffer[i]);
+                            Array.Copy(bytes, 0, buffer, i * 8, bytes.Length);
+                        }
+                        break;
+                }
+            }
+
+            if (buffer != null)
+            {
+                _outputBuffer.AddSamples(buffer, 0, buffer.Length);
+            }
         }
 
         private void DisposeOutput()
