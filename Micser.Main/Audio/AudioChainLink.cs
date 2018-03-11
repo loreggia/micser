@@ -65,7 +65,7 @@ namespace Micser.Main.Audio
 
         protected virtual void OnInputDataAvailable(object sender, AudioDataEventArgs e)
         {
-            // make a copy
+            // default implementation applies volume and sends the data to the next link
             var buffer = new float[e.Count];
             Array.Copy(e.Buffer, buffer, buffer.Length);
 

@@ -50,11 +50,23 @@ namespace Micser.Main.Audio
             throw new InvalidOperationException($"The input uses an unsupported format: {WaveFormat}");
         }
 
+        private static float[] ConvertDouble(byte[] buffer, int count)
+        {
+            var result = new float[count / 8];
+
+            for (int i = 0; i < result.Length; i++)
+            {
+                result[i] = (float)BitConverter.ToDouble(buffer, i * 8);
+            }
+
+            return result;
+        }
+
         private static float[] ConvertPcm16Bit(byte[] buffer, int count)
         {
             var result = new float[count / 2];
 
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < result.Length; i++)
             {
                 result[i] = (float)(BitConverter.ToInt16(buffer, i * 2) / 32767d);
             }
@@ -66,10 +78,10 @@ namespace Micser.Main.Audio
         {
             var result = new float[count / 3];
 
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < result.Length; i++)
             {
                 var sourceIndex = i * 3;
-                result[i] = (float)(((sbyte)buffer[sourceIndex + 2] << 16 | buffer[sourceIndex + 1] << 8 | buffer[sourceIndex]) / 8388608d);
+                result[i] = (float)((buffer[sourceIndex + 2] << 16 | buffer[sourceIndex + 1] << 8 | buffer[sourceIndex]) / 8388608d);
             }
 
             return result;
@@ -79,7 +91,7 @@ namespace Micser.Main.Audio
         {
             var result = new float[count / 4];
 
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < result.Length; i++)
             {
                 result[i] = (float)(BitConverter.ToInt32(buffer, i * 4) / (double)int.MaxValue);
             }
@@ -91,7 +103,7 @@ namespace Micser.Main.Audio
         {
             var result = new float[count];
 
-            for (int i = 0; i < count; i++)
+            for (int i = 0; i < result.Length; i++)
             {
                 result[i] = (float)(buffer[i] / 128d - 1.0d);
             }
@@ -99,14 +111,16 @@ namespace Micser.Main.Audio
             return result;
         }
 
-        private float[] ConvertDouble(byte[] buffer, int count)
+        private static float[] ConvertSingle(byte[] buffer, int count)
         {
-            throw new NotImplementedException();
-        }
+            var result = new float[count / 4];
 
-        private float[] ConvertSingle(byte[] buffer, int count)
-        {
-            throw new NotImplementedException();
+            for (int i = 0; i < result.Length; i++)
+            {
+                result[i] = BitConverter.ToSingle(buffer, i * 4);
+            }
+
+            return result;
         }
     }
 }
