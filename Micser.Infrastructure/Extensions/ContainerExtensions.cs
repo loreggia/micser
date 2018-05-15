@@ -1,6 +1,8 @@
 ﻿using System.Windows;
 using Micser.Infrastructure.Widgets;
+using Prism.Ioc;
 using Prism.Regions;
+using Prism.Unity;
 using Unity;
 using Unity.Injection;
 
@@ -8,10 +10,11 @@ namespace Micser.Infrastructure.Extensions
 {
     public static class ContainerExtensions
     {
-        public static void RegisterView<TView, TViewModel>(this IUnityContainer container, string regionName)
+        public static void RegisterView<TView, TViewModel>(this IContainerRegistry containerRegistry, string regionName)
             where TView : FrameworkElement
             where TViewModel : IViewModel
         {
+            var container = containerRegistry.GetContainer();
             container.RegisterType<TView>("default");
             container.RegisterType<TView>(new InjectionFactory(c =>
             {
@@ -30,10 +33,11 @@ namespace Micser.Infrastructure.Extensions
             }
         }
 
-        public static void RegisterWidget<TWidget, TViewModel>(this IUnityContainer container, string defaultName)
+        public static void RegisterWidget<TWidget, TViewModel>(this IContainerRegistry containerRegistry, string defaultName)
             where TWidget : Widget
             where TViewModel : WidgetViewModel
         {
+            var container = containerRegistry.GetContainer();
             container.RegisterType<Widget>(typeof(TViewModel).FullName, new InjectionFactory(c =>
             {
                 var widget = c.Resolve<TWidget>();
