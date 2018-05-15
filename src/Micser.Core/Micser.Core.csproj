@@ -20,7 +20,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>..\Bin\Debug\App\</OutputPath>
+    <OutputPath>..\..\bin\Debug\App\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -29,7 +29,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>..\Bin\Release\App\</OutputPath>
+    <OutputPath>..\..\bin\Release\App\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -38,7 +38,7 @@
     <StartupObject>Micser.Core.App</StartupObject>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>..\Graphics\icon.ico</ApplicationIcon>
+    <ApplicationIcon>..\..\gfx\icon.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -97,7 +97,7 @@
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="..\Graphics\logo.psd">
+    <None Include="..\..\gfx\logo.psd">
       <Link>logo.psd</Link>
     </None>
     <None Include="Properties\Settings.settings">
@@ -115,7 +115,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="..\Graphics\icon.ico">
+    <Resource Include="..\..\gfx\icon.ico">
       <Link>icon.ico</Link>
     </Resource>
   </ItemGroup>
