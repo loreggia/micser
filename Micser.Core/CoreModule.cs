@@ -1,23 +1,20 @@
 ﻿using Micser.Infrastructure.Menu;
 using Micser.Infrastructure.Themes;
+using Prism.Ioc;
 using Prism.Modularity;
-using Unity;
 
 namespace Micser.Core
 {
     public class CoreModule : IModule
     {
-        private readonly IUnityContainer _container;
-
-        public CoreModule(IUnityContainer container)
+        public void OnInitialized(IContainerProvider containerProvider)
         {
-            _container = container;
         }
 
-        public void Initialize()
+        public void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            _container.RegisterSingleton<IResourceRegistry, ResourceRegistry>();
-            _container.RegisterSingleton<IMenuItemRegistry, MenuItemRegistry>();
+            containerRegistry.RegisterSingleton<IResourceRegistry, ResourceRegistry>();
+            containerRegistry.RegisterSingleton<IMenuItemRegistry, MenuItemRegistry>();
         }
     }
 }

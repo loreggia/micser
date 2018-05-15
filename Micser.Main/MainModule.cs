@@ -8,36 +8,34 @@ using Micser.Main.ViewModels;
 using Micser.Main.ViewModels.Widgets;
 using Micser.Main.Views;
 using Micser.Main.Views.Widgets;
+using Prism.Ioc;
 using Prism.Modularity;
 using Prism.Regions;
-using Unity;
 
 namespace Micser.Main
 {
     public class MainModule : IModule
     {
-        private readonly IUnityContainer _container;
-        private readonly IRegionManager _regionManager;
-        private readonly IResourceRegistry _resourceRegistry;
-
-        public MainModule(IUnityContainer container, IRegionManager regionManager, IResourceRegistry resourceRegistry)
-        {
-            _container = container;
-            _regionManager = regionManager;
-            _resourceRegistry = resourceRegistry;
-        }
-
         public void Initialize()
         {
-            _resourceRegistry.Add(new ResourceDictionary { Source = new Uri("Micser.Main;component/Themes/Generic.xaml", UriKind.Relative) });
+        }
 
-            _container.RegisterSingleton<IWidgetFactory, WidgetFactory>();
-            _container.RegisterWidget<DeviceInputWidget, DeviceInputViewModel>(Resources.DeviceInputWidgetName);
-            _container.RegisterWidget<DeviceOutputWidget, DeviceOutputViewModel>(Resources.DeviceOutputWidgetName);
+        public void OnInitialized(IContainerProvider containerProvider)
+        {
+            var resourceRegistry = containerProvider.Resolve<IResourceRegistry>();
+            resourceRegistry.Add(new ResourceDictionary { Source = new Uri("Micser.Main;component/Themes/Generic.xaml", UriKind.Relative) });
 
-            _container.RegisterView<MainView, MainViewModel>("MainRegion");
+            var regionManager = containerProvider.Resolve<IRegionManager>();
+            regionManager.RequestNavigate("MainRegion", new Uri(nameof(MainView), UriKind.Relative));
+        }
 
-            _regionManager.RequestNavigate("MainRegion", new Uri(nameof(MainView), UriKind.Relative));
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            containerRegistry.RegisterSingleton<IWidgetFactory, WidgetFactory>();
+            containerRegistry.RegisterWidget<DeviceInputWidget, DeviceInputViewModel>(Resources.DeviceInputWidgetName);
+            containerRegistry.RegisterWidget<DeviceOutputWidget, DeviceOutputViewModel>(Resources.DeviceOutputWidgetName);
+
+            containerRegistry.RegisterView<MainView, MainViewModel>("MainRegion");
         }
     }
 }
