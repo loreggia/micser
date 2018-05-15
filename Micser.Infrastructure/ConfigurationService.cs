@@ -5,15 +5,18 @@ using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using NLog;
 
 namespace Micser.Infrastructure
 {
     public class ConfigurationService : IConfigurationService
     {
         private readonly IDictionary<string, object> _configuration;
+        private readonly ILogger _logger;
 
-        public ConfigurationService()
+        public ConfigurationService(ILogger logger)
         {
+            _logger = logger;
             _configuration = new ConcurrentDictionary<string, object>();
         }
 
@@ -71,7 +74,7 @@ namespace Micser.Infrastructure
             }
             catch (Exception ex)
             {
-                // todo log
+                _logger.Error(ex);
                 return false;
             }
         }
@@ -93,7 +96,7 @@ namespace Micser.Infrastructure
             }
             catch (Exception ex)
             {
-                // todo log
+                _logger.Error(ex);
                 return false;
             }
         }

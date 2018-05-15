@@ -22,16 +22,16 @@ namespace Micser.Main.Test.Audio
 
             deviceOutput.DeviceDescription = deviceDescription;
 
-            var sineGenerator = new WaveGenerator
-            {
-                Frequency = 220
-            };
+            //var sineGenerator = new WaveGenerator
+            //{
+            //    Frequency = 220
+            //};
 
-            deviceOutput.Input = sineGenerator;
+            //deviceOutput.Input = sineGenerator;
 
             for (int i = 0; i < 500; i++)
             {
-                sineGenerator.Volume = i * 0.001f;
+                //sineGenerator.Volume = i * 0.001f;
                 Thread.Sleep(10);
             }
 
