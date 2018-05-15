@@ -97,8 +97,8 @@
     </PostBuildEvent>
   </PropertyGroup>
   <Target Name="CopyToBinDir" AfterTargets="AfterBuild">
-    <MakeDir Directories="$(SolutionDir)Bin\$(ConfigurationName)\Installer" />
-    <Copy SourceFiles="$(ProjectDir)Micser.msi" DestinationFolder="$(SolutionDir)Bin\$(ConfigurationName)\Installer" />
+    <MakeDir Directories="$(SolutionDir)..\bin\$(ConfigurationName)\Installer" />
+    <Copy SourceFiles="$(ProjectDir)Micser.msi" DestinationFolder="$(SolutionDir)..\bin\$(ConfigurationName)\Installer" />
   </Target>
   <UsingTask AssemblyFile="$(SolutionDir)packages\WixSharp.1.6.4.0\build\SetEnvVar.dll" TaskName="SetEnvVar" />
 </Project>
