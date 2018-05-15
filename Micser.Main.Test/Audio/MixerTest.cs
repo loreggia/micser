@@ -23,26 +23,26 @@ namespace Micser.Main.Test.Audio
             deviceOutput.DeviceDescription = deviceDescription;
 
             // A
-            var sineGenerator1 = new WaveGenerator { Frequency = 440 };
-            // C
-            var sineGenerator2 = new WaveGenerator { Frequency = 523.251 };
-            // E
-            var sineGenerator3 = new WaveGenerator { Frequency = 659.255 };
+            //var sineGenerator1 = new WaveGenerator { Frequency = 440 };
+            //// C
+            //var sineGenerator2 = new WaveGenerator { Frequency = 523.251 };
+            //// E
+            //var sineGenerator3 = new WaveGenerator { Frequency = 659.255 };
 
-            var mixer1 = new Mixer
-            {
-                Input = sineGenerator1,
-                Input2 = sineGenerator2
-            };
+            //var mixer1 = new Mixer
+            //{
+            //    Input = sineGenerator1,
+            //    Input2 = sineGenerator2
+            //};
 
-            var mixer2 = new Mixer
-            {
-                Input = mixer1,
-                Input2 = sineGenerator3
-            };
+            //var mixer2 = new Mixer
+            //{
+            //    Input = mixer1,
+            //    Input2 = sineGenerator3
+            //};
 
-            deviceOutput.Volume = 0.1f;
-            deviceOutput.Input = mixer2;
+            //deviceOutput.Volume = 0.1f;
+            //deviceOutput.Input = mixer2;
 
             Thread.Sleep(1000);
 

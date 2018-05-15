@@ -7,8 +7,12 @@ using System.Windows;
 using CommonServiceLocator;
 using Micser.Infrastructure;
 using Micser.Infrastructure.Themes;
+using NLog;
 using Prism.Ioc;
 using Prism.Modularity;
+using Prism.Unity;
+using Unity;
+using Unity.Injection;
 
 namespace Micser.Core
 {
@@ -17,6 +21,11 @@ namespace Micser.Core
     /// </summary>
     public partial class App
     {
+        public override void Initialize()
+        {
+            base.Initialize();
+        }
+
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)
         {
             base.ConfigureModuleCatalog(moduleCatalog);
@@ -49,6 +58,9 @@ namespace Micser.Core
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
             containerRegistry.RegisterSingleton<IConfigurationService, ConfigurationService>();
+
+            var container = containerRegistry.GetContainer();
+            container.RegisterType<ILogger>(new InjectionFactory((c, t, n) => LogManager.GetCurrentClassLogger()));
         }
 
         private static void LoadDynamicModules(IModuleCatalog moduleCatalog)
@@ -71,7 +83,8 @@ namespace Micser.Core
                 }
                 catch (Exception ex)
                 {
-                    // todo logger
+                    var logger = ServiceLocator.Current.GetInstance<ILogger>();
+                    logger.Debug(ex);
                     Debug.WriteLine(ex);
                 }
             }

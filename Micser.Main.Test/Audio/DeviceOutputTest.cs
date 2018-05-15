@@ -23,8 +23,8 @@ namespace Micser.Main.Test.Audio
 
             deviceOutput.DeviceDescription = deviceDescription;
 
-            var sineGenerator = new WaveGenerator();
-            deviceOutput.Input = sineGenerator;
+            //var sineGenerator = new WaveGenerator();
+            //deviceOutput.Input = sineGenerator;
 
             Thread.Sleep(1000);
 
@@ -46,12 +46,12 @@ namespace Micser.Main.Test.Audio
 
             deviceOutput.DeviceDescription = deviceDescription;
 
-            var waveGenerator = new WaveGenerator
-            {
-                Type = WaveType.Square,
-                Frequency = 220
-            };
-            deviceOutput.Input = waveGenerator;
+            //var waveGenerator = new WaveGenerator
+            //{
+            //    Type = WaveType.Square,
+            //    Frequency = 220
+            //};
+            //deviceOutput.Input = waveGenerator;
 
             Thread.Sleep(1000);
 
@@ -77,8 +77,8 @@ namespace Micser.Main.Test.Audio
 
             deviceOutput.DeviceDescription = null;
 
-            var sineGenerator = new WaveGenerator();
-            deviceOutput.Input = sineGenerator;
+            //var sineGenerator = new WaveGenerator();
+            //deviceOutput.Input = sineGenerator;
 
             Thread.Sleep(1000);
 
