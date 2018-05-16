@@ -1,4 +1,8 @@
 ﻿using System;
+using CSCore;
+using CSCore.CoreAudioAPI;
+using CSCore.SoundOut;
+using CSCore.Streams;
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
 using NAudio.Wave.SampleProviders;
@@ -10,7 +14,7 @@ namespace Micser.Main.Audio
         private DeviceDescription _deviceDescription;
         private int _latency;
         private WasapiOut _output;
-        private BufferedWaveProvider _outputBuffer;
+        private IWaveSource _outputBuffer;
 
         public DeviceOutput()
         {
@@ -161,9 +165,9 @@ namespace Micser.Main.Audio
                     return;
                 }
 
-                _output = new WasapiOut(device, AudioClientShareMode.Shared, true, Latency);
-                _outputBuffer = new BufferedWaveProvider(_output.OutputWaveFormat);
-                _output.Init(_outputBuffer);
+                _output = new WasapiOut(true, AudioClientShareMode.Shared, Latency);
+                _outputBuffer = new BufferSource(_output.OutputWaveFormat);
+                _output.Initialize(_outputBuffer);
                 _output.Play();
             }
         }
