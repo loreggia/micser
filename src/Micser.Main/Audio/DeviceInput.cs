@@ -1,5 +1,5 @@
-﻿using NAudio.CoreAudioApi;
-using NAudio.Wave;
+﻿using CSCore.CoreAudioAPI;
+using CSCore.SoundIn;
 
 namespace Micser.Main.Audio
 {
@@ -39,9 +39,9 @@ namespace Micser.Main.Audio
             }
         }
 
-        private void Capture_DataAvailable(object sender, WaveInEventArgs e)
+        private void Capture_DataAvailable(object sender, DataAvailableEventArgs e)
         {
-            var floatBuffer = _inputConverter.ConvertData(e.Buffer, e.BytesRecorded, out var count);
+            var floatBuffer = _inputConverter.ConvertData(e.Data, e.Offset, e.ByteCount, e.Format, out var count);
             OnDataAvailable(floatBuffer, count, _capture.WaveFormat.Channels);
         }
 
@@ -50,7 +50,7 @@ namespace Micser.Main.Audio
             if (_capture != null)
             {
                 _capture.DataAvailable -= Capture_DataAvailable;
-                _capture.StopRecording();
+                _capture.Stop();
                 _capture.Dispose();
                 _capture = null;
             }
@@ -73,16 +73,10 @@ namespace Micser.Main.Audio
                     return;
                 }
 
-                _capture = new WasapiCapture(device)
-                {
-                    ShareMode = AudioClientShareMode.Shared
-                };
-                _capture.StartRecording();
-                var defaultFormat = _capture.WaveFormat;
-                var newFormat = WaveFormat.CreateIeeeFloatWaveFormat(48000, defaultFormat.Channels);
-                _capture.WaveFormat = newFormat;
-                _inputConverter.WaveFormat = newFormat;
+                _capture = new WasapiCapture(true, AudioClientShareMode.Shared);
+                _inputConverter.WaveFormat = _capture.WaveFormat;
                 _capture.DataAvailable += Capture_DataAvailable;
+                _capture.Start();
             }
         }
     }

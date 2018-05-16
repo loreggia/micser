@@ -1,6 +1,6 @@
 ﻿using System;
+using CSCore;
 using Micser.Main.Extensions;
-using NAudio.Wave;
 
 namespace Micser.Main.Audio
 {
@@ -16,28 +16,30 @@ namespace Micser.Main.Audio
 
         public WaveFormat WaveFormat { get; set; }
 
-        public float[] ConvertData(byte[] inputBuffer, int inputCount, out int outputCount)
+        public float[] ConvertData(byte[] data, int offset, int count, WaveFormat format, out int outputCount)
         {
             outputCount = 0;
 
-            if (WaveFormat.Encoding == WaveFormatEncoding.Pcm)
+            format = format ?? WaveFormat;
+            
+            if (format.WaveFormatTag == AudioEncoding.Pcm)
             {
                 switch (WaveFormat.BitsPerSample)
                 {
                     case 8:
-                        ConvertPcm8Bit(inputBuffer, inputCount, out outputCount);
+                        ConvertPcm8Bit(data, offset, count, out outputCount);
                         break;
 
                     case 16:
-                        ConvertPcm16Bit(inputBuffer, inputCount, out outputCount);
+                        ConvertPcm16Bit(data, offset, count, out outputCount);
                         break;
 
                     case 24:
-                        ConvertPcm24Bit(inputBuffer, inputCount, out outputCount);
+                        ConvertPcm24Bit(data, offset, count, out outputCount);
                         break;
 
                     case 32:
-                        ConvertPcm32Bit(inputBuffer, inputCount, out outputCount);
+                        ConvertPcm32Bit(data, offset, count, out outputCount);
                         break;
 
                     default:
@@ -46,16 +48,16 @@ namespace Micser.Main.Audio
                 }
             }
 
-            if (WaveFormat.Encoding == WaveFormatEncoding.IeeeFloat)
+            if (WaveFormat.WaveFormatTag == AudioEncoding.IeeeFloat)
             {
                 switch (WaveFormat.BitsPerSample)
                 {
                     case 32:
-                        ConvertSingle(inputBuffer, inputCount, out outputCount);
+                        ConvertSingle(data, offset, count, out outputCount);
                         break;
 
                     case 64:
-                        ConvertDouble(inputBuffer, inputCount, out outputCount);
+                        ConvertDouble(data, offset, count, out outputCount);
                         break;
 
                     default:
@@ -76,29 +78,29 @@ namespace Micser.Main.Audio
             }
         }
 
-        private void ConvertDouble(byte[] buffer, int count, out int outputCount)
+        private void ConvertDouble(byte[] data, int offset, int count, out int outputCount)
         {
             outputCount = count / 8;
             EnsureBuffer(outputCount);
 
             for (int i = 0; i < outputCount; i++)
             {
-                _sharedBuffer[i] = (float)BitConverter.ToDouble(buffer, i * 8);
+                _sharedBuffer[i] = (float)BitConverter.ToDouble(data, i * 8);
             }
         }
 
-        private void ConvertPcm16Bit(byte[] buffer, int count, out int outputCount)
+        private void ConvertPcm16Bit(byte[] data, int offset, int count, out int outputCount)
         {
             outputCount = count / 2;
             EnsureBuffer(outputCount);
 
             for (int i = 0; i < outputCount; i++)
             {
-                _sharedBuffer[i] = (float)(BitConverter.ToInt16(buffer, i * 2) / 32767d);
+                _sharedBuffer[i] = (float)(BitConverter.ToInt16(data, i * 2) / 32767d);
             }
         }
 
-        private void ConvertPcm24Bit(byte[] buffer, int count, out int outputCount)
+        private void ConvertPcm24Bit(byte[] data, int offset, int count, out int outputCount)
         {
             outputCount = count / 3;
             EnsureBuffer(outputCount);
@@ -106,40 +108,40 @@ namespace Micser.Main.Audio
             for (int i = 0; i < outputCount; i++)
             {
                 var sourceIndex = i * 3;
-                _sharedBuffer[i] = (float)((buffer[sourceIndex + 2] << 16 | buffer[sourceIndex + 1] << 8 | buffer[sourceIndex]) / 8388608d);
+                _sharedBuffer[i] = (float)((data[sourceIndex + 2] << 16 | data[sourceIndex + 1] << 8 | data[sourceIndex]) / 8388608d);
             }
         }
 
-        private void ConvertPcm32Bit(byte[] buffer, int count, out int outputCount)
+        private void ConvertPcm32Bit(byte[] data, int offset, int count, out int outputCount)
         {
             outputCount = count / 4;
             EnsureBuffer(outputCount);
 
             for (int i = 0; i < outputCount; i++)
             {
-                _sharedBuffer[i] = (float)(BitConverter.ToInt32(buffer, i * 4) / (double)int.MaxValue);
+                _sharedBuffer[i] = (float)(BitConverter.ToInt32(data, i * 4) / (double)int.MaxValue);
             }
         }
 
-        private void ConvertPcm8Bit(byte[] buffer, int count, out int outputCount)
+        private void ConvertPcm8Bit(byte[] data, int offset, int count, out int outputCount)
         {
             outputCount = count;
             EnsureBuffer(outputCount);
 
             for (int i = 0; i < outputCount; i++)
             {
-                _sharedBuffer[i] = (float)(buffer[i] / 128d - 1.0d);
+                _sharedBuffer[i] = (float)(data[i] / 128d - 1.0d);
             }
         }
 
-        private void ConvertSingle(byte[] buffer, int count, out int outputCount)
+        private void ConvertSingle(byte[] data, int offset, int count, out int outputCount)
         {
             outputCount = count / 4;
             EnsureBuffer(outputCount);
 
             for (int i = 0; i < outputCount; i++)
             {
-                _sharedBuffer[i] = BitConverter.ToSingle(buffer, i * 4);
+                _sharedBuffer[i] = BitConverter.ToSingle(data, i * 4);
             }
         }
 
