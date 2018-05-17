@@ -11,6 +11,9 @@ namespace Micser.Main.Test.Audio
         [TestCategory("Sound")]
         public void SetDeviceDescriptionStartsRecording()
         {
+            //var deviceService = new DeviceService();
+            //var devices = deviceService.GetDevices(DeviceType.Input).ToArray();
+
             var deviceInput = new DeviceInput();
 
             var deviceDescription = new DeviceDescription
@@ -34,7 +37,7 @@ namespace Micser.Main.Test.Audio
             }
 
             //todo create meaningful test after change to output driven
-            //Assert.IsTrue(testOutput.HasInput);
+            Assert.IsTrue(testOutput.HasInput);
 
             deviceInput.Dispose();
         }
@@ -42,6 +45,12 @@ namespace Micser.Main.Test.Audio
         private class TestChainLink : AudioChainLink
         {
             public bool HasInput { get; set; }
+
+            protected override void OnDataAvailable(float[] buffer, int count, int channelCount)
+            {
+                HasInput = true;
+                base.OnDataAvailable(buffer, count, channelCount);
+            }
         }
     }
 }
