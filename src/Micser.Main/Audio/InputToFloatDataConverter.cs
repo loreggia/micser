@@ -21,10 +21,11 @@ namespace Micser.Main.Audio
             outputCount = 0;
 
             format = format ?? WaveFormat;
+            var formatExtensible = format as WaveFormatExtensible;
 
-            if (format.WaveFormatTag == AudioEncoding.Pcm)
+            if (format.WaveFormatTag == AudioEncoding.Pcm || formatExtensible?.SubFormat == AudioSubTypes.Pcm)
             {
-                switch (WaveFormat.BitsPerSample)
+                switch (format.BitsPerSample)
                 {
                     case 8:
                         ConvertPcm8Bit(data, offset, count, out outputCount);
@@ -44,13 +45,13 @@ namespace Micser.Main.Audio
 
                     default:
                         throw new InvalidOperationException(
-                            $"Invalid PCM input format using {WaveFormat.BitsPerSample} bits per sample.");
+                            $"Invalid PCM input format using {format.BitsPerSample} bits per sample.");
                 }
             }
 
-            if (format.WaveFormatTag == AudioEncoding.IeeeFloat)
+            if (format.WaveFormatTag == AudioEncoding.IeeeFloat || formatExtensible?.SubFormat == AudioSubTypes.IeeeFloat)
             {
-                switch (WaveFormat.BitsPerSample)
+                switch (format.BitsPerSample)
                 {
                     case 32:
                         ConvertSingle(data, offset, count, out outputCount);
@@ -62,7 +63,7 @@ namespace Micser.Main.Audio
 
                     default:
                         throw new InvalidOperationException(
-                            $"Invalid float input format using {WaveFormat.BitsPerSample} bits per sample.");
+                            $"Invalid float input format using {format.BitsPerSample} bits per sample.");
                 }
             }
 
