@@ -21,7 +21,7 @@ namespace Micser.Main.Audio
             outputCount = 0;
 
             format = format ?? WaveFormat;
-            
+
             if (format.WaveFormatTag == AudioEncoding.Pcm)
             {
                 switch (WaveFormat.BitsPerSample)
@@ -48,7 +48,7 @@ namespace Micser.Main.Audio
                 }
             }
 
-            if (WaveFormat.WaveFormatTag == AudioEncoding.IeeeFloat)
+            if (format.WaveFormatTag == AudioEncoding.IeeeFloat)
             {
                 switch (WaveFormat.BitsPerSample)
                 {
