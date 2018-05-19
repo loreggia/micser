@@ -74,9 +74,9 @@ namespace Micser.Main.Audio
                 }
 
                 _capture = new WasapiCapture(true, AudioClientShareMode.Shared);
-                _inputConverter.WaveFormat = _capture.WaveFormat;
                 _capture.DataAvailable += Capture_DataAvailable;
                 _capture.Initialize();
+                _inputConverter.WaveFormat = _capture.WaveFormat;
                 _capture.Start();
             }
         }
