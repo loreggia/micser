@@ -2,11 +2,12 @@
 
 namespace Micser.Main.Audio
 {
-    public class AudioChainLink : IAudioChainLink, IDisposable
+    public abstract class AudioChainLink : IAudioChainLink, IDisposable
     {
         private IAudioChainLink _input;
+        private float[] _buffer;
 
-        public AudioChainLink()
+        protected AudioChainLink()
         {
             Volume = 1f;
         }
@@ -40,6 +41,14 @@ namespace Micser.Main.Audio
             GC.SuppressFinalize(this);
         }
 
+        protected void EnsureBuffer(int count)
+        {
+            if ((_buffer?.Length ?? 0) < count)
+            {
+                _buffer = new float[count];
+            }
+        }
+
         protected void ApplyVolume(float[] buffer, int count)
         {
             if (Volume == 1f)
@@ -66,12 +75,13 @@ namespace Micser.Main.Audio
         protected virtual void OnInputDataAvailable(object sender, AudioDataEventArgs e)
         {
             // default implementation applies volume and sends the data to the next link
-            var buffer = new float[e.Count];
-            Array.Copy(e.Buffer, buffer, buffer.Length);
+            EnsureBuffer(e.Count);
+            
+            Array.Copy(e.Buffer, _buffer, e.Count);
 
-            ApplyVolume(buffer, buffer.Length);
+            ApplyVolume(_buffer, e.Count);
 
-            OnDataAvailable(buffer, buffer.Length, e.ChannelCount);
+            OnDataAvailable(_buffer, e.Count, e.ChannelCount);
         }
     }
 }
