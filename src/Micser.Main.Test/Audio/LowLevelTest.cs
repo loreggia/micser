@@ -1,5 +1,4 @@
-﻿using CSCore;
-using CSCore.CoreAudioAPI;
+﻿using CSCore.CoreAudioAPI;
 using CSCore.SoundIn;
 using CSCore.SoundOut;
 using CSCore.Streams;
@@ -14,19 +13,15 @@ namespace Micser.Main.Test.Audio
         public void EventDriven()
         {
             var capture = new WasapiCapture(true, AudioClientShareMode.Shared);
-
-            capture.DataAvailable += (sender, e) =>
-            {
-                
-            };
-            
             capture.Initialize();
 
             var inSource = new SoundInSource(capture) { FillWithZeros = true };
-            
+
             var output = new WasapiOut(true, AudioClientShareMode.Shared, 20);
-            
-            output.Initialize();
+            output.Initialize(inSource);
+
+            capture.Start();
+            output.Play();
         }
     }
 }
