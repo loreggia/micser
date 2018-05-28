@@ -16,10 +16,6 @@ namespace Micser.Main
 {
     public class MainModule : IModule
     {
-        public void Initialize()
-        {
-        }
-
         public void OnInitialized(IContainerProvider containerProvider)
         {
             var resourceRegistry = containerProvider.Resolve<IResourceRegistry>();
