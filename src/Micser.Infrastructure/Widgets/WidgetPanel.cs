@@ -556,5 +556,23 @@ namespace Micser.Infrastructure.Widgets
                     throw new ArgumentOutOfRangeException();
             }
         }
+
+        public void RemoveConnection(Connection connection)
+        {
+            if (connection == null || !(connection.DataContext is ConnectionViewModel vm))
+            {
+                return;
+            }
+
+            if (ConnectionsSource is ICollection<ConnectionViewModel> collection)
+            {
+                collection.Remove(vm);
+            }
+
+            if (!(ConnectionsSource is INotifyCollectionChanged))
+            {
+                _connections.Remove(connection);
+            }
+        }
     }
 }

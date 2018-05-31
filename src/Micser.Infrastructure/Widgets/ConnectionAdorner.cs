@@ -112,7 +112,7 @@ namespace Micser.Infrastructure.Widgets
                 // remove connection
                 _connection.Sink = null;
                 _connection.Source = null;
-                _widgetPanel.Children.Remove(_connection);
+                _widgetPanel.RemoveConnection(_connection);
             }
 
             HitWidget = null;
