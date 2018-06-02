@@ -10,22 +10,21 @@ namespace Micser.Main.Audio
 
         public InputToFloatDataConverter()
         {
-            // default buffer size of one second dual channel 44100Hz audio
-            _sharedBuffer = new float[88200];
+            // default buffer size of two seconds dual channel 48000Hz audio
+            _sharedBuffer = new float[48000 * 2 * 2];
         }
-
-        public WaveFormat WaveFormat { get; set; }
 
         public float[] ConvertData(byte[] data, int offset, int count, WaveFormat format, out int outputCount)
         {
             outputCount = 0;
 
-            format = format ?? WaveFormat;
+            var bitsPerSample = format.BitsPerSample;
+
             var formatExtensible = format as WaveFormatExtensible;
 
             if (format.WaveFormatTag == AudioEncoding.Pcm || formatExtensible?.SubFormat == AudioSubTypes.Pcm)
             {
-                switch (format.BitsPerSample)
+                switch (bitsPerSample)
                 {
                     case 8:
                         ConvertPcm8Bit(data, offset, count, out outputCount);
@@ -51,7 +50,7 @@ namespace Micser.Main.Audio
 
             if (format.WaveFormatTag == AudioEncoding.IeeeFloat || formatExtensible?.SubFormat == AudioSubTypes.IeeeFloat)
             {
-                switch (format.BitsPerSample)
+                switch (bitsPerSample)
                 {
                     case 32:
                         ConvertSingle(data, offset, count, out outputCount);
@@ -67,7 +66,7 @@ namespace Micser.Main.Audio
                 }
             }
 
-            Clamp(outputCount);
+            //Clamp(outputCount);
             return _sharedBuffer;
         }
 
@@ -84,7 +83,7 @@ namespace Micser.Main.Audio
             outputCount = count / 8;
             EnsureBuffer(outputCount);
 
-            for (int i = 0; i < outputCount; i++)
+            for (int i = offset * 8; i < outputCount; i++)
             {
                 _sharedBuffer[i] = (float)BitConverter.ToDouble(data, i * 8);
             }
@@ -95,7 +94,7 @@ namespace Micser.Main.Audio
             outputCount = count / 2;
             EnsureBuffer(outputCount);
 
-            for (int i = 0; i < outputCount; i++)
+            for (int i = offset * 2; i < outputCount; i++)
             {
                 _sharedBuffer[i] = (float)(BitConverter.ToInt16(data, i * 2) / 32767d);
             }
@@ -106,7 +105,7 @@ namespace Micser.Main.Audio
             outputCount = count / 3;
             EnsureBuffer(outputCount);
 
-            for (int i = 0; i < outputCount; i++)
+            for (int i = offset * 3; i < outputCount; i++)
             {
                 var sourceIndex = i * 3;
                 _sharedBuffer[i] = (float)((data[sourceIndex + 2] << 16 | data[sourceIndex + 1] << 8 | data[sourceIndex]) / 8388608d);
@@ -118,7 +117,7 @@ namespace Micser.Main.Audio
             outputCount = count / 4;
             EnsureBuffer(outputCount);
 
-            for (int i = 0; i < outputCount; i++)
+            for (int i = offset * 4; i < outputCount; i++)
             {
                 _sharedBuffer[i] = (float)(BitConverter.ToInt32(data, i * 4) / (double)int.MaxValue);
             }
@@ -129,7 +128,7 @@ namespace Micser.Main.Audio
             outputCount = count;
             EnsureBuffer(outputCount);
 
-            for (int i = 0; i < outputCount; i++)
+            for (int i = offset; i < outputCount; i++)
             {
                 _sharedBuffer[i] = (float)(data[i] / 128d - 1.0d);
             }
@@ -140,7 +139,7 @@ namespace Micser.Main.Audio
             outputCount = count / 4;
             EnsureBuffer(outputCount);
 
-            for (int i = 0; i < outputCount; i++)
+            for (int i = offset * 4; i < outputCount; i++)
             {
                 _sharedBuffer[i] = BitConverter.ToSingle(data, i * 4);
             }
