@@ -84,7 +84,7 @@
                         </Grid>
 
                         <!--Uncomment this to show default label text-->
-                        <TextBlock Width="100" Height="35" Text="Label"
+                        <TextBlock Width="100" Height="35" Text="{Binding Label}"
                             Canvas.Left="{Binding LabelPosition.X}"
                             Canvas.Top="{Binding LabelPosition.Y}">
                             <TextBlock.RenderTransform>
