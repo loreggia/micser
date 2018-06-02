@@ -21,11 +21,16 @@ namespace Micser.Infrastructure.Widgets
         public static readonly DependencyProperty IsSelectedProperty = DependencyProperty.Register(
             nameof(IsSelected), typeof(bool), typeof(Connection), new PropertyMetadata(false, OnIsSelectedPropertyChanged));
 
-        public static readonly DependencyProperty LabelPositionProperty = DependencyProperty.Register(
+        public static readonly DependencyProperty LabelPositionProperty;
+
+        public static readonly DependencyPropertyKey LabelPositionPropertyKey = DependencyProperty.RegisterReadOnly(
             nameof(LabelPosition), typeof(Point), typeof(Connection), new PropertyMetadata(default(Point)));
 
+        public static readonly DependencyProperty LabelProperty = DependencyProperty.Register(
+            nameof(Label), typeof(string), typeof(Connection), new PropertyMetadata(null));
+
         public static readonly DependencyProperty PathGeometryProperty = DependencyProperty.Register(
-            nameof(PathGeometry), typeof(PathGeometry), typeof(Connection), new PropertyMetadata(null, OnPathGeometryPropertyChanged));
+                    nameof(PathGeometry), typeof(PathGeometry), typeof(Connection), new PropertyMetadata(null, OnPathGeometryPropertyChanged));
 
         public static readonly DependencyProperty SinkAnchorAngleProperty = DependencyProperty.Register(
             nameof(SinkAnchorAngle), typeof(double), typeof(Connection), new PropertyMetadata(0d));
@@ -55,7 +60,13 @@ namespace Micser.Infrastructure.Widgets
             nameof(StrokeDashArray), typeof(DoubleCollection), typeof(Connection), new PropertyMetadata(null));
 
         private Adorner _connectionAdorner;
+
         private WidgetPanel _parentPanel;
+
+        static Connection()
+        {
+            LabelPositionProperty = LabelPositionPropertyKey.DependencyProperty;
+        }
 
         public Connection(Connector source, Connector sink)
         {
@@ -70,10 +81,16 @@ namespace Micser.Infrastructure.Widgets
             set => SetValue(IsSelectedProperty, value);
         }
 
+        public string Label
+        {
+            get => (string)GetValue(LabelProperty);
+            set => SetValue(LabelProperty, value);
+        }
+
         public Point LabelPosition
         {
             get => (Point)GetValue(LabelPositionProperty);
-            set => SetValue(LabelPositionProperty, value);
+            private set => SetValue(LabelPositionPropertyKey, value);
         }
 
         public PathGeometry PathGeometry
