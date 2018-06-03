@@ -3,6 +3,7 @@ using CSCore;
 using CSCore.CoreAudioAPI;
 using CSCore.SoundOut;
 using CSCore.Streams;
+using CSCore.Streams.SampleConverter;
 
 namespace Micser.Main.Audio
 {
@@ -11,7 +12,7 @@ namespace Micser.Main.Audio
         private DeviceDescription _deviceDescription;
         private int _latency;
         private WasapiOut _output;
-        private IWaveSource _outputBuffer;
+        private WriteableBufferingSource _outputBuffer;
 
         public DeviceOutput()
         {
@@ -69,9 +70,9 @@ namespace Micser.Main.Audio
                 return;
             }
 
-            var inputData = FillChannels(e.Buffer, e.Count, e.ChannelCount, out var count);
+            //var inputData = FillChannels(e.Buffer, e.Count, e.ChannelCount, out var count);
 
-            byte[] buffer = null;
+            //byte[] buffer = null;
 
             //if (_output.OutputWaveFormat.Encoding == WaveFormatEncoding.Pcm)
             //{
@@ -163,7 +164,7 @@ namespace Micser.Main.Audio
                 }
 
                 _output = new WasapiOut(true, AudioClientShareMode.Shared, Latency);
-                _outputBuffer = new WriteableBufferingSource(new WaveFormat());
+                _outputBuffer = new WriteableBufferingSource(new WaveFormat()) { FillWithZeros = true };
                 _output.Initialize(_outputBuffer);
                 _output.Play();
             }

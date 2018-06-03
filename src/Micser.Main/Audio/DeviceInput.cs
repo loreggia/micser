@@ -1,18 +1,14 @@
 ﻿using CSCore.CoreAudioAPI;
 using CSCore.SoundIn;
+using CSCore.Streams;
 
 namespace Micser.Main.Audio
 {
     public class DeviceInput : AudioChainLink
     {
-        private readonly InputToFloatDataConverter _inputConverter;
         private WasapiCapture _capture;
+        private WriteableBufferingSource _captureBuffer;
         private DeviceDescription _deviceDescription;
-
-        public DeviceInput()
-        {
-            _inputConverter = new InputToFloatDataConverter();
-        }
 
         public DeviceDescription DeviceDescription
         {
@@ -41,12 +37,14 @@ namespace Micser.Main.Audio
 
         private void Capture_DataAvailable(object sender, DataAvailableEventArgs e)
         {
-            var floatBuffer = _inputConverter.ConvertData(e.Data, e.Offset, e.ByteCount, e.Format, out var count);
-            OnDataAvailable(floatBuffer, count, _capture.WaveFormat.Channels);
+            _captureBuffer.Write(e.Data, e.Offset, e.ByteCount);
         }
 
         private void DisposeCapture()
         {
+            _captureBuffer?.Dispose();
+            _captureBuffer = null;
+
             if (_capture != null)
             {
                 _capture.DataAvailable -= Capture_DataAvailable;
@@ -76,6 +74,7 @@ namespace Micser.Main.Audio
                 _capture = new WasapiCapture(true, AudioClientShareMode.Shared);
                 _capture.DataAvailable += Capture_DataAvailable;
                 _capture.Initialize();
+                _captureBuffer = new WriteableBufferingSource(_capture.WaveFormat) { FillWithZeros = true };
                 _capture.Start();
             }
         }
