@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using CSCore.CoreAudioAPI;
 using CSCore.SoundOut;
 
@@ -77,6 +78,7 @@ namespace Micser.Main.Audio
         {
             if (_output != null)
             {
+                _output.Stopped -= OnOutputStopped;
                 _output.Stop();
                 _output.Dispose();
                 _output = null;
@@ -103,7 +105,14 @@ namespace Micser.Main.Audio
                 _output = new WasapiOut(true, AudioClientShareMode.Shared, Latency);
                 _output.Initialize(Input.Output);
                 _output.Play();
+                _output.Stopped += OnOutputStopped;
             }
+        }
+
+        private void OnOutputStopped(object sender, PlaybackStoppedEventArgs e)
+        {
+            Debug.WriteLine("Warning: Output stopped!");
+            _output.Play();
         }
     }
 }
