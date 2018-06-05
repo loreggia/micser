@@ -75,6 +75,7 @@ namespace Micser.Main.Audio
                 _capture.DataAvailable += Capture_DataAvailable;
                 _capture.Initialize();
                 _captureBuffer = new WriteableBufferingSource(_capture.WaveFormat) { FillWithZeros = true };
+                Output = _captureBuffer;
                 _capture.Start();
             }
         }

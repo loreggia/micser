@@ -41,9 +41,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Audio\DeviceInputTest.cs" />
     <Compile Include="Audio\DeviceOutputTest.cs" />
-    <Compile Include="Audio\LowLevelTest.cs" />
     <Compile Include="Audio\MixerTest.cs" />
     <Compile Include="Audio\VolumeChangeTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

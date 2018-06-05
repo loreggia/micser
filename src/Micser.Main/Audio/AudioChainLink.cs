@@ -5,18 +5,53 @@ namespace Micser.Main.Audio
 {
     public abstract class AudioChainLink : IAudioChainLink, IDisposable
     {
-        private float[] _buffer;
+        private IAudioChainLink _input;
+        private IWaveSource _output;
 
-        protected AudioChainLink()
+        public event EventHandler InputChanged;
+
+        public event EventHandler OutputChanged;
+
+        public IAudioChainLink Input
         {
-            Volume = 1f;
+            get => _input;
+            set
+            {
+                if (_input == value)
+                {
+                    return;
+                }
+
+                if (_input != null)
+                {
+                    _input.OutputChanged -= OnInputOutputChanged;
+                }
+
+                _input = value;
+
+                if (value != null)
+                {
+                    _input.OutputChanged += OnInputOutputChanged;
+                }
+
+                OnInputChanged();
+            }
         }
 
-        public event AudioDataEventHandler DataAvailable;
+        public IWaveSource Output
+        {
+            get => _output;
+            protected set
+            {
+                if (_output == value)
+                {
+                    return;
+                }
 
-        public IAudioChainLink Input { get; set; }
-        public IWaveSource Output { get; set; }
-        public float Volume { get; set; }
+                _output = value;
+                OnOutputChanged();
+            }
+        }
 
         public void Dispose()
         {
@@ -24,47 +59,23 @@ namespace Micser.Main.Audio
             GC.SuppressFinalize(this);
         }
 
-        protected void ApplyVolume(float[] buffer, int count)
-        {
-            if (Volume == 1f)
-            {
-                return;
-            }
-
-            for (int i = 0; i < count; i++)
-            {
-                buffer[i] *= Volume;
-            }
-        }
-
         protected virtual void Dispose(bool disposing)
         {
             Input = null;
         }
 
-        protected void EnsureBuffer(int count)
+        protected virtual void OnInputChanged()
         {
-            if ((_buffer?.Length ?? 0) < count)
-            {
-                _buffer = new float[count];
-            }
+            InputChanged?.Invoke(this, EventArgs.Empty);
         }
 
-        protected virtual void OnDataAvailable(float[] buffer, int count, int channelCount)
+        protected virtual void OnInputOutputChanged(object sender, EventArgs e)
         {
-            DataAvailable?.Invoke(this, new AudioDataEventArgs(buffer, count, channelCount));
         }
 
-        protected virtual void OnInputDataAvailable(object sender, AudioDataEventArgs e)
+        protected virtual void OnOutputChanged()
         {
-            // default implementation applies volume and sends the data to the next link
-            EnsureBuffer(e.Count);
-
-            Array.Copy(e.Buffer, _buffer, e.Count);
-
-            ApplyVolume(_buffer, e.Count);
-
-            OnDataAvailable(_buffer, e.Count, e.ChannelCount);
+            OutputChanged?.Invoke(this, EventArgs.Empty);
         }
     }
 }

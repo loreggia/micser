@@ -1,9 +1,6 @@
 ﻿using System;
-using CSCore;
 using CSCore.CoreAudioAPI;
 using CSCore.SoundOut;
-using CSCore.Streams;
-using CSCore.Streams.SampleConverter;
 
 namespace Micser.Main.Audio
 {
@@ -12,7 +9,6 @@ namespace Micser.Main.Audio
         private DeviceDescription _deviceDescription;
         private int _latency;
         private WasapiOut _output;
-        private WriteableBufferingSource _outputBuffer;
 
         public DeviceOutput()
         {
@@ -63,94 +59,35 @@ namespace Micser.Main.Audio
             }
         }
 
-        protected override void OnInputDataAvailable(object sender, AudioDataEventArgs e)
+        protected override void OnInputChanged()
         {
-            if (_output == null || _outputBuffer == null)
-            {
-                return;
-            }
+            base.OnInputChanged();
 
-            //var inputData = FillChannels(e.Buffer, e.Count, e.ChannelCount, out var count);
+            InitializeDevice();
+        }
 
-            //byte[] buffer = null;
+        protected override void OnInputOutputChanged(object sender, EventArgs e)
+        {
+            base.OnInputOutputChanged(sender, e);
 
-            //if (_output.OutputWaveFormat.Encoding == WaveFormatEncoding.Pcm)
-            //{
-            //    switch (_output.OutputWaveFormat.BitsPerSample)
-            //    {
-            //        case 8:
-            //        case 16:
-            //        case 24:
-            //        case 32:
-            //        case 64:
-            //        default:
-            //            break;
-            //    }
-            //}
-            //else if (_output.OutputWaveFormat.Encoding == WaveFormatEncoding.IeeeFloat || _output.OutputWaveFormat.Encoding == WaveFormatEncoding.Extensible)
-            //{
-            //    switch (_output.OutputWaveFormat.BitsPerSample)
-            //    {
-            //        case 32:
-            //            buffer = new byte[count * 4];
-            //            Buffer.BlockCopy(inputData, 0, buffer, 0, buffer.Length);
-            //            break;
-
-            //        case 64:
-            //            buffer = new byte[count * 8];
-            //            for (int i = 0; i < count; i++)
-            //            {
-            //                var bytes = BitConverter.GetBytes(inputData[i]);
-            //                Array.Copy(bytes, 0, buffer, i * 8, bytes.Length);
-            //            }
-            //            break;
-            //    }
-            //}
-
-            //if (buffer != null)
-            //{
-            //    _outputBuffer.AddSamples(buffer, 0, buffer.Length);
-            //}
+            InitializeDevice();
         }
 
         private void DisposeOutput()
         {
             if (_output != null)
             {
-                _outputBuffer = null;
                 _output.Stop();
                 _output.Dispose();
                 _output = null;
             }
         }
 
-        private float[] FillChannels(float[] buffer, int count, int inputChannelCount, out int outputCount)
-        {
-            //var outputChannelCount = _output.OutputWaveFormat.Channels;
-
-            //if (inputChannelCount == outputChannelCount)
-            //{
-            outputCount = count;
-            return buffer;
-            //}
-
-            // todo reuse array
-            //var result = new float[count / inputChannelCount * outputChannelCount];
-
-            //for (int i = 0; i < count; i++)
-            //{
-            //    Array.Copy(buffer, i * inputChannelCount, result, i * outputChannelCount, Math.Min(inputChannelCount, outputChannelCount));
-            //}
-
-            //outputCount = result.Length;
-            //return result;
-        }
-
         private void InitializeDevice()
         {
             DisposeOutput();
 
-            if (string.IsNullOrEmpty(DeviceDescription?.Id))
+            if (string.IsNullOrEmpty(DeviceDescription?.Id) || Input?.Output == null)
             {
                 return;
             }
@@ -164,8 +101,7 @@ namespace Micser.Main.Audio
                 }
 
                 _output = new WasapiOut(true, AudioClientShareMode.Shared, Latency);
-                _outputBuffer = new WriteableBufferingSource(new WaveFormat()) { FillWithZeros = true };
-                _output.Initialize(_outputBuffer);
+                _output.Initialize(Input.Output);
                 _output.Play();
             }
         }
