@@ -51,11 +51,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Audio\AudioChainLink.cs" />
-    <Compile Include="Audio\AudioDataEventArgs.cs" />
     <Compile Include="Audio\DeviceInput.cs" />
     <Compile Include="Audio\DeviceOutput.cs" />
     <Compile Include="Audio\IAudioChainLink.cs" />
-    <Compile Include="Audio\InputToFloatDataConverter.cs" />
     <Content Include="Audio\Mixer.cs" />
     <Content Include="Audio\WaveGenerator.cs" />
     <Compile Include="Extensions\ContainerExtensions.cs" />
