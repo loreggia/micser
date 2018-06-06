@@ -54,8 +54,8 @@
     <Compile Include="Audio\DeviceInput.cs" />
     <Compile Include="Audio\DeviceOutput.cs" />
     <Compile Include="Audio\IAudioChainLink.cs" />
-    <Content Include="Audio\Mixer.cs" />
-    <Content Include="Audio\WaveGenerator.cs" />
+    <Compile Include="Audio\Mixer.cs" />
+    <Compile Include="Audio\MixerSource.cs" />
     <Compile Include="Extensions\ContainerExtensions.cs" />
     <Compile Include="Extensions\ComparableExtensions.cs" />
     <Compile Include="MainModule.cs" />
