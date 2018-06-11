@@ -11,6 +11,7 @@ namespace Micser.Infrastructure.Widgets
         private readonly ObservableCollection<ConnectorViewModel> _outputConnectors;
         private string _header;
         private Guid _id;
+        private WidgetState _loadingWidgetState;
         private string _name;
         private Point _position;
 
@@ -36,6 +37,8 @@ namespace Micser.Infrastructure.Widgets
 
         public IEnumerable<ConnectorViewModel> InputConnectors => _inputConnectors;
 
+        public bool IsInitialized { get; protected set; }
+
         public string Name
         {
             get => _name;
@@ -52,10 +55,21 @@ namespace Micser.Infrastructure.Widgets
 
         public virtual void Initialize()
         {
+            IsInitialized = true;
+
+            if (_loadingWidgetState != null)
+            {
+                LoadState(_loadingWidgetState);
+                _loadingWidgetState = null;
+            }
         }
 
         public virtual void LoadState(WidgetState state)
         {
+            if (!IsInitialized)
+            {
+                _loadingWidgetState = state;
+            }
         }
 
         public virtual void SaveState(WidgetState state)

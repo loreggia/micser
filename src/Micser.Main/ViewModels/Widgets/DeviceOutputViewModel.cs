@@ -9,6 +9,7 @@ namespace Micser.Main.ViewModels.Widgets
     public class DeviceOutputViewModel : AudioChainLinkViewModel
     {
         public const string InputConnectorName = "Input1";
+        public const string SettingKeyDeviceId = "DeviceId";
 
         private IEnumerable<DeviceDescription> _deviceDescriptions;
         private DeviceOutput _deviceOutput;
@@ -42,11 +43,25 @@ namespace Micser.Main.ViewModels.Widgets
 
         public override void Initialize()
         {
-            base.Initialize();
-
             UpdateDeviceDescriptions();
+            base.Initialize();
+        }
 
-            _deviceOutput.DeviceDescription = SelectedDeviceDescription;
+        public override void LoadState(WidgetState state)
+        {
+            base.LoadState(state);
+
+            if (state.Settings.TryGetValue(SettingKeyDeviceId, out var deviceId) && deviceId is string idString)
+            {
+                SelectedDeviceDescription = DeviceDescriptions?.FirstOrDefault(d => d.Id == idString);
+            }
+        }
+
+        public override void SaveState(WidgetState state)
+        {
+            base.SaveState(state);
+
+            state.Settings[SettingKeyDeviceId] = SelectedDeviceDescription?.Id;
         }
 
         protected override void Dispose(bool disposing)

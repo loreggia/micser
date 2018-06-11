@@ -93,6 +93,7 @@ namespace Micser.Main.ViewModels
                     vm.Id = widgetState.Id;
                     vm.Name = widgetState.Name;
                     vm.Position = widgetState.Position;
+                    vm.LoadState(widgetState);
                     _widgets.Add(vm);
                 }
             }
