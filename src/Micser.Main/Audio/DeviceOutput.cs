@@ -103,6 +103,7 @@ namespace Micser.Main.Audio
                 }
 
                 _output = new WasapiOut(true, AudioClientShareMode.Shared, Latency);
+                _output.Device = device;
                 _output.Initialize(Input.Output);
                 _output.Play();
                 _output.Stopped += OnOutputStopped;
