@@ -1,6 +1,8 @@
-﻿using CSCore.CoreAudioAPI;
+﻿using System;
+using CSCore.CoreAudioAPI;
 using CSCore.SoundIn;
 using CSCore.Streams;
+using NLog;
 
 namespace Micser.Main.Audio
 {
@@ -8,6 +10,7 @@ namespace Micser.Main.Audio
     {
         private WasapiCapture _capture;
         private DeviceDescription _deviceDescription;
+        private ILogger _logger = LogManager.GetCurrentClassLogger();
         private SoundInSource _soundInSource;
 
         public DeviceDescription DeviceDescription
@@ -67,10 +70,18 @@ namespace Micser.Main.Audio
 
                 _capture = new WasapiCapture(true, AudioClientShareMode.Shared);
                 _capture.Device = device;
-                _capture.Initialize();
-                _soundInSource = new SoundInSource(_capture) { FillWithZeros = true };
-                Output = _soundInSource;
-                _capture.Start();
+
+                try
+                {
+                    _capture.Initialize();
+                    _soundInSource = new SoundInSource(_capture) { FillWithZeros = true };
+                    Output = _soundInSource;
+                    _capture.Start();
+                }
+                catch (Exception ex)
+                {
+                    _logger.Log(LogLevel.Error, ex);
+                }
             }
         }
     }
