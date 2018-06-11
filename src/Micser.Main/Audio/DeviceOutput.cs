@@ -113,7 +113,7 @@ namespace Micser.Main.Audio
         private void OnOutputStopped(object sender, PlaybackStoppedEventArgs e)
         {
             Debug.WriteLine("Warning: Output stopped!");
-            _output.Play();
+            //_output.Play();
         }
     }
 }

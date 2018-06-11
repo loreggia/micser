@@ -110,6 +110,8 @@ namespace Micser.Infrastructure.Widgets
             else
             {
                 // remove connection
+                _connection.Sink.Connection = null;
+                _connection.Source.Connection = null;
                 _connection.Sink = null;
                 _connection.Source = null;
                 _widgetPanel.RemoveConnection(_connection);

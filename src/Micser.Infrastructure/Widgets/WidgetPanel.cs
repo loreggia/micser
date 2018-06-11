@@ -90,6 +90,9 @@ namespace Micser.Infrastructure.Widgets
                     Sink = sinkVm
                 };
 
+                sourceVm.Connection = vm;
+                sinkVm.Connection = vm;
+
                 if (ConnectionsSource is ICollection<ConnectionViewModel> collection)
                 {
                     collection.Add(vm);
@@ -299,7 +302,10 @@ namespace Micser.Infrastructure.Widgets
 
             if (source != null && sink != null && !_connections.Any(c => ReferenceEquals(c.Source, source) && ReferenceEquals(c.Sink, sink)))
             {
-                _connections.Add(new Connection(source, sink) { DataContext = vm });
+                var connection = new Connection(source, sink) {DataContext = vm};
+                source.Connection = connection;
+                sink.Connection = connection;
+                _connections.Add(connection);
             }
         }
 
