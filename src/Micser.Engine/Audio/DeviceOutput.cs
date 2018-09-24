@@ -1,11 +1,12 @@
-﻿using System;
-using System.Diagnostics;
-using CSCore.CoreAudioAPI;
+﻿using CSCore.CoreAudioAPI;
 using CSCore.SoundOut;
+using Micser.Shared.Models;
+using System;
+using System.Diagnostics;
 
-namespace Micser.Main.Audio
+namespace Micser.Engine.Audio
 {
-    public class DeviceOutput : AudioChainLink
+    public class DeviceOutput : AudioModule
     {
         private DeviceDescription _deviceDescription;
         private int _latency;
@@ -17,7 +18,7 @@ namespace Micser.Main.Audio
         }
 
         /// <summary>
-        /// Gets or sets the output device description. The <see cref="DeviceDescription.Id"/>-Property is used to select the device.
+        /// Gets or sets the output device description. The <see cref="DeviceDescription.DeviceId"/>-Property is used to select the device.
         /// </summary>
         public DeviceDescription DeviceDescription
         {
@@ -89,21 +90,23 @@ namespace Micser.Main.Audio
         {
             DisposeOutput();
 
-            if (string.IsNullOrEmpty(DeviceDescription?.Id) || Input?.Output == null)
+            if (string.IsNullOrEmpty(DeviceDescription?.DeviceId) || Input?.Output == null)
             {
                 return;
             }
 
             using (var deviceEnumerator = new MMDeviceEnumerator())
             {
-                var device = deviceEnumerator.GetDevice(DeviceDescription.Id);
+                var device = deviceEnumerator.GetDevice(DeviceDescription.DeviceId);
                 if (!device.DataFlow.HasFlag(DataFlow.Render))
                 {
                     return;
                 }
 
-                _output = new WasapiOut(true, AudioClientShareMode.Shared, Latency);
-                _output.Device = device;
+                _output = new WasapiOut(true, AudioClientShareMode.Shared, Latency)
+                {
+                    Device = device
+                };
                 _output.Initialize(Input.Output);
                 _output.Play();
                 _output.Stopped += OnOutputStopped;

@@ -160,13 +160,13 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CommonServiceLocator">
-      <Version>2.0.3</Version>
+      <Version>2.0.4</Version>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>11.0.2</Version>
     </PackageReference>
     <PackageReference Include="NLog">
-      <Version>4.5.4</Version>
+      <Version>4.5.10</Version>
     </PackageReference>
     <PackageReference Include="Prism.Core">
       <Version>7.1.0.135-pre</Version>
@@ -178,7 +178,7 @@
       <Version>7.1.0.123-pre</Version>
     </PackageReference>
     <PackageReference Include="Unity">
-      <Version>5.8.6</Version>
+      <Version>5.8.11</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

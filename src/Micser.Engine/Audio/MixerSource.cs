@@ -1,8 +1,8 @@
-﻿using System;
+﻿using CSCore;
+using System;
 using System.Collections.Generic;
-using CSCore;
 
-namespace Micser.Main.Audio
+namespace Micser.Engine.Audio
 {
     public class MixerSource : ISampleSource
     {
@@ -74,7 +74,7 @@ namespace Micser.Main.Audio
 
         public int Read(float[] buffer, int offset, int count)
         {
-            int numberOfStoredSamples = 0;
+            var numberOfStoredSamples = 0;
 
             if (count > 0 && _sampleSources.Count > 0)
             {
@@ -83,10 +83,10 @@ namespace Micser.Main.Audio
                     _mixerBuffer = _mixerBuffer.CheckBuffer(count);
                     var numberOfReadSamples = new List<int>();
 
-                    for (int m = _sampleSources.Count - 1; m >= 0; m--)
+                    for (var m = _sampleSources.Count - 1; m >= 0; m--)
                     {
                         var sampleSource = _sampleSources[m];
-                        int read = sampleSource.Read(_mixerBuffer, 0, count);
+                        var read = sampleSource.Read(_mixerBuffer, 0, count);
 
                         for (int i = offset, n = 0; n < read; i++, n++)
                         {
@@ -119,8 +119,8 @@ namespace Micser.Main.Audio
                     if (DivideResult)
                     {
                         numberOfReadSamples.Sort();
-                        int currentOffset = offset;
-                        int remainingSources = numberOfReadSamples.Count;
+                        var currentOffset = offset;
+                        var remainingSources = numberOfReadSamples.Count;
 
                         foreach (var readSamples in numberOfReadSamples)
                         {

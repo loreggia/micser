@@ -50,6 +50,12 @@
     <Compile Include="Api\Modules\AudioModuleDescriptionsModule.cs" />
     <Compile Include="Api\Modules\BaseModule.cs" />
     <Compile Include="Api\Server.cs" />
+    <Compile Include="Audio\AudioModule.cs" />
+    <Compile Include="Audio\DeviceInput.cs" />
+    <Compile Include="Audio\DeviceOutput.cs" />
+    <Compile Include="Audio\IAudioModule.cs" />
+    <Compile Include="Audio\Mixer.cs" />
+    <Compile Include="Audio\MixerSource.cs" />
     <Compile Include="ProjectInstaller.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -84,6 +90,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="CSCore">
+      <Version>1.2.1.2</Version>
+    </PackageReference>
     <PackageReference Include="Nancy">
       <Version>1.4.4</Version>
     </PackageReference>
@@ -92,6 +101,12 @@
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>11.0.2</Version>
+    </PackageReference>
+    <PackageReference Include="NLog">
+      <Version>4.5.10</Version>
+    </PackageReference>
+    <PackageReference Include="NLog.LiteDB">
+      <Version>2018.9.2.5</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -73,10 +73,10 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="WixSharp">
-      <Version>1.6.4</Version>
+      <Version>1.9.2</Version>
     </PackageReference>
     <PackageReference Include="WixSharp.bin">
-      <Version>1.6.4.3</Version>
+      <Version>1.9.2</Version>
     </PackageReference>
   </ItemGroup>
   <!-- <ItemGroup> -->

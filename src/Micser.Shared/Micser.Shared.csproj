@@ -41,8 +41,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DeviceService.cs" />
     <Compile Include="Globals.cs" />
     <Compile Include="Models\AudioModuleDescription.cs" />
+    <Compile Include="Models\DeviceDescription.cs" />
+    <Compile Include="Models\DeviceType.cs" />
     <Compile Include="Models\Model.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

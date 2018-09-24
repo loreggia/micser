@@ -1,4 +1,4 @@
-﻿namespace Micser.Main.Audio
+﻿namespace Micser.Shared.Models
 {
     public enum DeviceType
     {

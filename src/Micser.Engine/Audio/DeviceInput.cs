@@ -1,12 +1,13 @@
-﻿using System;
-using CSCore.CoreAudioAPI;
+﻿using CSCore.CoreAudioAPI;
 using CSCore.SoundIn;
 using CSCore.Streams;
+using Micser.Shared.Models;
 using NLog;
+using System;
 
-namespace Micser.Main.Audio
+namespace Micser.Engine.Audio
 {
-    public class DeviceInput : AudioChainLink
+    public class DeviceInput : AudioModule
     {
         private WasapiCapture _capture;
         private DeviceDescription _deviceDescription;
@@ -62,14 +63,16 @@ namespace Micser.Main.Audio
 
             using (var deviceEnumerator = new MMDeviceEnumerator())
             {
-                var device = deviceEnumerator.GetDevice(DeviceDescription.Id);
+                var device = deviceEnumerator.GetDevice(DeviceDescription.DeviceId);
                 if (!device.DataFlow.HasFlag(DataFlow.Capture))
                 {
                     return;
                 }
 
-                _capture = new WasapiCapture(true, AudioClientShareMode.Shared);
-                _capture.Device = device;
+                _capture = new WasapiCapture(true, AudioClientShareMode.Shared)
+                {
+                    Device = device
+                };
 
                 try
                 {
