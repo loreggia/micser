@@ -1,10 +1,9 @@
-﻿using System;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Micser.Shared.Models;
+using System;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Micser.Main.Audio;
-using Micser.Main.Services;
 
-namespace Micser.Main.Test.Services
+namespace Micser.Shared.Test
 {
     [TestClass]
     public class DeviceServiceTest

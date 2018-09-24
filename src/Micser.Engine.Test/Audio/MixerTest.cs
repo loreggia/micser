@@ -1,8 +1,9 @@
-﻿using System.Threading;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Micser.Main.Audio;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Micser.Engine.Audio;
+using Micser.Shared.Models;
+using System.Threading;
 
-namespace Micser.Main.Test.Audio
+namespace Micser.Engine.Test.Audio
 {
     [TestClass]
     public class MixerTest

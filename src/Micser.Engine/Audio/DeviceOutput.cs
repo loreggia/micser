@@ -90,14 +90,14 @@ namespace Micser.Engine.Audio
         {
             DisposeOutput();
 
-            if (string.IsNullOrEmpty(DeviceDescription?.DeviceId) || Input?.Output == null)
+            if (string.IsNullOrEmpty(DeviceDescription?.Id) || Input?.Output == null)
             {
                 return;
             }
 
             using (var deviceEnumerator = new MMDeviceEnumerator())
             {
-                var device = deviceEnumerator.GetDevice(DeviceDescription.DeviceId);
+                var device = deviceEnumerator.GetDevice(DeviceDescription.Id);
                 if (!device.DataFlow.HasFlag(DataFlow.Render))
                 {
                     return;

@@ -1,8 +1,9 @@
-﻿using System.Threading;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Micser.Main.Audio;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Micser.Engine.Audio;
+using Micser.Shared.Models;
+using System.Threading;
 
-namespace Micser.Main.Test.Audio
+namespace Micser.Engine.Test.Audio
 {
     [TestClass]
     public class VolumeChangeTest
@@ -29,7 +30,7 @@ namespace Micser.Main.Test.Audio
 
             //deviceOutput.Input = sineGenerator;
 
-            for (int i = 0; i < 500; i++)
+            for (var i = 0; i < 500; i++)
             {
                 //sineGenerator.Volume = i * 0.001f;
                 Thread.Sleep(10);
