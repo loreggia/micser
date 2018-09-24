@@ -50,12 +50,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Audio\AudioChainLink.cs" />
-    <Compile Include="Audio\DeviceInput.cs" />
-    <Compile Include="Audio\DeviceOutput.cs" />
-    <Compile Include="Audio\IAudioChainLink.cs" />
-    <Compile Include="Audio\Mixer.cs" />
-    <Compile Include="Audio\MixerSource.cs" />
     <Compile Include="Extensions\ContainerExtensions.cs" />
     <Compile Include="Extensions\ComparableExtensions.cs" />
     <Compile Include="MainModule.cs" />
@@ -65,9 +59,6 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="Audio\DeviceDescription.cs" />
-    <Compile Include="Services\DeviceService.cs" />
-    <Compile Include="Audio\DeviceType.cs" />
     <Compile Include="ViewModels\Widgets\AudioChainLinkViewModel.cs" />
     <Compile Include="ViewModels\Widgets\DeviceOutputViewModel.cs" />
     <Compile Include="ViewModels\Widgets\DeviceInputViewModel.cs" />
@@ -112,6 +103,10 @@
       <Project>{e14431b4-f54a-4d36-b505-1d3407252430}</Project>
       <Name>Micser.Infrastructure</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Micser.Shared\Micser.Shared.csproj">
+      <Project>{ec2284af-9eda-4598-82d7-8c55ef58a54a}</Project>
+      <Name>Micser.Shared</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
@@ -120,20 +115,19 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="Audio\" />
     <Folder Include="Controls\" />
+    <Folder Include="Services\" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CommonServiceLocator">
-      <Version>2.0.3</Version>
-    </PackageReference>
-    <PackageReference Include="CSCore">
-      <Version>1.2.1.2</Version>
+      <Version>2.0.4</Version>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>11.0.2</Version>
     </PackageReference>
     <PackageReference Include="NLog">
-      <Version>4.5.4</Version>
+      <Version>4.5.10</Version>
     </PackageReference>
     <PackageReference Include="Prism.Core">
       <Version>7.1.0.135-pre</Version>

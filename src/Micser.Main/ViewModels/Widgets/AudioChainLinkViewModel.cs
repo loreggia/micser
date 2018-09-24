@@ -1,21 +1,20 @@
 ﻿using Micser.Infrastructure.Widgets;
-using Micser.Main.Audio;
 
 namespace Micser.Main.ViewModels.Widgets
 {
     public class AudioChainLinkViewModel : WidgetViewModel
     {
-        protected ConnectorViewModel AddInput(string name, IAudioChainLink link)
+        protected ConnectorViewModel AddInput(string name)
         {
-            var input = new ConnectorViewModel(name, this, link);
+            var input = new ConnectorViewModel(name, this, null);
             input.ConnectionChanged += OnInputConnectionChanged;
             AddInput(input);
             return input;
         }
 
-        protected ConnectorViewModel AddOutput(string name, IAudioChainLink link)
+        protected ConnectorViewModel AddOutput(string name)
         {
-            var output = new ConnectorViewModel(name, this, link);
+            var output = new ConnectorViewModel(name, this, null);
             output.ConnectionChanged += OnOutputConnectionChanged;
             AddOutput(output);
             return output;

@@ -1,18 +1,18 @@
-﻿using System;
-using CSCore;
+﻿using CSCore;
+using System;
 
-namespace Micser.Main.Audio
+namespace Micser.Engine.Audio
 {
-    public abstract class AudioChainLink : IAudioChainLink, IDisposable
+    public abstract class AudioModule : IAudioModule, IDisposable
     {
-        private IAudioChainLink _input;
+        private IAudioModule _input;
         private IWaveSource _output;
 
         public event EventHandler InputChanged;
 
         public event EventHandler OutputChanged;
 
-        public IAudioChainLink Input
+        public IAudioModule Input
         {
             get => _input;
             set

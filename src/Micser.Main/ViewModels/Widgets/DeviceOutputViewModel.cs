@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using Micser.Infrastructure.Widgets;
+using Micser.Shared.Models;
+using System.Collections.Generic;
 using System.Linq;
-using Micser.Infrastructure.Widgets;
-using Micser.Main.Audio;
-using Micser.Main.Services;
 
 namespace Micser.Main.ViewModels.Widgets
 {
@@ -11,16 +10,14 @@ namespace Micser.Main.ViewModels.Widgets
         public const string InputConnectorName = "Input1";
         public const string SettingKeyDeviceId = "DeviceId";
 
+        private readonly ConnectorViewModel _inputViewModel;
         private IEnumerable<DeviceDescription> _deviceDescriptions;
-        private DeviceOutput _deviceOutput;
-        private ConnectorViewModel _inputViewModel;
         private DeviceDescription _selectedDeviceDescription;
 
         public DeviceOutputViewModel()
         {
             Header = "Device Output";
-            _deviceOutput = new DeviceOutput();
-            _inputViewModel = AddInput(InputConnectorName, _deviceOutput);
+            _inputViewModel = AddInput(InputConnectorName);
         }
 
         public IEnumerable<DeviceDescription> DeviceDescriptions
@@ -32,13 +29,7 @@ namespace Micser.Main.ViewModels.Widgets
         public DeviceDescription SelectedDeviceDescription
         {
             get => _selectedDeviceDescription;
-            set
-            {
-                if (SetProperty(ref _selectedDeviceDescription, value) && _deviceOutput != null)
-                {
-                    _deviceOutput.DeviceDescription = value;
-                }
-            }
+            set => SetProperty(ref _selectedDeviceDescription, value);
         }
 
         public override void Initialize()
@@ -53,7 +44,7 @@ namespace Micser.Main.ViewModels.Widgets
 
             if (state.Settings.TryGetValue(SettingKeyDeviceId, out var deviceId) && deviceId is string idString)
             {
-                SelectedDeviceDescription = DeviceDescriptions?.FirstOrDefault(d => d.Id == idString);
+                SelectedDeviceDescription = DeviceDescriptions?.FirstOrDefault(d => d.DeviceId == idString);
             }
         }
 
@@ -61,27 +52,7 @@ namespace Micser.Main.ViewModels.Widgets
         {
             base.SaveState(state);
 
-            state.Settings[SettingKeyDeviceId] = SelectedDeviceDescription?.Id;
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-            if (disposing)
-            {
-                _deviceOutput?.Dispose();
-                _deviceOutput = null;
-            }
-        }
-
-        protected override void OnInputConnectionChanged(object sender, ConnectionChangedEventArgs e)
-        {
-            base.OnInputConnectionChanged(sender, e);
-
-            if (e.NewConnection?.Source?.Data is IAudioChainLink audioChainLink)
-            {
-                _deviceOutput.Input = audioChainLink;
-            }
+            state.Settings[SettingKeyDeviceId] = SelectedDeviceDescription?.DeviceId;
         }
 
         private void UpdateDeviceDescriptions()
