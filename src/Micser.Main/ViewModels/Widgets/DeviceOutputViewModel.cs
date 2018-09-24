@@ -1,4 +1,5 @@
 ﻿using Micser.Infrastructure.Widgets;
+using Micser.Shared;
 using Micser.Shared.Models;
 using System.Collections.Generic;
 using System.Linq;
@@ -44,7 +45,7 @@ namespace Micser.Main.ViewModels.Widgets
 
             if (state.Settings.TryGetValue(SettingKeyDeviceId, out var deviceId) && deviceId is string idString)
             {
-                SelectedDeviceDescription = DeviceDescriptions?.FirstOrDefault(d => d.DeviceId == idString);
+                SelectedDeviceDescription = DeviceDescriptions?.FirstOrDefault(d => d.Id == idString);
             }
         }
 
@@ -52,7 +53,7 @@ namespace Micser.Main.ViewModels.Widgets
         {
             base.SaveState(state);
 
-            state.Settings[SettingKeyDeviceId] = SelectedDeviceDescription?.DeviceId;
+            state.Settings[SettingKeyDeviceId] = SelectedDeviceDescription?.Id;
         }
 
         private void UpdateDeviceDescriptions()

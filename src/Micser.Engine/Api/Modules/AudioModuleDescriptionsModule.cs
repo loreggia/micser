@@ -16,7 +16,7 @@ namespace Micser.Engine.Api.Modules
         {
             using (var db = new Database())
             {
-                return db.AudioModuleDescriptions.ToArray();
+                return db.GetCollection<AudioModuleDescription>().FindAll().ToArray();
             }
         }
     }

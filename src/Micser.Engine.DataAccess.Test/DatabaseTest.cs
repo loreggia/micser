@@ -8,8 +8,8 @@ namespace Micser.Engine.DataAccess.Test
         [TestMethod]
         public void InstantiateDb()
         {
-            var db = new Database();
-            var moduleDescriptions = db.AudioModuleDescriptions;
+            var db = new Database("test.db");
+            var moduleDescriptions = db.GetCollection("test");
             Assert.IsNotNull(moduleDescriptions);
         }
     }

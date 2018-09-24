@@ -63,7 +63,7 @@ namespace Micser.Engine.Audio
 
             using (var deviceEnumerator = new MMDeviceEnumerator())
             {
-                var device = deviceEnumerator.GetDevice(DeviceDescription.DeviceId);
+                var device = deviceEnumerator.GetDevice(DeviceDescription.Id);
                 if (!device.DataFlow.HasFlag(DataFlow.Capture))
                 {
                     return;

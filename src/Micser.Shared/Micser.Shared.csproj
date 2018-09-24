@@ -51,6 +51,9 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <PackageReference Include="CSCore">
+      <Version>1.2.1.2</Version>
+    </PackageReference>
     <PackageReference Include="LiteDB">
       <Version>4.1.4</Version>
     </PackageReference>

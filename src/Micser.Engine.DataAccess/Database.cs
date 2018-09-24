@@ -17,8 +17,8 @@ namespace Micser.Engine.DataAccess
             Directory.CreateDirectory(AppDataFolder);
         }
 
-        public Database()
-            : base(ConnectionString)
+        public Database(string connectionString = null)
+            : base(connectionString ?? ConnectionString)
         {
         }
     }

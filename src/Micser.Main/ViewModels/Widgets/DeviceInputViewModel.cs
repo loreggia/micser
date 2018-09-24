@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using Micser.Infrastructure.Widgets;
+using Micser.Shared;
+using Micser.Shared.Models;
+using System.Collections.Generic;
 using System.Linq;
-using Micser.Infrastructure.Widgets;
-using Micser.Main.Audio;
-using Micser.Main.Services;
 
 namespace Micser.Main.ViewModels.Widgets
 {
@@ -11,17 +11,14 @@ namespace Micser.Main.ViewModels.Widgets
         public const string OutputConnectorName = "Output1";
         public const string SettingKeyDeviceId = "DeviceId";
 
-        private IAudioChainLink _currentOutputLink;
+        private readonly ConnectorViewModel _outputViewModel;
         private IEnumerable<DeviceDescription> _deviceDescriptions;
-        private DeviceInput _deviceInput;
-        private ConnectorViewModel _outputViewModel;
         private DeviceDescription _selectedDeviceDescription;
 
         public DeviceInputViewModel()
         {
             Header = "Device Input";
-            _deviceInput = new DeviceInput();
-            _outputViewModel = AddOutput(OutputConnectorName, _deviceInput);
+            _outputViewModel = AddOutput(OutputConnectorName);
         }
 
         public IEnumerable<DeviceDescription> DeviceDescriptions
@@ -33,13 +30,7 @@ namespace Micser.Main.ViewModels.Widgets
         public DeviceDescription SelectedDeviceDescription
         {
             get => _selectedDeviceDescription;
-            set
-            {
-                if (SetProperty(ref _selectedDeviceDescription, value))
-                {
-                    _deviceInput.DeviceDescription = value;
-                }
-            }
+            set => SetProperty(ref _selectedDeviceDescription, value);
         }
 
         public override void Initialize()
@@ -63,33 +54,6 @@ namespace Micser.Main.ViewModels.Widgets
             base.SaveState(state);
 
             state.Settings[SettingKeyDeviceId] = SelectedDeviceDescription?.Id;
-        }
-
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-
-            if (disposing)
-            {
-                _deviceInput?.Dispose();
-                _deviceInput = null;
-            }
-        }
-
-        protected override void OnOutputConnectionChanged(object sender, ConnectionChangedEventArgs e)
-        {
-            base.OnOutputConnectionChanged(sender, e);
-
-            if (_currentOutputLink != null)
-            {
-                _currentOutputLink.Input = null;
-            }
-
-            if (e.NewConnection?.Sink?.Data is IAudioChainLink audioChainLink)
-            {
-                audioChainLink.Input = _deviceInput;
-                _currentOutputLink = audioChainLink;
-            }
         }
 
         private void UpdateDeviceDescriptions()

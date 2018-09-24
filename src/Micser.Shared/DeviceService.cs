@@ -1,4 +1,5 @@
-﻿using Micser.Shared.Models;
+﻿using CSCore.CoreAudioAPI;
+using Micser.Shared.Models;
 using System.Collections.Generic;
 
 namespace Micser.Shared
@@ -12,7 +13,7 @@ namespace Micser.Shared
             {
                 yield return new DeviceDescription
                 {
-                    DeviceId = audioEndPoint.DeviceID,
+                    Id = audioEndPoint.DeviceID,
                     Name = audioEndPoint.FriendlyName,
                     //IconPath = audioEndPoint.IconPath,
                     IsActive = audioEndPoint.DeviceState == DeviceState.Active,
