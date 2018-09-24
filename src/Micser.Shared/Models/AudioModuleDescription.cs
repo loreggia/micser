@@ -1,7 +1,6 @@
 ﻿namespace Micser.Shared.Models
 {
-    public class AudioModuleDescription
+    public class AudioModuleDescription : Model
     {
-        
     }
 }
