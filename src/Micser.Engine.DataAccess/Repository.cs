@@ -1,6 +1,7 @@
-﻿using System;
+﻿using Micser.Shared;
+using System;
 
-namespace Micser.Shared.DataAccess
+namespace Micser.Engine.DataAccess
 {
     public abstract class Repository<T> : IDisposable
     {

@@ -46,6 +46,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Api\Bootstrapper.cs" />
+    <Compile Include="Api\Modules\AudioModuleDescriptionsModule.cs" />
+    <Compile Include="Api\Modules\BaseModule.cs" />
+    <Compile Include="Api\Server.cs" />
     <Compile Include="ProjectInstaller.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -68,6 +72,27 @@
     <EmbeddedResource Include="ProjectInstaller.resx">
       <DependentUpon>ProjectInstaller.cs</DependentUpon>
     </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Micser.Engine.DataAccess\Micser.Engine.DataAccess.csproj">
+      <Project>{21b30955-3ae6-42cd-9a0d-8814d6b72cf3}</Project>
+      <Name>Micser.Engine.DataAccess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Micser.Shared\Micser.Shared.csproj">
+      <Project>{ec2284af-9eda-4598-82d7-8c55ef58a54a}</Project>
+      <Name>Micser.Shared</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Nancy">
+      <Version>1.4.4</Version>
+    </PackageReference>
+    <PackageReference Include="Nancy.Hosting.Self">
+      <Version>1.4.1</Version>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>11.0.2</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

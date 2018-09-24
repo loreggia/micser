@@ -41,8 +41,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataAccess\Repository.cs" />
-    <Compile Include="Database.cs" />
+    <Compile Include="Globals.cs" />
     <Compile Include="Models\AudioModuleDescription.cs" />
     <Compile Include="Models\Model.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
