@@ -1,7 +1,9 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using CSCore;
+using CSCore.CoreAudioAPI;
+using CSCore.Streams;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Micser.Engine.Audio;
 using Micser.Shared.Models;
-using System;
 using System.Threading;
 
 namespace Micser.Engine.Test.Audio
@@ -86,15 +88,15 @@ namespace Micser.Engine.Test.Audio
             deviceOutput.Dispose();
         }
 
-        /// <summary>
-        /// TODO specific exception?
-        /// </summary>
         [TestMethod]
         [TestCategory("Sound")]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(CoreAudioAPIException))]
         public void SetInvalidDescriptionInvalidIdThrowsException()
         {
-            var deviceOutput = new DeviceOutput();
+            var deviceOutput = new DeviceOutput
+            {
+                Input = new TestInput()
+            };
 
             var deviceDescription = new DeviceDescription
             {
@@ -113,6 +115,14 @@ namespace Micser.Engine.Test.Audio
             var deviceDescription = new DeviceDescription();
 
             deviceOutput.DeviceDescription = deviceDescription;
+        }
+
+        private class TestInput : AudioModule
+        {
+            public TestInput()
+            {
+                Output = new WriteableBufferingSource(new WaveFormat()) { FillWithZeros = true };
+            }
         }
     }
 }

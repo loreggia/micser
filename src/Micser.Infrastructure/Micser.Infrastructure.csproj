@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="Bindable.cs" />
     <Compile Include="ConfigurationService.cs" />
+    <Compile Include="Extensions\ComparableExtensions.cs" />
     <Compile Include="Extensions\ItemsControlExtensions.cs" />
     <Compile Include="IConfigurationService.cs" />
     <Compile Include="Widgets\ConnectionChangedEventHandler.cs" />
