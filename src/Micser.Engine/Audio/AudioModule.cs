@@ -1,10 +1,14 @@
 ﻿using CSCore;
+using Micser.Shared.Models;
+using NLog;
 using System;
 
 namespace Micser.Engine.Audio
 {
-    public abstract class AudioModule : IAudioModule, IDisposable
+    public abstract class AudioModule : IAudioModule
     {
+        protected static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
+
         private IAudioModule _input;
         private IWaveSource _output;
 
@@ -58,6 +62,8 @@ namespace Micser.Engine.Audio
             Dispose(true);
             GC.SuppressFinalize(this);
         }
+
+        public abstract void Initialize(AudioModuleDescription description);
 
         protected virtual void Dispose(bool disposing)
         {

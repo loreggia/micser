@@ -11,7 +11,6 @@ namespace Micser.Engine.Audio
     {
         private WasapiCapture _capture;
         private DeviceDescription _deviceDescription;
-        private ILogger _logger = LogManager.GetCurrentClassLogger();
         private SoundInSource _soundInSource;
 
         public DeviceDescription DeviceDescription
@@ -27,6 +26,10 @@ namespace Micser.Engine.Audio
                     InitializeDevice();
                 }
             }
+        }
+
+        public override void Initialize(AudioModuleDescription description)
+        {
         }
 
         protected override void Dispose(bool disposing)
@@ -83,7 +86,7 @@ namespace Micser.Engine.Audio
                 }
                 catch (Exception ex)
                 {
-                    _logger.Log(LogLevel.Error, ex);
+                    Logger.Log(LogLevel.Error, ex);
                 }
             }
         }

@@ -1,9 +1,10 @@
 ﻿using CSCore;
+using Micser.Shared.Models;
 using System;
 
 namespace Micser.Engine.Audio
 {
-    public interface IAudioModule
+    public interface IAudioModule : IDisposable
     {
         event EventHandler InputChanged;
 
@@ -11,5 +12,7 @@ namespace Micser.Engine.Audio
 
         IAudioModule Input { get; set; }
         IWaveSource Output { get; }
+
+        void Initialize(AudioModuleDescription description);
     }
 }
