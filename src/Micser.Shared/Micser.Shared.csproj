@@ -41,6 +41,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Api\ApiClient.cs" />
+    <Compile Include="Api\ServiceResult.cs" />
     <Compile Include="DeviceService.cs" />
     <Compile Include="Globals.cs" />
     <Compile Include="Models\AudioModuleDescription.cs" />
@@ -56,6 +58,9 @@
     </PackageReference>
     <PackageReference Include="LiteDB">
       <Version>4.1.4</Version>
+    </PackageReference>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>11.0.2</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
