@@ -142,7 +142,7 @@ namespace Micser.Shared.Api
 
         private static HttpClient CreateClient()
         {
-            var baseAddress = new Uri("http://localhost:" + Globals.ApiPort);
+            var baseAddress = new Uri($"http://localhost:{Globals.ApiPort}/api/");
 
             try
             {

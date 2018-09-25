@@ -1,8 +1,8 @@
 ﻿namespace Micser.Engine.Audio
 {
-    public class Mixer : AudioModule
+    public class MixerModule : AudioModule
     {
-        public Mixer()
+        public MixerModule()
         {
         }
 

@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Api\ApiClient.cs" />
+    <Compile Include="Api\AudioModuleDescriptionsApiClient.cs" />
     <Compile Include="Api\ServiceResult.cs" />
     <Compile Include="DeviceService.cs" />
     <Compile Include="Globals.cs" />

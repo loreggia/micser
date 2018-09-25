@@ -50,11 +50,12 @@
     <Compile Include="Api\Modules\AudioModuleDescriptionsModule.cs" />
     <Compile Include="Api\Modules\BaseModule.cs" />
     <Compile Include="Api\Server.cs" />
+    <Compile Include="Audio\AudioEngine.cs" />
     <Compile Include="Audio\AudioModule.cs" />
-    <Compile Include="Audio\DeviceInput.cs" />
-    <Compile Include="Audio\DeviceOutput.cs" />
+    <Compile Include="Audio\DeviceInputModule.cs" />
+    <Compile Include="Audio\DeviceOutputModule.cs" />
     <Compile Include="Audio\IAudioModule.cs" />
-    <Compile Include="Audio\Mixer.cs" />
+    <Compile Include="Audio\MixerModule.cs" />
     <Compile Include="Audio\MixerSource.cs" />
     <Compile Include="ProjectInstaller.cs">
       <SubType>Component</SubType>
