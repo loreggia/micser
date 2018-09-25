@@ -7,7 +7,7 @@ using System;
 
 namespace Micser.Engine.Audio
 {
-    public class DeviceInput : AudioModule
+    public class DeviceInputModule : AudioModule
     {
         private WasapiCapture _capture;
         private DeviceDescription _deviceDescription;

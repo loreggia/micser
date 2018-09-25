@@ -6,13 +6,13 @@ using System.Diagnostics;
 
 namespace Micser.Engine.Audio
 {
-    public class DeviceOutput : AudioModule
+    public class DeviceOutputModule : AudioModule
     {
         private DeviceDescription _deviceDescription;
         private int _latency;
         private WasapiOut _output;
 
-        public DeviceOutput()
+        public DeviceOutputModule()
         {
             Latency = 25;
         }

@@ -16,7 +16,7 @@ namespace Micser.Engine.Test.Audio
         [TestCategory("SkipWhenLiveUnitTesting")]
         public void PlaySineWave()
         {
-            var deviceOutput = new DeviceOutput();
+            var deviceOutput = new DeviceOutputModule();
 
             var deviceDescription = new DeviceDescription
             {
@@ -39,7 +39,7 @@ namespace Micser.Engine.Test.Audio
         [TestCategory("SkipWhenLiveUnitTesting")]
         public void PlaySquareWave()
         {
-            var deviceOutput = new DeviceOutput();
+            var deviceOutput = new DeviceOutputModule();
 
             var deviceDescription = new DeviceDescription
             {
@@ -68,7 +68,7 @@ namespace Micser.Engine.Test.Audio
         [TestCategory("Sound")]
         public void SetDescriptionToNullResetsOutput()
         {
-            var deviceOutput = new DeviceOutput();
+            var deviceOutput = new DeviceOutputModule();
 
             var deviceDescription = new DeviceDescription
             {
@@ -93,7 +93,7 @@ namespace Micser.Engine.Test.Audio
         [ExpectedException(typeof(CoreAudioAPIException))]
         public void SetInvalidDescriptionInvalidIdThrowsException()
         {
-            var deviceOutput = new DeviceOutput
+            var deviceOutput = new DeviceOutputModule
             {
                 Input = new TestInput()
             };
@@ -110,7 +110,7 @@ namespace Micser.Engine.Test.Audio
         [TestCategory("Sound")]
         public void SetInvalidDescriptionNullIdDoesNothing()
         {
-            var deviceOutput = new DeviceOutput();
+            var deviceOutput = new DeviceOutputModule();
 
             var deviceDescription = new DeviceDescription();
 

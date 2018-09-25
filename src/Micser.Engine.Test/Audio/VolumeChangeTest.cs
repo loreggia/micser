@@ -13,7 +13,7 @@ namespace Micser.Engine.Test.Audio
         [TestCategory("SkipWhenLiveUnitTesting")]
         public void ChangeVolumeOfSineGeneratorToDeviceOutput()
         {
-            var deviceOutput = new DeviceOutput();
+            var deviceOutput = new DeviceOutputModule();
 
             var deviceDescription = new DeviceDescription
             {
