@@ -1,16 +1,20 @@
 ﻿using CSCore.CoreAudioAPI;
 using CSCore.SoundIn;
 using CSCore.Streams;
+using Micser.Shared;
 using Micser.Shared.Models;
 using NLog;
 using System;
+using System.Linq;
 
 namespace Micser.Engine.Audio
 {
     public class DeviceInputModule : AudioModule
     {
         private WasapiCapture _capture;
+
         private DeviceDescription _deviceDescription;
+
         private SoundInSource _soundInSource;
 
         public DeviceDescription DeviceDescription
@@ -28,8 +32,19 @@ namespace Micser.Engine.Audio
             }
         }
 
+        public override string GetState()
+        {
+            return DeviceDescription?.Id;
+        }
+
         public override void Initialize(AudioModuleDescription description)
         {
+            if (!string.IsNullOrEmpty(description.State))
+            {
+                var deviceId = description.State;
+                var deviceService = new DeviceService();
+                DeviceDescription = deviceService.GetDevices(DeviceType.Input).FirstOrDefault(d => d.Id == deviceId);
+            }
         }
 
         protected override void Dispose(bool disposing)
@@ -89,6 +104,11 @@ namespace Micser.Engine.Audio
                     Logger.Log(LogLevel.Error, ex);
                 }
             }
+        }
+
+        private class DeviceInputState : AudioModuleState
+        {
+            public string DeviceId { get; set; }
         }
     }
 }

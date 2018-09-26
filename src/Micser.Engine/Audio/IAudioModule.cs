@@ -13,6 +13,8 @@ namespace Micser.Engine.Audio
         IAudioModule Input { get; set; }
         IWaveSource Output { get; }
 
-        void Initialize(AudioModuleDescription description);
+        string GetState();
+
+        void Initialize(AudioModuleDescription state);
     }
 }

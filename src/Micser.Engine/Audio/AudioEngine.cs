@@ -33,14 +33,23 @@ namespace Micser.Engine.Audio
                 var moduleDescriptions = db.GetCollection<AudioModuleDescription>().FindAll().ToArray();
                 foreach (var description in moduleDescriptions)
                 {
-                    if (Activator.CreateInstance(description.Type) is IAudioModule module)
+                    var type = Type.GetType(description.Type);
+                    if (type != null)
                     {
-                        module.Initialize(description);
-                        Modules.Add(module);
+                        if (Activator.CreateInstance(type) is IAudioModule module)
+                        {
+                            module.Initialize(description);
+                            Modules.Add(module);
+                        }
+                        else
+                        {
+                            _logger.Warn(
+                                $"Could not create an instance of a module. Description-ID: {description.Id}, Type: {description.Type}");
+                        }
                     }
                     else
                     {
-                        _logger.Warn($"Could not create an instance of a module. Description-ID: {description.Id}, Type: {description.Type}");
+                        _logger.Warn($"Could not find module type. Description-ID: {description.Id}, Type: {description.Type}");
                     }
                 }
             }

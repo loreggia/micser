@@ -1,8 +1,10 @@
 ﻿using CSCore.CoreAudioAPI;
 using CSCore.SoundOut;
+using Micser.Shared;
 using Micser.Shared.Models;
 using System;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Micser.Engine.Audio
 {
@@ -18,7 +20,7 @@ namespace Micser.Engine.Audio
         }
 
         /// <summary>
-        /// Gets or sets the output device description. The <see cref="DeviceDescription.DeviceId"/>-Property is used to select the device.
+        /// Gets or sets the output device description. The <see cref="DeviceDescription.Id"/>-Property is used to select the device.
         /// </summary>
         public DeviceDescription DeviceDescription
         {
@@ -48,6 +50,21 @@ namespace Micser.Engine.Audio
                     _latency = value;
                     InitializeDevice();
                 }
+            }
+        }
+
+        public override string GetState()
+        {
+            return DeviceDescription?.Id;
+        }
+
+        public override void Initialize(AudioModuleDescription description)
+        {
+            if (!string.IsNullOrEmpty(description.State))
+            {
+                var deviceId = description.State;
+                var deviceService = new DeviceService();
+                DeviceDescription = deviceService.GetDevices(DeviceType.Output).FirstOrDefault(d => d.Id == deviceId);
             }
         }
 
