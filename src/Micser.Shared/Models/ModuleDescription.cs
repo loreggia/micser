@@ -2,7 +2,7 @@
 {
     public class ModuleDescription : Model
     {
-        public string State { get; set; }
+        public ModuleState State { get; set; }
         public string Type { get; set; }
     }
 }
