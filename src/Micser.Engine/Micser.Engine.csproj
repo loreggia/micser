@@ -47,7 +47,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Api\Bootstrapper.cs" />
-    <Compile Include="Api\Modules\AudioModuleDescriptionsModule.cs" />
+    <Compile Include="Api\Modules\ModuleDescriptionsModule.cs" />
     <Compile Include="Api\Modules\BaseModule.cs" />
     <Compile Include="Api\Server.cs" />
     <Compile Include="Audio\AudioEngine.cs" />

@@ -42,12 +42,12 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Api\ApiClient.cs" />
-    <Compile Include="Api\AudioModuleDescriptionsApiClient.cs" />
+    <Compile Include="Api\ModuleDescriptionsApiClient.cs" />
     <Compile Include="Api\ServiceResult.cs" />
     <Compile Include="DeviceService.cs" />
     <Compile Include="Globals.cs" />
-    <Compile Include="Models\AudioModuleDescription.cs" />
-    <Compile Include="Models\AudioModuleState.cs" />
+    <Compile Include="Models\ModuleDescription.cs" />
+    <Compile Include="Models\ModuleState.cs" />
     <Compile Include="Models\DeviceDescription.cs" />
     <Compile Include="Models\DeviceType.cs" />
     <Compile Include="Models\Model.cs" />

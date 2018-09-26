@@ -65,7 +65,7 @@ namespace Micser.Engine.Audio
 
         public abstract string GetState();
 
-        public abstract void Initialize(AudioModuleDescription description);
+        public abstract void Initialize(ModuleDescription description);
 
         protected virtual void Dispose(bool disposing)
         {
