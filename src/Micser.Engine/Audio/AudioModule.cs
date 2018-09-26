@@ -63,6 +63,8 @@ namespace Micser.Engine.Audio
             GC.SuppressFinalize(this);
         }
 
+        public abstract string GetState();
+
         public abstract void Initialize(AudioModuleDescription description);
 
         protected virtual void Dispose(bool disposing)

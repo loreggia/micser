@@ -123,6 +123,15 @@ namespace Micser.Engine.Test.Audio
             {
                 Output = new WriteableBufferingSource(new WaveFormat()) { FillWithZeros = true };
             }
+
+            public override string GetState()
+            {
+                return null;
+            }
+
+            public override void Initialize(AudioModuleDescription description)
+            {
+            }
         }
     }
 }
