@@ -1,6 +1,6 @@
 ﻿namespace Micser.Shared.Models
 {
-    public abstract class AudioModuleState
+    public abstract class ModuleState
     {
     }
 }

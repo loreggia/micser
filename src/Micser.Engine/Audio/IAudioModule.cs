@@ -15,6 +15,6 @@ namespace Micser.Engine.Audio
 
         string GetState();
 
-        void Initialize(AudioModuleDescription state);
+        void Initialize(ModuleDescription state);
     }
 }

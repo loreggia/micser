@@ -15,7 +15,7 @@ namespace Micser.Engine.Audio
             throw new System.NotImplementedException();
         }
 
-        public override void Initialize(AudioModuleDescription description)
+        public override void Initialize(ModuleDescription description)
         {
             throw new System.NotImplementedException();
         }

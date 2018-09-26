@@ -37,7 +37,7 @@ namespace Micser.Engine.Audio
             return DeviceDescription?.Id;
         }
 
-        public override void Initialize(AudioModuleDescription description)
+        public override void Initialize(ModuleDescription description)
         {
             if (!string.IsNullOrEmpty(description.State))
             {
@@ -106,7 +106,7 @@ namespace Micser.Engine.Audio
             }
         }
 
-        private class DeviceInputState : AudioModuleState
+        private class DeviceInputState : ModuleState
         {
             public string DeviceId { get; set; }
         }

@@ -30,7 +30,7 @@ namespace Micser.Engine.Audio
 
             using (var db = new Database())
             {
-                var moduleDescriptions = db.GetCollection<AudioModuleDescription>().FindAll().ToArray();
+                var moduleDescriptions = db.GetCollection<ModuleDescription>().FindAll().ToArray();
                 foreach (var description in moduleDescriptions)
                 {
                     var type = Type.GetType(description.Type);
