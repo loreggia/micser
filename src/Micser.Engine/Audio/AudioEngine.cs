@@ -52,6 +52,26 @@ namespace Micser.Engine.Audio
                         _logger.Warn($"Could not find module type. Description-ID: {description.Id}, Type: {description.Type}");
                     }
                 }
+
+                var connections = db.GetCollection<ModuleConnectionDescription>().FindAll().ToArray();
+                foreach (var connection in connections)
+                {
+                    var source = Modules.FirstOrDefault(m => m.Description.Id == connection.SourceId);
+                    var target = Modules.FirstOrDefault(m => m.Description.Id == connection.TargetId);
+
+                    if (source == null)
+                    {
+                        _logger.Warn($"Source module for connection not found. ID: {connection.SourceId}");
+                        continue;
+                    }
+                    if (target == null)
+                    {
+                        _logger.Warn($"Target module for connection not found. ID: {connection.TargetId}");
+                        continue;
+                    }
+
+                    target.Input = source;
+                }
             }
         }
 

@@ -128,10 +128,6 @@ namespace Micser.Engine.Test.Audio
             {
                 return null;
             }
-
-            public override void Initialize(ModuleDescription description)
-            {
-            }
         }
     }
 }

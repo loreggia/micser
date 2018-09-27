@@ -60,9 +60,11 @@ namespace Micser.Engine.Audio
 
         public override void Initialize(ModuleDescription description)
         {
-            if (!string.IsNullOrEmpty(description.State))
+            base.Initialize(description);
+
+            if (description.State is DeviceOutputState state)
             {
-                var deviceId = description.State;
+                var deviceId = state.DeviceId;
                 var deviceService = new DeviceService();
                 DeviceDescription = deviceService.GetDevices(DeviceType.Output).FirstOrDefault(d => d.Id == deviceId);
             }
@@ -125,8 +127,8 @@ namespace Micser.Engine.Audio
                     Device = device
                 };
                 _output.Initialize(Input.Output);
-                _output.Play();
                 _output.Stopped += OnOutputStopped;
+                _output.Play();
             }
         }
 
@@ -134,6 +136,11 @@ namespace Micser.Engine.Audio
         {
             Debug.WriteLine("Warning: Output stopped!");
             //_output.Play();
+        }
+
+        public class DeviceOutputState : ModuleState
+        {
+            public string DeviceId { get; set; }
         }
     }
 }
