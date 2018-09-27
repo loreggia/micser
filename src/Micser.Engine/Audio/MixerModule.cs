@@ -1,6 +1,4 @@
-﻿using Micser.Shared.Models;
-
-namespace Micser.Engine.Audio
+﻿namespace Micser.Engine.Audio
 {
     public class MixerModule : AudioModule
     {
@@ -11,11 +9,6 @@ namespace Micser.Engine.Audio
         public IAudioModule Input2 { get; set; }
 
         public override string GetState()
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override void Initialize(ModuleDescription description)
         {
             throw new System.NotImplementedException();
         }

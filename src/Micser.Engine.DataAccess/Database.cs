@@ -1,5 +1,4 @@
 ﻿using LiteDB;
-using Micser.Shared.Models;
 using System;
 using System.IO;
 
@@ -21,14 +20,6 @@ namespace Micser.Engine.DataAccess
         public Database(string connectionString = null)
             : base(connectionString ?? ConnectionString)
         {
-            Mapper.Entity<ModuleDescription>().Id(x => x.Id);
-
-            var collection = GetCollection<ModuleDescription>();
-            collection.EnsureIndex(d => d.Id, true);
-            var input = new ModuleDescription { Id = 1, State = "{0.0.1.00000000}.{232aa400-5c3f-4f66-b5ab-afe5e2bfb594}", Type = "Micser.Engine.Audio.DeviceInputModule, Micser.Engine" };
-            collection.Upsert(input);
-            var output = new ModuleDescription { Id = 2, State = "{0.0.0.00000000}.{04097f83-4fdf-4dae-bfa4-0891f20d1352}", Type = "Micser.Engine.Audio.DeviceOutputModule, Micser.Engine" };
-            collection.Upsert(output);
         }
     }
 }

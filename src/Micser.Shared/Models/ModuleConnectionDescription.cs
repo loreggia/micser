@@ -2,7 +2,17 @@
 {
     public class ModuleConnectionDescription : Model
     {
-        public ModuleDescription Source { get; set; }
-        public ModuleDescription Target { get; set; }
+        public ModuleConnectionDescription()
+        {
+        }
+
+        public ModuleConnectionDescription(int sourceId, int targetId)
+        {
+            SourceId = sourceId;
+            TargetId = targetId;
+        }
+
+        public int SourceId { get; set; }
+        public int TargetId { get; set; }
     }
 }
