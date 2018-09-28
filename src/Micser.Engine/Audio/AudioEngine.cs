@@ -7,7 +7,7 @@ using System.Linq;
 
 namespace Micser.Engine.Audio
 {
-    public sealed class AudioEngine : IDisposable
+    public sealed class AudioEngine : IAudioEngine
     {
         private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
 
@@ -30,7 +30,7 @@ namespace Micser.Engine.Audio
 
             using (var db = new Database())
             {
-                var moduleDescriptions = db.GetCollection<ModuleDescription>().FindAll().ToArray();
+                var moduleDescriptions = db.GetCollection<Module>().FindAll().ToArray();
                 foreach (var description in moduleDescriptions)
                 {
                     var type = Type.GetType(description.Type);
@@ -53,7 +53,7 @@ namespace Micser.Engine.Audio
                     }
                 }
 
-                var connections = db.GetCollection<ModuleConnectionDescription>().FindAll().ToArray();
+                var connections = db.GetCollection<ModuleConnection>().FindAll().ToArray();
                 foreach (var connection in connections)
                 {
                     var source = Modules.FirstOrDefault(m => m.Description.Id == connection.SourceId);

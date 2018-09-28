@@ -1,12 +1,12 @@
 ﻿namespace Micser.Shared.Models
 {
-    public class ModuleConnectionDescription : Model
+    public class ModuleConnection : Model
     {
-        public ModuleConnectionDescription()
+        public ModuleConnection()
         {
         }
 
-        public ModuleConnectionDescription(int sourceId, int targetId)
+        public ModuleConnection(int sourceId, int targetId)
         {
             SourceId = sourceId;
             TargetId = targetId;
