@@ -10,12 +10,12 @@ namespace Micser.Engine.Audio
 
         event EventHandler OutputChanged;
 
-        ModuleDescription Description { get; set; }
+        Module Description { get; set; }
         IAudioModule Input { get; set; }
         IWaveSource Output { get; }
 
         string GetState();
 
-        void Initialize(ModuleDescription state);
+        void Initialize(Module state);
     }
 }

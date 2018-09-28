@@ -58,7 +58,7 @@ namespace Micser.Engine.Audio
             return DeviceDescription?.Id;
         }
 
-        public override void Initialize(ModuleDescription description)
+        public override void Initialize(Module description)
         {
             base.Initialize(description);
 

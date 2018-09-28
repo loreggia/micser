@@ -16,7 +16,7 @@ namespace Micser.Engine.Audio
 
         public event EventHandler OutputChanged;
 
-        public ModuleDescription Description { get; set; }
+        public Module Description { get; set; }
 
         public IAudioModule Input
         {
@@ -67,7 +67,7 @@ namespace Micser.Engine.Audio
 
         public abstract string GetState();
 
-        public virtual void Initialize(ModuleDescription description)
+        public virtual void Initialize(Module description)
         {
             Description = description;
         }

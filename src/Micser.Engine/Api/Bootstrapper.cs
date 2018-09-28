@@ -1,4 +1,5 @@
-﻿using Nancy;
+﻿using Micser.Engine.Audio;
+using Nancy;
 using Nancy.Bootstrapper;
 using Nancy.TinyIoc;
 using System;
@@ -9,7 +10,20 @@ namespace Micser.Engine.Api
 {
     public class Bootstrapper : DefaultNancyBootstrapper
     {
+        private readonly IAudioEngine _audioEngine;
+
+        public Bootstrapper(IAudioEngine audioEngine)
+        {
+            _audioEngine = audioEngine;
+        }
+
         protected override IEnumerable<Type> ViewEngines => new Type[0];
+
+        protected override void RegisterInstances(TinyIoCContainer container, IEnumerable<InstanceRegistration> instanceRegistrations)
+        {
+            base.RegisterInstances(container, instanceRegistrations);
+            container.Register(_audioEngine);
+        }
 
         protected override void RequestStartup(TinyIoCContainer container, IPipelines pipelines, NancyContext context)
         {

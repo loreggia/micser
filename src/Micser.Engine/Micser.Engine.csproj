@@ -47,13 +47,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Api\Bootstrapper.cs" />
-    <Compile Include="Api\Modules\ModuleDescriptionsModule.cs" />
+    <Compile Include="Api\Modules\ModuleConnectionsModule.cs" />
+    <Compile Include="Api\Modules\ModulesModule.cs" />
     <Compile Include="Api\Modules\BaseModule.cs" />
     <Compile Include="Api\Server.cs" />
     <Compile Include="Audio\AudioEngine.cs" />
     <Compile Include="Audio\AudioModule.cs" />
     <Compile Include="Audio\DeviceInputModule.cs" />
     <Compile Include="Audio\DeviceOutputModule.cs" />
+    <Compile Include="Audio\IAudioEngine.cs" />
     <Compile Include="Audio\IAudioModule.cs" />
     <Compile Include="Audio\MixerModule.cs" />
     <Compile Include="Audio\MixerSource.cs" />
