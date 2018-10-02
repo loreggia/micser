@@ -1,6 +1,6 @@
 ﻿using Micser.Infrastructure.Widgets;
 
-namespace Micser.Main.ViewModels.Widgets
+namespace Micser.Plugins.Main.ViewModels.Widgets
 {
     public class AudioChainLinkViewModel : WidgetViewModel
     {

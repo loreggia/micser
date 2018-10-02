@@ -1,10 +1,10 @@
-﻿using Micser.Infrastructure.Widgets;
+﻿using System.Collections.Generic;
+using System.Linq;
+using Micser.Infrastructure.Widgets;
 using Micser.Shared;
 using Micser.Shared.Models;
-using System.Collections.Generic;
-using System.Linq;
 
-namespace Micser.Main.ViewModels.Widgets
+namespace Micser.Plugins.Main.ViewModels.Widgets
 {
     public class DeviceOutputViewModel : AudioChainLinkViewModel
     {

@@ -3,10 +3,10 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using Micser.Infrastructure;
 using Micser.Infrastructure.Widgets;
-using Micser.Main.Views;
+using Micser.Plugins.Main.Views;
 using Prism.Regions;
 
-namespace Micser.Main.ViewModels
+namespace Micser.Plugins.Main.ViewModels
 {
     public class MainViewModel : ViewModelNavigationAware
     {

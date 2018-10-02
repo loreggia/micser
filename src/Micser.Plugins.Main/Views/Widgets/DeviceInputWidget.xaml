@@ -1,16 +1,16 @@
-﻿<widgets:Widget x:Class="Micser.Main.Views.Widgets.DeviceInputWidget"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-                 xmlns:p="clr-namespace:Micser.Main.Properties"
-             xmlns:c="clr-namespace:Micser.Infrastructure.Controls;assembly=Micser.Infrastructure"
-             xmlns:w="clr-namespace:Micser.Main.ViewModels.Widgets"
-             xmlns:widgets="clr-namespace:Micser.Infrastructure.Widgets;assembly=Micser.Infrastructure"
-             mc:Ignorable="d"
-                 d:DataContext="{d:DesignInstance w:DeviceInputViewModel}"
-                 MinWidth="175"
-                 MinHeight="75">
+﻿<widgets:Widget x:Class="Micser.Plugins.Main.Views.Widgets.DeviceInputWidget"
+                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                xmlns:p="clr-namespace:Micser.Plugins.Main.Properties"
+                xmlns:c="clr-namespace:Micser.Infrastructure.Controls;assembly=Micser.Infrastructure"
+                xmlns:widgets="clr-namespace:Micser.Infrastructure.Widgets;assembly=Micser.Infrastructure"
+                xmlns:widgets1="clr-namespace:Micser.Plugins.Main.ViewModels.Widgets"
+                mc:Ignorable="d"
+                d:DataContext="{d:DesignInstance widgets1:DeviceInputViewModel}"
+                MinWidth="175"
+                MinHeight="75">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />

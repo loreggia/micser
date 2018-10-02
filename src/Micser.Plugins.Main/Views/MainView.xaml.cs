@@ -1,4 +1,4 @@
-﻿namespace Micser.Main.Views
+﻿namespace Micser.Plugins.Main.Views
 {
     /// <summary>
     /// Interaction logic for MainView.xaml
