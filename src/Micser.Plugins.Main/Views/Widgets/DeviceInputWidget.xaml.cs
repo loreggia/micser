@@ -1,7 +1,6 @@
-﻿using Micser.Infrastructure.Controls;
-using Micser.Infrastructure.Widgets;
+﻿using Micser.Infrastructure.Widgets;
 
-namespace Micser.Main.Views.Widgets
+namespace Micser.Plugins.Main.Views.Widgets
 {
     public partial class DeviceInputWidget
     {

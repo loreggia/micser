@@ -66,7 +66,7 @@ namespace Micser.Core
         private static void LoadDynamicModules(IModuleCatalog moduleCatalog)
         {
             var executingFile = new FileInfo(Assembly.GetExecutingAssembly().Location);
-            var moduleFiles = executingFile.Directory.GetFiles("Micser.*.dll");
+            var moduleFiles = executingFile.Directory.GetFiles("Micser.Plugins.*.dll");
             foreach (var moduleFile in moduleFiles)
             {
                 try

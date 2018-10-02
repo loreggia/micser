@@ -3,16 +3,16 @@ using System.Windows;
 using Micser.Infrastructure.Extensions;
 using Micser.Infrastructure.Themes;
 using Micser.Infrastructure.Widgets;
-using Micser.Main.Properties;
-using Micser.Main.ViewModels;
-using Micser.Main.ViewModels.Widgets;
-using Micser.Main.Views;
-using Micser.Main.Views.Widgets;
+using Micser.Plugins.Main.Properties;
+using Micser.Plugins.Main.ViewModels;
+using Micser.Plugins.Main.ViewModels.Widgets;
+using Micser.Plugins.Main.Views;
+using Micser.Plugins.Main.Views.Widgets;
 using Prism.Ioc;
 using Prism.Modularity;
 using Prism.Regions;
 
-namespace Micser.Main
+namespace Micser.Plugins.Main
 {
     public class MainModule : IModule
     {
