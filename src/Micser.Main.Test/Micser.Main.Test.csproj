@@ -44,12 +44,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Micser.Main\Micser.Main.csproj">
-      <Project>{278da3ca-5758-4c71-8a77-ede249167cc3}</Project>
-      <Name>Micser.Main</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="MSTest.TestAdapter">
       <Version>1.3.2</Version>
     </PackageReference>
