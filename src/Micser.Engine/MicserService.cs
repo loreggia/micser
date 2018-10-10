@@ -101,7 +101,8 @@ namespace Micser.Engine
         private void RegisterTypes(IUnityContainer container)
         {
             container.RegisterInstance(new ConnectionString(Globals.DefaultConnectionString));
-            container.RegisterType<Database>();
+            container.RegisterType<DbContext>();
+            container.RegisterSingleton<IDatabase, Database>();
         }
     }
 }

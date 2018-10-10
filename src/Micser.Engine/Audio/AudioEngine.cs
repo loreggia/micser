@@ -31,7 +31,9 @@ namespace Micser.Engine.Audio
         {
             Stop();
 
-            using (var db = new Database())
+            var database = container.Resolve<IDatabase>();
+
+            using (var db = database.GetContext())
             {
                 var moduleDescriptions = db.GetCollection<Module>().FindAll().ToArray();
                 foreach (var description in moduleDescriptions)
@@ -39,7 +41,7 @@ namespace Micser.Engine.Audio
                     var type = Type.GetType(description.Type);
                     if (type != null)
                     {
-                        if (Activator.CreateInstance(type) is IAudioModule module)
+                        if (container.Resolve(type) is IAudioModule module)
                         {
                             module.Initialize(description);
                             Modules.Add(module);
