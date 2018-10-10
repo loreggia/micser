@@ -2,11 +2,11 @@
 using Nancy;
 using Nancy.Bootstrapper;
 using Nancy.Diagnostics;
+using Nancy.ViewEngines;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Unity;
-using Unity.Lifetime;
 
 namespace Micser.Engine.Api
 {
@@ -17,6 +17,13 @@ namespace Micser.Engine.Api
         public Bootstrapper(IUnityContainer container = null)
         {
             _container = container;
+        }
+
+        protected override void ConfigureApplicationContainer(IUnityContainer container)
+        {
+            base.ConfigureApplicationContainer(container);
+
+            container.RegisterSingleton<IFileSystemReader, DefaultFileSystemReader>();
         }
 
         protected override IUnityContainer CreateRequestContainer(NancyContext context)
@@ -61,7 +68,7 @@ namespace Micser.Engine.Api
 
         protected override IEnumerable<IRequestStartup> RegisterAndGetRequestStartupTasks(IUnityContainer container, Type[] requestStartupTypes)
         {
-            container.RegisterTypes<IRequestStartup>(requestStartupTypes, new TransientLifetimeManager());
+            container.RegisterTypes<IRequestStartup>(requestStartupTypes);
             return container.ResolveAll<IRequestStartup>();
         }
 
@@ -77,10 +84,10 @@ namespace Micser.Engine.Api
                 switch (typeRegistration.Lifetime)
                 {
                     case Lifetime.Transient:
-                        container.RegisterTypes(typeRegistration.RegistrationType, typeRegistration.ImplementationTypes, new TransientLifetimeManager());
+                        container.RegisterTypes(typeRegistration.RegistrationType, typeRegistration.ImplementationTypes);
                         continue;
                     case Lifetime.Singleton:
-                        container.RegisterTypes(typeRegistration.RegistrationType, typeRegistration.ImplementationTypes, new ContainerControlledLifetimeManager());
+                        container.RegisterSingletons(typeRegistration.RegistrationType, typeRegistration.ImplementationTypes);
                         continue;
                     case Lifetime.PerRequest:
                         throw new InvalidOperationException("Unable to directly register a per request lifetime.");
@@ -100,7 +107,7 @@ namespace Micser.Engine.Api
 
         protected override void RegisterRequestContainerModules(IUnityContainer container, IEnumerable<ModuleRegistration> moduleRegistrationTypes)
         {
-            container.RegisterTypes<INancyModule>(moduleRegistrationTypes.Select(x => x.ModuleType), new ContainerControlledLifetimeManager());
+            container.RegisterSingletons<INancyModule>(moduleRegistrationTypes.Select(x => x.ModuleType));
         }
 
         protected override void RegisterTypes(IUnityContainer container, IEnumerable<TypeRegistration> typeRegistrations)

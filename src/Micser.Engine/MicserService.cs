@@ -4,7 +4,6 @@ using Micser.Engine.Audio;
 using Micser.Engine.DataAccess;
 using Micser.Infrastructure;
 using Micser.Infrastructure.Extensions;
-using Micser.Infrastructure.Models;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -14,8 +13,6 @@ using System.Linq;
 using System.Reflection;
 using System.ServiceProcess;
 using Unity;
-using Unity.Lifetime;
-using Module = Micser.Infrastructure.Models.Module;
 
 namespace Micser.Engine
 {
@@ -38,24 +35,9 @@ namespace Micser.Engine
         public void ManualStart()
         {
             var container = new UnityContainer();
+            container.RegisterInstance(new Database());
 
             LoadPlugins(container);
-
-#if DEBUG
-            using (var db = new Database())
-            {
-                var moduleDescriptions = db.GetCollection<Module>();
-                moduleDescriptions.EnsureIndex(d => d.Id, true);
-                var input = new Module { Id = 1, State = new DeviceInputModule.DeviceInputState { DeviceId = "{0.0.1.00000000}.{232aa400-5c3f-4f66-b5ab-afe5e2bfb594}" }, Type = "Micser.Engine.Audio.DeviceInputModule, Micser.Engine" };
-                moduleDescriptions.Upsert(input);
-                var output = new Module { Id = 2, State = new DeviceOutputModule.DeviceOutputState { DeviceId = "{0.0.0.00000000}.{04097f83-4fdf-4dae-bfa4-0891f20d1352}" }, Type = "Micser.Engine.Audio.DeviceOutputModule, Micser.Engine" };
-                moduleDescriptions.Upsert(output);
-
-                var moduleConnections = db.GetCollection<ModuleConnection>();
-                var connection = new ModuleConnection(input.Id, output.Id) { Id = 1 };
-                moduleConnections.Upsert(connection);
-            }
-#endif
 
             _server.Start(container);
             _engine.Start(container);
@@ -91,7 +73,7 @@ namespace Micser.Engine
                 {
                     var assembly = Assembly.LoadFile(moduleFile.FullName);
                     var moduleTypes = assembly.GetExportedTypes().Where(t => typeof(IEngineModule).IsAssignableFrom(t));
-                    container.RegisterTypes<IEngineModule>(moduleTypes, new ContainerControlledLifetimeManager());
+                    container.RegisterSingletons<IEngineModule>(moduleTypes);
                     var modules = container.ResolveAll<IEngineModule>();
                     foreach (var engineModule in modules)
                     {
