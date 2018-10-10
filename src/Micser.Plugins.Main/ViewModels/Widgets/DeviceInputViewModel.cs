@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Micser.Infrastructure.Audio;
+using Micser.Infrastructure.Models;
 using Micser.Infrastructure.Widgets;
-using Micser.Shared;
-using Micser.Shared.Models;
 
 namespace Micser.Plugins.Main.ViewModels.Widgets
 {

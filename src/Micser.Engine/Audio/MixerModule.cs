@@ -1,4 +1,6 @@
-﻿namespace Micser.Engine.Audio
+﻿using Micser.Infrastructure.Modules;
+
+namespace Micser.Engine.Audio
 {
     public class MixerModule : AudioModule
     {

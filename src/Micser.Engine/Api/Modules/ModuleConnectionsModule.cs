@@ -1,8 +1,8 @@
-﻿using Micser.Engine.Audio;
-using Micser.Engine.DataAccess;
-using Micser.Shared.Models;
+﻿using Micser.Engine.DataAccess;
 using System.Collections.Generic;
 using System.Linq;
+using Micser.Infrastructure.Audio;
+using Micser.Infrastructure.Models;
 
 namespace Micser.Engine.Api.Modules
 {

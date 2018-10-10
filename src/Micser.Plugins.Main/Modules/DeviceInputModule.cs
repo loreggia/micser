@@ -1,13 +1,14 @@
-﻿using CSCore.CoreAudioAPI;
+﻿using System;
+using System.Linq;
+using CSCore.CoreAudioAPI;
 using CSCore.SoundIn;
 using CSCore.Streams;
-using Micser.Shared;
-using Micser.Shared.Models;
+using Micser.Infrastructure.Audio;
+using Micser.Infrastructure.Models;
+using Micser.Infrastructure.Modules;
 using NLog;
-using System;
-using System.Linq;
 
-namespace Micser.Engine.Audio
+namespace Micser.Plugins.Main.Modules
 {
     public class DeviceInputModule : AudioModule
     {

@@ -1,9 +1,9 @@
-﻿using CSCore;
-using Micser.Shared.Models;
+﻿using System;
+using CSCore;
+using Micser.Infrastructure.Models;
 using NLog;
-using System;
 
-namespace Micser.Engine.Audio
+namespace Micser.Infrastructure.Modules
 {
     public abstract class AudioModule : IAudioModule
     {

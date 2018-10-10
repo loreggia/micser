@@ -1,10 +1,7 @@
-﻿using LiteDB;
-
-namespace Micser.Shared.Models
+﻿namespace Micser.Infrastructure.Models
 {
     public class Model
     {
-        [BsonId(true)]
         public int Id { get; set; }
     }
 }

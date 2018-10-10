@@ -41,20 +41,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Api\ApiClient.cs" />
-    <Compile Include="Api\ModuleDescriptionsApiClient.cs" />
-    <Compile Include="Api\ServiceResult.cs" />
-    <Compile Include="DeviceService.cs" />
-    <Compile Include="Globals.cs" />
-    <Compile Include="Models\ModuleConnection.cs" />
-    <Compile Include="Models\Module.cs" />
-    <Compile Include="Models\ModuleState.cs" />
-    <Compile Include="Models\DeviceDescription.cs" />
-    <Compile Include="Models\DeviceType.cs" />
-    <Compile Include="Models\Model.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Modules\" />
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CSCore">
       <Version>1.2.1.2</Version>

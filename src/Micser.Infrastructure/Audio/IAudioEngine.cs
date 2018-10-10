@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Micser.Engine.Audio
+namespace Micser.Infrastructure.Audio
 {
     public interface IAudioEngine : IDisposable
     {

@@ -51,9 +51,9 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Micser.Shared\Micser.Shared.csproj">
-      <Project>{ec2284af-9eda-4598-82d7-8c55ef58a54a}</Project>
-      <Name>Micser.Shared</Name>
+    <ProjectReference Include="..\Micser.Infrastructure\Micser.Infrastructure.csproj">
+      <Project>{e14431b4-f54a-4d36-b505-1d3407252430}</Project>
+      <Name>Micser.Infrastructure</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -2,8 +2,8 @@
 using CSCore.CoreAudioAPI;
 using CSCore.Streams;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Micser.Engine.Audio;
-using Micser.Shared.Models;
+using Micser.Infrastructure.Models;
+using Micser.Infrastructure.Modules;
 using System.Threading;
 
 namespace Micser.Engine.Test.Audio
