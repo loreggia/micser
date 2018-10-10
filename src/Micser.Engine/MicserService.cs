@@ -18,9 +18,22 @@ namespace Micser.Engine
 {
     public partial class MicserService : ServiceBase
     {
+        private static readonly string AppDataFolder = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData, Environment.SpecialFolderOption.Create),
+            "Micser");
+
+        private static readonly string DefaultConnectionString = Path.Combine(AppDataFolder, "Database.db");
+
         private readonly AudioEngine _engine;
+
         private readonly ICollection<IEngineModule> _plugins;
+
         private readonly Server _server;
+
+        static MicserService()
+        {
+            Directory.CreateDirectory(AppDataFolder);
+        }
 
         public MicserService()
         {
@@ -35,7 +48,8 @@ namespace Micser.Engine
         public void ManualStart()
         {
             var container = new UnityContainer();
-            container.RegisterInstance(new Database());
+
+            RegisterTypes(container);
 
             LoadPlugins(container);
 
@@ -88,6 +102,12 @@ namespace Micser.Engine
                     Debug.WriteLine(ex);
                 }
             }
+        }
+
+        private void RegisterTypes(IUnityContainer container)
+        {
+            container.RegisterInstance(new ConnectionString(DefaultConnectionString));
+            container.RegisterType<Database>();
         }
     }
 }
