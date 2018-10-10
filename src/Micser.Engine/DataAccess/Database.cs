@@ -1,21 +1,19 @@
-﻿using LiteDB;
-using Micser.Infrastructure.Models;
-using System.IO;
+﻿using Unity;
 
 namespace Micser.Engine.DataAccess
 {
-    public class Database : LiteDatabase
+    internal class Database : IDatabase
     {
-        static Database()
+        private readonly IUnityContainer _container;
+
+        public Database(IUnityContainer container)
         {
-            Directory.CreateDirectory(AppDataFolder);
+            _container = container;
         }
 
-        public Database(ConnectionString connectionString)
-            : base(connectionString ?? ConnectionString)
+        public DbContext GetContext()
         {
-            Mapper.Entity<Module>().Id(x => x.Id);
-            Mapper.Entity<ModuleConnection>().Id(x => x.Id);
+            return _container.Resolve<DbContext>();
         }
     }
 }

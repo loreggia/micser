@@ -1,6 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Micser.Engine.DataAccess;
 
-namespace Micser.Engine.DataAccess.Test
+namespace Micser.Engine.Test.DataAccess
 {
     [TestClass]
     public class DatabaseTest
@@ -8,7 +9,7 @@ namespace Micser.Engine.DataAccess.Test
         [TestMethod]
         public void InstantiateDb()
         {
-            var db = new Database("test.db");
+            var db = new DbContext(new ConnectionString("test.db"));
             var moduleDescriptions = db.GetCollection("test");
             Assert.IsNotNull(moduleDescriptions);
         }
