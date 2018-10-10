@@ -54,8 +54,8 @@
     <Compile Include="Audio\AudioEngine.cs" />
     <Compile Include="Audio\MixerModule.cs" />
     <Compile Include="Audio\MixerSource.cs" />
+    <Compile Include="DataAccess\ConnectionString.cs" />
     <Compile Include="DataAccess\Database.cs" />
-    <Compile Include="DataAccess\Repository.cs" />
     <Compile Include="ProjectInstaller.cs">
       <SubType>Component</SubType>
     </Compile>

@@ -1,24 +1,17 @@
 ﻿using LiteDB;
-using System;
-using System.IO;
 using Micser.Infrastructure.Models;
+using System.IO;
 
 namespace Micser.Engine.DataAccess
 {
     public class Database : LiteDatabase
     {
-        private static readonly string AppDataFolder = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData, Environment.SpecialFolderOption.Create),
-            "Micser");
-
-        private static readonly string ConnectionString = Path.Combine(AppDataFolder, "Database.db");
-
         static Database()
         {
             Directory.CreateDirectory(AppDataFolder);
         }
 
-        public Database(string connectionString = null)
+        public Database(ConnectionString connectionString)
             : base(connectionString ?? ConnectionString)
         {
             Mapper.Entity<Module>().Id(x => x.Id);
