@@ -52,11 +52,6 @@
     <Compile Include="Api\Modules\BaseModule.cs" />
     <Compile Include="Api\Server.cs" />
     <Compile Include="Audio\AudioEngine.cs" />
-    <Compile Include="Audio\AudioModule.cs" />
-    <Compile Include="Audio\DeviceInputModule.cs" />
-    <Compile Include="Audio\DeviceOutputModule.cs" />
-    <Compile Include="Audio\IAudioEngine.cs" />
-    <Compile Include="Audio\IAudioModule.cs" />
     <Compile Include="Audio\MixerModule.cs" />
     <Compile Include="Audio\MixerSource.cs" />
     <Compile Include="ProjectInstaller.cs">
@@ -87,9 +82,9 @@
       <Project>{21b30955-3ae6-42cd-9a0d-8814d6b72cf3}</Project>
       <Name>Micser.Engine.DataAccess</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Micser.Shared\Micser.Shared.csproj">
-      <Project>{ec2284af-9eda-4598-82d7-8c55ef58a54a}</Project>
-      <Name>Micser.Shared</Name>
+    <ProjectReference Include="..\Micser.Infrastructure\Micser.Infrastructure.csproj">
+      <Project>{e14431b4-f54a-4d36-b505-1d3407252430}</Project>
+      <Name>Micser.Infrastructure</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
@@ -110,6 +105,9 @@
     </PackageReference>
     <PackageReference Include="NLog.LiteDB">
       <Version>2018.9.2.5</Version>
+    </PackageReference>
+    <PackageReference Include="Unity">
+      <Version>5.8.11</Version>
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

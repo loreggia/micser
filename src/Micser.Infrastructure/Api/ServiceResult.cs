@@ -1,6 +1,6 @@
 ﻿using System.Net.Http;
 
-namespace Micser.Shared.Api
+namespace Micser.Infrastructure.Api
 {
     public class ServiceResult
     {

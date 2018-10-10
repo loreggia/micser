@@ -14,7 +14,7 @@ using Prism.Regions;
 
 namespace Micser.Plugins.Main
 {
-    public class MainModule : IModule
+    public class MainAppModule : IModule
     {
         public void OnInitialized(IContainerProvider containerProvider)
         {

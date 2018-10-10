@@ -50,11 +50,27 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Api\ApiClient.cs" />
+    <Compile Include="Api\ModuleDescriptionsApiClient.cs" />
+    <Compile Include="Api\ServiceResult.cs" />
+    <Compile Include="Audio\DeviceService.cs" />
+    <Compile Include="Audio\IAudioEngine.cs" />
     <Compile Include="Bindable.cs" />
     <Compile Include="ConfigurationService.cs" />
     <Compile Include="Extensions\ComparableExtensions.cs" />
     <Compile Include="Extensions\ItemsControlExtensions.cs" />
+    <Compile Include="Extensions\UnityContainerExtensions.cs" />
+    <Compile Include="Globals.cs" />
     <Compile Include="IConfigurationService.cs" />
+    <Compile Include="IEngineModule.cs" />
+    <Compile Include="Models\DeviceDescription.cs" />
+    <Compile Include="Models\DeviceType.cs" />
+    <Compile Include="Models\Model.cs" />
+    <Compile Include="Models\Module.cs" />
+    <Compile Include="Models\ModuleConnection.cs" />
+    <Compile Include="Models\ModuleState.cs" />
+    <Compile Include="Modules\AudioModule.cs" />
+    <Compile Include="Modules\IAudioModule.cs" />
     <Compile Include="Widgets\ConnectionChangedEventHandler.cs" />
     <Compile Include="Widgets\ConnectionInfo.cs" />
     <Compile Include="Widgets\ConnectorChangedEventHandler.cs" />
@@ -82,7 +98,7 @@
     <Compile Include="Converter\ConverterExtension.cs" />
     <Compile Include="Converter\DoubleToRectConverter.cs" />
     <Compile Include="CustomApplicationCommands.cs" />
-    <Compile Include="Extensions\ContainerExtensions.cs" />
+    <Compile Include="Extensions\PrismContainerExtensions.cs" />
     <Compile Include="Extensions\DependencyObjectExtensions.cs" />
     <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="Extensions\PropertyExtensions.cs" />
@@ -163,6 +179,9 @@
     <PackageReference Include="CommonServiceLocator">
       <Version>2.0.4</Version>
     </PackageReference>
+    <PackageReference Include="CSCore">
+      <Version>1.2.1.2</Version>
+    </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>11.0.2</Version>
     </PackageReference>
@@ -182,5 +201,6 @@
       <Version>5.8.11</Version>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

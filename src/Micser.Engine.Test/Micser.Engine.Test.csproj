@@ -42,9 +42,9 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Audio\DeviceOutputTest.cs" />
-    <Compile Include="Audio\MixerTest.cs" />
-    <Compile Include="Audio\VolumeChangeTest.cs" />
+    <Content Include="Audio\DeviceOutputTest.cs" />
+    <Content Include="Audio\MixerTest.cs" />
+    <Content Include="Audio\VolumeChangeTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -63,9 +63,9 @@
       <Project>{88134b7e-e212-413b-881e-2cddffd527d6}</Project>
       <Name>Micser.Engine</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Micser.Shared\Micser.Shared.csproj">
-      <Project>{ec2284af-9eda-4598-82d7-8c55ef58a54a}</Project>
-      <Name>Micser.Shared</Name>
+    <ProjectReference Include="..\Micser.Infrastructure\Micser.Infrastructure.csproj">
+      <Project>{e14431b4-f54a-4d36-b505-1d3407252430}</Project>
+      <Name>Micser.Infrastructure</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />

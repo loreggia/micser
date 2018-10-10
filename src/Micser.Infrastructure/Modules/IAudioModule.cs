@@ -1,8 +1,8 @@
-﻿using CSCore;
-using Micser.Shared.Models;
-using System;
+﻿using System;
+using CSCore;
+using Micser.Infrastructure.Models;
 
-namespace Micser.Engine.Audio
+namespace Micser.Infrastructure.Modules
 {
     public interface IAudioModule : IDisposable
     {

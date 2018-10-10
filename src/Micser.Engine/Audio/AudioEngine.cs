@@ -1,9 +1,12 @@
 ﻿using Micser.Engine.DataAccess;
-using Micser.Shared.Models;
+using Micser.Infrastructure.Audio;
+using Micser.Infrastructure.Models;
+using Micser.Infrastructure.Modules;
 using NLog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity;
 
 namespace Micser.Engine.Audio
 {
@@ -24,7 +27,7 @@ namespace Micser.Engine.Audio
             GC.SuppressFinalize(this);
         }
 
-        public void Start()
+        public void Start(IUnityContainer container)
         {
             Stop();
 

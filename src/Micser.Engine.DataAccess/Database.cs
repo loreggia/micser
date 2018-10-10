@@ -1,6 +1,7 @@
 ﻿using LiteDB;
 using System;
 using System.IO;
+using Micser.Infrastructure.Models;
 
 namespace Micser.Engine.DataAccess
 {
@@ -20,6 +21,8 @@ namespace Micser.Engine.DataAccess
         public Database(string connectionString = null)
             : base(connectionString ?? ConnectionString)
         {
+            Mapper.Entity<Module>().Id(x => x.Id);
+            Mapper.Entity<ModuleConnection>().Id(x => x.Id);
         }
     }
 }

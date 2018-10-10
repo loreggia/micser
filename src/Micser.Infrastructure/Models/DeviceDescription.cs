@@ -1,4 +1,4 @@
-﻿namespace Micser.Shared.Models
+﻿namespace Micser.Infrastructure.Models
 {
     public class DeviceDescription
     {

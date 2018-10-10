@@ -1,4 +1,4 @@
-﻿namespace Micser.Shared.Api
+﻿namespace Micser.Infrastructure.Api
 {
     public class ModuleDescriptionsApiClient : ApiClient
     {

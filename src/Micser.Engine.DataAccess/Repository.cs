@@ -1,5 +1,4 @@
-﻿using Micser.Shared;
-using System;
+﻿using System;
 
 namespace Micser.Engine.DataAccess
 {
