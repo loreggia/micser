@@ -18,12 +18,6 @@ namespace Micser.Engine
 {
     public partial class MicserService : ServiceBase
     {
-        private static readonly string AppDataFolder = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData, Environment.SpecialFolderOption.Create),
-            "Micser");
-
-        private static readonly string DefaultConnectionString = Path.Combine(AppDataFolder, "Database.db");
-
         private readonly AudioEngine _engine;
 
         private readonly ICollection<IEngineModule> _plugins;
@@ -32,7 +26,7 @@ namespace Micser.Engine
 
         static MicserService()
         {
-            Directory.CreateDirectory(AppDataFolder);
+            Directory.CreateDirectory(Globals.AppDataFolder);
         }
 
         public MicserService()
@@ -106,7 +100,7 @@ namespace Micser.Engine
 
         private void RegisterTypes(IUnityContainer container)
         {
-            container.RegisterInstance(new ConnectionString(DefaultConnectionString));
+            container.RegisterInstance(new ConnectionString(Globals.DefaultConnectionString));
             container.RegisterType<Database>();
         }
     }
