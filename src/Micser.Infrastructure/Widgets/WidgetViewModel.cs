@@ -8,11 +8,17 @@ namespace Micser.Infrastructure.Widgets
     public abstract class WidgetViewModel : ViewModel
     {
         private readonly ObservableCollection<ConnectorViewModel> _inputConnectors;
+
         private readonly ObservableCollection<ConnectorViewModel> _outputConnectors;
+
         private string _header;
+
         private Guid _id;
+
         private WidgetState _loadingWidgetState;
+
         private string _name;
+
         private Point _position;
 
         protected WidgetViewModel()
@@ -76,14 +82,38 @@ namespace Micser.Infrastructure.Widgets
         {
         }
 
+        protected ConnectorViewModel AddInput(string name)
+        {
+            var input = new ConnectorViewModel(name, this, null);
+            input.ConnectionChanged += OnInputConnectionChanged;
+            AddInput(input);
+            return input;
+        }
+
         protected virtual void AddInput(ConnectorViewModel input)
         {
             _inputConnectors.Add(input);
         }
 
+        protected ConnectorViewModel AddOutput(string name)
+        {
+            var output = new ConnectorViewModel(name, this, null);
+            output.ConnectionChanged += OnOutputConnectionChanged;
+            AddOutput(output);
+            return output;
+        }
+
         protected virtual void AddOutput(ConnectorViewModel output)
         {
             _outputConnectors.Add(output);
+        }
+
+        protected virtual void OnInputConnectionChanged(object sender, ConnectionChangedEventArgs e)
+        {
+        }
+
+        protected virtual void OnOutputConnectionChanged(object sender, ConnectionChangedEventArgs e)
+        {
         }
     }
 }

@@ -1,24 +1,24 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Micser.Infrastructure.Audio;
+﻿using Micser.Infrastructure.Audio;
 using Micser.Infrastructure.Models;
 using Micser.Infrastructure.Widgets;
+using System.Collections.Generic;
+using System.Linq;
 
-namespace Micser.Plugins.Main.ViewModels.Widgets
+namespace Micser.Plugins.Main.Widgets
 {
-    public class DeviceOutputViewModel : AudioChainLinkViewModel
+    public class DeviceInputViewModel : WidgetViewModel
     {
-        public const string InputConnectorName = "Input1";
+        public const string OutputConnectorName = "Output1";
         public const string SettingKeyDeviceId = "DeviceId";
 
-        private readonly ConnectorViewModel _inputViewModel;
+        private readonly ConnectorViewModel _outputViewModel;
         private IEnumerable<DeviceDescription> _deviceDescriptions;
         private DeviceDescription _selectedDeviceDescription;
 
-        public DeviceOutputViewModel()
+        public DeviceInputViewModel()
         {
-            Header = "Device Output";
-            _inputViewModel = AddInput(InputConnectorName);
+            Header = "Device Input";
+            _outputViewModel = AddOutput(OutputConnectorName);
         }
 
         public IEnumerable<DeviceDescription> DeviceDescriptions
@@ -59,7 +59,7 @@ namespace Micser.Plugins.Main.ViewModels.Widgets
         private void UpdateDeviceDescriptions()
         {
             var deviceService = new DeviceService();
-            DeviceDescriptions = deviceService.GetDevices(DeviceType.Output).ToArray();
+            DeviceDescriptions = deviceService.GetDevices(DeviceType.Input).ToArray();
         }
     }
 }

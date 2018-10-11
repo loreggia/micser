@@ -55,20 +55,12 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
-    <Compile Include="ViewModels\MainViewModel.cs" />
-    <Compile Include="ViewModels\Widgets\AudioChainLinkViewModel.cs" />
-    <Compile Include="ViewModels\Widgets\DeviceInputViewModel.cs" />
-    <Compile Include="ViewModels\Widgets\DeviceOutputViewModel.cs" />
-    <Compile Include="Views\MainView.xaml.cs">
-      <DependentUpon>MainView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\SettingsView.xaml.cs">
-      <DependentUpon>SettingsView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\Widgets\DeviceInputWidget.xaml.cs">
+    <Compile Include="Widgets\DeviceInputViewModel.cs" />
+    <Compile Include="Widgets\DeviceOutputViewModel.cs" />
+    <Compile Include="Widgets\DeviceInputWidget.xaml.cs">
       <DependentUpon>DeviceInputWidget.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Views\Widgets\DeviceOutputWidget.xaml.cs">
+    <Compile Include="Widgets\DeviceOutputWidget.xaml.cs">
       <DependentUpon>DeviceOutputWidget.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
@@ -77,19 +69,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\MainView.xaml">
+    <Page Include="Widgets\DeviceInputWidget.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\SettingsView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Widgets\DeviceInputWidget.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\Widgets\DeviceOutputWidget.xaml">
+    <Page Include="Widgets\DeviceOutputWidget.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

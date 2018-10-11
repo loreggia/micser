@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace Micser.Plugins.Main.Views
+namespace Micser.Infrastructure.Views
 {
     /// <summary>
     /// Interaction logic for SettingsView.xaml

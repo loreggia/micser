@@ -1,11 +1,9 @@
-﻿using System;
-using Micser.Infrastructure.Extensions;
+﻿using Micser.Infrastructure.Extensions;
 using Micser.Infrastructure.Menu;
 using Micser.Infrastructure.ViewModels;
 using Micser.Infrastructure.Views;
 using Prism.Ioc;
 using Prism.Modularity;
-using Prism.Regions;
 
 namespace Micser.Infrastructure
 {
@@ -23,15 +21,18 @@ namespace Micser.Infrastructure
             menuItemRegistry.Add(new MenuItemDescription { Header = "_Options", Id = "Options", ParentId = "Tools" });
             menuItemRegistry.Add(new MenuItemDescription { Header = "_About", Id = "About", ParentId = "Help" });
 
-            var regionManager = containerProvider.Resolve<IRegionManager>();
-            regionManager.RequestNavigate("MenuRegion", new Uri(nameof(MainMenuView), UriKind.Relative));
-            regionManager.RequestNavigate("StatusRegion", new Uri(nameof(MainStatusBarView), UriKind.Relative));
+            var navigationManager = containerProvider.Resolve<INavigationManager>();
+            navigationManager.Navigate<MainStatusBarView>(Globals.PrismRegions.Status);
         }
 
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            containerRegistry.RegisterView<MainMenuView, MainMenuViewModel>("MenuRegion");
-            containerRegistry.RegisterView<MainStatusBarView, MainStatusBarViewModel>("StatusRegion");
+            containerRegistry.RegisterView<MainMenuView, MainMenuViewModel>(Globals.PrismRegions.Menu);
+
+            containerRegistry.RegisterView<MainStatusBarView, MainStatusBarViewModel>(Globals.PrismRegions.Status);
+
+            containerRegistry.RegisterView<StartupView, StartupViewModel>(Globals.PrismRegions.Main);
+            containerRegistry.RegisterView<MainView, MainViewModel>(Globals.PrismRegions.Main);
         }
     }
 }
