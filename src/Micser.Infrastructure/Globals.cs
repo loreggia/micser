@@ -14,5 +14,12 @@ namespace Micser.Infrastructure
             "Micser");
 
         public static readonly string DefaultConnectionString = Path.Combine(AppDataFolder, "Database.db");
+
+        public static class PrismRegions
+        {
+            public const string Main = "MainRegion";
+            public const string Menu = "MenuRegion";
+            public const string Status = "StatusRegion";
+        }
     }
 }

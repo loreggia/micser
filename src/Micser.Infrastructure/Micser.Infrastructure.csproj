@@ -53,6 +53,7 @@
     <Compile Include="Api\ApiClient.cs" />
     <Compile Include="Api\ModuleDescriptionsApiClient.cs" />
     <Compile Include="Api\ServiceResult.cs" />
+    <Compile Include="ApplicationEvents.cs" />
     <Compile Include="Audio\DeviceService.cs" />
     <Compile Include="Audio\IAudioEngine.cs" />
     <Compile Include="Bindable.cs" />
@@ -63,6 +64,7 @@
     <Compile Include="Globals.cs" />
     <Compile Include="IConfigurationService.cs" />
     <Compile Include="IEngineModule.cs" />
+    <Compile Include="INavigationManager.cs" />
     <Compile Include="Models\DeviceDescription.cs" />
     <Compile Include="Models\DeviceType.cs" />
     <Compile Include="Models\Model.cs" />
@@ -71,6 +73,18 @@
     <Compile Include="Models\ModuleState.cs" />
     <Compile Include="Modules\AudioModule.cs" />
     <Compile Include="Modules\IAudioModule.cs" />
+    <Compile Include="NavigationManager.cs" />
+    <Compile Include="ViewModels\MainViewModel.cs" />
+    <Compile Include="ViewModels\StartupViewModel.cs" />
+    <Compile Include="Views\MainView.xaml.cs">
+      <DependentUpon>MainView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\SettingsView.xaml.cs">
+      <DependentUpon>SettingsView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Views\StartupView.xaml.cs">
+      <DependentUpon>StartupView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Widgets\ConnectionChangedEventHandler.cs" />
     <Compile Include="Widgets\ConnectionInfo.cs" />
     <Compile Include="Widgets\ConnectorChangedEventHandler.cs" />
@@ -86,8 +100,10 @@
     <Compile Include="Controls\EditableTextBlock.cs" />
     <Compile Include="Controls\EditableTextBlockAdorner.cs" />
     <Compile Include="Controls\RelativePositionPanel.cs" />
+    <Compile Include="Widgets\IWidgetRegistry.cs" />
     <Compile Include="Widgets\ResizeThumb.cs" />
     <Compile Include="Widgets\RubberbandAdorner.cs" />
+    <Compile Include="Widgets\WidgetRegistry.cs" />
     <Compile Include="Widgets\WidgetState.cs" />
     <Compile Include="Widgets\WidgetToolbox.cs" />
     <Compile Include="Widgets\WidgetToolboxItem.cs" />
@@ -174,6 +190,18 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Views\MainView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\SettingsView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Views\StartupView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CommonServiceLocator">
@@ -201,6 +229,8 @@
       <Version>5.8.11</Version>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Assets\icon.ico" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

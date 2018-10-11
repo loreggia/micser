@@ -1,8 +1,8 @@
-﻿using System.ComponentModel;
+﻿using Micser.Infrastructure;
+using Prism.Regions;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
-using Micser.Infrastructure;
-using Prism.Regions;
 
 namespace Micser.Core
 {

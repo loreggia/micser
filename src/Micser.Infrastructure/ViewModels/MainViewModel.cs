@@ -1,12 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using Micser.Infrastructure.Views;
+using Micser.Infrastructure.Widgets;
+using Prism.Regions;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using Micser.Infrastructure;
-using Micser.Infrastructure.Widgets;
-using Micser.Plugins.Main.Views;
-using Prism.Regions;
 
-namespace Micser.Plugins.Main.ViewModels
+namespace Micser.Infrastructure.ViewModels
 {
     public class MainViewModel : ViewModelNavigationAware
     {
@@ -15,17 +14,18 @@ namespace Micser.Plugins.Main.ViewModels
 
         private readonly IConfigurationService _configurationService;
         private readonly IList<ConnectionViewModel> _connections;
+        private readonly IWidgetRegistry _widgetRegistry;
         private readonly IList<WidgetViewModel> _widgets;
         private IEnumerable<WidgetDescription> _availableWidgets;
 
-        public MainViewModel(IConfigurationService configurationService, IWidgetFactory widgetFactory, IEnumerable<WidgetDescription> availableWidgets)
+        public MainViewModel(IConfigurationService configurationService, IWidgetFactory widgetFactory, IWidgetRegistry widgetRegistry)
         {
             _configurationService = configurationService;
+            _widgetRegistry = widgetRegistry;
             _widgets = new ObservableCollection<WidgetViewModel>();
             _connections = new ObservableCollection<ConnectionViewModel>();
 
             WidgetFactory = widgetFactory;
-            AvailableWidgets = availableWidgets;
         }
 
         public IEnumerable<WidgetDescription> AvailableWidgets
@@ -82,6 +82,8 @@ namespace Micser.Plugins.Main.ViewModels
         public override void OnNavigatedTo(NavigationContext navigationContext)
         {
             base.OnNavigatedTo(navigationContext);
+
+            AvailableWidgets = _widgetRegistry.Widgets;
 
             var widgetStates = _configurationService.GetSettingEnumerable<WidgetState>(WidgetsConfigurationKey);
 

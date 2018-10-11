@@ -8,6 +8,10 @@
              d:DesignWidth="300"
              d:DataContext="{d:DesignInstance viewModels:MainStatusBarViewModel}">
     <Grid>
-        <StatusBar ItemsSource="{Binding StatusItems}" />
+        <StatusBar>
+            <StatusBarItem>
+                <TextBlock Text="{Binding StatusText}" />
+            </StatusBarItem>
+        </StatusBar>
     </Grid>
 </UserControl>

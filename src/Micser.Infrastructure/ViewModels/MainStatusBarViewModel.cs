@@ -1,16 +1,26 @@
-﻿using System.Collections.Generic;
-using System.Windows.Controls.Primitives;
+﻿using Prism.Events;
 
 namespace Micser.Infrastructure.ViewModels
 {
     public class MainStatusBarViewModel : ViewModelNavigationAware
     {
-        private IEnumerable<StatusBarItem> _statusItems;
+        private string _statusText;
 
-        public IEnumerable<StatusBarItem> StatusItems
+        public MainStatusBarViewModel(IEventAggregator eventAggregator)
         {
-            get => _statusItems;
-            set => SetProperty(ref _statusItems, value);
+            var statusEvent = eventAggregator.GetEvent<ApplicationEvents.StatusChange>();
+            statusEvent.Subscribe(OnStatusChange);
+        }
+
+        public string StatusText
+        {
+            get => _statusText;
+            set => SetProperty(ref _statusText, value);
+        }
+
+        private void OnStatusChange(string text)
+        {
+            StatusText = text;
         }
     }
 }
