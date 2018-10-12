@@ -1,7 +1,9 @@
 ﻿using Micser.Infrastructure.Extensions;
 using Micser.Infrastructure.Menu;
+using Micser.Infrastructure.Themes;
 using Micser.Infrastructure.ViewModels;
 using Micser.Infrastructure.Views;
+using Micser.Infrastructure.Widgets;
 using Prism.Ioc;
 using Prism.Modularity;
 
@@ -11,6 +13,8 @@ namespace Micser.Infrastructure
     {
         public void OnInitialized(IContainerProvider containerProvider)
         {
+            containerProvider.Resolve<IApplicationStateService>().Initialize();
+
             // top level menu items
             var menuItemRegistry = containerProvider.Resolve<IMenuItemRegistry>();
             menuItemRegistry.Add(new MenuItemDescription { Header = "_File", Id = "File" });
@@ -22,17 +26,23 @@ namespace Micser.Infrastructure
             menuItemRegistry.Add(new MenuItemDescription { Header = "_About", Id = "About", ParentId = "Help" });
 
             var navigationManager = containerProvider.Resolve<INavigationManager>();
-            navigationManager.Navigate<MainStatusBarView>(Globals.PrismRegions.Status);
+            navigationManager.Navigate<StartupView>();
         }
 
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            containerRegistry.RegisterView<MainMenuView, MainMenuViewModel>(Globals.PrismRegions.Menu);
+            containerRegistry.RegisterSingleton<IApplicationStateService, ApplicationStateService>();
+            containerRegistry.RegisterSingleton<IResourceRegistry, ResourceRegistry>();
+            containerRegistry.RegisterSingleton<IMenuItemRegistry, MenuItemRegistry>();
+            containerRegistry.RegisterSingleton<IWidgetRegistry, WidgetRegistry>();
+            containerRegistry.RegisterSingleton<IWidgetFactory, WidgetFactory>();
+            containerRegistry.RegisterSingleton<INavigationManager, NavigationManager>();
 
-            containerRegistry.RegisterView<MainStatusBarView, MainStatusBarViewModel>(Globals.PrismRegions.Status);
+            containerRegistry.RegisterView<StartupView, StartupViewModel>();
 
-            containerRegistry.RegisterView<StartupView, StartupViewModel>(Globals.PrismRegions.Main);
-            containerRegistry.RegisterView<MainView, MainViewModel>(Globals.PrismRegions.Main);
+            containerRegistry.RegisterView<MainMenuView, MainMenuViewModel>();
+            containerRegistry.RegisterView<MainStatusBarView, MainStatusBarViewModel>();
+            containerRegistry.RegisterView<MainView, MainViewModel>();
         }
     }
 }

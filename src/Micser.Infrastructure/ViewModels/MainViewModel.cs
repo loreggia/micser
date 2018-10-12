@@ -1,5 +1,4 @@
-﻿using Micser.Infrastructure.Views;
-using Micser.Infrastructure.Widgets;
+﻿using Micser.Infrastructure.Widgets;
 using Prism.Regions;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -41,12 +40,6 @@ namespace Micser.Infrastructure.ViewModels
         public override void OnNavigatedFrom(NavigationContext navigationContext)
         {
             base.OnNavigatedFrom(navigationContext);
-
-            if (navigationContext.Uri.OriginalString == typeof(MainView).Name)
-            {
-                // TODO why is this method called at startup
-                return;
-            }
 
             var widgetStates = new List<WidgetState>();
 

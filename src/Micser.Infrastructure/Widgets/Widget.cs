@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Micser.Infrastructure.Extensions;
+using Micser.Infrastructure.Themes;
+using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using Micser.Infrastructure.Extensions;
-using Micser.Infrastructure.Themes;
 
 namespace Micser.Infrastructure.Widgets
 {
@@ -56,6 +56,7 @@ namespace Micser.Infrastructure.Widgets
         public Widget()
         {
             ResourceRegistry.RegisterResourcesFor(this);
+            SetResourceReference(StyleProperty, typeof(Widget));
 
             Loaded += OnWidgetLoaded;
             Dispatcher.ShutdownStarted += OnDispatcherShutdownStarted;

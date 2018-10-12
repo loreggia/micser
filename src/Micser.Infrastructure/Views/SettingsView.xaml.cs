@@ -1,11 +1,6 @@
-﻿using System.Windows.Controls;
-
-namespace Micser.Infrastructure.Views
+﻿namespace Micser.Infrastructure.Views
 {
-    /// <summary>
-    /// Interaction logic for SettingsView.xaml
-    /// </summary>
-    public partial class SettingsView : UserControl
+    public partial class SettingsView
     {
         public SettingsView()
         {
