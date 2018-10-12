@@ -26,6 +26,10 @@ namespace Micser.Infrastructure.Themes
                 },
                 new ResourceDictionary
                 {
+                    Source = new Uri("Micser.Infrastructure;component/Themes/BusyPanel.xaml", UriKind.Relative)
+                },
+                new ResourceDictionary
+                {
                     Source = new Uri("Micser.Infrastructure;component/Themes/Connection.xaml", UriKind.Relative)
                 },
                 new ResourceDictionary
@@ -35,6 +39,10 @@ namespace Micser.Infrastructure.Themes
                 new ResourceDictionary
                 {
                     Source = new Uri("Micser.Infrastructure;component/Themes/Thumbs.xaml", UriKind.Relative)
+                },
+                new ResourceDictionary
+                {
+                    Source = new Uri("Micser.Infrastructure;component/Themes/View.xaml", UriKind.Relative)
                 },
                 new ResourceDictionary
                 {

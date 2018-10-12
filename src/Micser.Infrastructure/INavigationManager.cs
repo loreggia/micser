@@ -2,6 +2,6 @@
 {
     public interface INavigationManager
     {
-        void Navigate<TView>(string region = Globals.PrismRegions.Main);
+        void Navigate<TView>(string regionName = Globals.PrismRegions.Main);
     }
 }

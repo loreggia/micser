@@ -1,6 +1,5 @@
 ﻿using Micser.Infrastructure.Widgets;
 using Prism.Ioc;
-using Prism.Regions;
 using Prism.Unity;
 using System.Windows;
 using Unity;
@@ -10,15 +9,15 @@ namespace Micser.Infrastructure.Extensions
 {
     public static class PrismContainerExtensions
     {
-        public static void RegisterView<TView, TViewModel>(this IContainerRegistry containerRegistry, string regionName)
+        public static void RegisterView<TView, TViewModel>(this IContainerRegistry containerRegistry)
                     where TView : FrameworkElement
             where TViewModel : IViewModel
         {
             var container = containerRegistry.GetContainer();
-            container.RegisterType<TView>("default");
-            container.RegisterType<TView>(new InjectionFactory(c =>
+            container.RegisterType<TView>();
+            container.RegisterType<object>(typeof(TView).Name, new InjectionFactory(c =>
             {
-                var view = c.Resolve<TView>("default");
+                var view = c.Resolve<TView>();
                 var viewModel = c.Resolve<TViewModel>();
 
                 view.DataContext = viewModel;
@@ -26,11 +25,7 @@ namespace Micser.Infrastructure.Extensions
                 return view;
             }));
 
-            if (!string.IsNullOrEmpty(regionName))
-            {
-                var regionManager = container.Resolve<IRegionManager>();
-                regionManager.RegisterViewWithRegion(regionName, typeof(TView));
-            }
+            //container.RegisterTypeForNavigation<TView>();
         }
 
         public static void RegisterWidget<TWidget, TViewModel>(this IContainerRegistry containerRegistry, string defaultName)

@@ -1,13 +1,10 @@
-﻿using Micser.Infrastructure.Widgets;
-
-namespace Micser.Plugins.Main.Views.Widgets
+﻿namespace Micser.Plugins.Main.Widgets
 {
     public partial class DeviceInputWidget
     {
         public DeviceInputWidget()
         {
             InitializeComponent();
-            SetResourceReference(StyleProperty, typeof(Widget));
         }
     }
 }

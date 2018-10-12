@@ -1,20 +1,29 @@
-﻿using System;
+﻿using Micser.Infrastructure.Controls;
+using Micser.Infrastructure.Themes;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
-using Micser.Infrastructure.Controls;
 
 namespace Micser.Infrastructure
 {
-    public class View : UserControl
+    public class View : ContentControl
     {
         public static readonly DependencyProperty IsBusyProperty = DependencyProperty.Register(
             nameof(IsBusy), typeof(bool), typeof(View), new PropertyMetadata(false, IsBusyPropertyChanged));
 
         private BusyAdorner _busyAdorner;
 
+        static View()
+        {
+            DefaultStyleKeyProperty.OverrideMetadata(typeof(View), new FrameworkPropertyMetadata(typeof(View)));
+        }
+
         public View()
         {
+            ResourceRegistry.RegisterResourcesFor(this);
+            SetResourceReference(StyleProperty, typeof(View));
+
             Dispatcher.ShutdownStarted += OnDispatcherShutdownStarted;
         }
 
@@ -28,6 +37,7 @@ namespace Micser.Infrastructure
 
         private static void IsBusyPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
+            return;
             var view = (View)d;
 
             var layer = AdornerLayer.GetAdornerLayer(view);

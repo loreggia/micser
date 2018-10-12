@@ -1,7 +1,6 @@
 ﻿using Micser.Infrastructure.Extensions;
 using Micser.Infrastructure.Themes;
 using Micser.Plugins.Main.Properties;
-using Micser.Plugins.Main.Views.Widgets;
 using Micser.Plugins.Main.Widgets;
 using Prism.Ioc;
 using Prism.Modularity;
@@ -15,7 +14,7 @@ namespace Micser.Plugins.Main
         public void OnInitialized(IContainerProvider containerProvider)
         {
             var resourceRegistry = containerProvider.Resolve<IResourceRegistry>();
-            resourceRegistry.Add(new ResourceDictionary { Source = new Uri("Micser.Main;component/Themes/Generic.xaml", UriKind.Relative) });
+            resourceRegistry.Add(new ResourceDictionary { Source = new Uri("Micser.Plugins.Main;component/Themes/Generic.xaml", UriKind.Relative) });
         }
 
         public void RegisterTypes(IContainerRegistry containerRegistry)

@@ -54,14 +54,17 @@
     <Compile Include="Api\ModuleDescriptionsApiClient.cs" />
     <Compile Include="Api\ServiceResult.cs" />
     <Compile Include="ApplicationEvents.cs" />
+    <Compile Include="ApplicationStateService.cs" />
     <Compile Include="Audio\DeviceService.cs" />
     <Compile Include="Audio\IAudioEngine.cs" />
     <Compile Include="Bindable.cs" />
     <Compile Include="ConfigurationService.cs" />
+    <Compile Include="Controls\BusyPanel.cs" />
     <Compile Include="Extensions\ComparableExtensions.cs" />
     <Compile Include="Extensions\ItemsControlExtensions.cs" />
     <Compile Include="Extensions\UnityContainerExtensions.cs" />
     <Compile Include="Globals.cs" />
+    <Compile Include="IApplicationStateService.cs" />
     <Compile Include="IConfigurationService.cs" />
     <Compile Include="IEngineModule.cs" />
     <Compile Include="INavigationManager.cs" />
@@ -150,6 +153,10 @@
     <Compile Include="Widgets\WidgetFactory.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Themes\BusyPanel.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Themes\Connection.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -165,6 +172,10 @@
     <Page Include="Themes\Thumbs.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\View.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Themes\WidgetToolbox.xaml">
       <SubType>Designer</SubType>
