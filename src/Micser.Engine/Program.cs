@@ -1,7 +1,12 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.ServiceProcess;
 using System.Threading;
+using Micser.Infrastructure;
+using NLog;
+using NLog.Config;
+using NLog.Targets;
 
 namespace Micser.Engine
 {
@@ -12,6 +17,21 @@ namespace Micser.Engine
         /// </summary>
         internal static void Main(params string[] arguments)
         {
+            var config = new LoggingConfiguration();
+            config.AddTarget(new ColoredConsoleTarget("ConsoleTarget")
+            {
+                Layout = @"${date:format=HH\:mm\:ss} ${level} ${message} ${exception}",
+                DetectConsoleAvailable = true
+            });
+            config.AddTarget(new FileTarget("FileTarget")
+            {
+                ArchiveNumbering = ArchiveNumberingMode.DateAndSequence,
+                FileName = Path.Combine(Globals.AppDataFolder, "Micser.Engine.log"),
+                FileNameKind = FilePathKind.Absolute
+            });
+
+            LogManager.Configuration = config;
+
             var service = new MicserService();
 
             if (arguments.Any(a => string.Equals("manual", a, StringComparison.InvariantCultureIgnoreCase)))
