@@ -12,16 +12,38 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
+using NLog.Config;
+using NLog.Targets;
 using Unity;
 using Unity.Injection;
 
-namespace Micser.Core
+namespace Micser.App
 {
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
-    public partial class App
+    public partial class Application
     {
+        protected override void OnStartup(StartupEventArgs e)
+        {
+            base.OnStartup(e);
+
+            var config = new LoggingConfiguration();
+            config.AddTarget(new ColoredConsoleTarget("ConsoleTarget")
+            {
+                Layout = @"${date:format=HH\:mm\:ss} ${level} ${message} ${exception}",
+                DetectConsoleAvailable = true
+            });
+            config.AddTarget(new FileTarget("FileTarget")
+            {
+                ArchiveNumbering = ArchiveNumberingMode.DateAndSequence,
+                FileName = Path.Combine(Globals.AppDataFolder, "Micser.App.log"),
+                FileNameKind = FilePathKind.Absolute
+            });
+
+            LogManager.Configuration = config;
+        }
+
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)
         {
             base.ConfigureModuleCatalog(moduleCatalog);

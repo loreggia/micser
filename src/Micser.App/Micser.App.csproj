@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{80AA2402-DE97-422B-8D56-9C709F38925C}</ProjectGuid>
     <OutputType>WinExe</OutputType>
-    <RootNamespace>Micser.Core</RootNamespace>
-    <AssemblyName>Micser.Core</AssemblyName>
+    <RootNamespace>Micser.App</RootNamespace>
+    <AssemblyName>Micser.App</AssemblyName>
     <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -35,7 +35,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>Micser.Core.App</StartupObject>
+    <StartupObject>Micser.App.Application</StartupObject>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>..\..\gfx\icon.ico</ApplicationIcon>
@@ -62,7 +62,7 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <ApplicationDefinition Include="App.xaml">
+    <ApplicationDefinition Include="Application.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
@@ -74,8 +74,8 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Compile Include="App.xaml.cs">
-      <DependentUpon>App.xaml</DependentUpon>
+    <Compile Include="Application.xaml.cs">
+      <DependentUpon>Application.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
   </ItemGroup>

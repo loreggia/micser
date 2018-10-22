@@ -4,7 +4,7 @@ using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
 
-namespace Micser.Core
+namespace Micser.App
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

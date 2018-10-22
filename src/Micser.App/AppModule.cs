@@ -1,7 +1,7 @@
 ﻿using Prism.Ioc;
 using Prism.Modularity;
 
-namespace Micser.Core
+namespace Micser.App
 {
     public class AppModule : IModule
     {
