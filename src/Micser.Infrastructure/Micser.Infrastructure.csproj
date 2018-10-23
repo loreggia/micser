@@ -51,7 +51,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Api\ApiClient.cs" />
-    <Compile Include="Api\ModuleDescriptionsApiClient.cs" />
+    <Compile Include="Api\ErrorList.cs" />
+    <Compile Include="Api\ModulesApiClient.cs" />
     <Compile Include="Api\ServiceResult.cs" />
     <Compile Include="ApplicationEvents.cs" />
     <Compile Include="ApplicationStateService.cs" />
@@ -70,6 +71,7 @@
     <Compile Include="INavigationManager.cs" />
     <Compile Include="Models\DeviceDescription.cs" />
     <Compile Include="Models\DeviceType.cs" />
+    <Compile Include="Api\Error.cs" />
     <Compile Include="Models\Model.cs" />
     <Compile Include="Models\Module.cs" />
     <Compile Include="Models\ModuleConnection.cs" />

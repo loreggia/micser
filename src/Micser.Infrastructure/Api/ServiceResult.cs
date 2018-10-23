@@ -1,40 +1,26 @@
-﻿using System.Net.Http;
+﻿using System.Linq;
+using System.Net;
+using System.Net.Http;
 
 namespace Micser.Infrastructure.Api
 {
-    public class ServiceResult
+    public class ServiceResult<TData>
     {
-        public ServiceResult(int statusCode, string statusText)
-        {
-            StatusCode = statusCode;
-            StatusText = statusText;
-        }
-
-        public ServiceResult(HttpResponseMessage message)
-            : this((int)message.StatusCode, message.ReasonPhrase)
+        public ServiceResult(HttpResponseMessage message, TData data, ErrorList error)
+            : this(message.StatusCode, data, error)
         {
         }
 
-        public bool IsSuccess => StatusCode >= 200 && StatusCode <= 299;
-        public int StatusCode { get; }
-        public string StatusText { get; }
-    }
-
-    public class ServiceResult<TData, TError> : ServiceResult
-    {
-        public ServiceResult(HttpResponseMessage message, TData data, TError error)
-            : this((int)message.StatusCode, message.ReasonPhrase, data, error)
+        public ServiceResult(HttpStatusCode statusCode, TData data, ErrorList error)
         {
-        }
-
-        public ServiceResult(int statusCode, string statusText, TData data, TError error)
-            : base(statusCode, statusText)
-        {
+            ResponseStatusCode = statusCode;
             Data = data;
-            Error = error;
+            ErrorList = error;
         }
 
-        public TData Data { get; }
-        public TError Error { get; }
+        public TData Data { get; set; }
+        public ErrorList ErrorList { get; set; }
+        public bool IsSuccess => ErrorList?.Errors.Any() != true;
+        public HttpStatusCode ResponseStatusCode { get; set; }
     }
 }
