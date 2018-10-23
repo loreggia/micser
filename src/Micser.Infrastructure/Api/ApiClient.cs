@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -10,7 +11,6 @@ using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 
 namespace Micser.Infrastructure.Api
 {
@@ -29,32 +29,32 @@ namespace Micser.Infrastructure.Api
             _resource = resource.TrimEnd('/') + "/";
         }
 
-        protected async Task<ServiceResult> DeleteAsync(string action, string id, object parameters = null)
+        protected async Task<ServiceResult<T>> DeleteAsync<T>(string action, string id, object parameters = null)
         {
             try
             {
                 var response = await _httpClient.DeleteAsync(_resource + action + "/" + id + GetQueryString(parameters));
-                return new ServiceResult(response);
+                return await HandleResponseAsync<T>(response);
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex);
-                return GetInternalErrorResult(ex);
+                return GetInternalErrorResult<T>(ex);
             }
         }
 
-        protected async Task<ServiceResult<T, string>> GetAsync<T>(string action, object parameters = null)
+        protected async Task<ServiceResult<T>> GetAsync<T>(string action, object parameters = null)
         {
             try
             {
                 var url = GetResourceUrl(action, parameters);
                 var response = await _httpClient.GetAsync(url);
-                return await HandleResponseAsync<T, string>(response);
+                return await HandleResponseAsync<T>(response);
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex);
-                return GetInternalErrorResult<T, string>(ex);
+                return GetInternalErrorResult<T>(ex);
             }
         }
 
@@ -63,7 +63,7 @@ namespace Micser.Infrastructure.Api
             return _resource + action + GetQueryString(parameters);
         }
 
-        protected async Task<ServiceResult<Stream, string>> GetStreamAsync(string action, object parameters = null)
+        protected async Task<ServiceResult<Stream>> GetStreamAsync(string action, object parameters = null)
         {
             try
             {
@@ -82,16 +82,16 @@ namespace Micser.Infrastructure.Api
                     error = response.ReasonPhrase;
                 }
 
-                return new ServiceResult<Stream, string>(response, result, error);
+                return new ServiceResult<Stream>(response, result, new ErrorList(error));
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex);
-                return GetInternalErrorResult<Stream, string>(ex);
+                return GetInternalErrorResult<Stream>(ex);
             }
         }
 
-        protected async Task<ServiceResult<T, string>> PostAsync<T>(string action, object data, object parameters = null)
+        protected async Task<ServiceResult<T>> PostAsync<T>(string action, object data, object parameters = null)
         {
             try
             {
@@ -99,44 +99,27 @@ namespace Micser.Infrastructure.Api
                 var content = JsonConvert.SerializeObject(data);
 
                 var response = await _httpClient.PostAsync(url, new StringContent(content, Encoding.UTF8, "application/json"));
-                return await HandleResponseAsync<T, string>(response);
+                return await HandleResponseAsync<T>(response);
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex);
-                return GetInternalErrorResult<T, string>(ex);
+                return GetInternalErrorResult<T>(ex);
             }
         }
 
-        protected async Task<ServiceResult<TData, TError>> PostAsync<TData, TError>(string action, object data, object parameters = null)
-        {
-            try
-            {
-                var url = GetResourceUrl(action, parameters);
-                var content = JsonConvert.SerializeObject(data);
-
-                var response = await _httpClient.PostAsync(url, new StringContent(content, Encoding.UTF8, "application/json"));
-                return await HandleResponseAsync<TData, TError>(response);
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine(ex);
-                return GetInternalErrorResult<TData, TError>(ex);
-            }
-        }
-
-        protected async Task<ServiceResult<T, string>> PutAsync<T>(string action, object id, object data, object parameters = null)
+        protected async Task<ServiceResult<T>> PutAsync<T>(string action, object id, object data, object parameters = null)
         {
             try
             {
                 var content = JsonConvert.SerializeObject(data);
                 var response = await _httpClient.PutAsync(_resource + action + "/" + id + GetQueryString(parameters), new StringContent(content, Encoding.UTF8, "application/json"));
-                return await HandleResponseAsync<T, string>(response);
+                return await HandleResponseAsync<T>(response);
             }
             catch (Exception ex)
             {
                 Debug.WriteLine(ex);
-                return GetInternalErrorResult<T, string>(ex);
+                return GetInternalErrorResult<T>(ex);
             }
         }
 
@@ -165,26 +148,21 @@ namespace Micser.Infrastructure.Api
             return httpClient;
         }
 
-        private static ServiceResult GetInternalErrorResult(Exception ex)
+        private static ServiceResult<T> GetInternalErrorResult<T>(Exception ex)
         {
-            return new ServiceResult(Globals.InternalErrorStatusCode, ex.ToString());
+            return new ServiceResult<T>(Globals.InternalErrorStatusCode, default(T), new ErrorList(ex));
         }
 
-        private static ServiceResult<TData, TError> GetInternalErrorResult<TData, TError>(Exception ex)
+        private static async Task<ServiceResult<T>> HandleResponseAsync<T>(HttpResponseMessage response)
         {
-            return new ServiceResult<TData, TError>(Globals.InternalErrorStatusCode, ex.ToString(), default(TData), default(TError));
-        }
-
-        private static async Task<ServiceResult<TData, TError>> HandleResponseAsync<TData, TError>(HttpResponseMessage response)
-        {
-            var data = default(TData);
-            var error = default(TError);
+            var data = default(T);
+            ErrorList error = null;
 
             var responseString = await response.Content.ReadAsStringAsync();
 
             if (response.IsSuccessStatusCode)
             {
-                data = (TData)JsonConvert.DeserializeObject(responseString, typeof(TData));
+                data = (T)JsonConvert.DeserializeObject(responseString, typeof(T));
             }
             else if (!string.IsNullOrEmpty(responseString))
             {
@@ -194,11 +172,11 @@ namespace Micser.Infrastructure.Api
                 }
                 else
                 {
-                    error = (TError)JsonConvert.DeserializeObject(responseString, typeof(TError));
+                    error = (ErrorList)JsonConvert.DeserializeObject(responseString, typeof(ErrorList));
                 }
             }
 
-            return new ServiceResult<TData, TError>(response, data, error);
+            return new ServiceResult<T>(response, data, error);
         }
 
         #region Helpers

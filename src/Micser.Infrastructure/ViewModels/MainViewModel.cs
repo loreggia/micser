@@ -1,4 +1,6 @@
-﻿using Micser.Infrastructure.Widgets;
+﻿using Micser.Infrastructure.Api;
+using Micser.Infrastructure.Widgets;
+using NLog;
 using Prism.Regions;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -13,14 +15,18 @@ namespace Micser.Infrastructure.ViewModels
 
         private readonly IConfigurationService _configurationService;
         private readonly IList<ConnectionViewModel> _connections;
+        private readonly ILogger _logger;
+        private readonly ModulesApiClient _modulesApiClient;
         private readonly IWidgetRegistry _widgetRegistry;
         private readonly IList<WidgetViewModel> _widgets;
         private IEnumerable<WidgetDescription> _availableWidgets;
 
-        public MainViewModel(IConfigurationService configurationService, IWidgetFactory widgetFactory, IWidgetRegistry widgetRegistry)
+        public MainViewModel(IConfigurationService configurationService, IWidgetFactory widgetFactory, IWidgetRegistry widgetRegistry, ILogger logger, ModulesApiClient modulesApiClient)
         {
             _configurationService = configurationService;
             _widgetRegistry = widgetRegistry;
+            _logger = logger;
+            _modulesApiClient = modulesApiClient;
             _widgets = new ObservableCollection<WidgetViewModel>();
             _connections = new ObservableCollection<ConnectionViewModel>();
 
@@ -72,11 +78,29 @@ namespace Micser.Infrastructure.ViewModels
             _configurationService.SetSetting(ConnectionsConfigurationKey, connections);
         }
 
-        public override void OnNavigatedTo(NavigationContext navigationContext)
+        public override async void OnNavigatedTo(NavigationContext navigationContext)
         {
             base.OnNavigatedTo(navigationContext);
 
             AvailableWidgets = _widgetRegistry.Widgets;
+
+            var modulesResult = await _modulesApiClient.GetAll();
+
+            if (modulesResult.IsSuccess)
+            {
+                var modules = modulesResult.Data;
+
+                if (modules?.Any() == true)
+                {
+                    foreach (var module in modules)
+                    {
+                    }
+                }
+            }
+            else
+            {
+                _logger.Error(modulesResult.ErrorList);
+            }
 
             var widgetStates = _configurationService.GetSettingEnumerable<WidgetState>(WidgetsConfigurationKey);
 
