@@ -32,7 +32,7 @@ namespace Micser.Infrastructure.Api
         public override string ToString()
         {
             var errors = Errors?.Select(e => $"{{Code: '{e.Code}', Message: '{e.Message}', Field: '{e.Field}'}}") ?? new string[0];
-            return $"Errors: {string.Join(", ", errors)}";
+            return $"{string.Join(", ", errors)}";
         }
     }
 }

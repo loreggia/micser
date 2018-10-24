@@ -3,6 +3,7 @@ using Micser.Engine.Api;
 using Micser.Engine.Audio;
 using Micser.Engine.DataAccess;
 using Micser.Infrastructure;
+using Micser.Infrastructure.Audio;
 using Micser.Infrastructure.Extensions;
 using NLog;
 using System;
@@ -103,6 +104,7 @@ namespace Micser.Engine
             container.RegisterInstance(new ConnectionString(Globals.DefaultConnectionString));
             container.RegisterType<DbContext>();
             container.RegisterSingleton<IDatabase, Database>();
+            container.RegisterInstance<IAudioEngine>(_engine);
         }
     }
 }
