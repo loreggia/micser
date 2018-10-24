@@ -90,7 +90,7 @@ namespace Micser.Infrastructure.ViewModels
             {
                 var modules = modulesResult.Data;
 
-                if (modules?.Any() == true)
+                if (modules != null)
                 {
                     foreach (var module in modules)
                     {
@@ -99,7 +99,7 @@ namespace Micser.Infrastructure.ViewModels
             }
             else
             {
-                _logger.Error(modulesResult.ErrorList);
+                _logger.Error(modulesResult);
             }
 
             var widgetStates = _configurationService.GetSettingEnumerable<WidgetState>(WidgetsConfigurationKey);

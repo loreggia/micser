@@ -24,9 +24,19 @@ namespace Micser.App
     /// </summary>
     public partial class Application
     {
+        protected override void OnExit(ExitEventArgs e)
+        {
+            base.OnExit(e);
+
+            var logger = LogManager.GetCurrentClassLogger();
+            logger.Info("Exiting...");
+        }
+
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
+
+            Directory.CreateDirectory(Globals.AppDataFolder);
 
             var config = new LoggingConfiguration();
             config.AddTarget(new ColoredConsoleTarget("ConsoleTarget")
@@ -37,11 +47,17 @@ namespace Micser.App
             config.AddTarget(new FileTarget("FileTarget")
             {
                 ArchiveNumbering = ArchiveNumberingMode.DateAndSequence,
+                ArchiveOldFileOnStartup = true,
+                MaxArchiveFiles = 10,
                 FileName = Path.Combine(Globals.AppDataFolder, "Micser.App.log"),
                 FileNameKind = FilePathKind.Absolute
             });
+            config.AddRuleForAllLevels("ConsoleTarget");
+            config.AddRuleForAllLevels("FileTarget");
 
             LogManager.Configuration = config;
+            var logger = LogManager.GetCurrentClassLogger();
+            logger.Info("Starting...");
         }
 
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)

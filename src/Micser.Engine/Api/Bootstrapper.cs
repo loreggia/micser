@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Unity;
+using Unity.RegistrationByConvention;
 
 namespace Micser.Engine.Api
 {
@@ -24,6 +25,16 @@ namespace Micser.Engine.Api
             base.ConfigureApplicationContainer(container);
 
             container.RegisterSingleton<IFileSystemReader, DefaultFileSystemReader>();
+            container.RegisterSingleton<IInteractiveDiagnostics, InteractiveDiagnostics>();
+
+            // auto register modules
+            container.RegisterTypes(
+                AllClasses
+                    .FromLoadedAssemblies()
+                    .Where(t => typeof(INancyModule).IsAssignableFrom(t)),
+                WithMappings.FromAllInterfaces,
+                WithName.TypeName,
+                WithLifetime.Transient);
         }
 
         protected override IUnityContainer CreateRequestContainer(NancyContext context)

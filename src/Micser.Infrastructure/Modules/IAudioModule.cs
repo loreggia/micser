@@ -1,11 +1,13 @@
-﻿using System;
-using CSCore;
+﻿using CSCore;
 using Micser.Infrastructure.Models;
+using System;
 
 namespace Micser.Infrastructure.Modules
 {
     public interface IAudioModule : IDisposable
     {
+        Type WidgetType { get; }
+
         event EventHandler InputChanged;
 
         event EventHandler OutputChanged;

@@ -1,12 +1,14 @@
-﻿using System;
-using CSCore;
+﻿using CSCore;
 using Micser.Infrastructure.Models;
 using NLog;
+using System;
 
 namespace Micser.Infrastructure.Modules
 {
     public abstract class AudioModule : IAudioModule
     {
+        public abstract Type WidgetType { get; }
+
         protected static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
         private IAudioModule _input;

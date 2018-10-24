@@ -1,12 +1,13 @@
-﻿using System;
-using System.Linq;
-using CSCore.CoreAudioAPI;
+﻿using CSCore.CoreAudioAPI;
 using CSCore.SoundIn;
 using CSCore.Streams;
 using Micser.Infrastructure.Audio;
 using Micser.Infrastructure.Models;
 using Micser.Infrastructure.Modules;
+using Micser.Plugins.Main.Widgets;
 using NLog;
+using System;
+using System.Linq;
 
 namespace Micser.Plugins.Main.Modules
 {
@@ -32,6 +33,8 @@ namespace Micser.Plugins.Main.Modules
                 }
             }
         }
+
+        public override Type WidgetType => typeof(DeviceInputWidget);
 
         public override string GetState()
         {
