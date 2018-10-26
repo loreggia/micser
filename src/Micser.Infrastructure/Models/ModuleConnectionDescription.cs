@@ -1,12 +1,12 @@
 ﻿namespace Micser.Infrastructure.Models
 {
-    public class ModuleConnection : Model
+    public class ModuleConnectionDescription : Model
     {
-        public ModuleConnection()
+        public ModuleConnectionDescription()
         {
         }
 
-        public ModuleConnection(int sourceId, int targetId)
+        public ModuleConnectionDescription(int sourceId, int targetId)
         {
             SourceId = sourceId;
             TargetId = targetId;

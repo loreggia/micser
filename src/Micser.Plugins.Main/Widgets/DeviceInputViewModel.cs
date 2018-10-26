@@ -43,17 +43,17 @@ namespace Micser.Plugins.Main.Widgets
         {
             base.LoadState(state);
 
-            if (state.Settings.TryGetValue(SettingKeyDeviceId, out var deviceId) && deviceId is string idString)
-            {
-                SelectedDeviceDescription = DeviceDescriptions?.FirstOrDefault(d => d.Id == idString);
-            }
+            //if (state.Settings.TryGetValue(SettingKeyDeviceId, out var deviceId) && deviceId is string idString)
+            //{
+            //    SelectedDeviceDescription = DeviceDescriptions?.FirstOrDefault(d => d.Id == idString);
+            //}
         }
 
         public override void SaveState(WidgetState state)
         {
             base.SaveState(state);
 
-            state.Settings[SettingKeyDeviceId] = SelectedDeviceDescription?.Id;
+            //state.Settings[SettingKeyDeviceId] = SelectedDeviceDescription?.Id;
         }
 
         private void UpdateDeviceDescriptions()

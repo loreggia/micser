@@ -27,6 +27,7 @@
         <Setter Property="InputConnectorsSource" Value="{Binding InputConnectors}" />
         <Setter Property="OutputConnectorsSource" Value="{Binding OutputConnectors}" />
         <Setter Property="Position" Value="{Binding Position, Mode=TwoWay}" />
+        <Setter Property="Size" Value="{Binding Size, Mode=TwoWay}" />
         <Setter Property="InputConnectorTemplate">
             <Setter.Value>
                 <DataTemplate>

@@ -20,6 +20,7 @@ namespace Micser.Infrastructure.Widgets
         private string _name;
 
         private Point _position;
+        private Size _size;
 
         protected WidgetViewModel()
         {
@@ -57,6 +58,12 @@ namespace Micser.Infrastructure.Widgets
         {
             get => _position;
             set => SetProperty(ref _position, value);
+        }
+
+        public Size Size
+        {
+            get => _size;
+            set => SetProperty(ref _size, value);
         }
 
         public virtual void Initialize()

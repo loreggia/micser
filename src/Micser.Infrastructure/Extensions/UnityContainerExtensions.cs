@@ -14,7 +14,7 @@ namespace Micser.Infrastructure.Extensions
                 container.RegisterType(moduleType);
             }
 
-            container.RegisterTypes<IAudioModule>(moduleTypes);
+            container.RegisterTypes<IModule>(moduleTypes);
         }
 
         public static void RegisterSingletons(this IUnityContainer container, Type from, IEnumerable<Type> types)
