@@ -4,20 +4,18 @@ using System;
 
 namespace Micser.Infrastructure.Modules
 {
-    public interface IAudioModule : IDisposable
+    public interface IModule : IDisposable
     {
-        Type WidgetType { get; }
-
         event EventHandler InputChanged;
 
         event EventHandler OutputChanged;
 
-        Module Description { get; set; }
-        IAudioModule Input { get; set; }
+        ModuleDescription Description { get; }
+        IModule Input { get; set; }
         IWaveSource Output { get; }
 
-        string GetState();
+        ModuleState GetState();
 
-        void Initialize(Module state);
+        void Initialize(ModuleDescription description);
     }
 }

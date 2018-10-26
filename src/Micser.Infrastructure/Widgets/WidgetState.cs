@@ -1,10 +1,10 @@
-﻿using System.Windows;
+﻿using Micser.Infrastructure.Models;
+using System.Windows;
 
 namespace Micser.Infrastructure.Widgets
 {
-    public class WidgetState
+    public class WidgetState : ModuleViewState
     {
-        public int ModuleId { get; set; }
         public Point Position { get; set; }
         public Size Size { get; set; }
     }

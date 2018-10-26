@@ -11,9 +11,9 @@ namespace Micser.Infrastructure.Api
         {
         }
 
-        public async Task<ServiceResult<IEnumerable<Module>>> GetAll()
+        public async Task<ServiceResult<IEnumerable<ModuleDescription>>> GetAll()
         {
-            return await GetAsync<IEnumerable<Module>>(null);
+            return await GetAsync<IEnumerable<ModuleDescription>>(null);
         }
     }
 }

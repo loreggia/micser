@@ -5,22 +5,19 @@ using System;
 
 namespace Micser.Infrastructure.Modules
 {
-    public abstract class AudioModule : IAudioModule
+    public abstract class Module : IModule
     {
-        public abstract Type WidgetType { get; }
-
         protected static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
-
-        private IAudioModule _input;
+        private IModule _input;
         private IWaveSource _output;
 
         public event EventHandler InputChanged;
 
         public event EventHandler OutputChanged;
 
-        public Module Description { get; set; }
+        public ModuleDescription Description { get; set; }
 
-        public IAudioModule Input
+        public IModule Input
         {
             get => _input;
             set
@@ -67,9 +64,9 @@ namespace Micser.Infrastructure.Modules
             GC.SuppressFinalize(this);
         }
 
-        public abstract string GetState();
+        public abstract ModuleState GetState();
 
-        public virtual void Initialize(Module description)
+        public virtual void Initialize(ModuleDescription description)
         {
             Description = description;
         }

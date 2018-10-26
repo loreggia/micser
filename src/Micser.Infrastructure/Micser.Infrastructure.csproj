@@ -73,11 +73,12 @@
     <Compile Include="Models\DeviceType.cs" />
     <Compile Include="Api\Error.cs" />
     <Compile Include="Models\Model.cs" />
-    <Compile Include="Models\Module.cs" />
-    <Compile Include="Models\ModuleConnection.cs" />
+    <Compile Include="Models\ModuleDescription.cs" />
+    <Compile Include="Models\ModuleConnectionDescription.cs" />
     <Compile Include="Models\ModuleState.cs" />
-    <Compile Include="Modules\AudioModule.cs" />
-    <Compile Include="Modules\IAudioModule.cs" />
+    <Compile Include="Models\ModuleViewState.cs" />
+    <Compile Include="Modules\Module.cs" />
+    <Compile Include="Modules\IModule.cs" />
     <Compile Include="NavigationManager.cs" />
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\StartupViewModel.cs" />

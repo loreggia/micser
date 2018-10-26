@@ -53,10 +53,8 @@ namespace Micser.Infrastructure.ViewModels
             {
                 var state = new WidgetState
                 {
-                    Id = vm.Id,
-                    Name = vm.Name,
                     Position = vm.Position,
-                    ViewModelType = vm.GetType()
+                    Size = vm.Size
                 };
                 vm.SaveState(state);
                 widgetStates.Add(state);
@@ -108,12 +106,11 @@ namespace Micser.Infrastructure.ViewModels
             {
                 foreach (var widgetState in widgetStates)
                 {
-                    var vm = WidgetFactory.CreateViewModel(widgetState.ViewModelType);
-                    vm.Id = widgetState.Id;
-                    vm.Name = widgetState.Name;
-                    vm.Position = widgetState.Position;
-                    vm.LoadState(widgetState);
-                    _widgets.Add(vm);
+                    //var vm = WidgetFactory.CreateViewModel(widgetState.ViewModelType);
+                    //vm.Position = widgetState.Position;
+                    //vm.Size = widgetState.Size;
+                    //vm.LoadState(widgetState);
+                    //_widgets.Add(vm);
                 }
             }
 

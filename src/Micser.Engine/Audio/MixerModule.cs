@@ -1,16 +1,17 @@
-﻿using Micser.Infrastructure.Modules;
+﻿using Micser.Infrastructure.Models;
+using Micser.Infrastructure.Modules;
 
 namespace Micser.Engine.Audio
 {
-    public class MixerModule : AudioModule
+    public class MixerModule : Module
     {
         public MixerModule()
         {
         }
 
-        public IAudioModule Input2 { get; set; }
+        public IModule Input2 { get; set; }
 
-        public override string GetState()
+        public override ModuleState GetState()
         {
             throw new System.NotImplementedException();
         }

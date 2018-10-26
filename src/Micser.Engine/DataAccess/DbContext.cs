@@ -9,8 +9,8 @@ namespace Micser.Engine.DataAccess
         public DbContext(ConnectionString connectionString)
             : base(connectionString ?? Globals.DefaultConnectionString)
         {
-            Mapper.Entity<Module>().Id(x => x.Id);
-            Mapper.Entity<ModuleConnection>().Id(x => x.Id);
+            Mapper.Entity<ModuleDescription>().Id(x => x.Id);
+            Mapper.Entity<ModuleConnectionDescription>().Id(x => x.Id);
         }
     }
 }

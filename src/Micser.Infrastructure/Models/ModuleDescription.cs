@@ -1,8 +1,10 @@
 ﻿namespace Micser.Infrastructure.Models
 {
-    public class Module : Model
+    public class ModuleDescription : Model
     {
         public ModuleState State { get; set; }
         public string Type { get; set; }
+        public ModuleViewState ViewState { get; set; }
+        public string ViewType { get; set; }
     }
 }

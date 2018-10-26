@@ -40,6 +40,9 @@ namespace Micser.Infrastructure.Widgets
         public static readonly DependencyProperty PositionProperty = DependencyProperty.Register(
             nameof(Position), typeof(Point), typeof(Widget), new PropertyMetadata(default(Point), OnPositionPropertyChanged));
 
+        public static readonly DependencyProperty SizeProperty = DependencyProperty.Register(
+            nameof(Size), typeof(Size), typeof(Widget), new PropertyMetadata(default(Size), OnSizePropertyChanged));
+
         internal const string PartNameInputConnectors = "PART_InputConnectors";
 
         internal const string PartNameOutputConnectors = "PART_OutputConnectors";
@@ -123,6 +126,12 @@ namespace Micser.Infrastructure.Widgets
             set => SetValue(PositionProperty, value);
         }
 
+        public Size Size
+        {
+            get => (Size)GetValue(SizeProperty);
+            set => SetValue(SizeProperty, value);
+        }
+
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
@@ -165,6 +174,15 @@ namespace Micser.Infrastructure.Widgets
             {
                 Canvas.SetLeft(element, point.X);
                 Canvas.SetTop(element, point.Y);
+            }
+        }
+
+        private static void OnSizePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (e.NewValue is Size size && d is FrameworkElement element)
+            {
+                element.Width = size.Width;
+                element.Height = size.Height;
             }
         }
 
