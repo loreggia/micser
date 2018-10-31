@@ -41,9 +41,9 @@ namespace Micser.Setup
                                            .Add(Dialogs.Exit);
 
 #if DEBUG
-            project.SourceBaseDir = @"..\Bin\Debug\";
+            project.SourceBaseDir = @"..\..\bin\Debug\";
 #else
-            project.SourceBaseDir = @"..\Bin\Release\";
+            project.SourceBaseDir = @"..\..\bin\Release\";
 #endif
 
             project.BuildMsi();
