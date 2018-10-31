@@ -4,6 +4,7 @@ using NLog;
 using Prism.Regions;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.Linq;
 
 namespace Micser.Infrastructure.ViewModels
@@ -14,11 +15,11 @@ namespace Micser.Infrastructure.ViewModels
         public const string WidgetsConfigurationKey = "Widgets";
 
         private readonly IConfigurationService _configurationService;
-        private readonly IList<ConnectionViewModel> _connections;
+        private readonly ObservableCollection<ConnectionViewModel> _connections;
         private readonly ILogger _logger;
         private readonly ModulesApiClient _modulesApiClient;
         private readonly IWidgetRegistry _widgetRegistry;
-        private readonly IList<WidgetViewModel> _widgets;
+        private readonly ObservableCollection<WidgetViewModel> _widgets;
         private IEnumerable<WidgetDescription> _availableWidgets;
 
         public MainViewModel(IConfigurationService configurationService, IWidgetFactory widgetFactory, IWidgetRegistry widgetRegistry, ILogger logger, ModulesApiClient modulesApiClient)
@@ -28,7 +29,9 @@ namespace Micser.Infrastructure.ViewModels
             _logger = logger;
             _modulesApiClient = modulesApiClient;
             _widgets = new ObservableCollection<WidgetViewModel>();
+            _widgets.CollectionChanged += OnWidgetsCollectionChanged;
             _connections = new ObservableCollection<ConnectionViewModel>();
+            _connections.CollectionChanged += OnConnectionsCollectionChanged;
 
             WidgetFactory = widgetFactory;
         }
@@ -40,7 +43,9 @@ namespace Micser.Infrastructure.ViewModels
         }
 
         public IEnumerable<ConnectionViewModel> Connections => _connections;
+
         public IWidgetFactory WidgetFactory { get; }
+
         public IEnumerable<WidgetViewModel> Widgets => _widgets;
 
         public override void OnNavigatedFrom(NavigationContext navigationContext)
@@ -139,6 +144,14 @@ namespace Micser.Infrastructure.ViewModels
                     }
                 }
             }
+        }
+
+        private void OnConnectionsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+        }
+
+        private void OnWidgetsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
         }
     }
 }
