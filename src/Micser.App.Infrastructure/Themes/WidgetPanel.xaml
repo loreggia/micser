@@ -1,0 +1,34 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:widgets="clr-namespace:Micser.App.Infrastructure.Widgets">
+
+    <Style TargetType="{x:Type widgets:WidgetPanel}">
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Setter Property="Background" Value="White" />
+
+        <!--<Style.Triggers>
+            <Trigger Property="IsWidgetLayoutChanging" Value="True">
+                <Setter Property="Background">
+                    <Setter.Value>
+                        -->
+        <!--{Binding RasterSize, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:WidgetPanel}, Converter={converter:DoubleToRectConverter}}-->
+        <!--
+                        <DrawingBrush TileMode="Tile" Viewport="{Binding RasterSize, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:WidgetPanel}, Converter={converter:DoubleToRectConverter}}" ViewportUnits="Absolute">
+                            <DrawingBrush.Drawing>
+                                <GeometryDrawing Brush="Gray">
+                                    <GeometryDrawing.Geometry>
+                                        <RectangleGeometry Rect="{Binding RasterSize, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:WidgetPanel}, Converter={converter:DoubleToRectConverter}}" />
+                                    </GeometryDrawing.Geometry>
+                                    <GeometryDrawing.Pen>
+                                        <Pen Brush="DarkGray" Thickness="0.5" />
+                                    </GeometryDrawing.Pen>
+                                </GeometryDrawing>
+                            </DrawingBrush.Drawing>
+                        </DrawingBrush>
+                    </Setter.Value>
+                </Setter>
+            </Trigger>
+        </Style.Triggers>-->
+    </Style>
+</ResourceDictionary>

@@ -1,8 +1,8 @@
-﻿using Micser.Engine.DataAccess;
-using Micser.Infrastructure.Audio;
-using Micser.Infrastructure.Models;
+﻿using Micser.Engine.Audio;
 using System.Collections.Generic;
 using System.Linq;
+using Micser.Infrastructure.DataAccess;
+using Micser.Infrastructure.Models;
 
 namespace Micser.Engine.Api.Controllers
 {
@@ -21,10 +21,8 @@ namespace Micser.Engine.Api.Controllers
 
         private IEnumerable<ModuleConnectionDescription> GetAll()
         {
-            using (var db = _database.GetContext())
-            {
-                return db.GetCollection<ModuleConnectionDescription>().FindAll().ToArray();
-            }
+            var db = _database.GetContext();
+            return db.GetCollection<ModuleConnectionDescription>().ToArray();
         }
     }
 }

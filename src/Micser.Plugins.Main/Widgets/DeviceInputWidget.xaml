@@ -1,13 +1,13 @@
-﻿<w:Widget x:Class="Micser.Plugins.Main.Widgets.DeviceInputWidget"
+﻿<widgets1:Widget x:Class="Micser.Plugins.Main.Widgets.DeviceInputWidget"
                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
                 xmlns:p="clr-namespace:Micser.Plugins.Main.Properties"
-                xmlns:c="clr-namespace:Micser.Infrastructure.Controls;assembly=Micser.Infrastructure"
-                xmlns:w="clr-namespace:Micser.Infrastructure.Widgets;assembly=Micser.Infrastructure"
-                xmlns:widgets="clr-namespace:Micser.Plugins.Main.Widgets"
-                mc:Ignorable="d"
+          xmlns:widgets="clr-namespace:Micser.Plugins.Main.Widgets"
+          xmlns:widgets1="clr-namespace:Micser.App.Infrastructure.Widgets;assembly=Micser.App.Infrastructure"
+          xmlns:controls="clr-namespace:Micser.App.Infrastructure.Controls;assembly=Micser.App.Infrastructure"
+          mc:Ignorable="d"
                 d:DataContext="{d:DesignInstance widgets:DeviceInputViewModel}"
                 MinWidth="175"
                 MinHeight="75">
@@ -22,9 +22,9 @@
         </Grid.ColumnDefinitions>
 
         <Label Grid.Row="0" Grid.Column="0" Target="{Binding ElementName=TxtName}" Content="{x:Static p:Resources.Name}" VerticalAlignment="Center" />
-        <c:EditableTextBlock Grid.Row="0" Grid.Column="1" x:Name="TxtName" Text="{Binding Name, Mode=TwoWay}" MinWidth="100" VerticalAlignment="Center" HorizontalAlignment="Stretch" />
+        <controls:EditableTextBlock Grid.Row="0" Grid.Column="1" x:Name="TxtName" Text="{Binding Name, Mode=TwoWay}" MinWidth="100" VerticalAlignment="Center" HorizontalAlignment="Stretch" />
 
         <Label Grid.Row="1" Grid.Column="0" Target="{Binding ElementName=CbxDevice}" Content="{x:Static p:Resources.Device}" VerticalAlignment="Center" />
         <ComboBox Grid.Row="1" Grid.Column="1" x:Name="CbxDevice" MinWidth="100" ItemsSource="{Binding DeviceDescriptions}" DisplayMemberPath="Name" SelectedItem="{Binding SelectedDeviceDescription}" HorizontalAlignment="Stretch" />
     </Grid>
-</w:Widget>
+</widgets1:Widget>

@@ -109,6 +109,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Micser.App.Infrastructure\Micser.App.Infrastructure.csproj">
+      <Project>{26b45a3b-725b-48e1-b272-4b0875b0c04a}</Project>
+      <Name>Micser.App.Infrastructure</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Micser.Infrastructure\Micser.Infrastructure.csproj">
       <Project>{e14431b4-f54a-4d36-b505-1d3407252430}</Project>
       <Name>Micser.Infrastructure</Name>
@@ -127,16 +131,16 @@
       <Version>1.0.8</Version>
     </PackageReference>
     <PackageReference Include="NLog">
-      <Version>4.5.10</Version>
+      <Version>4.5.11</Version>
     </PackageReference>
     <PackageReference Include="Prism.Core">
-      <Version>7.1.0.135-pre</Version>
+      <Version>7.1.0.431</Version>
     </PackageReference>
     <PackageReference Include="Prism.Unity">
-      <Version>7.1.0.123-pre</Version>
+      <Version>7.1.0.431</Version>
     </PackageReference>
     <PackageReference Include="Prism.Wpf">
-      <Version>7.1.0.123-pre</Version>
+      <Version>7.1.0.431</Version>
     </PackageReference>
     <PackageReference Include="Unity">
       <Version>5.8.11</Version>

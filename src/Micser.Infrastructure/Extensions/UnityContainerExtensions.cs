@@ -1,5 +1,4 @@
-﻿using Micser.Infrastructure.Modules;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Unity;
 
@@ -7,16 +6,6 @@ namespace Micser.Infrastructure.Extensions
 {
     public static class UnityContainerExtensions
     {
-        public static void RegisterAudioModules(this IUnityContainer container, params Type[] moduleTypes)
-        {
-            foreach (var moduleType in moduleTypes)
-            {
-                container.RegisterType(moduleType);
-            }
-
-            container.RegisterTypes<IModule>(moduleTypes);
-        }
-
         public static void RegisterSingletons(this IUnityContainer container, Type from, IEnumerable<Type> types)
         {
             foreach (var type in types)

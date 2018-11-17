@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Micser.Infrastructure.Models;
 using System.Threading;
+using Micser.Infrastructure.Common.Models;
 
 namespace Micser.Engine.Test.Audio
 {

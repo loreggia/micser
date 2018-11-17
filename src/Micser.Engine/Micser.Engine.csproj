@@ -52,12 +52,9 @@
     <Compile Include="Api\Controllers\Controller.cs" />
     <Compile Include="Api\Server.cs" />
     <Compile Include="Audio\AudioEngine.cs" />
+    <Compile Include="Audio\IAudioEngine.cs" />
     <Compile Include="Audio\MixerModule.cs" />
     <Compile Include="Audio\MixerSource.cs" />
-    <Compile Include="DataAccess\ConnectionString.cs" />
-    <Compile Include="DataAccess\Database.cs" />
-    <Compile Include="DataAccess\DbContext.cs" />
-    <Compile Include="DataAccess\IDatabase.cs" />
     <Compile Include="ProjectInstaller.cs">
       <SubType>Component</SubType>
     </Compile>
@@ -82,6 +79,10 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Micser.Engine.Infrastructure\Micser.Engine.Infrastructure.csproj">
+      <Project>{c5d0038c-8258-4bb4-9723-f3855f583e95}</Project>
+      <Name>Micser.Engine.Infrastructure</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Micser.Infrastructure\Micser.Infrastructure.csproj">
       <Project>{e14431b4-f54a-4d36-b505-1d3407252430}</Project>
       <Name>Micser.Infrastructure</Name>
@@ -98,10 +99,7 @@
       <Version>1.4.1</Version>
     </PackageReference>
     <PackageReference Include="NLog">
-      <Version>4.5.10</Version>
-    </PackageReference>
-    <PackageReference Include="NLog.LiteDB">
-      <Version>2018.9.2.5</Version>
+      <Version>4.5.11</Version>
     </PackageReference>
     <PackageReference Include="Unity">
       <Version>5.8.11</Version>

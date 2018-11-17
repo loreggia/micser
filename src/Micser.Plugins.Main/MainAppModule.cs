@@ -1,5 +1,5 @@
-﻿using Micser.Infrastructure.Extensions;
-using Micser.Infrastructure.Themes;
+﻿using Micser.App.Infrastructure.Extensions;
+using Micser.App.Infrastructure.Themes;
 using Micser.Plugins.Main.Properties;
 using Micser.Plugins.Main.Widgets;
 using Prism.Ioc;

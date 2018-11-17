@@ -1,8 +1,8 @@
-﻿using Micser.Infrastructure.Audio;
-using Micser.Infrastructure.Models;
-using Micser.Infrastructure.Widgets;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
+using Micser.App.Infrastructure.Widgets;
+using Micser.Infrastructure;
+using Micser.Infrastructure.Models;
 
 namespace Micser.Plugins.Main.Widgets
 {
