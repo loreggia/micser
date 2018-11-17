@@ -3,6 +3,7 @@ using Prism.Regions;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
+using Micser.App.Infrastructure;
 
 namespace Micser.App
 {
@@ -11,14 +12,12 @@ namespace Micser.App
     /// </summary>
     public partial class MainShell
     {
-        private readonly IConfigurationService _configurationService;
         private readonly IRegionManager _regionManager;
         private bool _isExiting;
 
-        public MainShell(IRegionManager regionManager, IConfigurationService configurationService)
+        public MainShell(IRegionManager regionManager)
         {
             _regionManager = regionManager;
-            _configurationService = configurationService;
             InitializeComponent();
             Loaded += MainShell_Loaded;
         }
@@ -42,7 +41,6 @@ namespace Micser.App
         {
             _isExiting = true;
             _regionManager.RequestNavigate(Globals.PrismRegions.Main, "");
-            _configurationService.Save();
             Application.Current.Shutdown();
         }
 

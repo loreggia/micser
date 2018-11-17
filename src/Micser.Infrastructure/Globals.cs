@@ -14,7 +14,8 @@ namespace Micser.Infrastructure
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData, Environment.SpecialFolderOption.Create),
             "Micser");
 
-        public static readonly string DefaultConnectionString = Path.Combine(AppDataFolder, "Database.db");
+        public static readonly string AppDbLocation = Path.Combine(AppDataFolder, "App.json");
+        public static readonly string EngineDbLocation = Path.Combine(AppDataFolder, "Engine.json");
 
         public static class PrismRegions
         {

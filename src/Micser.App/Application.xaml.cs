@@ -1,21 +1,19 @@
 ﻿using CommonServiceLocator;
 using Micser.Infrastructure;
-using Micser.Infrastructure.Themes;
 using NLog;
+using NLog.Config;
+using NLog.Targets;
 using Prism.Events;
 using Prism.Ioc;
 using Prism.Modularity;
-using Prism.Unity;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
-using NLog.Config;
-using NLog.Targets;
-using Unity;
-using Unity.Injection;
+using Micser.App.Infrastructure;
+using Micser.App.Infrastructure.Themes;
 
 namespace Micser.App
 {
@@ -24,12 +22,50 @@ namespace Micser.App
     /// </summary>
     public partial class Application
     {
+        protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)
+        {
+            base.ConfigureModuleCatalog(moduleCatalog);
+
+            moduleCatalog.AddModule<AppModule>();
+            moduleCatalog.AddModule<InfrastructureAppModule>();
+
+            LoadPlugins(moduleCatalog);
+        }
+
+        protected override Window CreateShell()
+        {
+            return GetService<MainShell>();
+        }
+
+        protected override void InitializeModules()
+        {
+            SetStatus("Initializing...");
+
+            base.InitializeModules();
+
+            var resourceRegistry = GetService<IResourceRegistry>();
+            foreach (var dictionary in resourceRegistry.Items)
+            {
+                Current.Resources.MergedDictionaries.Add(dictionary);
+            }
+
+            var eventAggregator = GetService<IEventAggregator>();
+            var modulesLoadedEvent = eventAggregator.GetEvent<ApplicationEvents.ModulesLoaded>();
+            modulesLoadedEvent.Publish();
+        }
+
         protected override void OnExit(ExitEventArgs e)
         {
             base.OnExit(e);
 
             var logger = LogManager.GetCurrentClassLogger();
             logger.Info("Exiting...");
+        }
+
+        protected override void OnInitialized()
+        {
+            base.OnInitialized();
+            SetStatus("Ready");
         }
 
         protected override void OnStartup(StartupEventArgs e)
@@ -60,53 +96,8 @@ namespace Micser.App
             logger.Info("Starting...");
         }
 
-        protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)
-        {
-            base.ConfigureModuleCatalog(moduleCatalog);
-
-            moduleCatalog.AddModule<AppModule>();
-            moduleCatalog.AddModule<InfrastructureModule>();
-
-            LoadPlugins(moduleCatalog);
-        }
-
-        protected override Window CreateShell()
-        {
-            return GetService<MainShell>();
-        }
-
-        protected override void InitializeModules()
-        {
-            SetStatus("Initializing...");
-
-            var configurationService = GetService<IConfigurationService>();
-            configurationService.Load();
-
-            base.InitializeModules();
-
-            var resourceRegistry = GetService<IResourceRegistry>();
-            foreach (var dictionary in resourceRegistry.Items)
-            {
-                Current.Resources.MergedDictionaries.Add(dictionary);
-            }
-
-            var eventAggregator = GetService<IEventAggregator>();
-            var modulesLoadedEvent = eventAggregator.GetEvent<ApplicationEvents.ModulesLoaded>();
-            modulesLoadedEvent.Publish();
-        }
-
-        protected override void OnInitialized()
-        {
-            base.OnInitialized();
-            SetStatus("Ready");
-        }
-
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            containerRegistry.RegisterSingleton<IConfigurationService, ConfigurationService>();
-
-            var container = containerRegistry.GetContainer();
-            container.RegisterType<ILogger>(new InjectionFactory((c, t, n) => LogManager.GetCurrentClassLogger()));
         }
 
         private static T GetService<T>()

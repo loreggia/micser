@@ -1,12 +1,12 @@
 ﻿using CSCore.CoreAudioAPI;
 using CSCore.SoundIn;
 using CSCore.Streams;
-using Micser.Infrastructure.Audio;
-using Micser.Infrastructure.Models;
-using Micser.Infrastructure.Modules;
 using NLog;
 using System;
 using System.Linq;
+using Micser.Engine.Infrastructure;
+using Micser.Infrastructure;
+using Micser.Infrastructure.Models;
 
 namespace Micser.Plugins.Main.Modules
 {

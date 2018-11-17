@@ -1,10 +1,7 @@
 ﻿using CommonServiceLocator;
 using Micser.Engine.Api;
 using Micser.Engine.Audio;
-using Micser.Engine.DataAccess;
 using Micser.Infrastructure;
-using Micser.Infrastructure.Audio;
-using Micser.Infrastructure.Extensions;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -13,6 +10,8 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.ServiceProcess;
+using Micser.Engine.Infrastructure;
+using Micser.Infrastructure.Extensions;
 using Unity;
 
 namespace Micser.Engine
@@ -74,6 +73,8 @@ namespace Micser.Engine
         {
             _plugins.Clear();
 
+            _plugins.Add(new InfrastructureEngineModule());
+
             var executingFile = new FileInfo(Assembly.GetExecutingAssembly().Location);
             var moduleFiles = executingFile.Directory.GetFiles(Globals.PluginSearchPattern);
             foreach (var moduleFile in moduleFiles)
@@ -86,7 +87,6 @@ namespace Micser.Engine
                     var modules = container.ResolveAll<IEngineModule>();
                     foreach (var engineModule in modules)
                     {
-                        engineModule.RegisterTypes(container);
                         _plugins.Add(engineModule);
                     }
                 }
@@ -97,13 +97,15 @@ namespace Micser.Engine
                     Debug.WriteLine(ex);
                 }
             }
+
+            foreach (var engineModule in _plugins)
+            {
+                engineModule.RegisterTypes(container);
+            }
         }
 
         private void RegisterTypes(IUnityContainer container)
         {
-            container.RegisterInstance(new ConnectionString(Globals.DefaultConnectionString));
-            container.RegisterType<DbContext>();
-            container.RegisterSingleton<IDatabase, Database>();
             container.RegisterInstance<IAudioEngine>(_engine);
         }
     }

@@ -1,11 +1,11 @@
-﻿using Micser.Infrastructure.Extensions;
-using Nancy;
+﻿using Nancy;
 using Nancy.Bootstrapper;
 using Nancy.Diagnostics;
 using Nancy.ViewEngines;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Micser.Infrastructure.Extensions;
 using Unity;
 using Unity.RegistrationByConvention;
 

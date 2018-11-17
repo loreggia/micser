@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Micser.Engine.DataAccess;
+using Micser.Infrastructure.DataAccess;
+using NLog;
 
 namespace Micser.Engine.Test.DataAccess
 {
@@ -9,9 +10,9 @@ namespace Micser.Engine.Test.DataAccess
         [TestMethod]
         public void InstantiateDb()
         {
-            var db = new DbContext(new ConnectionString("test.db"));
-            var moduleDescriptions = db.GetCollection("test");
-            Assert.IsNotNull(moduleDescriptions);
+            var db = new Database("test.db", LogManager.GetCurrentClassLogger());
+            var dbContext = db.GetContext();
+            Assert.IsNotNull(dbContext);
         }
     }
 }

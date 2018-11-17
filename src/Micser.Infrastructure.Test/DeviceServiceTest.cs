@@ -1,8 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Micser.Infrastructure.Audio;
-using Micser.Infrastructure.Models;
 using System;
 using System.Linq;
+using Micser.Infrastructure.Models;
 
 namespace Micser.Infrastructure.Test
 {
