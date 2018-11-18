@@ -6,7 +6,7 @@ using Unity.Injection;
 
 namespace Micser.Engine.Infrastructure
 {
-    public class InfrastructureEngineModule : IEngineModule
+    public class InfrastructureModule : IEngineModule
     {
         public void RegisterTypes(IUnityContainer container)
         {
