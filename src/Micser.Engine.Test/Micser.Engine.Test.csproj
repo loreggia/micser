@@ -64,9 +64,9 @@
       <Project>{88134b7e-e212-413b-881e-2cddffd527d6}</Project>
       <Name>Micser.Engine</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Micser.Infrastructure\Micser.Infrastructure.csproj">
+    <ProjectReference Include="..\Micser.Common\Micser.Common.csproj">
       <Project>{e14431b4-f54a-4d36-b505-1d3407252430}</Project>
-      <Name>Micser.Infrastructure</Name>
+      <Name>Micser.Common</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
