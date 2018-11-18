@@ -1,4 +1,4 @@
-﻿namespace Micser.App.Infrastructure.Views
+﻿namespace Micser.App.Views
 {
     public partial class MainMenuView
     {

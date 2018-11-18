@@ -1,6 +1,7 @@
-﻿using Prism.Events;
+﻿using Micser.App.Infrastructure;
+using Prism.Events;
 
-namespace Micser.App.Infrastructure.ViewModels
+namespace Micser.App.ViewModels
 {
     public class MainStatusBarViewModel : ViewModelNavigationAware
     {

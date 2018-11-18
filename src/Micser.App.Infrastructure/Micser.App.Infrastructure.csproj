@@ -68,7 +68,7 @@
     <Compile Include="Extensions\PrismContainerExtensions.cs" />
     <Compile Include="IApplicationStateService.cs" />
     <Compile Include="INavigationManager.cs" />
-    <Compile Include="InfrastructureAppModule.cs" />
+    <Compile Include="InfrastructureModule.cs" />
     <Compile Include="ISelectable.cs" />
     <Compile Include="IViewModel.cs" />
     <Compile Include="Menu\IMenuItemRegistry.cs" />
@@ -85,25 +85,6 @@
     <Compile Include="View.cs" />
     <Compile Include="ViewModel.cs" />
     <Compile Include="ViewModelNavigationAware.cs" />
-    <Compile Include="ViewModels\MainMenuViewModel.cs" />
-    <Compile Include="ViewModels\MainStatusBarViewModel.cs" />
-    <Compile Include="ViewModels\MainViewModel.cs" />
-    <Compile Include="ViewModels\StartupViewModel.cs" />
-    <Compile Include="Views\MainMenuView.xaml.cs">
-      <DependentUpon>MainMenuView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\MainStatusBarView.xaml.cs">
-      <DependentUpon>MainStatusBarView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\MainView.xaml.cs">
-      <DependentUpon>MainView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\SettingsView.xaml.cs">
-      <DependentUpon>SettingsView.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="Views\StartupView.xaml.cs">
-      <DependentUpon>StartupView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Widgets\Connection.cs" />
     <Compile Include="Widgets\ConnectionAdorner.cs" />
     <Compile Include="Widgets\ConnectionChangedEventHandler.cs" />
@@ -170,30 +151,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Views\MainMenuView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\MainStatusBarView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\MainView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\SettingsView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Views\StartupView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Assets\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\Micser.Infrastructure\Micser.Infrastructure.csproj">
       <Project>{e14431b4-f54a-4d36-b505-1d3407252430}</Project>

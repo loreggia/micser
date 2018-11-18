@@ -1,9 +1,10 @@
-﻿using Micser.App.Infrastructure.Views;
+﻿using Micser.App.Infrastructure;
+using Micser.App.Views;
 using Micser.Infrastructure;
 using Prism.Events;
 using System.Threading.Tasks;
 
-namespace Micser.App.Infrastructure.ViewModels
+namespace Micser.App.ViewModels
 {
     public class StartupViewModel : ViewModelNavigationAware
     {
