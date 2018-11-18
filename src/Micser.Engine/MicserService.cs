@@ -73,7 +73,7 @@ namespace Micser.Engine
         {
             _plugins.Clear();
 
-            _plugins.Add(new InfrastructureEngineModule());
+            _plugins.Add(new InfrastructureModule());
 
             var executingFile = new FileInfo(Assembly.GetExecutingAssembly().Location);
             var moduleFiles = executingFile.Directory.GetFiles(Globals.PluginSearchPattern);
