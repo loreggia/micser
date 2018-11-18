@@ -152,9 +152,9 @@
       <Project>{26b45a3b-725b-48e1-b272-4b0875b0c04a}</Project>
       <Name>Micser.App.Infrastructure</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Micser.Infrastructure\Micser.Infrastructure.csproj">
+    <ProjectReference Include="..\Micser.Common\Micser.Common.csproj">
       <Project>{e14431b4-f54a-4d36-b505-1d3407252430}</Project>
-      <Name>Micser.Infrastructure</Name>
+      <Name>Micser.Common</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

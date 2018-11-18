@@ -14,9 +14,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Micser.Vac.Package", "Micse
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Micser.Vac.Driver", "Micser.Vac.Driver\Micser.Vac.Driver.vcxproj", "{6EEBBC22-F44C-400D-8FBB-2E42960D287B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Micser.Infrastructure", "Micser.Infrastructure\Micser.Infrastructure.csproj", "{E14431B4-F54A-4D36-B505-1D3407252430}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Micser.Common", "Micser.Common\Micser.Common.csproj", "{E14431B4-F54A-4D36-B505-1D3407252430}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Micser.Infrastructure.Test", "Micser.Infrastructure.Test\Micser.Infrastructure.Test.csproj", "{5CB07365-3143-4B65-9118-7B255AACAC6F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Micser.Common.Test", "Micser.Common.Test\Micser.Common.Test.csproj", "{5CB07365-3143-4B65-9118-7B255AACAC6F}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Test", "Test", "{3094D470-6483-45FF-8185-97FD6671701D}"
 EndProject
