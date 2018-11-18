@@ -1,4 +1,5 @@
-﻿using Micser.App.Infrastructure.Api;
+﻿using Micser.App.Infrastructure;
+using Micser.App.Infrastructure.Api;
 using Micser.App.Infrastructure.Widgets;
 using Micser.Infrastructure.DataAccess;
 using NLog;
@@ -7,7 +8,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 
-namespace Micser.App.Infrastructure.ViewModels
+namespace Micser.App.ViewModels
 {
     public class MainViewModel : ViewModelNavigationAware
     {

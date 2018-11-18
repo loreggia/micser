@@ -27,7 +27,7 @@ namespace Micser.App
             base.ConfigureModuleCatalog(moduleCatalog);
 
             moduleCatalog.AddModule<AppModule>();
-            moduleCatalog.AddModule<InfrastructureAppModule>();
+            moduleCatalog.AddModule<InfrastructureModule>();
 
             LoadPlugins(moduleCatalog);
         }
