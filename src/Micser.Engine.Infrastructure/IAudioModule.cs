@@ -4,14 +4,14 @@ using System;
 
 namespace Micser.Engine.Infrastructure
 {
-    public interface IModule : IDisposable
+    public interface IAudioModule : IDisposable
     {
         event EventHandler InputChanged;
 
         event EventHandler OutputChanged;
 
         ModuleDescription Description { get; }
-        IModule Input { get; set; }
+        IAudioModule Input { get; set; }
         IWaveSource Output { get; }
 
         ModuleState GetState();

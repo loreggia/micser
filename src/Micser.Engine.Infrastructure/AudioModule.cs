@@ -5,10 +5,10 @@ using System;
 
 namespace Micser.Engine.Infrastructure
 {
-    public abstract class Module : IModule
+    public abstract class AudioModule : IAudioModule
     {
         protected static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
-        private IModule _input;
+        private IAudioModule _input;
         private IWaveSource _output;
 
         public event EventHandler InputChanged;
@@ -17,7 +17,7 @@ namespace Micser.Engine.Infrastructure
 
         public ModuleDescription Description { get; set; }
 
-        public IModule Input
+        public IAudioModule Input
         {
             get => _input;
             set

@@ -3,13 +3,13 @@ using Micser.Infrastructure.Models;
 
 namespace Micser.Engine.Audio
 {
-    public class MixerModule : Module
+    public class MixerModule : AudioModule
     {
         public MixerModule()
         {
         }
 
-        public IModule Input2 { get; set; }
+        public IAudioModule Input2 { get; set; }
 
         public override ModuleState GetState()
         {

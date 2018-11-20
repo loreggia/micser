@@ -7,7 +7,7 @@ namespace Micser.Engine.Audio
 {
     public interface IAudioEngine : IDisposable
     {
-        ICollection<IModule> Modules { get; }
+        ICollection<IAudioModule> Modules { get; }
 
         void Start(IUnityContainer container);
 

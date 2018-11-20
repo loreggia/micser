@@ -15,10 +15,10 @@ namespace Micser.Engine.Audio
 
         public AudioEngine()
         {
-            Modules = new List<IModule>();
+            Modules = new List<IAudioModule>();
         }
 
-        public ICollection<IModule> Modules { get; }
+        public ICollection<IAudioModule> Modules { get; }
 
         public void Dispose()
         {
@@ -39,7 +39,7 @@ namespace Micser.Engine.Audio
                 var type = Type.GetType(description.Type);
                 if (type != null)
                 {
-                    if (container.Resolve(type) is IModule module)
+                    if (container.Resolve(type) is IAudioModule module)
                     {
                         module.Initialize(description);
                         Modules.Add(module);
