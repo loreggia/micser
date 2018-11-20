@@ -9,7 +9,7 @@ using Micser.Infrastructure.Models;
 
 namespace Micser.Plugins.Main.Modules
 {
-    public class DeviceOutputModule : Module
+    public class DeviceOutputModule : AudioModule
     {
         private DeviceDescription _deviceDescription;
         private int _latency;

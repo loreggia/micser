@@ -43,9 +43,9 @@
   <ItemGroup>
     <Compile Include="Extensions\UnityContainerExtensions.cs" />
     <Compile Include="IEngineModule.cs" />
-    <Compile Include="IModule.cs" />
+    <Compile Include="IAudioModule.cs" />
     <Compile Include="InfrastructureModule.cs" />
-    <Compile Include="Module.cs" />
+    <Compile Include="AudioModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

@@ -13,7 +13,7 @@ namespace Micser.Engine.Infrastructure.Extensions
                 container.RegisterType(moduleType);
             }
 
-            container.RegisterTypes<IModule>(moduleTypes);
+            container.RegisterTypes<IAudioModule>(moduleTypes);
         }
     }
 }

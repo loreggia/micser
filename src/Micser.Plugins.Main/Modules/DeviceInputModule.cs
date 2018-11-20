@@ -10,7 +10,7 @@ using Micser.Infrastructure.Models;
 
 namespace Micser.Plugins.Main.Modules
 {
-    public class DeviceInputModule : Module
+    public class DeviceInputModule : AudioModule
     {
         private WasapiCapture _capture;
 
