@@ -1,15 +1,15 @@
-﻿using Micser.App.Infrastructure.Extensions;
+﻿using Micser.App.Infrastructure;
+using Micser.App.Infrastructure.Extensions;
 using Micser.App.Infrastructure.Themes;
 using Micser.Plugins.Main.Properties;
 using Micser.Plugins.Main.Widgets;
 using Prism.Ioc;
-using Prism.Modularity;
 using System;
 using System.Windows;
 
 namespace Micser.Plugins.Main
 {
-    public class MainAppModule : IModule
+    public class MainAppModule : IPlugin
     {
         public void OnInitialized(IContainerProvider containerProvider)
         {

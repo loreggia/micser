@@ -77,7 +77,7 @@
       <Version>1.2.1.2</Version>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
-      <Version>11.0.2</Version>
+      <Version>12.0.1</Version>
     </PackageReference>
     <PackageReference Include="NLog">
       <Version>4.5.11</Version>
@@ -92,7 +92,7 @@
       <Version>7.1.0.431</Version>
     </PackageReference>
     <PackageReference Include="Unity">
-      <Version>5.8.11</Version>
+      <Version>5.8.13</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup />

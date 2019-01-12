@@ -11,7 +11,8 @@
     <AssemblyName>WixSharpSetup</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <NuGetPackageImportStamp></NuGetPackageImportStamp>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
     <PublishUrl>publish\</PublishUrl>
     <Install>true</Install>
     <InstallFrom>Disk</InstallFrom>
@@ -74,10 +75,10 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="WixSharp">
-      <Version>1.9.2</Version>
+      <Version>1.9.3</Version>
     </PackageReference>
     <PackageReference Include="WixSharp.bin">
-      <Version>1.9.2</Version>
+      <Version>1.9.3</Version>
     </PackageReference>
   </ItemGroup>
   <!-- <ItemGroup> -->
@@ -94,7 +95,8 @@
   </Target>
   -->
   <PropertyGroup>
-    <PostBuildEvent></PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <Target Name="CopyToBinDir" AfterTargets="AfterBuild">
     <MakeDir Directories="$(SolutionDir)..\bin\$(ConfigurationName)\Installer" />

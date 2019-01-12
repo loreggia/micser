@@ -1,10 +1,9 @@
 ﻿using Micser.App.Infrastructure.Widgets;
 using Prism.Ioc;
-using Prism.Modularity;
 
 namespace Micser.App.Infrastructure
 {
-    public class InfrastructureModule : IModule
+    public class InfrastructureModule : IPlugin
     {
         public void OnInitialized(IContainerProvider containerProvider)
         {

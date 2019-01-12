@@ -69,6 +69,7 @@
     <Compile Include="IApplicationStateService.cs" />
     <Compile Include="INavigationManager.cs" />
     <Compile Include="InfrastructureModule.cs" />
+    <Compile Include="IPlugin.cs" />
     <Compile Include="ISelectable.cs" />
     <Compile Include="IViewModel.cs" />
     <Compile Include="Menu\IMenuItemRegistry.cs" />
