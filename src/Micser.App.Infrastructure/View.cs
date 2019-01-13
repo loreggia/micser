@@ -1,18 +1,14 @@
-﻿using Micser.App.Infrastructure.Controls;
-using Micser.App.Infrastructure.Themes;
+﻿using Micser.App.Infrastructure.Themes;
 using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
 
 namespace Micser.App.Infrastructure
 {
     public class View : ContentControl
     {
         public static readonly DependencyProperty IsBusyProperty = DependencyProperty.Register(
-            nameof(IsBusy), typeof(bool), typeof(View), new PropertyMetadata(false, IsBusyPropertyChanged));
-
-        private BusyAdorner _busyAdorner;
+            nameof(IsBusy), typeof(bool), typeof(View), new PropertyMetadata(false));
 
         static View()
         {
@@ -34,33 +30,6 @@ namespace Micser.App.Infrastructure
         }
 
         public ViewModel ViewModel => DataContext as ViewModel;
-
-        private static void IsBusyPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
-        {
-            return;
-            var view = (View)d;
-
-            var layer = AdornerLayer.GetAdornerLayer(view);
-
-            if (view.IsBusy)
-            {
-                layer.Add(view._busyAdorner ?? (view._busyAdorner = new BusyAdorner(view)));
-            }
-            else
-            {
-                var adorners = layer.GetAdorners(view);
-                if (adorners != null)
-                {
-                    foreach (var adorner in adorners)
-                    {
-                        if (adorner is BusyAdorner)
-                        {
-                            layer.Remove(adorner);
-                        }
-                    }
-                }
-            }
-        }
 
         private void OnDispatcherShutdownStarted(object sender, EventArgs e)
         {

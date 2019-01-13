@@ -1,9 +1,9 @@
-﻿using Prism.Regions;
+﻿using Micser.App.Infrastructure;
+using Micser.Common;
+using Prism.Regions;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
-using Micser.App.Infrastructure;
-using Micser.Common;
 
 namespace Micser.App
 {
@@ -13,12 +13,16 @@ namespace Micser.App
     public partial class MainShell
     {
         private readonly IRegionManager _regionManager;
+        private readonly ISettingsService _settingsService;
         private bool _isExiting;
 
-        public MainShell(IRegionManager regionManager)
+        public MainShell(IRegionManager regionManager, ISettingsService settingsService)
         {
             _regionManager = regionManager;
+            _settingsService = settingsService;
+
             InitializeComponent();
+
             Loaded += MainShell_Loaded;
         }
 
@@ -34,6 +38,8 @@ namespace Micser.App
 
         private void CloseCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
+            _isExiting = _settingsService.GetSetting(Globals.SettingKeys.ExitOnClose, false);
+
             Close();
         }
 

@@ -11,7 +11,7 @@ namespace Micser.Engine.Infrastructure
         public void RegisterTypes(IUnityContainer container)
         {
             container.RegisterType<ILogger>(new InjectionFactory(c => LogManager.GetCurrentClassLogger()));
-            container.RegisterSingleton<IDatabase>(new InjectionFactory(c => new Database(Globals.AppDbLocation, c.Resolve<ILogger>())));
+            container.RegisterSingleton<IDatabase>(new InjectionFactory(c => new Database(Globals.EngineDbLocation, c.Resolve<ILogger>())));
         }
     }
 }
