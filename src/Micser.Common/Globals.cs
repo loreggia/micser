@@ -23,5 +23,10 @@ namespace Micser.Common
             public const string Menu = "MenuRegion";
             public const string Status = "StatusRegion";
         }
+
+        public static class SettingKeys
+        {
+            public const string ExitOnClose = "ExitOnClose";
+        }
     }
 }

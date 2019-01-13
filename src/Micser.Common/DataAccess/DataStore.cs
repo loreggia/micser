@@ -5,16 +5,15 @@ namespace Micser.Common.DataAccess
 {
     public class DataStore
     {
-        private Database _database;
+        private readonly Database _database;
 
         public DataStore(Database database)
         {
             Tables = new ConcurrentDictionary<string, object>();
-
-            Initialize(database);
+            _database = database;
         }
 
-        public IDictionary<string, object> Tables { get; set; }
+        public IDictionary<string, object> Tables { get; }
 
         public IEnumerable<T> GetCollection<T>(string table = null)
         {
@@ -38,9 +37,17 @@ namespace Micser.Common.DataAccess
             _database.Save(this);
         }
 
-        internal void Initialize(Database database)
+        public void SetObject<T>(T value, string table = null)
         {
-            _database = database;
+            table = table ?? GetTableName<T>();
+            if (Tables.ContainsKey(table))
+            {
+                Tables[table] = value;
+            }
+            else
+            {
+                Tables.Add(table, value);
+            }
         }
 
         private static string GetTableName<T>()

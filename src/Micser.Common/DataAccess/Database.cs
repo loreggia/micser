@@ -1,7 +1,9 @@
-﻿using System;
-using System.IO;
+﻿using Micser.Common.Extensions;
 using Newtonsoft.Json;
 using NLog;
+using System;
+using System.Collections.Generic;
+using System.IO;
 
 namespace Micser.Common.DataAccess
 {
@@ -28,9 +30,10 @@ namespace Micser.Common.DataAccess
             {
                 using (var reader = new StreamReader(_fileName))
                 {
-                    var result = JsonConvert.DeserializeObject<DataStore>(reader.ReadToEnd());
-                    result.Initialize(this);
-                    return result;
+                    var tables = JsonConvert.DeserializeObject<Dictionary<string, object>>(reader.ReadToEnd());
+                    var dataStore = new DataStore(this);
+                    tables.ForEach(p => dataStore.Tables.Add(p.Key, p.Value));
+                    return dataStore;
                 }
             }
             catch (Exception ex)
@@ -47,7 +50,7 @@ namespace Micser.Common.DataAccess
             {
                 using (var writer = new StreamWriter(_fileName))
                 {
-                    var json = JsonConvert.SerializeObject(dataStore);
+                    var json = JsonConvert.SerializeObject(dataStore.Tables);
                     writer.Write(json);
                 }
             }
