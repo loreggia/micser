@@ -1,7 +1,9 @@
-﻿namespace Micser.Common
+﻿using System;
+
+namespace Micser.Common
 {
     public class Model
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
     }
 }

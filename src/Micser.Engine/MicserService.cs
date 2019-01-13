@@ -1,6 +1,10 @@
 ﻿using CommonServiceLocator;
+using Micser.Common;
+using Micser.Common.DataAccess;
+using Micser.Common.Extensions;
 using Micser.Engine.Api;
 using Micser.Engine.Audio;
+using Micser.Engine.Infrastructure;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -9,20 +13,16 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.ServiceProcess;
-using Micser.Common;
-using Micser.Common.Extensions;
-using Micser.Engine.Infrastructure;
 using Unity;
+using Unity.Injection;
 
 namespace Micser.Engine
 {
     public partial class MicserService : ServiceBase
     {
-        private readonly AudioEngine _engine;
-
         private readonly ICollection<IEngineModule> _plugins;
-
-        private readonly Server _server;
+        private IAudioEngine _engine;
+        private IServer _server;
 
         static MicserService()
         {
@@ -34,21 +34,24 @@ namespace Micser.Engine
             InitializeComponent();
 
             _plugins = new List<IEngineModule>();
-
-            _engine = new AudioEngine();
-            _server = new Server();
         }
 
         public void ManualStart()
         {
             var container = new UnityContainer();
 
-            RegisterTypes(container);
+            container.RegisterType<ILogger>(new InjectionFactory(c => LogManager.GetCurrentClassLogger()));
+            container.RegisterSingleton<IDatabase>(new InjectionFactory(c => new Database(Globals.EngineDbLocation, c.Resolve<ILogger>())));
+            container.RegisterSingleton<IAudioEngine, AudioEngine>();
+            container.RegisterSingleton<IServer, Server>();
+
+            _engine = container.Resolve<IAudioEngine>();
+            _server = container.Resolve<IServer>();
 
             LoadPlugins(container);
 
-            _server.Start(container);
-            _engine.Start(container);
+            _server.Start();
+            _engine.Start();
         }
 
         public void ManualStop()
@@ -102,11 +105,6 @@ namespace Micser.Engine
             {
                 engineModule.RegisterTypes(container);
             }
-        }
-
-        private void RegisterTypes(IUnityContainer container)
-        {
-            container.RegisterInstance<IAudioEngine>(_engine);
         }
     }
 }
