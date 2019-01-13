@@ -24,6 +24,8 @@ namespace Micser.App
             InitializeComponent();
 
             Loaded += MainShell_Loaded;
+
+            _settingsService.Load();
         }
 
         protected override void OnClosing(CancelEventArgs e)
@@ -47,6 +49,7 @@ namespace Micser.App
         {
             _isExiting = true;
             _regionManager.RequestNavigate(Globals.PrismRegions.Main, "");
+            _settingsService.Save();
             Application.Current.Shutdown();
         }
 
