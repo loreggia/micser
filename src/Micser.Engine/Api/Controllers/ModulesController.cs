@@ -1,10 +1,11 @@
 ﻿using Micser.Common.Modules;
 using Micser.Engine.Audio;
+using Micser.Engine.Infrastructure;
 using System.Linq;
 
 namespace Micser.Engine.Api.Controllers
 {
-    public class ModulesController : Controller
+    public class ModulesController : ApiController
     {
         private readonly IAudioEngine _audioEngine;
 
