@@ -1,6 +1,5 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:infrastructure="clr-namespace:Micser.Infrastructure"
                     xmlns:app="clr-namespace:Micser.App.Infrastructure"
                     xmlns:controls="clr-namespace:Micser.App.Infrastructure.Controls"
                     xmlns:converter="clr-namespace:Micser.App.Infrastructure.Converter">

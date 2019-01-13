@@ -1,8 +1,8 @@
 ﻿using Micser.App.Infrastructure;
 using Micser.App.Views;
-using Micser.Infrastructure;
 using Prism.Events;
 using System.Threading.Tasks;
+using Micser.Common;
 
 namespace Micser.App.ViewModels
 {

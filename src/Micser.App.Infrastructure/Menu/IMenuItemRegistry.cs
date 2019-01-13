@@ -1,4 +1,4 @@
-﻿using Micser.Infrastructure;
+﻿using Micser.Common;
 
 namespace Micser.App.Infrastructure.Menu
 {

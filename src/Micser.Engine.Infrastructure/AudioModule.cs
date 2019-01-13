@@ -1,5 +1,5 @@
 ﻿using CSCore;
-using Micser.Infrastructure.Models;
+using Micser.Common.Modules;
 using NLog;
 using System;
 
@@ -64,7 +64,7 @@ namespace Micser.Engine.Infrastructure
             GC.SuppressFinalize(this);
         }
 
-        public abstract ModuleState GetState();
+        public abstract IModuleState GetState();
 
         public virtual void Initialize(ModuleDescription description)
         {

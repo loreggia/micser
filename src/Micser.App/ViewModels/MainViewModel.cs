@@ -1,12 +1,12 @@
 ﻿using Micser.App.Infrastructure;
 using Micser.App.Infrastructure.Api;
 using Micser.App.Infrastructure.Widgets;
-using Micser.Infrastructure.DataAccess;
 using NLog;
 using Prism.Regions;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using Micser.Common.DataAccess;
 
 namespace Micser.App.ViewModels
 {

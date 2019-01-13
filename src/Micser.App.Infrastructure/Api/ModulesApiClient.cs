@@ -1,4 +1,4 @@
-﻿using Micser.Infrastructure.Models;
+﻿using Micser.Common.Modules;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

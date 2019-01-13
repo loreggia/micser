@@ -1,20 +1,16 @@
 ﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
 
-namespace Micser.Infrastructure.DataAccess
+namespace Micser.Common.DataAccess
 {
     public class DataStore
     {
         private Database _database;
 
-        public DataStore()
+        public DataStore(Database database)
         {
             Tables = new ConcurrentDictionary<string, object>();
-        }
 
-        public DataStore(Database database)
-            : this()
-        {
             Initialize(database);
         }
 

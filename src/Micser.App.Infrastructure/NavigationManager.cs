@@ -1,6 +1,6 @@
-﻿using Micser.Infrastructure;
-using Prism.Regions;
+﻿using Prism.Regions;
 using System;
+using Micser.Common;
 
 namespace Micser.App.Infrastructure
 {

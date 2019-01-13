@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
-using CSCore.CoreAudioAPI;
-using Micser.Infrastructure.Models;
+﻿using CSCore.CoreAudioAPI;
+using System.Collections.Generic;
 
-namespace Micser.Infrastructure
+namespace Micser.Common.Devices
 {
     public class DeviceService
     {

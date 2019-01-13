@@ -1,8 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using Micser.App.Infrastructure.Widgets;
+using Micser.Common.Devices;
+using System.Collections.Generic;
 using System.Linq;
-using Micser.App.Infrastructure.Widgets;
-using Micser.Infrastructure;
-using Micser.Infrastructure.Models;
 
 namespace Micser.Plugins.Main.Widgets
 {

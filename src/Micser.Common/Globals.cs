@@ -2,7 +2,7 @@
 using System.IO;
 using System.Net;
 
-namespace Micser.Infrastructure
+namespace Micser.Common
 {
     public static class Globals
     {

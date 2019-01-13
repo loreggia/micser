@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Micser.Common.Devices;
 using System;
 using System.Linq;
-using Micser.Infrastructure.Models;
 
 namespace Micser.Infrastructure.Test
 {

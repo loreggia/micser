@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Micser.Infrastructure.Extensions
+namespace Micser.Common.Extensions
 {
     public static class ComparableExtensions
     {
