@@ -8,14 +8,13 @@ using Micser.Infrastructure;
 using Micser.Infrastructure.DataAccess;
 using NLog;
 using Prism.Ioc;
-using Prism.Modularity;
 using Prism.Unity;
 using Unity;
 using Unity.Injection;
 
 namespace Micser.App
 {
-    public class AppModule : IModule
+    public class AppModule : IAppModule
     {
         public void OnInitialized(IContainerProvider containerProvider)
         {

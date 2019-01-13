@@ -3,7 +3,7 @@ using Prism.Ioc;
 
 namespace Micser.App.Infrastructure
 {
-    public class InfrastructureModule : IPlugin
+    public class InfrastructureModule : IAppModule
     {
         public void OnInitialized(IContainerProvider containerProvider)
         {
