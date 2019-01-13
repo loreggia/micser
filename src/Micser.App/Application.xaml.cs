@@ -1,4 +1,6 @@
 ﻿using CommonServiceLocator;
+using Micser.App.Infrastructure;
+using Micser.App.Infrastructure.Themes;
 using Micser.Infrastructure;
 using NLog;
 using NLog.Config;
@@ -12,8 +14,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Windows;
-using Micser.App.Infrastructure;
-using Micser.App.Infrastructure.Themes;
 
 namespace Micser.App
 {
