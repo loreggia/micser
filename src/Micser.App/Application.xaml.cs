@@ -116,7 +116,7 @@ namespace Micser.App
                 try
                 {
                     var assembly = Assembly.LoadFile(moduleFile.FullName);
-                    var moduleTypes = assembly.GetExportedTypes().Where(t => typeof(IModule).IsAssignableFrom(t));
+                    var moduleTypes = assembly.GetExportedTypes().Where(t => typeof(IAppModule).IsAssignableFrom(t));
                     foreach (var moduleType in moduleTypes)
                     {
                         if (moduleCatalog.Modules.All(m => m.ModuleType != moduleType.AssemblyQualifiedName))

@@ -2,7 +2,7 @@
 
 namespace Micser.App.Infrastructure
 {
-    public interface IPlugin : IModule
+    public interface IAppModule : IModule
     {
     }
 }

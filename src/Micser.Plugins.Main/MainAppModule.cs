@@ -9,7 +9,7 @@ using System.Windows;
 
 namespace Micser.Plugins.Main
 {
-    public class MainAppModule : IPlugin
+    public class MainAppModule : IAppModule
     {
         public void OnInitialized(IContainerProvider containerProvider)
         {
