@@ -1,5 +1,5 @@
-﻿<unity:PrismApplication x:Class="Micser.App.Application"
+﻿<prism:PrismApplication x:Class="Micser.App.Application"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:unity="http://prismlibrary.com/">
-</unity:PrismApplication>
+             xmlns:prism="http://prismlibrary.com/">
+</prism:PrismApplication>
