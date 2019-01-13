@@ -1,4 +1,6 @@
-﻿namespace Micser.Common.Modules
+﻿using System;
+
+namespace Micser.Common.Modules
 {
     public class ModuleConnectionDescription : Model
     {
@@ -6,13 +8,13 @@
         {
         }
 
-        public ModuleConnectionDescription(int sourceId, int targetId)
+        public ModuleConnectionDescription(Guid sourceId, Guid targetId)
         {
             SourceId = sourceId;
             TargetId = targetId;
         }
 
-        public int SourceId { get; set; }
-        public int TargetId { get; set; }
+        public Guid SourceId { get; set; }
+        public Guid TargetId { get; set; }
     }
 }

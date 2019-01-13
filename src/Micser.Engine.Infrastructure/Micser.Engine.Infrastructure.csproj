@@ -47,6 +47,7 @@
     <Compile Include="IAudioModule.cs" />
     <Compile Include="InfrastructureModule.cs" />
     <Compile Include="AudioModule.cs" />
+    <Compile Include="IServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

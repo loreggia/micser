@@ -1,7 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Micser.Common.Modules;
 using Micser.Engine.Infrastructure;
-using Unity;
+using System;
+using System.Collections.Generic;
 
 namespace Micser.Engine.Audio
 {
@@ -9,7 +9,9 @@ namespace Micser.Engine.Audio
     {
         ICollection<IAudioModule> Modules { get; }
 
-        void Start(IUnityContainer container);
+        void AddModule(ModuleDescription module);
+
+        void Start();
 
         void Stop();
     }
