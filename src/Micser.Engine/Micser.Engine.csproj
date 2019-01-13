@@ -49,7 +49,6 @@
     <Compile Include="Api\Bootstrapper.cs" />
     <Compile Include="Api\Controllers\ModuleConnectionsController.cs" />
     <Compile Include="Api\Controllers\ModulesController.cs" />
-    <Compile Include="Api\Controllers\Controller.cs" />
     <Compile Include="Api\Server.cs" />
     <Compile Include="Audio\AudioEngine.cs" />
     <Compile Include="Audio\IAudioEngine.cs" />
