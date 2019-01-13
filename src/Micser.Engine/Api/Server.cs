@@ -1,6 +1,6 @@
-﻿using Micser.Infrastructure;
-using Nancy.Hosting.Self;
+﻿using Nancy.Hosting.Self;
 using System;
+using Micser.Common;
 using Unity;
 
 namespace Micser.Engine.Api

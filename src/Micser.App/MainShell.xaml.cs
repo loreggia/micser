@@ -1,9 +1,9 @@
-﻿using Micser.Infrastructure;
-using Prism.Regions;
+﻿using Prism.Regions;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
 using Micser.App.Infrastructure;
+using Micser.Common;
 
 namespace Micser.App
 {

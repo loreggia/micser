@@ -1,9 +1,9 @@
-﻿using Newtonsoft.Json;
-using NLog;
-using System;
+﻿using System;
 using System.IO;
+using Newtonsoft.Json;
+using NLog;
 
-namespace Micser.Infrastructure.DataAccess
+namespace Micser.Common.DataAccess
 {
     public class Database : IDatabase
     {

@@ -3,7 +3,7 @@ using System.IO;
 using System.Linq;
 using System.ServiceProcess;
 using System.Threading;
-using Micser.Infrastructure;
+using Micser.Common;
 using NLog;
 using NLog.Config;
 using NLog.Targets;

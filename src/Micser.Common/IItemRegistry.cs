@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Micser.Infrastructure
+namespace Micser.Common
 {
     public interface IItemRegistry<T>
     {

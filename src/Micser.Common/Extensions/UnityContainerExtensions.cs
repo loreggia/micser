@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Unity;
 
-namespace Micser.Infrastructure.Extensions
+namespace Micser.Common.Extensions
 {
     public static class UnityContainerExtensions
     {

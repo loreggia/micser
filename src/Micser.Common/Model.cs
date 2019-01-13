@@ -1,4 +1,4 @@
-﻿namespace Micser.Infrastructure.Models
+﻿namespace Micser.Common
 {
     public class Model
     {

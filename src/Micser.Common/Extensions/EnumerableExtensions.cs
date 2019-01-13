@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Micser.Infrastructure.Extensions
+namespace Micser.Common.Extensions
 {
     public static class EnumerableExtensions
     {

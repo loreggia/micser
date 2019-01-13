@@ -1,5 +1,4 @@
-﻿using Micser.Infrastructure;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -12,6 +11,7 @@ using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Micser.Common;
 
 namespace Micser.App.Infrastructure.Api
 {

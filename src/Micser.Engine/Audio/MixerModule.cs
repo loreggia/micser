@@ -1,5 +1,5 @@
-﻿using Micser.Engine.Infrastructure;
-using Micser.Infrastructure.Models;
+﻿using Micser.Common.Modules;
+using Micser.Engine.Infrastructure;
 
 namespace Micser.Engine.Audio
 {
@@ -11,7 +11,7 @@ namespace Micser.Engine.Audio
 
         public IAudioModule Input2 { get; set; }
 
-        public override ModuleState GetState()
+        public override IModuleState GetState()
         {
             throw new System.NotImplementedException();
         }

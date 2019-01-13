@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Micser.Infrastructure
+namespace Micser.Common
 {
     public class ItemRegistry<T> : IItemRegistry<T>
     {

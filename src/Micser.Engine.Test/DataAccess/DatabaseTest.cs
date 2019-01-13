@@ -1,5 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Micser.Infrastructure.DataAccess;
+using Micser.Common.DataAccess;
 using NLog;
 
 namespace Micser.Engine.Test.DataAccess

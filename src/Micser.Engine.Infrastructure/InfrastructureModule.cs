@@ -1,5 +1,5 @@
-﻿using Micser.Infrastructure;
-using Micser.Infrastructure.DataAccess;
+﻿using Micser.Common;
+using Micser.Common.DataAccess;
 using NLog;
 using Unity;
 using Unity.Injection;

@@ -1,7 +1,6 @@
 ﻿using CommonServiceLocator;
 using Micser.Engine.Api;
 using Micser.Engine.Audio;
-using Micser.Infrastructure;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -10,8 +9,9 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.ServiceProcess;
+using Micser.Common;
+using Micser.Common.Extensions;
 using Micser.Engine.Infrastructure;
-using Micser.Infrastructure.Extensions;
 using Unity;
 
 namespace Micser.Engine

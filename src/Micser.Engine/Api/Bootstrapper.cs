@@ -5,7 +5,7 @@ using Nancy.ViewEngines;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Micser.Infrastructure.Extensions;
+using Micser.Common.Extensions;
 using Unity;
 using Unity.RegistrationByConvention;
 
