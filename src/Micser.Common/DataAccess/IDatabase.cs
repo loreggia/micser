@@ -2,6 +2,6 @@
 {
     public interface IDatabase
     {
-        DataStore GetContext();
+        DataContext GetContext();
     }
 }
