@@ -19,11 +19,11 @@ namespace Micser.Common.DataAccess
             _logger = logger;
         }
 
-        public DataStore GetContext()
+        public DataContext GetContext()
         {
             if (!File.Exists(_fileName))
             {
-                return new DataStore(this);
+                return new DataContext(this);
             }
 
             try
@@ -31,7 +31,7 @@ namespace Micser.Common.DataAccess
                 using (var reader = new StreamReader(_fileName))
                 {
                     var tables = JsonConvert.DeserializeObject<Dictionary<string, object>>(reader.ReadToEnd());
-                    var dataStore = new DataStore(this);
+                    var dataStore = new DataContext(this);
                     tables.ForEach(p => dataStore.Tables.Add(p.Key, p.Value));
                     return dataStore;
                 }
@@ -41,16 +41,16 @@ namespace Micser.Common.DataAccess
                 _logger.Log(LogLevel.Error, ex);
             }
 
-            return new DataStore(this);
+            return new DataContext(this);
         }
 
-        internal void Save(DataStore dataStore)
+        internal void Save(DataContext dataContext)
         {
             try
             {
                 using (var writer = new StreamWriter(_fileName))
                 {
-                    var json = JsonConvert.SerializeObject(dataStore.Tables);
+                    var json = JsonConvert.SerializeObject(dataContext.Tables);
                     writer.Write(json);
                 }
             }
