@@ -1,8 +1,7 @@
-﻿using Micser.Common.Extensions;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using NLog;
 using System;
-using System.Collections.Generic;
 using System.IO;
 
 namespace Micser.Common.DataAccess
@@ -12,6 +11,7 @@ namespace Micser.Common.DataAccess
         private readonly string _fileName;
         private readonly object _lock = new object();
         private readonly ILogger _logger;
+        private JObject _dbInstance;
 
         public Database(string fileName, ILogger logger)
         {
@@ -21,37 +21,40 @@ namespace Micser.Common.DataAccess
 
         public DataContext GetContext()
         {
-            if (!File.Exists(_fileName))
-            {
-                return new DataContext(this);
-            }
+            return new DataContext(this);
+        }
 
+        internal DbSet<T> GetDbSet<T>(string table)
+        {
+            var dbSet = new DbSet<T>();
+        }
+
+        internal void Load()
+        {
             try
             {
                 using (var reader = new StreamReader(_fileName))
+                using (var jsonReader = new JsonTextReader(reader))
                 {
-                    var tables = JsonConvert.DeserializeObject<Dictionary<string, object>>(reader.ReadToEnd());
-                    var dataStore = new DataContext(this);
-                    tables.ForEach(p => dataStore.Tables.Add(p.Key, p.Value));
-                    return dataStore;
+                    _dbInstance = JObject.Load(jsonReader);
                 }
             }
             catch (Exception ex)
             {
                 _logger.Log(LogLevel.Error, ex);
             }
-
-            return new DataContext(this);
         }
 
         internal void Save(DataContext dataContext)
         {
             try
             {
+                dataContext.
+
                 using (var writer = new StreamWriter(_fileName))
+                using (var jsonWriter = new JsonTextWriter(writer))
                 {
-                    var json = JsonConvert.SerializeObject(dataContext.Tables);
-                    writer.Write(json);
+                    _dbInstance.WriteTo(jsonWriter);
                 }
             }
             catch (Exception ex)

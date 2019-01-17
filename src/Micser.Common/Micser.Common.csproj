@@ -51,6 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataAccess\DbEntry.cs" />
+    <Compile Include="DataAccess\DbSet.cs" />
     <Compile Include="Devices\DeviceService.cs" />
     <Compile Include="DataAccess\Database.cs" />
     <Compile Include="DataAccess\DataContext.cs" />
