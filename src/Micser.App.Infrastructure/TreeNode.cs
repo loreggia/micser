@@ -16,13 +16,14 @@ namespace Micser.App.Infrastructure
         public TreeNode<T> Parent { get; set; }
 
         public static IEnumerable<TreeNode<T>> CreateTree<TId>(IEnumerable<T> source, Func<T, TId> idSelector,
-            Func<T, TId> parentIdSelector, Func<T, object> orderFunc)
+                                                               Func<T, TId> parentIdSelector, Func<T, object> orderFunc)
         {
             var treeNodeList = source.Select(x => new TreeNode<T>(x)).ToArray();
 
             foreach (var treeNode in treeNodeList)
             {
-                treeNode.Children = treeNodeList.Where(c => Equals(parentIdSelector(c.Item), idSelector(treeNode.Item))).OrderBy(x => orderFunc(x.Item));
+                treeNode.Children = treeNodeList.Where(c => Equals(parentIdSelector(c.Item), idSelector(treeNode.Item)))
+                                                .OrderBy(x => orderFunc(x.Item));
                 foreach (var child in treeNode.Children)
                 {
                     child.Parent = treeNode;

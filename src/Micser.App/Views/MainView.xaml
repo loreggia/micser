@@ -21,12 +21,12 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0">
-        </Grid>
+        <Grid Grid.Row="0" />
 
         <!-- Widgets="{Binding Widgets}"-->
         <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-            <w:WidgetPanel x:Name="WidgetPanel" WidgetFactory="{Binding WidgetFactory}" WidgetsSource="{Binding Widgets}" ConnectionsSource="{Binding Connections}" />
+            <w:WidgetPanel x:Name="WidgetPanel" WidgetFactory="{Binding WidgetFactory}" WidgetsSource="{Binding Widgets}"
+                           ConnectionsSource="{Binding Connections}" />
         </ScrollViewer>
 
         <Expander Grid.Row="2" Header="Widgets" IsExpanded="True">

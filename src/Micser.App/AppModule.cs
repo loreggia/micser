@@ -5,7 +5,6 @@ using Micser.App.Infrastructure.Themes;
 using Micser.App.ViewModels;
 using Micser.App.Views;
 using Prism.Ioc;
-using Unity;
 
 namespace Micser.App
 {
@@ -15,12 +14,13 @@ namespace Micser.App
         {
             // top level menu items
             var menuItemRegistry = containerProvider.Resolve<IMenuItemRegistry>();
-            menuItemRegistry.Add(new MenuItemDescription { Header = "_File", Id = "File" });
-            menuItemRegistry.Add(new MenuItemDescription { Header = "_Tools", Id = "Tools" });
-            menuItemRegistry.Add(new MenuItemDescription { Header = "_Help", Id = "Help" });
+            menuItemRegistry.Add(new MenuItemDescription {Header = "_File", Id = "File"});
+            menuItemRegistry.Add(new MenuItemDescription {Header = "_Tools", Id = "Tools"});
+            menuItemRegistry.Add(new MenuItemDescription {Header = "_Help", Id = "Help"});
 
-            menuItemRegistry.Add(new MenuItemDescription { Header = "E_xit", Id = "Exit", ParentId = "File", Command = CustomApplicationCommands.Exit });
-            menuItemRegistry.Add(new MenuItemDescription { Header = "_Options", Id = "Options", ParentId = "Tools" });
+            menuItemRegistry.Add(new MenuItemDescription
+                                     {Header = "E_xit", Id = "Exit", ParentId = "File", Command = CustomApplicationCommands.Exit});
+            menuItemRegistry.Add(new MenuItemDescription {Header = "_Options", Id = "Options", ParentId = "Tools"});
 
             var navigationManager = containerProvider.Resolve<INavigationManager>();
             navigationManager.Navigate<StartupView>();

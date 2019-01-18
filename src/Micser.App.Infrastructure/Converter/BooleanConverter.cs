@@ -20,6 +20,7 @@ namespace Micser.App.Infrastructure.Converter
             {
                 return b ? TrueValue : FalseValue;
             }
+
             return FalseValue;
         }
 
@@ -32,6 +33,7 @@ namespace Micser.App.Infrastructure.Converter
                     return true;
                 }
             }
+
             return false;
         }
     }

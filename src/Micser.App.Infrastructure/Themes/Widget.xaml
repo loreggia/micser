@@ -62,11 +62,18 @@
                                         <ColumnDefinition Width="Auto" />
                                     </Grid.ColumnDefinitions>
 
-                                    <ContentControl Grid.Row="0" Grid.ColumnSpan="3" Content="{TemplateBinding Header}" ContentTemplate="{TemplateBinding HeaderTemplate}" />
+                                    <ContentControl Grid.Row="0" Grid.ColumnSpan="3" Content="{TemplateBinding Header}"
+                                                    ContentTemplate="{TemplateBinding HeaderTemplate}" />
 
-                                    <ItemsControl x:Name="PART_InputConnectors" Grid.Row="1" Grid.Column="0" ItemsSource="{Binding InputConnectorsSource, RelativeSource={RelativeSource TemplatedParent}}" ItemTemplate="{TemplateBinding InputConnectorTemplate}" />
-                                    <ContentPresenter Grid.Row="1" Grid.Column="1" Margin="3" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}" />
-                                    <ItemsControl x:Name="PART_OutputConnectors" Grid.Row="1" Grid.Column="2" ItemsSource="{Binding OutputConnectorsSource, RelativeSource={RelativeSource TemplatedParent}}" ItemTemplate="{TemplateBinding OutputConnectorTemplate}" />
+                                    <ItemsControl x:Name="PART_InputConnectors" Grid.Row="1" Grid.Column="0"
+                                                  ItemsSource="{Binding InputConnectorsSource, RelativeSource={RelativeSource TemplatedParent}}"
+                                                  ItemTemplate="{TemplateBinding InputConnectorTemplate}" />
+                                    <ContentPresenter Grid.Row="1" Grid.Column="1" Margin="3" Content="{TemplateBinding Content}"
+                                                      ContentTemplate="{TemplateBinding ContentTemplate}"
+                                                      ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}" />
+                                    <ItemsControl x:Name="PART_OutputConnectors" Grid.Row="1" Grid.Column="2"
+                                                  ItemsSource="{Binding OutputConnectorsSource, RelativeSource={RelativeSource TemplatedParent}}"
+                                                  ItemTemplate="{TemplateBinding OutputConnectorTemplate}" />
                                 </Grid>
 
                                 <widgets:ResizeThumb HorizontalAlignment="Left" VerticalAlignment="Stretch" Cursor="SizeWE" Width="3" />
@@ -91,5 +98,5 @@
         </Setter>
     </Style>
 
-    <Style TargetType="{x:Type widgets:Widget}" BasedOn="{StaticResource DefaultWidgetStyle}"></Style>
+    <Style TargetType="{x:Type widgets:Widget}" BasedOn="{StaticResource DefaultWidgetStyle}" />
 </ResourceDictionary>

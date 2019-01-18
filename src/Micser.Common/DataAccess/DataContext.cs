@@ -1,24 +1,17 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Micser.Common.DataAccess
 {
     public class DataContext : IDisposable
     {
         private readonly Database _database;
-        private readonly Dictionary<string, IEnumerable> _tables;
+        private readonly Dictionary<string, object> _tables;
 
         public DataContext(Database database)
         {
             _database = database;
-            _tables = new Dictionary<string, IEnumerable>();
-        }
-
-        ~DataContext()
-        {
-            Dispose(false);
+            _tables = new Dictionary<string, object>();
         }
 
         public void Dispose()
@@ -27,15 +20,20 @@ namespace Micser.Common.DataAccess
             GC.SuppressFinalize(this);
         }
 
-        public IEnumerable<T> GetCollection<T>(string table = null)
+        ~DataContext()
+        {
+            Dispose(false);
+        }
+
+        public IDbSet<T> GetCollection<T>(string table = null)
         {
             table = table ?? GetTableName<T>();
-            if (_tables.ContainsKey(table))
+            if (_tables.ContainsKey(table) && _tables[table] is IDbSet<T> dbSet)
             {
-                return _tables[table].Cast<T>();
+                return dbSet;
             }
 
-            var dbSet = _database.GetDbSet<T>(table);
+            dbSet = _database.GetDbSet<T>(this, table);
             _tables.Add(table, dbSet);
             return dbSet;
         }

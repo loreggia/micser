@@ -9,9 +9,9 @@ namespace Micser.App.Infrastructure.Widgets
     public class RubberbandAdorner : Adorner
     {
         private readonly Pen _rubberbandPen;
+        private readonly Point? _startPoint;
         private readonly WidgetPanel _widgetPanel;
         private Point? _endPoint;
-        private Point? _startPoint;
 
         public RubberbandAdorner(WidgetPanel widgetPanel, Point? dragStartPoint)
             : base(widgetPanel)
@@ -20,7 +20,7 @@ namespace Micser.App.Infrastructure.Widgets
             _startPoint = dragStartPoint;
             _rubberbandPen = new Pen(Brushes.LightSlateGray, 1)
             {
-                DashStyle = new DashStyle(new double[] { 2 }, 1)
+                DashStyle = new DashStyle(new double[] {2}, 1)
             };
         }
 

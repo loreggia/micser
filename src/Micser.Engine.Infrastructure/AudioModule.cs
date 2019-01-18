@@ -1,7 +1,7 @@
-﻿using CSCore;
+﻿using System;
+using CSCore;
 using Micser.Common.Modules;
 using NLog;
-using System;
 
 namespace Micser.Engine.Infrastructure
 {

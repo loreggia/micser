@@ -11,8 +11,6 @@
             Data = data;
         }
 
-        public event ConnectionChangedEventHandler ConnectionChanged;
-
         public ConnectionViewModel Connection
         {
             get => _connection;
@@ -29,6 +27,8 @@
         public object Data { get; }
         public string Name { get; }
         public WidgetViewModel Widget { get; }
+
+        public event ConnectionChangedEventHandler ConnectionChanged;
 
         protected virtual void OnConnectionChanged(ConnectionChangedEventArgs e)
         {

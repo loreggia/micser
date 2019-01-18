@@ -1,9 +1,9 @@
-﻿using Micser.App.Infrastructure.Extensions;
-using System;
+﻿using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
+using Micser.App.Infrastructure.Extensions;
 
 namespace Micser.App.Infrastructure.Widgets
 {
@@ -31,29 +31,29 @@ namespace Micser.App.Infrastructure.Widgets
 
         public Connection Connection
         {
-            get => (Connection)GetValue(ConnectionProperty);
+            get => (Connection) GetValue(ConnectionProperty);
             set => SetValue(ConnectionProperty, value);
         }
 
         public bool IsConnectionSource
         {
-            get => (bool)GetValue(IsConnectionSourceProperty);
+            get => (bool) GetValue(IsConnectionSourceProperty);
             set => SetValue(IsConnectionSourceProperty, value);
         }
 
         public ConnectorOrientation Orientation { get; set; }
 
         /// <summary>
-        /// The Widget this Connector belongs to.
+        ///     The Widget this Connector belongs to.
         /// </summary>
         public Widget ParentWidget => _parentWidget ?? (_parentWidget = this.GetParentOfType<Widget>());
 
         /// <summary>
-        /// Center position of this Connector relative to the WidgetPanel.
+        ///     Center position of this Connector relative to the WidgetPanel.
         /// </summary>
         public Point Position
         {
-            get => (Point)GetValue(PositionProperty);
+            get => (Point) GetValue(PositionProperty);
             set => SetValue(PositionProperty, value);
         }
 
@@ -124,7 +124,6 @@ namespace Micser.App.Infrastructure.Widgets
             var panel = ParentPanel;
             if (panel != null)
             {
-                //get centre position of this Connector relative to the WidgetPanel
                 Position = TransformToAncestor(panel).Transform(new Point(Width / 2, Height / 2));
             }
         }

@@ -33,11 +33,15 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <ContentControl Grid.Row="0" x:Name="MenuRegion" regions:RegionManager.RegionName="{x:Static c:Globals+PrismRegions.Menu}" Style="{StaticResource RegionStyle}" />
-        <ContentControl Grid.Row="1" x:Name="MainRegion" regions:RegionManager.RegionName="{x:Static c:Globals+PrismRegions.Main}" Style="{StaticResource RegionStyle}" />
-        <ContentControl Grid.Row="2" x:Name="StatusRegion" regions:RegionManager.RegionName="{x:Static c:Globals+PrismRegions.Status}" Style="{StaticResource RegionStyle}" />
+        <ContentControl Grid.Row="0" x:Name="MenuRegion" regions:RegionManager.RegionName="{x:Static c:Globals+PrismRegions.Menu}"
+                        Style="{StaticResource RegionStyle}" />
+        <ContentControl Grid.Row="1" x:Name="MainRegion" regions:RegionManager.RegionName="{x:Static c:Globals+PrismRegions.Main}"
+                        Style="{StaticResource RegionStyle}" />
+        <ContentControl Grid.Row="2" x:Name="StatusRegion" regions:RegionManager.RegionName="{x:Static c:Globals+PrismRegions.Status}"
+                        Style="{StaticResource RegionStyle}" />
 
-        <tb:TaskbarIcon Grid.Row="3" x:Name="TaskbarIcon" MenuActivation="RightClick" ToolTipText="{x:Static p:Resources.ApplicationTitle}" TrayMouseDoubleClick="OnTrayMouseDoubleClick" IconSource="icon.ico">
+        <tb:TaskbarIcon Grid.Row="3" x:Name="TaskbarIcon" MenuActivation="RightClick" ToolTipText="{x:Static p:Resources.ApplicationTitle}"
+                        TrayMouseDoubleClick="OnTrayMouseDoubleClick" IconSource="icon.ico">
             <tb:TaskbarIcon.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Restore" Click="TaskbarIconRestoreClick" />

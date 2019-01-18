@@ -13,7 +13,7 @@ namespace Micser.Engine
     internal static class Program
     {
         /// <summary>
-        /// The main entry point for the application.
+        ///     The main entry point for the application.
         /// </summary>
         internal static void Main(params string[] arguments)
         {
@@ -44,7 +44,7 @@ namespace Micser.Engine
                 }
             }
 
-            ServiceBase.Run(new ServiceBase[] { service });
+            ServiceBase.Run(new ServiceBase[] {service});
         }
     }
 }

@@ -11,6 +11,7 @@ namespace Micser.Common.Extensions
             {
                 action(element);
             }
+
             return source;
         }
     }

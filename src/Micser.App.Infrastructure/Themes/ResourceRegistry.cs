@@ -60,7 +60,7 @@ namespace Micser.App.Infrastructure.Themes
                 new ResourceDictionary
                 {
                     Source = new Uri("Micser.App.Infrastructure;component/Themes/WidgetToolbox.xaml", UriKind.Relative)
-                },
+                }
             });
 
         public static void RegisterResourcesFor(FrameworkElement element)

@@ -1,11 +1,11 @@
-﻿using Nancy;
-using Nancy.Bootstrapper;
-using Nancy.Diagnostics;
-using Nancy.ViewEngines;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Micser.Common.Extensions;
+using Nancy;
+using Nancy.Bootstrapper;
+using Nancy.Diagnostics;
+using Nancy.ViewEngines;
 using Unity;
 using Unity.RegistrationByConvention;
 
@@ -30,8 +30,8 @@ namespace Micser.Engine.Api
             // auto register modules
             container.RegisterTypes(
                 AllClasses
-                    .FromLoadedAssemblies()
-                    .Where(t => typeof(INancyModule).IsAssignableFrom(t)),
+                   .FromLoadedAssemblies()
+                   .Where(t => typeof(INancyModule).IsAssignableFrom(t)),
                 WithMappings.FromAllInterfaces,
                 WithName.TypeName,
                 WithLifetime.Transient);
@@ -88,7 +88,8 @@ namespace Micser.Engine.Api
             applicationContainer.RegisterInstance<INancyModuleCatalog>(this);
         }
 
-        protected override void RegisterCollectionTypes(IUnityContainer container, IEnumerable<CollectionTypeRegistration> collectionTypeRegistrations)
+        protected override void RegisterCollectionTypes(IUnityContainer container,
+                                                        IEnumerable<CollectionTypeRegistration> collectionTypeRegistrations)
         {
             foreach (var typeRegistration in collectionTypeRegistrations)
             {
@@ -146,7 +147,7 @@ namespace Micser.Engine.Api
             base.RequestStartup(container, pipelines, context);
             if (context.Request.Headers.Accept.All(x => x.Item1 != "application/json"))
             {
-                context.Request.Headers.Accept = new[] { new Tuple<string, decimal>("application/json", 1m) }.Concat(context.Request.Headers.Accept);
+                context.Request.Headers.Accept = new[] {new Tuple<string, decimal>("application/json", 1m)}.Concat(context.Request.Headers.Accept);
             }
         }
     }

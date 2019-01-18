@@ -1,11 +1,11 @@
-﻿using Micser.Common.DataAccess;
+﻿using System;
+using System.Linq;
+using Micser.Common.DataAccess;
 using Micser.Common.Modules;
 using Micser.Engine.Audio;
 using Micser.Engine.Infrastructure;
 using Nancy;
 using Nancy.ModelBinding;
-using System;
-using System.Linq;
 
 namespace Micser.Engine.Api.Controllers
 {

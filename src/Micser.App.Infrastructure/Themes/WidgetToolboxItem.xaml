@@ -19,17 +19,18 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type widgets:WidgetToolboxItem}">
-                    <Border CornerRadius="5" Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}">
+                    <Border CornerRadius="5" Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}"
+                            BorderBrush="{TemplateBinding BorderBrush}">
                         <Grid>
                             <Rectangle Name="Border"
-                                   StrokeThickness="1"
-                                   StrokeDashArray="2"
-                                   Fill="Transparent"
-                                   SnapsToDevicePixels="true" />
+                                       StrokeThickness="1"
+                                       StrokeDashArray="2"
+                                       Fill="Transparent"
+                                       SnapsToDevicePixels="true" />
                             <ContentPresenter Content="{TemplateBinding ContentControl.Content}"
-                                          ContentTemplate="{StaticResource WidgetToolboxItemContentTemplate}"
-                                          Margin="{TemplateBinding Padding}"
-                                          SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}" />
+                                              ContentTemplate="{StaticResource WidgetToolboxItemContentTemplate}"
+                                              Margin="{TemplateBinding Padding}"
+                                              SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}" />
                         </Grid>
                     </Border>
 

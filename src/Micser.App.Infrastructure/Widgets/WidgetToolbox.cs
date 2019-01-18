@@ -1,6 +1,6 @@
-﻿using Micser.App.Infrastructure.Themes;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
+using Micser.App.Infrastructure.Themes;
 
 namespace Micser.App.Infrastructure.Widgets
 {

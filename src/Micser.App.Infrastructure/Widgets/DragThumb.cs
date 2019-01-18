@@ -1,8 +1,8 @@
-﻿using Micser.App.Infrastructure.Extensions;
-using System;
+﻿using System;
 using System.Linq;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
+using Micser.App.Infrastructure.Extensions;
 
 namespace Micser.App.Infrastructure.Widgets
 {

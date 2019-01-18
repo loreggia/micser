@@ -1,6 +1,6 @@
-﻿using CSCore;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using CSCore;
 
 namespace Micser.Engine.Audio
 {
@@ -16,9 +16,10 @@ namespace Micser.Engine.Audio
             FillWithZeros = false;
         }
 
-        public bool CanSeek => false;
         public bool DivideResult { get; set; }
         public bool FillWithZeros { get; set; }
+
+        public bool CanSeek => false;
 
         public long Length => 0;
 
@@ -29,36 +30,6 @@ namespace Micser.Engine.Audio
         }
 
         public WaveFormat WaveFormat { get; }
-
-        public void AddSource(ISampleSource source)
-        {
-            if (source == null)
-            {
-                throw new ArgumentNullException(nameof(source));
-            }
-
-            if (source.WaveFormat.Channels != WaveFormat.Channels ||
-               source.WaveFormat.SampleRate != WaveFormat.SampleRate)
-                throw new ArgumentException("Invalid format.", nameof(source));
-
-            lock (_lockObj)
-            {
-                if (!Contains(source))
-                {
-                    _sampleSources.Add(source);
-                }
-            }
-        }
-
-        public bool Contains(ISampleSource source)
-        {
-            if (source == null)
-            {
-                return false;
-            }
-
-            return _sampleSources.Contains(source);
-        }
 
         public void Dispose()
         {
@@ -111,7 +82,6 @@ namespace Micser.Engine.Audio
                         }
                         else
                         {
-                            //raise event here
                             RemoveSource(sampleSource); //remove the input to make sure that the event gets only raised once.
                         }
                     }
@@ -153,6 +123,38 @@ namespace Micser.Engine.Audio
             }
 
             return numberOfStoredSamples;
+        }
+
+        public void AddSource(ISampleSource source)
+        {
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            if (source.WaveFormat.Channels != WaveFormat.Channels ||
+                source.WaveFormat.SampleRate != WaveFormat.SampleRate)
+            {
+                throw new ArgumentException("Invalid format.", nameof(source));
+            }
+
+            lock (_lockObj)
+            {
+                if (!Contains(source))
+                {
+                    _sampleSources.Add(source);
+                }
+            }
+        }
+
+        public bool Contains(ISampleSource source)
+        {
+            if (source == null)
+            {
+                return false;
+            }
+
+            return _sampleSources.Contains(source);
         }
 
         public void RemoveSource(ISampleSource source)

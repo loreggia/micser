@@ -5,10 +5,6 @@
         private ConnectorViewModel _sink;
         private ConnectorViewModel _source;
 
-        public event ConnectorChangedEventHandler SinkChanged;
-
-        public event ConnectorChangedEventHandler SourceChanged;
-
         public ConnectorViewModel Sink
         {
             get => _sink;
@@ -34,6 +30,10 @@
                 }
             }
         }
+
+        public event ConnectorChangedEventHandler SinkChanged;
+
+        public event ConnectorChangedEventHandler SourceChanged;
 
         protected virtual void OnSinkChanged(ConnectorChangedEventArgs e)
         {

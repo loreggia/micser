@@ -1,16 +1,44 @@
-﻿using System.Collections.ObjectModel;
-using System.Collections.Specialized;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 
 namespace Micser.Common.DataAccess
 {
-    public class DbSet<T> : ObservableCollection<T>
+    public class DbSet<T> : IDbSet<T>
     {
-        public bool HasChanges { get; protected set; }
+        private readonly DataContext _context;
+        private readonly List<T> _entities;
 
-        protected override void OnCollectionChanged(NotifyCollectionChangedEventArgs e)
+        public DbSet(DataContext context)
         {
-            base.OnCollectionChanged(e);
-            HasChanges = true;
+            _context = context;
+            _entities = new List<T>();
+        }
+
+        public IEnumerator<T> GetEnumerator()
+        {
+            return _entities.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        public void Insert(T entity)
+        {
+            _entities.Add(entity);
+        }
+
+        public void Update(T entity)
+        {
+            var index = _entities.IndexOf(entity);
+            if (index < 0)
+            {
+                throw new InvalidOperationException("Entity has not been added.");
+            }
+
+            _entities[index] = entity;
         }
     }
 }

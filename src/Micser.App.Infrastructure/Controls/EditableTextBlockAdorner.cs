@@ -20,13 +20,15 @@ namespace Micser.App.Infrastructure.Controls
             _collection = new VisualCollection(this);
             _textBox = new TextBox();
             _textBlock = editableTextBlock;
-            var binding = new Binding(nameof(EditableTextBlock.Text)) { Source = editableTextBlock };
+            var binding = new Binding(nameof(EditableTextBlock.Text)) {Source = editableTextBlock};
             _textBox.SetBinding(TextBox.TextProperty, binding);
             _textBox.MaxLength = editableTextBlock.MaxLength;
             _textBox.KeyUp += TextBox_KeyUp;
             _textBox.LostFocus += TextBox_LostFocus;
             _collection.Add(_textBox);
         }
+
+        protected override int VisualChildrenCount => _collection.Count;
 
         public event KeyEventHandler TextBoxKeyUp
         {
@@ -39,8 +41,6 @@ namespace Micser.App.Infrastructure.Controls
             add => _textBox.LostFocus += value;
             remove => _textBox.LostFocus -= value;
         }
-
-        protected override int VisualChildrenCount => _collection.Count;
 
         protected override Size ArrangeOverride(Size finalSize)
         {

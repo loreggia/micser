@@ -1,5 +1,4 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -12,6 +11,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using Micser.Common;
+using Newtonsoft.Json;
 
 namespace Micser.App.Infrastructure.Api
 {
@@ -114,7 +114,8 @@ namespace Micser.App.Infrastructure.Api
             try
             {
                 var content = JsonConvert.SerializeObject(data);
-                var response = await _httpClient.PutAsync(_resource + action + "/" + id + GetQueryString(parameters), new StringContent(content, Encoding.UTF8, "application/json"));
+                var response = await _httpClient.PutAsync(_resource + action + "/" + id + GetQueryString(parameters),
+                                                          new StringContent(content, Encoding.UTF8, "application/json"));
                 return await HandleResponseAsync<T>(response);
             }
             catch (Exception ex)
@@ -163,7 +164,7 @@ namespace Micser.App.Infrastructure.Api
 
             if (response.IsSuccessStatusCode)
             {
-                data = (T)JsonConvert.DeserializeObject(responseString, typeof(T));
+                data = (T) JsonConvert.DeserializeObject(responseString, typeof(T));
             }
             else if (!string.IsNullOrEmpty(responseString))
             {
@@ -173,7 +174,7 @@ namespace Micser.App.Infrastructure.Api
                 }
                 else
                 {
-                    error = (ErrorList)JsonConvert.DeserializeObject(responseString, typeof(ErrorList));
+                    error = (ErrorList) JsonConvert.DeserializeObject(responseString, typeof(ErrorList));
                 }
             }
 
@@ -191,9 +192,9 @@ namespace Micser.App.Infrastructure.Api
 
             var items = new List<string>();
             var fields = parameters
-                .GetType()
-                .GetRuntimeFields()
-                .Where(f => f.IsPublic);
+                        .GetType()
+                        .GetRuntimeFields()
+                        .Where(f => f.IsPublic);
 
             foreach (var fieldInfo in fields)
             {
@@ -204,9 +205,9 @@ namespace Micser.App.Infrastructure.Api
             }
 
             var properties = parameters
-                .GetType()
-                .GetRuntimeProperties()
-                .Where(p => p.CanRead);
+                            .GetType()
+                            .GetRuntimeProperties()
+                            .Where(p => p.CanRead);
 
             foreach (var propertyInfo in properties)
             {
@@ -220,6 +221,7 @@ namespace Micser.App.Infrastructure.Api
             {
                 return "?" + string.Join("&", items);
             }
+
             return "";
         }
 
@@ -230,6 +232,7 @@ namespace Micser.App.Infrastructure.Api
                 var items = enumerable.Cast<object>().Select(x => $"{key}={x}");
                 return string.Join("&", items);
             }
+
             return $"{key}={value}";
         }
 

@@ -1,7 +1,7 @@
-﻿using Micser.App.Infrastructure.Widgets;
+﻿using System.Windows;
+using Micser.App.Infrastructure.Widgets;
 using Prism.Ioc;
 using Prism.Unity;
-using System.Windows;
 using Unity;
 using Unity.Injection;
 
@@ -10,7 +10,7 @@ namespace Micser.App.Infrastructure.Extensions
     public static class PrismContainerExtensions
     {
         public static void RegisterView<TView, TViewModel>(this IContainerRegistry containerRegistry)
-                    where TView : FrameworkElement
+            where TView : FrameworkElement
             where TViewModel : IViewModel
         {
             var container = containerRegistry.GetContainer();

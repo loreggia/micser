@@ -5,17 +5,17 @@ namespace Micser.App.Infrastructure
     public static class CustomApplicationCommands
     {
         /// <summary>
-        /// Closes the window or exits depending on settings.
+        ///     Closes the window or exits depending on settings.
         /// </summary>
         public static readonly RoutedUICommand Close;
 
         /// <summary>
-        /// Exits the application.
+        ///     Exits the application.
         /// </summary>
         public static readonly RoutedUICommand Exit;
 
         /// <summary>
-        /// Restores the minimized/hidden window.
+        ///     Restores the minimized/hidden window.
         /// </summary>
         public static readonly RoutedUICommand Restore;
 

@@ -91,8 +91,8 @@ namespace Micser.App.Infrastructure.Widgets
         {
             if (HitConnector != null)
             {
-                var connectionVm = (ConnectionViewModel)_connection.DataContext;
-                var connectorVm = (ConnectorViewModel)HitConnector.DataContext;
+                var connectionVm = (ConnectionViewModel) _connection.DataContext;
+                var connectorVm = (ConnectorViewModel) HitConnector.DataContext;
 
                 if (Equals(_connection.Source, _fixConnector))
                 {
@@ -138,7 +138,7 @@ namespace Micser.App.Infrastructure.Widgets
             HitConnector = null;
             _pathGeometry = null;
             Cursor = Cursors.Cross;
-            _connection.StrokeDashArray = new DoubleCollection(new double[] { 1, 2 });
+            _connection.StrokeDashArray = new DoubleCollection(new double[] {1, 2});
 
             if (sender == _sourceDragThumb)
             {
@@ -177,6 +177,7 @@ namespace Micser.App.Infrastructure.Widgets
 
                     return;
                 }
+
                 hitObject = VisualTreeHelper.GetParent(hitObject);
             }
 

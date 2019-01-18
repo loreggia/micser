@@ -1,6 +1,6 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Micser.App.Infrastructure;
-using System.Linq;
 
 namespace Micser.Infrastructure.Test
 {
@@ -15,7 +15,7 @@ namespace Micser.Infrastructure.Test
                 new TestClass(2, null, "Root 2"),
                 new TestClass(1, null, "Root 1"),
                 new TestClass(3, 1, "Item"),
-                new TestClass(4, 3, "Child"),
+                new TestClass(4, 3, "Child")
             };
             var tree = TreeNode<TestClass>.CreateTree(input, x => x.Id, x => x.ParentId, x => x.Text);
 

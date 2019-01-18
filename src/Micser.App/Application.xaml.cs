@@ -1,4 +1,10 @@
-﻿using CommonServiceLocator;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Windows;
+using CommonServiceLocator;
 using Micser.App.Infrastructure;
 using Micser.App.Infrastructure.Themes;
 using Micser.Common;
@@ -10,19 +16,13 @@ using Prism.Events;
 using Prism.Ioc;
 using Prism.Modularity;
 using Prism.Unity;
-using System;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Windows;
 using Unity;
 using Unity.Injection;
 
 namespace Micser.App
 {
     /// <summary>
-    /// Interaction logic for App.xaml
+    ///     Interaction logic for App.xaml
     /// </summary>
     public partial class Application
     {

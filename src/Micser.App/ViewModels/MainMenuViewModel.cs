@@ -1,7 +1,7 @@
-﻿using Micser.App.Infrastructure;
+﻿using System.Collections.Generic;
+using Micser.App.Infrastructure;
 using Micser.App.Infrastructure.Menu;
 using Prism.Regions;
-using System.Collections.Generic;
 
 namespace Micser.App.ViewModels
 {
