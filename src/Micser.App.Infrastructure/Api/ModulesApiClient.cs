@@ -1,6 +1,6 @@
-﻿using Micser.Common.Modules;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
+using Micser.Common.Modules;
 
 namespace Micser.App.Infrastructure.Api
 {

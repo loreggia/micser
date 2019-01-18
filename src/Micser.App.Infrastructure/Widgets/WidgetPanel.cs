@@ -1,5 +1,4 @@
-﻿using Micser.App.Infrastructure.Themes;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -8,13 +7,15 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
+using Micser.App.Infrastructure.Themes;
 
 namespace Micser.App.Infrastructure.Widgets
 {
     public class WidgetPanel : Canvas
     {
         public static readonly DependencyProperty ConnectionsSourceProperty = DependencyProperty.Register(
-            nameof(ConnectionsSource), typeof(IEnumerable<ConnectionViewModel>), typeof(WidgetPanel), new PropertyMetadata(null, OnConnectionsSourcePropertyChanged));
+            nameof(ConnectionsSource), typeof(IEnumerable<ConnectionViewModel>), typeof(WidgetPanel),
+            new PropertyMetadata(null, OnConnectionsSourcePropertyChanged));
 
         public static readonly DependencyProperty RasterSizeProperty = DependencyProperty.Register(
             nameof(RasterSize), typeof(double), typeof(WidgetPanel), new PropertyMetadata(25d));
@@ -23,7 +24,8 @@ namespace Micser.App.Infrastructure.Widgets
             nameof(WidgetFactory), typeof(IWidgetFactory), typeof(WidgetPanel), new PropertyMetadata(null, OnWidgetFactoryPropertyChanged));
 
         public static readonly DependencyProperty WidgetsSourceProperty = DependencyProperty.Register(
-            nameof(WidgetsSource), typeof(IEnumerable<WidgetViewModel>), typeof(WidgetPanel), new PropertyMetadata(null, OnWidgetsSourcePropertyChanged));
+            nameof(WidgetsSource), typeof(IEnumerable<WidgetViewModel>), typeof(WidgetPanel),
+            new PropertyMetadata(null, OnWidgetsSourcePropertyChanged));
 
         private readonly ObservableCollection<Connection> _connections;
         private readonly ObservableCollection<Widget> _widgets;
@@ -45,19 +47,19 @@ namespace Micser.App.Infrastructure.Widgets
 
         public IEnumerable<ConnectionViewModel> ConnectionsSource
         {
-            get => (IEnumerable<ConnectionViewModel>)GetValue(ConnectionsSourceProperty);
+            get => (IEnumerable<ConnectionViewModel>) GetValue(ConnectionsSourceProperty);
             set => SetValue(ConnectionsSourceProperty, value);
         }
 
         public double RasterSize
         {
-            get => (double)GetValue(RasterSizeProperty);
+            get => (double) GetValue(RasterSizeProperty);
             set => SetValue(RasterSizeProperty, value);
         }
 
         public IWidgetFactory WidgetFactory
         {
-            get => (IWidgetFactory)GetValue(WidgetFactoryProperty);
+            get => (IWidgetFactory) GetValue(WidgetFactoryProperty);
             set => SetValue(WidgetFactoryProperty, value);
         }
 
@@ -65,7 +67,7 @@ namespace Micser.App.Infrastructure.Widgets
 
         public IEnumerable<WidgetViewModel> WidgetsSource
         {
-            get => (IEnumerable<WidgetViewModel>)GetValue(WidgetsSourceProperty);
+            get => (IEnumerable<WidgetViewModel>) GetValue(WidgetsSourceProperty);
             set => SetValue(WidgetsSourceProperty, value);
         }
 
@@ -239,6 +241,7 @@ namespace Micser.App.Infrastructure.Widgets
                     adornerLayer.Add(adorner);
                 }
             }
+
             e.Handled = true;
         }
 
@@ -256,7 +259,7 @@ namespace Micser.App.Infrastructure.Widgets
 
         private static void OnConnectionsSourcePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var panel = (WidgetPanel)d;
+            var panel = (WidgetPanel) d;
 
             if (e.OldValue is INotifyCollectionChanged oldCollection)
             {
@@ -273,7 +276,7 @@ namespace Micser.App.Infrastructure.Widgets
 
         private static void OnWidgetFactoryPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var panel = (WidgetPanel)d;
+            var panel = (WidgetPanel) d;
             if (e.NewValue is IWidgetFactory factory && !panel._widgets.Any() && panel.WidgetsSource != null)
             {
                 foreach (var item in panel.WidgetsSource)
@@ -285,7 +288,7 @@ namespace Micser.App.Infrastructure.Widgets
 
         private static void OnWidgetsSourcePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var panel = (WidgetPanel)d;
+            var panel = (WidgetPanel) d;
 
             if (e.OldValue is INotifyCollectionChanged oldCollection)
             {
@@ -312,15 +315,15 @@ namespace Micser.App.Infrastructure.Widgets
         {
             //return;
             var source = _widgets
-                .SelectMany(w => w.OutputConnectors ?? new Connector[0])
-                .FirstOrDefault(c => c.DataContext == vm.Source);
+                        .SelectMany(w => w.OutputConnectors ?? new Connector[0])
+                        .FirstOrDefault(c => c.DataContext == vm.Source);
             var sink = _widgets
-                .SelectMany(w => w.InputConnectors ?? new Connector[0])
-                .FirstOrDefault(c => c.DataContext == vm.Sink);
+                      .SelectMany(w => w.InputConnectors ?? new Connector[0])
+                      .FirstOrDefault(c => c.DataContext == vm.Sink);
 
             if (source != null && sink != null && !_connections.Any(c => ReferenceEquals(c.Source, source) && ReferenceEquals(c.Sink, sink)))
             {
-                var connection = new Connection(source, sink) { DataContext = vm };
+                var connection = new Connection(source, sink) {DataContext = vm};
                 source.Connection = connection;
                 sink.Connection = connection;
                 _connections.Add(connection);
@@ -339,6 +342,7 @@ namespace Micser.App.Infrastructure.Widgets
                         Children.Add(connection);
                         connection.IsSelected = true;
                     }
+
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
@@ -346,6 +350,7 @@ namespace Micser.App.Infrastructure.Widgets
                     {
                         Children.Remove(connection);
                     }
+
                     break;
 
                 case NotifyCollectionChangedAction.Replace:
@@ -358,6 +363,7 @@ namespace Micser.App.Infrastructure.Widgets
                     {
                         Children.Add(connection);
                     }
+
                     break;
 
                 case NotifyCollectionChangedAction.Move:
@@ -369,6 +375,7 @@ namespace Micser.App.Infrastructure.Widgets
                     {
                         Children.Remove(connection);
                     }
+
                     break;
 
                 default:
@@ -385,6 +392,7 @@ namespace Micser.App.Infrastructure.Widgets
                     {
                         AddConnection(item);
                     }
+
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
@@ -396,6 +404,7 @@ namespace Micser.App.Infrastructure.Widgets
                             _connections.Remove(connection);
                         }
                     }
+
                     break;
 
                 case NotifyCollectionChangedAction.Replace:
@@ -491,6 +500,7 @@ namespace Micser.App.Infrastructure.Widgets
                         Children.Add(widget);
                         widget.IsSelected = true;
                     }
+
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
@@ -498,6 +508,7 @@ namespace Micser.App.Infrastructure.Widgets
                     {
                         Children.Remove(widget);
                     }
+
                     break;
 
                 case NotifyCollectionChangedAction.Replace:
@@ -510,6 +521,7 @@ namespace Micser.App.Infrastructure.Widgets
                     {
                         Children.Add(widget);
                     }
+
                     break;
 
                 case NotifyCollectionChangedAction.Move:
@@ -536,6 +548,7 @@ namespace Micser.App.Infrastructure.Widgets
                             _widgets.Add(WidgetFactory.CreateWidget(item));
                         }
                     }
+
                     break;
 
                 case NotifyCollectionChangedAction.Remove:
@@ -547,6 +560,7 @@ namespace Micser.App.Infrastructure.Widgets
                             _widgets.Remove(widget);
                         }
                     }
+
                     break;
 
                 case NotifyCollectionChangedAction.Replace:

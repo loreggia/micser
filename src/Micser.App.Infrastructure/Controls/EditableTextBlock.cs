@@ -22,13 +22,13 @@ namespace Micser.App.Infrastructure.Controls
 
         public bool IsEditing
         {
-            get => (bool)GetValue(IsEditingProperty);
+            get => (bool) GetValue(IsEditingProperty);
             set => SetValue(IsEditingProperty, value);
         }
 
         public int MaxLength
         {
-            get => (int)GetValue(MaxLengthProperty);
+            get => (int) GetValue(MaxLengthProperty);
             set => SetValue(MaxLengthProperty, value);
         }
 
@@ -42,7 +42,7 @@ namespace Micser.App.Infrastructure.Controls
 
         private static void IsEditingPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var textBlock = (EditableTextBlock)d;
+            var textBlock = (EditableTextBlock) d;
 
             //Get the adorner layer of the uielement (here TextBlock)
             var layer = AdornerLayer.GetAdornerLayer(textBlock);
@@ -55,6 +55,7 @@ namespace Micser.App.Infrastructure.Controls
                 {
                     textBlock._adorner = new EditableTextBlockAdorner(textBlock);
                 }
+
                 layer.Add(textBlock._adorner);
             }
             else

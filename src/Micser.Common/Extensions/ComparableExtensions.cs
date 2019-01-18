@@ -17,7 +17,7 @@ namespace Micser.Common.Extensions
         }
 
         public static T ClampMin<T>(this T value, T min)
-                    where T : IComparable<T>
+            where T : IComparable<T>
         {
             return value.CompareTo(min) < 0 ? min : value;
         }

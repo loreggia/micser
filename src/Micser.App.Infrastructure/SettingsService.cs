@@ -1,7 +1,6 @@
-﻿using Micser.Common.DataAccess;
-using Micser.Common.Extensions;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Collections.Generic;
+using Micser.Common.DataAccess;
 
 namespace Micser.App.Infrastructure
 {
@@ -27,7 +26,7 @@ namespace Micser.App.Infrastructure
             {
                 if (_settings.ContainsKey(key))
                 {
-                    return _settings[key] is T ? (T)_settings[key] : defaultValue;
+                    return _settings[key] is T ? (T) _settings[key] : defaultValue;
                 }
             }
 
@@ -37,26 +36,26 @@ namespace Micser.App.Infrastructure
         public void Load()
         {
             var context = _database.GetContext();
-            var settings = context.GetObject<IDictionary<string, object>>(SettingsTableName);
-
-            if (settings != null)
-            {
-                lock (_settings)
-                {
-                    _settings.Clear();
-                    settings.ForEach(p => _settings.Add(p.Key, p.Value));
-                }
-            }
+//            var settings = context.GetObject<IDictionary<string, object>>(SettingsTableName);
+//
+//            if (settings != null)
+//            {
+//                lock (_settings)
+//                {
+//                    _settings.Clear();
+//                    settings.ForEach(p => _settings.Add(p.Key, p.Value));
+//                }
+//            }
         }
 
         public void Save()
         {
             var context = _database.GetContext();
-            lock (_settings)
-            {
-                context.SetObject(_settings, SettingsTableName);
-                context.Save();
-            }
+//            lock (_settings)
+//            {
+//                context.SetObject(_settings, SettingsTableName);
+//                context.Save();
+//            }
         }
 
         public void SetSetting<T>(string key, T value)

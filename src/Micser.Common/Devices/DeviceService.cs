@@ -1,5 +1,5 @@
-﻿using CSCore.CoreAudioAPI;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using CSCore.CoreAudioAPI;
 
 namespace Micser.Common.Devices
 {
@@ -8,7 +8,8 @@ namespace Micser.Common.Devices
         public IEnumerable<DeviceDescription> GetDevices(DeviceType type)
         {
             var deviceEnumerator = new MMDeviceEnumerator();
-            foreach (var audioEndPoint in deviceEnumerator.EnumAudioEndpoints(type == DeviceType.Input ? DataFlow.Capture : DataFlow.Render, DeviceState.Active | DeviceState.UnPlugged))
+            foreach (var audioEndPoint in deviceEnumerator.EnumAudioEndpoints(type == DeviceType.Input ? DataFlow.Capture : DataFlow.Render,
+                                                                              DeviceState.Active | DeviceState.UnPlugged))
             {
                 yield return new DeviceDescription
                 {

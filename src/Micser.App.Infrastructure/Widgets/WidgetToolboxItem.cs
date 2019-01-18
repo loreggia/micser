@@ -1,12 +1,12 @@
-﻿using Micser.App.Infrastructure.Themes;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Micser.App.Infrastructure.Themes;
 
 namespace Micser.App.Infrastructure.Widgets
 {
     /// <summary>
-    /// Represents a selectable item in the Toolbox.
+    ///     Represents a selectable item in the Toolbox.
     /// </summary>
     public class WidgetToolboxItem : ContentControl
     {

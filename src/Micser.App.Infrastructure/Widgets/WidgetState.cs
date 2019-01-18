@@ -1,5 +1,5 @@
-﻿using Micser.Common.Modules;
-using System.Windows;
+﻿using System.Windows;
+using Micser.Common.Modules;
 
 namespace Micser.App.Infrastructure.Widgets
 {

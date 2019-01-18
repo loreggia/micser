@@ -1,9 +1,10 @@
-﻿using Micser.App.Infrastructure.Extensions;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
+using Micser.App.Infrastructure.Extensions;
 
 namespace Micser.App.Infrastructure.Widgets
 {
@@ -16,7 +17,8 @@ namespace Micser.App.Infrastructure.Widgets
 
         private Widget ParentWidget => this.GetParentOfType<Widget>();
 
-        private static void CalculateDragLimits(IEnumerable<ISelectable> selectedItems, out double minLeft, out double minTop, out double minDeltaHorizontal, out double minDeltaVertical)
+        private static void CalculateDragLimits(IEnumerable<ISelectable> selectedItems, out double minLeft, out double minTop,
+                                                out double minDeltaHorizontal, out double minDeltaVertical)
         {
             minLeft = double.MaxValue;
             minTop = double.MaxValue;
@@ -63,12 +65,12 @@ namespace Micser.App.Infrastructure.Widgets
                     double dragDeltaVertical;
                     switch (VerticalAlignment)
                     {
-                        case System.Windows.VerticalAlignment.Bottom:
+                        case VerticalAlignment.Bottom:
                             dragDeltaVertical = Math.Min(-e.VerticalChange, minDeltaVertical);
                             w.Height = w.ActualHeight - dragDeltaVertical;
                             break;
 
-                        case System.Windows.VerticalAlignment.Top:
+                        case VerticalAlignment.Top:
                             var position = w.Position;
                             dragDeltaVertical = Math.Min(Math.Max(-minTop, e.VerticalChange), minDeltaVertical);
                             position.Y += dragDeltaVertical;
@@ -80,7 +82,7 @@ namespace Micser.App.Infrastructure.Widgets
                     double dragDeltaHorizontal;
                     switch (HorizontalAlignment)
                     {
-                        case System.Windows.HorizontalAlignment.Left:
+                        case HorizontalAlignment.Left:
                             var position = w.Position;
                             dragDeltaHorizontal = Math.Min(Math.Max(-minLeft, e.HorizontalChange), minDeltaHorizontal);
                             position.X += dragDeltaHorizontal;
@@ -88,12 +90,13 @@ namespace Micser.App.Infrastructure.Widgets
                             w.Width = w.ActualWidth - dragDeltaHorizontal;
                             break;
 
-                        case System.Windows.HorizontalAlignment.Right:
+                        case HorizontalAlignment.Right:
                             dragDeltaHorizontal = Math.Min(-e.HorizontalChange, minDeltaHorizontal);
                             w.Width = w.ActualWidth - dragDeltaHorizontal;
                             break;
                     }
                 }
+
                 e.Handled = true;
             }
         }

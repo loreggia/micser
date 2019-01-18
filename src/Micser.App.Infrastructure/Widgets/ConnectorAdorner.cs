@@ -150,6 +150,7 @@ namespace Micser.App.Infrastructure.Widgets
 
                     return;
                 }
+
                 hitObject = VisualTreeHelper.GetParent(hitObject);
             }
 

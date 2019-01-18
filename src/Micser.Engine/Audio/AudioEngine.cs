@@ -1,10 +1,10 @@
-﻿using Micser.Common.DataAccess;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Micser.Common.DataAccess;
 using Micser.Common.Modules;
 using Micser.Engine.Infrastructure;
 using NLog;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Unity;
 
 namespace Micser.Engine.Audio
@@ -93,6 +93,7 @@ namespace Micser.Engine.Audio
             {
                 audioModule.Dispose();
             }
+
             Modules.Clear();
         }
     }

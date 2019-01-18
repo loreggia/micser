@@ -1,11 +1,11 @@
-﻿using CSCore.CoreAudioAPI;
+﻿using System;
+using System.Diagnostics;
+using System.Linq;
+using CSCore.CoreAudioAPI;
 using CSCore.SoundOut;
 using Micser.Common.Devices;
 using Micser.Common.Modules;
 using Micser.Engine.Infrastructure;
-using System;
-using System.Diagnostics;
-using System.Linq;
 
 namespace Micser.Plugins.Main.Modules
 {
@@ -21,7 +21,7 @@ namespace Micser.Plugins.Main.Modules
         }
 
         /// <summary>
-        /// Gets or sets the output device description. The <see cref="DeviceDescription.Id"/>-Property is used to select the device.
+        ///     Gets or sets the output device description. The <see cref="DeviceDescription.Id" />-Property is used to select the device.
         /// </summary>
         public DeviceDescription DeviceDescription
         {
@@ -39,7 +39,7 @@ namespace Micser.Plugins.Main.Modules
         }
 
         /// <summary>
-        /// Gets or sets the output latency in milliseconds.
+        ///     Gets or sets the output latency in milliseconds.
         /// </summary>
         public int Latency
         {

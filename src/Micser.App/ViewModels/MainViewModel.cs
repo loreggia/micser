@@ -1,12 +1,12 @@
-﻿using Micser.App.Infrastructure;
-using Micser.App.Infrastructure.Api;
-using Micser.App.Infrastructure.Widgets;
-using NLog;
-using Prism.Regions;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using Micser.App.Infrastructure;
+using Micser.App.Infrastructure.Api;
+using Micser.App.Infrastructure.Widgets;
 using Micser.Common.DataAccess;
+using NLog;
+using Prism.Regions;
 
 namespace Micser.App.ViewModels
 {
@@ -23,7 +23,8 @@ namespace Micser.App.ViewModels
         private readonly ObservableCollection<WidgetViewModel> _widgets;
         private IEnumerable<WidgetDescription> _availableWidgets;
 
-        public MainViewModel(IDatabase database, IWidgetFactory widgetFactory, IWidgetRegistry widgetRegistry, ILogger logger, ModulesApiClient modulesApiClient)
+        public MainViewModel(IDatabase database, IWidgetFactory widgetFactory, IWidgetRegistry widgetRegistry, ILogger logger,
+                             ModulesApiClient modulesApiClient)
         {
             _database = database;
             _widgetRegistry = widgetRegistry;
@@ -79,6 +80,7 @@ namespace Micser.App.ViewModels
                     SinkConnectorName = connection.Sink.Name
                 });
             }
+
             //_configurationService.SetSetting(ConnectionsConfigurationKey, connections);
         }
 

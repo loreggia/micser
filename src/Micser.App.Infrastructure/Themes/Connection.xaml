@@ -56,15 +56,14 @@
                 <ControlTemplate TargetType="{x:Type widgets:Connection}">
                     <Canvas DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}">
                         <Path Name="PART_ConnectionPath"
-                            StrokeThickness="2"
-                            Stroke="{StaticResource ConnectorBrush}"
-                            StrokeStartLineCap="Round"
-                            StrokeEndLineCap="Round"
-                            StrokeLineJoin="Round"
-                            StrokeDashArray="{Binding StrokeDashArray}"
-                            SnapsToDevicePixels="True"
-                            Data="{Binding PathGeometry}">
-                        </Path>
+                              StrokeThickness="2"
+                              Stroke="{StaticResource ConnectorBrush}"
+                              StrokeStartLineCap="Round"
+                              StrokeEndLineCap="Round"
+                              StrokeLineJoin="Round"
+                              StrokeDashArray="{Binding StrokeDashArray}"
+                              SnapsToDevicePixels="True"
+                              Data="{Binding PathGeometry}" />
                         <Grid Style="{StaticResource ArrowGridStyle}"
                               Canvas.Left="{Binding SourceAnchorPosition.X}"
                               Canvas.Top="{Binding SourceAnchorPosition.Y}">
@@ -74,8 +73,8 @@
                             </Grid.LayoutTransform>
                         </Grid>
                         <Grid Style="{StaticResource ArrowGridStyle}"
-                            Canvas.Left="{Binding SinkAnchorPosition.X}"
-                            Canvas.Top="{Binding SinkAnchorPosition.Y}">
+                              Canvas.Left="{Binding SinkAnchorPosition.X}"
+                              Canvas.Top="{Binding SinkAnchorPosition.Y}">
                             <Path Name="PART_SinkAnchorPath" />
                             <Grid.LayoutTransform>
                                 <RotateTransform Angle="{Binding SinkAnchorAngle}" />
@@ -84,8 +83,8 @@
 
                         <!--Uncomment this to show default label text-->
                         <TextBlock Width="100" Height="35" Text="{Binding Label}"
-                            Canvas.Left="{Binding LabelPosition.X}"
-                            Canvas.Top="{Binding LabelPosition.Y}">
+                                   Canvas.Left="{Binding LabelPosition.X}"
+                                   Canvas.Top="{Binding LabelPosition.Y}">
                             <TextBlock.RenderTransform>
                                 <TranslateTransform X="5" Y="5" />
                             </TextBlock.RenderTransform>

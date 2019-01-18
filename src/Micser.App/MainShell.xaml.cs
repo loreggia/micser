@@ -1,14 +1,14 @@
-﻿using Micser.App.Infrastructure;
-using Micser.Common;
-using Prism.Regions;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
+using Micser.App.Infrastructure;
+using Micser.Common;
+using Prism.Regions;
 
 namespace Micser.App
 {
     /// <summary>
-    /// Interaction logic for MainWindow.xaml
+    ///     Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainShell
     {
@@ -50,7 +50,7 @@ namespace Micser.App
             _isExiting = true;
             _regionManager.RequestNavigate(Globals.PrismRegions.Main, "");
             _settingsService.Save();
-            Application.Current.Shutdown();
+            System.Windows.Application.Current.Shutdown();
         }
 
         private void MainShell_Loaded(object sender, RoutedEventArgs e)

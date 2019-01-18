@@ -8,7 +8,8 @@ namespace Micser.App.Infrastructure.Controls
     public class RelativePositionPanel : Panel
     {
         public static readonly DependencyProperty RelativePositionProperty = DependencyProperty.RegisterAttached(
-            "RelativePosition", typeof(Point), typeof(RelativePositionPanel), new FrameworkPropertyMetadata(new Point(0, 0), OnRelativePositionChanged));
+            "RelativePosition", typeof(Point), typeof(RelativePositionPanel),
+            new FrameworkPropertyMetadata(new Point(0, 0), OnRelativePositionChanged));
 
         public static Point GetRelativePosition(UIElement element)
         {
@@ -16,7 +17,8 @@ namespace Micser.App.Infrastructure.Controls
             {
                 throw new ArgumentNullException(nameof(element));
             }
-            return (Point)element.GetValue(RelativePositionProperty);
+
+            return (Point) element.GetValue(RelativePositionProperty);
         }
 
         public static void SetRelativePosition(UIElement element, Point value)
@@ -25,6 +27,7 @@ namespace Micser.App.Infrastructure.Controls
             {
                 throw new ArgumentNullException(nameof(element));
             }
+
             element.SetValue(RelativePositionProperty, value);
         }
 
@@ -38,12 +41,20 @@ namespace Micser.App.Infrastructure.Controls
                     var x = (arrangeSize.Width - element.DesiredSize.Width) * relPosition.X;
                     var y = (arrangeSize.Height - element.DesiredSize.Height) * relPosition.Y;
 
-                    if (double.IsNaN(x)) x = 0;
-                    if (double.IsNaN(y)) y = 0;
+                    if (double.IsNaN(x))
+                    {
+                        x = 0;
+                    }
+
+                    if (double.IsNaN(y))
+                    {
+                        y = 0;
+                    }
 
                     element.Arrange(new Rect(new Point(x, y), element.DesiredSize));
                 }
             }
+
             return arrangeSize;
         }
 

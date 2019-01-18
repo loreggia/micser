@@ -1,8 +1,8 @@
-﻿using Newtonsoft.Json;
+﻿using System;
+using System.IO;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NLog;
-using System;
-using System.IO;
 
 namespace Micser.Common.DataAccess
 {
@@ -24,9 +24,10 @@ namespace Micser.Common.DataAccess
             return new DataContext(this);
         }
 
-        internal DbSet<T> GetDbSet<T>(string table)
+        internal DbSet<T> GetDbSet<T>(DataContext context, string table)
         {
-            var dbSet = new DbSet<T>();
+            var dbSet = new DbSet<T>(context);
+            return dbSet;
         }
 
         internal void Load()
@@ -49,7 +50,7 @@ namespace Micser.Common.DataAccess
         {
             try
             {
-                dataContext.
+//                dataContext.
 
                 using (var writer = new StreamWriter(_fileName))
                 using (var jsonWriter = new JsonTextWriter(writer))

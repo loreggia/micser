@@ -1,7 +1,7 @@
-﻿using Micser.Common.Modules;
-using Micser.Engine.Infrastructure;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Micser.Common.Modules;
+using Micser.Engine.Infrastructure;
 
 namespace Micser.Engine.Audio
 {

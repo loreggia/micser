@@ -1,12 +1,12 @@
-﻿using CSCore.CoreAudioAPI;
+﻿using System;
+using System.Linq;
+using CSCore.CoreAudioAPI;
 using CSCore.SoundIn;
 using CSCore.Streams;
 using Micser.Common.Devices;
 using Micser.Common.Modules;
 using Micser.Engine.Infrastructure;
 using NLog;
-using System;
-using System.Linq;
 
 namespace Micser.Plugins.Main.Modules
 {
@@ -101,7 +101,7 @@ namespace Micser.Plugins.Main.Modules
                 try
                 {
                     _capture.Initialize();
-                    _soundInSource = new SoundInSource(_capture) { FillWithZeros = true };
+                    _soundInSource = new SoundInSource(_capture) {FillWithZeros = true};
                     Output = _soundInSource;
                     _capture.Start();
                 }

@@ -1,7 +1,7 @@
-﻿using Micser.Common;
+﻿using System;
+using Micser.Common;
 using Micser.Engine.Infrastructure;
 using Nancy.Hosting.Self;
-using System;
 using Unity;
 
 namespace Micser.Engine.Api
@@ -25,7 +25,8 @@ namespace Micser.Engine.Api
         {
             _host?.Dispose();
 
-            _host = new NancyHost(new Uri($"http://localhost:{Globals.ApiPort}"), new Bootstrapper(_container), new HostConfiguration { RewriteLocalhost = false });
+            _host = new NancyHost(new Uri($"http://localhost:{Globals.ApiPort}"), new Bootstrapper(_container),
+                                  new HostConfiguration {RewriteLocalhost = false});
             _host.Start();
         }
 

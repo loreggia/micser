@@ -1,4 +1,11 @@
-﻿using CommonServiceLocator;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.ServiceProcess;
+using CommonServiceLocator;
 using Micser.Common;
 using Micser.Common.DataAccess;
 using Micser.Common.Extensions;
@@ -6,13 +13,6 @@ using Micser.Engine.Api;
 using Micser.Engine.Audio;
 using Micser.Engine.Infrastructure;
 using NLog;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.ServiceProcess;
 using Unity;
 using Unity.Injection;
 

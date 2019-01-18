@@ -1,8 +1,8 @@
-﻿using Micser.App.Infrastructure;
+﻿using System.Threading.Tasks;
+using Micser.App.Infrastructure;
 using Micser.App.Views;
-using Prism.Events;
-using System.Threading.Tasks;
 using Micser.Common;
+using Prism.Events;
 
 namespace Micser.App.ViewModels
 {
@@ -11,7 +11,8 @@ namespace Micser.App.ViewModels
         private readonly INavigationManager _navigationManager;
         private bool _isLoading;
 
-        public StartupViewModel(IApplicationStateService applicationStateService, IEventAggregator eventAggregator, INavigationManager navigationManager)
+        public StartupViewModel(IApplicationStateService applicationStateService, IEventAggregator eventAggregator,
+                                INavigationManager navigationManager)
         {
             _navigationManager = navigationManager;
 
