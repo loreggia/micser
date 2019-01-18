@@ -10,10 +10,13 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type app:View}">
-                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
+                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}">
                         <Grid>
-                            <ContentPresenter Margin="3" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}" ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}" />
-                            <controls:BusyPanel Visibility="{Binding IsBusy, RelativeSource={RelativeSource TemplatedParent}, Converter={converter:BooleanToVisibilityConverter}}" />
+                            <ContentPresenter Margin="3" Content="{TemplateBinding Content}" ContentTemplate="{TemplateBinding ContentTemplate}"
+                                              ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}" />
+                            <controls:BusyPanel
+                                Visibility="{Binding IsBusy, RelativeSource={RelativeSource TemplatedParent}, Converter={converter:BooleanToVisibilityConverter}}" />
                         </Grid>
                     </Border>
                 </ControlTemplate>
@@ -21,5 +24,5 @@
         </Setter>
     </Style>
 
-    <Style TargetType="{x:Type app:View}" BasedOn="{StaticResource DefaultViewStyle}"></Style>
+    <Style TargetType="{x:Type app:View}" BasedOn="{StaticResource DefaultViewStyle}" />
 </ResourceDictionary>
