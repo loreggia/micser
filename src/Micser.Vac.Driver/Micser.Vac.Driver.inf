@@ -8,7 +8,7 @@ Class=MEDIA ; DONE: edit Class
 ClassGuid={4d36e96c-e325-11ce-bfc1-08002be10318} ; DONE: edit ClassGuid 
 Provider=%ManufacturerName%
 CatalogFile=Micser.Vac.Driver.cat
-DriverVer= 01/24/2018, 1.0.0.0; DONE: set DriverVer in stampinf property pages
+DriverVer=01/01/2019, 1.0.0.0; DONE: set DriverVer in stampinf property pages
 
 [DestinationDirs]
 DefaultDestDir = 12
