@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NLog;
@@ -21,23 +23,42 @@ namespace Micser.Common.DataAccess
 
         public DataContext GetContext()
         {
+            Load();
+
             return new DataContext(this);
         }
 
-        internal DbSet<T> GetDbSet<T>(DataContext context, string table)
+        internal DbSet<T> GetDbSet<T>(string table)
         {
-            var dbSet = new DbSet<T>(context);
+            var dbSet = new DbSet<T>(table);
+
+            if (_dbInstance.TryGetValue(table, StringComparison.InvariantCultureIgnoreCase, out var token))
+            {
+                var entities = token.ToObject<IEnumerable<T>>();
+                var dbEntries = entities.Select(e => new DbEntry<T>(e));
+                dbSet.Initialize(dbEntries);
+            }
+
             return dbSet;
         }
 
-        internal void Load()
+        private void Load()
         {
             try
             {
-                using (var reader = new StreamReader(_fileName))
-                using (var jsonReader = new JsonTextReader(reader))
+                lock (_lock)
                 {
-                    _dbInstance = JObject.Load(jsonReader);
+                    if (!File.Exists(_fileName))
+                    {
+                        _dbInstance = new JObject();
+                        return;
+                    }
+
+                    using (var reader = new StreamReader(_fileName))
+                    using (var jsonReader = new JsonTextReader(reader))
+                    {
+                        _dbInstance = JObject.Load(jsonReader);
+                    }
                 }
             }
             catch (Exception ex)
@@ -50,11 +71,14 @@ namespace Micser.Common.DataAccess
         {
             try
             {
-//                dataContext.
-
                 using (var writer = new StreamWriter(_fileName))
                 using (var jsonWriter = new JsonTextWriter(writer))
                 {
+                    var dbSets = dataContext.GetChangedSets();
+                    foreach (var dbSet in dbSets)
+                    {
+                        _dbInstance[dbSet.Name] = JToken.FromObject(dbSet.Cast<object>());
+                    }
                     _dbInstance.WriteTo(jsonWriter);
                 }
             }

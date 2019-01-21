@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="DataAccess\DbEntry.cs" />
     <Compile Include="DataAccess\DbSet.cs" />
+    <Compile Include="DataAccess\IdAttribute.cs" />
     <Compile Include="DataAccess\IDbSet.cs" />
     <Compile Include="Devices\DeviceService.cs" />
     <Compile Include="DataAccess\Database.cs" />

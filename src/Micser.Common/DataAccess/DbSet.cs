@@ -1,23 +1,25 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Micser.Common.DataAccess
 {
     public class DbSet<T> : IDbSet<T>
     {
-        private readonly DataContext _context;
-        private readonly List<T> _entities;
+        private readonly Dictionary<object, DbEntry<T>> _entities;
 
-        public DbSet(DataContext context)
+        public DbSet(string name)
         {
-            _context = context;
-            _entities = new List<T>();
+            Name = name;
+            _entities = new Dictionary<object, DbEntry<T>>();
         }
+
+        public string Name { get; }
 
         public IEnumerator<T> GetEnumerator()
         {
-            return _entities.GetEnumerator();
+            return _entities.Values.Select(e => e.Entity).GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -27,18 +29,39 @@ namespace Micser.Common.DataAccess
 
         public void Insert(T entity)
         {
-            _entities.Add(entity);
+            if (entity == null)
+            {
+                throw new ArgumentNullException(nameof(entity));
+            }
+
+            var dbEntry = new DbEntry<T>(entity);
+            if (_entities.ContainsKey(dbEntry.Id))
+            {
+                throw new InvalidOperationException($"An entity with ID {dbEntry.Id} is already part of the DB set.");
+            }
+
+            _entities.Add(dbEntry.Id, dbEntry);
         }
 
         public void Update(T entity)
         {
-            var index = _entities.IndexOf(entity);
-            if (index < 0)
+            var dbEntry = new DbEntry<T>(entity);
+            if (!_entities.ContainsKey(dbEntry.Id))
             {
                 throw new InvalidOperationException("Entity has not been added.");
             }
 
-            _entities[index] = entity;
+            _entities[dbEntry.Id] = dbEntry;
+        }
+
+        public void Initialize(IEnumerable<DbEntry<T>> dbEntries)
+        {
+            _entities.Clear();
+
+            foreach (var dbEntry in dbEntries)
+            {
+                _entities.Add(dbEntry.Id, dbEntry);
+            }
         }
     }
 }
