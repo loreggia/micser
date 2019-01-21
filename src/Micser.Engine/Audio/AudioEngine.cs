@@ -24,6 +24,12 @@ namespace Micser.Engine.Audio
 
         public ICollection<IAudioModule> Modules { get; }
 
+        public void UpdateModule(ModuleDescription description)
+        {
+            var module = Modules.SingleOrDefault(m => m.Description.Id == description.Id);
+            module?.Initialize(description);
+        }
+
         public void AddModule(ModuleDescription description)
         {
             var type = Type.GetType(description.Type);

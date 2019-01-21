@@ -7,6 +7,7 @@ namespace Micser.Common.DataAccess
     {
         void Insert(T entity);
         void Update(T entity);
+        T GetById<TId>(TId id);
     }
 
     public interface IDbSet : IEnumerable

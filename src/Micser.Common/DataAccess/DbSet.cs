@@ -27,6 +27,16 @@ namespace Micser.Common.DataAccess
             return GetEnumerator();
         }
 
+        public T GetById<TId>(TId id)
+        {
+            if (_entities.TryGetValue(id, out var dbEntry))
+            {
+                return dbEntry.Entity;
+            }
+
+            return default(T);
+        }
+
         public void Insert(T entity)
         {
             if (entity == null)
