@@ -21,16 +21,17 @@ namespace Micser.Engine.Api.Controllers
             _database = database;
 
             Get["/"] = _ => GetAll();
-            Post["/"] = _ => CreateModule();
+            Post["/"] = _ => PostModule();
+            Put["/{id:guid}"] = p => PutModule(p.id);
         }
 
-        private dynamic CreateModule()
+        private dynamic PostModule()
         {
             var module = this.Bind<ModuleDescription>();
 
             if (module == null || string.IsNullOrEmpty(module.Type))
             {
-                return HttpStatusCode.BadRequest;
+                return HttpStatusCode.UnprocessableEntity;
             }
 
             module.Id = Guid.NewGuid();
@@ -38,6 +39,30 @@ namespace Micser.Engine.Api.Controllers
             _audioEngine.AddModule(module);
 
             return module;
+        }
+
+        private dynamic PutModule(Guid id)
+        {
+            using (var ctx = _database.GetContext())
+            {
+                var descriptions = ctx.GetCollection<ModuleDescription>();
+                var module = descriptions.GetById(id);
+
+                if (module == null)
+                {
+                    return HttpStatusCode.NotFound;
+                }
+
+                var model = this.Bind<ModuleDescription>();
+                module.State = model.State;
+                module.ViewState = model.ViewState;
+
+                descriptions.Update(module);
+                ctx.Save();
+
+                _audioEngine.UpdateModule(module);
+                return module;
+            }
         }
 
         private dynamic GetAll()
