@@ -140,12 +140,12 @@ namespace Micser.App.Infrastructure.Widgets
             Cursor = Cursors.Cross;
             _connection.StrokeDashArray = new DoubleCollection(new double[] {1, 2});
 
-            if (sender == _sourceDragThumb)
+            if (Equals(sender, _sourceDragThumb))
             {
                 _fixConnector = _connection.Sink;
                 _dragConnector = _connection.Source;
             }
-            else if (sender == _sinkDragThumb)
+            else if (Equals(sender, _sinkDragThumb))
             {
                 _dragConnector = _connection.Sink;
                 _fixConnector = _connection.Source;

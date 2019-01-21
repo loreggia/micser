@@ -11,8 +11,9 @@ namespace Micser.App.Infrastructure
     // I will keep on searching.
 
     // Helper class to provide an orthogonal connection path
-    public class PathFinder
+    public static class PathFinder
     {
+        private const double Epsilon = 0.001d;
         private const int Margin = 20;
 
         public static List<Point> GetConnectionLine(ConnectorInfo source, ConnectorInfo sink, bool showLastLine)
@@ -426,7 +427,7 @@ namespace Micser.App.Infrastructure
                     break;
 
                 default:
-                    throw new Exception("No neighour corners found!");
+                    throw new Exception("No neighbour corners found!");
             }
         }
 
@@ -508,12 +509,12 @@ namespace Micser.App.Infrastructure
 
         private static ConnectorOrientation GetOrientation(Point p1, Point p2)
         {
-            if (p1.X == p2.X)
+            if (Math.Abs(p1.X - p2.X) < Epsilon)
             {
                 return p1.Y >= p2.Y ? ConnectorOrientation.Bottom : ConnectorOrientation.Top;
             }
 
-            if (p1.Y == p2.Y)
+            if (Math.Abs(p1.Y - p2.Y) < Epsilon)
             {
                 return p1.X >= p2.X ? ConnectorOrientation.Right : ConnectorOrientation.Left;
             }
@@ -598,7 +599,7 @@ namespace Micser.App.Infrastructure
 
             for (var j = 0; j < points.Count - 1; j++)
             {
-                if (points[j].X != points[j + 1].X && points[j].Y != points[j + 1].Y)
+                if (Math.Abs(points[j].X - points[j + 1].X) > Epsilon && Math.Abs(points[j].Y - points[j + 1].Y) > Epsilon)
                 {
                     // orientation from point
                     var orientationFrom = j == 0 ? sourceOrientation : GetOrientation(points[j], points[j - 1]);

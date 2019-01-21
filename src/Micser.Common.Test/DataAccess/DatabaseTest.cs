@@ -4,11 +4,24 @@ using System.Linq;
 using Micser.Common.DataAccess;
 using NLog;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Micser.Infrastructure.Test.DataAccess
 {
-    public class DatabaseTest
+    public class DatabaseTest : IDisposable
     {
+        public DatabaseTest(ITestOutputHelper testOutputHelper)
+        {
+            _testFileManager = new TestFileManager(testOutputHelper);
+        }
+
+        public void Dispose()
+        {
+            _testFileManager.DeleteFiles();
+        }
+
+        private readonly TestFileManager _testFileManager;
+
         private class TestClass
         {
             public TestClass()
@@ -16,7 +29,14 @@ namespace Micser.Infrastructure.Test.DataAccess
                 Id = Guid.NewGuid();
             }
 
-            public Guid Id { get; }
+            public Guid Id
+            {
+                get;
+                // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Local
+                // ReSharper disable once MemberCanBePrivate.Local
+                set;
+            }
+
             public IDictionary<string, object> Dictionary { get; set; }
             public int Integer { get; set; }
             public string String { get; set; }
@@ -25,7 +45,8 @@ namespace Micser.Infrastructure.Test.DataAccess
         [Fact]
         public void InstantiateDb()
         {
-            var db = new Database("test.db", LogManager.CreateNullLogger());
+            var fileName = _testFileManager.GetFileName();
+            var db = new Database(fileName, LogManager.CreateNullLogger());
             Assert.NotNull(db);
 
             using (var dbContext = db.GetContext())
@@ -41,7 +62,8 @@ namespace Micser.Infrastructure.Test.DataAccess
         [Fact]
         public void SaveAndLoadObject()
         {
-            var db = new Database("test.db", LogManager.CreateNullLogger());
+            var fileName = _testFileManager.GetFileName();
+            var db = new Database(fileName, LogManager.CreateNullLogger());
 
             Guid id;
 

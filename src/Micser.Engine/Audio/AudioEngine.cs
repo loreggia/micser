@@ -50,7 +50,6 @@ namespace Micser.Engine.Audio
         public void Dispose()
         {
             Stop();
-            GC.SuppressFinalize(this);
         }
 
         public void Start()
