@@ -44,7 +44,7 @@ namespace Micser.Infrastructure.Test.DataAccess
             var db = new Database("test.db", LogManager.CreateNullLogger());
 
             Guid id;
-            
+
             using (var saveContext = db.GetContext())
             {
                 var testObject = new TestClass
@@ -65,7 +65,7 @@ namespace Micser.Infrastructure.Test.DataAccess
             using (var loadContext = db.GetContext())
             {
                 var result = loadContext.GetCollection<TestClass>().FirstOrDefault(x => x.Id == id);
-                
+
                 Assert.NotNull(result);
                 Assert.Equal("Test", result.String);
                 Assert.Equal(42, result.Integer);
