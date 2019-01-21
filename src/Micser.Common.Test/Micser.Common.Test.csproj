@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="DataAccess\DatabaseTest.cs" />
     <Compile Include="DeviceServiceTest.cs" />
+    <Compile Include="TestFileManager.cs" />
     <Compile Include="TreeNodeTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

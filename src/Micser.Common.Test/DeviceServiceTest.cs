@@ -1,12 +1,19 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using Micser.Common.Devices;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Micser.Infrastructure.Test
 {
     public class DeviceServiceTest
     {
+        public DeviceServiceTest(ITestOutputHelper testOutputHelper)
+        {
+            _testOutputHelper = testOutputHelper;
+        }
+
+        private readonly ITestOutputHelper _testOutputHelper;
+
         [Fact]
         //[Category("Sound")]
         public void GetInputDevicesTest()
@@ -18,7 +25,7 @@ namespace Micser.Infrastructure.Test
             Assert.True(devicesArray.Length > 0);
             foreach (var deviceDescription in devicesArray)
             {
-                Console.WriteLine($"{deviceDescription.Name}: {deviceDescription.Id}");
+                _testOutputHelper.WriteLine($"{deviceDescription.Name}: {deviceDescription.Id}");
             }
         }
 
@@ -33,7 +40,7 @@ namespace Micser.Infrastructure.Test
             Assert.True(devicesArray.Length > 0);
             foreach (var deviceDescription in devicesArray)
             {
-                Console.WriteLine($"{deviceDescription.Name}: {deviceDescription.Id}");
+                _testOutputHelper.WriteLine($"{deviceDescription.Name}: {deviceDescription.Id}");
             }
         }
     }
