@@ -1,13 +1,12 @@
 ﻿using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Micser.App.Infrastructure;
+using Xunit;
 
 namespace Micser.Infrastructure.Test
 {
-    [TestClass]
     public class TreeNodeTest
     {
-        [TestMethod]
+        [Fact]
         public void CreateTree()
         {
             var input = new[]
@@ -21,15 +20,15 @@ namespace Micser.Infrastructure.Test
 
             var treeArray = tree.ToArray();
 
-            Assert.AreEqual(2, treeArray.Length);
-            Assert.IsNull(treeArray[0].Parent);
-            Assert.IsNull(treeArray[1].Parent);
-            Assert.AreEqual("Root 1", treeArray[0].Item.Text);
-            Assert.AreEqual("Root 2", treeArray[1].Item.Text);
-            Assert.AreEqual(1, treeArray[0].Children.Count());
-            Assert.AreEqual(0, treeArray[1].Children.Count());
-            Assert.AreEqual("Item", treeArray[0].Children.First().Item.Text);
-            Assert.AreEqual("Child", treeArray[0].Children.First().Children.First().Item.Text);
+            Assert.Equal(2, treeArray.Length);
+            Assert.Null(treeArray[0].Parent);
+            Assert.Null(treeArray[1].Parent);
+            Assert.Equal("Root 1", treeArray[0].Item.Text);
+            Assert.Equal("Root 2", treeArray[1].Item.Text);
+            Assert.Single(treeArray[0].Children);
+            Assert.Empty(treeArray[1].Children);
+            Assert.Equal("Item", treeArray[0].Children.First().Item.Text);
+            Assert.Equal("Child", treeArray[0].Children.First().Children.First().Item.Text);
         }
 
         private class TestClass
