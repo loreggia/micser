@@ -30,7 +30,7 @@ namespace Micser.App.Infrastructure.Api
             _resource = resource.TrimEnd('/') + "/";
         }
 
-        protected async Task<ServiceResult<T>> DeleteAsync<T>(string action, string id, object parameters = null)
+        protected async Task<ServiceResult<T>> DeleteAsync<T>(string action, object id, object parameters = null)
         {
             try
             {
