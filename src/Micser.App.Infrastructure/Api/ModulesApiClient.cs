@@ -15,5 +15,20 @@ namespace Micser.App.Infrastructure.Api
         {
             return await GetAsync<IEnumerable<ModuleDescription>>(null);
         }
+
+        public async Task<ServiceResult<ModuleDescription>> Create(ModuleDescription description)
+        {
+            return await PostAsync<ModuleDescription>(null, description);
+        }
+
+        public async Task<ServiceResult<ModuleDescription>> Update(ModuleDescription description)
+        {
+            return await PutAsync<ModuleDescription>(null, description.Id, description);
+        }
+
+        public async Task<ServiceResult<bool>> Delete(ModuleDescription description)
+        {
+            return await DeleteAsync<bool>(null, description.Id);
+        }
     }
 }

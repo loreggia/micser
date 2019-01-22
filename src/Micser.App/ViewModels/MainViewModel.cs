@@ -24,7 +24,7 @@ namespace Micser.App.ViewModels
         private IEnumerable<WidgetDescription> _availableWidgets;
 
         public MainViewModel(IDatabase database, IWidgetFactory widgetFactory, IWidgetRegistry widgetRegistry, ILogger logger,
-                             ModulesApiClient modulesApiClient)
+            ModulesApiClient modulesApiClient)
         {
             _database = database;
             _widgetRegistry = widgetRegistry;
@@ -154,6 +154,31 @@ namespace Micser.App.ViewModels
         }
 
         private void OnWidgetsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    foreach (WidgetViewModel viewModel in e.NewItems)
+                    {
+                        CreateModule(viewModel);
+                    }
+
+                    break;
+                case NotifyCollectionChangedAction.Remove:
+                    foreach (WidgetViewModel viewModel in e.OldItems)
+                    {
+                        DeleteModule(viewModel);
+                    }
+
+                    break;
+            }
+        }
+
+        private void DeleteModule(WidgetViewModel viewModel)
+        {
+        }
+
+        private void CreateModule(WidgetViewModel viewModel)
         {
         }
     }
