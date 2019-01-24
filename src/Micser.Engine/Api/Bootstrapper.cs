@@ -1,11 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Micser.Common.Extensions;
+﻿using Micser.Common.Extensions;
 using Nancy;
 using Nancy.Bootstrapper;
 using Nancy.Diagnostics;
 using Nancy.ViewEngines;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Unity;
 using Unity.RegistrationByConvention;
 
@@ -147,7 +147,7 @@ namespace Micser.Engine.Api
             base.RequestStartup(container, pipelines, context);
             if (context.Request.Headers.Accept.All(x => x.Item1 != "application/json"))
             {
-                context.Request.Headers.Accept = new[] {new Tuple<string, decimal>("application/json", 1m)}.Concat(context.Request.Headers.Accept);
+                context.Request.Headers.Accept = new[] { new Tuple<string, decimal>("application/json", 1m) }.Concat(context.Request.Headers.Accept);
             }
         }
     }

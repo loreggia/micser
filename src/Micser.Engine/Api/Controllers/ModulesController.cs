@@ -1,11 +1,11 @@
-﻿using System;
-using System.Linq;
-using Micser.Common.DataAccess;
+﻿using Micser.Common.DataAccess;
 using Micser.Common.Modules;
 using Micser.Engine.Audio;
 using Micser.Engine.Infrastructure;
 using Nancy;
 using Nancy.ModelBinding;
+using System;
+using System.Linq;
 
 namespace Micser.Engine.Api.Controllers
 {
@@ -21,11 +21,17 @@ namespace Micser.Engine.Api.Controllers
             _database = database;
 
             Get["/"] = _ => GetAll();
-            Post["/"] = _ => PostModule();
-            Put["/{id:guid}"] = p => PutModule(p.id);
+            Post["/"] = _ => InsertModule();
+            Put["/{id:guid}"] = p => UpdateModule(p.id);
         }
 
-        private dynamic PostModule()
+        private dynamic GetAll()
+        {
+            var modules = _audioEngine.Modules;
+            return modules.Select(m => m.Description).ToArray();
+        }
+
+        private dynamic InsertModule()
         {
             var module = this.Bind<ModuleDescription>();
 
@@ -41,7 +47,7 @@ namespace Micser.Engine.Api.Controllers
             return module;
         }
 
-        private dynamic PutModule(Guid id)
+        private dynamic UpdateModule(Guid id)
         {
             using (var ctx = _database.GetContext())
             {
@@ -63,12 +69,6 @@ namespace Micser.Engine.Api.Controllers
                 _audioEngine.UpdateModule(module);
                 return module;
             }
-        }
-
-        private dynamic GetAll()
-        {
-            var modules = _audioEngine.Modules;
-            return modules.Select(m => m.Description).ToArray();
         }
     }
 }
