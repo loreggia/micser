@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Micser.App.Infrastructure.Widgets;
+﻿using Micser.App.Infrastructure.Widgets;
 using Micser.Common.Devices;
+using Micser.Plugins.Main.Modules;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Micser.Plugins.Main.Widgets
 {
@@ -26,10 +28,18 @@ namespace Micser.Plugins.Main.Widgets
             set => SetProperty(ref _deviceDescriptions, value);
         }
 
+        public override Type ModuleType => typeof(DeviceInputModule);
+
         public DeviceDescription SelectedDeviceDescription
         {
             get => _selectedDeviceDescription;
             set => SetProperty(ref _selectedDeviceDescription, value);
+        }
+
+        public override WidgetState GetState()
+        {
+            //state.Settings[SettingKeyDeviceId] = SelectedDeviceDescription?.Id;
+            return base.GetState();
         }
 
         public override void Initialize()
@@ -46,13 +56,6 @@ namespace Micser.Plugins.Main.Widgets
             //{
             //    SelectedDeviceDescription = DeviceDescriptions?.FirstOrDefault(d => d.Id == idString);
             //}
-        }
-
-        public override void SaveState(WidgetState state)
-        {
-            base.SaveState(state);
-
-            //state.Settings[SettingKeyDeviceId] = SelectedDeviceDescription?.Id;
         }
 
         private void UpdateDeviceDescriptions()

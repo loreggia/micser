@@ -1,12 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Collections.Specialized;
-using Micser.App.Infrastructure;
+﻿using Micser.App.Infrastructure;
 using Micser.App.Infrastructure.Api;
 using Micser.App.Infrastructure.Widgets;
 using Micser.Common.DataAccess;
+using Micser.Common.Modules;
 using NLog;
 using Prism.Regions;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 
 namespace Micser.App.ViewModels
 {
@@ -54,32 +55,32 @@ namespace Micser.App.ViewModels
         {
             base.OnNavigatedFrom(navigationContext);
 
-            var widgetStates = new List<WidgetState>();
+            //var widgetStates = new List<WidgetState>();
 
-            foreach (var vm in Widgets)
-            {
-                var state = new WidgetState
-                {
-                    Position = vm.Position,
-                    Size = vm.Size
-                };
-                vm.SaveState(state);
-                widgetStates.Add(state);
-            }
+            //foreach (var vm in Widgets)
+            //{
+            //    var state = new WidgetState
+            //    {
+            //        Position = vm.Position,
+            //        Size = vm.Size
+            //    };
+            //    vm.SaveState(state);
+            //    widgetStates.Add(state);
+            //}
 
             //_configurationService.SetSetting(WidgetsConfigurationKey, widgetStates);
 
-            var connections = new List<ConnectionInfo>();
-            foreach (var connection in Connections)
-            {
-                connections.Add(new ConnectionInfo
-                {
-                    SourceWidgetId = connection.Source.Widget.Id,
-                    SourceConnectorName = connection.Source.Name,
-                    SinkWidgetId = connection.Sink.Widget.Id,
-                    SinkConnectorName = connection.Sink.Name
-                });
-            }
+            //var connections = new List<ConnectionInfo>();
+            //foreach (var connection in Connections)
+            //{
+            //    connections.Add(new ConnectionInfo
+            //    {
+            //        SourceWidgetId = connection.Source.Widget.Id,
+            //        SourceConnectorName = connection.Source.Name,
+            //        SinkWidgetId = connection.Sink.Widget.Id,
+            //        SinkConnectorName = connection.Sink.Name
+            //    });
+            //}
 
             //_configurationService.SetSetting(ConnectionsConfigurationKey, connections);
         }
@@ -90,7 +91,7 @@ namespace Micser.App.ViewModels
 
             AvailableWidgets = _widgetRegistry.Widgets;
 
-            var modulesResult = await _modulesApiClient.GetAll();
+            var modulesResult = await _modulesApiClient.GetAllAsync();
 
             if (modulesResult.IsSuccess)
             {
@@ -149,6 +150,40 @@ namespace Micser.App.ViewModels
             //}
         }
 
+        private async void CreateModule(WidgetViewModel viewModel)
+        {
+            var moduleDescription = new ModuleDescription
+            {
+                Type = viewModel.ModuleType.FullName,
+                ViewState = viewModel.GetState()
+            };
+            var result = await _modulesApiClient.CreateAsync(moduleDescription);
+
+            if (result.IsSuccess)
+            {
+                viewModel.Id = result.Data.Id;
+
+                if (moduleDescription.ViewState is WidgetState widgetState)
+                {
+                    viewModel.LoadState(widgetState);
+                }
+            }
+            else
+            {
+                // TODO error handling / remove it
+            }
+        }
+
+        private async void DeleteModule(WidgetViewModel viewModel)
+        {
+            var result = await _modulesApiClient.DeleteAsync(viewModel.Id);
+
+            if (!result.IsSuccess)
+            {
+                // TODO error handling / reload everything
+            }
+        }
+
         private void OnConnectionsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
         }
@@ -164,6 +199,7 @@ namespace Micser.App.ViewModels
                     }
 
                     break;
+
                 case NotifyCollectionChangedAction.Remove:
                     foreach (WidgetViewModel viewModel in e.OldItems)
                     {
@@ -172,14 +208,6 @@ namespace Micser.App.ViewModels
 
                     break;
             }
-        }
-
-        private void DeleteModule(WidgetViewModel viewModel)
-        {
-        }
-
-        private void CreateModule(WidgetViewModel viewModel)
-        {
         }
     }
 }
