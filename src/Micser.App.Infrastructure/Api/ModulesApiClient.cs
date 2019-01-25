@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using Micser.Common.Modules;
+using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using Micser.Common.Modules;
 
 namespace Micser.App.Infrastructure.Api
 {
@@ -11,24 +12,24 @@ namespace Micser.App.Infrastructure.Api
         {
         }
 
-        public async Task<ServiceResult<IEnumerable<ModuleDescription>>> GetAll()
-        {
-            return await GetAsync<IEnumerable<ModuleDescription>>(null);
-        }
-
-        public async Task<ServiceResult<ModuleDescription>> Create(ModuleDescription description)
+        public async Task<ServiceResult<ModuleDescription>> CreateAsync(ModuleDescription description)
         {
             return await PostAsync<ModuleDescription>(null, description);
         }
 
-        public async Task<ServiceResult<ModuleDescription>> Update(ModuleDescription description)
+        public async Task<ServiceResult<bool>> DeleteAsync(Guid id)
         {
-            return await PutAsync<ModuleDescription>(null, description.Id, description);
+            return await DeleteAsync<bool>(null, id);
         }
 
-        public async Task<ServiceResult<bool>> Delete(ModuleDescription description)
+        public async Task<ServiceResult<IEnumerable<ModuleDescription>>> GetAllAsync()
         {
-            return await DeleteAsync<bool>(null, description.Id);
+            return await GetAsync<IEnumerable<ModuleDescription>>(null);
+        }
+
+        public async Task<ServiceResult<ModuleDescription>> UpdateAsync(ModuleDescription description)
+        {
+            return await PutAsync<ModuleDescription>(null, description.Id, description);
         }
     }
 }

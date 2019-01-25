@@ -24,8 +24,6 @@ namespace Micser.App.Infrastructure.Widgets
 
         protected WidgetViewModel()
         {
-            Id = Guid.NewGuid();
-
             _inputConnectors = new ObservableCollection<ConnectorViewModel>();
             _outputConnectors = new ObservableCollection<ConnectorViewModel>();
         }
@@ -43,8 +41,8 @@ namespace Micser.App.Infrastructure.Widgets
         }
 
         public IEnumerable<ConnectorViewModel> InputConnectors => _inputConnectors;
-
         public bool IsInitialized { get; protected set; }
+        public abstract Type ModuleType { get; }
 
         public string Name
         {
@@ -66,6 +64,15 @@ namespace Micser.App.Infrastructure.Widgets
             set => SetProperty(ref _size, value);
         }
 
+        public virtual WidgetState GetState()
+        {
+            return new WidgetState
+            {
+                Position = Position,
+                Size = Size
+            };
+        }
+
         public virtual void Initialize()
         {
             IsInitialized = true;
@@ -83,10 +90,6 @@ namespace Micser.App.Infrastructure.Widgets
             {
                 _loadingWidgetState = state;
             }
-        }
-
-        public virtual void SaveState(WidgetState state)
-        {
         }
 
         protected ConnectorViewModel AddInput(string name)
