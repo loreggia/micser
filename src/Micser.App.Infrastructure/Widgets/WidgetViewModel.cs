@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Micser.Common.Widgets;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows;
@@ -89,7 +90,11 @@ namespace Micser.App.Infrastructure.Widgets
             if (!IsInitialized)
             {
                 _loadingWidgetState = state;
+                return;
             }
+
+            Position = state.Position;
+            Size = state.Size;
         }
 
         protected ConnectorViewModel AddInput(string name)
