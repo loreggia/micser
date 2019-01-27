@@ -1,12 +1,12 @@
-﻿using System;
-using System.Linq;
-using CSCore.CoreAudioAPI;
+﻿using CSCore.CoreAudioAPI;
 using CSCore.SoundIn;
 using CSCore.Streams;
 using Micser.Common.Devices;
 using Micser.Common.Modules;
 using Micser.Engine.Infrastructure;
 using NLog;
+using System;
+using System.Linq;
 
 namespace Micser.Plugins.Main.Modules
 {
@@ -33,7 +33,7 @@ namespace Micser.Plugins.Main.Modules
             }
         }
 
-        public override IModuleState GetState()
+        public override ModuleState GetState()
         {
             return new DeviceInputState
             {
@@ -101,7 +101,7 @@ namespace Micser.Plugins.Main.Modules
                 try
                 {
                     _capture.Initialize();
-                    _soundInSource = new SoundInSource(_capture) {FillWithZeros = true};
+                    _soundInSource = new SoundInSource(_capture) { FillWithZeros = true };
                     Output = _soundInSource;
                     _capture.Start();
                 }
@@ -112,9 +112,13 @@ namespace Micser.Plugins.Main.Modules
             }
         }
 
-        public class DeviceInputState : IModuleState
+        public class DeviceInputState : ModuleState
         {
-            public string DeviceId { get; set; }
+            public string DeviceId
+            {
+                get => Data.TryGetValue(nameof(DeviceId), out var deviceId) ? deviceId as string : null;
+                set => Data[nameof(DeviceId)] = value;
+            }
         }
     }
 }

@@ -107,7 +107,6 @@
     <Compile Include="Widgets\WidgetFactory.cs" />
     <Compile Include="Widgets\WidgetPanel.cs" />
     <Compile Include="Widgets\WidgetRegistry.cs" />
-    <Compile Include="Widgets\WidgetState.cs" />
     <Compile Include="Widgets\WidgetToolbox.cs" />
     <Compile Include="Widgets\WidgetToolboxItem.cs" />
     <Compile Include="Widgets\WidgetViewModel.cs" />

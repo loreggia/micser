@@ -64,10 +64,10 @@
     <Compile Include="Devices\DeviceDescription.cs" />
     <Compile Include="Devices\DeviceType.cs" />
     <Compile Include="Model.cs" />
+    <Compile Include="Modules\ModuleState.cs" />
+    <Compile Include="Widgets\WidgetState.cs" />
     <Compile Include="Modules\ModuleDescription.cs" />
     <Compile Include="Modules\ModuleConnectionDescription.cs" />
-    <Compile Include="Modules\IModuleState.cs" />
-    <Compile Include="Modules\IModuleViewState.cs" />
     <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="IItemRegistry.cs" />
     <Compile Include="ItemRegistry.cs" />
@@ -99,6 +99,8 @@
       <Version>5.8.13</Version>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Models\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,5 +1,6 @@
 ﻿using Micser.App.Infrastructure.Widgets;
 using Micser.Common.Devices;
+using Micser.Common.Widgets;
 using Micser.Plugins.Main.Modules;
 using System;
 using System.Collections.Generic;
@@ -38,8 +39,9 @@ namespace Micser.Plugins.Main.Widgets
 
         public override WidgetState GetState()
         {
-            //state.Settings[SettingKeyDeviceId] = SelectedDeviceDescription?.Id;
-            return base.GetState();
+            var state = base.GetState();
+            state.Data[SettingKeyDeviceId] = SelectedDeviceDescription?.Id;
+            return state;
         }
 
         public override void Initialize()
@@ -52,10 +54,10 @@ namespace Micser.Plugins.Main.Widgets
         {
             base.LoadState(state);
 
-            //if (state.Settings.TryGetValue(SettingKeyDeviceId, out var deviceId) && deviceId is string idString)
-            //{
-            //    SelectedDeviceDescription = DeviceDescriptions?.FirstOrDefault(d => d.Id == idString);
-            //}
+            if (state.Data.TryGetValue(SettingKeyDeviceId, out var deviceId) && deviceId is string idString)
+            {
+                SelectedDeviceDescription = DeviceDescriptions?.FirstOrDefault(d => d.Id == idString);
+            }
         }
 
         private void UpdateDeviceDescriptions()

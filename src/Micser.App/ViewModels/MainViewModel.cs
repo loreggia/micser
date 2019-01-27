@@ -3,6 +3,7 @@ using Micser.App.Infrastructure.Api;
 using Micser.App.Infrastructure.Widgets;
 using Micser.Common.DataAccess;
 using Micser.Common.Modules;
+using Micser.Common.Widgets;
 using NLog;
 using Prism.Regions;
 using System.Collections.Generic;

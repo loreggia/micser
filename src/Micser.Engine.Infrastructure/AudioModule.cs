@@ -1,7 +1,7 @@
-﻿using System;
-using CSCore;
+﻿using CSCore;
 using Micser.Common.Modules;
 using NLog;
+using System;
 
 namespace Micser.Engine.Infrastructure
 {
@@ -64,7 +64,7 @@ namespace Micser.Engine.Infrastructure
             GC.SuppressFinalize(this);
         }
 
-        public abstract IModuleState GetState();
+        public abstract ModuleState GetState();
 
         public virtual void Initialize(ModuleDescription description)
         {

@@ -1,11 +1,11 @@
-﻿using System;
-using System.Diagnostics;
-using System.Linq;
-using CSCore.CoreAudioAPI;
+﻿using CSCore.CoreAudioAPI;
 using CSCore.SoundOut;
 using Micser.Common.Devices;
 using Micser.Common.Modules;
 using Micser.Engine.Infrastructure;
+using System;
+using System.Diagnostics;
+using System.Linq;
 
 namespace Micser.Plugins.Main.Modules
 {
@@ -54,7 +54,7 @@ namespace Micser.Plugins.Main.Modules
             }
         }
 
-        public override IModuleState GetState()
+        public override ModuleState GetState()
         {
             return new DeviceOutputState
             {
@@ -142,9 +142,13 @@ namespace Micser.Plugins.Main.Modules
             //_output.Play();
         }
 
-        public class DeviceOutputState : IModuleState
+        public class DeviceOutputState : ModuleState
         {
-            public string DeviceId { get; set; }
+            public string DeviceId
+            {
+                get => Data.TryGetValue(nameof(DeviceId), out var deviceId) ? deviceId as string : null;
+                set => Data[nameof(DeviceId)] = value;
+            }
         }
     }
 }
