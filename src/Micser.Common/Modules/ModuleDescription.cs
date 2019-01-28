@@ -1,11 +1,9 @@
-﻿using Micser.Common.Widgets;
-
-namespace Micser.Common.Modules
+﻿namespace Micser.Common.Modules
 {
     public class ModuleDescription : Model
     {
-        public ModuleState State { get; set; }
+        public StateDictionary State { get; set; }
         public string Type { get; set; }
-        public WidgetState ViewState { get; set; }
+        public StateDictionary ViewState { get; set; }
     }
 }

@@ -1,17 +1,19 @@
-﻿using System.Collections.Generic;
-using System.Windows;
+﻿using System.Windows;
 
 namespace Micser.Common.Widgets
 {
-    public class WidgetState
+    public class WidgetState : StateDictionary
     {
-        public WidgetState()
+        public Point Position
         {
-            Data = new Dictionary<string, object>();
+            get;
+            set;
         }
 
-        public Dictionary<string, object> Data { get; set; }
-        public Point Position { get; set; }
-        public Size Size { get; set; }
+        public Size Size
+        {
+            get;
+            set;
+        }
     }
 }

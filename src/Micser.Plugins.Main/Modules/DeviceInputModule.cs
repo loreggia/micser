@@ -1,6 +1,7 @@
 ﻿using CSCore.CoreAudioAPI;
 using CSCore.SoundIn;
 using CSCore.Streams;
+using Micser.Common;
 using Micser.Common.Devices;
 using Micser.Common.Modules;
 using Micser.Engine.Infrastructure;
@@ -12,10 +13,9 @@ namespace Micser.Plugins.Main.Modules
 {
     public class DeviceInputModule : AudioModule
     {
+        private const string DeviceIdKey = "DeviceId";
         private WasapiCapture _capture;
-
         private DeviceDescription _deviceDescription;
-
         private SoundInSource _soundInSource;
 
         public DeviceDescription DeviceDescription
@@ -33,11 +33,11 @@ namespace Micser.Plugins.Main.Modules
             }
         }
 
-        public override ModuleState GetState()
+        public override StateDictionary GetState()
         {
-            return new DeviceInputState
+            return new StateDictionary
             {
-                DeviceId = DeviceDescription?.Id
+                {DeviceIdKey , DeviceDescription?.Id}
             };
         }
 
@@ -45,9 +45,9 @@ namespace Micser.Plugins.Main.Modules
         {
             base.Initialize(description);
 
-            if (description.State is DeviceInputState state)
+            var deviceId = description.State?.GetObject<string>(DeviceIdKey);
+            if (deviceId != null)
             {
-                var deviceId = state.DeviceId;
                 var deviceService = new DeviceService();
                 DeviceDescription = deviceService.GetDevices(DeviceType.Input).FirstOrDefault(d => d.Id == deviceId);
             }
@@ -109,15 +109,6 @@ namespace Micser.Plugins.Main.Modules
                 {
                     Logger.Log(LogLevel.Error, ex);
                 }
-            }
-        }
-
-        public class DeviceInputState : ModuleState
-        {
-            public string DeviceId
-            {
-                get => Data.TryGetValue(nameof(DeviceId), out var deviceId) ? deviceId as string : null;
-                set => Data[nameof(DeviceId)] = value;
             }
         }
     }

@@ -67,6 +67,10 @@
               <File Id="Nancy.Hosting.Self.dll_2106079591" Source="App\Nancy.Hosting.Self.dll" />
             </Component>
 
+            <Component Id="Component.Nancy.Serialization.JsonNet.dll_1259959754" Guid="6fe30b47-2577-43ad-9095-18616cb1114c">
+              <File Id="Nancy.Serialization.JsonNet.dll_1259959754" Source="App\Nancy.Serialization.JsonNet.dll" />
+            </Component>
+
             <Component Id="Component.Newtonsoft.Json.dll_2068862308" Guid="6fe30b47-2577-43ad-9095-18611d1d8f99">
               <File Id="Newtonsoft.Json.dll_2068862308" Source="App\Newtonsoft.Json.dll" />
             </Component>
@@ -217,6 +221,7 @@
       <ComponentRef Id="Component.Micser.Plugins.Main.dll_703895423" />
       <ComponentRef Id="Component.Nancy.dll_735301589" />
       <ComponentRef Id="Component.Nancy.Hosting.Self.dll_2106079591" />
+      <ComponentRef Id="Component.Nancy.Serialization.JsonNet.dll_1259959754" />
       <ComponentRef Id="Component.Newtonsoft.Json.dll_2068862308" />
       <ComponentRef Id="Component.NLog.dll_1128448916" />
       <ComponentRef Id="Component.Prism.dll_717679119" />

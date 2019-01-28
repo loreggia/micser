@@ -64,7 +64,7 @@
     <Compile Include="Devices\DeviceDescription.cs" />
     <Compile Include="Devices\DeviceType.cs" />
     <Compile Include="Model.cs" />
-    <Compile Include="Modules\ModuleState.cs" />
+    <Compile Include="StateDictionary.cs" />
     <Compile Include="Widgets\WidgetState.cs" />
     <Compile Include="Modules\ModuleDescription.cs" />
     <Compile Include="Modules\ModuleConnectionDescription.cs" />

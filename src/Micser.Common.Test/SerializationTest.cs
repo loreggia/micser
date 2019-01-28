@@ -1,4 +1,5 @@
-﻿using Micser.Common.Modules;
+﻿using Micser.Common;
+using Micser.Common.Modules;
 using Micser.Common.Widgets;
 using Newtonsoft.Json;
 using System;
@@ -15,18 +16,18 @@ namespace Micser.Infrastructure.Test
             var description = new ModuleDescription
             {
                 Id = Guid.NewGuid(),
-                State = new ModuleState
+                State = new StateDictionary
                 {
-                    Data = { { "Test1", 1 } },
+                    { "Test1", 1 }
                 },
                 Type = "TestType",
                 ViewState = new WidgetState
                 {
-                    Data = { { "Test2", 2 } },
                     Position = new Point(1, 2),
                     Size = new Size()
                 }
             };
+            description.ViewState.Add("Test2", 2);
 
             var serialized = JsonConvert.SerializeObject(description);
 
