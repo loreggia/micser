@@ -1,4 +1,5 @@
 ﻿using CSCore;
+using Micser.Common;
 using Micser.Common.Modules;
 using System;
 
@@ -14,7 +15,7 @@ namespace Micser.Engine.Infrastructure
         IAudioModule Input { get; set; }
         IWaveSource Output { get; }
 
-        ModuleState GetState();
+        StateDictionary GetState();
 
         void Initialize(ModuleDescription description);
     }
