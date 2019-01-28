@@ -35,7 +35,7 @@ namespace Micser.Engine.Api.Controllers
         {
             var module = this.Bind<ModuleDescription>();
 
-            if (module == null || string.IsNullOrEmpty(module.Type))
+            if (string.IsNullOrEmpty(module?.Type))
             {
                 return HttpStatusCode.UnprocessableEntity;
             }
