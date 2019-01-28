@@ -39,10 +39,12 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataAccess\DatabaseTest.cs" />
     <Compile Include="DeviceServiceTest.cs" />
+    <Compile Include="SerializationTest.cs" />
     <Compile Include="TestFileManager.cs" />
     <Compile Include="TreeNodeTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

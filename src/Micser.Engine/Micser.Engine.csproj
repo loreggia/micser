@@ -49,6 +49,7 @@
     <Compile Include="Api\Bootstrapper.cs" />
     <Compile Include="Api\Controllers\ModuleConnectionsController.cs" />
     <Compile Include="Api\Controllers\ModulesController.cs" />
+    <Compile Include="Api\MicserJsonSerializer.cs" />
     <Compile Include="Api\Server.cs" />
     <Compile Include="Audio\AudioEngine.cs" />
     <Compile Include="Audio\IAudioEngine.cs" />
@@ -95,6 +96,9 @@
       <Version>1.4.5</Version>
     </PackageReference>
     <PackageReference Include="Nancy.Hosting.Self">
+      <Version>1.4.1</Version>
+    </PackageReference>
+    <PackageReference Include="Nancy.Serialization.JsonNet">
       <Version>1.4.1</Version>
     </PackageReference>
     <PackageReference Include="NLog">
