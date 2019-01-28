@@ -2,7 +2,10 @@
 using Nancy;
 using Nancy.Bootstrapper;
 using Nancy.Diagnostics;
+using Nancy.ModelBinding;
+using Nancy.Serialization.JsonNet;
 using Nancy.ViewEngines;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,6 +29,9 @@ namespace Micser.Engine.Api
 
             container.RegisterSingleton<IFileSystemReader, DefaultFileSystemReader>();
             container.RegisterSingleton<IInteractiveDiagnostics, InteractiveDiagnostics>();
+            container.RegisterType<ISerializer, JsonNetSerializer>();
+            container.RegisterType<IBodyDeserializer, JsonNetBodyDeserializer>();
+            container.RegisterType<JsonSerializer, MicserJsonSerializer>();
 
             // auto register modules
             container.RegisterTypes(
