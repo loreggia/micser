@@ -51,9 +51,12 @@ namespace Micser.Common.DataAccess
 
         public virtual void Save()
         {
-            // todo remove deleted
             _database.Save(this);
-            // todo mark as unchanged
+            foreach (var dbSet in _tables.Values)
+            {
+                var deleted = dbSet.Cast<DbEntry>().Where(e => e.State == EntryState.Deleted);
+                //todo
+            }
         }
 
         protected virtual void Dispose(bool disposing)
@@ -66,7 +69,7 @@ namespace Micser.Common.DataAccess
 
         protected virtual string GetTableName<T>()
         {
-            return typeof(T).FullName;
+            return typeof(T).AssemblyQualifiedName;
         }
     }
 }

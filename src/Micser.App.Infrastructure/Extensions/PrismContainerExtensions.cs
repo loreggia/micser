@@ -1,7 +1,7 @@
-﻿using System.Windows;
-using Micser.App.Infrastructure.Widgets;
+﻿using Micser.App.Infrastructure.Widgets;
 using Prism.Ioc;
 using Prism.Unity;
+using System.Windows;
 using Unity;
 using Unity.Injection;
 
@@ -33,12 +33,12 @@ namespace Micser.App.Infrastructure.Extensions
             where TViewModel : WidgetViewModel
         {
             var container = containerRegistry.GetContainer();
-            container.RegisterType<Widget>(typeof(TViewModel).FullName, new InjectionFactory(c =>
+            container.RegisterType<Widget>(typeof(TViewModel).AssemblyQualifiedName, new InjectionFactory(c =>
             {
                 var widget = c.Resolve<TWidget>();
                 return widget;
             }));
-            container.RegisterInstance(typeof(TWidget).FullName, new WidgetDescription
+            container.RegisterInstance(typeof(TWidget).AssemblyQualifiedName, new WidgetDescription
             {
                 Name = defaultName,
                 ViewType = typeof(TWidget),
