@@ -5,10 +5,18 @@ using System.Reflection;
 
 namespace Micser.Common.DataAccess
 {
+    public enum EntryState
+    {
+        Unchanged,
+        Added,
+        Changed,
+        Deleted
+    }
+
     public class DbEntry<T> : DbEntry
     {
-        private object _id;
         private readonly PropertyInfo _idProperty;
+        private object _id;
 
         public DbEntry(T entity)
         {
@@ -40,6 +48,8 @@ namespace Micser.Common.DataAccess
         {
             PropertyCache = new Dictionary<Type, PropertyInfo>();
         }
+
+        public EntryState State { get; set; }
 
         public static PropertyInfo GetIdProperty<T>()
         {

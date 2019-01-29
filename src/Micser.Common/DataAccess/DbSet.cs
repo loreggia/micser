@@ -17,14 +17,12 @@ namespace Micser.Common.DataAccess
 
         public string Name { get; }
 
-        public IEnumerator<T> GetEnumerator()
+        public void Delete<TId>(TId id)
         {
-            return _entities.Values.Select(e => e.Entity).GetEnumerator();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
+            if (_entities.TryGetValue(id, out var dbEntry))
+            {
+                dbEntry.State = EntryState.Deleted;
+            }
         }
 
         public T GetById<TId>(TId id)
@@ -37,31 +35,14 @@ namespace Micser.Common.DataAccess
             return default(T);
         }
 
-        public void Insert(T entity)
+        public IEnumerator<T> GetEnumerator()
         {
-            if (entity == null)
-            {
-                throw new ArgumentNullException(nameof(entity));
-            }
-
-            var dbEntry = new DbEntry<T>(entity);
-            if (_entities.ContainsKey(dbEntry.Id))
-            {
-                throw new InvalidOperationException($"An entity with ID {dbEntry.Id} is already part of the DB set.");
-            }
-
-            _entities.Add(dbEntry.Id, dbEntry);
+            return _entities.Values.Select(e => e.Entity).GetEnumerator();
         }
 
-        public void Update(T entity)
+        IEnumerator IEnumerable.GetEnumerator()
         {
-            var dbEntry = new DbEntry<T>(entity);
-            if (!_entities.ContainsKey(dbEntry.Id))
-            {
-                throw new InvalidOperationException("Entity has not been added.");
-            }
-
-            _entities[dbEntry.Id] = dbEntry;
+            return _entities.Values.GetEnumerator();
         }
 
         public void Initialize(IEnumerable<DbEntry<T>> dbEntries)
@@ -72,6 +53,39 @@ namespace Micser.Common.DataAccess
             {
                 _entities.Add(dbEntry.Id, dbEntry);
             }
+        }
+
+        public void Insert(T entity)
+        {
+            if (entity == null)
+            {
+                throw new ArgumentNullException(nameof(entity));
+            }
+
+            var dbEntry = new DbEntry<T>(entity)
+            {
+                State = EntryState.Added
+            };
+            if (_entities.ContainsKey(dbEntry.Id))
+            {
+                throw new InvalidOperationException($"An entity with ID {dbEntry.Id} is already part of the DB set.");
+            }
+
+            _entities.Add(dbEntry.Id, dbEntry);
+        }
+
+        public void Update(T entity)
+        {
+            var dbEntry = new DbEntry<T>(entity)
+            {
+                State = EntryState.Changed
+            };
+            if (!_entities.ContainsKey(dbEntry.Id))
+            {
+                throw new InvalidOperationException("Entity has not been added.");
+            }
+
+            _entities[dbEntry.Id] = dbEntry;
         }
     }
 }

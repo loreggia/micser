@@ -1,4 +1,4 @@
-﻿using Micser.Common;
+﻿using Micser.Common.Modules;
 using Micser.Engine.Infrastructure;
 using System;
 
@@ -8,7 +8,7 @@ namespace Micser.Engine.Audio
     {
         public IAudioModule Input2 { get; set; }
 
-        public override StateDictionary GetState()
+        public override ModuleState GetState()
         {
             throw new NotImplementedException();
         }
