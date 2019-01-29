@@ -15,12 +15,12 @@ namespace Micser.App.Infrastructure.Widgets
 
         public virtual WidgetViewModel CreateViewModel(Type widgetVmType)
         {
-            return (WidgetViewModel) _container.Resolve(widgetVmType);
+            return (WidgetViewModel)_container.Resolve(widgetVmType);
         }
 
         public virtual Widget CreateWidget(WidgetViewModel viewModel)
         {
-            var result = _container.Resolve<Widget>(viewModel.GetType().FullName);
+            var result = _container.Resolve<Widget>(viewModel.GetType().AssemblyQualifiedName);
             result.DataContext = viewModel;
             result.Loaded += OnWidgetLoaded;
             return result;
@@ -28,15 +28,15 @@ namespace Micser.App.Infrastructure.Widgets
 
         public virtual Widget CreateWidget(WidgetDescription d)
         {
-            var result = _container.Resolve<Widget>(d.ViewModelType.FullName);
-            result.DataContext = (WidgetViewModel) _container.Resolve(d.ViewModelType);
+            var result = _container.Resolve<Widget>(d.ViewModelType.AssemblyQualifiedName);
+            result.DataContext = (WidgetViewModel)_container.Resolve(d.ViewModelType);
             result.Loaded += OnWidgetLoaded;
             return result;
         }
 
         protected virtual void OnWidgetLoaded(object sender, RoutedEventArgs e)
         {
-            var widget = (Widget) sender;
+            var widget = (Widget)sender;
             var viewModel = widget.DataContext as WidgetViewModel;
             viewModel?.Initialize();
         }

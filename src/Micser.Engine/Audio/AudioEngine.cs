@@ -56,41 +56,45 @@ namespace Micser.Engine.Audio
         {
             Stop();
 
-            var db = _database.GetContext();
-            var moduleDescriptions = db.GetCollection<ModuleDescription>();
-
-            foreach (var description in moduleDescriptions.ToArray())
+            using (var ctx = _database.GetContext())
             {
-                try
-                {
-                    AddModule(description);
-                }
-                catch (Exception ex)
-                {
-                    _logger.Error(ex, "Could not load module. ID: {0}", description.Id);
-                    moduleDescriptions.Delete(description.Id);
-                }
-            }
+                var moduleDescriptions = ctx.GetCollection<ModuleDescription>();
 
-            var connections = db.GetCollection<ModuleConnectionDescription>().ToArray();
-            foreach (var connection in connections)
-            {
-                var source = Modules.FirstOrDefault(m => m.Description.Id == connection.SourceId);
-                var target = Modules.FirstOrDefault(m => m.Description.Id == connection.TargetId);
-
-                if (source == null)
+                foreach (var description in moduleDescriptions.ToArray())
                 {
-                    _logger.Warn($"Source module for connection not found. ID: {connection.SourceId}");
-                    continue;
+                    try
+                    {
+                        AddModule(description);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.Error(ex, "Could not load module. ID: {0}", description.Id);
+                        moduleDescriptions.Delete(description.Id);
+                    }
                 }
 
-                if (target == null)
+                var connections = ctx.GetCollection<ModuleConnectionDescription>().ToArray();
+                foreach (var connection in connections)
                 {
-                    _logger.Warn($"Target module for connection not found. ID: {connection.TargetId}");
-                    continue;
+                    var source = Modules.FirstOrDefault(m => m.Description.Id == connection.SourceId);
+                    var target = Modules.FirstOrDefault(m => m.Description.Id == connection.TargetId);
+
+                    if (source == null)
+                    {
+                        _logger.Warn($"Source module for connection not found. ID: {connection.SourceId}");
+                        continue;
+                    }
+
+                    if (target == null)
+                    {
+                        _logger.Warn($"Target module for connection not found. ID: {connection.TargetId}");
+                        continue;
+                    }
+
+                    target.Input = source;
                 }
 
-                target.Input = source;
+                ctx.Save();
             }
         }
 

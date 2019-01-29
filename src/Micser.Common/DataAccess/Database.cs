@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using NLog;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using NLog;
 
 namespace Micser.Common.DataAccess
 {
@@ -42,6 +42,32 @@ namespace Micser.Common.DataAccess
             return dbSet;
         }
 
+        internal void Save(DataContext dataContext)
+        {
+            try
+            {
+                using (var writer = new StreamWriter(_fileName))
+                using (var jsonWriter = new JsonTextWriter(writer))
+                {
+                    var dbSets = dataContext.GetChangedSets();
+                    foreach (var dbSet in dbSets)
+                    {
+                        var entries = dbSet
+                            .Cast<DbEntry>()
+                            .Where(e => e.State != EntryState.Deleted)
+                            .Select(e => e.GetEntity())
+                            .ToArray();
+                        _dbInstance[dbSet.Name] = JToken.FromObject(entries);
+                    }
+                    _dbInstance.WriteTo(jsonWriter);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Log(LogLevel.Error, ex);
+            }
+        }
+
         private void Load()
         {
             try
@@ -64,27 +90,7 @@ namespace Micser.Common.DataAccess
             catch (Exception ex)
             {
                 _logger.Log(LogLevel.Error, ex);
-            }
-        }
-
-        internal void Save(DataContext dataContext)
-        {
-            try
-            {
-                using (var writer = new StreamWriter(_fileName))
-                using (var jsonWriter = new JsonTextWriter(writer))
-                {
-                    var dbSets = dataContext.GetChangedSets();
-                    foreach (var dbSet in dbSets)
-                    {
-                        _dbInstance[dbSet.Name] = JToken.FromObject(dbSet.Cast<object>());
-                    }
-                    _dbInstance.WriteTo(jsonWriter);
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.Log(LogLevel.Error, ex);
+                _dbInstance = new JObject();
             }
         }
     }

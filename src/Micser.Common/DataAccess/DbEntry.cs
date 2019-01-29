@@ -38,6 +38,11 @@ namespace Micser.Common.DataAccess
                 _idProperty?.SetValue(Entity, value);
             }
         }
+
+        public override object GetEntity()
+        {
+            return Entity;
+        }
     }
 
     public abstract class DbEntry
@@ -74,5 +79,7 @@ namespace Micser.Common.DataAccess
 
             return idProperty;
         }
+
+        public abstract object GetEntity();
     }
 }

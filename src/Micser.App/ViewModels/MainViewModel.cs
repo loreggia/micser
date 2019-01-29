@@ -167,8 +167,8 @@ namespace Micser.App.ViewModels
         {
             var moduleDescription = new ModuleDescription
             {
-                ModuleType = viewModel.ModuleType.FullName,
-                WidgetType = viewModel.GetType().FullName,
+                ModuleType = viewModel.ModuleType.AssemblyQualifiedName,
+                WidgetType = viewModel.GetType().AssemblyQualifiedName,
                 WidgetState = viewModel.GetState()
             };
             var result = await _modulesApiClient.CreateAsync(moduleDescription);
