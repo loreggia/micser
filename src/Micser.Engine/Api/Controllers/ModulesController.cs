@@ -27,20 +27,29 @@ namespace Micser.Engine.Api.Controllers
 
         private dynamic GetAll()
         {
-            var modules = _audioEngine.Modules;
-            return modules.Select(m => m.Description).ToArray();
+            using (var ctx = _database.GetContext())
+            {
+                return ctx.GetCollection<ModuleDescription>().ToArray();
+            }
         }
 
         private dynamic InsertModule()
         {
             var module = this.Bind<ModuleDescription>();
 
-            if (string.IsNullOrEmpty(module?.Type))
+            if (string.IsNullOrEmpty(module?.ModuleType) ||
+                string.IsNullOrEmpty(module.WidgetType))
             {
                 return HttpStatusCode.UnprocessableEntity;
             }
 
             module.Id = Guid.NewGuid();
+
+            using (var ctx = _database.GetContext())
+            {
+                ctx.GetCollection<ModuleDescription>().Insert(module);
+                ctx.Save();
+            }
 
             _audioEngine.AddModule(module);
 
@@ -60,8 +69,8 @@ namespace Micser.Engine.Api.Controllers
                 }
 
                 var model = this.Bind<ModuleDescription>();
-                module.State = model.State;
-                module.ViewState = model.ViewState;
+                module.ModuleState = model.ModuleState;
+                module.WidgetState = model.WidgetState;
 
                 descriptions.Update(module);
                 ctx.Save();

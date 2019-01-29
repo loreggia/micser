@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Micser.Common.DataAccess
 {
@@ -14,15 +15,25 @@ namespace Micser.Common.DataAccess
             _tables = new Dictionary<string, IDbSet>();
         }
 
+        ~DataContext()
+        {
+            Dispose(false);
+        }
+
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
-        ~DataContext()
+        public IEnumerable<IDbSet> GetChangedSets()
         {
-            Dispose(false);
+            var dbSets = _tables.Values;
+            var result = from dbSet in dbSets
+                         let dbEntries = dbSet.Cast<DbEntry>()
+                         where dbEntries.Any(e => e.State != EntryState.Unchanged)
+                         select dbSet;
+            return result;
         }
 
         public IDbSet<T> GetCollection<T>(string table = null)
@@ -40,7 +51,9 @@ namespace Micser.Common.DataAccess
 
         public virtual void Save()
         {
+            // todo remove deleted
             _database.Save(this);
+            // todo mark as unchanged
         }
 
         protected virtual void Dispose(bool disposing)
@@ -54,11 +67,6 @@ namespace Micser.Common.DataAccess
         protected virtual string GetTableName<T>()
         {
             return typeof(T).FullName;
-        }
-
-        public IEnumerable<IDbSet> GetChangedSets()
-        {
-            return _tables.Values;
         }
     }
 }

@@ -1,10 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using Micser.Common.DataAccess;
+﻿using Micser.Common.DataAccess;
 using Micser.Common.Modules;
 using Micser.Engine.Infrastructure;
 using NLog;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using Unity;
 
 namespace Micser.Engine.Audio
@@ -24,15 +24,9 @@ namespace Micser.Engine.Audio
 
         public ICollection<IAudioModule> Modules { get; }
 
-        public void UpdateModule(ModuleDescription description)
-        {
-            var module = Modules.SingleOrDefault(m => m.Description.Id == description.Id);
-            module?.Initialize(description);
-        }
-
         public void AddModule(ModuleDescription description)
         {
-            var type = Type.GetType(description.Type);
+            var type = Type.GetType(description.ModuleType);
             if (type != null)
             {
                 if (_container.Resolve(type) is IAudioModule module)
@@ -43,13 +37,13 @@ namespace Micser.Engine.Audio
                 else
                 {
                     _logger.Warn(
-                        $"Could not create an instance of a module. Description-ID: {description.Id}, Type: {description.Type}");
+                        $"Could not create an instance of a module. Description-ID: {description.Id}, Type: {description.ModuleType}");
                 }
             }
             else
             {
                 _logger.Warn(
-                    $"Could not find module type. Description-ID: {description.Id}, Type: {description.Type}");
+                    $"Could not find module type. Description-ID: {description.Id}, Type: {description.ModuleType}");
             }
         }
 
@@ -63,11 +57,19 @@ namespace Micser.Engine.Audio
             Stop();
 
             var db = _database.GetContext();
+            var moduleDescriptions = db.GetCollection<ModuleDescription>();
 
-            var moduleDescriptions = db.GetCollection<ModuleDescription>().ToArray();
-            foreach (var description in moduleDescriptions)
+            foreach (var description in moduleDescriptions.ToArray())
             {
-                AddModule(description);
+                try
+                {
+                    AddModule(description);
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex, "Could not load module. ID: {0}", description.Id);
+                    moduleDescriptions.Delete(description.Id);
+                }
             }
 
             var connections = db.GetCollection<ModuleConnectionDescription>().ToArray();
@@ -100,6 +102,12 @@ namespace Micser.Engine.Audio
             }
 
             Modules.Clear();
+        }
+
+        public void UpdateModule(ModuleDescription description)
+        {
+            var module = Modules.SingleOrDefault(m => m.Description.Id == description.Id);
+            module?.Initialize(description);
         }
     }
 }

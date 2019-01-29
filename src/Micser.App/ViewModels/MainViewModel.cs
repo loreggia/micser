@@ -6,6 +6,7 @@ using Micser.Common.Modules;
 using Micser.Common.Widgets;
 using NLog;
 using Prism.Regions;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -102,6 +103,17 @@ namespace Micser.App.ViewModels
                 {
                     foreach (var module in modules)
                     {
+                        try
+                        {
+                            var type = Type.GetType(module.WidgetType);
+                            var vm = WidgetFactory.CreateViewModel(type);
+                            vm.LoadState(module.WidgetState);
+                            _widgets.Add(vm);
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.Error(ex, "Could not load widget. ID: {0}", module.Id);
+                        }
                     }
                 }
             }
@@ -155,8 +167,9 @@ namespace Micser.App.ViewModels
         {
             var moduleDescription = new ModuleDescription
             {
-                Type = viewModel.ModuleType.FullName,
-                ViewState = viewModel.GetState()
+                ModuleType = viewModel.ModuleType.FullName,
+                WidgetType = viewModel.GetType().FullName,
+                WidgetState = viewModel.GetState()
             };
             var result = await _modulesApiClient.CreateAsync(moduleDescription);
 
@@ -164,7 +177,7 @@ namespace Micser.App.ViewModels
             {
                 viewModel.Id = result.Data.Id;
 
-                if (moduleDescription.ViewState is WidgetState widgetState)
+                if (moduleDescription.WidgetState is WidgetState widgetState)
                 {
                     viewModel.LoadState(widgetState);
                 }

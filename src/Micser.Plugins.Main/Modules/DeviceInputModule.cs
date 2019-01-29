@@ -1,7 +1,6 @@
 ﻿using CSCore.CoreAudioAPI;
 using CSCore.SoundIn;
 using CSCore.Streams;
-using Micser.Common;
 using Micser.Common.Devices;
 using Micser.Common.Modules;
 using Micser.Engine.Infrastructure;
@@ -33,9 +32,9 @@ namespace Micser.Plugins.Main.Modules
             }
         }
 
-        public override StateDictionary GetState()
+        public override ModuleState GetState()
         {
-            return new StateDictionary
+            return new ModuleState
             {
                 {DeviceIdKey , DeviceDescription?.Id}
             };
@@ -45,7 +44,7 @@ namespace Micser.Plugins.Main.Modules
         {
             base.Initialize(description);
 
-            var deviceId = description.State?.GetObject<string>(DeviceIdKey);
+            var deviceId = description.ModuleState?.GetObject<string>(DeviceIdKey);
             if (deviceId != null)
             {
                 var deviceService = new DeviceService();
