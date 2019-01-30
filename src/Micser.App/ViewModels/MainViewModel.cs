@@ -25,9 +25,10 @@ namespace Micser.App.ViewModels
         private readonly IWidgetRegistry _widgetRegistry;
         private readonly ObservableCollection<WidgetViewModel> _widgets;
         private IEnumerable<WidgetDescription> _availableWidgets;
+        private bool _isLoading;
 
         public MainViewModel(IDatabase database, IWidgetFactory widgetFactory, IWidgetRegistry widgetRegistry, ILogger logger,
-            ModulesApiClient modulesApiClient)
+                    ModulesApiClient modulesApiClient)
         {
             _database = database;
             _widgetRegistry = widgetRegistry;
@@ -89,6 +90,8 @@ namespace Micser.App.ViewModels
 
         public override async void OnNavigatedTo(NavigationContext navigationContext)
         {
+            _isLoading = true;
+
             base.OnNavigatedTo(navigationContext);
 
             AvailableWidgets = _widgetRegistry.Widgets;
@@ -121,6 +124,8 @@ namespace Micser.App.ViewModels
             {
                 _logger.Error(modulesResult);
             }
+
+            _isLoading = false;
 
             //var widgetStates = _configurationService.GetSettingEnumerable<WidgetState>(WidgetsConfigurationKey);
 
@@ -200,10 +205,19 @@ namespace Micser.App.ViewModels
 
         private void OnConnectionsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
+            if (_isLoading)
+            {
+                return;
+            }
         }
 
         private void OnWidgetsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
+            if (_isLoading)
+            {
+                return;
+            }
+
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
