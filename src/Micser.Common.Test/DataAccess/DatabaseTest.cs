@@ -1,15 +1,17 @@
-﻿using System;
+﻿using Micser.Common.DataAccess;
+using NLog;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Micser.Common.DataAccess;
-using NLog;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Micser.Infrastructure.Test.DataAccess
+namespace Micser.Common.Test.DataAccess
 {
     public class DatabaseTest : IDisposable
     {
+        private readonly TestFileManager _testFileManager;
+
         public DatabaseTest(ITestOutputHelper testOutputHelper)
         {
             _testFileManager = new TestFileManager(testOutputHelper);
@@ -18,18 +20,6 @@ namespace Micser.Infrastructure.Test.DataAccess
         public void Dispose()
         {
             _testFileManager.DeleteFiles();
-        }
-
-        private readonly TestFileManager _testFileManager;
-
-        private class TestClass
-        {
-            public Guid Id{get;set;}
-
-            public IDictionary<string, object> Dictionary { get; set; }
-            public int Integer { get; set; }
-            public string String { get; set; }
-            public DateTime DateTime { get; set; }
         }
 
         [Fact]
@@ -90,6 +80,15 @@ namespace Micser.Infrastructure.Test.DataAccess
                 Assert.Equal("value", result.Dictionary["key"]);
                 Assert.Equal(now, result.DateTime);
             }
+        }
+
+        private class TestClass
+        {
+            public DateTime DateTime { get; set; }
+            public IDictionary<string, object> Dictionary { get; set; }
+            public Guid Id { get; set; }
+            public int Integer { get; set; }
+            public string String { get; set; }
         }
     }
 }
