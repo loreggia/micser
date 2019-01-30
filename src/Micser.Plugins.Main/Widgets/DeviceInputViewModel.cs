@@ -40,7 +40,7 @@ namespace Micser.Plugins.Main.Widgets
         public override WidgetState GetState()
         {
             var state = base.GetState();
-            state[SettingKeyDeviceId] = SelectedDeviceDescription?.Id;
+            state.Data[SettingKeyDeviceId] = SelectedDeviceDescription?.Id;
             return state;
         }
 
@@ -54,7 +54,7 @@ namespace Micser.Plugins.Main.Widgets
         {
             base.LoadState(state);
 
-            var deviceId = state?.GetObject<string>(SettingKeyDeviceId);
+            var deviceId = state?.Data.GetObject<string>(SettingKeyDeviceId);
             if (deviceId != null)
             {
                 SelectedDeviceDescription = DeviceDescriptions?.FirstOrDefault(d => d.Id == deviceId);

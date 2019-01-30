@@ -36,7 +36,7 @@ namespace Micser.Plugins.Main.Modules
         {
             return new ModuleState
             {
-                {DeviceIdKey , DeviceDescription?.Id}
+                Data = { { DeviceIdKey, DeviceDescription?.Id } }
             };
         }
 
@@ -44,7 +44,7 @@ namespace Micser.Plugins.Main.Modules
         {
             base.Initialize(description);
 
-            var deviceId = description.ModuleState?.GetObject<string>(DeviceIdKey);
+            var deviceId = description.ModuleState?.Data.GetObject<string>(DeviceIdKey);
             if (deviceId != null)
             {
                 var deviceService = new DeviceService();
