@@ -1,18 +1,18 @@
-﻿using System.Linq;
-using Micser.Common.Devices;
+﻿using Micser.Common.Devices;
+using System.Linq;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Micser.Infrastructure.Test
+namespace Micser.Common.Test
 {
     public class DeviceServiceTest
     {
+        private readonly ITestOutputHelper _testOutputHelper;
+
         public DeviceServiceTest(ITestOutputHelper testOutputHelper)
         {
             _testOutputHelper = testOutputHelper;
         }
-
-        private readonly ITestOutputHelper _testOutputHelper;
 
         [Fact]
         //[Category("Sound")]

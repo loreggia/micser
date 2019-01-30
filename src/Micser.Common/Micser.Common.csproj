@@ -59,6 +59,8 @@
     <Compile Include="DataAccess\DataContext.cs" />
     <Compile Include="DataAccess\IDatabase.cs" />
     <Compile Include="Extensions\ComparableExtensions.cs" />
+    <Compile Include="Extensions\PropertyExtensions.cs" />
+    <Compile Include="Extensions\SerializationExtensions.cs" />
     <Compile Include="Extensions\UnityContainerExtensions.cs" />
     <Compile Include="Globals.cs" />
     <Compile Include="Devices\DeviceDescription.cs" />

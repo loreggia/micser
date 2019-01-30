@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Xunit.Abstractions;
 
-namespace Micser.Infrastructure.Test
+namespace Micser.Common.Test
 {
     public class TestFileManager
     {
@@ -15,13 +15,6 @@ namespace Micser.Infrastructure.Test
             _fileNames = new List<string>();
 
             _testOutputHelper = testOutputHelper;
-        }
-
-        public string GetFileName()
-        {
-            var fn = Guid.NewGuid() + ".tmp";
-            _fileNames.Add(fn);
-            return fn;
         }
 
         public void DeleteFiles()
@@ -39,6 +32,13 @@ namespace Micser.Infrastructure.Test
             }
 
             _fileNames.Clear();
+        }
+
+        public string GetFileName()
+        {
+            var fn = Guid.NewGuid() + ".tmp";
+            _fileNames.Add(fn);
+            return fn;
         }
     }
 }
