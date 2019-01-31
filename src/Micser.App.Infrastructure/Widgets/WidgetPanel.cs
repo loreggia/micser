@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Micser.App.Infrastructure.Themes;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -7,7 +8,6 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
-using Micser.App.Infrastructure.Themes;
 
 namespace Micser.App.Infrastructure.Widgets
 {
@@ -17,17 +17,22 @@ namespace Micser.App.Infrastructure.Widgets
             nameof(ConnectionsSource), typeof(IEnumerable<ConnectionViewModel>), typeof(WidgetPanel),
             new PropertyMetadata(null, OnConnectionsSourcePropertyChanged));
 
-        public static readonly DependencyProperty RasterSizeProperty = DependencyProperty.Register(
-            nameof(RasterSize), typeof(double), typeof(WidgetPanel), new PropertyMetadata(25d));
+        public static readonly DependencyProperty GridSizeProperty = DependencyProperty.Register(
+            nameof(GridSize), typeof(double), typeof(WidgetPanel), new PropertyMetadata(25d));
+
+        public static readonly DependencyProperty IsGridVisibleProperty = DependencyProperty.Register(
+            nameof(IsGridVisible), typeof(bool), typeof(WidgetPanel), new PropertyMetadata(false));
 
         public static readonly DependencyProperty WidgetFactoryProperty = DependencyProperty.Register(
-            nameof(WidgetFactory), typeof(IWidgetFactory), typeof(WidgetPanel), new PropertyMetadata(null, OnWidgetFactoryPropertyChanged));
+            nameof(WidgetFactory), typeof(IWidgetFactory), typeof(WidgetPanel),
+            new PropertyMetadata(null, OnWidgetFactoryPropertyChanged));
 
         public static readonly DependencyProperty WidgetsSourceProperty = DependencyProperty.Register(
             nameof(WidgetsSource), typeof(IEnumerable<WidgetViewModel>), typeof(WidgetPanel),
             new PropertyMetadata(null, OnWidgetsSourcePropertyChanged));
 
         private readonly ObservableCollection<Connection> _connections;
+
         private readonly ObservableCollection<Widget> _widgets;
 
         // start point of the rubberband drag operation
@@ -47,19 +52,25 @@ namespace Micser.App.Infrastructure.Widgets
 
         public IEnumerable<ConnectionViewModel> ConnectionsSource
         {
-            get => (IEnumerable<ConnectionViewModel>) GetValue(ConnectionsSourceProperty);
+            get => (IEnumerable<ConnectionViewModel>)GetValue(ConnectionsSourceProperty);
             set => SetValue(ConnectionsSourceProperty, value);
         }
 
-        public double RasterSize
+        public double GridSize
         {
-            get => (double) GetValue(RasterSizeProperty);
-            set => SetValue(RasterSizeProperty, value);
+            get => (double)GetValue(GridSizeProperty);
+            set => SetValue(GridSizeProperty, value);
+        }
+
+        public bool IsGridVisible
+        {
+            get => (bool)GetValue(IsGridVisibleProperty);
+            set => SetValue(IsGridVisibleProperty, value);
         }
 
         public IWidgetFactory WidgetFactory
         {
-            get => (IWidgetFactory) GetValue(WidgetFactoryProperty);
+            get => (IWidgetFactory)GetValue(WidgetFactoryProperty);
             set => SetValue(WidgetFactoryProperty, value);
         }
 
@@ -67,7 +78,7 @@ namespace Micser.App.Infrastructure.Widgets
 
         public IEnumerable<WidgetViewModel> WidgetsSource
         {
-            get => (IEnumerable<WidgetViewModel>) GetValue(WidgetsSourceProperty);
+            get => (IEnumerable<WidgetViewModel>)GetValue(WidgetsSourceProperty);
             set => SetValue(WidgetsSourceProperty, value);
         }
 
@@ -250,16 +261,15 @@ namespace Micser.App.Infrastructure.Widgets
             base.OnMouseUp(e);
 
             // todo snapping
-            //var widgets = SelectedItems.OfType<Widget>();
-            //foreach (var widget in widgets)
-            //{
-            //    SnapToGrid(widget);
-            //}
+            foreach (var widget in Widgets)
+            {
+                SnapToGrid(widget);
+            }
         }
 
         private static void OnConnectionsSourcePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var panel = (WidgetPanel) d;
+            var panel = (WidgetPanel)d;
 
             if (e.OldValue is INotifyCollectionChanged oldCollection)
             {
@@ -276,7 +286,7 @@ namespace Micser.App.Infrastructure.Widgets
 
         private static void OnWidgetFactoryPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var panel = (WidgetPanel) d;
+            var panel = (WidgetPanel)d;
             if (e.NewValue is IWidgetFactory factory && !panel._widgets.Any() && panel.WidgetsSource != null)
             {
                 foreach (var item in panel.WidgetsSource)
@@ -288,7 +298,7 @@ namespace Micser.App.Infrastructure.Widgets
 
         private static void OnWidgetsSourcePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var panel = (WidgetPanel) d;
+            var panel = (WidgetPanel)d;
 
             if (e.OldValue is INotifyCollectionChanged oldCollection)
             {
@@ -323,7 +333,7 @@ namespace Micser.App.Infrastructure.Widgets
 
             if (source != null && sink != null && !_connections.Any(c => ReferenceEquals(c.Source, source) && ReferenceEquals(c.Sink, sink)))
             {
-                var connection = new Connection(source, sink) {DataContext = vm};
+                var connection = new Connection(source, sink) { DataContext = vm };
                 source.Connection = connection;
                 sink.Connection = connection;
                 _connections.Add(connection);
@@ -448,41 +458,34 @@ namespace Micser.App.Infrastructure.Widgets
             }
         }
 
-        private void SnapToGrid(FrameworkElement element)
+        private void SnapToGrid(Widget widget)
         {
-            if (element == null)
-            {
-                return;
-            }
-
             // snap position
-            var left = GetLeft(element);
-            var top = GetTop(element);
+            var left = widget.Position.X;
+            var top = widget.Position.Y;
             SnapToRasterSize(ref left);
             SnapToRasterSize(ref top);
-            SetLeft(element, left);
-            SetTop(element, top);
+            widget.Position = new Point(left, top);
 
             // snap size
-            var width = element.ActualWidth;
-            var height = element.ActualHeight;
+            var width = widget.Size.Width;
+            var height = widget.Size.Height;
             SnapToRasterSize(ref width);
             SnapToRasterSize(ref height);
-            element.Width = width;
-            element.Height = height;
+            widget.Size = new Size(width, height);
         }
 
         private void SnapToRasterSize(ref double value)
         {
-            var snap = value % RasterSize;
+            var snap = value % GridSize;
 
-            if (snap <= RasterSize / 2d)
+            if (snap <= GridSize / 2d)
             {
                 snap *= -1;
             }
             else
             {
-                snap = RasterSize - snap;
+                snap = GridSize - snap;
             }
 
             value += snap;

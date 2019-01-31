@@ -11,14 +11,15 @@ namespace Micser.Engine.Audio
 {
     public sealed class AudioEngine : IAudioEngine
     {
-        private static readonly ILogger _logger = LogManager.GetCurrentClassLogger();
         private readonly IUnityContainer _container;
         private readonly IDatabase _database;
+        private readonly ILogger _logger;
 
-        public AudioEngine(IUnityContainer container, IDatabase database)
+        public AudioEngine(IUnityContainer container, IDatabase database, ILogger logger)
         {
             _container = container;
             _database = database;
+            _logger = logger;
             Modules = new List<IAudioModule>();
         }
 
@@ -54,6 +55,8 @@ namespace Micser.Engine.Audio
 
         public void Start()
         {
+            _logger.Info("Starting audio engine");
+
             Stop();
 
             using (var ctx = _database.GetContext())
@@ -96,16 +99,27 @@ namespace Micser.Engine.Audio
 
                 ctx.Save();
             }
+
+            _logger.Info("Audio engine started");
         }
 
         public void Stop()
         {
+            if (Modules.Count == 0)
+            {
+                return;
+            }
+
+            _logger.Info("Stopping audio engine");
+
             foreach (var audioModule in Modules)
             {
                 audioModule.Dispose();
             }
 
             Modules.Clear();
+
+            _logger.Info("Audio engine stopped");
         }
 
         public void UpdateModule(ModuleDescription description)

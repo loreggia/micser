@@ -1,10 +1,10 @@
-﻿using System;
+﻿using Micser.App.Infrastructure.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls.Primitives;
 using System.Windows.Media;
-using Micser.App.Infrastructure.Extensions;
 
 namespace Micser.App.Infrastructure.Widgets
 {
@@ -63,19 +63,20 @@ namespace Micser.App.Infrastructure.Widgets
                     }
 
                     double dragDeltaVertical;
+                    var size = w.Size;
+                    var position = w.Position;
+
                     switch (VerticalAlignment)
                     {
                         case VerticalAlignment.Bottom:
                             dragDeltaVertical = Math.Min(-e.VerticalChange, minDeltaVertical);
-                            w.Height = w.ActualHeight - dragDeltaVertical;
+                            size.Height = w.ActualHeight - dragDeltaVertical;
                             break;
 
                         case VerticalAlignment.Top:
-                            var position = w.Position;
                             dragDeltaVertical = Math.Min(Math.Max(-minTop, e.VerticalChange), minDeltaVertical);
                             position.Y += dragDeltaVertical;
-                            w.Position = position;
-                            w.Height = w.ActualHeight - dragDeltaVertical;
+                            size.Height = w.ActualHeight - dragDeltaVertical;
                             break;
                     }
 
@@ -83,18 +84,19 @@ namespace Micser.App.Infrastructure.Widgets
                     switch (HorizontalAlignment)
                     {
                         case HorizontalAlignment.Left:
-                            var position = w.Position;
                             dragDeltaHorizontal = Math.Min(Math.Max(-minLeft, e.HorizontalChange), minDeltaHorizontal);
                             position.X += dragDeltaHorizontal;
-                            w.Position = position;
-                            w.Width = w.ActualWidth - dragDeltaHorizontal;
+                            size.Width = w.ActualWidth - dragDeltaHorizontal;
                             break;
 
                         case HorizontalAlignment.Right:
                             dragDeltaHorizontal = Math.Min(-e.HorizontalChange, minDeltaHorizontal);
-                            w.Width = w.ActualWidth - dragDeltaHorizontal;
+                            size.Width = w.ActualWidth - dragDeltaHorizontal;
                             break;
                     }
+
+                    w.Position = position;
+                    w.Size = size;
                 }
 
                 e.Handled = true;

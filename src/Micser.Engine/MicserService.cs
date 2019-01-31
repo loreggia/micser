@@ -1,18 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.ServiceProcess;
-using CommonServiceLocator;
-using Micser.Common;
+﻿using Micser.Common;
 using Micser.Common.DataAccess;
 using Micser.Common.Extensions;
 using Micser.Engine.Api;
 using Micser.Engine.Audio;
 using Micser.Engine.Infrastructure;
 using NLog;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.ServiceProcess;
 using Unity;
 using Unity.Injection;
 
@@ -20,6 +18,7 @@ namespace Micser.Engine
 {
     public partial class MicserService : ServiceBase
     {
+        private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
         private readonly ICollection<IEngineModule> _plugins;
         private IAudioEngine _engine;
         private IServer _server;
@@ -38,6 +37,8 @@ namespace Micser.Engine
 
         public void ManualStart()
         {
+            Logger.Info("Starting service");
+
             var container = new UnityContainer();
 
             container.RegisterType<ILogger>(new InjectionFactory(c => LogManager.GetCurrentClassLogger()));
@@ -52,14 +53,20 @@ namespace Micser.Engine
 
             _server.Start();
             _engine.Start();
+
+            Logger.Info("Service started");
         }
 
         public void ManualStop()
         {
+            Logger.Info("Stopping service");
+
             _server.Stop();
             _engine.Stop();
 
             _plugins.Clear();
+
+            Logger.Info("Service stopped");
         }
 
         protected override void OnStart(string[] args)
@@ -74,6 +81,8 @@ namespace Micser.Engine
 
         private void LoadPlugins(IUnityContainer container)
         {
+            Logger.Info("Loading plugins");
+
             _plugins.Clear();
 
             _plugins.Add(new InfrastructureModule());
@@ -91,13 +100,12 @@ namespace Micser.Engine
                     foreach (var engineModule in modules)
                     {
                         _plugins.Add(engineModule);
+                        Logger.Info($"Loading plugin {engineModule.GetType().AssemblyQualifiedName}");
                     }
                 }
                 catch (Exception ex)
                 {
-                    var logger = ServiceLocator.Current.GetInstance<ILogger>();
-                    logger.Debug(ex);
-                    Debug.WriteLine(ex);
+                    Logger.Debug(ex);
                 }
             }
 
@@ -105,6 +113,8 @@ namespace Micser.Engine
             {
                 engineModule.RegisterTypes(container);
             }
+
+            Logger.Info("Plugins loaded");
         }
     }
 }
