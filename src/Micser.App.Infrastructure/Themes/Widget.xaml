@@ -18,7 +18,7 @@
         <Setter Property="BorderBrush" Value="Black" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="MinWidth" Value="25" />
-        <Setter Property="MinHeight" Value="25" />
+        <Setter Property="MinHeight" Value="35" />
         <Setter Property="Width" Value="Auto" />
         <Setter Property="Height" Value="Auto" />
         <Setter Property="SnapsToDevicePixels" Value="True" />

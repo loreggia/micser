@@ -1,12 +1,12 @@
-﻿using System;
+﻿using Micser.Common;
+using NLog;
+using NLog.Config;
+using NLog.Targets;
+using System;
 using System.IO;
 using System.Linq;
 using System.ServiceProcess;
 using System.Threading;
-using Micser.Common;
-using NLog;
-using NLog.Config;
-using NLog.Targets;
 
 namespace Micser.Engine
 {
@@ -26,9 +26,13 @@ namespace Micser.Engine
             config.AddTarget(new FileTarget("FileTarget")
             {
                 ArchiveNumbering = ArchiveNumberingMode.DateAndSequence,
+                ArchiveOldFileOnStartup = true,
+                MaxArchiveFiles = 10,
                 FileName = Path.Combine(Globals.AppDataFolder, "Micser.Engine.log"),
                 FileNameKind = FilePathKind.Absolute
             });
+            config.AddRuleForAllLevels("ConsoleTarget");
+            config.AddRuleForAllLevels("FileTarget");
 
             LogManager.Configuration = config;
 
@@ -44,7 +48,7 @@ namespace Micser.Engine
                 }
             }
 
-            ServiceBase.Run(new ServiceBase[] {service});
+            ServiceBase.Run(new ServiceBase[] { service });
         }
     }
 }
