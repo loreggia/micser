@@ -21,7 +21,7 @@ namespace Micser.App.Infrastructure.Widgets
             nameof(GridSize), typeof(double), typeof(WidgetPanel), new PropertyMetadata(25d));
 
         public static readonly DependencyProperty IsGridVisibleProperty = DependencyProperty.Register(
-            nameof(IsGridVisible), typeof(bool), typeof(WidgetPanel), new PropertyMetadata(false));
+            nameof(IsGridVisible), typeof(bool), typeof(WidgetPanel), new PropertyMetadata(false, OnIsGridVisiblePropertyChanged));
 
         public static readonly DependencyProperty WidgetFactoryProperty = DependencyProperty.Register(
             nameof(WidgetFactory), typeof(IWidgetFactory), typeof(WidgetPanel),
@@ -200,6 +200,8 @@ namespace Micser.App.Infrastructure.Widgets
                     _widgets.Add(widget);
                 }
 
+                SnapWidgetsToGrid();
+
                 e.Handled = true;
             }
         }
@@ -256,17 +258,6 @@ namespace Micser.App.Infrastructure.Widgets
             e.Handled = true;
         }
 
-        protected override void OnMouseUp(MouseButtonEventArgs e)
-        {
-            base.OnMouseUp(e);
-
-            // todo snapping
-            foreach (var widget in Widgets)
-            {
-                SnapToGrid(widget);
-            }
-        }
-
         private static void OnConnectionsSourcePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var panel = (WidgetPanel)d;
@@ -282,6 +273,15 @@ namespace Micser.App.Infrastructure.Widgets
             }
 
             panel.RefreshConnections();
+        }
+
+        private static void OnIsGridVisiblePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            var panel = (WidgetPanel)d;
+            if (!(e.NewValue is bool b) || !b)
+            {
+                panel.SnapWidgetsToGrid();
+            }
         }
 
         private static void OnWidgetFactoryPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -458,24 +458,7 @@ namespace Micser.App.Infrastructure.Widgets
             }
         }
 
-        private void SnapToGrid(Widget widget)
-        {
-            // snap position
-            var left = widget.Position.X;
-            var top = widget.Position.Y;
-            SnapToRasterSize(ref left);
-            SnapToRasterSize(ref top);
-            widget.Position = new Point(left, top);
-
-            // snap size
-            var width = widget.Size.Width;
-            var height = widget.Size.Height;
-            SnapToRasterSize(ref width);
-            SnapToRasterSize(ref height);
-            widget.Size = new Size(width, height);
-        }
-
-        private void SnapToRasterSize(ref double value)
+        private void SnapValueToGridSize(ref double value)
         {
             var snap = value % GridSize;
 
@@ -489,6 +472,26 @@ namespace Micser.App.Infrastructure.Widgets
             }
 
             value += snap;
+        }
+
+        private void SnapWidgetsToGrid()
+        {
+            foreach (var widget in Widgets)
+            {
+                // snap position
+                var left = widget.Position.X;
+                var top = widget.Position.Y;
+                SnapValueToGridSize(ref left);
+                SnapValueToGridSize(ref top);
+                widget.Position = new Point(left, top);
+
+                // snap size
+                var width = widget.Size.Width;
+                var height = widget.Size.Height;
+                SnapValueToGridSize(ref width);
+                SnapValueToGridSize(ref height);
+                widget.Size = new Size(width, height);
+            }
         }
 
         private void Widgets_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
