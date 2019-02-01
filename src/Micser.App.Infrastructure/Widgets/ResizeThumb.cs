@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls.Primitives;
-using System.Windows.Media;
 
 namespace Micser.App.Infrastructure.Widgets
 {
@@ -13,9 +12,13 @@ namespace Micser.App.Infrastructure.Widgets
         public ResizeThumb()
         {
             DragDelta += ResizeThumb_DragDelta;
+            DragStarted += ResizeThumb_DragStarted;
+            DragCompleted += ResizeThumb_DragCompleted;
         }
 
-        private Widget ParentWidget => this.GetParentOfType<Widget>();
+        private Widget Widget => this.GetParentOfType<Widget>();
+
+        private WidgetPanel WidgetPanel => this.GetParentOfType<WidgetPanel>();
 
         private static void CalculateDragLimits(IEnumerable<ISelectable> selectedItems, out double minLeft, out double minTop,
                                                 out double minDeltaHorizontal, out double minDeltaVertical)
@@ -41,66 +44,75 @@ namespace Micser.App.Infrastructure.Widgets
             }
         }
 
+        private void ResizeThumb_DragCompleted(object sender, DragCompletedEventArgs e)
+        {
+            WidgetPanel.IsGridVisible = false;
+        }
+
         private void ResizeThumb_DragDelta(object sender, DragDeltaEventArgs e)
         {
-            var widget = ParentWidget;
-            if (widget == null)
+            var widget = Widget;
+            var panel = WidgetPanel;
+
+            if (widget == null || WidgetPanel == null || !widget.IsSelected)
             {
                 return;
             }
 
-            if (VisualTreeHelper.GetParent(widget) is WidgetPanel panel && widget.IsSelected)
+            var widgets = panel.Widgets.Where(w => w.IsSelected).ToArray();
+
+            CalculateDragLimits(widgets, out var minLeft, out var minTop, out var minDeltaHorizontal, out var minDeltaVertical);
+
+            foreach (var w in widgets)
             {
-                var widgets = panel.Widgets.Where(w => w.IsSelected).ToArray();
-
-                CalculateDragLimits(widgets, out var minLeft, out var minTop, out var minDeltaHorizontal, out var minDeltaVertical);
-
-                foreach (var w in widgets)
+                if (w == null)
                 {
-                    if (w == null)
-                    {
-                        continue;
-                    }
-
-                    double dragDeltaVertical;
-                    var size = w.Size;
-                    var position = w.Position;
-
-                    switch (VerticalAlignment)
-                    {
-                        case VerticalAlignment.Bottom:
-                            dragDeltaVertical = Math.Min(-e.VerticalChange, minDeltaVertical);
-                            size.Height = w.ActualHeight - dragDeltaVertical;
-                            break;
-
-                        case VerticalAlignment.Top:
-                            dragDeltaVertical = Math.Min(Math.Max(-minTop, e.VerticalChange), minDeltaVertical);
-                            position.Y += dragDeltaVertical;
-                            size.Height = w.ActualHeight - dragDeltaVertical;
-                            break;
-                    }
-
-                    double dragDeltaHorizontal;
-                    switch (HorizontalAlignment)
-                    {
-                        case HorizontalAlignment.Left:
-                            dragDeltaHorizontal = Math.Min(Math.Max(-minLeft, e.HorizontalChange), minDeltaHorizontal);
-                            position.X += dragDeltaHorizontal;
-                            size.Width = w.ActualWidth - dragDeltaHorizontal;
-                            break;
-
-                        case HorizontalAlignment.Right:
-                            dragDeltaHorizontal = Math.Min(-e.HorizontalChange, minDeltaHorizontal);
-                            size.Width = w.ActualWidth - dragDeltaHorizontal;
-                            break;
-                    }
-
-                    w.Position = position;
-                    w.Size = size;
+                    continue;
                 }
 
-                e.Handled = true;
+                double dragDeltaVertical;
+                var size = w.Size;
+                var position = w.Position;
+
+                switch (VerticalAlignment)
+                {
+                    case VerticalAlignment.Bottom:
+                        dragDeltaVertical = Math.Min(-e.VerticalChange, minDeltaVertical);
+                        size.Height = w.ActualHeight - dragDeltaVertical;
+                        break;
+
+                    case VerticalAlignment.Top:
+                        dragDeltaVertical = Math.Min(Math.Max(-minTop, e.VerticalChange), minDeltaVertical);
+                        position.Y += dragDeltaVertical;
+                        size.Height = w.ActualHeight - dragDeltaVertical;
+                        break;
+                }
+
+                double dragDeltaHorizontal;
+                switch (HorizontalAlignment)
+                {
+                    case HorizontalAlignment.Left:
+                        dragDeltaHorizontal = Math.Min(Math.Max(-minLeft, e.HorizontalChange), minDeltaHorizontal);
+                        position.X += dragDeltaHorizontal;
+                        size.Width = w.ActualWidth - dragDeltaHorizontal;
+                        break;
+
+                    case HorizontalAlignment.Right:
+                        dragDeltaHorizontal = Math.Min(-e.HorizontalChange, minDeltaHorizontal);
+                        size.Width = w.ActualWidth - dragDeltaHorizontal;
+                        break;
+                }
+
+                w.Position = position;
+                w.Size = size;
             }
+
+            e.Handled = true;
+        }
+
+        private void ResizeThumb_DragStarted(object sender, DragStartedEventArgs e)
+        {
+            WidgetPanel.IsGridVisible = true;
         }
     }
 }
