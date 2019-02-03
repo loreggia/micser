@@ -12,10 +12,10 @@ namespace Micser.Engine.Audio
     public sealed class AudioEngine : IAudioEngine
     {
         private readonly IUnityContainer _container;
-        private readonly IDatabase _database;
+        private readonly IUnitOfWorkFactory _database;
         private readonly ILogger _logger;
 
-        public AudioEngine(IUnityContainer container, IDatabase database, ILogger logger)
+        public AudioEngine(IUnityContainer container, IUnitOfWorkFactory database, ILogger logger)
         {
             _container = container;
             _database = database;

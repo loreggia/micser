@@ -1,10 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Windows;
-using CommonServiceLocator;
+﻿using CommonServiceLocator;
 using Micser.App.Infrastructure;
 using Micser.App.Infrastructure.Themes;
 using Micser.Common;
@@ -16,6 +10,12 @@ using Prism.Events;
 using Prism.Ioc;
 using Prism.Modularity;
 using Prism.Unity;
+using System;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Reflection;
+using System.Windows;
 using Unity;
 using Unity.Injection;
 
@@ -105,7 +105,7 @@ namespace Micser.App
             // register types that MainShell depends on here..
             var container = containerRegistry.GetContainer();
             container.RegisterType<ILogger>(new InjectionFactory(c => LogManager.GetCurrentClassLogger()));
-            container.RegisterSingleton<IDatabase>(new InjectionFactory(c => new Database(Globals.AppDbLocation, c.Resolve<ILogger>())));
+            container.RegisterInstance<IUnitOfWorkFactory>(new UnitOfWorkFactory(() => container.Resolve<IUnitOfWork>()));
 
             containerRegistry.RegisterSingleton<ISettingsService, SettingsService>();
         }

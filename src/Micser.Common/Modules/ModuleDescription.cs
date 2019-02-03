@@ -2,7 +2,7 @@
 
 namespace Micser.Common.Modules
 {
-    public class ModuleDescription : Model
+    public class ModuleDescription
     {
         public ModuleState ModuleState { get; set; }
         public string ModuleType { get; set; }

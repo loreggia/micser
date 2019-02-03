@@ -19,7 +19,7 @@ namespace Micser.App.ViewModels
         public const string WidgetsConfigurationKey = "Widgets";
 
         private readonly ObservableCollection<ConnectionViewModel> _connections;
-        private readonly IDatabase _database;
+        private readonly IUnitOfWorkFactory _database;
         private readonly ILogger _logger;
         private readonly ModulesApiClient _modulesApiClient;
         private readonly IWidgetRegistry _widgetRegistry;
@@ -27,7 +27,7 @@ namespace Micser.App.ViewModels
         private IEnumerable<WidgetDescription> _availableWidgets;
         private bool _isLoading;
 
-        public MainViewModel(IDatabase database, IWidgetFactory widgetFactory, IWidgetRegistry widgetRegistry, ILogger logger,
+        public MainViewModel(IUnitOfWorkFactory database, IWidgetFactory widgetFactory, IWidgetRegistry widgetRegistry, ILogger logger,
                     ModulesApiClient modulesApiClient)
         {
             _database = database;

@@ -42,7 +42,7 @@ namespace Micser.Engine
             var container = new UnityContainer();
 
             container.RegisterType<ILogger>(new InjectionFactory(c => LogManager.GetCurrentClassLogger()));
-            container.RegisterSingleton<IDatabase>(new InjectionFactory(c => new Database(Globals.EngineDbLocation, c.Resolve<ILogger>())));
+            container.RegisterInstance<IUnitOfWorkFactory>(new UnitOfWorkFactory(() => container.Resolve<IUnitOfWork>()));
             container.RegisterSingleton<IAudioEngine, AudioEngine>();
             container.RegisterSingleton<IServer, Server>();
 

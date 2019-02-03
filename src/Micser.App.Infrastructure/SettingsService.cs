@@ -1,17 +1,17 @@
-﻿using System.Collections.Concurrent;
+﻿using Micser.Common.DataAccess;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using Micser.Common.DataAccess;
 
 namespace Micser.App.Infrastructure
 {
     public class SettingsService : ISettingsService
     {
         private const string SettingsTableName = "Settings";
-        private readonly IDatabase _database;
+        private readonly IUnitOfWorkFactory _database;
 
         private readonly IDictionary<string, object> _settings;
 
-        public SettingsService(IDatabase database)
+        public SettingsService(IUnitOfWorkFactory database)
         {
             _settings = new ConcurrentDictionary<string, object>();
 
@@ -26,7 +26,7 @@ namespace Micser.App.Infrastructure
             {
                 if (_settings.ContainsKey(key))
                 {
-                    return _settings[key] is T ? (T) _settings[key] : defaultValue;
+                    return _settings[key] is T ? (T)_settings[key] : defaultValue;
                 }
             }
 
@@ -35,27 +35,32 @@ namespace Micser.App.Infrastructure
 
         public void Load()
         {
-            var context = _database.GetContext();
-//            var settings = context.GetObject<IDictionary<string, object>>(SettingsTableName);
-//
-//            if (settings != null)
-//            {
-//                lock (_settings)
-//                {
-//                    _settings.Clear();
-//                    settings.ForEach(p => _settings.Add(p.Key, p.Value));
-//                }
-//            }
+            using (var uow = _database.Create())
+            {
+            }
+
+            //            var settings = context.GetObject<IDictionary<string, object>>(SettingsTableName);
+            //
+            //            if (settings != null)
+            //            {
+            //                lock (_settings)
+            //                {
+            //                    _settings.Clear();
+            //                    settings.ForEach(p => _settings.Add(p.Key, p.Value));
+            //                }
+            //            }
         }
 
         public void Save()
         {
-            var context = _database.GetContext();
-//            lock (_settings)
-//            {
-//                context.SetObject(_settings, SettingsTableName);
-//                context.Save();
-//            }
+            using (var uow = _database.Create())
+            {
+            }
+            //            lock (_settings)
+            //            {
+            //                context.SetObject(_settings, SettingsTableName);
+            //                context.Save();
+            //            }
         }
 
         public void SetSetting<T>(string key, T value)

@@ -5,16 +5,15 @@ using Micser.Engine.Infrastructure;
 using Nancy;
 using Nancy.ModelBinding;
 using System;
-using System.Linq;
 
 namespace Micser.Engine.Api.Controllers
 {
     public class ModulesController : ApiController
     {
         private readonly IAudioEngine _audioEngine;
-        private readonly IDatabase _database;
+        private readonly IUnitOfWorkFactory _database;
 
-        public ModulesController(IAudioEngine audioEngine, IDatabase database)
+        public ModulesController(IAudioEngine audioEngine, IUnitOfWorkFactory database)
             : base("modules")
         {
             _audioEngine = audioEngine;
@@ -25,11 +24,18 @@ namespace Micser.Engine.Api.Controllers
             Put["/{id:guid}"] = p => UpdateModule(p.id);
         }
 
+        private dynamic DeleteModule(Guid id)
+        {
+            using (var uow = _database.Create())
+            {
+            }
+        }
+
         private dynamic GetAll()
         {
-            using (var ctx = _database.GetContext())
+            using (var ctx = _database.Create())
             {
-                return ctx.GetCollection<ModuleDescription>().ToArray();
+                return ctx.Modules.GetAll();
             }
         }
 
@@ -45,7 +51,7 @@ namespace Micser.Engine.Api.Controllers
 
             module.Id = Guid.NewGuid();
 
-            using (var ctx = _database.GetContext())
+            using (var ctx = _database.Create())
             {
                 ctx.GetCollection<ModuleDescription>().Insert(module);
                 ctx.Save();
@@ -58,7 +64,7 @@ namespace Micser.Engine.Api.Controllers
 
         private dynamic UpdateModule(Guid id)
         {
-            using (var ctx = _database.GetContext())
+            using (var ctx = _database.Create())
             {
                 var descriptions = ctx.GetCollection<ModuleDescription>();
                 var module = descriptions.GetById(id);
