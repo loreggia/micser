@@ -3,16 +3,15 @@ using Micser.Common.Modules;
 using Micser.Engine.Audio;
 using Micser.Engine.Infrastructure;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Micser.Engine.Api.Controllers
 {
     public class ModuleConnectionsController : ApiController
     {
         private readonly IAudioEngine _audioEngine;
-        private readonly IDatabase _database;
+        private readonly IUnitOfWorkFactory _database;
 
-        public ModuleConnectionsController(IDatabase database, IAudioEngine audioEngine)
+        public ModuleConnectionsController(IUnitOfWorkFactory database, IAudioEngine audioEngine)
             : base("moduleconnections")
         {
             _database = database;
@@ -22,8 +21,10 @@ namespace Micser.Engine.Api.Controllers
 
         private IEnumerable<ModuleConnectionDescription> GetAll()
         {
-            var db = _database.GetContext();
-            return db.GetCollection<ModuleConnectionDescription>().ToArray();
+            using (var uow = _database.Create())
+            {
+                return uow.ModuleConnections.GetAll();
+            }
         }
     }
 }

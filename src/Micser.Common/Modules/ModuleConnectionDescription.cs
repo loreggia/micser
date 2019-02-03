@@ -2,7 +2,7 @@
 
 namespace Micser.Common.Modules
 {
-    public class ModuleConnectionDescription : Model
+    public class ModuleConnectionDescription
     {
         public ModuleConnectionDescription()
         {

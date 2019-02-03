@@ -26,7 +26,7 @@ namespace Micser.Common.Test.DataAccess
         public void InstantiateDb()
         {
             var fileName = _testFileManager.GetFileName();
-            var db = new Database(fileName, LogManager.CreateNullLogger());
+            var db = new MicserDbContext(fileName, LogManager.CreateNullLogger());
             Assert.NotNull(db);
 
             using (var dbContext = db.GetContext())
@@ -43,7 +43,7 @@ namespace Micser.Common.Test.DataAccess
         public void SaveAndLoadObject()
         {
             var fileName = _testFileManager.GetFileName();
-            var db = new Database(fileName, LogManager.CreateNullLogger());
+            var db = new MicserDbContext(fileName, LogManager.CreateNullLogger());
 
             var id = Guid.NewGuid();
             var now = DateTime.Now;
