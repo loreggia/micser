@@ -4,6 +4,7 @@ using Micser.Engine.Infrastructure;
 using Micser.Engine.Infrastructure.Services;
 using Nancy;
 using Nancy.ModelBinding;
+using System.Collections.Generic;
 
 namespace Micser.Engine.Api.Controllers
 {
@@ -36,7 +37,7 @@ namespace Micser.Engine.Api.Controllers
             return module;
         }
 
-        private dynamic GetAll()
+        private IEnumerable<ModuleDto> GetAll()
         {
             return _moduleService.GetAll();
         }

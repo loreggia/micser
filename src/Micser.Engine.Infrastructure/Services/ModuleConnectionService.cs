@@ -24,6 +24,36 @@ namespace Micser.Engine.Infrastructure.Services
             }
         }
 
+        public bool Insert(ModuleConnectionDto dto)
+        {
+            using (var uow = _uowFactory.Create())
+            {
+                var connections = uow.GetRepository<IModuleConnectionRepository>();
+                var existing = connections.GetBySourceAndTargetIds(dto.SourceId, dto.TargetId);
+
+                if (existing != null)
+                {
+                    dto.Id = existing.Id;
+                    return true;
+                }
+            }
+        }
+
+        private static ModuleConnection GetModuleConnection(ModuleConnectionDto dto)
+        {
+            if (dto == null)
+            {
+                return null;
+            }
+
+            return new ModuleConnection
+            {
+                Id = dto.Id,
+                SourceModuleId = dto.SourceId,
+                TargetModuleId = dto.TargetId
+            };
+        }
+
         private static ModuleConnectionDto GetModuleConnectionDto(ModuleConnection mc)
         {
             if (mc == null)
@@ -31,7 +61,12 @@ namespace Micser.Engine.Infrastructure.Services
                 return null;
             }
 
-            return new ModuleConnectionDto(mc.SourceModuleId, mc.TargetModuleId);
+            return new ModuleConnectionDto
+            {
+                Id = mc.Id,
+                SourceId = mc.SourceModuleId,
+                TargetId = mc.TargetModuleId
+            };
         }
     }
 }
