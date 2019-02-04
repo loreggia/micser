@@ -114,6 +114,7 @@ namespace Micser.App.ViewModels
                         {
                             var type = Type.GetType(module.WidgetType);
                             var vm = WidgetFactory.CreateViewModel(type);
+                            vm.Id = module.Id;
                             vm.LoadState(module.WidgetState);
                             _widgets.Add(vm);
                         }
