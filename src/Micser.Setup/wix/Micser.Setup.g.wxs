@@ -151,6 +151,21 @@
               <File Id="Unity.ServiceLocation.dll_1183268791" Source="App\Unity.ServiceLocation.dll" />
             </Component>
 
+            <Directory Id="INSTALLDIR.App.x64" Name="x64">
+
+              <Component Id="Component.SQLite.Interop.dll_1463789569" Guid="6fe30b47-2577-43ad-9095-1861935ff12a">
+                <File Id="SQLite.Interop.dll_1463789569" Source="App\x64\SQLite.Interop.dll" />
+              </Component>
+
+            </Directory>
+
+            <Directory Id="INSTALLDIR.App.x86" Name="x86">
+
+              <Component Id="Component.SQLite.Interop.dll_768334697" Guid="6fe30b47-2577-43ad-9095-1861beee8a4d">
+                <File Id="SQLite.Interop.dll_768334697" Source="App\x86\SQLite.Interop.dll" />
+              </Component>
+
+            </Directory>
           </Directory>
 
           <Directory Id="INSTALLDIR.Driver" Name="Driver">
@@ -266,6 +281,8 @@
       <ComponentRef Id="Component.Unity.Interception.dll_288550111" />
       <ComponentRef Id="Component.Unity.RegistrationByConvention.dll_839282795" />
       <ComponentRef Id="Component.Unity.ServiceLocation.dll_1183268791" />
+      <ComponentRef Id="Component.SQLite.Interop.dll_1463789569" />
+      <ComponentRef Id="Component.SQLite.Interop.dll_768334697" />
       <ComponentRef Id="Component.Micser.Vac.Package.cer_837308400" />
       <ComponentRef Id="Component.micser.vac.driver.cat_1881001242" />
       <ComponentRef Id="Component.Micser.Vac.Driver.inf_1342068543" />
