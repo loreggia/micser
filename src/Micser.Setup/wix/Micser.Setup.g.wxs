@@ -23,6 +23,14 @@
               <File Id="CSCore.dll_1469794440" Source="App\CSCore.dll" />
             </Component>
 
+            <Component Id="Component.EntityFramework.dll_444040168" Guid="6fe30b47-2577-43ad-9095-18617255bda7">
+              <File Id="EntityFramework.dll_444040168" Source="App\EntityFramework.dll" />
+            </Component>
+
+            <Component Id="Component.EntityFramework.SqlServer.dll_1753858166" Guid="6fe30b47-2577-43ad-9095-1861ea15c1b8">
+              <File Id="EntityFramework.SqlServer.dll_1753858166" Source="App\EntityFramework.SqlServer.dll" />
+            </Component>
+
             <Component Id="Component.Hardcodet.Wpf.TaskbarNotification.dll_1816670365" Guid="6fe30b47-2577-43ad-9095-186110e2af56">
               <File Id="Hardcodet.Wpf.TaskbarNotification.dll_1816670365" Source="App\Hardcodet.Wpf.TaskbarNotification.dll" />
             </Component>
@@ -91,8 +99,24 @@
               <File Id="Prism.Wpf.dll_953004500" Source="App\Prism.Wpf.dll" />
             </Component>
 
+            <Component Id="Component.SQLite.CodeFirst.dll_1345865147" Guid="6fe30b47-2577-43ad-9095-1861464dfa04">
+              <File Id="SQLite.CodeFirst.dll_1345865147" Source="App\SQLite.CodeFirst.dll" />
+            </Component>
+
             <Component Id="Component.System.Configuration.ConfigurationManager.dll_1048326755" Guid="6fe30b47-2577-43ad-9095-1861cb803ffa">
               <File Id="System.Configuration.ConfigurationManager.dll_1048326755" Source="App\System.Configuration.ConfigurationManager.dll" />
+            </Component>
+
+            <Component Id="Component.System.Data.SQLite.dll_265942448" Guid="6fe30b47-2577-43ad-9095-1861d37ae81d">
+              <File Id="System.Data.SQLite.dll_265942448" Source="App\System.Data.SQLite.dll" />
+            </Component>
+
+            <Component Id="Component.System.Data.SQLite.EF6.dll_149858138" Guid="6fe30b47-2577-43ad-9095-1861bf858635">
+              <File Id="System.Data.SQLite.EF6.dll_149858138" Source="App\System.Data.SQLite.EF6.dll" />
+            </Component>
+
+            <Component Id="Component.System.Data.SQLite.Linq.dll_633665491" Guid="6fe30b47-2577-43ad-9095-1861720a8828">
+              <File Id="System.Data.SQLite.Linq.dll_633665491" Source="App\System.Data.SQLite.Linq.dll" />
             </Component>
 
             <Component Id="Component.System.Windows.Interactivity.dll_716508900" Guid="6fe30b47-2577-43ad-9095-186172e20691">
@@ -210,6 +234,8 @@
     <Feature Id="Complete" Title="Complete" Absent="allow" Level="1">
       <ComponentRef Id="Component.CommonServiceLocator.dll_1043268448" />
       <ComponentRef Id="Component.CSCore.dll_1469794440" />
+      <ComponentRef Id="Component.EntityFramework.dll_444040168" />
+      <ComponentRef Id="Component.EntityFramework.SqlServer.dll_1753858166" />
       <ComponentRef Id="Component.Hardcodet.Wpf.TaskbarNotification.dll_1816670365" />
       <ComponentRef Id="Component.Micser.App.exe_1064145124" />
       <ComponentRef Id="Component.Micser.App.exe.config_222573622" />
@@ -227,7 +253,11 @@
       <ComponentRef Id="Component.Prism.dll_717679119" />
       <ComponentRef Id="Component.Prism.Unity.Wpf.dll_1974939844" />
       <ComponentRef Id="Component.Prism.Wpf.dll_953004500" />
+      <ComponentRef Id="Component.SQLite.CodeFirst.dll_1345865147" />
       <ComponentRef Id="Component.System.Configuration.ConfigurationManager.dll_1048326755" />
+      <ComponentRef Id="Component.System.Data.SQLite.dll_265942448" />
+      <ComponentRef Id="Component.System.Data.SQLite.EF6.dll_149858138" />
+      <ComponentRef Id="Component.System.Data.SQLite.Linq.dll_633665491" />
       <ComponentRef Id="Component.System.Windows.Interactivity.dll_716508900" />
       <ComponentRef Id="Component.Unity.Abstractions.dll_1566875426" />
       <ComponentRef Id="Component.Unity.Configuration.dll_1212215679" />
