@@ -106,7 +106,9 @@ namespace Micser.Engine.Infrastructure.Services
             return new ModuleConnection
             {
                 Id = dto.Id,
+                SourceConnectorName = dto.SourceConnectorName,
                 SourceModuleId = dto.SourceId,
+                TargetConnectorName = dto.TargetConnectorName,
                 TargetModuleId = dto.TargetId
             };
         }
@@ -121,7 +123,9 @@ namespace Micser.Engine.Infrastructure.Services
             return new ModuleConnectionDto
             {
                 Id = mc.Id,
+                SourceConnectorName = mc.SourceConnectorName,
                 SourceId = mc.SourceModuleId,
+                TargetConnectorName = mc.TargetConnectorName,
                 TargetId = mc.TargetModuleId
             };
         }

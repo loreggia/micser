@@ -95,12 +95,12 @@ namespace Micser.App.Infrastructure.Widgets
             if (sourceConnector.DataContext is ConnectorViewModel sourceVm &&
                 sinkConnector.DataContext is ConnectorViewModel sinkVm &&
                 ConnectionsSource != null &&
-                !ConnectionsSource.Any(c => c.Source == sourceVm && c.Sink == sinkVm))
+                !ConnectionsSource.Any(c => c.Source == sourceVm && c.Target == sinkVm))
             {
                 var vm = new ConnectionViewModel
                 {
                     Source = sourceVm,
-                    Sink = sinkVm
+                    Target = sinkVm
                 };
 
                 sourceVm.Connection = vm;
@@ -329,7 +329,7 @@ namespace Micser.App.Infrastructure.Widgets
                         .FirstOrDefault(c => c.DataContext == vm.Source);
             var sink = _widgets
                       .SelectMany(w => w.InputConnectors ?? new Connector[0])
-                      .FirstOrDefault(c => c.DataContext == vm.Sink);
+                      .FirstOrDefault(c => c.DataContext == vm.Target);
 
             if (source != null && sink != null && !_connections.Any(c => ReferenceEquals(c.Source, source) && ReferenceEquals(c.Sink, sink)))
             {

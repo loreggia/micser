@@ -2,7 +2,7 @@
 
 namespace Micser.Common.Modules
 {
-    public class ModuleDto
+    public class ModuleDto : IIdentifiable
     {
         public long Id { get; set; }
         public ModuleState ModuleState { get; set; }
