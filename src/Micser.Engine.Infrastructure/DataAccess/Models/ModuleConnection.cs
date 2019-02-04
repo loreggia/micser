@@ -8,11 +8,11 @@ namespace Micser.Engine.Infrastructure.DataAccess.Models
         public virtual Module SourceModule { get; set; }
 
         [ForeignKey(nameof(SourceModule))]
-        public int SourceModuleId { get; set; }
+        public long SourceModuleId { get; set; }
 
         public virtual Module TargetModule { get; set; }
 
         [ForeignKey(nameof(TargetModule))]
-        public int TargetModuleId { get; set; }
+        public long TargetModuleId { get; set; }
     }
 }
