@@ -260,3 +260,6 @@ paket-files/
 __pycache__/
 *.pyc
 *.msi
+
+# Micser specific
+/src/Micser.Setup/wix/Micser.Setup.g.wxs
