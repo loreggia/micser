@@ -1,5 +1,6 @@
 ﻿using CommonServiceLocator;
 using Micser.App.Infrastructure;
+using Micser.App.Infrastructure.DataAccess;
 using Micser.App.Infrastructure.Themes;
 using Micser.Common;
 using Micser.Common.DataAccess;
@@ -11,6 +12,7 @@ using Prism.Ioc;
 using Prism.Modularity;
 using Prism.Unity;
 using System;
+using System.Data.Entity;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -107,6 +109,7 @@ namespace Micser.App
             var container = containerRegistry.GetContainer();
             container.RegisterType<ILogger>(new InjectionFactory(c => LogManager.GetCurrentClassLogger()));
 
+            container.RegisterType<DbContext, AppDbContext>();
             container.RegisterInstance<IRepositoryFactory>(new RepositoryFactory((t, c) => container.Resolve(t, new ParameterOverride("context", c))));
             container.RegisterInstance<IUnitOfWorkFactory>(new UnitOfWorkFactory(() => container.Resolve<IUnitOfWork>()));
             container.RegisterType<IUnitOfWork, UnitOfWork>();
