@@ -1,13 +1,11 @@
-﻿using Micser.Common.DataAccess.Repositories;
-using System;
+﻿using System;
 
 namespace Micser.Common.DataAccess
 {
     public interface IUnitOfWork : IDisposable
     {
-        IModuleConnectionRepository ModuleConnections { get; }
-        IModuleRepository Modules { get; }
-
         int Complete();
+
+        T GetRepository<T>() where T : class;
     }
 }

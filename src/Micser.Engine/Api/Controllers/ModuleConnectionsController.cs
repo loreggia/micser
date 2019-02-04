@@ -2,7 +2,9 @@
 using Micser.Common.Modules;
 using Micser.Engine.Audio;
 using Micser.Engine.Infrastructure;
+using Micser.Engine.Infrastructure.DataAccess.Repositories;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Micser.Engine.Api.Controllers
 {
@@ -19,11 +21,12 @@ namespace Micser.Engine.Api.Controllers
             Get["/"] = _ => GetAll();
         }
 
-        private IEnumerable<ModuleConnectionDescription> GetAll()
+        private IEnumerable<ModuleConnectionDto> GetAll()
         {
             using (var uow = _database.Create())
             {
-                return uow.ModuleConnections.GetAll();
+                var connections = uow.GetRepository<IModuleConnectionRepository>();
+                return connections.GetAll().Select(c => new ModuleConnectionDto(c.SourceModuleId, c.TargetModuleId));
             }
         }
     }

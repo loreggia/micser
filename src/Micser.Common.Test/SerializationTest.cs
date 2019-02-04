@@ -1,7 +1,6 @@
 ﻿using Micser.Common.Modules;
 using Micser.Common.Widgets;
 using Newtonsoft.Json;
-using System;
 using System.Windows;
 using Xunit;
 
@@ -12,9 +11,9 @@ namespace Micser.Common.Test
         [Fact]
         public void Serialize_Deserialize_ModuleDescription()
         {
-            var description = new ModuleDescription
+            var description = new ModuleDto
             {
-                Id = Guid.NewGuid(),
+                Id = 123,
                 ModuleState = new ModuleState(),
                 ModuleType = "TestType1",
                 WidgetState = new WidgetState
@@ -29,13 +28,13 @@ namespace Micser.Common.Test
 
             var serialized = JsonConvert.SerializeObject(description, Formatting.Indented);
 
-            var result = JsonConvert.DeserializeObject<ModuleDescription>(serialized);
+            var result = JsonConvert.DeserializeObject<ModuleDto>(serialized);
 
             Assert.NotNull(result);
             Assert.NotNull(result.ModuleState);
             Assert.NotNull(result.WidgetState);
 
-            Assert.Equal(description.Id, result.Id);
+            Assert.Equal(123, result.Id);
             Assert.Equal("TestType1", result.ModuleType);
             Assert.Equal("TestType2", result.WidgetType);
 

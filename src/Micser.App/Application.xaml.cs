@@ -18,6 +18,7 @@ using System.Reflection;
 using System.Windows;
 using Unity;
 using Unity.Injection;
+using Unity.Resolution;
 
 namespace Micser.App
 {
@@ -105,7 +106,10 @@ namespace Micser.App
             // register types that MainShell depends on here..
             var container = containerRegistry.GetContainer();
             container.RegisterType<ILogger>(new InjectionFactory(c => LogManager.GetCurrentClassLogger()));
+
+            container.RegisterInstance<IRepositoryFactory>(new RepositoryFactory((t, c) => container.Resolve(t, new ParameterOverride("context", c))));
             container.RegisterInstance<IUnitOfWorkFactory>(new UnitOfWorkFactory(() => container.Resolve<IUnitOfWork>()));
+            container.RegisterType<IUnitOfWork, UnitOfWork>();
 
             containerRegistry.RegisterSingleton<ISettingsService, SettingsService>();
         }

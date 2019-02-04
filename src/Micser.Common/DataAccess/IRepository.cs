@@ -13,7 +13,7 @@ namespace Micser.Common.DataAccess
 
         IEnumerable<TEntity> Find(Expression<Func<TEntity, bool>> predicate);
 
-        TEntity Get(int id);
+        TEntity Get(long id);
 
         IEnumerable<TEntity> GetAll();
 

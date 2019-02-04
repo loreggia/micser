@@ -1,5 +1,4 @@
 ﻿using Micser.Common.Modules;
-using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -12,24 +11,24 @@ namespace Micser.App.Infrastructure.Api
         {
         }
 
-        public async Task<ServiceResult<ModuleDescription>> CreateAsync(ModuleDescription description)
+        public async Task<ServiceResult<ModuleDto>> CreateAsync(ModuleDto description)
         {
-            return await PostAsync<ModuleDescription>(null, description);
+            return await PostAsync<ModuleDto>(null, description);
         }
 
-        public async Task<ServiceResult<bool>> DeleteAsync(Guid id)
+        public async Task<ServiceResult<bool>> DeleteAsync(long id)
         {
             return await DeleteAsync<bool>(null, id);
         }
 
-        public async Task<ServiceResult<IEnumerable<ModuleDescription>>> GetAllAsync()
+        public async Task<ServiceResult<IEnumerable<ModuleDto>>> GetAllAsync()
         {
-            return await GetAsync<IEnumerable<ModuleDescription>>(null);
+            return await GetAsync<IEnumerable<ModuleDto>>(null);
         }
 
-        public async Task<ServiceResult<ModuleDescription>> UpdateAsync(ModuleDescription description)
+        public async Task<ServiceResult<ModuleDto>> UpdateAsync(ModuleDto description)
         {
-            return await PutAsync<ModuleDescription>(null, description.Id, description);
+            return await PutAsync<ModuleDto>(null, description.Id, description);
         }
     }
 }

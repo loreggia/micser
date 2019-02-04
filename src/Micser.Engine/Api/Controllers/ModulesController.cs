@@ -1,10 +1,14 @@
 ﻿using Micser.Common.DataAccess;
 using Micser.Common.Modules;
+using Micser.Common.Widgets;
 using Micser.Engine.Audio;
 using Micser.Engine.Infrastructure;
+using Micser.Engine.Infrastructure.DataAccess.Models;
+using Micser.Engine.Infrastructure.DataAccess.Repositories;
 using Nancy;
 using Nancy.ModelBinding;
-using System;
+using Newtonsoft.Json;
+using System.Linq;
 
 namespace Micser.Engine.Api.Controllers
 {
@@ -21,68 +25,105 @@ namespace Micser.Engine.Api.Controllers
 
             Get["/"] = _ => GetAll();
             Post["/"] = _ => InsertModule();
-            Put["/{id:guid}"] = p => UpdateModule(p.id);
+            Put["/{id:long}"] = p => UpdateModule(p.id);
+            Delete["/{id:long}"] = p => DeleteModule(p.id);
         }
 
-        private dynamic DeleteModule(Guid id)
+        private static ModuleDto GetModuleDto(Module m)
+        {
+            return new ModuleDto
+            {
+                Id = m.Id,
+                ModuleState = JsonConvert.DeserializeObject<ModuleState>(m.ModuleStateJson),
+                ModuleType = m.ModuleType,
+                WidgetState = JsonConvert.DeserializeObject<WidgetState>(m.WidgetStateJson),
+                WidgetType = m.WidgetType
+            };
+        }
+
+        private dynamic DeleteModule(long id)
         {
             using (var uow = _database.Create())
             {
+                var modules = uow.GetRepository<IModuleRepository>();
+                var module = modules.Get(id);
+                if (module == null)
+                {
+                    return HttpStatusCode.NotFound;
+                }
+
+                modules.Remove(module);
+                uow.Complete();
+
+                return module;
             }
         }
 
         private dynamic GetAll()
         {
-            using (var ctx = _database.Create())
+            using (var uow = _database.Create())
             {
-                return ctx.Modules.GetAll();
+                var modules = uow.GetRepository<IModuleRepository>();
+                return modules.GetAll().Select(GetModuleDto);
             }
         }
 
         private dynamic InsertModule()
         {
-            var module = this.Bind<ModuleDescription>();
+            var moduleDto = this.Bind<ModuleDto>();
 
-            if (string.IsNullOrEmpty(module?.ModuleType) ||
-                string.IsNullOrEmpty(module.WidgetType))
+            if (string.IsNullOrEmpty(moduleDto?.ModuleType) ||
+                string.IsNullOrEmpty(moduleDto.WidgetType))
             {
                 return HttpStatusCode.UnprocessableEntity;
             }
 
-            module.Id = Guid.NewGuid();
-
-            using (var ctx = _database.Create())
+            var module = new Module
             {
-                ctx.GetCollection<ModuleDescription>().Insert(module);
-                ctx.Save();
+                ModuleType = moduleDto.ModuleType,
+                WidgetType = moduleDto.WidgetType,
+                ModuleStateJson = JsonConvert.SerializeObject(moduleDto.ModuleState),
+                WidgetStateJson = JsonConvert.SerializeObject(moduleDto.WidgetState)
+            };
+
+            using (var uow = _database.Create())
+            {
+                var modules = uow.GetRepository<IModuleRepository>();
+                modules.Add(module);
+
+                if (uow.Complete() <= 0)
+                {
+                    return HttpStatusCode.InternalServerError;
+                }
             }
 
-            _audioEngine.AddModule(module);
+            _audioEngine.AddModule(module.Id);
 
             return module;
         }
 
-        private dynamic UpdateModule(Guid id)
+        private dynamic UpdateModule(long id)
         {
-            using (var ctx = _database.Create())
+            var moduleDto = this.Bind<ModuleDto>();
+
+            using (var uow = _database.Create())
             {
-                var descriptions = ctx.GetCollection<ModuleDescription>();
-                var module = descriptions.GetById(id);
+                var modules = uow.GetRepository<IModuleRepository>();
+                var module = modules.Get(id);
 
                 if (module == null)
                 {
                     return HttpStatusCode.NotFound;
                 }
 
-                var model = this.Bind<ModuleDescription>();
-                module.ModuleState = model.ModuleState;
-                module.WidgetState = model.WidgetState;
+                module.ModuleStateJson = JsonConvert.SerializeObject(moduleDto.ModuleState);
+                module.WidgetStateJson = JsonConvert.SerializeObject(moduleDto.WidgetState);
 
-                descriptions.Update(module);
-                ctx.Save();
+                uow.Complete();
 
-                _audioEngine.UpdateModule(module);
-                return module;
+                _audioEngine.UpdateModule(module.Id);
+
+                return GetModuleDto(module);
             }
         }
     }

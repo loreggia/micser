@@ -14,7 +14,7 @@ namespace Micser.App.Infrastructure.Widgets
 
         private string _header;
 
-        private Guid _id;
+        private long _id;
 
         private WidgetState _loadingWidgetState;
 
@@ -35,7 +35,7 @@ namespace Micser.App.Infrastructure.Widgets
             set => SetProperty(ref _header, value);
         }
 
-        public Guid Id
+        public long Id
         {
             get => _id;
             set => SetProperty(ref _id, value);

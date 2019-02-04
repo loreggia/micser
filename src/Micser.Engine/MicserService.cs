@@ -4,6 +4,7 @@ using Micser.Common.Extensions;
 using Micser.Engine.Api;
 using Micser.Engine.Audio;
 using Micser.Engine.Infrastructure;
+using Micser.Engine.Infrastructure.DataAccess.Repositories;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,7 @@ using System.Reflection;
 using System.ServiceProcess;
 using Unity;
 using Unity.Injection;
+using Unity.Resolution;
 
 namespace Micser.Engine
 {
@@ -42,7 +44,14 @@ namespace Micser.Engine
             var container = new UnityContainer();
 
             container.RegisterType<ILogger>(new InjectionFactory(c => LogManager.GetCurrentClassLogger()));
+
+            container.RegisterInstance<IRepositoryFactory>(new RepositoryFactory((t, c) => container.Resolve(t, new ParameterOverride("context", c))));
             container.RegisterInstance<IUnitOfWorkFactory>(new UnitOfWorkFactory(() => container.Resolve<IUnitOfWork>()));
+            container.RegisterType<IUnitOfWork, UnitOfWork>();
+
+            container.RegisterType<IModuleRepository, ModuleRepository>();
+            container.RegisterType<IModuleConnectionRepository, ModuleConnectionRepository>();
+
             container.RegisterSingleton<IAudioEngine, AudioEngine>();
             container.RegisterSingleton<IServer, Server>();
 
