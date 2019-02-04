@@ -97,7 +97,7 @@ namespace Micser.App.Infrastructure.Widgets
                 if (Equals(_connection.Source, _fixConnector))
                 {
                     _connection.Sink = HitConnector;
-                    connectionVm.Sink = connectorVm;
+                    connectionVm.Target = connectorVm;
                 }
                 else
                 {

@@ -2,20 +2,18 @@
 {
     public class ConnectionViewModel : ViewModel
     {
-        private ConnectorViewModel _sink;
+        private long _id;
         private ConnectorViewModel _source;
+        private ConnectorViewModel _target;
 
-        public ConnectorViewModel Sink
+        public event ConnectorChangedEventHandler SinkChanged;
+
+        public event ConnectorChangedEventHandler SourceChanged;
+
+        public long Id
         {
-            get => _sink;
-            set
-            {
-                var oldValue = _sink;
-                if (SetProperty(ref _sink, value))
-                {
-                    OnSinkChanged(new ConnectorChangedEventArgs(oldValue, value));
-                }
-            }
+            get => _id;
+            set => SetProperty(ref _id, value);
         }
 
         public ConnectorViewModel Source
@@ -31,9 +29,18 @@
             }
         }
 
-        public event ConnectorChangedEventHandler SinkChanged;
-
-        public event ConnectorChangedEventHandler SourceChanged;
+        public ConnectorViewModel Target
+        {
+            get => _target;
+            set
+            {
+                var oldValue = _target;
+                if (SetProperty(ref _target, value))
+                {
+                    OnSinkChanged(new ConnectorChangedEventArgs(oldValue, value));
+                }
+            }
+        }
 
         protected virtual void OnSinkChanged(ConnectorChangedEventArgs e)
         {

@@ -61,29 +61,22 @@ namespace Micser.Engine.Api.Controllers
 
         private dynamic UpdateConnection(long id)
         {
-            var connection = _moduleConnectionService.GetById(id);
+            var connectionDto = _moduleConnectionService.GetById(id);
 
-            if (connection == null)
+            if (connectionDto == null)
             {
                 return HttpStatusCode.NotFound;
             }
 
-            var connectionDto = this.Bind<ModuleConnectionDto>();
+            this.BindTo(connectionDto);
+            connectionDto.Id = id;
 
-            if (connectionDto.SourceId <= 0 || connectionDto.TargetId <= 0)
-            {
-                return HttpStatusCode.UnprocessableEntity;
-            }
-
-            connection.SourceId = connectionDto.SourceId;
-            connection.TargetId = connectionDto.TargetId;
-
-            if (!_moduleConnectionService.Update(connection))
+            if (!_moduleConnectionService.Update(connectionDto))
             {
                 return HttpStatusCode.InternalServerError;
             }
 
-            return connection;
+            return connectionDto;
         }
     }
 }

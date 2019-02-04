@@ -46,8 +46,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Api\ApiClient.cs" />
+    <Compile Include="Api\CrudApiClient.cs" />
     <Compile Include="Api\Error.cs" />
     <Compile Include="Api\ErrorList.cs" />
+    <Compile Include="Api\ModuleConnectionsApiClient.cs" />
     <Compile Include="Api\ModulesApiClient.cs" />
     <Compile Include="Api\ServiceResult.cs" />
     <Compile Include="ApplicationEvents.cs" />

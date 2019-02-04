@@ -3,13 +3,13 @@ using Micser.App.Infrastructure.Api;
 using Micser.App.Infrastructure.Widgets;
 using Micser.Common.DataAccess;
 using Micser.Common.Modules;
-using Micser.Common.Widgets;
 using NLog;
 using Prism.Regions;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Linq;
 
 namespace Micser.App.ViewModels
 {
@@ -19,6 +19,7 @@ namespace Micser.App.ViewModels
         public const string WidgetsConfigurationKey = "Widgets";
 
         private readonly ObservableCollection<ConnectionViewModel> _connections;
+        private readonly ModuleConnectionsApiClient _connectionsApiClient;
         private readonly IUnitOfWorkFactory _database;
         private readonly ILogger _logger;
         private readonly ModulesApiClient _modulesApiClient;
@@ -27,13 +28,15 @@ namespace Micser.App.ViewModels
         private IEnumerable<WidgetDescription> _availableWidgets;
         private bool _isLoading;
 
-        public MainViewModel(IUnitOfWorkFactory database, IWidgetFactory widgetFactory, IWidgetRegistry widgetRegistry, ILogger logger,
-                    ModulesApiClient modulesApiClient)
+        public MainViewModel(IUnitOfWorkFactory database, IWidgetFactory widgetFactory, IWidgetRegistry widgetRegistry, ILogger logger)
         {
             _database = database;
             _widgetRegistry = widgetRegistry;
             _logger = logger;
-            _modulesApiClient = modulesApiClient;
+
+            _modulesApiClient = new ModulesApiClient();
+            _connectionsApiClient = new ModuleConnectionsApiClient();
+
             _widgets = new ObservableCollection<WidgetViewModel>();
             _widgets.CollectionChanged += OnWidgetsCollectionChanged;
             _connections = new ObservableCollection<ConnectionViewModel>();
@@ -96,6 +99,7 @@ namespace Micser.App.ViewModels
 
             AvailableWidgets = _widgetRegistry.Widgets;
 
+            // widgets/modules
             var modulesResult = await _modulesApiClient.GetAllAsync();
 
             if (modulesResult.IsSuccess)
@@ -125,71 +129,102 @@ namespace Micser.App.ViewModels
                 _logger.Error(modulesResult);
             }
 
+            // connections
+            var connectionsResult = await _connectionsApiClient.GetAllAsync();
+
+            if (connectionsResult.IsSuccess)
+            {
+                var connections = connectionsResult.Data;
+
+                if (connections != null)
+                {
+                    foreach (var connectionDto in connections)
+                    {
+                        try
+                        {
+                            var sourceWidget = Widgets.FirstOrDefault(w => w.Id == connectionDto.SourceId);
+                            var targetWidget = Widgets.FirstOrDefault(w => w.Id == connectionDto.TargetId);
+
+                            var source = sourceWidget?.OutputConnectors.FirstOrDefault(c => c.Name == connectionDto.SourceConnectorName);
+                            var target = targetWidget?.InputConnectors.FirstOrDefault(c => c.Name == connectionDto.TargetConnectorName);
+
+                            if (source != null && target != null)
+                            {
+                                var cvm = new ConnectionViewModel
+                                {
+                                    Id = connectionDto.Id,
+                                    Source = source,
+                                    Target = target
+                                };
+                                _connections.Add(cvm);
+                                source.Connection = cvm;
+                                target.Connection = cvm;
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.Error(ex, "Could not load widget connection. ID: {0}", connectionDto.Id);
+                        }
+                    }
+                }
+            }
+
             _isLoading = false;
+        }
 
-            //var widgetStates = _configurationService.GetSettingEnumerable<WidgetState>(WidgetsConfigurationKey);
+        private async void CreateConnection(ConnectionViewModel viewModel)
+        {
+            var connectionDto = new ModuleConnectionDto
+            {
+                SourceConnectorName = viewModel.Source.Name,
+                SourceId = viewModel.Source.Widget.Id,
+                TargetConnectorName = viewModel.Target.Name,
+                TargetId = viewModel.Target.Widget.Id
+            };
+            var result = await _connectionsApiClient.CreateAsync(connectionDto);
 
-            //if (widgetStates != null)
-            //{
-            //    foreach (var widgetState in widgetStates)
-            //    {
-            //        //var vm = WidgetFactory.CreateViewModel(widgetState.ViewModelType);
-            //        //vm.Position = widgetState.Position;
-            //        //vm.Size = widgetState.Size;
-            //        //vm.LoadState(widgetState);
-            //        //_widgets.Add(vm);
-            //    }
-            //}
-
-            //var connections = _configurationService.GetSettingEnumerable<ConnectionInfo>(ConnectionsConfigurationKey);
-
-            //if (connections != null)
-            //{
-            //    foreach (var connectionInfo in connections)
-            //    {
-            //        var sourceWidget = Widgets.FirstOrDefault(w => w.Id == connectionInfo.SourceWidgetId);
-            //        var sinkWidget = Widgets.FirstOrDefault(w => w.Id == connectionInfo.SinkWidgetId);
-
-            //        var source = sourceWidget?.OutputConnectors.FirstOrDefault(c => c.Name == connectionInfo.SourceConnectorName);
-            //        var sink = sinkWidget?.InputConnectors.FirstOrDefault(c => c.Name == connectionInfo.SinkConnectorName);
-
-            //        if (source != null && sink != null)
-            //        {
-            //            var cvm = new ConnectionViewModel
-            //            {
-            //                Source = source,
-            //                Sink = sink
-            //            };
-            //            _connections.Add(cvm);
-            //            source.Connection = cvm;
-            //            sink.Connection = cvm;
-            //        }
-            //    }
-            //}
+            if (result.IsSuccess)
+            {
+                viewModel.Id = result.Data.Id;
+            }
+            else
+            {
+                // TODO error handling
+            }
         }
 
         private async void CreateModule(WidgetViewModel viewModel)
         {
-            var moduleDescription = new ModuleDto
+            var moduleDto = new ModuleDto
             {
                 ModuleType = viewModel.ModuleType.AssemblyQualifiedName,
                 WidgetType = viewModel.GetType().AssemblyQualifiedName,
                 WidgetState = viewModel.GetState()
             };
-            var result = await _modulesApiClient.CreateAsync(moduleDescription);
+            var result = await _modulesApiClient.CreateAsync(moduleDto);
 
             if (result.IsSuccess)
             {
                 viewModel.Id = result.Data.Id;
 
-                if (moduleDescription.WidgetState is WidgetState widgetState)
+                if (moduleDto.WidgetState != null)
                 {
-                    viewModel.LoadState(widgetState);
+                    viewModel.LoadState(moduleDto.WidgetState);
                 }
             }
             else
             {
                 // TODO error handling / remove it
+            }
+        }
+
+        private async void DeleteConnection(ConnectionViewModel viewModel)
+        {
+            var result = await _connectionsApiClient.DeleteAsync(viewModel.Id);
+
+            if (!result.IsSuccess)
+            {
+                // TODO error handling
             }
         }
 
@@ -208,6 +243,25 @@ namespace Micser.App.ViewModels
             if (_isLoading)
             {
                 return;
+            }
+
+            switch (e.Action)
+            {
+                case NotifyCollectionChangedAction.Add:
+                    foreach (ConnectionViewModel viewModel in e.NewItems)
+                    {
+                        CreateConnection(viewModel);
+                    }
+
+                    break;
+
+                case NotifyCollectionChangedAction.Remove:
+                    foreach (ConnectionViewModel viewModel in e.OldItems)
+                    {
+                        DeleteConnection(viewModel);
+                    }
+
+                    break;
             }
         }
 
