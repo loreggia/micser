@@ -64,9 +64,19 @@ namespace Micser.Engine.Api.Controllers
 
         private dynamic UpdateModule(long id)
         {
+            var module = _moduleService.GetById(id);
+
+            if (module == null)
+            {
+                return HttpStatusCode.NotFound;
+            }
+
             var moduleDto = this.Bind<ModuleDto>();
 
-            if (!_moduleService.Update(moduleDto))
+            module.ModuleState = moduleDto.ModuleState;
+            module.WidgetState = moduleDto.WidgetState;
+
+            if (!_moduleService.Update(module))
             {
                 return HttpStatusCode.InternalServerError;
             }

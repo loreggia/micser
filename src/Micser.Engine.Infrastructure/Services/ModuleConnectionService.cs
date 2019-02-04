@@ -16,6 +16,25 @@ namespace Micser.Engine.Infrastructure.Services
             _uowFactory = uowFactory;
         }
 
+        public ModuleConnectionDto Delete(long id)
+        {
+            using (var uow = _uowFactory.Create())
+            {
+                var connections = uow.GetRepository<IModuleConnectionRepository>();
+                var connection = connections.Get(id);
+
+                if (connection == null)
+                {
+                    return null;
+                }
+
+                connections.Remove(connection);
+                uow.Complete();
+
+                return GetModuleConnectionDto(connection);
+            }
+        }
+
         public IEnumerable<ModuleConnectionDto> GetAll()
         {
             using (var uow = _uowFactory.Create())
@@ -24,18 +43,56 @@ namespace Micser.Engine.Infrastructure.Services
             }
         }
 
+        public ModuleConnectionDto GetById(long id)
+        {
+            using (var uow = _uowFactory.Create())
+            {
+                var connection = uow.GetRepository<IModuleConnectionRepository>().Get(id);
+                return GetModuleConnectionDto(connection);
+            }
+        }
+
         public bool Insert(ModuleConnectionDto dto)
         {
             using (var uow = _uowFactory.Create())
             {
                 var connections = uow.GetRepository<IModuleConnectionRepository>();
-                var existing = connections.GetBySourceAndTargetIds(dto.SourceId, dto.TargetId);
+                var connection = connections.GetBySourceAndTargetIds(dto.SourceId, dto.TargetId);
 
-                if (existing != null)
+                if (connection != null)
                 {
-                    dto.Id = existing.Id;
+                    return false;
+                }
+
+                connection = GetModuleConnection(dto);
+                connections.Add(connection);
+
+                if (uow.Complete() > 0)
+                {
+                    dto.Id = connection.Id;
                     return true;
                 }
+            }
+
+            return false;
+        }
+
+        public bool Update(ModuleConnectionDto dto)
+        {
+            using (var uow = _uowFactory.Create())
+            {
+                var connections = uow.GetRepository<IModuleConnectionRepository>();
+                var connection = connections.Get(dto.Id);
+
+                if (connection == null)
+                {
+                    return false;
+                }
+
+                connection.SourceModuleId = dto.SourceId;
+                connection.TargetModuleId = dto.TargetId;
+
+                return uow.Complete() > 0;
             }
         }
 
