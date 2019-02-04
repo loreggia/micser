@@ -6,12 +6,7 @@
         {
         }
 
-        public ModuleConnectionDto(long sourceId, long targetId)
-        {
-            SourceId = sourceId;
-            TargetId = targetId;
-        }
-
+        public long Id { get; set; }
         public long SourceId { get; set; }
         public long TargetId { get; set; }
     }

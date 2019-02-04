@@ -5,5 +5,6 @@ namespace Micser.Engine.Infrastructure.DataAccess.Repositories
 {
     public interface IModuleConnectionRepository : IRepository<ModuleConnection>
     {
+        ModuleConnection GetBySourceAndTargetIds(long sourceId, long targetId);
     }
 }
