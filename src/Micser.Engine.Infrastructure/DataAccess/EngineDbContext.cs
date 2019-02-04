@@ -4,9 +4,9 @@ using System.Data.Entity;
 
 namespace Micser.Engine.Infrastructure.DataAccess
 {
-    public class MicserDbContext : DbContext
+    public class EngineDbContext : DbContext
     {
-        public MicserDbContext()
+        public EngineDbContext()
             : base("DefaultConnection")
         {
         }
@@ -16,7 +16,7 @@ namespace Micser.Engine.Infrastructure.DataAccess
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            Database.SetInitializer(new SqliteCreateDatabaseIfNotExists<MicserDbContext>(modelBuilder));
+            Database.SetInitializer(new SqliteCreateDatabaseIfNotExists<EngineDbContext>(modelBuilder));
 
             modelBuilder.Entity<Module>()
                 .HasMany(m => m.SourceModuleConnections)
