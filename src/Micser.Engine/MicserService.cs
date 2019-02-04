@@ -6,6 +6,7 @@ using Micser.Engine.Audio;
 using Micser.Engine.Infrastructure;
 using Micser.Engine.Infrastructure.DataAccess;
 using Micser.Engine.Infrastructure.DataAccess.Repositories;
+using Micser.Engine.Infrastructure.Services;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -54,6 +55,9 @@ namespace Micser.Engine
 
             container.RegisterType<IModuleRepository, ModuleRepository>();
             container.RegisterType<IModuleConnectionRepository, ModuleConnectionRepository>();
+
+            container.RegisterType<IModuleService, ModuleService>();
+            container.RegisterType<IModuleConnectionService, ModuleConnectionService>();
 
             container.RegisterSingleton<IAudioEngine, AudioEngine>();
             container.RegisterSingleton<IServer, Server>();

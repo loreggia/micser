@@ -1,10 +1,5 @@
-﻿using Micser.Common.DataAccess;
-using Micser.Common.Modules;
-using Micser.Common.Widgets;
-using Micser.Engine.Infrastructure;
-using Micser.Engine.Infrastructure.DataAccess.Models;
-using Micser.Engine.Infrastructure.DataAccess.Repositories;
-using Newtonsoft.Json;
+﻿using Micser.Engine.Infrastructure;
+using Micser.Engine.Infrastructure.Services;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -16,27 +11,23 @@ namespace Micser.Engine.Audio
     public sealed class AudioEngine : IAudioEngine
     {
         private readonly IUnityContainer _container;
-        private readonly IUnitOfWorkFactory _database;
         private readonly ILogger _logger;
+        private readonly IModuleConnectionService _moduleConnectionService;
         private readonly List<IAudioModule> _modules;
+        private readonly IModuleService _moduleService;
 
-        public AudioEngine(IUnityContainer container, IUnitOfWorkFactory database, ILogger logger)
+        public AudioEngine(IUnityContainer container, ILogger logger, IModuleService moduleService, IModuleConnectionService moduleConnectionService)
         {
             _container = container;
-            _database = database;
             _logger = logger;
+            _moduleService = moduleService;
+            _moduleConnectionService = moduleConnectionService;
             _modules = new List<IAudioModule>();
         }
 
         public void AddModule(long id)
         {
-            ModuleDto moduleDto;
-
-            using (var uow = _database.Create())
-            {
-                var module = uow.GetRepository<IModuleRepository>().Get(id);
-                moduleDto = GetModuleDto(module);
-            }
+            var moduleDto = _moduleService.GetById(id);
 
             var type = Type.GetType(moduleDto.ModuleType);
             if (type != null)
@@ -70,45 +61,37 @@ namespace Micser.Engine.Audio
 
             Stop();
 
-            using (var uow = _database.Create())
+            foreach (var module in _moduleService.GetAll())
             {
-                var moduleDescriptions = uow.GetRepository<IModuleRepository>();
-
-                foreach (var module in moduleDescriptions.GetAll())
+                try
                 {
-                    try
-                    {
-                        AddModule(module.Id);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.Error(ex, "Could not load module. ID: {0}", module.Id);
-                        moduleDescriptions.Remove(module);
-                    }
+                    AddModule(module.Id);
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex, "Could not load module. ID: {0}", module.Id);
+                    _moduleService.Delete(module.Id);
+                }
+            }
+
+            foreach (var connection in _moduleConnectionService.GetAll())
+            {
+                var source = _modules.FirstOrDefault(m => m.Description.Id == connection.SourceId);
+                var target = _modules.FirstOrDefault(m => m.Description.Id == connection.TargetId);
+
+                if (source == null)
+                {
+                    _logger.Warn($"Source module for connection not found. ID: {connection.SourceId}");
+                    continue;
                 }
 
-                var connections = uow.GetRepository<IModuleConnectionRepository>();
-                foreach (var connection in connections.GetAll())
+                if (target == null)
                 {
-                    var source = _modules.FirstOrDefault(m => m.Description.Id == connection.SourceModuleId);
-                    var target = _modules.FirstOrDefault(m => m.Description.Id == connection.TargetModuleId);
-
-                    if (source == null)
-                    {
-                        _logger.Warn($"Source module for connection not found. ID: {connection.SourceModuleId}");
-                        continue;
-                    }
-
-                    if (target == null)
-                    {
-                        _logger.Warn($"Target module for connection not found. ID: {connection.TargetModuleId}");
-                        continue;
-                    }
-
-                    target.Input = source;
+                    _logger.Warn($"Target module for connection not found. ID: {connection.TargetId}");
+                    continue;
                 }
 
-                uow.Complete();
+                target.Input = source;
             }
 
             _logger.Info("Audio engine started");
@@ -136,26 +119,8 @@ namespace Micser.Engine.Audio
         public void UpdateModule(long id)
         {
             var audioModule = _modules.SingleOrDefault(m => m.Description.Id == id);
-            ModuleDto moduleDto;
-            using (var uow = _database.Create())
-            {
-                var modules = uow.GetRepository<IModuleRepository>();
-                var module = modules.Get(id);
-                moduleDto = GetModuleDto(module);
-            }
+            var moduleDto = _moduleService.GetById(id);
             audioModule?.Initialize(moduleDto);
-        }
-
-        private static ModuleDto GetModuleDto(Module module)
-        {
-            return new ModuleDto
-            {
-                Id = module.Id,
-                ModuleState = JsonConvert.DeserializeObject<ModuleState>(module.ModuleStateJson),
-                ModuleType = module.ModuleType,
-                WidgetState = JsonConvert.DeserializeObject<WidgetState>(module.WidgetStateJson),
-                WidgetType = module.WidgetType
-            };
         }
     }
 }
