@@ -42,6 +42,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApiController.cs" />
+    <Compile Include="DataAccess\EngineDbContext.cs" />
+    <Compile Include="DataAccess\Models\Module.cs" />
+    <Compile Include="DataAccess\Models\ModuleConnection.cs" />
+    <Compile Include="DataAccess\Repositories\IModuleConnectionRepository.cs" />
+    <Compile Include="DataAccess\Repositories\IModuleRepository.cs" />
+    <Compile Include="DataAccess\Repositories\ModuleConnectionRepository.cs" />
+    <Compile Include="DataAccess\Repositories\ModuleRepository.cs" />
     <Compile Include="Extensions\UnityContainerExtensions.cs" />
     <Compile Include="IEngineModule.cs" />
     <Compile Include="IAudioModule.cs" />
@@ -67,5 +74,6 @@
       <Name>Micser.Common</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

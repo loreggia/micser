@@ -63,7 +63,7 @@ namespace Micser.Plugins.Main.Modules
             };
         }
 
-        public override void Initialize(ModuleDescription description)
+        public override void Initialize(ModuleDto description)
         {
             base.Initialize(description);
 

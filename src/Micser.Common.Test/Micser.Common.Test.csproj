@@ -42,7 +42,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="DataAccess\DatabaseTest.cs" />
     <Compile Include="DeviceServiceTest.cs" />
     <Compile Include="SerializationTest.cs" />
     <Compile Include="TestFileManager.cs" />

@@ -170,7 +170,7 @@ namespace Micser.App.ViewModels
 
         private async void CreateModule(WidgetViewModel viewModel)
         {
-            var moduleDescription = new ModuleDescription
+            var moduleDescription = new ModuleDto
             {
                 ModuleType = viewModel.ModuleType.AssemblyQualifiedName,
                 WidgetType = viewModel.GetType().AssemblyQualifiedName,

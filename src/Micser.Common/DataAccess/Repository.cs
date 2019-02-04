@@ -6,12 +6,12 @@ using System.Linq.Expressions;
 
 namespace Micser.Common.DataAccess
 {
-    public class Repository<TEntity> : IRepository<TEntity>
+    public abstract class Repository<TEntity> : IRepository<TEntity>
         where TEntity : class
     {
         protected readonly DbContext Context;
 
-        public Repository(DbContext context)
+        protected Repository(DbContext context)
         {
             Context = context;
         }
@@ -33,7 +33,7 @@ namespace Micser.Common.DataAccess
             return DbSet.Where(predicate);
         }
 
-        public TEntity Get(int id)
+        public TEntity Get(long id)
         {
             return DbSet.Find(id);
         }

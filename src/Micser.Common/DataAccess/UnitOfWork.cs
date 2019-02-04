@@ -1,21 +1,17 @@
-﻿using Micser.Common.DataAccess.Repositories;
-using System.Data.Entity;
+﻿using System.Data.Entity;
 
 namespace Micser.Common.DataAccess
 {
     public class UnitOfWork : IUnitOfWork
     {
         private readonly DbContext _context;
-        private IModuleConnectionRepository _moduleConnections;
-        private IModuleRepository _modules;
+        private readonly IRepositoryFactory _repositoryFactory;
 
-        public UnitOfWork(DbContext context)
+        public UnitOfWork(DbContext context, IRepositoryFactory repositoryFactory)
         {
             _context = context;
+            _repositoryFactory = repositoryFactory;
         }
-
-        public IModuleConnectionRepository ModuleConnections => _moduleConnections ?? (_moduleConnections = new ModuleConnectionRepository(_context));
-        public IModuleRepository Modules => _modules ?? (_modules = new ModuleRepository(_context));
 
         public int Complete()
         {
@@ -25,6 +21,11 @@ namespace Micser.Common.DataAccess
         public void Dispose()
         {
             _context.Dispose();
+        }
+
+        public T GetRepository<T>() where T : class
+        {
+            return _repositoryFactory.Create<T>(_context);
         }
     }
 }

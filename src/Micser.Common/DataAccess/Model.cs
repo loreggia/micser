@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Micser.Common.DataAccess.Models
+namespace Micser.Common.DataAccess
 {
     public class Model
     {
         [Key]
-        public int Id { get; set; }
+        public long Id { get; set; }
     }
 }

@@ -1,7 +1,8 @@
-﻿using Micser.Common.DataAccess.Models;
+﻿using Micser.Common.DataAccess;
+using Micser.Engine.Infrastructure.DataAccess.Models;
 using System.Data.Entity;
 
-namespace Micser.Common.DataAccess.Repositories
+namespace Micser.Engine.Infrastructure.DataAccess.Repositories
 {
     public class ModuleConnectionRepository : Repository<ModuleConnection>, IModuleConnectionRepository
     {
