@@ -37,12 +37,14 @@ namespace Micser.App
             containerRegistry.RegisterSingleton<IMenuItemRegistry, MenuItemRegistry>();
             containerRegistry.RegisterSingleton<INavigationManager, NavigationManager>();
 
-            containerRegistry.RegisterView<StartupView, StartupViewModel>();
-            containerRegistry.RegisterView<StatusView, StatusViewModel>();
-
             containerRegistry.RegisterView<MainMenuView, MainMenuViewModel>();
             containerRegistry.RegisterView<MainStatusBarView, MainStatusBarViewModel>();
+
+            containerRegistry.RegisterView<StartupView, StartupViewModel>();
+            containerRegistry.RegisterView<StatusView, StatusViewModel>();
             containerRegistry.RegisterView<MainView, MainViewModel>();
+            containerRegistry.RegisterView<SettingsView, SettingsViewModel>();
+            containerRegistry.RegisterView<AboutView, AboutViewModel>();
         }
     }
 }
