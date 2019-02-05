@@ -53,6 +53,7 @@
     <Compile Include="Api\ModulesApiClient.cs" />
     <Compile Include="Api\ServiceResult.cs" />
     <Compile Include="Api\StatusApiClient.cs" />
+    <Compile Include="AppGlobals.cs" />
     <Compile Include="ApplicationEvents.cs" />
     <Compile Include="ApplicationStateService.cs" />
     <Compile Include="Bindable.cs" />

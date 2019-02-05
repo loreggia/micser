@@ -14,16 +14,6 @@ namespace Micser.Common
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData, Environment.SpecialFolderOption.Create),
             "Micser");
 
-        public static readonly string AppDbLocation = Path.Combine(AppDataFolder, "App.json");
-        public static readonly string EngineDbLocation = Path.Combine(AppDataFolder, "Engine.json");
-
-        public static class PrismRegions
-        {
-            public const string Main = "MainRegion";
-            public const string Menu = "MenuRegion";
-            public const string Status = "StatusRegion";
-        }
-
         public static class SettingKeys
         {
             public const string ExitOnClose = "ExitOnClose";

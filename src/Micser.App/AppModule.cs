@@ -15,14 +15,14 @@ namespace Micser.App
         {
             // top level menu items
             var menuItemRegistry = containerProvider.Resolve<IMenuItemRegistry>();
-            menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemFileHeader, Id = "File" });
-            menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemToolsHeader, Id = "Tools" });
-            menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemHelpHeader, Id = "Help" });
+            menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemFileHeader, Id = AppGlobals.MenuItemIds.File });
+            menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemToolsHeader, Id = AppGlobals.MenuItemIds.Tools });
+            menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemHelpHeader, Id = AppGlobals.MenuItemIds.Help });
 
-            menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemExitHeader, Id = "Exit", ParentId = "File", Command = CustomApplicationCommands.Exit });
-
-            menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemSettingsHeader, Id = "Settings", ParentId = "Tools", Command = new NavigationCommand<SettingsView>() });
-            //menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemAboutHeader, Id = "About", ParentId = "Help", Command = new NavigationCommand<AboutView>() });
+            // sub-entries
+            menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemExitHeader, Id = AppGlobals.MenuItemIds.FileExit, ParentId = AppGlobals.MenuItemIds.File, Command = CustomApplicationCommands.Exit });
+            menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemSettingsHeader, Id = AppGlobals.MenuItemIds.ToolsSettings, ParentId = AppGlobals.MenuItemIds.Tools, Command = new NavigationCommand<SettingsView>() });
+            menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemAboutHeader, Id = AppGlobals.MenuItemIds.HelpAbout, ParentId = AppGlobals.MenuItemIds.Help, Command = new NavigationCommand<AboutView>() });
 
             var navigationManager = containerProvider.Resolve<INavigationManager>();
             navigationManager.Navigate<StartupView>();
