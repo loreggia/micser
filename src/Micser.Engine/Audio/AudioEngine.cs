@@ -25,6 +25,8 @@ namespace Micser.Engine.Audio
             _modules = new List<IAudioModule>();
         }
 
+        public bool IsRunning { get; private set; }
+
         public void AddModule(long id)
         {
             var moduleDto = _moduleService.GetById(id);
@@ -94,6 +96,7 @@ namespace Micser.Engine.Audio
                 target.Input = source;
             }
 
+            IsRunning = true;
             _logger.Info("Audio engine started");
         }
 
@@ -114,6 +117,8 @@ namespace Micser.Engine.Audio
             _modules.Clear();
 
             _logger.Info("Audio engine stopped");
+
+            IsRunning = false;
         }
 
         public void UpdateModule(long id)

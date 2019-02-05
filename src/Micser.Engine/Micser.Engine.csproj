@@ -49,6 +49,7 @@
     <Compile Include="Api\Bootstrapper.cs" />
     <Compile Include="Api\Controllers\ModuleConnectionsController.cs" />
     <Compile Include="Api\Controllers\ModulesController.cs" />
+    <Compile Include="Api\Controllers\StatusController.cs" />
     <Compile Include="Api\MicserJsonSerializer.cs" />
     <Compile Include="Api\Server.cs" />
     <Compile Include="Audio\AudioEngine.cs" />

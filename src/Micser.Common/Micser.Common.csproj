@@ -69,6 +69,7 @@
     <Compile Include="DataAccess\Model.cs" />
     <Compile Include="IIdentifiable.cs" />
     <Compile Include="Modules\ModuleState.cs" />
+    <Compile Include="ServiceStatus.cs" />
     <Compile Include="StateDictionary.cs" />
     <Compile Include="Widgets\WidgetState.cs" />
     <Compile Include="Modules\ModuleDto.cs" />

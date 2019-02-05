@@ -52,6 +52,7 @@
     <Compile Include="Api\ModuleConnectionsApiClient.cs" />
     <Compile Include="Api\ModulesApiClient.cs" />
     <Compile Include="Api\ServiceResult.cs" />
+    <Compile Include="Api\StatusApiClient.cs" />
     <Compile Include="ApplicationEvents.cs" />
     <Compile Include="ApplicationStateService.cs" />
     <Compile Include="Bindable.cs" />
@@ -79,6 +80,7 @@
     <Compile Include="Menu\IMenuItemRegistry.cs" />
     <Compile Include="Menu\MenuItemDescription.cs" />
     <Compile Include="Menu\MenuItemRegistry.cs" />
+    <Compile Include="NavigationCommand.cs" />
     <Compile Include="NavigationManager.cs" />
     <Compile Include="PathFinder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
