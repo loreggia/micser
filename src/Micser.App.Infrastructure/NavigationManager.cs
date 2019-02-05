@@ -1,6 +1,5 @@
-﻿using System;
-using Micser.Common;
-using Prism.Regions;
+﻿using Prism.Regions;
+using System;
 
 namespace Micser.App.Infrastructure
 {
@@ -13,7 +12,7 @@ namespace Micser.App.Infrastructure
             _regionManager = regionManager;
         }
 
-        public void Navigate<TView>(string regionName = Globals.PrismRegions.Main)
+        public void Navigate<TView>(string regionName = AppGlobals.PrismRegions.Main)
         {
             _regionManager.RequestNavigate(regionName, new Uri(typeof(TView).Name, UriKind.Relative));
         }

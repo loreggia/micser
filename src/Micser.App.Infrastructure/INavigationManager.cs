@@ -1,9 +1,7 @@
-﻿using Micser.Common;
-
-namespace Micser.App.Infrastructure
+﻿namespace Micser.App.Infrastructure
 {
     public interface INavigationManager
     {
-        void Navigate<TView>(string regionName = Globals.PrismRegions.Main);
+        void Navigate<TView>(string regionName = AppGlobals.PrismRegions.Main);
     }
 }
