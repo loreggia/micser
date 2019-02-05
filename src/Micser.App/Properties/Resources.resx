@@ -120,4 +120,22 @@
   <data name="ApplicationTitle" xml:space="preserve">
     <value>Micser</value>
   </data>
+  <data name="MenuItemAboutHeader" xml:space="preserve">
+    <value>_About</value>
+  </data>
+  <data name="MenuItemExitHeader" xml:space="preserve">
+    <value>E_xit</value>
+  </data>
+  <data name="MenuItemFileHeader" xml:space="preserve">
+    <value>_File</value>
+  </data>
+  <data name="MenuItemHelpHeader" xml:space="preserve">
+    <value>_Help</value>
+  </data>
+  <data name="MenuItemSettingsHeader" xml:space="preserve">
+    <value>_Settings</value>
+  </data>
+  <data name="MenuItemToolsHeader" xml:space="preserve">
+    <value>_Tools</value>
+  </data>
 </root>

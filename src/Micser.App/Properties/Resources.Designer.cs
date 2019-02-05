@@ -68,5 +68,59 @@ namespace Micser.App.Properties {
                 return ResourceManager.GetString("ApplicationTitle", resourceCulture);
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _About.
+        /// </summary>
+        public static string MenuItemAboutHeader {
+            get {
+                return ResourceManager.GetString("MenuItemAboutHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to E_xit.
+        /// </summary>
+        public static string MenuItemExitHeader {
+            get {
+                return ResourceManager.GetString("MenuItemExitHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _File.
+        /// </summary>
+        public static string MenuItemFileHeader {
+            get {
+                return ResourceManager.GetString("MenuItemFileHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Help.
+        /// </summary>
+        public static string MenuItemHelpHeader {
+            get {
+                return ResourceManager.GetString("MenuItemHelpHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Settings.
+        /// </summary>
+        public static string MenuItemSettingsHeader {
+            get {
+                return ResourceManager.GetString("MenuItemSettingsHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Tools.
+        /// </summary>
+        public static string MenuItemToolsHeader {
+            get {
+                return ResourceManager.GetString("MenuItemToolsHeader", resourceCulture);
+            }
+        }
     }
 }
