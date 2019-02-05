@@ -7,7 +7,6 @@
         xmlns:p="clr-namespace:Micser.App.Properties"
         xmlns:tb="http://www.hardcodet.net/taskbar"
         xmlns:ai="clr-namespace:Micser.App.Infrastructure;assembly=Micser.App.Infrastructure"
-        xmlns:c="clr-namespace:Micser.Common;assembly=Micser.Common"
         mc:Ignorable="d"
         x:Name="Window"
         Title="{x:Static p:Resources.ApplicationTitle}" Height="600" Width="800"
@@ -33,11 +32,11 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <ContentControl Grid.Row="0" x:Name="MenuRegion" regions:RegionManager.RegionName="{x:Static c:Globals+PrismRegions.Menu}"
+        <ContentControl Grid.Row="0" x:Name="MenuRegion" regions:RegionManager.RegionName="{x:Static ai:AppGlobals+PrismRegions.Menu}"
                         Style="{StaticResource RegionStyle}" />
-        <ContentControl Grid.Row="1" x:Name="MainRegion" regions:RegionManager.RegionName="{x:Static c:Globals+PrismRegions.Main}"
+        <ContentControl Grid.Row="1" x:Name="MainRegion" regions:RegionManager.RegionName="{x:Static ai:AppGlobals+PrismRegions.Main}"
                         Style="{StaticResource RegionStyle}" />
-        <ContentControl Grid.Row="2" x:Name="StatusRegion" regions:RegionManager.RegionName="{x:Static c:Globals+PrismRegions.Status}"
+        <ContentControl Grid.Row="2" x:Name="StatusRegion" regions:RegionManager.RegionName="{x:Static ai:AppGlobals+PrismRegions.Status}"
                         Style="{StaticResource RegionStyle}" />
 
         <tb:TaskbarIcon Grid.Row="3" x:Name="TaskbarIcon" MenuActivation="RightClick" ToolTipText="{x:Static p:Resources.ApplicationTitle}"

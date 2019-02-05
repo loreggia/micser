@@ -1,7 +1,6 @@
 ﻿using Micser.App.Infrastructure;
 using Micser.App.Infrastructure.Api;
 using Micser.App.Views;
-using Micser.Common;
 using Prism.Events;
 using System.Threading.Tasks;
 
@@ -48,8 +47,8 @@ namespace Micser.App.ViewModels
             if (statusResult.IsSuccess)
             {
                 await Task.Delay(1000);
-                _navigationManager.Navigate<MainStatusBarView>(Globals.PrismRegions.Status);
-                _navigationManager.Navigate<MainMenuView>(Globals.PrismRegions.Menu);
+                _navigationManager.Navigate<MainStatusBarView>(AppGlobals.PrismRegions.Status);
+                _navigationManager.Navigate<MainMenuView>(AppGlobals.PrismRegions.Menu);
                 _navigationManager.Navigate<MainView>();
                 IsLoading = false;
             }
