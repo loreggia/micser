@@ -1,11 +1,27 @@
 ﻿using Micser.Engine.Infrastructure.DataAccess.Models;
-using SQLite.CodeFirst;
 using System.Data.Entity;
+using System.Data.Entity.Migrations;
+using System.Data.SQLite.EF6.Migrations;
 
 namespace Micser.Engine.Infrastructure.DataAccess
 {
+    public class ContextMigrationConfiguration : DbMigrationsConfiguration<EngineDbContext>
+    {
+        public ContextMigrationConfiguration()
+        {
+            AutomaticMigrationsEnabled = true;
+            AutomaticMigrationDataLossAllowed = true;
+            SetSqlGenerator("System.Data.SQLite", new SQLiteMigrationSqlGenerator());
+        }
+    }
+
     public class EngineDbContext : DbContext
     {
+        static EngineDbContext()
+        {
+            Database.SetInitializer(new MigrateDatabaseToLatestVersion<EngineDbContext, ContextMigrationConfiguration>(true));
+        }
+
         public EngineDbContext()
             : base("DefaultConnection")
         {
@@ -16,8 +32,6 @@ namespace Micser.Engine.Infrastructure.DataAccess
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            Database.SetInitializer(new SqliteCreateDatabaseIfNotExists<EngineDbContext>(modelBuilder));
-
             modelBuilder.Entity<Module>()
                 .HasMany(m => m.SourceModuleConnections)
                 .WithRequired(c => c.SourceModule)
