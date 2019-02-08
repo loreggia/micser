@@ -62,6 +62,7 @@
     <Compile Include="Controls\EditableTextBlockAdorner.cs" />
     <Compile Include="Controls\LoadingSpinner.cs" />
     <Compile Include="Controls\RelativePositionPanel.cs" />
+    <Compile Include="Controls\ToolBarTrayHelper.cs" />
     <Compile Include="Converter\BooleanConverter.cs" />
     <Compile Include="Converter\BooleanToVisibilityConverter.cs" />
     <Compile Include="Converter\ConverterExtension.cs" />
@@ -78,6 +79,7 @@
     <Compile Include="IAppModule.cs" />
     <Compile Include="ISelectable.cs" />
     <Compile Include="ISettingsService.cs" />
+    <Compile Include="ToolBars\IToolBarRegistry.cs" />
     <Compile Include="IViewModel.cs" />
     <Compile Include="Menu\IMenuItemRegistry.cs" />
     <Compile Include="Menu\MenuItemDescription.cs" />
@@ -92,6 +94,7 @@
     <Compile Include="Themes\IResourceRegistry.cs" />
     <Compile Include="Themes\ResourceRegistry.cs" />
     <Compile Include="Themes\ThemeKeyExtension.cs" />
+    <Compile Include="ToolBars\ToolBarRegistry.cs" />
     <Compile Include="TreeNode.cs" />
     <Compile Include="View.cs" />
     <Compile Include="ViewModel.cs" />
