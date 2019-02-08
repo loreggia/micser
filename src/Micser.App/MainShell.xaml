@@ -27,6 +27,7 @@
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -34,9 +35,11 @@
 
         <ContentControl Grid.Row="0" x:Name="MenuRegion" regions:RegionManager.RegionName="{x:Static ai:AppGlobals+PrismRegions.Menu}"
                         Style="{StaticResource RegionStyle}" />
-        <ContentControl Grid.Row="1" x:Name="MainRegion" regions:RegionManager.RegionName="{x:Static ai:AppGlobals+PrismRegions.Main}"
+        <ContentControl Grid.Row="1" x:Name="TopToolBarRegion" regions:RegionManager.RegionName="{x:Static ai:AppGlobals+PrismRegions.TopToolBar}"
                         Style="{StaticResource RegionStyle}" />
-        <ContentControl Grid.Row="2" x:Name="StatusRegion" regions:RegionManager.RegionName="{x:Static ai:AppGlobals+PrismRegions.Status}"
+        <ContentControl Grid.Row="2" x:Name="MainRegion" regions:RegionManager.RegionName="{x:Static ai:AppGlobals+PrismRegions.Main}"
+                        Style="{StaticResource RegionStyle}" />
+        <ContentControl Grid.Row="3" x:Name="StatusRegion" regions:RegionManager.RegionName="{x:Static ai:AppGlobals+PrismRegions.Status}"
                         Style="{StaticResource RegionStyle}" />
 
         <tb:TaskbarIcon Grid.Row="3" x:Name="TaskbarIcon" MenuActivation="RightClick" ToolTipText="{x:Static p:Resources.ApplicationTitle}"

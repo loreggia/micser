@@ -19,6 +19,7 @@
             public const string Main = "MainRegion";
             public const string Menu = "MenuRegion";
             public const string Status = "StatusRegion";
+            public const string TopToolBar = "TopToolBarRegion";
         }
     }
 }
