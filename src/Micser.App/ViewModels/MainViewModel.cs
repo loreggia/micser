@@ -4,7 +4,6 @@ using Micser.App.Infrastructure.Widgets;
 using Micser.Common.DataAccess;
 using Micser.Common.Modules;
 using NLog;
-using Prism.Regions;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -57,9 +56,9 @@ namespace Micser.App.ViewModels
 
         public IEnumerable<WidgetViewModel> Widgets => _widgets;
 
-        public override void OnNavigatedFrom(NavigationContext navigationContext)
+        protected override void OnNavigatedFrom(object parameter)
         {
-            base.OnNavigatedFrom(navigationContext);
+            base.OnNavigatedFrom(parameter);
 
             //var widgetStates = new List<WidgetState>();
 
@@ -91,11 +90,11 @@ namespace Micser.App.ViewModels
             //_configurationService.SetSetting(ConnectionsConfigurationKey, connections);
         }
 
-        public override async void OnNavigatedTo(NavigationContext navigationContext)
+        protected override async void OnNavigatedTo(object parameter)
         {
             _isLoading = true;
 
-            base.OnNavigatedTo(navigationContext);
+            base.OnNavigatedTo(parameter);
 
             AvailableWidgets = _widgetRegistry.Widgets;
 
