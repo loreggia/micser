@@ -10,7 +10,6 @@ namespace Micser.App.ViewModels
     {
         private readonly INavigationManager _navigationManager;
         private readonly StatusApiClient _statusApiClient;
-        private bool _isLoading;
 
         public StartupViewModel(
             IApplicationStateService applicationStateService,
@@ -21,7 +20,7 @@ namespace Micser.App.ViewModels
 
             _statusApiClient = new StatusApiClient();
 
-            IsLoading = true;
+            IsBusy = true;
 
             if (applicationStateService.ModulesLoaded)
             {
@@ -34,12 +33,6 @@ namespace Micser.App.ViewModels
             }
         }
 
-        public bool IsLoading
-        {
-            get => _isLoading;
-            set => SetProperty(ref _isLoading, value);
-        }
-
         private async void OnModulesLoaded()
         {
             var statusResult = await _statusApiClient.GetStatus();
@@ -50,12 +43,13 @@ namespace Micser.App.ViewModels
                 _navigationManager.Navigate<MainStatusBarView>(null, AppGlobals.PrismRegions.Status);
                 _navigationManager.Navigate<MainMenuView>(null, AppGlobals.PrismRegions.Menu);
                 _navigationManager.Navigate<MainView>();
-                IsLoading = false;
             }
             else
             {
                 _navigationManager.Navigate<StatusView>(StatusType.ConnectionFailed);
             }
+
+            IsBusy = false;
         }
     }
 }
