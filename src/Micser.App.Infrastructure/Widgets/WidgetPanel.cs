@@ -137,6 +137,24 @@ namespace Micser.App.Infrastructure.Widgets
             }
         }
 
+        public void RemoveWidget(Widget widget)
+        {
+            if (widget == null || !(widget.DataContext is WidgetViewModel vm))
+            {
+                return;
+            }
+
+            if (WidgetsSource is ICollection<WidgetViewModel> collection)
+            {
+                collection.Remove(vm);
+            }
+
+            if (!(WidgetsSource is INotifyCollectionChanged))
+            {
+                _widgets.Remove(widget);
+            }
+        }
+
         public void UpdateConnections()
         {
             if (ConnectionsSource != null)
@@ -219,9 +237,9 @@ namespace Micser.App.Infrastructure.Widgets
                     var connections = _connections.Where(c => c.Source.ParentWidget == widget || c.Sink.ParentWidget == widget).ToArray();
                     foreach (var connection in connections)
                     {
-                        _connections.Remove(connection);
+                        RemoveConnection(connection);
                     }
-                    _widgets.Remove(widget);
+                    RemoveWidget(widget);
                 }
             }
         }

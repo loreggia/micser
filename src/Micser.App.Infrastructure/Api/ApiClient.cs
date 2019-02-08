@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Micser.Common;
+using Newtonsoft.Json;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -10,8 +12,6 @@ using System.Net.Http.Headers;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using Micser.Common;
-using Newtonsoft.Json;
 
 namespace Micser.App.Infrastructure.Api
 {
@@ -34,7 +34,8 @@ namespace Micser.App.Infrastructure.Api
         {
             try
             {
-                var response = await _httpClient.DeleteAsync(_resource + action + "/" + id + GetQueryString(parameters));
+                var url = GetResourceUrl(action, id, parameters);
+                var response = await _httpClient.DeleteAsync(url);
                 return await HandleResponseAsync<T>(response);
             }
             catch (Exception ex)
@@ -62,6 +63,16 @@ namespace Micser.App.Infrastructure.Api
         protected string GetResourceUrl(string action, object parameters)
         {
             return _resource + action + GetQueryString(parameters);
+        }
+
+        protected string GetResourceUrl(string action, object id, object parameters)
+        {
+            if (!string.IsNullOrEmpty(action))
+            {
+                action = action.TrimEnd('/') + "/";
+            }
+
+            return _resource + action + id + GetQueryString(parameters);
         }
 
         protected async Task<ServiceResult<Stream>> GetStreamAsync(string action, object parameters = null)
@@ -113,9 +124,10 @@ namespace Micser.App.Infrastructure.Api
         {
             try
             {
+                var url = GetResourceUrl(action, id, parameters);
                 var content = JsonConvert.SerializeObject(data);
-                var response = await _httpClient.PutAsync(_resource + action + "/" + id + GetQueryString(parameters),
-                                                          new StringContent(content, Encoding.UTF8, "application/json"));
+
+                var response = await _httpClient.PutAsync(url, new StringContent(content, Encoding.UTF8, "application/json"));
                 return await HandleResponseAsync<T>(response);
             }
             catch (Exception ex)
@@ -164,7 +176,7 @@ namespace Micser.App.Infrastructure.Api
 
             if (response.IsSuccessStatusCode)
             {
-                data = (T) JsonConvert.DeserializeObject(responseString, typeof(T));
+                data = (T)JsonConvert.DeserializeObject(responseString, typeof(T));
             }
             else if (!string.IsNullOrEmpty(responseString))
             {
@@ -174,7 +186,7 @@ namespace Micser.App.Infrastructure.Api
                 }
                 else
                 {
-                    error = (ErrorList) JsonConvert.DeserializeObject(responseString, typeof(ErrorList));
+                    error = (ErrorList)JsonConvert.DeserializeObject(responseString, typeof(ErrorList));
                 }
             }
 
