@@ -1,7 +1,7 @@
-﻿using System.Windows;
+﻿using Micser.App.Infrastructure.Themes;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using Micser.App.Infrastructure.Themes;
 
 namespace Micser.App.Infrastructure.Widgets
 {
@@ -35,7 +35,7 @@ namespace Micser.App.Infrastructure.Widgets
             {
                 DragDrop.DoDragDrop(this, DataContext, DragDropEffects.Copy);
 
-                e.Handled = true;
+                //e.Handled = true;
             }
         }
 

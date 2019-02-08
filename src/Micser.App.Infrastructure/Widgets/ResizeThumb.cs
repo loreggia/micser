@@ -107,7 +107,7 @@ namespace Micser.App.Infrastructure.Widgets
                 w.Size = size;
             }
 
-            e.Handled = true;
+            //e.Handled = true;
         }
 
         private void ResizeThumb_DragStarted(object sender, DragStartedEventArgs e)

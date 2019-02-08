@@ -48,6 +48,7 @@ namespace Micser.App.Infrastructure.Widgets
             ResourceRegistry.RegisterResourcesFor(this);
 
             AllowDrop = true;
+            Focusable = true;
         }
 
         public IEnumerable<ConnectionViewModel> ConnectionsSource
@@ -202,7 +203,26 @@ namespace Micser.App.Infrastructure.Widgets
 
                 SnapWidgetsToGrid();
 
-                e.Handled = true;
+                //e.Handled = true;
+            }
+        }
+
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            base.OnKeyDown(e);
+
+            if (e.Key == Key.Delete || e.Key == Key.Back)
+            {
+                var selected = _widgets.Where(w => w.IsSelected).ToArray();
+                foreach (var widget in selected)
+                {
+                    var connections = _connections.Where(c => c.Source.ParentWidget == widget || c.Sink.ParentWidget == widget).ToArray();
+                    foreach (var connection in connections)
+                    {
+                        _connections.Remove(connection);
+                    }
+                    _widgets.Remove(widget);
+                }
             }
         }
 
@@ -227,8 +247,6 @@ namespace Micser.App.Infrastructure.Widgets
                 {
                     connection.IsSelected = false;
                 }
-
-                e.Handled = true;
             }
         }
 
@@ -255,7 +273,13 @@ namespace Micser.App.Infrastructure.Widgets
                 }
             }
 
-            e.Handled = true;
+            //e.Handled = true;
+        }
+
+        protected override void OnPreviewMouseDown(MouseButtonEventArgs e)
+        {
+            base.OnPreviewMouseDown(e);
+            Focus();
         }
 
         private static void OnConnectionsSourcePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
