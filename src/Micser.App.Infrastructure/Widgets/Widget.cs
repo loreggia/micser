@@ -164,8 +164,6 @@ namespace Micser.App.Infrastructure.Widgets
                     IsSelected = true;
                 }
             }
-
-            e.Handled = false;
         }
 
         private static void OnPositionPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)

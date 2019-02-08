@@ -1,9 +1,9 @@
-﻿using System;
+﻿using Micser.App.Infrastructure.Extensions;
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
-using Micser.App.Infrastructure.Extensions;
 
 namespace Micser.App.Infrastructure.Widgets
 {
@@ -20,9 +20,6 @@ namespace Micser.App.Infrastructure.Widgets
 
         private Point? _dragStartPoint;
 
-        private WidgetPanel _parentPanel;
-        private Widget _parentWidget;
-
         public Connector()
         {
             LayoutUpdated += Connector_LayoutUpdated;
@@ -31,13 +28,13 @@ namespace Micser.App.Infrastructure.Widgets
 
         public Connection Connection
         {
-            get => (Connection) GetValue(ConnectionProperty);
+            get => (Connection)GetValue(ConnectionProperty);
             set => SetValue(ConnectionProperty, value);
         }
 
         public bool IsConnectionSource
         {
-            get => (bool) GetValue(IsConnectionSourceProperty);
+            get => (bool)GetValue(IsConnectionSourceProperty);
             set => SetValue(IsConnectionSourceProperty, value);
         }
 
@@ -46,18 +43,18 @@ namespace Micser.App.Infrastructure.Widgets
         /// <summary>
         ///     The Widget this Connector belongs to.
         /// </summary>
-        public Widget ParentWidget => _parentWidget ?? (_parentWidget = this.GetParentOfType<Widget>());
+        public Widget ParentWidget => this.GetParentOfType<Widget>();
 
         /// <summary>
         ///     Center position of this Connector relative to the WidgetPanel.
         /// </summary>
         public Point Position
         {
-            get => (Point) GetValue(PositionProperty);
+            get => (Point)GetValue(PositionProperty);
             set => SetValue(PositionProperty, value);
         }
 
-        private WidgetPanel ParentPanel => _parentPanel ?? (_parentPanel = this.GetParentOfType<WidgetPanel>());
+        private WidgetPanel ParentPanel => this.GetParentOfType<WidgetPanel>();
 
         internal ConnectorInfo GetInfo()
         {
@@ -130,7 +127,7 @@ namespace Micser.App.Infrastructure.Widgets
 
         private void Connector_Loaded(object sender, RoutedEventArgs e)
         {
-            _parentPanel.UpdateConnections();
+            ParentPanel?.UpdateConnections();
         }
     }
 }

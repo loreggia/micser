@@ -20,7 +20,7 @@ namespace Micser.App.Infrastructure.Widgets
             _startPoint = dragStartPoint;
             _rubberbandPen = new Pen(Brushes.LightSlateGray, 1)
             {
-                DashStyle = new DashStyle(new double[] {2}, 1)
+                DashStyle = new DashStyle(new double[] { 2 }, 1)
             };
         }
 
@@ -45,7 +45,7 @@ namespace Micser.App.Infrastructure.Widgets
                 }
             }
 
-            e.Handled = true;
+            //e.Handled = true;
         }
 
         protected override void OnMouseUp(MouseButtonEventArgs e)
@@ -60,7 +60,7 @@ namespace Micser.App.Infrastructure.Widgets
             var adornerLayer = AdornerLayer.GetAdornerLayer(_widgetPanel);
             adornerLayer?.Remove(this);
 
-            e.Handled = true;
+            //e.Handled = true;
         }
 
         protected override void OnRender(DrawingContext dc)

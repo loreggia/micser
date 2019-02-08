@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Micser.App.Infrastructure.Extensions;
+using System;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using Micser.App.Infrastructure.Extensions;
 
 namespace Micser.App.Infrastructure.Widgets
 {
@@ -75,85 +75,85 @@ namespace Micser.App.Infrastructure.Widgets
             Unloaded += Connection_Unloaded;
         }
 
+        public bool IsSelected
+        {
+            get => (bool)GetValue(IsSelectedProperty);
+            set => SetValue(IsSelectedProperty, value);
+        }
+
         public string Label
         {
-            get => (string) GetValue(LabelProperty);
+            get => (string)GetValue(LabelProperty);
             set => SetValue(LabelProperty, value);
         }
 
         public Point LabelPosition
         {
-            get => (Point) GetValue(LabelPositionProperty);
+            get => (Point)GetValue(LabelPositionProperty);
             private set => SetValue(LabelPositionPropertyKey, value);
         }
 
         public PathGeometry PathGeometry
         {
-            get => (PathGeometry) GetValue(PathGeometryProperty);
+            get => (PathGeometry)GetValue(PathGeometryProperty);
             set => SetValue(PathGeometryProperty, value);
         }
 
         public Connector Sink
         {
-            get => (Connector) GetValue(SinkProperty);
+            get => (Connector)GetValue(SinkProperty);
             set => SetValue(SinkProperty, value);
         }
 
         public double SinkAnchorAngle
         {
-            get => (double) GetValue(SinkAnchorAngleProperty);
+            get => (double)GetValue(SinkAnchorAngleProperty);
             set => SetValue(SinkAnchorAngleProperty, value);
         }
 
         public Point SinkAnchorPosition
         {
-            get => (Point) GetValue(SinkAnchorPositionProperty);
+            get => (Point)GetValue(SinkAnchorPositionProperty);
             set => SetValue(SinkAnchorPositionProperty, value);
         }
 
         public ArrowSymbol SinkArrowSymbol
         {
-            get => (ArrowSymbol) GetValue(SinkArrowSymbolProperty);
+            get => (ArrowSymbol)GetValue(SinkArrowSymbolProperty);
             set => SetValue(SinkArrowSymbolProperty, value);
         }
 
         public Connector Source
         {
-            get => (Connector) GetValue(SourceProperty);
+            get => (Connector)GetValue(SourceProperty);
             set => SetValue(SourceProperty, value);
         }
 
         public double SourceAnchorAngle
         {
-            get => (double) GetValue(SourceAnchorAngleProperty);
+            get => (double)GetValue(SourceAnchorAngleProperty);
             set => SetValue(SourceAnchorAngleProperty, value);
         }
 
         public Point SourceAnchorPosition
         {
-            get => (Point) GetValue(SourceAnchorPositionProperty);
+            get => (Point)GetValue(SourceAnchorPositionProperty);
             set => SetValue(SourceAnchorPositionProperty, value);
         }
 
         public ArrowSymbol SourceArrowSymbol
         {
-            get => (ArrowSymbol) GetValue(SourceArrowSymbolProperty);
+            get => (ArrowSymbol)GetValue(SourceArrowSymbolProperty);
             set => SetValue(SourceArrowSymbolProperty, value);
         }
 
         public DoubleCollection StrokeDashArray
         {
-            get => (DoubleCollection) GetValue(StrokeDashArrayProperty);
+            get => (DoubleCollection)GetValue(StrokeDashArrayProperty);
             set => SetValue(StrokeDashArrayProperty, value);
         }
 
         private WidgetPanel ParentPanel => _parentPanel ?? (_parentPanel = this.GetParentOfType<WidgetPanel>());
-
-        public bool IsSelected
-        {
-            get => (bool) GetValue(IsSelectedProperty);
-            set => SetValue(IsSelectedProperty, value);
-        }
 
         internal void HideAdorner()
         {
@@ -189,12 +189,12 @@ namespace Micser.App.Infrastructure.Widgets
                 }
             }
 
-            e.Handled = false;
+            //e.Handled = false;
         }
 
         private static void OnConnectorPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var connection = (Connection) d;
+            var connection = (Connection)d;
             var positionPropertyDescriptor = DependencyPropertyDescriptor.FromProperty(Connector.PositionProperty, typeof(Connector));
 
             if (e.OldValue is Connector oldConnector)
@@ -214,7 +214,7 @@ namespace Micser.App.Infrastructure.Widgets
 
         private static void OnIsSelectedPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var connection = (Connection) d;
+            var connection = (Connection)d;
             if (e.NewValue as bool? == true)
             {
                 connection.ShowAdorner();
@@ -227,7 +227,7 @@ namespace Micser.App.Infrastructure.Widgets
 
         private static void OnPathGeometryPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            var connection = (Connection) d;
+            var connection = (Connection)d;
             connection.UpdateAnchorPosition();
         }
 

@@ -6,7 +6,8 @@
     <Style TargetType="{x:Type widgets:WidgetPanel}">
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="VerticalAlignment" Value="Stretch" />
-        <Setter Property="Background" Value="White" />
+        <Setter Property="Background" Value="#FFFFFE" />
+        <Setter Property="IsHitTestVisible" Value="True" />
 
         <Style.Triggers>
             <Trigger Property="IsGridVisible" Value="True">
