@@ -1,11 +1,11 @@
-﻿using System;
+﻿using Micser.App.Infrastructure.Extensions;
+using Micser.App.Infrastructure.Themes;
+using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using Micser.App.Infrastructure.Extensions;
-using Micser.App.Infrastructure.Themes;
 
 namespace Micser.App.Infrastructure.Widgets
 {
@@ -13,10 +13,6 @@ namespace Micser.App.Infrastructure.Widgets
     [TemplatePart(Name = PartNameOutputConnectors, Type = typeof(ItemsControl))]
     public class Widget : ContentControl, ISelectable
     {
-        internal const string PartNameInputConnectors = "PART_InputConnectors";
-
-        internal const string PartNameOutputConnectors = "PART_OutputConnectors";
-
         public static readonly DependencyProperty HeaderProperty = DependencyProperty.Register(
             nameof(Header), typeof(object), typeof(Widget), new PropertyMetadata(null));
 
@@ -47,6 +43,9 @@ namespace Micser.App.Infrastructure.Widgets
         public static readonly DependencyProperty SizeProperty = DependencyProperty.Register(
             nameof(Size), typeof(Size), typeof(Widget), new PropertyMetadata(default(Size), OnSizePropertyChanged));
 
+        internal const string PartNameInputConnectors = "PART_InputConnectors";
+
+        internal const string PartNameOutputConnectors = "PART_OutputConnectors";
         private ItemsControl _inputConnectorsControl;
 
         private ItemsControl _outputConnectorsControl;
@@ -73,7 +72,7 @@ namespace Micser.App.Infrastructure.Widgets
 
         public DataTemplate HeaderTemplate
         {
-            get => (DataTemplate) GetValue(HeaderTemplateProperty);
+            get => (DataTemplate)GetValue(HeaderTemplateProperty);
             set => SetValue(HeaderTemplateProperty, value);
         }
 
@@ -81,13 +80,13 @@ namespace Micser.App.Infrastructure.Widgets
 
         public IEnumerable<ConnectorViewModel> InputConnectorsSource
         {
-            get => (IEnumerable<ConnectorViewModel>) GetValue(InputConnectorsSourceProperty);
+            get => (IEnumerable<ConnectorViewModel>)GetValue(InputConnectorsSourceProperty);
             set => SetValue(InputConnectorsSourceProperty, value);
         }
 
         public DataTemplate InputConnectorTemplate
         {
-            get => (DataTemplate) GetValue(InputConnectorTemplateProperty);
+            get => (DataTemplate)GetValue(InputConnectorTemplateProperty);
             set => SetValue(InputConnectorTemplateProperty, value);
         }
 
@@ -97,48 +96,48 @@ namespace Micser.App.Infrastructure.Widgets
         /// </summary>
         public bool IsDragConnectionOver
         {
-            get => (bool) GetValue(IsDragConnectionOverProperty);
+            get => (bool)GetValue(IsDragConnectionOverProperty);
             set => SetValue(IsDragConnectionOverProperty, value);
+        }
+
+        public bool IsSelected
+        {
+            get => (bool)GetValue(IsSelectedProperty);
+            set => SetValue(IsSelectedProperty, value);
         }
 
         public IEnumerable<Connector> OutputConnectors => _outputConnectorsControl?.GetItemsChildren<Connector>();
 
         public IEnumerable<ConnectorViewModel> OutputConnectorsSource
         {
-            get => (IEnumerable<ConnectorViewModel>) GetValue(OutputConnectorsSourceProperty);
+            get => (IEnumerable<ConnectorViewModel>)GetValue(OutputConnectorsSourceProperty);
             set => SetValue(OutputConnectorsSourceProperty, value);
         }
 
         public DataTemplate OutputConnectorTemplate
         {
-            get => (DataTemplate) GetValue(OutputConnectorTemplateProperty);
+            get => (DataTemplate)GetValue(OutputConnectorTemplateProperty);
             set => SetValue(OutputConnectorTemplateProperty, value);
         }
 
         public Point Position
         {
-            get => (Point) GetValue(PositionProperty);
+            get => (Point)GetValue(PositionProperty);
             set => SetValue(PositionProperty, value);
         }
 
         public Size Size
         {
-            get => (Size) GetValue(SizeProperty);
+            get => (Size)GetValue(SizeProperty);
             set => SetValue(SizeProperty, value);
-        }
-
-        public bool IsSelected
-        {
-            get => (bool) GetValue(IsSelectedProperty);
-            set => SetValue(IsSelectedProperty, value);
         }
 
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
 
-            _inputConnectorsControl = (ItemsControl) GetTemplateChild(PartNameInputConnectors);
-            _outputConnectorsControl = (ItemsControl) GetTemplateChild(PartNameOutputConnectors);
+            _inputConnectorsControl = (ItemsControl)GetTemplateChild(PartNameInputConnectors);
+            _outputConnectorsControl = (ItemsControl)GetTemplateChild(PartNameOutputConnectors);
         }
 
         protected override void OnPreviewMouseDown(MouseButtonEventArgs e)
