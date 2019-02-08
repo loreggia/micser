@@ -107,6 +107,9 @@
     <PackageReference Include="System.Data.SQLite">
       <Version>1.0.109.2</Version>
     </PackageReference>
+    <PackageReference Include="System.Data.SQLite.EF6.Migrations">
+      <Version>1.0.103</Version>
+    </PackageReference>
     <PackageReference Include="Unity">
       <Version>5.8.13</Version>
     </PackageReference>
