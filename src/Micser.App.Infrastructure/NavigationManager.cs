@@ -12,9 +12,9 @@ namespace Micser.App.Infrastructure
             _regionManager = regionManager;
         }
 
-        public void Navigate<TView>(string regionName = AppGlobals.PrismRegions.Main)
+        public void Navigate<TView>(object parameter = null, string regionName = AppGlobals.PrismRegions.Main)
         {
-            _regionManager.RequestNavigate(regionName, new Uri(typeof(TView).Name, UriKind.Relative));
+            _regionManager.RequestNavigate(regionName, new Uri(typeof(TView).Name, UriKind.Relative), new NavigationParameters { { AppGlobals.NavigationParameterKey, parameter } });
         }
     }
 }

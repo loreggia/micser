@@ -47,14 +47,14 @@ namespace Micser.App.ViewModels
             if (statusResult.IsSuccess)
             {
                 await Task.Delay(1000);
-                _navigationManager.Navigate<MainStatusBarView>(AppGlobals.PrismRegions.Status);
-                _navigationManager.Navigate<MainMenuView>(AppGlobals.PrismRegions.Menu);
+                _navigationManager.Navigate<MainStatusBarView>(null, AppGlobals.PrismRegions.Status);
+                _navigationManager.Navigate<MainMenuView>(null, AppGlobals.PrismRegions.Menu);
                 _navigationManager.Navigate<MainView>();
                 IsLoading = false;
             }
             else
             {
-                _navigationManager.Navigate<StatusView>();
+                _navigationManager.Navigate<StatusView>(StatusType.ConnectionFailed);
             }
         }
     }

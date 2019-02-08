@@ -2,6 +2,8 @@
 {
     public static class AppGlobals
     {
+        public const string NavigationParameterKey = "_NavigationParameter";
+
         public static class MenuItemIds
         {
             public const string File = "File";

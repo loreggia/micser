@@ -1,7 +1,6 @@
-﻿using System.Collections.Generic;
-using Micser.App.Infrastructure;
+﻿using Micser.App.Infrastructure;
 using Micser.App.Infrastructure.Menu;
-using Prism.Regions;
+using System.Collections.Generic;
 
 namespace Micser.App.ViewModels
 {
@@ -21,9 +20,9 @@ namespace Micser.App.ViewModels
             set => SetProperty(ref _menuItems, value);
         }
 
-        public override void OnNavigatedTo(NavigationContext navigationContext)
+        protected override void OnNavigatedTo(object parameter)
         {
-            base.OnNavigatedTo(navigationContext);
+            base.OnNavigatedTo(parameter);
 
             var menuItems = _menuItemRegistry.Items;
             var tree = TreeNode<MenuItemDescription>.CreateTree(menuItems, m => m.Id, m => m.ParentId, m => m.Order);
