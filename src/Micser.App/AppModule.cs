@@ -1,7 +1,6 @@
 ﻿using Micser.App.Infrastructure;
 using Micser.App.Infrastructure.Extensions;
 using Micser.App.Infrastructure.Menu;
-using Micser.App.Infrastructure.Themes;
 using Micser.App.Properties;
 using Micser.App.ViewModels;
 using Micser.App.Views;
@@ -32,10 +31,7 @@ namespace Micser.App
 
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            containerRegistry.RegisterSingleton<IApplicationStateService, ApplicationStateService>();
-            containerRegistry.RegisterSingleton<IResourceRegistry, ResourceRegistry>();
-            containerRegistry.RegisterSingleton<IMenuItemRegistry, MenuItemRegistry>();
-            containerRegistry.RegisterSingleton<INavigationManager, NavigationManager>();
+            InfrastructureModule.RegisterInfrastructureTypes(containerRegistry);
 
             containerRegistry.RegisterView<MainMenuView, MainMenuViewModel>();
             containerRegistry.RegisterView<MainStatusBarView, MainStatusBarViewModel>();

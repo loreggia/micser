@@ -94,6 +94,10 @@
     <Compile Include="Themes\IResourceRegistry.cs" />
     <Compile Include="Themes\ResourceRegistry.cs" />
     <Compile Include="Themes\ThemeKeyExtension.cs" />
+    <Compile Include="ToolBars\ToolBarButton.cs" />
+    <Compile Include="ToolBars\ToolBarDescription.cs" />
+    <Compile Include="ToolBars\ToolBarItem.cs" />
+    <Compile Include="ToolBars\ToolBarLabel.cs" />
     <Compile Include="ToolBars\ToolBarRegistry.cs" />
     <Compile Include="TreeNode.cs" />
     <Compile Include="View.cs" />
