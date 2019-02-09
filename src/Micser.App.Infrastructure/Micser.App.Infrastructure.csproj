@@ -68,6 +68,7 @@
     <Compile Include="Converter\ConverterExtension.cs" />
     <Compile Include="Converter\DoubleToPointConverter.cs" />
     <Compile Include="Converter\DoubleToRectConverter.cs" />
+    <Compile Include="Converter\EmptyStringToVisibilityConverter.cs" />
     <Compile Include="CustomApplicationCommands.cs" />
     <Compile Include="DataAccess\AppDbContext.cs" />
     <Compile Include="Extensions\DependencyObjectExtensions.cs" />
@@ -97,6 +98,7 @@
     <Compile Include="ToolBars\ToolBarButton.cs" />
     <Compile Include="ToolBars\ToolBarDescription.cs" />
     <Compile Include="ToolBars\ToolBarItem.cs" />
+    <Compile Include="ToolBars\ToolBarItemTemplateSelector.cs" />
     <Compile Include="ToolBars\ToolBarLabel.cs" />
     <Compile Include="ToolBars\ToolBarRegistry.cs" />
     <Compile Include="TreeNode.cs" />
@@ -148,6 +150,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Themes\ToolBar.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Themes\View.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -169,9 +175,7 @@
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Resources\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <ProjectReference Include="..\Micser.Common\Micser.Common.csproj">
       <Project>{e14431b4-f54a-4d36-b505-1d3407252430}</Project>
@@ -182,6 +186,9 @@
     <PackageReference Include="Prism.Core">
       <Version>7.1.0.431</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Icons\Backward_16x.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

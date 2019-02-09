@@ -1,8 +1,8 @@
-﻿using System;
+﻿using Micser.Common;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows;
-using Micser.Common;
 
 namespace Micser.App.Infrastructure.Themes
 {
@@ -40,6 +40,10 @@ namespace Micser.App.Infrastructure.Themes
                 new ResourceDictionary
                 {
                     Source = new Uri("Micser.App.Infrastructure;component/Themes/Thumbs.xaml", UriKind.Relative)
+                },
+                new ResourceDictionary
+                {
+                    Source = new Uri("Micser.App.Infrastructure;component/Themes/ToolBar.xaml", UriKind.Relative)
                 },
                 new ResourceDictionary
                 {

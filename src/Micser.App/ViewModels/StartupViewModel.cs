@@ -42,6 +42,7 @@ namespace Micser.App.ViewModels
                 await Task.Delay(1000);
                 _navigationManager.Navigate<MainStatusBarView>(null, AppGlobals.PrismRegions.Status);
                 _navigationManager.Navigate<MainMenuView>(null, AppGlobals.PrismRegions.Menu);
+                _navigationManager.Navigate<ToolBarView>(AppGlobals.ToolBarIds.Main, AppGlobals.PrismRegions.TopToolBar);
                 _navigationManager.Navigate<MainView>();
             }
             else

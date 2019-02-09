@@ -1,6 +1,7 @@
 ﻿using Micser.App.Infrastructure;
 using Micser.App.Infrastructure.Extensions;
 using Micser.App.Infrastructure.Menu;
+using Micser.App.Infrastructure.ToolBars;
 using Micser.App.Properties;
 using Micser.App.ViewModels;
 using Micser.App.Views;
@@ -12,6 +13,8 @@ namespace Micser.App
     {
         public void OnInitialized(IContainerProvider containerProvider)
         {
+            var navigationManager = containerProvider.Resolve<INavigationManager>();
+
             // top level menu items
             var menuItemRegistry = containerProvider.Resolve<IMenuItemRegistry>();
             menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemFileHeader, Id = AppGlobals.MenuItemIds.File });
@@ -23,7 +26,15 @@ namespace Micser.App
             menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemSettingsHeader, Id = AppGlobals.MenuItemIds.ToolsSettings, ParentId = AppGlobals.MenuItemIds.Tools, Command = new NavigationCommand<SettingsView>() });
             menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemAboutHeader, Id = AppGlobals.MenuItemIds.HelpAbout, ParentId = AppGlobals.MenuItemIds.Help, Command = new NavigationCommand<AboutView>() });
 
-            var navigationManager = containerProvider.Resolve<INavigationManager>();
+            // main tool bar
+            var toolBarRegistry = containerProvider.Resolve<IToolBarRegistry>();
+            toolBarRegistry.AddItem(AppGlobals.ToolBarIds.Main, new ToolBarButton
+            {
+                Action = _ => navigationManager.GoBack(AppGlobals.PrismRegions.Main),
+                Description = "Go back",
+                IconPath = "Micser.App.Infrastructure;component/Images/Icons/Backward_16x.png"
+            });
+
             navigationManager.Navigate<StartupView>();
 
             containerProvider.Resolve<IApplicationStateService>().Initialize();
@@ -35,6 +46,7 @@ namespace Micser.App
 
             containerRegistry.RegisterView<MainMenuView, MainMenuViewModel>();
             containerRegistry.RegisterView<MainStatusBarView, MainStatusBarViewModel>();
+            containerRegistry.RegisterView<ToolBarView, ToolBarViewModel>();
 
             containerRegistry.RegisterView<StartupView, StartupViewModel>();
             containerRegistry.RegisterView<StatusView, StatusViewModel>();
