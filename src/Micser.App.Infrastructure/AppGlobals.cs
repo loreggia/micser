@@ -21,5 +21,10 @@
             public const string Status = "StatusRegion";
             public const string TopToolBar = "TopToolBarRegion";
         }
+
+        public static class ToolBarIds
+        {
+            public const string Main = "MainToolBar";
+        }
     }
 }

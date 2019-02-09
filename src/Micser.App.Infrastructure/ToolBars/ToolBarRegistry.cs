@@ -37,5 +37,10 @@ namespace Micser.App.Infrastructure.ToolBars
 
             _toolBars[toolBarName].Add(item);
         }
+
+        public ToolBarDescription GetToolBar(string toolBarName)
+        {
+            return _toolBars.ContainsKey(toolBarName) ? _toolBars[toolBarName] : null;
+        }
     }
 }
