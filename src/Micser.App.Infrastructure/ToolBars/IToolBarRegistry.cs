@@ -4,5 +4,6 @@ namespace Micser.App.Infrastructure.ToolBars
 {
     public interface IToolBarRegistry : IItemRegistry<ToolBarDescription>
     {
+        void AddItem(string toolBarName, ToolBarItem item);
     }
 }
