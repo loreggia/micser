@@ -2,7 +2,6 @@
 using Micser.App.Infrastructure.Api;
 using Micser.App.Views;
 using Prism.Events;
-using System.Threading.Tasks;
 
 namespace Micser.App.ViewModels
 {
@@ -39,7 +38,6 @@ namespace Micser.App.ViewModels
 
             if (statusResult.IsSuccess)
             {
-                await Task.Delay(1000);
                 _navigationManager.Navigate<MainStatusBarView>(null, AppGlobals.PrismRegions.Status);
                 _navigationManager.Navigate<MainMenuView>(null, AppGlobals.PrismRegions.Menu);
                 _navigationManager.Navigate<ToolBarView>(AppGlobals.ToolBarIds.Main, AppGlobals.PrismRegions.TopToolBar);
