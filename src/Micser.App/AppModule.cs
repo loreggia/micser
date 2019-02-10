@@ -23,8 +23,8 @@ namespace Micser.App
 
             // sub-entries
             menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemExitHeader, Id = AppGlobals.MenuItemIds.FileExit, ParentId = AppGlobals.MenuItemIds.File, Command = CustomApplicationCommands.Exit });
-            menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemSettingsHeader, Id = AppGlobals.MenuItemIds.ToolsSettings, ParentId = AppGlobals.MenuItemIds.Tools, Command = new NavigationCommand<SettingsView>() });
-            menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemAboutHeader, Id = AppGlobals.MenuItemIds.HelpAbout, ParentId = AppGlobals.MenuItemIds.Help, Command = new NavigationCommand<AboutView>() });
+            menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemSettingsHeader, Id = AppGlobals.MenuItemIds.ToolsSettings, ParentId = AppGlobals.MenuItemIds.Tools, Command = new NavigationCommand<SettingsView>(AppGlobals.PrismRegions.Main) });
+            menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemAboutHeader, Id = AppGlobals.MenuItemIds.HelpAbout, ParentId = AppGlobals.MenuItemIds.Help, Command = new NavigationCommand<AboutView>(AppGlobals.PrismRegions.Main) });
 
             // main tool bar
             var toolBarRegistry = containerProvider.Resolve<IToolBarRegistry>();
@@ -35,7 +35,7 @@ namespace Micser.App
                 IconPath = "Micser.App.Infrastructure;component/Images/Icons/Backward_16x.png"
             });
 
-            navigationManager.Navigate<StartupView>();
+            navigationManager.Navigate<StartupView>(AppGlobals.PrismRegions.Main, null, false);
 
             containerProvider.Resolve<IApplicationStateService>().Initialize();
         }
