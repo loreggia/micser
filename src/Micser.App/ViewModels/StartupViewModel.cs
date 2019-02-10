@@ -38,14 +38,14 @@ namespace Micser.App.ViewModels
 
             if (statusResult.IsSuccess)
             {
-                _navigationManager.Navigate<MainStatusBarView>(null, AppGlobals.PrismRegions.Status);
-                _navigationManager.Navigate<MainMenuView>(null, AppGlobals.PrismRegions.Menu);
-                _navigationManager.Navigate<ToolBarView>(AppGlobals.ToolBarIds.Main, AppGlobals.PrismRegions.TopToolBar);
-                _navigationManager.Navigate<MainView>();
+                _navigationManager.Navigate<MainStatusBarView>(AppGlobals.PrismRegions.Status, null, false);
+                _navigationManager.Navigate<MainMenuView>(AppGlobals.PrismRegions.Menu, null, false);
+                _navigationManager.Navigate<ToolBarView>(AppGlobals.PrismRegions.TopToolBar, AppGlobals.ToolBarIds.Main, false);
+                _navigationManager.Navigate<MainView>(AppGlobals.PrismRegions.Main, null, false);
             }
             else
             {
-                _navigationManager.Navigate<StatusView>(StatusType.ConnectionFailed);
+                _navigationManager.Navigate<StatusView>(AppGlobals.PrismRegions.Main, StatusType.ConnectionFailed, false);
             }
 
             IsBusy = false;

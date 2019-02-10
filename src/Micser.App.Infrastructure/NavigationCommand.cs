@@ -3,17 +3,28 @@ using Prism.Commands;
 
 namespace Micser.App.Infrastructure
 {
-    public class NavigationCommand<TView> : DelegateCommand
+    public class NavigationCommand<TView> : DelegateCommandBase
     {
-        public NavigationCommand()
-            : base(OnCommandExecuted)
+        public NavigationCommand(string regionName, object parameter = null, bool allowGoBack = true)
         {
+            RegionName = regionName;
+            Parameter = parameter;
+            AllowGoBack = allowGoBack;
         }
 
-        private static void OnCommandExecuted()
+        public bool AllowGoBack { get; }
+        public object Parameter { get; }
+        public string RegionName { get; }
+
+        protected override bool CanExecute(object parameter)
+        {
+            return true;
+        }
+
+        protected override void Execute(object parameter)
         {
             var navigationManager = ServiceLocator.Current.GetInstance<INavigationManager>();
-            navigationManager.Navigate<TView>();
+            navigationManager.Navigate<TView>(RegionName, Parameter, AllowGoBack);
         }
     }
 }
