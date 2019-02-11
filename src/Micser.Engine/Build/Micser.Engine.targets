@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="CopyPluginsToApp" BeforeTargets="AfterBuild">
+    <ItemGroup>
+      <PluginFiles Include="$(SolutionDir)Micser.Plugins.*\bin\$(ConfigurationName)\**\*.*" />
+    </ItemGroup>
+    <Message Text="%(PluginFiles.Identity)" Importance="High" />
+    <Copy SourceFiles="@(PluginFiles)" DestinationFolder="$(OutDir)" />
+  </Target>
+</Project>
