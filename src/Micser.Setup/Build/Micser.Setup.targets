@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?> 
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <BinDir>$(SolutionDir)..\bin\$(ConfigurationName)\</BinDir>
@@ -17,7 +17,7 @@
       <AppFiles Include="$(SolutionDir)Micser.Engine\bin\$(ConfigurationName)\**\*.*" />
       <AppFiles Include="$(SolutionDir)Micser.Plugins.*\bin\$(ConfigurationName)\**\*.*" />
     </ItemGroup>
-    <Message Text="%(AppFiles.Filename)" Importance="High" />
+    <Message Text="%(AppFiles.Identity)" Importance="High" />
     <Copy SourceFiles="@(AppFiles)" DestinationFolder="$(AppDir)" />
   </Target>
 </Project>
