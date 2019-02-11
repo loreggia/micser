@@ -59,7 +59,6 @@
     <Compile Include="Bindable.cs" />
     <Compile Include="Controls\BusyPanel.cs" />
     <Compile Include="Controls\EditableTextBlock.cs" />
-    <Compile Include="Controls\EditableTextBlockAdorner.cs" />
     <Compile Include="Controls\LoadingSpinner.cs" />
     <Compile Include="Controls\RelativePositionPanel.cs" />
     <Compile Include="Controls\ToolBarTrayHelper.cs" />
@@ -175,7 +174,9 @@
       <SubType>Designer</SubType>
     </Page>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Resource Include="Images\Icons\Edit_16x.png" />
+  </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Micser.Common\Micser.Common.csproj">
       <Project>{e14431b4-f54a-4d36-b505-1d3407252430}</Project>
@@ -189,6 +190,9 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\Icons\Backward_16x.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Icons\Save_16x.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
