@@ -32,6 +32,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Micser.Setup", "Micser.Setu
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Micser.Engine", "Micser.Engine\Micser.Engine.csproj", "{88134B7E-E212-413B-881E-2CDDFFD527D6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{6824C944-0750-41D6-898E-F05CDF0FB90A} = {6824C944-0750-41D6-898E-F05CDF0FB90A}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Micser.Engine.Test", "Micser.Engine.Test\Micser.Engine.Test.csproj", "{B3383CB9-7839-4DFE-BFED-6E89E9512565}"
 EndProject
