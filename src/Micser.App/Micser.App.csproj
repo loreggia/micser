@@ -164,6 +164,7 @@
     <None Include="..\..\gfx\logo.psd">
       <Link>logo.psd</Link>
     </None>
+    <None Include="Build\Micser.App.targets" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
@@ -214,4 +215,5 @@
     </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(ProjectDir)Build\Micser.App.targets" />
 </Project>
