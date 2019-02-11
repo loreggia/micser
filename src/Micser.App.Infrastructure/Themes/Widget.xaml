@@ -6,7 +6,13 @@
         <Grid MinHeight="16">
             <Border CornerRadius="5,5,0,0" Background="LightGray" />
             <ContentPresenter Margin="3" Content="{Binding}" />
-            <widgets:DragThumb />
+            <widgets:DragThumb>
+                <widgets:DragThumb.ContextMenu>
+                    <ContextMenu>
+                        <MenuItem Header="Delete" Command="{Binding DeleteCommand, RelativeSource={RelativeSource TemplatedParent}}" />
+                    </ContextMenu>
+                </widgets:DragThumb.ContextMenu>
+            </widgets:DragThumb>
         </Grid>
     </DataTemplate>
 

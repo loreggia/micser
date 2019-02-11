@@ -13,6 +13,9 @@ namespace Micser.App.Infrastructure.Widgets
     [TemplatePart(Name = PartNameOutputConnectors, Type = typeof(ItemsControl))]
     public class Widget : ContentControl, ISelectable
     {
+        public static readonly DependencyProperty DeleteCommandProperty = DependencyProperty.Register(
+            nameof(DeleteCommand), typeof(ICommand), typeof(Widget), new PropertyMetadata(null));
+
         public static readonly DependencyProperty HeaderProperty = DependencyProperty.Register(
             nameof(Header), typeof(object), typeof(Widget), new PropertyMetadata(null));
 
@@ -46,6 +49,7 @@ namespace Micser.App.Infrastructure.Widgets
         internal const string PartNameInputConnectors = "PART_InputConnectors";
 
         internal const string PartNameOutputConnectors = "PART_OutputConnectors";
+
         private ItemsControl _inputConnectorsControl;
 
         private ItemsControl _outputConnectorsControl;
@@ -62,6 +66,12 @@ namespace Micser.App.Infrastructure.Widgets
 
             Loaded += OnWidgetLoaded;
             Dispatcher.ShutdownStarted += OnDispatcherShutdownStarted;
+        }
+
+        public ICommand DeleteCommand
+        {
+            get => (ICommand)GetValue(DeleteCommandProperty);
+            set => SetValue(DeleteCommandProperty, value);
         }
 
         public object Header

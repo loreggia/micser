@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8" ?> 
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <BinDir>$(SolutionDir)..\bin\$(ConfigurationName)\</BinDir>
+  </PropertyGroup>
+  <Target Name="CopyMsiToBinDir" AfterTargets="AfterBuild">
+    <MakeDir Directories="$(BinDir)Installer" />
+    <Copy SourceFiles="$(ProjectDir)Micser.msi" DestinationFolder="$(BinDir)Installer" />
+  </Target>
+  <Target Name="CopyDllsToBinDir" BeforeTargets="BeforeBuild">
+    <PropertyGroup>
+      <AppDir>$(BinDir)App</AppDir>
+      <DrvDir>$(BinDir)Driver</DrvDir>
+    </PropertyGroup>
+    <ItemGroup>
+      <AppFiles Include="$(SolutionDir)Micser.App\bin\$(ConfigurationName)\**\*.*" />
+      <AppFiles Include="$(SolutionDir)Micser.Engine\bin\$(ConfigurationName)\**\*.*" />
+      <AppFiles Include="$(SolutionDir)Micser.Plugins.*\bin\$(ConfigurationName)\**\*.*" />
+    </ItemGroup>
+    <Message Text="%(AppFiles.Filename)" Importance="High" />
+    <Copy SourceFiles="@(AppFiles)" DestinationFolder="$(AppDir)" />
+  </Target>
+</Project>
