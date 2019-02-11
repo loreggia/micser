@@ -7,7 +7,5 @@ namespace Micser.App.Infrastructure.Widgets
         WidgetViewModel CreateViewModel(Type widgetVmType);
 
         Widget CreateWidget(WidgetViewModel viewModel);
-
-        Widget CreateWidget(WidgetDescription description);
     }
 }

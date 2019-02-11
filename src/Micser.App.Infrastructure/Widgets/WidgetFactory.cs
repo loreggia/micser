@@ -26,14 +26,6 @@ namespace Micser.App.Infrastructure.Widgets
             return result;
         }
 
-        public virtual Widget CreateWidget(WidgetDescription d)
-        {
-            var result = _container.Resolve<Widget>(d.ViewModelType.AssemblyQualifiedName);
-            result.DataContext = (WidgetViewModel)_container.Resolve(d.ViewModelType);
-            result.Loaded += OnWidgetLoaded;
-            return result;
-        }
-
         protected virtual void OnWidgetLoaded(object sender, RoutedEventArgs e)
         {
             var widget = (Widget)sender;
