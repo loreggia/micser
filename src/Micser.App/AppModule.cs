@@ -6,6 +6,7 @@ using Micser.App.Properties;
 using Micser.App.ViewModels;
 using Micser.App.Views;
 using Prism.Ioc;
+using System;
 
 namespace Micser.App
 {
@@ -32,7 +33,8 @@ namespace Micser.App
             {
                 Action = _ => navigationManager.GoBack(AppGlobals.PrismRegions.Main),
                 Description = "Go back",
-                IconPath = "Micser.App.Infrastructure;component/Images/Icons/Backward_16x.png"
+                Name = "Back",
+                IconPath = new Uri("/Micser.App.Infrastructure;component/Images/Icons/Backward_16x.png", UriKind.Relative)
             });
 
             navigationManager.Navigate<StartupView>(AppGlobals.PrismRegions.Main, null, false);

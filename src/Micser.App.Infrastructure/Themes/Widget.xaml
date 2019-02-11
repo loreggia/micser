@@ -9,7 +9,7 @@
             <widgets:DragThumb>
                 <widgets:DragThumb.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Header="Delete" Command="{Binding DeleteCommand, RelativeSource={RelativeSource TemplatedParent}}" />
+                        <MenuItem Header="Delete" Command="{Binding DeleteCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=widgets:Widget}}" />
                     </ContextMenu>
                 </widgets:DragThumb.ContextMenu>
             </widgets:DragThumb>
@@ -71,13 +71,13 @@
                                     <ContentControl Grid.Row="0" Grid.ColumnSpan="3" Content="{TemplateBinding Header}"
                                                     ContentTemplate="{TemplateBinding HeaderTemplate}" />
 
-                                    <ItemsControl x:Name="PART_InputConnectors" Grid.Row="1" Grid.Column="0"
+                                    <ItemsControl x:Name="PART_InputConnectors" Grid.Row="1" Grid.Column="0" Padding="5"
                                                   ItemsSource="{Binding InputConnectorsSource, RelativeSource={RelativeSource TemplatedParent}}"
                                                   ItemTemplate="{TemplateBinding InputConnectorTemplate}" />
                                     <ContentPresenter Grid.Row="1" Grid.Column="1" Margin="3" Content="{TemplateBinding Content}"
                                                       ContentTemplate="{TemplateBinding ContentTemplate}"
                                                       ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}" />
-                                    <ItemsControl x:Name="PART_OutputConnectors" Grid.Row="1" Grid.Column="2"
+                                    <ItemsControl x:Name="PART_OutputConnectors" Grid.Row="1" Grid.Column="2" Padding="5"
                                                   ItemsSource="{Binding OutputConnectorsSource, RelativeSource={RelativeSource TemplatedParent}}"
                                                   ItemTemplate="{TemplateBinding OutputConnectorTemplate}" />
                                 </Grid>

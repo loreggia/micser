@@ -1,8 +1,10 @@
 ﻿using Micser.Common.Widgets;
+using Prism.Commands;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows;
+using System.Windows.Input;
 
 namespace Micser.App.Infrastructure.Widgets
 {
@@ -12,6 +14,7 @@ namespace Micser.App.Infrastructure.Widgets
 
         private readonly ObservableCollection<ConnectorViewModel> _outputConnectors;
 
+        private ICommand _deleteCommand;
         private string _header;
 
         private long _id;
@@ -27,6 +30,14 @@ namespace Micser.App.Infrastructure.Widgets
         {
             _inputConnectors = new ObservableCollection<ConnectorViewModel>();
             _outputConnectors = new ObservableCollection<ConnectorViewModel>();
+
+            DeleteCommand = new DelegateCommand(OnDeleteWidget);
+        }
+
+        public ICommand DeleteCommand
+        {
+            get => _deleteCommand;
+            set => SetProperty(ref _deleteCommand, value);
         }
 
         public string Header
@@ -42,7 +53,9 @@ namespace Micser.App.Infrastructure.Widgets
         }
 
         public IEnumerable<ConnectorViewModel> InputConnectors => _inputConnectors;
+
         public bool IsInitialized { get; protected set; }
+
         public abstract Type ModuleType { get; }
 
         public string Name
@@ -121,6 +134,10 @@ namespace Micser.App.Infrastructure.Widgets
         protected virtual void AddOutput(ConnectorViewModel output)
         {
             _outputConnectors.Add(output);
+        }
+
+        protected virtual void OnDeleteWidget()
+        {
         }
 
         protected virtual void OnInputConnectionChanged(object sender, ConnectionChangedEventArgs e)
