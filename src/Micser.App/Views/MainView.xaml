@@ -7,6 +7,7 @@
     xmlns:i="clr-namespace:Micser.App.Infrastructure;assembly=Micser.App.Infrastructure"
     xmlns:w="clr-namespace:Micser.App.Infrastructure.Widgets;assembly=Micser.App.Infrastructure"
     xmlns:vm="clr-namespace:Micser.App.ViewModels"
+    xmlns:themes="clr-namespace:Micser.App.Infrastructure.Themes;assembly=Micser.App.Infrastructure"
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance vm:MainViewModel}"
     d:DesignWidth="300"
@@ -24,10 +25,17 @@
         <Grid Grid.Row="0" />
 
         <!-- Widgets="{Binding Widgets}"-->
-        <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto" Template="{DynamicResource ScrollViewerBorderControlTemplate}" BorderBrush="Black" BorderThickness="1" Margin="0,0,0,5">
+        <ScrollViewer
+            Grid.Row="1"
+            HorizontalScrollBarVisibility="Auto"
+            VerticalScrollBarVisibility="Auto"
+            Template="{DynamicResource ScrollViewerBorderControlTemplate}"
+            BorderBrush="{DynamicResource {themes:BrushThemeKey Neutral100}}"
+            BorderThickness="1"
+            Margin="0,0,0,5">
             <ScrollViewer.Resources>
                 <ControlTemplate x:Key="ScrollViewerBorderControlTemplate" TargetType="{x:Type ScrollViewer}">
-                    <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" CornerRadius="2">
+                    <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
                         <Grid x:Name="Grid" Background="{TemplateBinding Background}">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
@@ -49,7 +57,7 @@
                            ConnectionsSource="{Binding Connections}" />
         </ScrollViewer>
 
-        <Expander Grid.Row="2" Header="Widgets" IsExpanded="True" ExpandDirection="Up" BorderBrush="Black" BorderThickness="1">
+        <Expander Grid.Row="2" Header="Widgets" IsExpanded="True" ExpandDirection="Up" BorderBrush="{DynamicResource {themes:BrushThemeKey Neutral100}}" BorderThickness="1">
             <w:WidgetToolbox ItemsSource="{Binding AvailableWidgets}" />
         </Expander>
     </Grid>

@@ -34,7 +34,6 @@ namespace Micser.App.Infrastructure.Widgets
             if (_dragStartPoint.HasValue)
             {
                 DragDrop.DoDragDrop(this, DataContext, DragDropEffects.Copy);
-
                 //e.Handled = true;
             }
         }
