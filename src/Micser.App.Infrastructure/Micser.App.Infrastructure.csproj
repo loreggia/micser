@@ -79,6 +79,8 @@
     <Compile Include="IAppModule.cs" />
     <Compile Include="ISelectable.cs" />
     <Compile Include="ISettingsService.cs" />
+    <Compile Include="Themes\BrushThemeKeyExtension.cs" />
+    <Compile Include="Themes\ColorThemeKeyExtension.cs" />
     <Compile Include="ToolBars\IToolBarRegistry.cs" />
     <Compile Include="IViewModel.cs" />
     <Compile Include="Menu\IMenuItemRegistry.cs" />

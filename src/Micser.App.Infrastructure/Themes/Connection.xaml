@@ -1,6 +1,8 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:widgets="clr-namespace:Micser.App.Infrastructure.Widgets">
+                    xmlns:widgets="clr-namespace:Micser.App.Infrastructure.Widgets"
+                    xmlns:converter="clr-namespace:Micser.App.Infrastructure.Converter"
+                    xmlns:themes="clr-namespace:Micser.App.Infrastructure.Themes">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="Generic.xaml" />
@@ -21,7 +23,7 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type Thumb}">
-                            <Rectangle Fill="#AADCDCDC" Stroke="DodgerBlue" StrokeThickness="1" RadiusX="0" RadiusY="0" />
+                            <Rectangle Fill="{DynamicResource {themes:BrushThemeKey Neutral010}}" Stroke="{DynamicResource {themes:BrushThemeKey Secondary100}}" StrokeThickness="1" RadiusX="0" RadiusY="0" />
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>
@@ -38,7 +40,7 @@
             </Style>
             <!-- base style for all arrow shapes -->
             <Style x:Key="ArrowSymbolBaseStyle" TargetType="Path">
-                <Setter Property="Fill" Value="{StaticResource ConnectorBrush}" />
+                <Setter Property="Fill" Value="{DynamicResource {themes:BrushThemeKey Secondary050}}" />
                 <Setter Property="Stretch" Value="Fill" />
             </Style>
             <!-- Arrow -->
@@ -57,7 +59,7 @@
                     <Canvas DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}">
                         <Path Name="PART_ConnectionPath"
                               StrokeThickness="2"
-                              Stroke="{StaticResource ConnectorBrush}"
+                              Stroke="{DynamicResource {themes:BrushThemeKey Secondary050}}"
                               StrokeStartLineCap="Round"
                               StrokeEndLineCap="Round"
                               StrokeLineJoin="Round"
@@ -84,7 +86,8 @@
                         <!--Uncomment this to show default label text-->
                         <TextBlock Width="100" Height="35" Text="{Binding Label}"
                                    Canvas.Left="{Binding LabelPosition.X}"
-                                   Canvas.Top="{Binding LabelPosition.Y}">
+                                   Canvas.Top="{Binding LabelPosition.Y}"
+                                   Visibility="{Binding Label, Converter={converter:EmptyStringToVisibilityConverter}}">
                             <TextBlock.RenderTransform>
                                 <TranslateTransform X="5" Y="5" />
                             </TextBlock.RenderTransform>

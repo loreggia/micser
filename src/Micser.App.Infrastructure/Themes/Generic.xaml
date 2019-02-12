@@ -4,7 +4,75 @@
                     xmlns:themes="clr-namespace:Micser.App.Infrastructure.Themes"
                     xmlns:converter="clr-namespace:Micser.App.Infrastructure.Converter">
 
-    <SolidColorBrush x:Key="ConnectorBrush" Color="Gray" />
+    <!-- Colors -->
+    <Color x:Key="{themes:ColorThemeKey Primary100}">#FE9500</Color>
+    <Color x:Key="{themes:ColorThemeKey Primary090}">#FFA01A</Color>
+    <Color x:Key="{themes:ColorThemeKey Primary080}">#FEAA32</Color>
+    <Color x:Key="{themes:ColorThemeKey Primary070}">#FEB44C</Color>
+    <Color x:Key="{themes:ColorThemeKey Primary060}">#FEBF66</Color>
+    <Color x:Key="{themes:ColorThemeKey Primary050}">#FECA80</Color>
+    <Color x:Key="{themes:ColorThemeKey Primary040}">#FED498</Color>
+    <Color x:Key="{themes:ColorThemeKey Primary030}">#FEDEB1</Color>
+    <Color x:Key="{themes:ColorThemeKey Primary020}">#FEE9CC</Color>
+    <Color x:Key="{themes:ColorThemeKey Primary010}">#FEF3E4</Color>
+
+    <Color x:Key="{themes:ColorThemeKey Secondary100}">#006BFE</Color>
+    <Color x:Key="{themes:ColorThemeKey Secondary090}">#1A7AFE</Color>
+    <Color x:Key="{themes:ColorThemeKey Secondary080}">#3288FE</Color>
+    <Color x:Key="{themes:ColorThemeKey Secondary070}">#4C97FE</Color>
+    <Color x:Key="{themes:ColorThemeKey Secondary060}">#66A6FE</Color>
+    <Color x:Key="{themes:ColorThemeKey Secondary050}">#7EB4FE</Color>
+    <Color x:Key="{themes:ColorThemeKey Secondary040}">#98C3FE</Color>
+    <Color x:Key="{themes:ColorThemeKey Secondary030}">#B2D2FE</Color>
+    <Color x:Key="{themes:ColorThemeKey Secondary020}">#CCE1FE</Color>
+    <Color x:Key="{themes:ColorThemeKey Secondary010}">#E4EFFE</Color>
+
+    <Color x:Key="{themes:ColorThemeKey Neutral100}">#000000</Color>
+    <Color x:Key="{themes:ColorThemeKey Neutral090}">#1A1A1A</Color>
+    <Color x:Key="{themes:ColorThemeKey Neutral080}">#323232</Color>
+    <Color x:Key="{themes:ColorThemeKey Neutral070}">#4C4C4C</Color>
+    <Color x:Key="{themes:ColorThemeKey Neutral060}">#666666</Color>
+    <Color x:Key="{themes:ColorThemeKey Neutral050}">#7E7E7E</Color>
+    <Color x:Key="{themes:ColorThemeKey Neutral040}">#999999</Color>
+    <Color x:Key="{themes:ColorThemeKey Neutral030}">#B3B3B3</Color>
+    <Color x:Key="{themes:ColorThemeKey Neutral020}">#CDCDCD</Color>
+    <Color x:Key="{themes:ColorThemeKey Neutral010}">#E5E5E5</Color>
+    <!-- /Colors -->
+
+    <!-- Brushes -->
+    <SolidColorBrush x:Key="{themes:BrushThemeKey Primary100}" Color="{StaticResource {themes:ColorThemeKey Primary100}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey Primary090}" Color="{StaticResource {themes:ColorThemeKey Primary090}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey Primary080}" Color="{StaticResource {themes:ColorThemeKey Primary080}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey Primary070}" Color="{StaticResource {themes:ColorThemeKey Primary070}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey Primary060}" Color="{StaticResource {themes:ColorThemeKey Primary060}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey Primary050}" Color="{StaticResource {themes:ColorThemeKey Primary050}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey Primary040}" Color="{StaticResource {themes:ColorThemeKey Primary040}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey Primary030}" Color="{StaticResource {themes:ColorThemeKey Primary030}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey Primary020}" Color="{StaticResource {themes:ColorThemeKey Primary020}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey Primary010}" Color="{StaticResource {themes:ColorThemeKey Primary010}}" />
+
+    <SolidColorBrush x:Key="{themes:BrushThemeKey Secondary100}" Color="{StaticResource {themes:ColorThemeKey Secondary100}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey Secondary090}" Color="{StaticResource {themes:ColorThemeKey Secondary090}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey Secondary080}" Color="{StaticResource {themes:ColorThemeKey Secondary080}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey Secondary070}" Color="{StaticResource {themes:ColorThemeKey Secondary070}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey Secondary060}" Color="{StaticResource {themes:ColorThemeKey Secondary060}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey Secondary050}" Color="{StaticResource {themes:ColorThemeKey Secondary050}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey Secondary040}" Color="{StaticResource {themes:ColorThemeKey Secondary040}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey Secondary030}" Color="{StaticResource {themes:ColorThemeKey Secondary030}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey Secondary020}" Color="{StaticResource {themes:ColorThemeKey Secondary020}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey Secondary010}" Color="{StaticResource {themes:ColorThemeKey Secondary010}}" />
+
+    <SolidColorBrush x:Key="{themes:BrushThemeKey Neutral100}" Color="{StaticResource {themes:ColorThemeKey Neutral100}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey Neutral090}" Color="{StaticResource {themes:ColorThemeKey Neutral090}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey Neutral080}" Color="{StaticResource {themes:ColorThemeKey Neutral080}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey Neutral070}" Color="{StaticResource {themes:ColorThemeKey Neutral070}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey Neutral060}" Color="{StaticResource {themes:ColorThemeKey Neutral060}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey Neutral050}" Color="{StaticResource {themes:ColorThemeKey Neutral050}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey Neutral040}" Color="{StaticResource {themes:ColorThemeKey Neutral040}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey Neutral030}" Color="{StaticResource {themes:ColorThemeKey Neutral030}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey Neutral020}" Color="{StaticResource {themes:ColorThemeKey Neutral020}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey Neutral010}" Color="{StaticResource {themes:ColorThemeKey Neutral010}}" />
+    <!-- /Brushes -->
 
     <Style TargetType="{x:Type Label}">
         <Setter Property="HorizontalAlignment" Value="Left" />
