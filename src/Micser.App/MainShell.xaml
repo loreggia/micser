@@ -7,6 +7,7 @@
         xmlns:p="clr-namespace:Micser.App.Properties"
         xmlns:tb="http://www.hardcodet.net/taskbar"
         xmlns:ai="clr-namespace:Micser.App.Infrastructure;assembly=Micser.App.Infrastructure"
+        xmlns:themes="clr-namespace:Micser.App.Infrastructure.Themes;assembly=Micser.App.Infrastructure"
         mc:Ignorable="d"
         x:Name="Window"
         Title="{x:Static p:Resources.ApplicationTitle}" Height="600" Width="800"
@@ -24,7 +25,7 @@
         <CommandBinding Command="ai:CustomApplicationCommands.Restore" Executed="RestoreCommand_Executed" />
     </Window.CommandBindings>
 
-    <Grid>
+    <Grid Background="{DynamicResource {themes:BrushThemeKey Neutral050}}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
