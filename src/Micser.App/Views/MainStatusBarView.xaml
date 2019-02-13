@@ -10,9 +10,9 @@
         d:DesignWidth="300"
         d:DataContext="{d:DesignInstance vm:MainStatusBarViewModel}">
     <Grid>
-        <StatusBar Background="{DynamicResource {themes:BrushThemeKey Secondary100}}">
+        <StatusBar Background="{DynamicResource {themes:BrushThemeKey StatusBarBackground}}">
             <StatusBarItem>
-                <TextBlock Text="{Binding StatusText}" Foreground="{DynamicResource {themes:BrushThemeKey Neutral010}}" />
+                <TextBlock Text="{Binding StatusText}" Foreground="{DynamicResource {themes:BrushThemeKey DefaultForeground}}" />
             </StatusBarItem>
         </StatusBar>
     </Grid>

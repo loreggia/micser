@@ -23,7 +23,7 @@
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type Thumb}">
-                            <Rectangle Fill="{DynamicResource {themes:BrushThemeKey Neutral010}}" Stroke="{DynamicResource {themes:BrushThemeKey Secondary100}}" StrokeThickness="1" RadiusX="0" RadiusY="0" />
+                            <Rectangle Fill="{DynamicResource {themes:BrushThemeKey ConnectionThumb}}" Stroke="{DynamicResource {themes:BrushThemeKey ConnectionLine}}" StrokeThickness="1" RadiusX="0" RadiusY="0" />
                         </ControlTemplate>
                     </Setter.Value>
                 </Setter>
@@ -40,7 +40,7 @@
             </Style>
             <!-- base style for all arrow shapes -->
             <Style x:Key="ArrowSymbolBaseStyle" TargetType="Path">
-                <Setter Property="Fill" Value="{DynamicResource {themes:BrushThemeKey Secondary050}}" />
+                <Setter Property="Fill" Value="{DynamicResource {themes:BrushThemeKey ConnectionEnd}}" />
                 <Setter Property="Stretch" Value="Fill" />
             </Style>
             <!-- Arrow -->
@@ -59,7 +59,7 @@
                     <Canvas DataContext="{Binding RelativeSource={RelativeSource TemplatedParent}}">
                         <Path Name="PART_ConnectionPath"
                               StrokeThickness="2"
-                              Stroke="{DynamicResource {themes:BrushThemeKey Secondary050}}"
+                              Stroke="{DynamicResource {themes:BrushThemeKey ConnectionLine}}"
                               StrokeStartLineCap="Round"
                               StrokeEndLineCap="Round"
                               StrokeLineJoin="Round"

@@ -11,8 +11,8 @@
         <Setter Property="HorizontalContentAlignment" Value="Stretch" />
         <Setter Property="VerticalContentAlignment" Value="Stretch" />
         <Setter Property="Cursor" Value="Hand" />
-        <Setter Property="Background" Value="{DynamicResource {themes:BrushThemeKey Neutral010}}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource {themes:BrushThemeKey Neutral100}}" />
+        <Setter Property="Background" Value="{DynamicResource {themes:BrushThemeKey WidgetBackground}}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource {themes:BrushThemeKey WidgetBorder}}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="MinWidth" Value="25" />
         <Setter Property="MinHeight" Value="25" />
