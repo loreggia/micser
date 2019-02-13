@@ -16,15 +16,18 @@ namespace Micser.App
         {
             var navigationManager = containerProvider.Resolve<INavigationManager>();
 
-            // top level menu items
             var menuItemRegistry = containerProvider.Resolve<IMenuItemRegistry>();
-            menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemFileHeader, Id = AppGlobals.MenuItemIds.File });
-            menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemToolsHeader, Id = AppGlobals.MenuItemIds.Tools });
-            menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemHelpHeader, Id = AppGlobals.MenuItemIds.Help });
 
-            // sub-entries
+            menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemFileHeader, Id = AppGlobals.MenuItemIds.File });
+            menuItemRegistry.Add(new MenuItemDescription { Id = "Separator1", IsSeparator = true, ParentId = AppGlobals.MenuItemIds.File });
             menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemExitHeader, Id = AppGlobals.MenuItemIds.FileExit, ParentId = AppGlobals.MenuItemIds.File, Command = CustomApplicationCommands.Exit });
+
+            menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemToolsHeader, Id = AppGlobals.MenuItemIds.Tools });
+            menuItemRegistry.Add(new MenuItemDescription { Header = "Refresh", Id = "Refresh", ParentId = AppGlobals.MenuItemIds.Tools });
+            menuItemRegistry.Add(new MenuItemDescription { Id = "Separator2", IsSeparator = true, ParentId = AppGlobals.MenuItemIds.Tools });
             menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemSettingsHeader, Id = AppGlobals.MenuItemIds.ToolsSettings, ParentId = AppGlobals.MenuItemIds.Tools, Command = new NavigationCommand<SettingsView>(AppGlobals.PrismRegions.Main) });
+
+            menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemHelpHeader, Id = AppGlobals.MenuItemIds.Help });
             menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemAboutHeader, Id = AppGlobals.MenuItemIds.HelpAbout, ParentId = AppGlobals.MenuItemIds.Help, Command = new NavigationCommand<AboutView>(AppGlobals.PrismRegions.Main) });
 
             // main tool bar

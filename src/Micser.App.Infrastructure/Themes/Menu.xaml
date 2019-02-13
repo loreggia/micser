@@ -20,15 +20,99 @@
 
     <!-- MenuItem templates -->
     <ControlTemplate x:Key="{x:Static MenuItem.TopLevelHeaderTemplateKey}" TargetType="{x:Type MenuItem}">
+        <Border x:Name="Border" BorderThickness="1,1,1,0" BorderBrush="Transparent" Margin="{TemplateBinding Margin}">
+            <Grid>
+                <ContentPresenter Margin="6,3,6,3" ContentSource="Header" RecognizesAccessKey="True" />
+
+                <Popup x:Name="Popup" Placement="Bottom" PlacementTarget="{Binding ElementName=Border}" IsOpen="{TemplateBinding IsSubmenuOpen}" VerticalOffset="-1" AllowsTransparency="True" Focusable="False" PopupAnimation="Fade" MinWidth="100">
+                    <Border x:Name="SubmenuBorder" SnapsToDevicePixels="True" Background="{DynamicResource {themes:BrushThemeKey MenuItemBackgroundActive}}" BorderThickness="1" BorderBrush="Transparent">
+                        <ScrollViewer CanContentScroll="True"
+                                      HorizontalScrollBarVisibility="Hidden"
+                                      VerticalScrollBarVisibility="Auto">
+                            <!-- Style="{StaticResource MenuScrollViewer}"-->
+                            <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" />
+                        </ScrollViewer>
+                    </Border>
+                </Popup>
+            </Grid>
+        </Border>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsHighlighted" Value="True">
+                <Setter Property="Background" TargetName="Border" Value="{DynamicResource {themes:BrushThemeKey MenuItemBackgroundHover}}" />
+            </Trigger>
+            <Trigger Property="IsSubmenuOpen" Value="True">
+                <Setter TargetName="Border" Property="Background" Value="{DynamicResource {themes:BrushThemeKey MenuItemBackgroundActive}}" />
+                <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource {themes:BrushThemeKey MenuItemPopupBorder}}" />
+                <Setter TargetName="SubmenuBorder" Property="BorderBrush" Value="{DynamicResource {themes:BrushThemeKey MenuItemPopupBorder}}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{DynamicResource {themes:BrushThemeKey DefaultForegroundDisabled}}" />
+            </Trigger>
+        </ControlTemplate.Triggers>
     </ControlTemplate>
 
     <ControlTemplate x:Key="{x:Static MenuItem.TopLevelItemTemplateKey}" TargetType="{x:Type MenuItem}">
+        <Border x:Name="Border" Margin="{TemplateBinding Margin}">
+            <ContentPresenter Margin="6,3,6,3" ContentSource="Header" RecognizesAccessKey="True" />
+        </Border>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsHighlighted" Value="True">
+                <Setter Property="Background" TargetName="Border" Value="{DynamicResource {themes:BrushThemeKey MenuItemBackgroundHover}}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" TargetName="Border" Value="{DynamicResource {themes:BrushThemeKey MenuItemBackgroundActive}}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{DynamicResource {themes:BrushThemeKey DefaultForegroundDisabled}}" />
+            </Trigger>
+        </ControlTemplate.Triggers>
     </ControlTemplate>
 
     <ControlTemplate x:Key="{x:Static MenuItem.SubmenuHeaderTemplateKey}" TargetType="{x:Type MenuItem}">
+        <Border x:Name="Border" Margin="{TemplateBinding Margin}">
+            <ContentPresenter Margin="6,3,6,3" ContentSource="Header" RecognizesAccessKey="True" />
+        </Border>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsPressed" Value="True">
+                <Setter Property="Background" TargetName="Border" Value="{DynamicResource {themes:BrushThemeKey MenuItemBackgroundActive}}" />
+            </Trigger>
+            <Trigger Property="IsHighlighted" Value="True">
+                <Setter Property="Background" TargetName="Border" Value="{DynamicResource {themes:BrushThemeKey MenuItemBackgroundHover}}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{DynamicResource {themes:BrushThemeKey DefaultForegroundDisabled}}" />
+            </Trigger>
+        </ControlTemplate.Triggers>
     </ControlTemplate>
 
     <ControlTemplate x:Key="{x:Static MenuItem.SubmenuItemTemplateKey}" TargetType="{x:Type MenuItem}">
+        <Border x:Name="Border" Margin="{TemplateBinding Margin}">
+            <Grid>
+                <ContentPresenter Margin="6,3,6,3" ContentSource="Header" RecognizesAccessKey="True" />
+
+                <Popup x:Name="Popup" Placement="Right" IsOpen="{TemplateBinding IsSubmenuOpen}" AllowsTransparency="True" Focusable="False" PopupAnimation="Fade">
+                    <Border x:Name="SubmenuBorder" SnapsToDevicePixels="True" Background="{DynamicResource {themes:BrushThemeKey MenuItemBackgroundActive}}">
+                        <ScrollViewer CanContentScroll="True"
+                                      HorizontalScrollBarVisibility="Hidden"
+                                      VerticalScrollBarVisibility="Auto">
+                            <!-- Style="{StaticResource MenuScrollViewer}"-->
+                            <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" />
+                        </ScrollViewer>
+                    </Border>
+                </Popup>
+            </Grid>
+        </Border>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsHighlighted" Value="True">
+                <Setter Property="Background" TargetName="Border" Value="{DynamicResource {themes:BrushThemeKey MenuItemBackgroundHover}}" />
+            </Trigger>
+            <Trigger Property="IsSubmenuOpen" Value="True">
+                <Setter Property="Background" TargetName="Border" Value="{DynamicResource {themes:BrushThemeKey MenuItemBackgroundActive}}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+                <Setter Property="Foreground" Value="{DynamicResource {themes:BrushThemeKey DefaultForegroundDisabled}}" />
+            </Trigger>
+        </ControlTemplate.Triggers>
     </ControlTemplate>
 
     <!-- MenuItem Style -->
@@ -36,6 +120,7 @@
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="Background" Value="{DynamicResource {themes:BrushThemeKey DefaultBackground}}" />
         <Setter Property="Foreground" Value="{DynamicResource {themes:BrushThemeKey DefaultForeground}}" />
+        <Setter Property="Margin" Value="1" />
 
         <Style.Triggers>
             <Trigger Property="Role" Value="TopLevelHeader">
