@@ -4,6 +4,7 @@
     {
         DefaultBackground,
         DefaultForeground,
+        DefaultForegroundDisabled,
         DefaultBorder,
         ConnectionEnd,
         ConnectionLine,
@@ -14,7 +15,10 @@
         WidgetHeaderBackground,
         WidgetPanelBackground,
         WidgetPanelGridLine,
-        StatusBarBackground
+        StatusBarBackground,
+        MenuItemBackgroundHover,
+        MenuItemBackgroundActive,
+        MenuItemPopupBorder
     }
 
     public class BrushThemeKeyExtension : ThemeKeyExtension<BrushThemeKey>

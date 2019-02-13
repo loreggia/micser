@@ -79,6 +79,9 @@
     <Compile Include="IAppModule.cs" />
     <Compile Include="ISelectable.cs" />
     <Compile Include="ISettingsService.cs" />
+    <Compile Include="TestView.xaml.cs">
+      <DependentUpon>TestView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Themes\BrushThemeKeyExtension.cs" />
     <Compile Include="Themes\ColorThemeKeyExtension.cs" />
     <Compile Include="ToolBars\IToolBarRegistry.cs" />
@@ -131,6 +134,10 @@
     <Compile Include="Widgets\WidgetViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="TestView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Themes\Menu.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
