@@ -39,6 +39,10 @@ namespace Micser.App.Infrastructure.Themes
                 },
                 new ResourceDictionary
                 {
+                    Source = new Uri("Micser.App.Infrastructure;component/Themes/Menu.xaml", UriKind.Relative)
+                },
+                new ResourceDictionary
+                {
                     Source = new Uri("Micser.App.Infrastructure;component/Themes/Thumbs.xaml", UriKind.Relative)
                 },
                 new ResourceDictionary
