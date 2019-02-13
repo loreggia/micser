@@ -5,12 +5,10 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:i="clr-namespace:Micser.App.Infrastructure;assembly=Micser.App.Infrastructure"
     xmlns:vm="clr-namespace:Micser.App.ViewModels"
-    xmlns:themes="clr-namespace:Micser.App.Infrastructure.Themes;assembly=Micser.App.Infrastructure"
     x:Class="Micser.App.Views.MainMenuView"
     mc:Ignorable="d"
     d:DesignWidth="300"
-    d:DesignHeight="50"
-    d:DataContext="{d:DesignInstance Type=vm:MainMenuViewModel, IsDesignTimeCreatable=True}">
+    d:DataContext="{d:DesignInstance vm:MainMenuViewModel}">
 
     <Grid>
         <Menu ItemsSource="{Binding MenuItems}" IsMainMenu="True">
