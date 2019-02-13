@@ -131,6 +131,10 @@
     <Compile Include="Widgets\WidgetViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Page Include="Themes\Menu.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Themes\BusyPanel.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
