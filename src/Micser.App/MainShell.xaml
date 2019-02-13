@@ -25,7 +25,7 @@
         <CommandBinding Command="ai:CustomApplicationCommands.Restore" Executed="RestoreCommand_Executed" />
     </Window.CommandBindings>
 
-    <Grid Background="{DynamicResource {themes:BrushThemeKey Neutral050}}">
+    <Grid Background="{DynamicResource {themes:BrushThemeKey DefaultBackground}}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />

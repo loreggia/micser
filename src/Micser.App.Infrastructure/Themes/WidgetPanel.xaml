@@ -7,7 +7,7 @@
     <Style TargetType="{x:Type widgets:WidgetPanel}">
         <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="VerticalAlignment" Value="Stretch" />
-        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Background" Value="{DynamicResource {themes:BrushThemeKey WidgetPanelBackground}}" />
         <Setter Property="IsHitTestVisible" Value="True" />
 
         <Style.Triggers>
@@ -32,7 +32,7 @@
                                             </PathGeometry>
                                         </GeometryDrawing.Geometry>
                                         <GeometryDrawing.Pen>
-                                            <Pen Brush="{DynamicResource {themes:BrushThemeKey Neutral100}}" Thickness="1" />
+                                            <Pen Brush="{DynamicResource {themes:BrushThemeKey WidgetPanelGridLine}}" Thickness="1" />
                                         </GeometryDrawing.Pen>
                                     </GeometryDrawing>
                                 </DrawingBrush.Drawing>

@@ -12,7 +12,7 @@
              VerticalAlignment="Top"
              HorizontalAlignment="Stretch"
              d:DataContext="{d:DesignInstance viewModels:ToolBarViewModel}">
-    <ToolBar ItemsSource="{Binding Items}" VerticalAlignment="Top" HorizontalAlignment="Stretch" Background="{DynamicResource {themes:BrushThemeKey Neutral050}}">
+    <ToolBar ItemsSource="{Binding Items}" VerticalAlignment="Top" HorizontalAlignment="Stretch" Background="{DynamicResource {themes:BrushThemeKey DefaultBackground}}">
         <ToolBar.Resources>
             <Style x:Key="ToolBarThumbStyle"
                    TargetType="{x:Type Thumb}">

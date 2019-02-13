@@ -5,7 +5,7 @@
 
     <DataTemplate x:Key="DefaultHeaderTemplate">
         <Grid MinHeight="16">
-            <Border Background="{DynamicResource {themes:BrushThemeKey Primary050}}" />
+            <Border Background="{DynamicResource {themes:BrushThemeKey WidgetHeaderBackground}}" />
             <ContentPresenter Margin="3" Content="{Binding}" />
             <widgets:DragThumb>
                 <widgets:DragThumb.ContextMenu>
@@ -21,8 +21,8 @@
     <Style x:Key="DefaultWidgetStyle" TargetType="{x:Type widgets:Widget}">
         <Setter Property="HorizontalAlignment" Value="Left" />
         <Setter Property="VerticalAlignment" Value="Top" />
-        <Setter Property="Background" Value="{DynamicResource {themes:BrushThemeKey Neutral010}}" />
-        <Setter Property="BorderBrush" Value="{DynamicResource {themes:BrushThemeKey Neutral100}}" />
+        <Setter Property="Background" Value="{DynamicResource {themes:BrushThemeKey WidgetBackground}}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource {themes:BrushThemeKey WidgetBorder}}" />
         <Setter Property="BorderThickness" Value="1" />
         <Setter Property="MinWidth" Value="25" />
         <Setter Property="MinHeight" Value="35" />
@@ -96,7 +96,7 @@
 
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter Property="BorderBrush" Value="{DynamicResource {themes:BrushThemeKey Primary100}}" />
+                            <Setter Property="BorderBrush" Value="{DynamicResource {themes:BrushThemeKey WidgetBorderSelected}}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
