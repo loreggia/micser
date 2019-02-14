@@ -5,6 +5,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:i="clr-namespace:Micser.App.Infrastructure;assembly=Micser.App.Infrastructure"
     xmlns:vm="clr-namespace:Micser.App.ViewModels"
+    xmlns:menu="clr-namespace:Micser.App.Infrastructure.Menu;assembly=Micser.App.Infrastructure"
     x:Class="Micser.App.Views.MainMenuView"
     mc:Ignorable="d"
     d:DesignWidth="300"
@@ -12,16 +13,26 @@
 
     <Grid>
         <Menu ItemsSource="{Binding MenuItems}" IsMainMenu="True">
-            <Menu.ItemTemplate>
-                <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
-                    <HierarchicalDataTemplate.ItemContainerStyle>
-                        <Style TargetType="{x:Type MenuItem}">
-                            <Setter Property="Command" Value="{Binding Item.Command}" />
-                        </Style>
-                    </HierarchicalDataTemplate.ItemContainerStyle>
-                    <ContentPresenter Content="{Binding Item.Header}" RecognizesAccessKey="True" />
-                </HierarchicalDataTemplate>
-            </Menu.ItemTemplate>
+            <Menu.ItemTemplateSelector>
+                <menu:MenuItemTemplateSelector>
+                    <menu:MenuItemTemplateSelector.ItemTemplate>
+                        <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
+                            <HierarchicalDataTemplate.ItemContainerStyle>
+                                <Style TargetType="{x:Type MenuItem}">
+                                    <Setter Property="Command" Value="{Binding Item.Command}" />
+                                </Style>
+                            </HierarchicalDataTemplate.ItemContainerStyle>
+
+                            <ContentPresenter Content="{Binding Item.Header}" RecognizesAccessKey="True" />
+                        </HierarchicalDataTemplate>
+                    </menu:MenuItemTemplateSelector.ItemTemplate>
+                    <menu:MenuItemTemplateSelector.SeparatorTemplate>
+                        <DataTemplate>
+                            <Separator />
+                        </DataTemplate>
+                    </menu:MenuItemTemplateSelector.SeparatorTemplate>
+                </menu:MenuItemTemplateSelector>
+            </Menu.ItemTemplateSelector>
         </Menu>
     </Grid>
 </i:View>

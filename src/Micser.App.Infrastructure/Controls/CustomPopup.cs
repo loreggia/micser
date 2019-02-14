@@ -100,10 +100,10 @@ namespace Micser.App.Infrastructure.Controls
 
             switch (Placement)
             {
-                case PlacementMode.Top when offset.Y > 0:
-                case PlacementMode.Bottom when offset.Y < 0:
-                case PlacementMode.Left when offset.X > 0:
-                case PlacementMode.Right when offset.X < 0:
+                case PlacementMode.Top when offset.Y > 0.1:
+                case PlacementMode.Bottom when offset.Y < -0.1:
+                case PlacementMode.Left when offset.X > 0.1:
+                case PlacementMode.Right when offset.X < -0.1:
                     isOppositePlacement = true;
                     break;
             }

@@ -10,7 +10,7 @@
             <widgets:DragThumb>
                 <widgets:DragThumb.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Header="Delete" Command="{Binding DeleteCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=widgets:Widget}}" />
+                        <!--<MenuItem Header="Delete" Command="{Binding DeleteCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=widgets:Widget}}" />-->
                     </ContextMenu>
                 </widgets:DragThumb.ContextMenu>
             </widgets:DragThumb>
