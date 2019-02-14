@@ -28,7 +28,6 @@
         <Setter Property="MinHeight" Value="35" />
         <Setter Property="Width" Value="Auto" />
         <Setter Property="Height" Value="Auto" />
-        <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="Header" Value="{Binding Header}" />
         <Setter Property="HeaderTemplate" Value="{StaticResource DefaultHeaderTemplate}" />
         <Setter Property="InputConnectorsSource" Value="{Binding InputConnectors}" />

@@ -11,7 +11,8 @@
         mc:Ignorable="d"
         x:Name="Window"
         Title="{x:Static p:Resources.ApplicationTitle}" Height="600" Width="800"
-        Icon="icon.ico">
+        Icon="icon.ico"
+        UseLayoutRounding="True">
 
     <Window.Resources>
         <Style x:Key="RegionStyle" TargetType="ContentControl">
