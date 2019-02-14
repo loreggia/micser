@@ -80,6 +80,7 @@
     <Compile Include="IAppModule.cs" />
     <Compile Include="ISelectable.cs" />
     <Compile Include="ISettingsService.cs" />
+    <Compile Include="Menu\MenuItemTemplateSelector.cs" />
     <Compile Include="TestView.xaml.cs">
       <DependentUpon>TestView.xaml</DependentUpon>
     </Compile>
