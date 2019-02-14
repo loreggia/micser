@@ -10,9 +10,9 @@ namespace Micser.App.Infrastructure.Menu
 
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
-            if (item is MenuItemDescription desc)
+            if (item is TreeNode<MenuItemDescription> node)
             {
-                return desc.IsSeparator ? SeparatorTemplate : ItemTemplate;
+                return node.Item.IsSeparator ? SeparatorTemplate : ItemTemplate;
             }
 
             return ItemTemplate;
