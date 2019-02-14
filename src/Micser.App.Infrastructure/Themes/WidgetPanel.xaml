@@ -17,7 +17,7 @@
                         <Setter.Value>
                             <DrawingBrush
                                     TileMode="Tile"
-                                    Viewport="{Binding GridSize, RelativeSource={RelativeSource FindAncestor, AncestorLevel=5, AncestorType=widgets:WidgetPanel}, Converter={converter:DoubleToRectConverter}}"
+                                    Viewport="{Binding GridSize, RelativeSource={RelativeSource FindAncestor, AncestorType=widgets:WidgetPanel}, Converter={converter:DoubleToRectConverter}}"
                                     ViewportUnits="Absolute"
                                     Viewbox="{Binding GridSize, RelativeSource={RelativeSource FindAncestor, AncestorType=widgets:WidgetPanel}, Converter={converter:DoubleToRectConverter}}"
                                     ViewboxUnits="Absolute">
@@ -25,7 +25,7 @@
                                     <GeometryDrawing Brush="Transparent">
                                         <GeometryDrawing.Geometry>
                                             <PathGeometry>
-                                                <PathFigure StartPoint="{Binding GridSize, RelativeSource={RelativeSource FindAncestor, AncestorLevel=3, AncestorType=widgets:WidgetPanel}, Converter={converter:DoubleToPointConverter SetY=True}}">
+                                                <PathFigure StartPoint="{Binding GridSize, RelativeSource={RelativeSource FindAncestor, AncestorType=widgets:WidgetPanel}, Converter={converter:DoubleToPointConverter SetY=True}}">
                                                     <LineSegment Point="0,0" />
                                                     <LineSegment Point="{Binding GridSize, RelativeSource={RelativeSource FindAncestor, AncestorType=widgets:WidgetPanel}, Converter={converter:DoubleToPointConverter SetX=True}}" />
                                                 </PathFigure>

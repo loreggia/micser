@@ -58,6 +58,7 @@
     <Compile Include="ApplicationStateService.cs" />
     <Compile Include="Bindable.cs" />
     <Compile Include="Controls\BusyPanel.cs" />
+    <Compile Include="Controls\CustomPopup.cs" />
     <Compile Include="Controls\EditableTextBlock.cs" />
     <Compile Include="Controls\LoadingSpinner.cs" />
     <Compile Include="Controls\RelativePositionPanel.cs" />

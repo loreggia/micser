@@ -25,12 +25,10 @@
                             <Rectangle Name="Border"
                                        StrokeThickness="1"
                                        StrokeDashArray="2"
-                                       Fill="Transparent"
-                                       SnapsToDevicePixels="true" />
+                                       Fill="Transparent" />
                             <ContentPresenter Content="{TemplateBinding ContentControl.Content}"
                                               ContentTemplate="{StaticResource WidgetToolboxItemContentTemplate}"
-                                              Margin="{TemplateBinding Padding}"
-                                              SnapsToDevicePixels="{TemplateBinding UIElement.SnapsToDevicePixels}" />
+                                              Margin="{TemplateBinding Padding}" />
                         </Grid>
                     </Border>
 

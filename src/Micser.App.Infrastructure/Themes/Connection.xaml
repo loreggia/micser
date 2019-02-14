@@ -14,7 +14,6 @@
             <Style x:Key="ConnectionAdornerThumbStyle" TargetType="{x:Type Thumb}">
                 <Setter Property="Width" Value="12" />
                 <Setter Property="Height" Value="12" />
-                <Setter Property="SnapsToDevicePixels" Value="true" />
                 <Setter Property="RenderTransform">
                     <Setter.Value>
                         <TranslateTransform X="-6" Y="-6" />
@@ -52,7 +51,6 @@
                 <Setter Property="Data" Value="M-5,0 0,-5 5,0 0,5 Z" />
             </Style>
         </Style.Resources>
-        <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type widgets:Connection}">
@@ -64,7 +62,6 @@
                               StrokeEndLineCap="Round"
                               StrokeLineJoin="Round"
                               StrokeDashArray="{Binding StrokeDashArray}"
-                              SnapsToDevicePixels="True"
                               Data="{Binding PathGeometry}" />
                         <Grid Style="{StaticResource ArrowGridStyle}"
                               Canvas.Left="{Binding SourceAnchorPosition.X}"
