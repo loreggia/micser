@@ -62,7 +62,11 @@
                               StrokeEndLineCap="Round"
                               StrokeLineJoin="Round"
                               StrokeDashArray="{Binding StrokeDashArray}"
-                              Data="{Binding PathGeometry}" />
+                              Data="{Binding PathGeometry}">
+                            <Path.Effect>
+                                <DropShadowEffect BlurRadius="5" Opacity="0.8" ShadowDepth="5" Direction="-45" RenderingBias="Quality" />
+                            </Path.Effect>
+                        </Path>
                         <Grid Style="{StaticResource ArrowGridStyle}"
                               Canvas.Left="{Binding SourceAnchorPosition.X}"
                               Canvas.Top="{Binding SourceAnchorPosition.Y}">
