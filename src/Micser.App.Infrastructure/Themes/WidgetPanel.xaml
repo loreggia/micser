@@ -22,19 +22,31 @@
                                     Viewbox="{Binding GridSize, RelativeSource={RelativeSource FindAncestor, AncestorType=widgets:WidgetPanel}, Converter={converter:DoubleToRectConverter}}"
                                     ViewboxUnits="Absolute">
                                 <DrawingBrush.Drawing>
-                                    <GeometryDrawing Brush="Transparent">
-                                        <GeometryDrawing.Geometry>
-                                            <PathGeometry>
-                                                <PathFigure StartPoint="{Binding GridSize, RelativeSource={RelativeSource FindAncestor, AncestorType=widgets:WidgetPanel}, Converter={converter:DoubleToPointConverter SetY=True}}">
-                                                    <LineSegment Point="0,0" />
-                                                    <LineSegment Point="{Binding GridSize, RelativeSource={RelativeSource FindAncestor, AncestorType=widgets:WidgetPanel}, Converter={converter:DoubleToPointConverter SetX=True}}" />
-                                                </PathFigure>
-                                            </PathGeometry>
-                                        </GeometryDrawing.Geometry>
-                                        <GeometryDrawing.Pen>
-                                            <Pen Brush="{DynamicResource {themes:BrushThemeKey WidgetPanelGridLine}}" Thickness="1" />
-                                        </GeometryDrawing.Pen>
-                                    </GeometryDrawing>
+                                    <DrawingGroup>
+                                        <GeometryDrawing Brush="{DynamicResource {themes:BrushThemeKey WidgetPanelBackground}}">
+                                            <GeometryDrawing.Geometry>
+                                                <PathGeometry>
+                                                    <PathFigure StartPoint="{Binding GridSize, RelativeSource={RelativeSource FindAncestor, AncestorType=widgets:WidgetPanel}, Converter={converter:DoubleToPointConverter SetY=True}}">
+                                                        <LineSegment Point="0,0" />
+                                                        <LineSegment Point="{Binding GridSize, RelativeSource={RelativeSource FindAncestor, AncestorType=widgets:WidgetPanel}, Converter={converter:DoubleToPointConverter SetX=True}}" />
+                                                    </PathFigure>
+                                                </PathGeometry>
+                                            </GeometryDrawing.Geometry>
+                                            <GeometryDrawing.Pen>
+                                                <Pen Brush="{DynamicResource {themes:BrushThemeKey WidgetPanelGridLine}}" Thickness="1" />
+                                            </GeometryDrawing.Pen>
+                                        </GeometryDrawing>
+                                        <GeometryDrawing Brush="{DynamicResource {themes:BrushThemeKey WidgetPanelBackground}}">
+                                            <GeometryDrawing.Geometry>
+                                                <PathGeometry>
+                                                    <PathFigure StartPoint="{Binding GridSize, RelativeSource={RelativeSource FindAncestor, AncestorType=widgets:WidgetPanel}, Converter={converter:DoubleToPointConverter SetY=True}}">
+                                                        <LineSegment Point="{Binding GridSize, RelativeSource={RelativeSource FindAncestor, AncestorType=widgets:WidgetPanel}, Converter={converter:DoubleToPointConverter SetX=True, SetY=True}}" />
+                                                        <LineSegment Point="{Binding GridSize, RelativeSource={RelativeSource FindAncestor, AncestorType=widgets:WidgetPanel}, Converter={converter:DoubleToPointConverter SetX=True}}" />
+                                                    </PathFigure>
+                                                </PathGeometry>
+                                            </GeometryDrawing.Geometry>
+                                        </GeometryDrawing>
+                                    </DrawingGroup>
                                 </DrawingBrush.Drawing>
                             </DrawingBrush>
                         </Setter.Value>

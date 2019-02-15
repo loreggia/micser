@@ -9,8 +9,8 @@
                  xmlns:controls="clr-namespace:Micser.App.Infrastructure.Controls;assembly=Micser.App.Infrastructure"
                  mc:Ignorable="d"
                  d:DataContext="{d:DesignInstance widgets:DeviceOutputViewModel}"
-                 MinWidth="175"
-                 MinHeight="75">
+                 MinWidth="180"
+                 MinHeight="90">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />

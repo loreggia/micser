@@ -18,7 +18,7 @@ namespace Micser.App.Infrastructure.Widgets
             new PropertyMetadata(null, OnConnectionsSourcePropertyChanged));
 
         public static readonly DependencyProperty GridSizeProperty = DependencyProperty.Register(
-            nameof(GridSize), typeof(double), typeof(WidgetPanel), new PropertyMetadata(25d));
+            nameof(GridSize), typeof(double), typeof(WidgetPanel), new PropertyMetadata(10d));
 
         public static readonly DependencyProperty IsGridVisibleProperty = DependencyProperty.Register(
             nameof(IsGridVisible), typeof(bool), typeof(WidgetPanel), new PropertyMetadata(false, OnIsGridVisiblePropertyChanged));

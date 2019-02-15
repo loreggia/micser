@@ -15,6 +15,7 @@
         WidgetHeaderBackground,
         WidgetPanelBackground,
         WidgetPanelGridLine,
+        WidgetToolboxBackground,
         StatusBarBackground,
         MenuItemBackgroundHover,
         MenuItemBackgroundActive,

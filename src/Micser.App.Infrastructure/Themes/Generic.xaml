@@ -40,7 +40,7 @@
     <!-- /Colors -->
 
     <!-- Brushes -->
-    <SolidColorBrush x:Key="{themes:BrushThemeKey DefaultBackground}" Color="{StaticResource {themes:ColorThemeKey Neutral090}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey DefaultBackground}" Color="{StaticResource {themes:ColorThemeKey Neutral070}}" />
     <SolidColorBrush x:Key="{themes:BrushThemeKey DefaultForeground}" Color="{StaticResource {themes:ColorThemeKey Neutral010}}" />
     <SolidColorBrush x:Key="{themes:BrushThemeKey DefaultForegroundDisabled}" Color="{StaticResource {themes:ColorThemeKey Neutral050}}" />
     <SolidColorBrush x:Key="{themes:BrushThemeKey DefaultBorder}" Color="{StaticResource {themes:ColorThemeKey Neutral050}}" />
@@ -50,8 +50,10 @@
     <SolidColorBrush x:Key="{themes:BrushThemeKey WidgetBorderSelected}" Color="{StaticResource {themes:ColorThemeKey Primary100}}" />
     <SolidColorBrush x:Key="{themes:BrushThemeKey WidgetHeaderBackground}" Color="{StaticResource {themes:ColorThemeKey Primary050}}" />
 
-    <SolidColorBrush x:Key="{themes:BrushThemeKey WidgetPanelBackground}" Color="{StaticResource {themes:ColorThemeKey Neutral090}}" />
-    <SolidColorBrush x:Key="{themes:BrushThemeKey WidgetPanelGridLine}" Color="{StaticResource {themes:ColorThemeKey Neutral010}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey WidgetPanelBackground}" Color="{StaticResource {themes:ColorThemeKey Neutral080}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey WidgetPanelGridLine}" Color="{StaticResource {themes:ColorThemeKey Neutral060}}" />
+
+    <SolidColorBrush x:Key="{themes:BrushThemeKey WidgetToolboxBackground}" Color="{StaticResource {themes:ColorThemeKey Neutral080}}" />
 
     <SolidColorBrush x:Key="{themes:BrushThemeKey ConnectionEnd}" Color="{StaticResource {themes:ColorThemeKey Secondary100}}" />
     <SolidColorBrush x:Key="{themes:BrushThemeKey ConnectionLine}" Color="{StaticResource {themes:ColorThemeKey Secondary100}}" />
@@ -59,7 +61,7 @@
 
     <SolidColorBrush x:Key="{themes:BrushThemeKey StatusBarBackground}" Color="{StaticResource {themes:ColorThemeKey Secondary090}}" />
 
-    <SolidColorBrush x:Key="{themes:BrushThemeKey MenuItemBackgroundHover}" Color="{StaticResource {themes:ColorThemeKey Neutral070}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey MenuItemBackgroundHover}" Color="{StaticResource {themes:ColorThemeKey Neutral050}}" />
     <SolidColorBrush x:Key="{themes:BrushThemeKey MenuItemBackgroundActive}" Color="{StaticResource {themes:ColorThemeKey Neutral100}}" />
     <SolidColorBrush x:Key="{themes:BrushThemeKey MenuItemPopupBorder}" Color="{StaticResource {themes:ColorThemeKey Neutral070}}" />
     <SolidColorBrush x:Key="{themes:BrushThemeKey MenuItemArrow}" Color="{StaticResource {themes:ColorThemeKey Neutral030}}" />
