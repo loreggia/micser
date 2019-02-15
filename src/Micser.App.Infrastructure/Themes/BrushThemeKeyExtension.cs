@@ -18,7 +18,9 @@
         StatusBarBackground,
         MenuItemBackgroundHover,
         MenuItemBackgroundActive,
-        MenuItemPopupBorder
+        MenuItemPopupBorder,
+        MenuItemArrow,
+        MenuItemArrowHover
     }
 
     public class BrushThemeKeyExtension : ThemeKeyExtension<BrushThemeKey>
