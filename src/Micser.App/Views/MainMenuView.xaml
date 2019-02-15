@@ -5,35 +5,34 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:i="clr-namespace:Micser.App.Infrastructure;assembly=Micser.App.Infrastructure"
     xmlns:vm="clr-namespace:Micser.App.ViewModels"
-    xmlns:menu="clr-namespace:Micser.App.Infrastructure.Menu;assembly=Micser.App.Infrastructure"
     x:Class="Micser.App.Views.MainMenuView"
     mc:Ignorable="d"
     d:DesignWidth="300"
     d:DataContext="{d:DesignInstance vm:MainMenuViewModel}">
 
-    <i:View.Resources>
-        <menu:MenuItemContainerTemplateSelector x:Key="MenuItemContainerTemplateSelector">
-            <menu:MenuItemContainerTemplateSelector.ItemTemplate>
-                <DataTemplate>
-                    <MenuItem x:Name="MenuItem" Header="{Binding Item.Header}"
-                              Command="{Binding Item.Command}"
-                              UsesItemContainerTemplate="True"
-                              ItemContainerTemplateSelector="{DynamicResource MenuItemContainerTemplateSelector}" />
-                </DataTemplate>
-            </menu:MenuItemContainerTemplateSelector.ItemTemplate>
-            <menu:MenuItemContainerTemplateSelector.SeparatorTemplate>
-                <DataTemplate>
-                    <Separator />
-                </DataTemplate>
-            </menu:MenuItemContainerTemplateSelector.SeparatorTemplate>
-        </menu:MenuItemContainerTemplateSelector>
-    </i:View.Resources>
-
     <Grid>
-        <Menu ItemsSource="{Binding MenuItems}" IsMainMenu="True" UsesItemContainerTemplate="True" ItemContainerTemplateSelector="{StaticResource MenuItemContainerTemplateSelector}">
+        <Menu ItemsSource="{Binding MenuItems}" IsMainMenu="True">
             <Menu.ItemTemplate>
                 <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
-                    <ContentPresenter Content="{Binding}" RecognizesAccessKey="True" />
+                    <HierarchicalDataTemplate.ItemContainerStyle>
+                        <Style TargetType="{x:Type MenuItem}">
+                            <Setter Property="Command" Value="{Binding Item.Command}" />
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding Item.IsSeparator}" Value="True">
+                                    <Setter Property="IsTabStop" Value="False" />
+                                    <Setter Property="Template">
+                                        <Setter.Value>
+                                            <ControlTemplate TargetType="MenuItem">
+                                                <Separator Margin="25,1,1,1" />
+                                            </ControlTemplate>
+                                        </Setter.Value>
+                                    </Setter>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </HierarchicalDataTemplate.ItemContainerStyle>
+
+                    <ContentPresenter Content="{Binding Item.Header}" RecognizesAccessKey="True" />
                 </HierarchicalDataTemplate>
             </Menu.ItemTemplate>
         </Menu>

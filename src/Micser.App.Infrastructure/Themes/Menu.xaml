@@ -22,7 +22,7 @@
     <ControlTemplate x:Key="{x:Static MenuItem.TopLevelHeaderTemplateKey}" TargetType="{x:Type MenuItem}">
         <Border x:Name="Border" BorderThickness="1,1,1,0" BorderBrush="Transparent" Margin="{TemplateBinding Margin}">
             <Grid x:Name="Grid">
-                <ContentPresenter Margin="6,3,6,3" ContentSource="Header" RecognizesAccessKey="True" />
+                <ContentPresenter x:Name="HeaderHost" Margin="6,3,6,3" ContentSource="Header" RecognizesAccessKey="True" />
 
                 <controls:CustomPopup x:Name="Popup"
                                       Placement="Bottom"
@@ -33,7 +33,10 @@
                                       PopupAnimation="Fade"
                                       MinWidth="150">
                     <Grid Margin="5">
-                        <Border x:Name="SubmenuBorder" Background="{DynamicResource {themes:BrushThemeKey MenuItemBackgroundActive}}" BorderThickness="1" BorderBrush="Transparent">
+                        <Border x:Name="SubmenuBorder"
+                                Background="{DynamicResource {themes:BrushThemeKey MenuItemBackgroundActive}}"
+                                BorderThickness="1"
+                                BorderBrush="{DynamicResource {themes:BrushThemeKey MenuItemPopupBorder}}">
                             <Border.Effect>
                                 <DropShadowEffect BlurRadius="5" Opacity="0.8" ShadowDepth="5" Direction="-45" RenderingBias="Quality" />
                             </Border.Effect>
@@ -58,7 +61,6 @@
             <Trigger Property="IsSubmenuOpen" Value="True">
                 <Setter TargetName="Border" Property="Background" Value="{DynamicResource {themes:BrushThemeKey MenuItemBackgroundActive}}" />
                 <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource {themes:BrushThemeKey MenuItemPopupBorder}}" />
-                <Setter TargetName="SubmenuBorder" Property="BorderBrush" Value="{DynamicResource {themes:BrushThemeKey MenuItemPopupBorder}}" />
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="Foreground" Value="{DynamicResource {themes:BrushThemeKey DefaultForegroundDisabled}}" />
@@ -92,9 +94,19 @@
         </ControlTemplate.Triggers>
     </ControlTemplate>
 
-    <ControlTemplate x:Key="{x:Static MenuItem.SubmenuHeaderTemplateKey}" TargetType="{x:Type MenuItem}">
-        <Border x:Name="Border" Margin="{TemplateBinding Margin}">
-            <ContentPresenter Margin="6,3,6,3" ContentSource="Header" RecognizesAccessKey="True" />
+    <ControlTemplate x:Key="{x:Static MenuItem.SubmenuItemTemplateKey}" TargetType="{x:Type MenuItem}">
+        <Border x:Name="Border" BorderThickness="1" BorderBrush="Transparent" Margin="{TemplateBinding Margin}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="25" SharedSizeGroup="Icon" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" SharedSizeGroup="Shortcut" />
+                </Grid.ColumnDefinitions>
+
+                <ContentPresenter x:Name="Icon" Margin="6,3,6,3" VerticalAlignment="Center" ContentSource="Icon" />
+                <ContentPresenter x:Name="HeaderHost" Grid.Column="1" Margin="0,3,0,3" ContentSource="Header" RecognizesAccessKey="True" />
+                <TextBlock x:Name="InputGestureText" Grid.Column="2" Text="{TemplateBinding InputGestureText}" Margin="6,3,3,3" DockPanel.Dock="Right" />
+            </Grid>
         </Border>
         <ControlTemplate.Triggers>
             <Trigger Property="IsPressed" Value="True">
@@ -109,12 +121,30 @@
         </ControlTemplate.Triggers>
     </ControlTemplate>
 
-    <ControlTemplate x:Key="{x:Static MenuItem.SubmenuItemTemplateKey}" TargetType="{x:Type MenuItem}">
+    <ControlTemplate x:Key="{x:Static MenuItem.SubmenuHeaderTemplateKey}" TargetType="{x:Type MenuItem}">
         <Border x:Name="Border" BorderThickness="1" BorderBrush="Transparent" Margin="{TemplateBinding Margin}">
             <Grid x:Name="Grid">
-                <ContentPresenter Margin="6,3,6,3" ContentSource="Header" RecognizesAccessKey="True" />
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="25" SharedSizeGroup="Icon" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" SharedSizeGroup="Shortcut" />
+                    <ColumnDefinition Width="13" />
+                </Grid.ColumnDefinitions>
+
+                <ContentPresenter x:Name="Icon" Margin="6,3,6,3" VerticalAlignment="Center" ContentSource="Icon" />
+                <ContentPresenter x:Name="HeaderHost" Grid.Column="1" Margin="0,3,0,3" ContentSource="Header" RecognizesAccessKey="True" />
+                <TextBlock x:Name="InputGestureText" Grid.Column="2" Text="{TemplateBinding InputGestureText}" Margin="6,3,3,3" DockPanel.Dock="Right" />
+
+                <Path x:Name="Arrow"
+                      Grid.Column="3"
+                      HorizontalAlignment="Center"
+                      VerticalAlignment="Center"
+                      Data="M 0 0 L 0 7 L 4 3.5 Z"
+                      Fill="{DynamicResource {themes:BrushThemeKey MenuItemArrow}}" />
 
                 <controls:CustomPopup x:Name="Popup"
+                                      Grid.Column="0"
+                                      Grid.ColumnSpan="4"
                                       Placement="Right"
                                       PlacementTarget="{Binding ElementName=Border}"
                                       IsOpen="{TemplateBinding IsSubmenuOpen}"
@@ -123,7 +153,10 @@
                                       PopupAnimation="Fade"
                                       MinWidth="150">
                     <Grid Margin="5">
-                        <Border x:Name="SubmenuBorder" Background="{DynamicResource {themes:BrushThemeKey MenuItemBackgroundActive}}" BorderThickness="1" BorderBrush="Transparent">
+                        <Border x:Name="SubmenuBorder"
+                                Background="{DynamicResource {themes:BrushThemeKey MenuItemBackgroundActive}}"
+                                BorderThickness="1"
+                                BorderBrush="{DynamicResource {themes:BrushThemeKey MenuItemPopupBorder}}">
                             <Border.Effect>
                                 <DropShadowEffect BlurRadius="5" Opacity="0.8" ShadowDepth="5" Direction="-45" RenderingBias="Quality" />
                             </Border.Effect>
@@ -138,12 +171,8 @@
         </Border>
         <ControlTemplate.Triggers>
             <Trigger Property="IsHighlighted" Value="True">
-                <Setter Property="Background" TargetName="Border" Value="{DynamicResource {themes:BrushThemeKey MenuItemBackgroundHover}}" />
-            </Trigger>
-            <Trigger Property="IsSubmenuOpen" Value="True">
-                <Setter TargetName="Border" Property="Background" Value="{DynamicResource {themes:BrushThemeKey MenuItemBackgroundActive}}" />
-                <Setter TargetName="Border" Property="BorderBrush" Value="{DynamicResource {themes:BrushThemeKey MenuItemPopupBorder}}" />
-                <Setter TargetName="SubmenuBorder" Property="BorderBrush" Value="{DynamicResource {themes:BrushThemeKey MenuItemPopupBorder}}" />
+                <Setter TargetName="Border" Property="Background" Value="{DynamicResource {themes:BrushThemeKey MenuItemBackgroundHover}}" />
+                <Setter TargetName="Arrow" Property="Fill" Value="{DynamicResource {themes:BrushThemeKey MenuItemArrowHover}}"></Setter>
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="Foreground" Value="{DynamicResource {themes:BrushThemeKey DefaultForegroundDisabled}}" />
