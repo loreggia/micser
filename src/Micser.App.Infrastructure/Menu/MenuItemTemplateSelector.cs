@@ -3,19 +3,19 @@ using System.Windows.Controls;
 
 namespace Micser.App.Infrastructure.Menu
 {
-    public class MenuItemTemplateSelector : DataTemplateSelector
+    public class MenuItemContainerTemplateSelector : ItemContainerTemplateSelector
     {
         public DataTemplate ItemTemplate { get; set; }
         public DataTemplate SeparatorTemplate { get; set; }
 
-        public override DataTemplate SelectTemplate(object item, DependencyObject container)
+        public override DataTemplate SelectTemplate(object item, ItemsControl parentItemsControl)
         {
-            if (item is TreeNode<MenuItemDescription> node)
+            if (item is TreeNode<MenuItemDescription> node && node.Item.IsSeparator)
             {
-                return node.Item.IsSeparator ? SeparatorTemplate : ItemTemplate;
+                return SeparatorTemplate;
             }
 
-            return ItemTemplate;
+            return ItemTemplate ?? base.SelectTemplate(item, parentItemsControl);
         }
     }
 }
