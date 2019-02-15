@@ -11,28 +11,31 @@
     d:DesignWidth="300"
     d:DataContext="{d:DesignInstance vm:MainMenuViewModel}">
 
-    <Grid>
-        <Menu ItemsSource="{Binding MenuItems}" IsMainMenu="True">
-            <Menu.ItemTemplateSelector>
-                <menu:MenuItemTemplateSelector>
-                    <menu:MenuItemTemplateSelector.ItemTemplate>
-                        <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
-                            <HierarchicalDataTemplate.ItemContainerStyle>
-                                <Style TargetType="{x:Type MenuItem}">
-                                    <Setter Property="Command" Value="{Binding Item.Command}" />
-                                </Style>
-                            </HierarchicalDataTemplate.ItemContainerStyle>
+    <i:View.Resources>
+        <menu:MenuItemContainerTemplateSelector x:Key="MenuItemContainerTemplateSelector">
+            <menu:MenuItemContainerTemplateSelector.ItemTemplate>
+                <DataTemplate>
+                    <MenuItem x:Name="MenuItem" Header="{Binding Item.Header}"
+                              Command="{Binding Item.Command}"
+                              UsesItemContainerTemplate="True"
+                              ItemContainerTemplateSelector="{DynamicResource MenuItemContainerTemplateSelector}" />
+                </DataTemplate>
+            </menu:MenuItemContainerTemplateSelector.ItemTemplate>
+            <menu:MenuItemContainerTemplateSelector.SeparatorTemplate>
+                <DataTemplate>
+                    <Separator />
+                </DataTemplate>
+            </menu:MenuItemContainerTemplateSelector.SeparatorTemplate>
+        </menu:MenuItemContainerTemplateSelector>
+    </i:View.Resources>
 
-                            <ContentPresenter Content="{Binding Item.Header}" RecognizesAccessKey="True" />
-                        </HierarchicalDataTemplate>
-                    </menu:MenuItemTemplateSelector.ItemTemplate>
-                    <menu:MenuItemTemplateSelector.SeparatorTemplate>
-                        <DataTemplate>
-                            <Separator />
-                        </DataTemplate>
-                    </menu:MenuItemTemplateSelector.SeparatorTemplate>
-                </menu:MenuItemTemplateSelector>
-            </Menu.ItemTemplateSelector>
+    <Grid>
+        <Menu ItemsSource="{Binding MenuItems}" IsMainMenu="True" UsesItemContainerTemplate="True" ItemContainerTemplateSelector="{StaticResource MenuItemContainerTemplateSelector}">
+            <Menu.ItemTemplate>
+                <HierarchicalDataTemplate ItemsSource="{Binding Path=Children}">
+                    <ContentPresenter Content="{Binding}" RecognizesAccessKey="True" />
+                </HierarchicalDataTemplate>
+            </Menu.ItemTemplate>
         </Menu>
     </Grid>
 </i:View>
