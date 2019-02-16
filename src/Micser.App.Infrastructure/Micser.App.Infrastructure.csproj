@@ -80,6 +80,7 @@
     <Compile Include="IAppModule.cs" />
     <Compile Include="ISelectable.cs" />
     <Compile Include="ISettingsService.cs" />
+    <Compile Include="SetPropertyAction.cs" />
     <Compile Include="TestView.xaml.cs">
       <DependentUpon>TestView.xaml</DependentUpon>
     </Compile>
@@ -96,7 +97,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SettingsService.cs" />
     <Compile Include="StatusType.cs" />
-    <Compile Include="Themes\GenericThemeKeyExtension.cs" />
     <Compile Include="Themes\IResourceRegistry.cs" />
     <Compile Include="Themes\ResourceRegistry.cs" />
     <Compile Include="Themes\ThemeKeyExtension.cs" />
@@ -164,6 +164,14 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Themes\ToolBar.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\EditableTextBlock.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\Expander.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

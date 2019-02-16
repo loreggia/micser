@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Windows;
 
 namespace Micser.App.Infrastructure.Themes
@@ -21,55 +22,24 @@ namespace Micser.App.Infrastructure.Themes
         public static IEnumerable<ResourceDictionary> InfrastructureResources =>
             _infrastructureResources ?? (_infrastructureResources = new[]
             {
-                new ResourceDictionary
-                {
-                    Source = new Uri("Micser.App.Infrastructure;component/Themes/Generic.xaml", UriKind.Relative)
-                },
-                new ResourceDictionary
-                {
-                    Source = new Uri("Micser.App.Infrastructure;component/Themes/BusyPanel.xaml", UriKind.Relative)
-                },
-                new ResourceDictionary
-                {
-                    Source = new Uri("Micser.App.Infrastructure;component/Themes/Connection.xaml", UriKind.Relative)
-                },
-                new ResourceDictionary
-                {
-                    Source = new Uri("Micser.App.Infrastructure;component/Themes/Connector.xaml", UriKind.Relative)
-                },
-                new ResourceDictionary
-                {
-                    Source = new Uri("Micser.App.Infrastructure;component/Themes/Menu.xaml", UriKind.Relative)
-                },
-                new ResourceDictionary
-                {
-                    Source = new Uri("Micser.App.Infrastructure;component/Themes/Thumbs.xaml", UriKind.Relative)
-                },
-                new ResourceDictionary
-                {
-                    Source = new Uri("Micser.App.Infrastructure;component/Themes/ToolBar.xaml", UriKind.Relative)
-                },
-                new ResourceDictionary
-                {
-                    Source = new Uri("Micser.App.Infrastructure;component/Themes/View.xaml", UriKind.Relative)
-                },
-                new ResourceDictionary
-                {
-                    Source = new Uri("Micser.App.Infrastructure;component/Themes/Widget.xaml", UriKind.Relative)
-                },
-                new ResourceDictionary
-                {
-                    Source = new Uri("Micser.App.Infrastructure;component/Themes/WidgetPanel.xaml", UriKind.Relative)
-                },
-                new ResourceDictionary
-                {
-                    Source = new Uri("Micser.App.Infrastructure;component/Themes/WidgetToolboxItem.xaml", UriKind.Relative)
-                },
-                new ResourceDictionary
-                {
-                    Source = new Uri("Micser.App.Infrastructure;component/Themes/WidgetToolbox.xaml", UriKind.Relative)
-                }
-            });
+                "Generic.xaml",
+                "BusyPanel.xaml",
+                "Connection.xaml",
+                "Connector.xaml",
+                "EditableTextBlock.xaml",
+                "Expander.xaml",
+                "Menu.xaml",
+                "Thumbs.xaml",
+                "ToolBar.xaml",
+                "View.xaml",
+                "Widget.xaml",
+                "WidgetPanel.xaml",
+                "WidgetToolboxItem.xaml",
+                "WidgetToolbox.xaml"
+            }.Select(x => new ResourceDictionary
+            {
+                Source = new Uri("Micser.App.Infrastructure;component/Themes/" + x, UriKind.Relative)
+            }));
 
         public static void RegisterResourcesFor(FrameworkElement element)
         {
