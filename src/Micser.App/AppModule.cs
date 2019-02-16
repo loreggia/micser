@@ -42,6 +42,13 @@ namespace Micser.App
                 Name = "Back",
                 IconPath = new Uri("/Micser.App.Infrastructure;component/Images/Icons/Backward_16x.png", UriKind.Relative)
             });
+            toolBarRegistry.AddItem(AppGlobals.ToolBarIds.Main, new ToolBarLabel
+            {
+                Description = "Test desc",
+                Name = "Test",
+                IconPath = new Uri("/Micser.App.Infrastructure;component/Images/Icons/Backward_16x.png", UriKind.Relative),
+                Placement = ToolBarItemPlacement.Overflow
+            });
 
             navigationManager.Navigate<StartupView>(AppGlobals.PrismRegions.Main, null, false);
 

@@ -1,26 +1,39 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:toolBars="clr-namespace:Micser.App.Infrastructure.ToolBars"
-                    xmlns:converter="clr-namespace:Micser.App.Infrastructure.Converter">
+                    xmlns:converter="clr-namespace:Micser.App.Infrastructure.Converter"
+                    xmlns:infrastructure="clr-namespace:Micser.App.Infrastructure"
+                    xmlns:themes="clr-namespace:Micser.App.Infrastructure.Themes">
 
-    <DataTemplate x:Key="ToolBarButtonTemplate" DataType="{x:Type toolBars:ToolBarButton}">
-        <Button Command="{Binding ActionCommand}">
+    <DataTemplate x:Key="{x:Type toolBars:ToolBarButton}" DataType="{x:Type toolBars:ToolBarButton}">
+        <Button Command="{Binding ActionCommand}" ToolTip="{Binding Description}">
             <StackPanel Orientation="Horizontal">
                 <Image Source="{Binding IconPath}" Width="16" Height="16" Visibility="{Binding IconPath, Converter={converter:EmptyStringToVisibilityConverter}}" />
                 <TextBlock Text="{Binding Name}" Height="16" Visibility="{Binding Name, Converter={converter:EmptyStringToVisibilityConverter}}" />
             </StackPanel>
         </Button>
     </DataTemplate>
-    <DataTemplate x:Key="ToolBarLabelTemplate" DataType="{x:Type toolBars:ToolBarLabel}">
+    <DataTemplate x:Key="{x:Type toolBars:ToolBarLabel}" DataType="{x:Type toolBars:ToolBarLabel}">
         <TextBlock Text="{Binding Name}" ToolTip="{Binding Description}" />
     </DataTemplate>
 
-    <toolBars:ToolBarItemTemplateSelector
-        x:Key="ToolBarItemTemplateSelector"
-        ButtonTemplate="{StaticResource ToolBarButtonTemplate}"
-        LabelTemplate="{StaticResource ToolBarLabelTemplate}" />
-
     <Style TargetType="{x:Type ToolBar}">
-        <Setter Property="ItemTemplateSelector" Value="{StaticResource ToolBarItemTemplateSelector}" />
+        <Setter Property="Background" Value="{DynamicResource {themes:BrushThemeKey DefaultBackground}}" />
+        <Setter Property="ItemTemplateSelector">
+            <Setter.Value>
+                <infrastructure:ToolBarItemTemplateSelector />
+            </Setter.Value>
+        </Setter>
+        <Setter Property="ItemContainerStyle">
+            <Setter.Value>
+                <Style>
+                    <Setter Property="ToolBar.OverflowMode" Value="{Binding Placement, Converter={toolBars:ToolBarPlacementToOverflowModeConverter}}"></Setter>
+                </Style>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style TargetType="{x:Type ToolBarTray}">
+        <Setter Property="Background" Value="{DynamicResource {themes:BrushThemeKey DefaultBackground}}" />
     </Style>
 </ResourceDictionary>
