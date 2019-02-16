@@ -64,6 +64,7 @@ namespace Micser.App.Infrastructure.Widgets
 
         private void DragThumb_DragStarted(object sender, DragStartedEventArgs e)
         {
+            Widget.Focus();
             WidgetPanel.IsGridVisible = true;
         }
     }
