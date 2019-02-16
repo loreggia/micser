@@ -17,8 +17,62 @@
         <TextBlock Text="{Binding Name}" ToolTip="{Binding Description}" />
     </DataTemplate>
 
+    <Style x:Key="ToolBarThumbStyle" TargetType="{x:Type Thumb}">
+        <Setter Property="Background" Value="{DynamicResource {themes:BrushThemeKey DefaultBackground}}" />
+        <Setter Property="OverridesDefaultStyle" Value="true" />
+        <Setter Property="Cursor" Value="SizeAll" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Thumb}">
+                    <Border Background="{TemplateBinding Background}" SnapsToDevicePixels="True">
+                        <Rectangle Margin="0,2,2,2">
+                            <Rectangle.Fill>
+                                <DrawingBrush Viewport="0,0,4,4" ViewportUnits="Absolute" Viewbox="0,0,8,8" ViewboxUnits="Absolute" TileMode="Tile">
+                                    <DrawingBrush.Drawing>
+                                        <DrawingGroup>
+                                            <GeometryDrawing Brush="{DynamicResource {themes:BrushThemeKey DefaultIcon}}" Geometry="M 4 4 L 4 8 L 8 8 L 8 4 z" />
+                                        </DrawingGroup>
+                                    </DrawingBrush.Drawing>
+                                </DrawingBrush>
+                            </Rectangle.Fill>
+                        </Rectangle>
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="ToolBarOverflowButtonStyle" TargetType="{x:Type ToggleButton}">
+        <Setter Property="OverridesDefaultStyle" Value="true" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ToggleButton}">
+                    <Border x:Name="Border" SnapsToDevicePixels="true" Background="Transparent">
+                        <Grid>
+                            <Path x:Name="Arrow" Fill="{DynamicResource {themes:BrushThemeKey DefaultIcon}}" VerticalAlignment="Bottom" Margin="2,3" Data="M -0.5 3 L 5.5 3 L 2.5 6 Z" />
+                            <ContentPresenter />
+                        </Grid>
+                    </Border>
+
+                    <ControlTemplate.Triggers>
+                        <MultiTrigger>
+                            <MultiTrigger.Conditions>
+                                <Condition Property="IsMouseOver" Value="True" />
+                                <Condition Property="IsEnabled" Value="True" />
+                            </MultiTrigger.Conditions>
+                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource {themes:BrushThemeKey DefaultIcon}}" />
+                            <Setter TargetName="Arrow" Property="Fill" Value="{DynamicResource {themes:BrushThemeKey DefaultIconHover}}" />
+                        </MultiTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <Style TargetType="{x:Type ToolBar}">
         <Setter Property="Background" Value="{DynamicResource {themes:BrushThemeKey DefaultBackground}}" />
+        <Setter Property="SnapsToDevicePixels" Value="True" />
+        <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="ItemTemplateSelector">
             <Setter.Value>
                 <infrastructure:ToolBarItemTemplateSelector />
@@ -27,8 +81,37 @@
         <Setter Property="ItemContainerStyle">
             <Setter.Value>
                 <Style>
-                    <Setter Property="ToolBar.OverflowMode" Value="{Binding Placement, Converter={toolBars:ToolBarPlacementToOverflowModeConverter}}"></Setter>
+                    <Setter Property="ToolBar.OverflowMode" Value="{Binding Placement, Converter={toolBars:ToolBarPlacementToOverflowModeConverter}}" />
                 </Style>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type ToolBar}">
+                    <Border x:Name="MainPanelBorder" Background="{TemplateBinding Background}" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}">
+                        <DockPanel>
+                            <Thumb x:Name="ToolBarThumb" DockPanel.Dock="Left" Width="10" Style="{StaticResource ToolBarThumbStyle}" />
+                            <ContentPresenter x:Name="ToolBarHeader" ContentSource="Header" DockPanel.Dock="Left" />
+                            <ToolBarPanel x:Name="PART_ToolBarPanel" IsItemsHost="True" />
+
+                            <ToggleButton x:Name="OverflowButton" DockPanel.Dock="Right" ClickMode="Press"
+                                          IsChecked="{Binding IsOverflowOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" Style="{StaticResource ToolBarOverflowButtonStyle}">
+                                <Popup x:Name="OverflowPopup" AllowsTransparency="True" Placement="Bottom" StaysOpen="False" Focusable="False" PopupAnimation="Slide"
+                                       IsOpen="{Binding IsOverflowOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
+                                    <Border x:Name="OverflowBorder" BorderThickness="1" BorderBrush="{DynamicResource {themes:BrushThemeKey DefaultBorder}}"
+                                            Background="{DynamicResource {themes:BrushThemeKey DefaultBackground}}">
+                                        <Border.Effect>
+                                            <DropShadowEffect BlurRadius="5" Opacity="0.8" ShadowDepth="5" Direction="-45" RenderingBias="Quality" />
+                                        </Border.Effect>
+
+                                        <ToolBarOverflowPanel x:Name="PART_ToolBarOverflowPanel" WrapWidth="200" Focusable="True" FocusVisualStyle="{x:Null}" KeyboardNavigation.TabNavigation="Cycle"
+                                                              KeyboardNavigation.DirectionalNavigation="Cycle" />
+                                    </Border>
+                                </Popup>
+                            </ToggleButton>
+                        </DockPanel>
+                    </Border>
+                </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
