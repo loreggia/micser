@@ -24,7 +24,10 @@
         MenuItemBackgroundActive,
         MenuItemPopupBorder,
         MenuItemArrow,
-        MenuItemArrowHover
+        MenuItemArrowHover,
+        ToolBarButtonBackground,
+        ToolBarButtonBackgroundHover,
+        ToolBarButtonBackgroundActive
     }
 
     public class BrushThemeKeyExtension : ThemeKeyExtension<BrushThemeKey>

@@ -47,7 +47,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ToggleButton}">
-                    <Border x:Name="Border" SnapsToDevicePixels="true" Background="Transparent">
+                    <Border x:Name="Border" SnapsToDevicePixels="true" Background="{DynamicResource {themes:BrushThemeKey ToolBarButtonBackground}}">
                         <Grid>
                             <Path x:Name="Arrow" Fill="{DynamicResource {themes:BrushThemeKey DefaultIcon}}" VerticalAlignment="Bottom" Margin="2,3" Data="M -0.5 3 L 5.5 3 L 2.5 6 Z" />
                             <ContentPresenter />
@@ -55,14 +55,14 @@
                     </Border>
 
                     <ControlTemplate.Triggers>
-                        <MultiTrigger>
-                            <MultiTrigger.Conditions>
-                                <Condition Property="IsMouseOver" Value="True" />
-                                <Condition Property="IsEnabled" Value="True" />
-                            </MultiTrigger.Conditions>
-                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource {themes:BrushThemeKey DefaultIcon}}" />
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource {themes:BrushThemeKey ToolBarButtonBackgroundHover}}" />
                             <Setter TargetName="Arrow" Property="Fill" Value="{DynamicResource {themes:BrushThemeKey DefaultIconHover}}" />
-                        </MultiTrigger>
+                        </Trigger>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="Border" Property="Background" Value="{DynamicResource {themes:BrushThemeKey ToolBarButtonBackgroundHover}}" />
+                            <Setter TargetName="Arrow" Property="Fill" Value="{DynamicResource {themes:BrushThemeKey DefaultIconHover}}" />
+                        </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
@@ -70,6 +70,32 @@
     </Style>
 
     <Style TargetType="{x:Type ToolBar}">
+        <Style.Resources>
+            <Style TargetType="{x:Type Button}">
+                <Setter Property="OverridesDefaultStyle" Value="True" />
+                <Setter Property="Background" Value="{DynamicResource {themes:BrushThemeKey ToolBarButtonBackground}}" />
+                <Setter Property="Foreground" Value="{DynamicResource {themes:BrushThemeKey DefaultForeground}}" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="{x:Type Button}">
+                            <Border x:Name="Border" Background="{TemplateBinding Background}" BorderThickness="0">
+                                <ContentPresenter />
+                            </Border>
+
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="{DynamicResource {themes:BrushThemeKey ToolBarButtonBackgroundHover}}" />
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter Property="Background" Value="{DynamicResource {themes:BrushThemeKey ToolBarButtonBackgroundActive}}" />
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </Style.Resources>
+
         <Setter Property="Background" Value="{DynamicResource {themes:BrushThemeKey DefaultBackground}}" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="OverridesDefaultStyle" Value="True" />
