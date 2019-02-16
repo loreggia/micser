@@ -35,6 +35,7 @@
         <Setter Property="OutputConnectorsSource" Value="{Binding OutputConnectors}" />
         <Setter Property="Position" Value="{Binding Position, Mode=TwoWay}" />
         <Setter Property="Size" Value="{Binding Size, Mode=TwoWay}" />
+        <Setter Property="Focusable" Value="True" />
         <Setter Property="InputConnectorTemplate">
             <Setter.Value>
                 <DataTemplate>
@@ -72,17 +73,17 @@
                                 </Grid.ColumnDefinitions>
 
                                 <ContentControl Grid.Row="0" Grid.ColumnSpan="3" Content="{TemplateBinding Header}"
-                                                    ContentTemplate="{TemplateBinding HeaderTemplate}" />
+                                                ContentTemplate="{TemplateBinding HeaderTemplate}" Focusable="False" />
 
                                 <ItemsControl x:Name="PART_InputConnectors" Grid.Row="1" Grid.Column="0" Padding="0,5,0,5"
-                                                  ItemsSource="{Binding InputConnectorsSource, RelativeSource={RelativeSource TemplatedParent}}"
-                                                  ItemTemplate="{TemplateBinding InputConnectorTemplate}" />
+                                              ItemsSource="{Binding InputConnectorsSource, RelativeSource={RelativeSource TemplatedParent}}"
+                                              ItemTemplate="{TemplateBinding InputConnectorTemplate}" Focusable="False" />
                                 <ContentPresenter Grid.Row="1" Grid.Column="1" Margin="3" Content="{TemplateBinding Content}"
                                                       ContentTemplate="{TemplateBinding ContentTemplate}"
                                                       ContentTemplateSelector="{TemplateBinding ContentTemplateSelector}" />
                                 <ItemsControl x:Name="PART_OutputConnectors" Grid.Row="1" Grid.Column="2" Padding="0,5,0,5"
-                                                  ItemsSource="{Binding OutputConnectorsSource, RelativeSource={RelativeSource TemplatedParent}}"
-                                                  ItemTemplate="{TemplateBinding OutputConnectorTemplate}" />
+                                              ItemsSource="{Binding OutputConnectorsSource, RelativeSource={RelativeSource TemplatedParent}}"
+                                              ItemTemplate="{TemplateBinding OutputConnectorTemplate}" Focusable="False" />
                             </Grid>
 
                             <widgets:ResizeThumb HorizontalAlignment="Left" VerticalAlignment="Stretch" Cursor="SizeWE" Width="3" />
