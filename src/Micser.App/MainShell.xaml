@@ -10,7 +10,11 @@
         xmlns:themes="clr-namespace:Micser.App.Infrastructure.Themes;assembly=Micser.App.Infrastructure"
         mc:Ignorable="d"
         x:Name="Window"
-        Title="{x:Static p:Resources.ApplicationTitle}" Height="600" Width="800"
+        Title="{x:Static p:Resources.ApplicationTitle}"
+        Height="600"
+        Width="800"
+        MinWidth="350"
+        MinHeight="250"
         Icon="icon.ico"
         UseLayoutRounding="True">
 

@@ -103,7 +103,8 @@
     <Compile Include="ToolBars\ToolBarButton.cs" />
     <Compile Include="ToolBars\ToolBarDescription.cs" />
     <Compile Include="ToolBars\ToolBarItem.cs" />
-    <Compile Include="ToolBars\ToolBarItemTemplateSelector.cs" />
+    <Compile Include="ToolBars\ToolBarPlacementToOverflowModeConverter.cs" />
+    <Compile Include="TypeTemplateSelector.cs" />
     <Compile Include="ToolBars\ToolBarLabel.cs" />
     <Compile Include="ToolBars\ToolBarRegistry.cs" />
     <Compile Include="TreeNode.cs" />
