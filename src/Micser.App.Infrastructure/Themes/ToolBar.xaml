@@ -57,7 +57,7 @@
     <DataTemplate x:Key="{x:Type toolBars:ToolBarButton}" DataType="{x:Type toolBars:ToolBarButton}">
         <Button Command="{Binding ActionCommand}" ToolTip="{Binding Description}" Style="{StaticResource ToolBarButtonStyle}">
             <StackPanel Orientation="Horizontal">
-                <Image Source="{Binding IconPath}" Width="16" Height="16" Visibility="{Binding IconPath, Converter={converter:EmptyStringToVisibilityConverter}}" />
+                <Image Source="{Binding IconPath}" Width="16" Height="16" Margin="-3,0,3,0" VerticalAlignment="Center" Visibility="{Binding IconPath, Converter={converter:NullToVisibilityConverter}}" />
                 <TextBlock Text="{Binding Name}" Height="16" Visibility="{Binding Name, Converter={converter:EmptyStringToVisibilityConverter}}" />
             </StackPanel>
         </Button>
