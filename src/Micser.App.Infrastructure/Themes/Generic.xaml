@@ -72,7 +72,7 @@
 
     <SolidColorBrush x:Key="{themes:BrushThemeKey ToolBarButtonBackground}" Color="{StaticResource {themes:ColorThemeKey Neutral070}}" />
     <SolidColorBrush x:Key="{themes:BrushThemeKey ToolBarButtonBackgroundHover}" Color="{StaticResource {themes:ColorThemeKey Neutral050}}" />
-    <SolidColorBrush x:Key="{themes:BrushThemeKey ToolBarButtonBackgroundActive}" Color="{StaticResource {themes:ColorThemeKey Secondary100}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey ToolBarButtonBackgroundActive}" Color="{StaticResource {themes:ColorThemeKey Primary050}}" />
     <!-- /Brushes -->
 
     <Style TargetType="{x:Type Control}">

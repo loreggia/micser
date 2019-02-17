@@ -22,16 +22,18 @@ namespace Micser.App.ViewModels
         private readonly IUnitOfWorkFactory _database;
         private readonly ILogger _logger;
         private readonly ModulesApiClient _modulesApiClient;
+        private readonly INavigationManager _navigationManager;
         private readonly IWidgetRegistry _widgetRegistry;
         private readonly ObservableCollection<WidgetViewModel> _widgets;
         private IEnumerable<WidgetDescription> _availableWidgets;
         private bool _isLoading;
 
-        public MainViewModel(IUnitOfWorkFactory database, IWidgetFactory widgetFactory, IWidgetRegistry widgetRegistry, ILogger logger)
+        public MainViewModel(IUnitOfWorkFactory database, IWidgetFactory widgetFactory, IWidgetRegistry widgetRegistry, ILogger logger, INavigationManager navigationManager)
         {
             _database = database;
             _widgetRegistry = widgetRegistry;
             _logger = logger;
+            _navigationManager = navigationManager;
 
             _modulesApiClient = new ModulesApiClient();
             _connectionsApiClient = new ModuleConnectionsApiClient();
@@ -95,6 +97,8 @@ namespace Micser.App.ViewModels
             _isLoading = true;
 
             base.OnNavigatedTo(parameter);
+
+            _navigationManager.ClearJournal(AppGlobals.PrismRegions.Main);
 
             AvailableWidgets = _widgetRegistry.Widgets;
 

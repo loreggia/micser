@@ -2,8 +2,10 @@
 {
     public interface INavigationManager
     {
+        void ClearJournal(string regionName);
+
         void GoBack(string regionName);
 
-        void Navigate<TView>(string regionName, object parameter = null, bool allowGoBack = true);
+        void Navigate<TView>(string regionName, object parameter = null);
     }
 }
