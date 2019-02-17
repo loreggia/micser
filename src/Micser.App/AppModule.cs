@@ -6,7 +6,6 @@ using Micser.App.Properties;
 using Micser.App.ViewModels;
 using Micser.App.Views;
 using Prism.Ioc;
-using System;
 
 namespace Micser.App
 {
@@ -20,7 +19,7 @@ namespace Micser.App
 
             menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemFileHeader, Id = AppGlobals.MenuItemIds.File });
             menuItemRegistry.Add(new MenuItemDescription { Header = "Test", Id = "FileTest", ParentId = AppGlobals.MenuItemIds.File });
-            menuItemRegistry.Add(new MenuItemDescription { Header = "_Load", Id = "FileLoad", ParentId = "FileTest", IconPath = new Uri("/Micser.App.Infrastructure;component/Images/Icons/Backward_16x.png", UriKind.Relative) });
+            menuItemRegistry.Add(new MenuItemDescription { Header = "_Load", Id = "FileLoad", ParentId = "FileTest", IconResourceName = "Backward_16x" });
             menuItemRegistry.Add(new MenuItemDescription { Header = "_Save", Id = "FileSave", ParentId = "FileTest" });
             menuItemRegistry.Add(new MenuItemDescription { Id = "Separator1", IsSeparator = true, ParentId = AppGlobals.MenuItemIds.File });
             menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemExitHeader, Id = AppGlobals.MenuItemIds.FileExit, ParentId = AppGlobals.MenuItemIds.File, Command = CustomApplicationCommands.Exit });
@@ -40,7 +39,7 @@ namespace Micser.App
                 Action = _ => navigationManager.GoBack(AppGlobals.PrismRegions.Main),
                 Description = "Go back",
                 Name = "Back",
-                IconPath = new Uri("/Micser.App.Infrastructure;component/Images/Icons/Backward_16x.png", UriKind.Relative)
+                IconResourceName = "Backward_16x"
             });
             toolBarRegistry.AddItem(AppGlobals.ToolBarIds.Main, new ToolBarSeparator());
             toolBarRegistry.AddItem(AppGlobals.ToolBarIds.Main, new ToolBarButton
@@ -52,7 +51,7 @@ namespace Micser.App
             {
                 Description = "Test desc",
                 Name = "Test",
-                IconPath = new Uri("/Micser.App.Infrastructure;component/Images/Icons/Backward_16x.png", UriKind.Relative),
+                IconResourceName = "Backward_16x",
                 Placement = ToolBarItemPlacement.Overflow
             });
             toolBarRegistry.AddItem(AppGlobals.ToolBarIds.Main, new ToolBarSeparator { Placement = ToolBarItemPlacement.Overflow });

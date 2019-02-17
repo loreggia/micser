@@ -23,6 +23,7 @@ namespace Micser.App.Infrastructure.Themes
             _infrastructureResources ?? (_infrastructureResources = new[]
             {
                 "Generic.xaml",
+                "Icons.xaml",
                 "BusyPanel.xaml",
                 "Connection.xaml",
                 "Connector.xaml",
