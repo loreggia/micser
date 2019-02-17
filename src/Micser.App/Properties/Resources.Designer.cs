@@ -106,6 +106,33 @@ namespace Micser.App.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to _Load.
+        /// </summary>
+        public static string MenuItemLoadHeader {
+            get {
+                return ResourceManager.GetString("MenuItemLoadHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Refresh.
+        /// </summary>
+        public static string MenuItemRefreshHeader {
+            get {
+                return ResourceManager.GetString("MenuItemRefreshHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Save.
+        /// </summary>
+        public static string MenuItemSaveHeader {
+            get {
+                return ResourceManager.GetString("MenuItemSaveHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to _Settings.
         /// </summary>
         public static string MenuItemSettingsHeader {
@@ -120,6 +147,42 @@ namespace Micser.App.Properties {
         public static string MenuItemToolsHeader {
             get {
                 return ResourceManager.GetString("MenuItemToolsHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Go back.
+        /// </summary>
+        public static string ToolBarBackDescription {
+            get {
+                return ResourceManager.GetString("ToolBarBackDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Open.
+        /// </summary>
+        public static string ToolBarOpenDescription {
+            get {
+                return ResourceManager.GetString("ToolBarOpenDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Refresh.
+        /// </summary>
+        public static string ToolBarRefreshDescription {
+            get {
+                return ResourceManager.GetString("ToolBarRefreshDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Save.
+        /// </summary>
+        public static string ToolBarSaveDescription {
+            get {
+                return ResourceManager.GetString("ToolBarSaveDescription", resourceCulture);
             }
         }
     }

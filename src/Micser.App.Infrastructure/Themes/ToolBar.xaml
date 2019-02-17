@@ -13,7 +13,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Button}">
                     <Border x:Name="Border" Background="{TemplateBinding Background}" BorderThickness="0">
-                        <ContentPresenter Margin="6,3" />
+                        <ContentPresenter Margin="3" />
                     </Border>
 
                     <ControlTemplate.Triggers>
@@ -43,6 +43,7 @@
         <Setter Property="HorizontalAlignment" Value="Center" />
         <Setter Property="Width" Value="1" />
         <Setter Property="Height" Value="Auto" />
+        <Setter Property="Margin" Value="3,0" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Separator}">
@@ -57,8 +58,8 @@
     <DataTemplate x:Key="{x:Type toolBars:ToolBarButton}" DataType="{x:Type toolBars:ToolBarButton}">
         <Button Command="{Binding ActionCommand}" ToolTip="{Binding Description}" Style="{StaticResource ToolBarButtonStyle}">
             <StackPanel Orientation="Horizontal">
-                <ContentControl Content="{i:ResourceBinding IconResourceName}" Margin="-3,0,3,0" />
-                <TextBlock Text="{Binding Name}" Height="16" Visibility="{Binding Name, Converter={converter:EmptyStringToVisibilityConverter}}" />
+                <ContentControl Content="{i:ResourceBinding IconResourceName}" />
+                <TextBlock Text="{Binding Name}" Height="16" Visibility="{Binding Name, Converter={converter:EmptyStringToVisibilityConverter}}" Margin="3,0" />
             </StackPanel>
         </Button>
     </DataTemplate>
@@ -164,6 +165,12 @@
                             </ToggleButton>
                         </DockPanel>
                     </Border>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="HasOverflowItems" Value="False">
+                            <Setter TargetName="OverflowButton" Property="Visibility" Value="Collapsed"></Setter>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

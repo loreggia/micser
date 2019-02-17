@@ -7,6 +7,7 @@
         DefaultForegroundDisabled,
         DefaultBorder,
         DefaultIcon,
+        DefaultIconPrimary,
         DefaultIconHover,
         ConnectionEnd,
         ConnectionLine,

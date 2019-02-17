@@ -8,9 +8,12 @@
         {
             public const string File = "File";
             public const string FileExit = File + "Exit";
+            public const string FileLoad = "FileLoad";
+            public const string FileSave = "FileSave";
             public const string Help = "Help";
             public const string HelpAbout = Help + "About";
             public const string Tools = "Tools";
+            public const string ToolsRefresh = "ToolsRefresh";
             public const string ToolsSettings = Tools + "Settings";
         }
 
