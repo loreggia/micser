@@ -1,4 +1,5 @@
-﻿using System.Windows.Input;
+﻿using System;
+using System.Windows.Input;
 
 namespace Micser.App.Infrastructure.Menu
 {
@@ -6,6 +7,7 @@ namespace Micser.App.Infrastructure.Menu
     {
         public ICommand Command { get; set; }
         public string Header { get; set; }
+        public Uri IconPath { get; set; }
         public string Id { get; set; }
         public bool IsSeparator { get; set; }
         public int Order { get; set; }

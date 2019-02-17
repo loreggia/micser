@@ -69,6 +69,7 @@
     <Compile Include="Converter\DoubleToPointConverter.cs" />
     <Compile Include="Converter\DoubleToRectConverter.cs" />
     <Compile Include="Converter\EmptyStringToVisibilityConverter.cs" />
+    <Compile Include="Converter\NullToBooleanConverter.cs" />
     <Compile Include="Converter\NullToVisibilityConverter.cs" />
     <Compile Include="CustomApplicationCommands.cs" />
     <Compile Include="DataAccess\AppDbContext.cs" />
