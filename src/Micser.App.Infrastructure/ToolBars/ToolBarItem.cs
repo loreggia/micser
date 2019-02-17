@@ -19,6 +19,7 @@ namespace Micser.App.Infrastructure.ToolBars
         public string Description { get; set; }
         public Uri IconPath { get; set; }
         public string Name { get; set; }
+        public int Order { get; set; }
         public ToolBarItemPlacement Placement { get; set; }
     }
 }

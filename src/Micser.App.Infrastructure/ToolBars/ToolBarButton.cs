@@ -19,6 +19,6 @@ namespace Micser.App.Infrastructure.ToolBars
             }
         }
 
-        public ICommand ActionCommand => _actionCommand ?? (_actionCommand = new DelegateCommand(() => Action(this)));
+        public ICommand ActionCommand => _actionCommand ?? (_actionCommand = new DelegateCommand(() => Action?.Invoke(this)));
     }
 }

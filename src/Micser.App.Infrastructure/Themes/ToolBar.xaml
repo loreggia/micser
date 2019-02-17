@@ -5,8 +5,57 @@
                     xmlns:infrastructure="clr-namespace:Micser.App.Infrastructure"
                     xmlns:themes="clr-namespace:Micser.App.Infrastructure.Themes">
 
+    <Style x:Key="ToolBarButtonStyle" TargetType="{x:Type Button}">
+        <Setter Property="OverridesDefaultStyle" Value="True" />
+        <Setter Property="Background" Value="{DynamicResource {themes:BrushThemeKey ToolBarButtonBackground}}" />
+        <Setter Property="Foreground" Value="{DynamicResource {themes:BrushThemeKey DefaultForeground}}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border x:Name="Border" Background="{TemplateBinding Background}" BorderThickness="0">
+                        <ContentPresenter Margin="6,3" />
+                    </Border>
+
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Background" Value="{DynamicResource {themes:BrushThemeKey ToolBarButtonBackgroundHover}}" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter Property="Background" Value="{DynamicResource {themes:BrushThemeKey ToolBarButtonBackgroundActive}}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="ToolBarLabelStyle" TargetType="{x:Type TextBlock}">
+        <Setter Property="Background" Value="{DynamicResource {themes:BrushThemeKey ToolBarButtonBackground}}" />
+        <Setter Property="Foreground" Value="{DynamicResource {themes:BrushThemeKey DefaultForeground}}" />
+        <Setter Property="Focusable" Value="False" />
+        <Setter Property="Margin" Value="6,3" />
+    </Style>
+
+    <Style x:Key="ToolBarSeparatorStyle" TargetType="{x:Type Separator}">
+        <Setter Property="OverridesDefaultStyle" Value="True" />
+        <Setter Property="Background" Value="{DynamicResource {themes:BrushThemeKey DefaultBorder}}" />
+        <Setter Property="VerticalAlignment" Value="Stretch" />
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="Width" Value="1" />
+        <Setter Property="Height" Value="Auto" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Separator}">
+                    <Border x:Name="Border" Background="{TemplateBinding Background}" HorizontalAlignment="{TemplateBinding HorizontalAlignment}"
+                            VerticalAlignment="{TemplateBinding VerticalAlignment}" Width="{TemplateBinding Width}" Height="{TemplateBinding Height}" />
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Item templates -->
     <DataTemplate x:Key="{x:Type toolBars:ToolBarButton}" DataType="{x:Type toolBars:ToolBarButton}">
-        <Button Command="{Binding ActionCommand}" ToolTip="{Binding Description}">
+        <Button Command="{Binding ActionCommand}" ToolTip="{Binding Description}" Style="{StaticResource ToolBarButtonStyle}">
             <StackPanel Orientation="Horizontal">
                 <Image Source="{Binding IconPath}" Width="16" Height="16" Visibility="{Binding IconPath, Converter={converter:EmptyStringToVisibilityConverter}}" />
                 <TextBlock Text="{Binding Name}" Height="16" Visibility="{Binding Name, Converter={converter:EmptyStringToVisibilityConverter}}" />
@@ -14,8 +63,12 @@
         </Button>
     </DataTemplate>
     <DataTemplate x:Key="{x:Type toolBars:ToolBarLabel}" DataType="{x:Type toolBars:ToolBarLabel}">
-        <TextBlock Text="{Binding Name}" ToolTip="{Binding Description}" />
+        <TextBlock Text="{Binding Name}" ToolTip="{Binding Description}" Style="{StaticResource ToolBarLabelStyle}" />
     </DataTemplate>
+    <DataTemplate x:Key="{x:Type toolBars:ToolBarSeparator}" DataType="{x:Type toolBars:ToolBarSeparator}">
+        <Separator Style="{StaticResource ToolBarSeparatorStyle}" />
+    </DataTemplate>
+    <!-- /Item templates -->
 
     <Style x:Key="ToolBarThumbStyle" TargetType="{x:Type Thumb}">
         <Setter Property="Background" Value="{DynamicResource {themes:BrushThemeKey DefaultBackground}}" />
@@ -70,32 +123,6 @@
     </Style>
 
     <Style TargetType="{x:Type ToolBar}">
-        <Style.Resources>
-            <Style TargetType="{x:Type Button}">
-                <Setter Property="OverridesDefaultStyle" Value="True" />
-                <Setter Property="Background" Value="{DynamicResource {themes:BrushThemeKey ToolBarButtonBackground}}" />
-                <Setter Property="Foreground" Value="{DynamicResource {themes:BrushThemeKey DefaultForeground}}" />
-                <Setter Property="Template">
-                    <Setter.Value>
-                        <ControlTemplate TargetType="{x:Type Button}">
-                            <Border x:Name="Border" Background="{TemplateBinding Background}" BorderThickness="0">
-                                <ContentPresenter />
-                            </Border>
-
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Background" Value="{DynamicResource {themes:BrushThemeKey ToolBarButtonBackgroundHover}}" />
-                                </Trigger>
-                                <Trigger Property="IsPressed" Value="True">
-                                    <Setter Property="Background" Value="{DynamicResource {themes:BrushThemeKey ToolBarButtonBackgroundActive}}" />
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Setter.Value>
-                </Setter>
-            </Style>
-        </Style.Resources>
-
         <Setter Property="Background" Value="{DynamicResource {themes:BrushThemeKey DefaultBackground}}" />
         <Setter Property="SnapsToDevicePixels" Value="True" />
         <Setter Property="OverridesDefaultStyle" Value="True" />
@@ -125,13 +152,13 @@
                                 <Popup x:Name="OverflowPopup" AllowsTransparency="True" Placement="Bottom" StaysOpen="False" Focusable="False" PopupAnimation="Slide"
                                        IsOpen="{Binding IsOverflowOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
                                     <Border x:Name="OverflowBorder" BorderThickness="1" BorderBrush="{DynamicResource {themes:BrushThemeKey DefaultBorder}}"
-                                            Background="{DynamicResource {themes:BrushThemeKey DefaultBackground}}">
+                                            Background="{DynamicResource {themes:BrushThemeKey DefaultBackground}}" Margin="5">
                                         <Border.Effect>
                                             <DropShadowEffect BlurRadius="5" Opacity="0.8" ShadowDepth="5" Direction="-45" RenderingBias="Quality" />
                                         </Border.Effect>
 
                                         <ToolBarOverflowPanel x:Name="PART_ToolBarOverflowPanel" WrapWidth="200" Focusable="True" FocusVisualStyle="{x:Null}" KeyboardNavigation.TabNavigation="Cycle"
-                                                              KeyboardNavigation.DirectionalNavigation="Cycle" />
+                                                              KeyboardNavigation.DirectionalNavigation="Cycle" Margin="6,3" />
                                     </Border>
                                 </Popup>
                             </ToggleButton>

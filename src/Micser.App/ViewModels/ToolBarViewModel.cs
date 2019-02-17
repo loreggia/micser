@@ -1,6 +1,7 @@
 ﻿using Micser.App.Infrastructure;
 using Micser.App.Infrastructure.ToolBars;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Micser.App.ViewModels
 {
@@ -28,7 +29,7 @@ namespace Micser.App.ViewModels
 
                 if (toolBar != null)
                 {
-                    Items = toolBar.Items;
+                    Items = toolBar.Items.OrderBy(i => i.Order).ToArray();
                 }
             }
 
