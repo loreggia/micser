@@ -2,7 +2,7 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:toolBars="clr-namespace:Micser.App.Infrastructure.ToolBars"
                     xmlns:converter="clr-namespace:Micser.App.Infrastructure.Converter"
-                    xmlns:infrastructure="clr-namespace:Micser.App.Infrastructure"
+                    xmlns:i="clr-namespace:Micser.App.Infrastructure"
                     xmlns:themes="clr-namespace:Micser.App.Infrastructure.Themes">
 
     <Style x:Key="ToolBarButtonStyle" TargetType="{x:Type Button}">
@@ -57,16 +57,10 @@
     <DataTemplate x:Key="{x:Type toolBars:ToolBarButton}" DataType="{x:Type toolBars:ToolBarButton}">
         <Button Command="{Binding ActionCommand}" ToolTip="{Binding Description}" Style="{StaticResource ToolBarButtonStyle}">
             <StackPanel Orientation="Horizontal">
-                <Image x:Name="Image" Width="16" Height="16" Margin="-3,0,3,0" VerticalAlignment="Center" Visibility="{Binding IconPath, Converter={converter:NullToVisibilityConverter}}" />
+                <ContentControl Content="{i:ResourceBinding IconResourceName}" Margin="-3,0,3,0" />
                 <TextBlock Text="{Binding Name}" Height="16" Visibility="{Binding Name, Converter={converter:EmptyStringToVisibilityConverter}}" />
             </StackPanel>
         </Button>
-
-        <DataTemplate.Triggers>
-            <DataTrigger Binding="{Binding IconPath, Converter={converter:NullToBooleanConverter}}" Value="True">
-                <Setter TargetName="Image" Property="Source" Value="{Binding IconPath}" />
-            </DataTrigger>
-        </DataTemplate.Triggers>
     </DataTemplate>
     <DataTemplate x:Key="{x:Type toolBars:ToolBarLabel}" DataType="{x:Type toolBars:ToolBarLabel}">
         <TextBlock Text="{Binding Name}" ToolTip="{Binding Description}" Style="{StaticResource ToolBarLabelStyle}" />
@@ -134,7 +128,7 @@
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="ItemTemplateSelector">
             <Setter.Value>
-                <infrastructure:ToolBarItemTemplateSelector />
+                <i:ToolBarItemTemplateSelector />
             </Setter.Value>
         </Setter>
         <Setter Property="ItemContainerStyle">

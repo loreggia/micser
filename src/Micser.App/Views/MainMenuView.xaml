@@ -18,6 +18,7 @@
                     <HierarchicalDataTemplate.ItemContainerStyle>
                         <Style TargetType="{x:Type MenuItem}">
                             <Setter Property="Command" Value="{Binding Item.Command}" />
+                            <Setter Property="Icon" Value="{i:ResourceBinding Item.IconResourceName}" />
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding Item.IsSeparator}" Value="True">
                                     <Setter Property="IsTabStop" Value="False" />
@@ -26,13 +27,6 @@
                                             <ControlTemplate TargetType="MenuItem">
                                                 <Separator Margin="25,1,1,1" />
                                             </ControlTemplate>
-                                        </Setter.Value>
-                                    </Setter>
-                                </DataTrigger>
-                                <DataTrigger Binding="{Binding Item.IconPath, Converter={converter:NullToBooleanConverter}}" Value="True">
-                                    <Setter Property="Icon">
-                                        <Setter.Value>
-                                            <Image Source="{Binding Item.IconPath}" />
                                         </Setter.Value>
                                     </Setter>
                                 </DataTrigger>

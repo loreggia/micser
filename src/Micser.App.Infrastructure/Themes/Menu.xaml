@@ -103,7 +103,7 @@
                     <ColumnDefinition Width="Auto" SharedSizeGroup="Shortcut" />
                 </Grid.ColumnDefinitions>
 
-                <ContentPresenter x:Name="Icon" Margin="6,3,6,3" VerticalAlignment="Center" ContentSource="Icon" />
+                <ContentPresenter x:Name="Icon" Margin="3" VerticalAlignment="Center" ContentSource="Icon" />
                 <ContentPresenter x:Name="HeaderHost" Grid.Column="1" Margin="0,3,0,3" ContentSource="Header" RecognizesAccessKey="True" />
                 <TextBlock x:Name="InputGestureText" Grid.Column="2" Text="{TemplateBinding InputGestureText}" Margin="6,3,3,3" DockPanel.Dock="Right" />
             </Grid>
