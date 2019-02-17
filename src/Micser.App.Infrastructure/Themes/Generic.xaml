@@ -42,7 +42,9 @@
     <SolidColorBrush x:Key="{themes:BrushThemeKey DefaultForeground}" Color="{StaticResource {themes:ColorThemeKey Neutral010}}" />
     <SolidColorBrush x:Key="{themes:BrushThemeKey DefaultForegroundDisabled}" Color="{StaticResource {themes:ColorThemeKey Neutral050}}" />
     <SolidColorBrush x:Key="{themes:BrushThemeKey DefaultBorder}" Color="{StaticResource {themes:ColorThemeKey Neutral050}}" />
+
     <SolidColorBrush x:Key="{themes:BrushThemeKey DefaultIcon}" Color="{StaticResource {themes:ColorThemeKey Neutral030}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey DefaultIconPrimary}" Color="{StaticResource {themes:ColorThemeKey Primary100}}" />
     <SolidColorBrush x:Key="{themes:BrushThemeKey DefaultIconHover}" Color="{StaticResource {themes:ColorThemeKey Primary050}}" />
 
     <SolidColorBrush x:Key="{themes:BrushThemeKey WidgetBackground}" Color="{StaticResource {themes:ColorThemeKey Neutral010}}" />
@@ -70,7 +72,7 @@
 
     <SolidColorBrush x:Key="{themes:BrushThemeKey ToolBarButtonBackground}" Color="{StaticResource {themes:ColorThemeKey Neutral070}}" />
     <SolidColorBrush x:Key="{themes:BrushThemeKey ToolBarButtonBackgroundHover}" Color="{StaticResource {themes:ColorThemeKey Neutral050}}" />
-    <SolidColorBrush x:Key="{themes:BrushThemeKey ToolBarButtonBackgroundActive}" Color="{StaticResource {themes:ColorThemeKey Primary100}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey ToolBarButtonBackgroundActive}" Color="{StaticResource {themes:ColorThemeKey Secondary100}}" />
     <!-- /Brushes -->
 
     <Style TargetType="{x:Type Control}">
