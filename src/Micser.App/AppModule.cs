@@ -20,7 +20,7 @@ namespace Micser.App
 
             menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemFileHeader, Id = AppGlobals.MenuItemIds.File });
             menuItemRegistry.Add(new MenuItemDescription { Header = "Test", Id = "FileTest", ParentId = AppGlobals.MenuItemIds.File });
-            menuItemRegistry.Add(new MenuItemDescription { Header = "_Load", Id = "FileLoad", ParentId = "FileTest" });
+            menuItemRegistry.Add(new MenuItemDescription { Header = "_Load", Id = "FileLoad", ParentId = "FileTest", IconPath = new Uri("/Micser.App.Infrastructure;component/Images/Icons/Backward_16x.png", UriKind.Relative) });
             menuItemRegistry.Add(new MenuItemDescription { Header = "_Save", Id = "FileSave", ParentId = "FileTest" });
             menuItemRegistry.Add(new MenuItemDescription { Id = "Separator1", IsSeparator = true, ParentId = AppGlobals.MenuItemIds.File });
             menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemExitHeader, Id = AppGlobals.MenuItemIds.FileExit, ParentId = AppGlobals.MenuItemIds.File, Command = CustomApplicationCommands.Exit });
