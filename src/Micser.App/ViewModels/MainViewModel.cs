@@ -26,6 +26,7 @@ namespace Micser.App.ViewModels
         private readonly IWidgetRegistry _widgetRegistry;
         private readonly ObservableCollection<WidgetViewModel> _widgets;
         private IEnumerable<WidgetDescription> _availableWidgets;
+        private bool _isLoaded;
         private bool _isLoading;
 
         public MainViewModel(IUnitOfWorkFactory database, IWidgetFactory widgetFactory, IWidgetRegistry widgetRegistry, ILogger logger, INavigationManager navigationManager)
@@ -94,6 +95,11 @@ namespace Micser.App.ViewModels
 
         protected override async void OnNavigatedTo(object parameter)
         {
+            if (_isLoaded)
+            {
+                return;
+            }
+
             _isLoading = true;
 
             base.OnNavigatedTo(parameter);
@@ -174,6 +180,7 @@ namespace Micser.App.ViewModels
             }
 
             _isLoading = false;
+            _isLoaded = true;
         }
 
         private async void CreateConnection(ConnectionViewModel viewModel)

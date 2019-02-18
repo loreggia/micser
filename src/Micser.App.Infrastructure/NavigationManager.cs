@@ -14,17 +14,27 @@ namespace Micser.App.Infrastructure
 
         public void ClearJournal(string regionName)
         {
-            _regionManager.Regions[regionName].NavigationService.Journal.Clear();
+            var journal = _regionManager.Regions[regionName].NavigationService.Journal;
+            var currentEntry = journal.CurrentEntry;
+            journal.Clear();
+            journal.RecordNavigation(currentEntry, true);
         }
 
         public void GoBack(string regionName)
         {
-            _regionManager.Regions[regionName].NavigationService.Journal.GoBack();
+            var navService = _regionManager.Regions[regionName].NavigationService;
+            navService.NavigationFailed += OnNavigationFailed;
+            navService.Journal.GoBack();
+            navService.NavigationFailed -= OnNavigationFailed;
         }
 
         public void Navigate<TView>(string regionName, object parameter = null)
         {
             _regionManager.RequestNavigate(regionName, new Uri(typeof(TView).Name, UriKind.Relative), new NavigationParameters { { AppGlobals.NavigationParameterKey, parameter } });
+        }
+
+        private void OnNavigationFailed(object sender, RegionNavigationFailedEventArgs e)
+        {
         }
     }
 }
