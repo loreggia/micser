@@ -57,6 +57,7 @@
     <Compile Include="ApplicationEvents.cs" />
     <Compile Include="ApplicationStateService.cs" />
     <Compile Include="Bindable.cs" />
+    <Compile Include="CheckBoxLabelBehavior.cs" />
     <Compile Include="Controls\BusyPanel.cs" />
     <Compile Include="Controls\CustomPopup.cs" />
     <Compile Include="Controls\EditableTextBlock.cs" />
@@ -89,6 +90,7 @@
     <Compile Include="ResourceBinding.cs" />
     <Compile Include="SetPropertyAction.cs" />
     <Compile Include="Settings\SettingDefinition.cs" />
+    <Compile Include="Settings\SettingsPanel.cs" />
     <Compile Include="Settings\SettingsRegistry.cs" />
     <Compile Include="TestView.xaml.cs">
       <DependentUpon>TestView.xaml</DependentUpon>
@@ -187,6 +189,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Themes\Icons.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\SettingsPanel.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

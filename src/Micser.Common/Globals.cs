@@ -13,10 +13,5 @@ namespace Micser.Common
         public static readonly string AppDataFolder = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData, Environment.SpecialFolderOption.Create),
             "Micser");
-
-        public static class SettingKeys
-        {
-            public const string ExitOnClose = "ExitOnClose";
-        }
     }
 }

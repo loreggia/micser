@@ -30,6 +30,7 @@ namespace Micser.App.Infrastructure.Themes
                 "EditableTextBlock.xaml",
                 "Expander.xaml",
                 "Menu.xaml",
+                "SettingsPanel.xaml",
                 "Thumbs.xaml",
                 "ToolBar.xaml",
                 "View.xaml",

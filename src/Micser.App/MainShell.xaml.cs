@@ -1,6 +1,5 @@
 ﻿using Micser.App.Infrastructure;
 using Micser.App.Infrastructure.Settings;
-using Micser.Common;
 using Prism.Regions;
 using System.ComponentModel;
 using System.Windows;
@@ -28,7 +27,7 @@ namespace Micser.App
         protected override void OnClosing(CancelEventArgs e)
         {
             var settingsService = Application.GetService<ISettingsService>();
-            _isExiting = settingsService.GetSetting<bool>(Globals.SettingKeys.ExitOnClose);
+            _isExiting = settingsService.GetSetting<bool>(AppGlobals.SettingKeys.ExitOnClose);
 
             e.Cancel = !_isExiting;
             base.OnClosing(e);

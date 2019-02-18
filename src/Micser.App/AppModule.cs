@@ -1,6 +1,7 @@
 ﻿using Micser.App.Infrastructure;
 using Micser.App.Infrastructure.Extensions;
 using Micser.App.Infrastructure.Menu;
+using Micser.App.Infrastructure.Settings;
 using Micser.App.Infrastructure.ToolBars;
 using Micser.App.Properties;
 using Micser.App.ViewModels;
@@ -13,6 +14,16 @@ namespace Micser.App
     {
         public void OnInitialized(IContainerProvider containerProvider)
         {
+            var settingsRegistry = containerProvider.Resolve<ISettingsRegistry>();
+            settingsRegistry.Add(new SettingDefinition
+            {
+                Key = AppGlobals.SettingKeys.ExitOnClose,
+                Name = "Exit on close",
+                Description = "If enabled, the program will minimize to the system tray instead of exiting when the window is closed.",
+                DefaultValue = true,
+                Type = SettingType.Boolean
+            });
+
             var navigationManager = containerProvider.Resolve<INavigationManager>();
 
             var menuItemRegistry = containerProvider.Resolve<IMenuItemRegistry>();
