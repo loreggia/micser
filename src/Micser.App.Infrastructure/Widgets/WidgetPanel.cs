@@ -161,6 +161,10 @@ namespace Micser.App.Infrastructure.Widgets
             {
                 foreach (var connectionViewModel in ConnectionsSource)
                 {
+                    if (_connections.Select(c => (ConnectionViewModel)c.DataContext).Any(vm => vm.Id == connectionViewModel.Id))
+                    {
+                        continue;
+                    }
                     AddConnection(connectionViewModel);
                 }
             }

@@ -127,7 +127,7 @@ namespace Micser.App.Infrastructure.Widgets
 
         private void Connector_Loaded(object sender, RoutedEventArgs e)
         {
-            ParentPanel?.UpdateConnections();
+            //ParentPanel?.UpdateConnections();
         }
     }
 }
