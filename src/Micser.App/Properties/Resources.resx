@@ -150,13 +150,16 @@
   <data name="ToolBarBackDescription" xml:space="preserve">
     <value>Go back</value>
   </data>
-  <data name="ToolBarOpenDescription" xml:space="preserve">
-    <value>Open</value>
+  <data name="ToolBarLoadDescription" xml:space="preserve">
+    <value>Load</value>
   </data>
   <data name="ToolBarRefreshDescription" xml:space="preserve">
     <value>Refresh</value>
   </data>
   <data name="ToolBarSaveDescription" xml:space="preserve">
     <value>Save</value>
+  </data>
+  <data name="ToolBarSettingsDescription" xml:space="preserve">
+    <value>Settings</value>
   </data>
 </root>

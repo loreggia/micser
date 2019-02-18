@@ -56,9 +56,19 @@
 
     <!-- Item templates -->
     <DataTemplate x:Key="{x:Type toolBars:ToolBarButton}" DataType="{x:Type toolBars:ToolBarButton}">
-        <Button Command="{Binding ActionCommand}" ToolTip="{Binding Description}" Style="{StaticResource ToolBarButtonStyle}">
+        <Button Command="{Binding Command}" ToolTip="{Binding Description}" Style="{StaticResource ToolBarButtonStyle}">
             <StackPanel Orientation="Horizontal">
-                <ContentControl Content="{i:ResourceBinding IconResourceName}" />
+                <ContentControl Content="{i:ResourceBinding IconResourceName}">
+                    <ContentControl.Style>
+                        <Style TargetType="{x:Type ContentControl}">
+                            <Style.Triggers>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter Property="Opacity" Value="0.3" />
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </ContentControl.Style>
+                </ContentControl>
                 <TextBlock Text="{Binding Name}" Height="16" Visibility="{Binding Name, Converter={converter:EmptyStringToVisibilityConverter}}" Margin="3,0" />
             </StackPanel>
         </Button>

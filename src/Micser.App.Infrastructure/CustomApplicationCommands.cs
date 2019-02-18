@@ -1,4 +1,7 @@
-﻿using System.Windows.Input;
+﻿using Micser.Common.Extensions;
+using System;
+using System.Linq.Expressions;
+using System.Windows.Input;
 
 namespace Micser.App.Infrastructure
 {
@@ -15,15 +18,39 @@ namespace Micser.App.Infrastructure
         public static readonly RoutedUICommand Exit;
 
         /// <summary>
+        /// Performs a load action in the current context.
+        /// </summary>
+        public static readonly RoutedUICommand Load;
+
+        /// <summary>
+        /// Refreshes the current view.
+        /// </summary>
+        public static readonly RoutedUICommand Refresh;
+
+        /// <summary>
         /// Restores the minimized/hidden window.
         /// </summary>
         public static readonly RoutedUICommand Restore;
 
+        /// <summary>
+        /// Performs a save action in the current context.
+        /// </summary>
+        public static readonly RoutedUICommand Save;
+
         static CustomApplicationCommands()
         {
-            Close = new RoutedUICommand(nameof(Close), nameof(Close), typeof(CustomApplicationCommands));
-            Exit = new RoutedUICommand(nameof(Exit), nameof(Exit), typeof(CustomApplicationCommands));
-            Restore = new RoutedUICommand(nameof(Restore), nameof(Restore), typeof(CustomApplicationCommands));
+            Close = CreateCommand(() => Close);
+            Exit = CreateCommand(() => Exit);
+            Load = CreateCommand(() => Load);
+            Refresh = CreateCommand(() => Refresh);
+            Restore = CreateCommand(() => Restore);
+            Save = CreateCommand(() => Save);
+        }
+
+        private static RoutedUICommand CreateCommand<T>(Expression<Func<T>> command)
+        {
+            var name = PropertyExtensions.GetName(command);
+            return new RoutedUICommand(name, name, typeof(CustomApplicationCommands));
         }
     }
 }
