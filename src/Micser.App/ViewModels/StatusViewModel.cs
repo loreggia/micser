@@ -92,7 +92,7 @@ namespace Micser.App.ViewModels
                         var result = await _statusApiClient.GetStatus();
                         if (result.IsSuccess)
                         {
-                            _navigationManager.Navigate<MainView>(AppGlobals.PrismRegions.Main, null, false);
+                            _navigationManager.Navigate<MainView>(AppGlobals.PrismRegions.Main);
                         }
                         else
                         {

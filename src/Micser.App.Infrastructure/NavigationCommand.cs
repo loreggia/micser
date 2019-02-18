@@ -5,14 +5,12 @@ namespace Micser.App.Infrastructure
 {
     public class NavigationCommand<TView> : DelegateCommandBase
     {
-        public NavigationCommand(string regionName, object parameter = null, bool allowGoBack = true)
+        public NavigationCommand(string regionName, object parameter = null)
         {
             RegionName = regionName;
             Parameter = parameter;
-            AllowGoBack = allowGoBack;
         }
 
-        public bool AllowGoBack { get; }
         public object Parameter { get; }
         public string RegionName { get; }
 
@@ -24,7 +22,7 @@ namespace Micser.App.Infrastructure
         protected override void Execute(object parameter)
         {
             var navigationManager = ServiceLocator.Current.GetInstance<INavigationManager>();
-            navigationManager.Navigate<TView>(RegionName, Parameter, AllowGoBack);
+            navigationManager.Navigate<TView>(RegionName, Parameter);
         }
     }
 }

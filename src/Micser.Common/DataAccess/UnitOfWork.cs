@@ -23,7 +23,7 @@ namespace Micser.Common.DataAccess
             _context.Dispose();
         }
 
-        public T GetRepository<T>() where T : class
+        public T GetRepository<T>() where T : class, IRepository
         {
             return _repositoryFactory.Create<T>(_context);
         }

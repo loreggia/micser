@@ -29,6 +29,11 @@ namespace Micser.App
     /// </summary>
     public partial class Application
     {
+        public static T GetService<T>()
+        {
+            return ServiceLocator.Current.GetInstance<T>();
+        }
+
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)
         {
             base.ConfigureModuleCatalog(moduleCatalog);
@@ -113,13 +118,6 @@ namespace Micser.App
             container.RegisterInstance<IRepositoryFactory>(new RepositoryFactory((t, c) => container.Resolve(t, new ParameterOverride("context", c))));
             container.RegisterInstance<IUnitOfWorkFactory>(new UnitOfWorkFactory(() => container.Resolve<IUnitOfWork>()));
             container.RegisterType<IUnitOfWork, UnitOfWork>();
-
-            containerRegistry.RegisterSingleton<ISettingsService, SettingsService>();
-        }
-
-        private static T GetService<T>()
-        {
-            return ServiceLocator.Current.GetInstance<T>();
         }
 
         private static void LoadPlugins(IModuleCatalog moduleCatalog)
