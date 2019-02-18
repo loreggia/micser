@@ -61,6 +61,24 @@ namespace Micser.App.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Micser - The managed audio routing framework..
+        /// </summary>
+        public static string AboutText {
+            get {
+                return ResourceManager.GetString("AboutText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Version:.
+        /// </summary>
+        public static string AboutVersionText {
+            get {
+                return ResourceManager.GetString("AboutVersionText", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Micser.
         /// </summary>
         public static string ApplicationTitle {

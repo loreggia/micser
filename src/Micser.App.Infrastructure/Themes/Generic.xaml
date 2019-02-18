@@ -83,6 +83,11 @@
     <Style TargetType="{x:Type Label}">
         <Setter Property="HorizontalAlignment" Value="Left" />
         <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Foreground" Value="{DynamicResource {themes:BrushThemeKey DefaultForeground}}" />
+    </Style>
+
+    <Style TargetType="{x:Type TextBlock}">
+        <Setter Property="Foreground" Value="{DynamicResource {themes:BrushThemeKey DefaultForeground}}" />
     </Style>
 
     <Style TargetType="{x:Type GridSplitter}">
