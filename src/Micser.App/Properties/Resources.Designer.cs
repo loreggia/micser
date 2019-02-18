@@ -160,11 +160,11 @@ namespace Micser.App.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Open.
+        ///   Looks up a localized string similar to Load.
         /// </summary>
-        public static string ToolBarOpenDescription {
+        public static string ToolBarLoadDescription {
             get {
-                return ResourceManager.GetString("ToolBarOpenDescription", resourceCulture);
+                return ResourceManager.GetString("ToolBarLoadDescription", resourceCulture);
             }
         }
         
@@ -183,6 +183,15 @@ namespace Micser.App.Properties {
         public static string ToolBarSaveDescription {
             get {
                 return ResourceManager.GetString("ToolBarSaveDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Settings.
+        /// </summary>
+        public static string ToolBarSettingsDescription {
+            get {
+                return ResourceManager.GetString("ToolBarSettingsDescription", resourceCulture);
             }
         }
     }

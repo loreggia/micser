@@ -6,6 +6,7 @@ using Micser.App.Infrastructure.ToolBars;
 using Micser.App.Properties;
 using Micser.App.ViewModels;
 using Micser.App.Views;
+using Prism.Commands;
 using Prism.Ioc;
 
 namespace Micser.App
@@ -29,13 +30,13 @@ namespace Micser.App
             var menuItemRegistry = containerProvider.Resolve<IMenuItemRegistry>();
 
             menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemFileHeader, Id = AppGlobals.MenuItemIds.File });
-            menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemLoadHeader, Id = AppGlobals.MenuItemIds.FileLoad, ParentId = AppGlobals.MenuItemIds.File, IconResourceName = "OpenFile_16x" });
-            menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemSaveHeader, Id = AppGlobals.MenuItemIds.FileSave, ParentId = AppGlobals.MenuItemIds.File, IconResourceName = "Save_16x" });
+            menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemLoadHeader, Id = AppGlobals.MenuItemIds.FileLoad, ParentId = AppGlobals.MenuItemIds.File, Command = CustomApplicationCommands.Load, IconResourceName = "OpenFile_16x" });
+            menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemSaveHeader, Id = AppGlobals.MenuItemIds.FileSave, ParentId = AppGlobals.MenuItemIds.File, Command = CustomApplicationCommands.Save, IconResourceName = "Save_16x" });
             menuItemRegistry.Add(new MenuItemDescription { IsSeparator = true, ParentId = AppGlobals.MenuItemIds.File });
             menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemExitHeader, Id = AppGlobals.MenuItemIds.FileExit, ParentId = AppGlobals.MenuItemIds.File, Command = CustomApplicationCommands.Exit });
 
             menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemToolsHeader, Id = AppGlobals.MenuItemIds.Tools });
-            menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemRefreshHeader, Id = AppGlobals.MenuItemIds.ToolsRefresh, ParentId = AppGlobals.MenuItemIds.Tools, IconResourceName = "Refresh_16x" });
+            menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemRefreshHeader, Id = AppGlobals.MenuItemIds.ToolsRefresh, ParentId = AppGlobals.MenuItemIds.Tools, Command = CustomApplicationCommands.Refresh, IconResourceName = "Refresh_16x" });
             menuItemRegistry.Add(new MenuItemDescription { IsSeparator = true, ParentId = AppGlobals.MenuItemIds.Tools });
             menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemSettingsHeader, Id = AppGlobals.MenuItemIds.ToolsSettings, ParentId = AppGlobals.MenuItemIds.Tools, Command = new NavigationCommand<SettingsView>(AppGlobals.PrismRegions.Main), IconResourceName = "Settings_16x" });
 
@@ -46,30 +47,36 @@ namespace Micser.App
             var toolBarRegistry = containerProvider.Resolve<IToolBarRegistry>();
             toolBarRegistry.AddItem(AppGlobals.ToolBarIds.Main, new ToolBarButton
             {
-                Action = _ => navigationManager.GoBack(AppGlobals.PrismRegions.Main),
+                Command = new DelegateCommand(() => navigationManager.GoBack(AppGlobals.PrismRegions.Main)),
                 Description = Resources.ToolBarBackDescription,
                 IconResourceName = "Backward_16x"
             });
             toolBarRegistry.AddItem(AppGlobals.ToolBarIds.Main, new ToolBarSeparator());
             toolBarRegistry.AddItem(AppGlobals.ToolBarIds.Main, new ToolBarButton
             {
-                Description = Resources.ToolBarOpenDescription,
+                Command = CustomApplicationCommands.Load,
+                Description = Resources.ToolBarLoadDescription,
                 IconResourceName = "OpenFile_16x"
             });
             toolBarRegistry.AddItem(AppGlobals.ToolBarIds.Main, new ToolBarButton
             {
+                Command = CustomApplicationCommands.Save,
                 Description = Resources.ToolBarSaveDescription,
                 IconResourceName = "Save_16x"
             });
             toolBarRegistry.AddItem(AppGlobals.ToolBarIds.Main, new ToolBarSeparator());
             toolBarRegistry.AddItem(AppGlobals.ToolBarIds.Main, new ToolBarButton
             {
+                Command = CustomApplicationCommands.Refresh,
                 Description = Resources.ToolBarRefreshDescription,
                 IconResourceName = "Refresh_16x"
             });
+            toolBarRegistry.AddItem(AppGlobals.ToolBarIds.Main, new ToolBarSeparator());
             toolBarRegistry.AddItem(AppGlobals.ToolBarIds.Main, new ToolBarButton
             {
-                Name = "Test"
+                Command = new NavigationCommand<SettingsView>(AppGlobals.PrismRegions.Main),
+                Description = Resources.ToolBarSettingsDescription,
+                IconResourceName = "Settings_16x"
             });
 
             navigationManager.Navigate<StartupView>(AppGlobals.PrismRegions.Main);
