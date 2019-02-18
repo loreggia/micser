@@ -118,6 +118,9 @@ namespace Micser.App
             container.RegisterInstance<IRepositoryFactory>(new RepositoryFactory((t, c) => container.Resolve(t, new ParameterOverride("context", c))));
             container.RegisterInstance<IUnitOfWorkFactory>(new UnitOfWorkFactory(() => container.Resolve<IUnitOfWork>()));
             container.RegisterType<IUnitOfWork, UnitOfWork>();
+
+            // DEBUG
+            //container.RegisterType<IRegionNavigationJournal, MicserRegionNavigationJournal>();
         }
 
         private static void LoadPlugins(IModuleCatalog moduleCatalog)
