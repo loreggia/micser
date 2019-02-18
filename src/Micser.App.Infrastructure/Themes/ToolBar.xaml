@@ -129,7 +129,7 @@
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="ItemTemplateSelector">
             <Setter.Value>
-                <i:ToolBarItemTemplateSelector />
+                <i:TypeTemplateSelector />
             </Setter.Value>
         </Setter>
         <Setter Property="ItemContainerStyle">

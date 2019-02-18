@@ -4,7 +4,61 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:i="clr-namespace:Micser.App.Infrastructure;assembly=Micser.App.Infrastructure"
+        xmlns:vm="clr-namespace:Micser.App.ViewModels"
+        xmlns:settings="clr-namespace:Micser.App.Infrastructure.Settings;assembly=Micser.App.Infrastructure"
         mc:Ignorable="d"
-        d:DesignHeight="500" d:DesignWidth="800">
-    <Grid />
+        d:DesignHeight="500"
+        d:DesignWidth="800"
+        d:DataContext="{d:DesignInstance vm:SettingsViewModel}">
+
+    <i:View.Resources>
+        <i:TypeTemplateSelector x:Key="TemplateSelector" />
+
+        <DataTemplate x:Key="{x:Type vm:BooleanSettingViewModel}" DataType="{x:Type vm:BooleanSettingViewModel}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition SharedSizeGroup="Label" Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Label Content="{Binding Name}" ToolTip="{Binding Description}" Target="{Binding ElementName=CheckBox}" i:CheckBoxLabelBehavior.IsEnabled="True" />
+                <CheckBox x:Name="CheckBox" Grid.Column="1" IsChecked="{Binding Value, Mode=TwoWay}" VerticalAlignment="Center" />
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="{x:Type vm:IntegerSettingViewModel}" DataType="{x:Type vm:BooleanSettingViewModel}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition SharedSizeGroup="Label" Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Label Content="{Binding Name}" ToolTip="{Binding Description}" Target="{Binding ElementName=TextBox}" />
+                <TextBox x:Name="TextBox" Grid.Column="1" Text="{Binding Value, Mode=TwoWay}" />
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="{x:Type vm:DecimalSettingViewModel}" DataType="{x:Type vm:BooleanSettingViewModel}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition SharedSizeGroup="Label" Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Label Content="{Binding Name}" ToolTip="{Binding Description}" Target="{Binding ElementName=TextBox}" />
+                <TextBox x:Name="TextBox" Grid.Column="1" Text="{Binding Value, Mode=TwoWay}" />
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate x:Key="{x:Type vm:StringSettingViewModel}" DataType="{x:Type vm:BooleanSettingViewModel}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition SharedSizeGroup="Label" Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Label Content="{Binding Name}" ToolTip="{Binding Description}" Target="{Binding ElementName=TextBox}" />
+                <TextBox x:Name="TextBox" Grid.Column="1" Text="{Binding Value, Mode=TwoWay}" />
+            </Grid>
+        </DataTemplate>
+    </i:View.Resources>
+
+    <settings:SettingsPanel ItemsSource="{Binding Settings}" ItemTemplateSelector="{StaticResource TemplateSelector}">
+    </settings:SettingsPanel>
 </i:View>

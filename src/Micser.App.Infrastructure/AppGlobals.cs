@@ -25,6 +25,11 @@
             public const string TopToolBar = "TopToolBarRegion";
         }
 
+        public static class SettingKeys
+        {
+            public const string ExitOnClose = "ExitOnClose";
+        }
+
         public static class ToolBarIds
         {
             public const string Main = "MainToolBar";

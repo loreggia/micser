@@ -3,7 +3,7 @@ using System.Windows.Controls;
 
 namespace Micser.App.Infrastructure
 {
-    public class ToolBarItemTemplateSelector : DataTemplateSelector
+    public class TypeTemplateSelector : DataTemplateSelector
     {
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
