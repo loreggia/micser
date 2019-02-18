@@ -61,7 +61,7 @@ namespace Micser.App
                 Name = "Test"
             });
 
-            navigationManager.Navigate<StartupView>(AppGlobals.PrismRegions.Main, null, false);
+            navigationManager.Navigate<StartupView>(AppGlobals.PrismRegions.Main);
 
             containerProvider.Resolve<IApplicationStateService>().Initialize();
         }

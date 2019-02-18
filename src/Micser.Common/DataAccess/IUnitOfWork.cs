@@ -6,6 +6,6 @@ namespace Micser.Common.DataAccess
     {
         int Complete();
 
-        T GetRepository<T>() where T : class;
+        T GetRepository<T>() where T : class, IRepository;
     }
 }

@@ -1,5 +1,7 @@
-﻿using SQLite.CodeFirst;
+﻿using Micser.App.Infrastructure.DataAccess.Models;
 using System.Data.Entity;
+using System.Data.Entity.Migrations;
+using System.Data.SQLite.EF6.Migrations;
 
 namespace Micser.App.Infrastructure.DataAccess
 {
@@ -10,9 +12,21 @@ namespace Micser.App.Infrastructure.DataAccess
         {
         }
 
+        public IDbSet<SettingValue> Settings { get; set; }
+
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
-            Database.SetInitializer(new SqliteCreateDatabaseIfNotExists<AppDbContext>(modelBuilder));
+            Database.SetInitializer(new MigrateDatabaseToLatestVersion<AppDbContext, ContextMigrationConfiguration>(true));
+        }
+    }
+
+    public class ContextMigrationConfiguration : DbMigrationsConfiguration<AppDbContext>
+    {
+        public ContextMigrationConfiguration()
+        {
+            AutomaticMigrationsEnabled = true;
+            AutomaticMigrationDataLossAllowed = true;
+            SetSqlGenerator("System.Data.SQLite", new SQLiteMigrationSqlGenerator());
         }
     }
 }

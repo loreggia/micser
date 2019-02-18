@@ -1,4 +1,5 @@
 ﻿using Micser.App.Infrastructure;
+using Micser.App.Infrastructure.Settings;
 using Micser.Common;
 using Prism.Regions;
 using System.ComponentModel;
@@ -13,23 +14,22 @@ namespace Micser.App
     public partial class MainShell
     {
         private readonly IRegionManager _regionManager;
-        private readonly ISettingsService _settingsService;
         private bool _isExiting;
 
-        public MainShell(IRegionManager regionManager, ISettingsService settingsService)
+        public MainShell(IRegionManager regionManager)
         {
             _regionManager = regionManager;
-            _settingsService = settingsService;
 
             InitializeComponent();
 
             Loaded += MainShell_Loaded;
-
-            _settingsService.Load();
         }
 
         protected override void OnClosing(CancelEventArgs e)
         {
+            var settingsService = Application.GetService<ISettingsService>();
+            _isExiting = settingsService.GetSetting<bool>(Globals.SettingKeys.ExitOnClose);
+
             e.Cancel = !_isExiting;
             base.OnClosing(e);
             if (!_isExiting)
@@ -40,8 +40,6 @@ namespace Micser.App
 
         private void CloseCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            _isExiting = _settingsService.GetSetting(Globals.SettingKeys.ExitOnClose, false);
-
             Close();
         }
 
@@ -49,7 +47,6 @@ namespace Micser.App
         {
             _isExiting = true;
             _regionManager.RequestNavigate(AppGlobals.PrismRegions.Main, "");
-            _settingsService.Save();
             System.Windows.Application.Current.Shutdown();
         }
 

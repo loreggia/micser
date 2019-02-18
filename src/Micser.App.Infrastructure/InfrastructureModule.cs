@@ -1,4 +1,6 @@
-﻿using Micser.App.Infrastructure.Menu;
+﻿using Micser.App.Infrastructure.DataAccess.Repositories;
+using Micser.App.Infrastructure.Menu;
+using Micser.App.Infrastructure.Settings;
 using Micser.App.Infrastructure.Themes;
 using Micser.App.Infrastructure.ToolBars;
 using Micser.App.Infrastructure.Widgets;
@@ -21,6 +23,9 @@ namespace Micser.App.Infrastructure
             containerRegistry.RegisterSingleton<IToolBarRegistry, ToolBarRegistry>();
             containerRegistry.RegisterSingleton<IWidgetRegistry, WidgetRegistry>();
             containerRegistry.RegisterSingleton<IWidgetFactory, WidgetFactory>();
+            containerRegistry.RegisterSingleton<ISettingsRegistry, SettingsRegistry>();
+            containerRegistry.RegisterSingleton<ISettingValueRepository, SettingValueRepository>();
+            containerRegistry.RegisterSingleton<ISettingsService, SettingsService>();
 
             _isRegistered = true;
         }
