@@ -17,6 +17,10 @@
     HorizontalAlignment="Stretch"
     VerticalAlignment="Stretch">
 
+    <i:View.CommandBindings>
+        <CommandBinding Command="i:CustomApplicationCommands.Refresh" Executed="RefreshCommand_Executed" CanExecute="RefreshCommand_CanExecute" />
+    </i:View.CommandBindings>
+
     <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
