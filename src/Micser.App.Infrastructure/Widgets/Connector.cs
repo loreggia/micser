@@ -65,6 +65,16 @@ namespace Micser.App.Infrastructure.Widgets
                 Orientation = Orientation,
                 Position = Position
             };
+
+            if (double.IsNaN(info.ParentLeft))
+            {
+                info.ParentLeft = 0;
+            }
+            if (double.IsNaN(info.ParentTop))
+            {
+                info.ParentTop = 0;
+            }
+
             return info;
         }
 
