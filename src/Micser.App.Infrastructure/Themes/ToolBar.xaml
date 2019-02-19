@@ -58,7 +58,7 @@
     <DataTemplate x:Key="{x:Type toolBars:ToolBarButton}" DataType="{x:Type toolBars:ToolBarButton}">
         <Button Command="{Binding Command}" ToolTip="{Binding Description}" Style="{StaticResource ToolBarButtonStyle}">
             <StackPanel Orientation="Horizontal">
-                <ContentControl Content="{i:ResourceBinding IconResourceName}">
+                <ContentControl ContentTemplate="{i:ResourceBinding IconTemplateName}">
                     <ContentControl.Style>
                         <Style TargetType="{x:Type ContentControl}">
                             <Style.Triggers>

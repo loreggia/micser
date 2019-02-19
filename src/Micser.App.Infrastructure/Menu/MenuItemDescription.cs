@@ -8,7 +8,7 @@ namespace Micser.App.Infrastructure.Menu
         private bool _isSeparator;
         public ICommand Command { get; set; }
         public string Header { get; set; }
-        public string IconResourceName { get; set; }
+        public string IconTemplateName { get; set; }
         public string Id { get; set; }
 
         public bool IsSeparator
