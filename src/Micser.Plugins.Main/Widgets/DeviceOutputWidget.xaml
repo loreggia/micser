@@ -28,6 +28,6 @@
         <Label Grid.Row="1" Grid.Column="0" Target="{Binding ElementName=CbxDevice}" Content="{x:Static p:Resources.Device}"
                VerticalAlignment="Center" />
         <ComboBox Grid.Row="1" Grid.Column="1" x:Name="CbxDevice" MinWidth="100" ItemsSource="{Binding DeviceDescriptions}" DisplayMemberPath="Name"
-                  SelectedItem="{Binding SelectedDeviceDescription}" HorizontalAlignment="Stretch" />
+                  SelectedItem="{Binding SelectedDeviceDescription, Mode=TwoWay}" HorizontalAlignment="Stretch" />
     </Grid>
 </widgets1:Widget>
