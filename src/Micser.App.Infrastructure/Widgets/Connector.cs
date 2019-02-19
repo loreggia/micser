@@ -23,7 +23,6 @@ namespace Micser.App.Infrastructure.Widgets
         public Connector()
         {
             LayoutUpdated += Connector_LayoutUpdated;
-            Loaded += Connector_Loaded;
         }
 
         public Connection Connection
@@ -123,11 +122,6 @@ namespace Micser.App.Infrastructure.Widgets
             {
                 Position = TransformToAncestor(panel).Transform(new Point(Width / 2, Height / 2));
             }
-        }
-
-        private void Connector_Loaded(object sender, RoutedEventArgs e)
-        {
-            //ParentPanel?.UpdateConnections();
         }
     }
 }

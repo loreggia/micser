@@ -178,6 +178,15 @@ namespace Micser.App.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Forward.
+        /// </summary>
+        public static string ToolBarForwardDescription {
+            get {
+                return ResourceManager.GetString("ToolBarForwardDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Load.
         /// </summary>
         public static string ToolBarLoadDescription {

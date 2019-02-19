@@ -1,5 +1,4 @@
-﻿using Micser.App.Infrastructure.Themes;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -44,11 +43,6 @@ namespace Micser.App.Infrastructure.Widgets
             _widgets.CollectionChanged += Widgets_CollectionChanged;
             _connections = new ObservableCollection<Connection>();
             _connections.CollectionChanged += Connections_CollectionChanged;
-
-            ResourceRegistry.RegisterResourcesFor(this);
-
-            AllowDrop = true;
-            Focusable = true;
         }
 
         public IEnumerable<ConnectionViewModel> ConnectionsSource
@@ -250,6 +244,9 @@ namespace Micser.App.Infrastructure.Widgets
                 {
                     connection.IsSelected = false;
                 }
+
+                Focus();
+                e.Handled = true;
             }
         }
 

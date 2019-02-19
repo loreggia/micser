@@ -15,7 +15,8 @@
     d:DesignWidth="300"
     d:DesignHeight="200"
     HorizontalAlignment="Stretch"
-    VerticalAlignment="Stretch">
+    VerticalAlignment="Stretch"
+    Focusable="True">
 
     <i:View.CommandBindings>
         <CommandBinding Command="i:CustomApplicationCommands.Refresh" Executed="RefreshCommand_Executed" CanExecute="RefreshCommand_CanExecute" />
@@ -38,7 +39,8 @@
             VerticalScrollBarVisibility="Auto"
             Template="{DynamicResource ScrollViewerBorderControlTemplate}"
             BorderBrush="{DynamicResource {themes:BrushThemeKey DefaultBorder}}"
-            BorderThickness="1">
+            BorderThickness="1"
+            Focusable="False">
             <ScrollViewer.Resources>
                 <ControlTemplate x:Key="ScrollViewerBorderControlTemplate" TargetType="{x:Type ScrollViewer}">
                     <Border BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}">
@@ -66,8 +68,8 @@
                     </Border>
                 </ControlTemplate>
             </ScrollViewer.Resources>
-            <w:WidgetPanel x:Name="WidgetPanel" WidgetFactory="{Binding WidgetFactory}" WidgetsSource="{Binding Widgets}"
-                           ConnectionsSource="{Binding Connections}" />
+
+            <w:WidgetPanel x:Name="WidgetPanel" WidgetFactory="{Binding WidgetFactory}" WidgetsSource="{Binding Widgets}" ConnectionsSource="{Binding Connections}" Focusable="True" />
         </ScrollViewer>
 
         <GridSplitter Grid.Row="2" ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Center" Visibility="{Binding IsExpanded, ElementName=ToolboxExpander, Converter={converter:BooleanToVisibilityConverter}}" />
