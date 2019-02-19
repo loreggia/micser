@@ -22,23 +22,15 @@
                             <TextBox x:Name="PART_TextBox" Grid.Column="0" Text="{Binding Text, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" Visibility="{TemplateBinding IsEditing, Converter={converter:BooleanToVisibilityConverter FalseValue=Hidden, TrueValue=Visible}}" VerticalAlignment="Stretch" />
 
                             <ToggleButton x:Name="PART_ToggleButton" Grid.Column="1" IsChecked="{Binding IsEditing, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" DockPanel.Dock="Right">
-                                <ContentControl Width="16" Height="16">
-                                    <ContentControl.Style>
-                                        <Style TargetType="{x:Type ContentControl}">
-                                            <Style.Triggers>
-                                                <DataTrigger Binding="{Binding IsEditing, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:EditableTextBlock}}" Value="False">
-                                                    <Setter Property="Content" Value="{DynamicResource Edit_16x}" />
-                                                </DataTrigger>
-                                                <DataTrigger Binding="{Binding IsEditing, RelativeSource={RelativeSource FindAncestor, AncestorType=controls:EditableTextBlock}}" Value="True">
-                                                    <Setter Property="Content" Value="{DynamicResource Save_16x}" />
-                                                </DataTrigger>
-                                            </Style.Triggers>
-                                        </Style>
-                                    </ContentControl.Style>
-                                </ContentControl>
+                                <ContentControl x:Name="Icon" Width="16" Height="16" ContentTemplate="{DynamicResource Icon_Edit_16x}" />
                             </ToggleButton>
                         </Grid>
                     </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsEditing" Value="True">
+                            <Setter TargetName="Icon" Property="ContentTemplate" Value="{DynamicResource Icon_Save_16x}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

@@ -15,7 +15,7 @@
         }
 
         public string Description { get; set; }
-        public string IconResourceName { get; set; }
+        public string IconTemplateName { get; set; }
         public string Name { get; set; }
         public int Order { get; set; }
         public ToolBarItemPlacement Placement { get; set; }

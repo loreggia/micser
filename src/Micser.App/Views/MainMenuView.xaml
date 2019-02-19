@@ -5,7 +5,6 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:i="clr-namespace:Micser.App.Infrastructure;assembly=Micser.App.Infrastructure"
     xmlns:vm="clr-namespace:Micser.App.ViewModels"
-    xmlns:converter="clr-namespace:Micser.App.Infrastructure.Converter;assembly=Micser.App.Infrastructure"
     x:Class="Micser.App.Views.MainMenuView"
     mc:Ignorable="d"
     d:DesignWidth="300"
@@ -18,7 +17,8 @@
                     <HierarchicalDataTemplate.ItemContainerStyle>
                         <Style TargetType="{x:Type MenuItem}">
                             <Setter Property="Command" Value="{Binding Item.Command}" />
-                            <Setter Property="Icon" Value="{i:ResourceBinding Item.IconResourceName}" />
+                            <Setter Property="Icon" Value="{i:ResourceBinding Item.IconTemplateName}" />
+
                             <Style.Triggers>
                                 <DataTrigger Binding="{Binding Item.IsSeparator}" Value="True">
                                     <Setter Property="IsTabStop" Value="False" />

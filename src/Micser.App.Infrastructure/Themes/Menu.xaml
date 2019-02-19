@@ -103,7 +103,7 @@
                     <ColumnDefinition Width="Auto" SharedSizeGroup="Shortcut" />
                 </Grid.ColumnDefinitions>
 
-                <ContentPresenter x:Name="Icon" Margin="3" VerticalAlignment="Center" ContentSource="Icon" />
+                <ContentPresenter x:Name="Icon" Margin="3" VerticalAlignment="Center" ContentTemplate="{TemplateBinding Icon}" />
                 <ContentPresenter x:Name="HeaderHost" Grid.Column="1" Margin="0,3,0,3" ContentSource="Header" RecognizesAccessKey="True" />
                 <TextBlock x:Name="InputGestureText" Grid.Column="2" Text="{TemplateBinding InputGestureText}" Margin="6,3,3,3" DockPanel.Dock="Right" />
             </Grid>
@@ -117,6 +117,7 @@
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="Foreground" Value="{DynamicResource {themes:BrushThemeKey DefaultForegroundDisabled}}" />
+                <Setter TargetName="Icon" Property="Opacity" Value="0.3" />
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
@@ -131,7 +132,7 @@
                     <ColumnDefinition Width="13" />
                 </Grid.ColumnDefinitions>
 
-                <ContentPresenter x:Name="Icon" Margin="6,3,6,3" VerticalAlignment="Center" ContentSource="Icon" />
+                <ContentPresenter x:Name="Icon" Margin="6,3,6,3" VerticalAlignment="Center" ContentTemplate="{TemplateBinding Icon}" />
                 <ContentPresenter x:Name="HeaderHost" Grid.Column="1" Margin="0,3,0,3" ContentSource="Header" RecognizesAccessKey="True" />
                 <TextBlock x:Name="InputGestureText" Grid.Column="2" Text="{TemplateBinding InputGestureText}" Margin="6,3,3,3" DockPanel.Dock="Right" />
 
@@ -176,6 +177,7 @@
             </Trigger>
             <Trigger Property="IsEnabled" Value="False">
                 <Setter Property="Foreground" Value="{DynamicResource {themes:BrushThemeKey DefaultForegroundDisabled}}" />
+                <Setter TargetName="Icon" Property="Opacity" Value="0.3" />
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
