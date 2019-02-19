@@ -7,7 +7,10 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace Micser.App.ViewModels
 {
@@ -18,6 +21,7 @@ namespace Micser.App.ViewModels
         private readonly ILogger _logger;
         private readonly ModulesApiClient _modulesApiClient;
         private readonly INavigationManager _navigationManager;
+        private readonly ICollection<WidgetViewModel> _savingBuffer;
         private readonly IWidgetRegistry _widgetRegistry;
         private readonly ObservableCollection<WidgetViewModel> _widgets;
         private IEnumerable<WidgetDescription> _availableWidgets;
@@ -37,6 +41,8 @@ namespace Micser.App.ViewModels
             _widgets.CollectionChanged += OnWidgetsCollectionChanged;
             _connections = new ObservableCollection<ConnectionViewModel>();
             _connections.CollectionChanged += OnConnectionsCollectionChanged;
+
+            _savingBuffer = new List<WidgetViewModel>();
 
             WidgetFactory = widgetFactory;
         }
@@ -85,6 +91,7 @@ namespace Micser.App.ViewModels
                             var vm = WidgetFactory.CreateViewModel(type);
                             vm.Id = module.Id;
                             vm.LoadState(module.WidgetState);
+                            vm.PropertyChanged += OnWidgetPropertyChanged;
                             _widgets.Add(vm);
                         }
                         catch (Exception ex)
@@ -212,6 +219,8 @@ namespace Micser.App.ViewModels
             {
                 // TODO error handling / reload everything
             }
+
+            viewModel.PropertyChanged -= OnWidgetPropertyChanged;
         }
 
         private void OnConnectionsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -254,6 +263,43 @@ namespace Micser.App.ViewModels
             if (sender is ConnectionViewModel vm)
             {
                 UpdateConnection(vm);
+            }
+        }
+
+        private async void OnWidgetPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (_isLoading)
+            {
+                return;
+            }
+
+            if (sender is WidgetViewModel vm)
+            {
+                if (_savingBuffer.Contains(vm))
+                {
+                    return;
+                }
+
+                _savingBuffer.Add(vm);
+                await Task.Delay(500);
+                _savingBuffer.Remove(vm);
+
+                var moduleDto = new ModuleDto
+                {
+                    Id = vm.Id,
+                    WidgetState = vm.GetState()
+                };
+                var result = await _modulesApiClient.UpdateAsync(moduleDto);
+
+                if (!result.IsSuccess)
+                {
+                    Debug.WriteLine(result);
+                    // TODO error handling
+                }
+                else
+                {
+                    Debug.WriteLine($"Widget saved, ID: {vm.Id}");
+                }
             }
         }
 

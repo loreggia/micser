@@ -176,8 +176,23 @@ namespace Micser.App.Infrastructure.Widgets
                 left = double.IsNaN(left) ? 0 : left;
                 top = double.IsNaN(top) ? 0 : top;
 
+                if (element is FrameworkElement fe)
+                {
+                    var width = fe.Width;
+                    var height = fe.Height;
+
+                    fe.Width = double.IsNaN(width) ? fe.MinWidth : width;
+                    fe.Height = double.IsNaN(height) ? fe.MinHeight : height;
+                }
+
                 //measure desired size for each child
-                element.Measure(constraint);
+                try
+                {
+                    element.Measure(constraint);
+                }
+                catch (InvalidOperationException)
+                {
+                }
 
                 var desiredSize = element.DesiredSize;
                 if (!double.IsNaN(desiredSize.Width) && !double.IsNaN(desiredSize.Height))
@@ -389,7 +404,6 @@ namespace Micser.App.Infrastructure.Widgets
                     foreach (Connection connection in e.NewItems)
                     {
                         Children.Add(connection);
-                        connection.IsSelected = true;
                     }
 
                     break;

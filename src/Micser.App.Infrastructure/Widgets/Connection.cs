@@ -284,7 +284,9 @@ namespace Micser.App.Infrastructure.Widgets
             if (Source != null && Target != null)
             {
                 var geometry = new PathGeometry();
-                var linePoints = PathFinder.GetConnectionLine(Source.GetInfo(), Target.GetInfo(), true);
+                var sourceInfo = Source.GetInfo();
+                var targetInfo = Target.GetInfo();
+                var linePoints = PathFinder.GetConnectionLine(sourceInfo, targetInfo, true);
                 if (linePoints.Count > 0)
                 {
                     var figure = new PathFigure
