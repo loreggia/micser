@@ -1,5 +1,4 @@
 ﻿using Micser.App.Infrastructure.Extensions;
-using Micser.App.Infrastructure.Themes;
 using System;
 using System.Collections.Generic;
 using System.Windows;
@@ -54,14 +53,8 @@ namespace Micser.App.Infrastructure.Widgets
 
         private ItemsControl _outputConnectorsControl;
 
-        static Widget()
-        {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(Widget), new FrameworkPropertyMetadata(typeof(Widget)));
-        }
-
         public Widget()
         {
-            ResourceRegistry.RegisterResourcesFor(this);
             SetResourceReference(StyleProperty, typeof(Widget));
 
             Loaded += OnWidgetLoaded;

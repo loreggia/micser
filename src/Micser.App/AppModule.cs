@@ -7,6 +7,7 @@ using Micser.App.Properties;
 using Micser.App.ViewModels;
 using Micser.App.Views;
 using Prism.Commands;
+using Prism.Events;
 using Prism.Ioc;
 
 namespace Micser.App
@@ -45,12 +46,26 @@ namespace Micser.App
 
             // main tool bar
             var toolBarRegistry = containerProvider.Resolve<IToolBarRegistry>();
+            var eventAggregator = containerProvider.Resolve<IEventAggregator>();
+
+            var goBackCommand = new DelegateCommand(() => navigationManager.GoBack(AppGlobals.PrismRegions.Main), () => navigationManager.CanGoBack(AppGlobals.PrismRegions.Main));
+            eventAggregator.GetEvent<NavigationEvent>().Subscribe(info => goBackCommand.RaiseCanExecuteChanged());
             toolBarRegistry.AddItem(AppGlobals.ToolBarIds.Main, new ToolBarButton
             {
-                Command = new DelegateCommand(() => navigationManager.GoBack(AppGlobals.PrismRegions.Main)),
+                Command = goBackCommand,
                 Description = Resources.ToolBarBackDescription,
                 IconResourceName = "Backward_16x"
             });
+
+            var goForwardCommand = new DelegateCommand(() => navigationManager.GoForward(AppGlobals.PrismRegions.Main), () => navigationManager.CanGoForward(AppGlobals.PrismRegions.Main));
+            eventAggregator.GetEvent<NavigationEvent>().Subscribe(info => goForwardCommand.RaiseCanExecuteChanged());
+            toolBarRegistry.AddItem(AppGlobals.ToolBarIds.Main, new ToolBarButton
+            {
+                Command = goForwardCommand,
+                Description = Resources.ToolBarForwardDescription,
+                IconResourceName = "Forward_16x"
+            });
+
             toolBarRegistry.AddItem(AppGlobals.ToolBarIds.Main, new ToolBarSeparator());
             toolBarRegistry.AddItem(AppGlobals.ToolBarIds.Main, new ToolBarButton
             {

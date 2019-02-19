@@ -72,7 +72,6 @@ namespace Micser.App.Infrastructure.Widgets
         {
             Source = source;
             Sink = sink;
-            Unloaded += Connection_Unloaded;
         }
 
         public bool IsSelected
@@ -229,31 +228,6 @@ namespace Micser.App.Infrastructure.Widgets
         {
             var connection = (Connection)d;
             connection.UpdateAnchorPosition();
-        }
-
-        private void Connection_Unloaded(object sender, RoutedEventArgs e)
-        {
-            // do some housekeeping when Connection is unloaded
-
-            // remove event handler
-            Source = null;
-            Sink = null;
-
-            // remove adorner
-            if (_connectionAdorner != null)
-            {
-                var panel = ParentPanel;
-                if (panel != null)
-                {
-                    var adornerLayer = AdornerLayer.GetAdornerLayer(panel);
-
-                    if (adornerLayer != null)
-                    {
-                        adornerLayer.Remove(_connectionAdorner);
-                        _connectionAdorner = null;
-                    }
-                }
-            }
         }
 
         private void OnConnectorPositionChanged(object sender, EventArgs e)

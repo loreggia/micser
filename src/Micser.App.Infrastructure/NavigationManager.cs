@@ -1,40 +1,90 @@
-﻿using Prism.Regions;
+﻿using Prism.Events;
+using Prism.Regions;
 using System;
 
 namespace Micser.App.Infrastructure
 {
-    public class NavigationManager : INavigationManager
+    public class NavigationManager : INavigationManager, IDisposable
     {
+        private readonly IEventAggregator _eventAggregator;
         private readonly IRegionManager _regionManager;
 
-        public NavigationManager(IRegionManager regionManager)
+        public NavigationManager(IRegionManager regionManager, IEventAggregator eventAggregator)
         {
             _regionManager = regionManager;
+            _eventAggregator = eventAggregator;
+        }
+
+        public bool CanGoBack(string regionName)
+        {
+            var journal = _regionManager.Regions[regionName].NavigationService.Journal;
+            return journal.CanGoBack;
+        }
+
+        public bool CanGoForward(string regionName)
+        {
+            var journal = _regionManager.Regions[regionName].NavigationService.Journal;
+            return journal.CanGoForward;
         }
 
         public void ClearJournal(string regionName)
         {
-            var journal = _regionManager.Regions[regionName].NavigationService.Journal;
+            var journal = GetJournal(regionName);
             var currentEntry = journal.CurrentEntry;
             journal.Clear();
             journal.RecordNavigation(currentEntry, true);
         }
 
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
         public void GoBack(string regionName)
         {
-            var navService = _regionManager.Regions[regionName].NavigationService;
-            navService.NavigationFailed += OnNavigationFailed;
-            navService.Journal.GoBack();
-            navService.NavigationFailed -= OnNavigationFailed;
+            var journal = GetJournal(regionName);
+            journal.GoBack();
+        }
+
+        public void GoForward(string regionName)
+        {
+            var journal = GetJournal(regionName);
+            journal.GoForward();
         }
 
         public void Navigate<TView>(string regionName, object parameter = null)
         {
+            var region = _regionManager.Regions[regionName];
+            region.NavigationService.Navigated -= OnNavigated;
+            region.NavigationService.Navigated += OnNavigated;
             _regionManager.RequestNavigate(regionName, new Uri(typeof(TView).Name, UriKind.Relative), new NavigationParameters { { AppGlobals.NavigationParameterKey, parameter } });
         }
 
-        private void OnNavigationFailed(object sender, RegionNavigationFailedEventArgs e)
+        protected virtual void Dispose(bool disposing)
         {
+            if (disposing)
+            {
+                foreach (var region in _regionManager.Regions)
+                {
+                    region.NavigationService.Navigated -= OnNavigated;
+                }
+            }
+        }
+
+        private IRegionNavigationJournal GetJournal(string regionName)
+        {
+            return _regionManager.Regions[regionName].NavigationService.Journal;
+        }
+
+        private void OnNavigated(object sender, RegionNavigationEventArgs e)
+        {
+            _eventAggregator.GetEvent<NavigationEvent>().Publish(new NavigationInfo
+            {
+                RegionName = e.NavigationContext.NavigationService.Region.Name,
+                Parameter = e.NavigationContext.Parameters[AppGlobals.NavigationParameterKey],
+                ViewName = e.NavigationContext.Uri.OriginalString
+            });
         }
     }
 }

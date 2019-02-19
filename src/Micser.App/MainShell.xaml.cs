@@ -1,5 +1,6 @@
 ﻿using Micser.App.Infrastructure;
 using Micser.App.Infrastructure.Settings;
+using Prism.Events;
 using Prism.Regions;
 using System.ComponentModel;
 using System.Windows;
@@ -15,11 +16,12 @@ namespace Micser.App
         private readonly IRegionManager _regionManager;
         private bool _isExiting;
 
-        public MainShell(IRegionManager regionManager)
+        public MainShell(IRegionManager regionManager, IEventAggregator eventAggregator)
         {
-            _regionManager = regionManager;
-
             InitializeComponent();
+
+            _regionManager = regionManager;
+            eventAggregator.GetEvent<NavigationEvent>().Subscribe(OnNavigated);
 
             Loaded += MainShell_Loaded;
         }
@@ -52,6 +54,14 @@ namespace Micser.App
         private void MainShell_Loaded(object sender, RoutedEventArgs e)
         {
             CommandManager.InvalidateRequerySuggested();
+        }
+
+        private void OnNavigated(NavigationInfo info)
+        {
+            if (info.RegionName == AppGlobals.PrismRegions.Main)
+            {
+                (MainRegion.Content as IInputElement)?.Focus();
+            }
         }
 
         private void OnTrayMouseDoubleClick(object sender, RoutedEventArgs e)

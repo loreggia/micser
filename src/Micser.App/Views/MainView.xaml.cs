@@ -8,9 +8,16 @@ namespace Micser.App.Views
         public MainView()
         {
             InitializeComponent();
+
+            Loaded += MainView_Loaded;
         }
 
         private MainViewModel MainViewModel => (MainViewModel)DataContext;
+
+        private void MainView_Loaded(object sender, System.Windows.RoutedEventArgs e)
+        {
+            WidgetPanel.Focus();
+        }
 
         private void RefreshCommand_CanExecute(object sender, CanExecuteRoutedEventArgs e)
         {

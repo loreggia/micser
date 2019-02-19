@@ -1,5 +1,4 @@
-﻿using Micser.App.Infrastructure.Themes;
-using System.Windows;
+﻿using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 
@@ -11,16 +10,6 @@ namespace Micser.App.Infrastructure.Widgets
     public class WidgetToolboxItem : ContentControl
     {
         private Point? _dragStartPoint;
-
-        static WidgetToolboxItem()
-        {
-            DefaultStyleKeyProperty.OverrideMetadata(typeof(WidgetToolboxItem), new FrameworkPropertyMetadata(typeof(WidgetToolboxItem)));
-        }
-
-        public WidgetToolboxItem()
-        {
-            ResourceRegistry.RegisterResourcesFor(this);
-        }
 
         protected override void OnMouseMove(MouseEventArgs e)
         {
