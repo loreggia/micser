@@ -85,21 +85,21 @@ namespace Micser.App.Infrastructure.Widgets
             }
         }
 
-        public void CreateConnection(Connector sourceConnector, Connector sinkConnector)
+        public void CreateConnection(Connector sourceConnector, Connector targetConnector)
         {
             if (sourceConnector.DataContext is ConnectorViewModel sourceVm &&
-                sinkConnector.DataContext is ConnectorViewModel sinkVm &&
+                targetConnector.DataContext is ConnectorViewModel targetVm &&
                 ConnectionsSource != null &&
-                !ConnectionsSource.Any(c => c.Source == sourceVm && c.Target == sinkVm))
+                !ConnectionsSource.Any(c => c.Source == sourceVm && c.Target == targetVm))
             {
                 var vm = new ConnectionViewModel
                 {
                     Source = sourceVm,
-                    Target = sinkVm
+                    Target = targetVm
                 };
 
                 sourceVm.Connection = vm;
-                sinkVm.Connection = vm;
+                targetVm.Connection = vm;
 
                 if (ConnectionsSource is ICollection<ConnectionViewModel> collection)
                 {
@@ -159,6 +159,7 @@ namespace Micser.App.Infrastructure.Widgets
                     {
                         continue;
                     }
+
                     AddConnection(connectionViewModel);
                 }
             }
@@ -285,11 +286,12 @@ namespace Micser.App.Infrastructure.Widgets
                 var selected = _widgets.Where(w => w.IsSelected).ToArray();
                 foreach (var widget in selected)
                 {
-                    var connections = _connections.Where(c => c.Source.ParentWidget == widget || c.Sink.ParentWidget == widget).ToArray();
+                    var connections = _connections.Where(c => c.Source.ParentWidget == widget || c.Target.ParentWidget == widget).ToArray();
                     foreach (var connection in connections)
                     {
                         RemoveConnection(connection);
                     }
+
                     RemoveWidget(widget);
                 }
             }
@@ -362,17 +364,17 @@ namespace Micser.App.Infrastructure.Widgets
         {
             //return;
             var source = _widgets
-                        .SelectMany(w => w.OutputConnectors ?? new Connector[0])
-                        .FirstOrDefault(c => c.DataContext == vm.Source);
-            var sink = _widgets
-                      .SelectMany(w => w.InputConnectors ?? new Connector[0])
-                      .FirstOrDefault(c => c.DataContext == vm.Target);
+                .SelectMany(w => w.OutputConnectors ?? new Connector[0])
+                .FirstOrDefault(c => c.DataContext == vm.Source);
+            var target = _widgets
+                .SelectMany(w => w.InputConnectors ?? new Connector[0])
+                .FirstOrDefault(c => c.DataContext == vm.Target);
 
-            if (source != null && sink != null && !_connections.Any(c => ReferenceEquals(c.Source, source) && ReferenceEquals(c.Sink, sink)))
+            if (source != null && target != null && !_connections.Any(c => ReferenceEquals(c.Source, source) && ReferenceEquals(c.Target, target)))
             {
-                var connection = new Connection(source, sink) { DataContext = vm };
+                var connection = new Connection(source, target) { DataContext = vm };
                 source.Connection = connection;
-                sink.Connection = connection;
+                target.Connection = connection;
                 _connections.Add(connection);
             }
         }

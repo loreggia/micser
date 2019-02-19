@@ -1,7 +1,7 @@
-﻿using System;
+﻿using Micser.App.Infrastructure.Widgets;
+using System;
 using System.Collections.Generic;
 using System.Windows;
-using Micser.App.Infrastructure.Widgets;
 
 namespace Micser.App.Infrastructure
 {
@@ -16,32 +16,32 @@ namespace Micser.App.Infrastructure
         private const double Epsilon = 0.001d;
         private const int Margin = 20;
 
-        public static List<Point> GetConnectionLine(ConnectorInfo source, ConnectorInfo sink, bool showLastLine)
+        public static List<Point> GetConnectionLine(ConnectorInfo source, ConnectorInfo target, bool showLastLine)
         {
             var linePoints = new List<Point>();
 
             var rectSource = GetRectWithMargin(source, Margin);
-            var rectSink = GetRectWithMargin(sink, Margin);
+            var rectTarget = GetRectWithMargin(target, Margin);
 
             var startPoint = GetOffsetPoint(source, rectSource);
-            var endPoint = GetOffsetPoint(sink, rectSink);
+            var endPoint = GetOffsetPoint(target, rectTarget);
 
             linePoints.Add(startPoint);
             var currentPoint = startPoint;
 
-            if (!rectSink.Contains(currentPoint) && !rectSource.Contains(endPoint))
+            if (!rectTarget.Contains(currentPoint) && !rectSource.Contains(endPoint))
             {
                 while (true)
                 {
                     #region source node
 
-                    if (IsPointVisible(currentPoint, endPoint, new[] {rectSource, rectSink}))
+                    if (IsPointVisible(currentPoint, endPoint, new[] { rectSource, rectTarget }))
                     {
                         linePoints.Add(endPoint);
                         break;
                     }
 
-                    var neighbour = GetNearestVisibleNeighborSink(currentPoint, endPoint, sink, rectSource, rectSink);
+                    var neighbour = GetNearestVisibleNeighborTarget(currentPoint, endPoint, target, rectSource, rectTarget);
 
                     if (!double.IsNaN(neighbour.X))
                     {
@@ -52,11 +52,11 @@ namespace Micser.App.Infrastructure
 
                     if (currentPoint == startPoint)
                     {
-                        var n = GetNearestNeighborSource(source, endPoint, rectSource, rectSink, out var flag);
+                        var n = GetNearestNeighborSource(source, endPoint, rectSource, rectTarget, out var flag);
                         linePoints.Add(n);
                         currentPoint = n;
 
-                        if (!IsRectVisible(currentPoint, rectSink, new[] {rectSource}))
+                        if (!IsRectVisible(currentPoint, rectTarget, new[] { rectSource }))
                         {
                             GetOppositeCorners(source.Orientation, rectSource, out var n1, out var n2);
 
@@ -71,7 +71,7 @@ namespace Micser.App.Infrastructure
                                 currentPoint = n2;
                             }
 
-                            if (!IsRectVisible(currentPoint, rectSink, new[] {rectSource}))
+                            if (!IsRectVisible(currentPoint, rectTarget, new[] { rectSource }))
                             {
                                 if (flag)
                                 {
@@ -89,15 +89,15 @@ namespace Micser.App.Infrastructure
 
                     #endregion source node
 
-                    #region sink node
+                    #region target node
 
-                    else // from here on we jump to the sink node
+                    else // from here on we jump to the target node
                     {
-                        GetNeighborCorners(sink.Orientation, rectSink, out var s1, out var s2);
-                        GetOppositeCorners(sink.Orientation, rectSink, out var n1, out var n2);
+                        GetNeighborCorners(target.Orientation, rectTarget, out var s1, out var s2);
+                        GetOppositeCorners(target.Orientation, rectTarget, out var n1, out var n2);
 
-                        var n1Visible = IsPointVisible(currentPoint, n1, new[] {rectSource, rectSink});
-                        var n2Visible = IsPointVisible(currentPoint, n2, new[] {rectSource, rectSink});
+                        var n1Visible = IsPointVisible(currentPoint, n1, new[] { rectSource, rectTarget });
+                        var n2Visible = IsPointVisible(currentPoint, n2, new[] { rectSource, rectTarget });
 
                         if (n1Visible && n2Visible)
                         {
@@ -199,7 +199,7 @@ namespace Micser.App.Infrastructure
                         break;
                     }
 
-                    #endregion sink node
+                    #endregion target node
                 }
             }
             else
@@ -207,18 +207,18 @@ namespace Micser.App.Infrastructure
                 linePoints.Add(endPoint);
             }
 
-            linePoints = OptimizeLinePoints(linePoints, new[] {rectSource, rectSink}, source.Orientation, sink.Orientation);
+            linePoints = OptimizeLinePoints(linePoints, new[] { rectSource, rectTarget }, source.Orientation, target.Orientation);
 
-            CheckPathEnd(source, sink, showLastLine, linePoints);
+            CheckPathEnd(source, target, showLastLine, linePoints);
             return linePoints;
         }
 
-        public static List<Point> GetConnectionLine(ConnectorInfo source, Point sinkPoint, ConnectorOrientation preferredOrientation)
+        public static List<Point> GetConnectionLine(ConnectorInfo source, Point targetPoint, ConnectorOrientation preferredOrientation)
         {
             var linePoints = new List<Point>();
             var rectSource = GetRectWithMargin(source, 10);
             var startPoint = GetOffsetPoint(source, rectSource);
-            var endPoint = sinkPoint;
+            var endPoint = targetPoint;
 
             linePoints.Add(startPoint);
             var currentPoint = startPoint;
@@ -227,7 +227,7 @@ namespace Micser.App.Infrastructure
             {
                 while (true)
                 {
-                    if (IsPointVisible(currentPoint, endPoint, new[] {rectSource}))
+                    if (IsPointVisible(currentPoint, endPoint, new[] { rectSource }))
                     {
                         linePoints.Add(endPoint);
                         break;
@@ -237,7 +237,7 @@ namespace Micser.App.Infrastructure
                     linePoints.Add(n);
                     currentPoint = n;
 
-                    if (IsPointVisible(currentPoint, endPoint, new[] {rectSource}))
+                    if (IsPointVisible(currentPoint, endPoint, new[] { rectSource }))
                     {
                         linePoints.Add(endPoint);
                         break;
@@ -254,7 +254,7 @@ namespace Micser.App.Infrastructure
                 linePoints.Add(endPoint);
             }
 
-            linePoints = OptimizeLinePoints(linePoints, new[] {rectSource}, source.Orientation,
+            linePoints = OptimizeLinePoints(linePoints, new[] { rectSource }, source.Orientation,
                                             preferredOrientation != ConnectorOrientation.None
                                                 ? preferredOrientation
                                                 : GetOpositeOrientation(source.Orientation));
@@ -262,7 +262,7 @@ namespace Micser.App.Infrastructure
             return linePoints;
         }
 
-        private static void CheckPathEnd(ConnectorInfo source, ConnectorInfo sink, bool showLastLine, List<Point> linePoints)
+        private static void CheckPathEnd(ConnectorInfo source, ConnectorInfo target, bool showLastLine, List<Point> linePoints)
         {
             if (showLastLine)
             {
@@ -288,22 +288,22 @@ namespace Micser.App.Infrastructure
                         break;
                 }
 
-                switch (sink.Orientation)
+                switch (target.Orientation)
                 {
                     case ConnectorOrientation.Left:
-                        endPoint = new Point(sink.Position.X - marginPath, sink.Position.Y);
+                        endPoint = new Point(target.Position.X - marginPath, target.Position.Y);
                         break;
 
                     case ConnectorOrientation.Top:
-                        endPoint = new Point(sink.Position.X, sink.Position.Y - marginPath);
+                        endPoint = new Point(target.Position.X, target.Position.Y - marginPath);
                         break;
 
                     case ConnectorOrientation.Right:
-                        endPoint = new Point(sink.Position.X + marginPath, sink.Position.Y);
+                        endPoint = new Point(target.Position.X + marginPath, target.Position.Y);
                         break;
 
                     case ConnectorOrientation.Bottom:
-                        endPoint = new Point(sink.Position.X, sink.Position.Y + marginPath);
+                        endPoint = new Point(target.Position.X, target.Position.Y + marginPath);
                         break;
                 }
 
@@ -313,7 +313,7 @@ namespace Micser.App.Infrastructure
             else
             {
                 linePoints.Insert(0, source.Position);
-                linePoints.Add(sink.Position);
+                linePoints.Add(target.Position);
             }
         }
 
@@ -322,17 +322,17 @@ namespace Micser.App.Infrastructure
             return Point.Subtract(p1, p2).Length;
         }
 
-        private static Point GetNearestNeighborSource(ConnectorInfo source, Point endPoint, Rect rectSource, Rect rectSink, out bool flag)
+        private static Point GetNearestNeighborSource(ConnectorInfo source, Point endPoint, Rect rectSource, Rect rectTarget, out bool flag)
         {
             GetNeighborCorners(source.Orientation, rectSource, out var n1, out var n2);
 
-            if (rectSink.Contains(n1))
+            if (rectTarget.Contains(n1))
             {
                 flag = false;
                 return n2;
             }
 
-            if (rectSink.Contains(n2))
+            if (rectTarget.Contains(n2))
             {
                 flag = true;
                 return n1;
@@ -362,23 +362,23 @@ namespace Micser.App.Infrastructure
             return n2;
         }
 
-        private static Point GetNearestVisibleNeighborSink(Point currentPoint, Point endPoint, ConnectorInfo sink, Rect rectSource, Rect rectSink)
+        private static Point GetNearestVisibleNeighborTarget(Point currentPoint, Point endPoint, ConnectorInfo target, Rect rectSource, Rect rectTarget)
         {
-            GetNeighborCorners(sink.Orientation, rectSink, out var s1, out var s2);
+            GetNeighborCorners(target.Orientation, rectTarget, out var s1, out var s2);
 
-            var flag1 = IsPointVisible(currentPoint, s1, new[] {rectSource, rectSink});
-            var flag2 = IsPointVisible(currentPoint, s2, new[] {rectSource, rectSink});
+            var flag1 = IsPointVisible(currentPoint, s1, new[] { rectSource, rectTarget });
+            var flag2 = IsPointVisible(currentPoint, s2, new[] { rectSource, rectTarget });
 
             if (flag1) // s1 visible
             {
                 if (flag2) // s1 and s2 visible
                 {
-                    if (rectSink.Contains(s1))
+                    if (rectTarget.Contains(s1))
                     {
                         return s2;
                     }
 
-                    if (rectSink.Contains(s2))
+                    if (rectTarget.Contains(s2))
                     {
                         return s1;
                     }
@@ -573,7 +573,7 @@ namespace Micser.App.Infrastructure
         }
 
         private static List<Point> OptimizeLinePoints(IList<Point> linePoints, Rect[] rectangles, ConnectorOrientation sourceOrientation,
-                                                      ConnectorOrientation sinkOrientation)
+                                                      ConnectorOrientation targetOrientation)
         {
             var points = new List<Point>();
             var cut = 0;
@@ -605,7 +605,7 @@ namespace Micser.App.Infrastructure
                     var orientationFrom = j == 0 ? sourceOrientation : GetOrientation(points[j], points[j - 1]);
 
                     // orientation to pint
-                    var orientationTo = j == points.Count - 2 ? sinkOrientation : GetOrientation(points[j + 1], points[j + 2]);
+                    var orientationTo = j == points.Count - 2 ? targetOrientation : GetOrientation(points[j + 1], points[j + 2]);
 
                     if ((orientationFrom == ConnectorOrientation.Left || orientationFrom == ConnectorOrientation.Right) &&
                         (orientationTo == ConnectorOrientation.Left || orientationTo == ConnectorOrientation.Right))

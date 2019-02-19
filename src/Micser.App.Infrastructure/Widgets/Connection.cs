@@ -32,18 +32,6 @@ namespace Micser.App.Infrastructure.Widgets
         public static readonly DependencyProperty PathGeometryProperty = DependencyProperty.Register(
             nameof(PathGeometry), typeof(PathGeometry), typeof(Connection), new PropertyMetadata(null, OnPathGeometryPropertyChanged));
 
-        public static readonly DependencyProperty SinkAnchorAngleProperty = DependencyProperty.Register(
-            nameof(SinkAnchorAngle), typeof(double), typeof(Connection), new PropertyMetadata(0d));
-
-        public static readonly DependencyProperty SinkAnchorPositionProperty = DependencyProperty.Register(
-            nameof(SinkAnchorPosition), typeof(Point), typeof(Connection), new PropertyMetadata(default(Point)));
-
-        public static readonly DependencyProperty SinkArrowSymbolProperty = DependencyProperty.Register(
-            nameof(SinkArrowSymbol), typeof(ArrowSymbol), typeof(Connection), new PropertyMetadata(ArrowSymbol.Arrow));
-
-        public static readonly DependencyProperty SinkProperty = DependencyProperty.Register(
-            nameof(Sink), typeof(Connector), typeof(Connection), new PropertyMetadata(null, OnConnectorPropertyChanged));
-
         public static readonly DependencyProperty SourceAnchorAngleProperty = DependencyProperty.Register(
             nameof(SourceAnchorAngle), typeof(double), typeof(Connection), new PropertyMetadata(0d));
 
@@ -59,6 +47,18 @@ namespace Micser.App.Infrastructure.Widgets
         public static readonly DependencyProperty StrokeDashArrayProperty = DependencyProperty.Register(
             nameof(StrokeDashArray), typeof(DoubleCollection), typeof(Connection), new PropertyMetadata(null));
 
+        public static readonly DependencyProperty TargetAnchorAngleProperty = DependencyProperty.Register(
+            nameof(TargetAnchorAngle), typeof(double), typeof(Connection), new PropertyMetadata(0d));
+
+        public static readonly DependencyProperty TargetAnchorPositionProperty = DependencyProperty.Register(
+            nameof(TargetAnchorPosition), typeof(Point), typeof(Connection), new PropertyMetadata(default(Point)));
+
+        public static readonly DependencyProperty TargetArrowSymbolProperty = DependencyProperty.Register(
+                                                                    nameof(TargetArrowSymbol), typeof(ArrowSymbol), typeof(Connection), new PropertyMetadata(ArrowSymbol.Arrow));
+
+        public static readonly DependencyProperty TargetProperty = DependencyProperty.Register(
+                                                                    nameof(Target), typeof(Connector), typeof(Connection), new PropertyMetadata(null, OnConnectorPropertyChanged));
+
         private Adorner _connectionAdorner;
 
         private WidgetPanel _parentPanel;
@@ -68,10 +68,10 @@ namespace Micser.App.Infrastructure.Widgets
             LabelPositionProperty = LabelPositionPropertyKey.DependencyProperty;
         }
 
-        public Connection(Connector source, Connector sink)
+        public Connection(Connector source, Connector target)
         {
             Source = source;
-            Sink = sink;
+            Target = target;
         }
 
         public bool IsSelected
@@ -96,30 +96,6 @@ namespace Micser.App.Infrastructure.Widgets
         {
             get => (PathGeometry)GetValue(PathGeometryProperty);
             set => SetValue(PathGeometryProperty, value);
-        }
-
-        public Connector Sink
-        {
-            get => (Connector)GetValue(SinkProperty);
-            set => SetValue(SinkProperty, value);
-        }
-
-        public double SinkAnchorAngle
-        {
-            get => (double)GetValue(SinkAnchorAngleProperty);
-            set => SetValue(SinkAnchorAngleProperty, value);
-        }
-
-        public Point SinkAnchorPosition
-        {
-            get => (Point)GetValue(SinkAnchorPositionProperty);
-            set => SetValue(SinkAnchorPositionProperty, value);
-        }
-
-        public ArrowSymbol SinkArrowSymbol
-        {
-            get => (ArrowSymbol)GetValue(SinkArrowSymbolProperty);
-            set => SetValue(SinkArrowSymbolProperty, value);
         }
 
         public Connector Source
@@ -150,6 +126,30 @@ namespace Micser.App.Infrastructure.Widgets
         {
             get => (DoubleCollection)GetValue(StrokeDashArrayProperty);
             set => SetValue(StrokeDashArrayProperty, value);
+        }
+
+        public Connector Target
+        {
+            get => (Connector)GetValue(TargetProperty);
+            set => SetValue(TargetProperty, value);
+        }
+
+        public double TargetAnchorAngle
+        {
+            get => (double)GetValue(TargetAnchorAngleProperty);
+            set => SetValue(TargetAnchorAngleProperty, value);
+        }
+
+        public Point TargetAnchorPosition
+        {
+            get => (Point)GetValue(TargetAnchorPositionProperty);
+            set => SetValue(TargetAnchorPositionProperty, value);
+        }
+
+        public ArrowSymbol TargetArrowSymbol
+        {
+            get => (ArrowSymbol)GetValue(TargetArrowSymbolProperty);
+            set => SetValue(TargetArrowSymbolProperty, value);
         }
 
         private WidgetPanel ParentPanel => _parentPanel ?? (_parentPanel = this.GetParentOfType<WidgetPanel>());
@@ -268,23 +268,23 @@ namespace Micser.App.Infrastructure.Widgets
 
             // get angle from tangent vector
             SourceAnchorAngle = Math.Atan2(-pathTangentAtStartPoint.Y, -pathTangentAtStartPoint.X) * (180 / Math.PI);
-            SinkAnchorAngle = Math.Atan2(pathTangentAtEndPoint.Y, pathTangentAtEndPoint.X) * (180 / Math.PI);
+            TargetAnchorAngle = Math.Atan2(pathTangentAtEndPoint.Y, pathTangentAtEndPoint.X) * (180 / Math.PI);
 
-            // add some margin on source and sink side for visual reasons only
+            // add some margin on source and target side for visual reasons only
             pathStartPoint.Offset(-pathTangentAtStartPoint.X * 5, -pathTangentAtStartPoint.Y * 5);
             pathEndPoint.Offset(pathTangentAtEndPoint.X * 5, pathTangentAtEndPoint.Y * 5);
 
             SourceAnchorPosition = pathStartPoint;
-            SinkAnchorPosition = pathEndPoint;
+            TargetAnchorPosition = pathEndPoint;
             LabelPosition = pathMidPoint;
         }
 
         private void UpdatePathGeometry()
         {
-            if (Source != null && Sink != null)
+            if (Source != null && Target != null)
             {
                 var geometry = new PathGeometry();
-                var linePoints = PathFinder.GetConnectionLine(Source.GetInfo(), Sink.GetInfo(), true);
+                var linePoints = PathFinder.GetConnectionLine(Source.GetInfo(), Target.GetInfo(), true);
                 if (linePoints.Count > 0)
                 {
                     var figure = new PathFigure
