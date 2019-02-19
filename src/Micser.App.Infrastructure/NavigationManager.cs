@@ -79,7 +79,7 @@ namespace Micser.App.Infrastructure
 
         private void OnNavigated(object sender, RegionNavigationEventArgs e)
         {
-            _eventAggregator.GetEvent<NavigationEvent>().Publish(new NavigationInfo
+            _eventAggregator.GetEvent<ApplicationEvents.Navigated>().Publish(new ApplicationEvents.Navigated.NavigationInfo
             {
                 RegionName = e.NavigationContext.NavigationService.Region.Name,
                 Parameter = e.NavigationContext.Parameters[AppGlobals.NavigationParameterKey],

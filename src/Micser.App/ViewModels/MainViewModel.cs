@@ -1,7 +1,6 @@
 ﻿using Micser.App.Infrastructure;
 using Micser.App.Infrastructure.Api;
 using Micser.App.Infrastructure.Widgets;
-using Micser.Common.DataAccess;
 using Micser.Common.Modules;
 using NLog;
 using System;
@@ -14,12 +13,8 @@ namespace Micser.App.ViewModels
 {
     public class MainViewModel : ViewModelNavigationAware
     {
-        public const string ConnectionsConfigurationKey = "Connections";
-        public const string WidgetsConfigurationKey = "Widgets";
-
         private readonly ObservableCollection<ConnectionViewModel> _connections;
         private readonly ModuleConnectionsApiClient _connectionsApiClient;
-        private readonly IUnitOfWorkFactory _database;
         private readonly ILogger _logger;
         private readonly ModulesApiClient _modulesApiClient;
         private readonly INavigationManager _navigationManager;
@@ -29,9 +24,8 @@ namespace Micser.App.ViewModels
         private bool _isLoaded;
         private bool _isLoading;
 
-        public MainViewModel(IUnitOfWorkFactory database, IWidgetFactory widgetFactory, IWidgetRegistry widgetRegistry, ILogger logger, INavigationManager navigationManager)
+        public MainViewModel(IWidgetFactory widgetFactory, IWidgetRegistry widgetRegistry, ILogger logger, INavigationManager navigationManager)
         {
-            _database = database;
             _widgetRegistry = widgetRegistry;
             _logger = logger;
             _navigationManager = navigationManager;

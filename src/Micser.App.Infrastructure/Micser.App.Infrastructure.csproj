@@ -86,7 +86,6 @@
     <Compile Include="IAppModule.cs" />
     <Compile Include="ISelectable.cs" />
     <Compile Include="MicserRegionNavigationJournal.cs" />
-    <Compile Include="NavigationEvent.cs" />
     <Compile Include="Settings\ISettingsRegistry.cs" />
     <Compile Include="Settings\ISettingsService.cs" />
     <Compile Include="ResourceBinding.cs" />
