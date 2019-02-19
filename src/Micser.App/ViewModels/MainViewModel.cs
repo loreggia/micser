@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -166,6 +165,8 @@ namespace Micser.App.ViewModels
             if (result.IsSuccess)
             {
                 viewModel.Id = result.Data.Id;
+                viewModel.SourceChanged += OnConnectionSourceChanged;
+                viewModel.TargetChanged += OnConnectionTargetChanged;
             }
             else
             {
@@ -186,11 +187,11 @@ namespace Micser.App.ViewModels
             if (result.IsSuccess)
             {
                 viewModel.Id = result.Data.Id;
-
                 if (moduleDto.WidgetState != null)
                 {
                     viewModel.LoadState(moduleDto.WidgetState);
                 }
+                viewModel.PropertyChanged += OnWidgetPropertyChanged;
             }
             else
             {
@@ -293,12 +294,10 @@ namespace Micser.App.ViewModels
 
                 if (!result.IsSuccess)
                 {
-                    Debug.WriteLine(result);
                     // TODO error handling
                 }
                 else
                 {
-                    Debug.WriteLine($"Widget saved, ID: {vm.Id}");
                 }
             }
         }

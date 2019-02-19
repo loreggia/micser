@@ -15,8 +15,8 @@ namespace Micser.Common.Widgets
         [JsonExtensionData]
         public StateDictionary Data { get; set; }
 
+        public string Name { get; set; }
         public Point Position { get; set; }
-
         public Size Size { get; set; }
     }
 }

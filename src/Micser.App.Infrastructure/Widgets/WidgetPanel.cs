@@ -239,6 +239,28 @@ namespace Micser.App.Infrastructure.Widgets
             }
         }
 
+        protected override void OnKeyDown(KeyEventArgs e)
+        {
+            base.OnKeyDown(e);
+
+            if (e.Key == Key.Delete || e.Key == Key.Back)
+            {
+                var selected = _widgets.Where(w => w.IsSelected).ToArray();
+                foreach (var widget in selected)
+                {
+                    var connections = _connections.Where(c => c.Source.ParentWidget == widget || c.Target.ParentWidget == widget).ToArray();
+                    foreach (var connection in connections)
+                    {
+                        RemoveConnection(connection);
+                    }
+
+                    RemoveWidget(widget);
+                }
+
+                e.Handled = true;
+            }
+        }
+
         protected override void OnMouseDown(MouseButtonEventArgs e)
         {
             base.OnMouseDown(e);
@@ -290,26 +312,6 @@ namespace Micser.App.Infrastructure.Widgets
             }
 
             //e.Handled = true;
-        }
-
-        protected override void OnPreviewKeyDown(KeyEventArgs e)
-        {
-            base.OnPreviewKeyDown(e);
-
-            if (e.Key == Key.Delete || e.Key == Key.Back)
-            {
-                var selected = _widgets.Where(w => w.IsSelected).ToArray();
-                foreach (var widget in selected)
-                {
-                    var connections = _connections.Where(c => c.Source.ParentWidget == widget || c.Target.ParentWidget == widget).ToArray();
-                    foreach (var connection in connections)
-                    {
-                        RemoveConnection(connection);
-                    }
-
-                    RemoveWidget(widget);
-                }
-            }
         }
 
         private static void OnConnectionsSourcePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
