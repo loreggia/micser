@@ -73,9 +73,9 @@ namespace Micser.App.Infrastructure.Widgets
             if (HitConnector != null)
             {
                 var sourceConnector = _sourceConnector;
-                var sinkConnector = HitConnector;
+                var targetConnector = HitConnector;
 
-                _widgetPanel.CreateConnection(sourceConnector, sinkConnector);
+                _widgetPanel.CreateConnection(sourceConnector, targetConnector);
             }
 
             if (HitWidget != null)

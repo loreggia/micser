@@ -76,11 +76,11 @@
                             </Grid.LayoutTransform>
                         </Grid>
                         <Grid Style="{StaticResource ArrowGridStyle}"
-                              Canvas.Left="{Binding SinkAnchorPosition.X}"
-                              Canvas.Top="{Binding SinkAnchorPosition.Y}">
-                            <Path Name="PART_SinkAnchorPath" />
+                              Canvas.Left="{Binding TargetAnchorPosition.X}"
+                              Canvas.Top="{Binding TargetAnchorPosition.Y}">
+                            <Path Name="PART_TargetAnchorPath" />
                             <Grid.LayoutTransform>
-                                <RotateTransform Angle="{Binding SinkAnchorAngle}" />
+                                <RotateTransform Angle="{Binding TargetAnchorAngle}" />
                             </Grid.LayoutTransform>
                         </Grid>
 
@@ -101,11 +101,11 @@
                         <DataTrigger Value="Diamond" Binding="{Binding RelativeSource={RelativeSource Self},Path=SourceArrowSymbol}">
                             <Setter TargetName="PART_SourceAnchorPath" Property="Style" Value="{StaticResource Diamond}" />
                         </DataTrigger>
-                        <DataTrigger Value="Arrow" Binding="{Binding RelativeSource={RelativeSource Self},Path=SinkArrowSymbol}">
-                            <Setter TargetName="PART_SinkAnchorPath" Property="Style" Value="{StaticResource Arrow}" />
+                        <DataTrigger Value="Arrow" Binding="{Binding RelativeSource={RelativeSource Self},Path=TargetArrowSymbol}">
+                            <Setter TargetName="PART_TargetAnchorPath" Property="Style" Value="{StaticResource Arrow}" />
                         </DataTrigger>
-                        <DataTrigger Value="Diamond" Binding="{Binding RelativeSource={RelativeSource Self},Path=SinkArrowSymbol}">
-                            <Setter TargetName="PART_SinkAnchorPath" Property="Style" Value="{StaticResource Diamond}" />
+                        <DataTrigger Value="Diamond" Binding="{Binding RelativeSource={RelativeSource Self},Path=TargetArrowSymbol}">
+                            <Setter TargetName="PART_TargetAnchorPath" Property="Style" Value="{StaticResource Diamond}" />
                         </DataTrigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

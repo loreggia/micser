@@ -19,7 +19,7 @@ namespace Micser.App.Infrastructure.Widgets
         private Connector _fixConnector, _dragConnector;
         private Widget _hitWidget;
         private PathGeometry _pathGeometry;
-        private Thumb _sourceDragThumb, _sinkDragThumb;
+        private Thumb _sourceDragThumb, _targetDragThumb;
 
         public ConnectionAdorner(WidgetPanel panel, Connection connection)
             : base(panel)
@@ -36,8 +36,8 @@ namespace Micser.App.Infrastructure.Widgets
             var spd = DependencyPropertyDescriptor.FromProperty(Connection.SourceAnchorPositionProperty, typeof(Connection));
             spd.AddValueChanged(_connection, SourceAnchorPositionChanged);
 
-            spd = DependencyPropertyDescriptor.FromProperty(Connection.SinkAnchorPositionProperty, typeof(Connection));
-            spd.AddValueChanged(_connection, SinkAnchorPositionChanged);
+            spd = DependencyPropertyDescriptor.FromProperty(Connection.TargetAnchorPositionProperty, typeof(Connection));
+            spd.AddValueChanged(_connection, TargetAnchorPositionChanged);
 
             InitializeDragThumbs();
 
@@ -91,12 +91,12 @@ namespace Micser.App.Infrastructure.Widgets
         {
             if (HitConnector != null)
             {
-                var connectionVm = (ConnectionViewModel) _connection.DataContext;
-                var connectorVm = (ConnectorViewModel) HitConnector.DataContext;
+                var connectionVm = (ConnectionViewModel)_connection.DataContext;
+                var connectorVm = (ConnectorViewModel)HitConnector.DataContext;
 
                 if (Equals(_connection.Source, _fixConnector))
                 {
-                    _connection.Sink = HitConnector;
+                    _connection.Target = HitConnector;
                     connectionVm.Target = connectorVm;
                 }
                 else
@@ -110,9 +110,9 @@ namespace Micser.App.Infrastructure.Widgets
             else
             {
                 // remove connection
-                _connection.Sink.Connection = null;
+                _connection.Target.Connection = null;
                 _connection.Source.Connection = null;
-                _connection.Sink = null;
+                _connection.Target = null;
                 _connection.Source = null;
                 _widgetPanel.RemoveConnection(_connection);
             }
@@ -138,16 +138,16 @@ namespace Micser.App.Infrastructure.Widgets
             HitConnector = null;
             _pathGeometry = null;
             Cursor = Cursors.Cross;
-            _connection.StrokeDashArray = new DoubleCollection(new double[] {1, 2});
+            _connection.StrokeDashArray = new DoubleCollection(new double[] { 1, 2 });
 
             if (Equals(sender, _sourceDragThumb))
             {
-                _fixConnector = _connection.Sink;
+                _fixConnector = _connection.Target;
                 _dragConnector = _connection.Source;
             }
-            else if (Equals(sender, _sinkDragThumb))
+            else if (Equals(sender, _targetDragThumb))
             {
-                _dragConnector = _connection.Sink;
+                _dragConnector = _connection.Target;
                 _fixConnector = _connection.Source;
             }
         }
@@ -203,31 +203,31 @@ namespace Micser.App.Infrastructure.Widgets
             _sourceDragThumb.DragStarted += DragThumb_DragStarted;
             _sourceDragThumb.DragCompleted += DragThumb_DragCompleted;
 
-            // sink drag thumb
-            _sinkDragThumb = new Thumb();
-            Canvas.SetLeft(_sinkDragThumb, _connection.SinkAnchorPosition.X);
-            Canvas.SetTop(_sinkDragThumb, _connection.SinkAnchorPosition.Y);
-            _adornerCanvas.Children.Add(_sinkDragThumb);
+            // target drag thumb
+            _targetDragThumb = new Thumb();
+            Canvas.SetLeft(_targetDragThumb, _connection.TargetAnchorPosition.X);
+            Canvas.SetTop(_targetDragThumb, _connection.TargetAnchorPosition.Y);
+            _adornerCanvas.Children.Add(_targetDragThumb);
             if (dragThumbStyle != null)
             {
-                _sinkDragThumb.Style = dragThumbStyle;
+                _targetDragThumb.Style = dragThumbStyle;
             }
 
-            _sinkDragThumb.DragDelta += DragThumb_DragDelta;
-            _sinkDragThumb.DragStarted += DragThumb_DragStarted;
-            _sinkDragThumb.DragCompleted += DragThumb_DragCompleted;
-        }
-
-        private void SinkAnchorPositionChanged(object sender, EventArgs e)
-        {
-            Canvas.SetLeft(_sinkDragThumb, _connection.SinkAnchorPosition.X);
-            Canvas.SetTop(_sinkDragThumb, _connection.SinkAnchorPosition.Y);
+            _targetDragThumb.DragDelta += DragThumb_DragDelta;
+            _targetDragThumb.DragStarted += DragThumb_DragStarted;
+            _targetDragThumb.DragCompleted += DragThumb_DragCompleted;
         }
 
         private void SourceAnchorPositionChanged(object sender, EventArgs e)
         {
             Canvas.SetLeft(_sourceDragThumb, _connection.SourceAnchorPosition.X);
             Canvas.SetTop(_sourceDragThumb, _connection.SourceAnchorPosition.Y);
+        }
+
+        private void TargetAnchorPositionChanged(object sender, EventArgs e)
+        {
+            Canvas.SetLeft(_targetDragThumb, _connection.TargetAnchorPosition.X);
+            Canvas.SetTop(_targetDragThumb, _connection.TargetAnchorPosition.Y);
         }
 
         private PathGeometry UpdatePathGeometry(Point position)

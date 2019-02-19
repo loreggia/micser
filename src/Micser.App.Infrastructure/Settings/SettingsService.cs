@@ -42,6 +42,11 @@ namespace Micser.App.Infrastructure.Settings
             }
         }
 
+        void ISettingsService.Load()
+        {
+            EnsureLoaded();
+        }
+
         public void SetSetting<T>(string key, T value)
         {
             EnsureLoaded();

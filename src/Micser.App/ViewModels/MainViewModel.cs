@@ -59,40 +59,6 @@ namespace Micser.App.ViewModels
 
         public IEnumerable<WidgetViewModel> Widgets => _widgets;
 
-        protected override void OnNavigatedFrom(object parameter)
-        {
-            base.OnNavigatedFrom(parameter);
-
-            //var widgetStates = new List<WidgetState>();
-
-            //foreach (var vm in Widgets)
-            //{
-            //    var state = new WidgetState
-            //    {
-            //        Position = vm.Position,
-            //        Size = vm.Size
-            //    };
-            //    vm.SaveState(state);
-            //    widgetStates.Add(state);
-            //}
-
-            //_configurationService.SetSetting(WidgetsConfigurationKey, widgetStates);
-
-            //var connections = new List<ConnectionInfo>();
-            //foreach (var connection in Connections)
-            //{
-            //    connections.Add(new ConnectionInfo
-            //    {
-            //        SourceWidgetId = connection.Source.Widget.Id,
-            //        SourceConnectorName = connection.Source.Name,
-            //        SinkWidgetId = connection.Sink.Widget.Id,
-            //        SinkConnectorName = connection.Sink.Name
-            //    });
-            //}
-
-            //_configurationService.SetSetting(ConnectionsConfigurationKey, connections);
-        }
-
         protected override async void OnNavigatedTo(object parameter)
         {
             if (_isLoaded)
@@ -169,6 +135,8 @@ namespace Micser.App.ViewModels
                                 _connections.Add(cvm);
                                 source.Connection = cvm;
                                 target.Connection = cvm;
+                                cvm.SourceChanged += OnConnectionSourceChanged;
+                                cvm.TargetChanged += OnConnectionTargetChanged;
                             }
                         }
                         catch (Exception ex)
@@ -237,6 +205,9 @@ namespace Micser.App.ViewModels
             {
                 // TODO error handling
             }
+
+            viewModel.SourceChanged -= OnConnectionSourceChanged;
+            viewModel.TargetChanged -= OnConnectionTargetChanged;
         }
 
         private async void DeleteModule(WidgetViewModel viewModel)
@@ -276,6 +247,22 @@ namespace Micser.App.ViewModels
             }
         }
 
+        private void OnConnectionSourceChanged(object sender, ConnectorChangedEventArgs e)
+        {
+            if (sender is ConnectionViewModel vm)
+            {
+                UpdateConnection(vm);
+            }
+        }
+
+        private void OnConnectionTargetChanged(object sender, ConnectorChangedEventArgs e)
+        {
+            if (sender is ConnectionViewModel vm)
+            {
+                UpdateConnection(vm);
+            }
+        }
+
         private void OnWidgetsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             if (_isLoading)
@@ -300,6 +287,28 @@ namespace Micser.App.ViewModels
                     }
 
                     break;
+            }
+        }
+
+        private async void UpdateConnection(ConnectionViewModel viewModel)
+        {
+            var connectionDto = new ModuleConnectionDto
+            {
+                Id = viewModel.Id,
+                SourceConnectorName = viewModel.Source.Name,
+                SourceId = viewModel.Source.Widget.Id,
+                TargetConnectorName = viewModel.Target.Name,
+                TargetId = viewModel.Target.Widget.Id
+            };
+            var result = await _connectionsApiClient.UpdateAsync(connectionDto);
+
+            if (result.IsSuccess)
+            {
+                viewModel.Id = result.Data.Id;
+            }
+            else
+            {
+                // TODO error handling
             }
         }
     }
