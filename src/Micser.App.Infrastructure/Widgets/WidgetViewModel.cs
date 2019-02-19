@@ -82,6 +82,7 @@ namespace Micser.App.Infrastructure.Widgets
         {
             return new WidgetState
             {
+                Name = Name,
                 Position = Position,
                 Size = Size
             };
@@ -106,6 +107,7 @@ namespace Micser.App.Infrastructure.Widgets
                 return;
             }
 
+            Name = state.Name;
             Position = state.Position;
             Size = state.Size;
         }
