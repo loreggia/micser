@@ -8,6 +8,16 @@ namespace Micser.App.Infrastructure
         {
         }
 
+        public class Navigated : PubSubEvent<Navigated.NavigationInfo>
+        {
+            public class NavigationInfo
+            {
+                public object Parameter { get; set; }
+                public string RegionName { get; set; }
+                public string ViewName { get; set; }
+            }
+        }
+
         public class StatusChange : PubSubEvent<string>
         {
         }

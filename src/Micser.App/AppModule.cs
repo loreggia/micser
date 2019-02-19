@@ -49,7 +49,7 @@ namespace Micser.App
             var eventAggregator = containerProvider.Resolve<IEventAggregator>();
 
             var goBackCommand = new DelegateCommand(() => navigationManager.GoBack(AppGlobals.PrismRegions.Main), () => navigationManager.CanGoBack(AppGlobals.PrismRegions.Main));
-            eventAggregator.GetEvent<NavigationEvent>().Subscribe(info => goBackCommand.RaiseCanExecuteChanged());
+            eventAggregator.GetEvent<ApplicationEvents.Navigated>().Subscribe(info => goBackCommand.RaiseCanExecuteChanged());
             toolBarRegistry.AddItem(AppGlobals.ToolBarIds.Main, new ToolBarButton
             {
                 Command = goBackCommand,
@@ -58,7 +58,7 @@ namespace Micser.App
             });
 
             var goForwardCommand = new DelegateCommand(() => navigationManager.GoForward(AppGlobals.PrismRegions.Main), () => navigationManager.CanGoForward(AppGlobals.PrismRegions.Main));
-            eventAggregator.GetEvent<NavigationEvent>().Subscribe(info => goForwardCommand.RaiseCanExecuteChanged());
+            eventAggregator.GetEvent<ApplicationEvents.Navigated>().Subscribe(info => goForwardCommand.RaiseCanExecuteChanged());
             toolBarRegistry.AddItem(AppGlobals.ToolBarIds.Main, new ToolBarButton
             {
                 Command = goForwardCommand,
