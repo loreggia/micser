@@ -13,7 +13,7 @@ namespace Micser.App.Infrastructure.Controls
         public const string PartNameToggleButton = "PART_ToggleButton";
 
         public static readonly DependencyProperty IsEditingProperty = DependencyProperty.Register(
-                    nameof(IsEditing), typeof(bool), typeof(EditableTextBlock), new PropertyMetadata(false));
+            nameof(IsEditing), typeof(bool), typeof(EditableTextBlock), new PropertyMetadata(false));
 
         public static readonly DependencyProperty MaxLengthProperty = DependencyProperty.Register(
             nameof(MaxLength), typeof(int), typeof(EditableTextBlock), new PropertyMetadata(0));

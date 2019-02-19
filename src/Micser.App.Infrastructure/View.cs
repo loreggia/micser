@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
-using Micser.App.Infrastructure.Themes;
 
 namespace Micser.App.Infrastructure
 {
@@ -17,7 +16,6 @@ namespace Micser.App.Infrastructure
 
         public View()
         {
-            ResourceRegistry.RegisterResourcesFor(this);
             SetResourceReference(StyleProperty, typeof(View));
 
             Dispatcher.ShutdownStarted += OnDispatcherShutdownStarted;
@@ -25,7 +23,7 @@ namespace Micser.App.Infrastructure
 
         public bool IsBusy
         {
-            get => (bool) GetValue(IsBusyProperty);
+            get => (bool)GetValue(IsBusyProperty);
             set => SetValue(IsBusyProperty, value);
         }
 

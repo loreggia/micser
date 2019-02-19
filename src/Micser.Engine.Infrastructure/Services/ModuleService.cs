@@ -90,7 +90,7 @@ namespace Micser.Engine.Infrastructure.Services
                 module.ModuleStateJson = JsonConvert.SerializeObject(moduleDto.ModuleState);
                 module.WidgetStateJson = JsonConvert.SerializeObject(moduleDto.WidgetState);
 
-                return uow.Complete() > 0;
+                return uow.Complete() >= 0;
             }
         }
 
