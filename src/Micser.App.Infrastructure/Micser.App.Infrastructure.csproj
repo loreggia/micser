@@ -59,6 +59,7 @@
     <Compile Include="ApplicationStateService.cs" />
     <Compile Include="Bindable.cs" />
     <Compile Include="CheckBoxLabelBehavior.cs" />
+    <Compile Include="CommandBindingToCommand.cs" />
     <Compile Include="Controls\BusyPanel.cs" />
     <Compile Include="Controls\CustomPopup.cs" />
     <Compile Include="Controls\EditableTextBlock.cs" />

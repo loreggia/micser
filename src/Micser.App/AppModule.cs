@@ -9,6 +9,7 @@ using Micser.App.Views;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Ioc;
+using System.Diagnostics;
 
 namespace Micser.App
 {
@@ -24,6 +25,25 @@ namespace Micser.App
                 Description = "If enabled, the program will minimize to the system tray instead of exiting when the window is closed.",
                 DefaultValue = true,
                 Type = SettingType.Boolean
+            });
+            settingsRegistry.Add(new SettingDefinition
+            {
+                Key = AppGlobals.SettingKeys.Startup,
+                Name = "Startup",
+                Description = "If enabled, the program will start when you log in.",
+                DefaultValue = true,
+                Type = SettingType.Boolean,
+                StorageType = SettingStorageType.Custom,
+                GetCustomSetting = () =>
+                {
+                    Debug.WriteLine("Get custom setting");
+                    return true;
+                },
+                SetCustomSetting = x =>
+                {
+                    //Environment.GetFolderPath(Environment.SpecialFolder.Startup)
+                    Debug.WriteLine("Set custom setting");
+                }
             });
 
             var navigationManager = containerProvider.Resolve<INavigationManager>();

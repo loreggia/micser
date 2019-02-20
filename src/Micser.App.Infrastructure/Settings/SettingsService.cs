@@ -6,6 +6,7 @@ using NLog;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Micser.App.Infrastructure.Settings
 {
@@ -51,14 +52,28 @@ namespace Micser.App.Infrastructure.Settings
         {
             EnsureLoaded();
 
+            var setting = _registry.Items.FirstOrDefault(i => string.Equals(i.Key, key, StringComparison.InvariantCultureIgnoreCase));
+
+            if (setting == null)
+            {
+                _logger.Warn($"Saving unregistered setting '{key}'.");
+            }
+
             lock (_settings)
             {
-                if (!_settings.ContainsKey(key))
-                {
-                    _logger.Warn($"Saving unregistered setting '{key}'.");
-                }
-
                 _settings[key] = value;
+
+                if (setting != null && setting.StorageType == SettingStorageType.Custom)
+                {
+                    if (setting.SetCustomSetting != null)
+                    {
+                        setting.SetCustomSetting(value);
+                    }
+                    else
+                    {
+                        _logger.Error($"A custom setting must set the GetCustomSetting and SetCustomSetting delegates. Key: {setting.Key}");
+                    }
+                }
 
                 using (var uow = _database.Create())
                 {
@@ -113,7 +128,7 @@ namespace Micser.App.Infrastructure.Settings
                 {
                     var settingRepo = uow.GetRepository<ISettingValueRepository>();
 
-                    foreach (var setting in _registry.Items)
+                    foreach (var setting in _registry.Items.Where(i => i.StorageType == SettingStorageType.Internal))
                     {
                         object value = null;
                         var settingValue = settingRepo.GetByKey(setting.Key);
@@ -129,6 +144,25 @@ namespace Micser.App.Infrastructure.Settings
                         }
 
                         _settings[setting.Key] = value ?? setting.DefaultValue;
+                    }
+                }
+
+                foreach (var setting in _registry.Items.Where(i => i.StorageType == SettingStorageType.Custom))
+                {
+                    try
+                    {
+                        if (setting.GetCustomSetting != null)
+                        {
+                            _settings[setting.Key] = setting.GetCustomSetting() ?? setting.DefaultValue;
+                        }
+                        else
+                        {
+                            _logger.Error($"A custom setting must set the GetCustomSetting and SetCustomSetting delegates. Key: {setting.Key}");
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.Error(ex, $"Could not load a custom setting. Key: {setting.Key}");
                     }
                 }
             }
