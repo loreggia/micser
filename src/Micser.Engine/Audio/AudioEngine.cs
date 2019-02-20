@@ -52,6 +52,16 @@ namespace Micser.Engine.Audio
             }
         }
 
+        public void DeleteModule(long id)
+        {
+            var audioModule = _modules.SingleOrDefault(m => m.Description.Id == id);
+            if (audioModule != null)
+            {
+                _modules.Remove(audioModule);
+                audioModule.Dispose();
+            }
+        }
+
         public void Dispose()
         {
             Stop();

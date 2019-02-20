@@ -34,6 +34,8 @@ namespace Micser.Engine.Api.Controllers
                 return HttpStatusCode.NotFound;
             }
 
+            _audioEngine.DeleteModule(id);
+
             return module;
         }
 

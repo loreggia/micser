@@ -8,6 +8,8 @@ namespace Micser.Engine.Audio
 
         void AddModule(long id);
 
+        void DeleteModule(long id);
+
         void Start();
 
         void Stop();
