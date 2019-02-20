@@ -19,6 +19,7 @@ namespace Micser.App.Infrastructure
             SetResourceReference(StyleProperty, typeof(View));
 
             Dispatcher.ShutdownStarted += OnDispatcherShutdownStarted;
+            DataContextChanged += OnDataContextChanged;
         }
 
         public bool IsBusy
@@ -28,6 +29,15 @@ namespace Micser.App.Infrastructure
         }
 
         public ViewModel ViewModel => DataContext as ViewModel;
+
+        private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        {
+            var commandBindings = ViewModel?.CommandBindings;
+            if (commandBindings != null)
+            {
+                CommandBindings.AddRange(commandBindings);
+            }
+        }
 
         private void OnDispatcherShutdownStarted(object sender, EventArgs e)
         {
