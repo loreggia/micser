@@ -67,7 +67,7 @@ namespace Micser.App.Infrastructure.Settings
                 {
                     if (setting.SetCustomSetting != null)
                     {
-                        setting.SetCustomSetting(value);
+                        setting.SetCustomSetting(value, _logger);
                     }
                     else
                     {
@@ -153,7 +153,7 @@ namespace Micser.App.Infrastructure.Settings
                     {
                         if (setting.GetCustomSetting != null)
                         {
-                            _settings[setting.Key] = setting.GetCustomSetting() ?? setting.DefaultValue;
+                            _settings[setting.Key] = setting.GetCustomSetting(_logger) ?? setting.DefaultValue;
                         }
                         else
                         {

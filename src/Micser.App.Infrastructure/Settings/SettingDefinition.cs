@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NLog;
+using System;
 
 namespace Micser.App.Infrastructure.Settings
 {
@@ -26,10 +27,10 @@ namespace Micser.App.Infrastructure.Settings
 
         public object DefaultValue { get; set; }
         public string Description { get; set; }
-        public Func<object> GetCustomSetting { get; set; }
+        public Func<ILogger, object> GetCustomSetting { get; set; }
         public string Key { get; set; }
         public string Name { get; set; }
-        public Action<object> SetCustomSetting { get; set; }
+        public Action<object, ILogger> SetCustomSetting { get; set; }
         public SettingStorageType StorageType { get; set; }
         public SettingType Type { get; set; }
     }

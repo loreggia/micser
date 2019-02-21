@@ -4,12 +4,12 @@ using Micser.App.Infrastructure.Menu;
 using Micser.App.Infrastructure.Settings;
 using Micser.App.Infrastructure.ToolBars;
 using Micser.App.Properties;
+using Micser.App.Settings;
 using Micser.App.ViewModels;
 using Micser.App.Views;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Ioc;
-using System.Diagnostics;
 
 namespace Micser.App
 {
@@ -34,16 +34,8 @@ namespace Micser.App
                 DefaultValue = true,
                 Type = SettingType.Boolean,
                 StorageType = SettingStorageType.Custom,
-                GetCustomSetting = () =>
-                {
-                    Debug.WriteLine("Get custom setting");
-                    return true;
-                },
-                SetCustomSetting = x =>
-                {
-                    //Environment.GetFolderPath(Environment.SpecialFolder.Startup)
-                    Debug.WriteLine("Set custom setting");
-                }
+                GetCustomSetting = StartupSettingHelper.GetStartupSetting,
+                SetCustomSetting = StartupSettingHelper.SetStartupSetting
             });
 
             var navigationManager = containerProvider.Resolve<INavigationManager>();
