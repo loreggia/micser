@@ -1,7 +1,10 @@
 ﻿using Micser.App.Infrastructure;
 using Micser.App.Infrastructure.Settings;
+using Prism.Commands;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace Micser.App.ViewModels
 {
@@ -16,7 +19,12 @@ namespace Micser.App.ViewModels
         {
             _settingsRegistry = settingsRegistry;
             _settingsService = settingsService;
+
+            SaveCommand = new DelegateCommand(Save, () => !IsBusy);
+            AddCommandBinding(CustomApplicationCommands.Save, SaveCommand);
         }
+
+        public ICommand SaveCommand { get; }
 
         public IEnumerable<SettingViewModel> Settings
         {
@@ -24,132 +32,121 @@ namespace Micser.App.ViewModels
             set => SetProperty(ref _settings, value);
         }
 
-        protected override void OnNavigatedTo(object parameter)
+        protected override async void OnNavigatedTo(object parameter)
         {
             base.OnNavigatedTo(parameter);
 
-            var settings = _settingsRegistry.Items.Select(s =>
+            await LoadAsync();
+        }
+
+        private async Task LoadAsync()
+        {
+            IsBusy = true;
+            await Task.Run(() =>
             {
-                switch (s.Type)
+                var settings = _settingsRegistry.Items.Select(s =>
                 {
-                    case SettingType.Boolean:
-                        return (SettingViewModel)new BooleanSettingViewModel(s, _settingsService.GetSetting<bool>(s.Key));
+                    switch (s.Type)
+                    {
+                        case SettingType.Boolean:
+                            return (SettingViewModel)new BooleanSettingViewModel(s, _settingsService.GetSetting<bool>(s.Key));
 
-                    case SettingType.Integer:
-                        return new IntegerSettingViewModel(s, _settingsService.GetSetting<long>(s.Key));
+                        case SettingType.Integer:
+                            return new IntegerSettingViewModel(s, _settingsService.GetSetting<long>(s.Key));
 
-                    case SettingType.Decimal:
-                        return new DecimalSettingViewModel(s, _settingsService.GetSetting<double>(s.Key));
+                        case SettingType.Decimal:
+                            return new DecimalSettingViewModel(s, _settingsService.GetSetting<double>(s.Key));
 
-                    default:
-                        return new StringSettingViewModel(s, _settingsService.GetSetting<string>(s.Key));
+                        default:
+                            return new StringSettingViewModel(s, _settingsService.GetSetting<string>(s.Key));
+                    }
+                });
+
+                Settings = settings;
+            });
+            IsBusy = false;
+        }
+
+        private async void Save()
+        {
+            IsBusy = true;
+            await Task.Run(() =>
+            {
+                foreach (var settingVm in Settings)
+                {
+                    _settingsService.SetSetting(settingVm.Definition.Key, settingVm.GetValue());
                 }
             });
-
-            Settings = settings;
+            IsBusy = false;
         }
     }
 
     public abstract class SettingViewModel : ViewModel
     {
-        protected object DefaultValue;
-
-        private string _description;
-        private string _key;
-        private string _name;
-
-        protected SettingViewModel(SettingDefinition setting)
+        protected SettingViewModel(SettingDefinition definition)
         {
-            Key = setting.Key;
-            Name = setting.Name;
-            Description = setting.Description;
-            DefaultValue = setting.DefaultValue;
+            Definition = definition;
         }
 
-        public string Description
+        public SettingDefinition Definition { get; }
+
+        public abstract object GetValue();
+    }
+
+    public abstract class SettingViewModel<T> : SettingViewModel
+    {
+        private T _value;
+
+        protected SettingViewModel(SettingDefinition setting, T value)
+                    : base(setting)
         {
-            get => _description;
-            set => SetProperty(ref _description, value);
+            Value = value;
         }
 
-        public string Key
+        public T Value
         {
-            get => _key;
-            set => SetProperty(ref _key, value);
+            get => _value;
+            set => SetProperty(ref _value, value);
         }
 
-        public string Name
+        public override object GetValue()
         {
-            get => _name;
-            set => SetProperty(ref _name, value);
+            return Value;
         }
     }
 
-    internal class BooleanSettingViewModel : SettingViewModel
+    internal class BooleanSettingViewModel : SettingViewModel<bool>
     {
-        private bool _value;
-
         public BooleanSettingViewModel(SettingDefinition setting, bool value)
-            : base(setting)
+            : base(setting, value)
         {
-            Value = value;
-        }
-
-        public bool Value
-        {
-            get => _value;
-            set => SetProperty(ref _value, value);
         }
     }
 
-    internal class DecimalSettingViewModel : SettingViewModel
+    internal class DecimalSettingViewModel : SettingViewModel<double>
     {
-        private double _value;
-
         public DecimalSettingViewModel(SettingDefinition setting, double value)
-            : base(setting)
+            : base(setting, value)
         {
             Value = value;
         }
-
-        public double Value
-        {
-            get => _value;
-            set => SetProperty(ref _value, value);
-        }
     }
 
-    internal class IntegerSettingViewModel : SettingViewModel
+    internal class IntegerSettingViewModel : SettingViewModel<long>
     {
-        private long _value;
-
         public IntegerSettingViewModel(SettingDefinition setting, long value)
-            : base(setting)
+            : base(setting, value)
         {
             Value = value;
-        }
-
-        public long Value
-        {
-            get => _value;
-            set => SetProperty(ref _value, value);
         }
     }
 
-    internal class StringSettingViewModel : SettingViewModel
+    internal class StringSettingViewModel : SettingViewModel<string>
     {
-        private string _value;
-
         public StringSettingViewModel(SettingDefinition setting, string value)
-            : base(setting)
+            : base(setting, value)
         {
             Value = value;
-        }
-
-        public string Value
-        {
-            get => _value;
-            set => SetProperty(ref _value, value);
         }
     }
 }

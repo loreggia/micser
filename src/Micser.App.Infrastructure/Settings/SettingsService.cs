@@ -48,7 +48,7 @@ namespace Micser.App.Infrastructure.Settings
             EnsureLoaded();
         }
 
-        public void SetSetting<T>(string key, T value)
+        public void SetSetting(string key, object value)
         {
             EnsureLoaded();
 
