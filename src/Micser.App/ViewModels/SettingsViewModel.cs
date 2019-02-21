@@ -62,7 +62,7 @@ namespace Micser.App.ViewModels
                     }
                 });
 
-                Settings = settings;
+                Settings = settings.ToArray();
             });
             IsBusy = false;
         }
