@@ -43,6 +43,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="DataAccess\UnitOfWorkTest.cs" />
     <Compile Include="DeviceServiceTest.cs" />
     <Compile Include="SerializationTest.cs" />
     <Compile Include="TestFileManager.cs" />
