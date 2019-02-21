@@ -15,12 +15,22 @@ namespace Micser.App.Settings
 
         public static object GetStartupSetting(ILogger logger)
         {
-            var fileName = Path.Combine(StartupFolder, StartupShortcutFileName);
-            return File.Exists(fileName);
+            try
+            {
+                var fileName = Path.Combine(StartupFolder, StartupShortcutFileName);
+                return File.Exists(fileName);
+            }
+            catch (Exception ex)
+            {
+                logger.Error(ex);
+                return false;
+            }
         }
 
         public static void SetStartupSetting(object value, ILogger logger)
         {
+            value = value ?? false;
+
             if (value is bool isEnabled)
             {
                 var fileName = Path.Combine(StartupFolder, StartupShortcutFileName);
@@ -29,10 +39,17 @@ namespace Micser.App.Settings
                 if (isEnabled && !fileExists)
                 {
                     // create shortcut
-                    var shell = new WshShell();
-                    var shortcut = (IWshShortcut)shell.CreateShortcut(fileName);
-                    shortcut.TargetPath = Assembly.GetExecutingAssembly().Location;
-                    shortcut.Save();
+                    try
+                    {
+                        var shell = new WshShell();
+                        var shortcut = (IWshShortcut)shell.CreateShortcut(fileName);
+                        shortcut.TargetPath = Assembly.GetExecutingAssembly().Location;
+                        shortcut.Save();
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.Error(ex, "Could not create the startup shortcut.");
+                    }
                 }
                 else if (!isEnabled && fileExists)
                 {
@@ -43,8 +60,13 @@ namespace Micser.App.Settings
                     }
                     catch (Exception ex)
                     {
+                        logger.Error(ex, "Could not delete the startup shortcut.");
                     }
                 }
+            }
+            else
+            {
+                logger.Warn($"Invalid value '{value}', expected a boolean.");
             }
         }
     }
