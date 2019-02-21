@@ -14,6 +14,11 @@ namespace Micser.App.Infrastructure.DataAccess
 
         public IDbSet<SettingValue> Settings { get; set; }
 
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
+        }
+
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
             Database.SetInitializer(new MigrateDatabaseToLatestVersion<AppDbContext, ContextMigrationConfiguration>(true));

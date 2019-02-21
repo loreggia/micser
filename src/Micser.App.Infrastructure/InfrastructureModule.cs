@@ -24,8 +24,9 @@ namespace Micser.App.Infrastructure
             containerRegistry.RegisterSingleton<IWidgetRegistry, WidgetRegistry>();
             containerRegistry.RegisterSingleton<IWidgetFactory, WidgetFactory>();
             containerRegistry.RegisterSingleton<ISettingsRegistry, SettingsRegistry>();
-            containerRegistry.RegisterSingleton<ISettingValueRepository, SettingValueRepository>();
             containerRegistry.RegisterSingleton<ISettingsService, SettingsService>();
+
+            containerRegistry.Register<ISettingValueRepository, SettingValueRepository>();
 
             _isRegistered = true;
         }
