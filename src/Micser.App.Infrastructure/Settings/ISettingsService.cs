@@ -6,6 +6,6 @@
 
         void Load();
 
-        void SetSetting<T>(string key, T value);
+        void SetSetting(string key, object value);
     }
 }
