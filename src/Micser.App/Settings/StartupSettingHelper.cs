@@ -44,6 +44,7 @@ namespace Micser.App.Settings
                         var shell = new WshShell();
                         var shortcut = (IWshShortcut)shell.CreateShortcut(fileName);
                         shortcut.TargetPath = Assembly.GetExecutingAssembly().Location;
+                        shortcut.WorkingDirectory = Path.GetDirectoryName(shortcut.TargetPath);
                         shortcut.Save();
                     }
                     catch (Exception ex)
