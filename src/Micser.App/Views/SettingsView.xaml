@@ -20,7 +20,7 @@
                     <ColumnDefinition SharedSizeGroup="Label" Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <Label Content="{Binding Name}" ToolTip="{Binding Description}" Target="{Binding ElementName=CheckBox}" i:CheckBoxLabelBehavior.IsEnabled="True" />
+                <Label Content="{Binding Definition.Name}" ToolTip="{Binding Definition.Description}" Target="{Binding ElementName=CheckBox}" i:CheckBoxLabelBehavior.IsEnabled="True" />
                 <CheckBox x:Name="CheckBox" Grid.Column="1" IsChecked="{Binding Value, Mode=TwoWay}" VerticalAlignment="Center" />
             </Grid>
         </DataTemplate>
@@ -31,7 +31,7 @@
                     <ColumnDefinition SharedSizeGroup="Label" Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <Label Content="{Binding Name}" ToolTip="{Binding Description}" Target="{Binding ElementName=TextBox}" />
+                <Label Content="{Binding Definition.Name}" ToolTip="{Binding Definition.Description}" Target="{Binding ElementName=TextBox}" />
                 <TextBox x:Name="TextBox" Grid.Column="1" Text="{Binding Value, Mode=TwoWay}" />
             </Grid>
         </DataTemplate>
@@ -42,7 +42,7 @@
                     <ColumnDefinition SharedSizeGroup="Label" Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <Label Content="{Binding Name}" ToolTip="{Binding Description}" Target="{Binding ElementName=TextBox}" />
+                <Label Content="{Binding Definition.Name}" ToolTip="{Binding Definition.Description}" Target="{Binding ElementName=TextBox}" />
                 <TextBox x:Name="TextBox" Grid.Column="1" Text="{Binding Value, Mode=TwoWay}" />
             </Grid>
         </DataTemplate>
@@ -53,7 +53,7 @@
                     <ColumnDefinition SharedSizeGroup="Label" Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-                <Label Content="{Binding Name}" ToolTip="{Binding Description}" Target="{Binding ElementName=TextBox}" />
+                <Label Content="{Binding Definition.Name}" ToolTip="{Binding Definition.Description}" Target="{Binding ElementName=TextBox}" />
                 <TextBox x:Name="TextBox" Grid.Column="1" Text="{Binding Value, Mode=TwoWay}" />
             </Grid>
         </DataTemplate>
