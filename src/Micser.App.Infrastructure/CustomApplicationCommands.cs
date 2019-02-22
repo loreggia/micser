@@ -13,6 +13,11 @@ namespace Micser.App.Infrastructure
         public static readonly RoutedUICommand Close;
 
         /// <summary>
+        /// Performs a delete action in the current context.
+        /// </summary>
+        public static readonly RoutedUICommand Delete;
+
+        /// <summary>
         /// Exits the application.
         /// </summary>
         public static readonly RoutedUICommand Exit;
@@ -45,6 +50,7 @@ namespace Micser.App.Infrastructure
             Refresh = CreateCommand(() => Refresh);
             Restore = CreateCommand(() => Restore);
             Save = CreateCommand(() => Save);
+            Delete = CreateCommand(() => Delete);
         }
 
         private static RoutedUICommand CreateCommand<T>(Expression<Func<T>> command)
