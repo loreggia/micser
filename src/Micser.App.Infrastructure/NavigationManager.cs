@@ -55,10 +55,19 @@ namespace Micser.App.Infrastructure
 
         public void Navigate<TView>(string regionName, object parameter = null)
         {
+            var viewName = typeof(TView).Name;
             var region = _regionManager.Regions[regionName];
+            var currentEntry = region.NavigationService.Journal.CurrentEntry;
+            if (currentEntry != null &&
+                currentEntry.Uri.OriginalString == viewName &&
+                Equals(currentEntry.Parameters[AppGlobals.NavigationParameterKey], parameter))
+            {
+                return;
+            }
+
             region.NavigationService.Navigated -= OnNavigated;
             region.NavigationService.Navigated += OnNavigated;
-            _regionManager.RequestNavigate(regionName, new Uri(typeof(TView).Name, UriKind.Relative), new NavigationParameters { { AppGlobals.NavigationParameterKey, parameter } });
+            _regionManager.RequestNavigate(regionName, new Uri(viewName, UriKind.Relative), new NavigationParameters { { AppGlobals.NavigationParameterKey, parameter } });
         }
 
         protected virtual void Dispose(bool disposing)

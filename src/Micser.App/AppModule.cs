@@ -60,6 +60,14 @@ namespace Micser.App
             var toolBarRegistry = containerProvider.Resolve<IToolBarRegistry>();
             var eventAggregator = containerProvider.Resolve<IEventAggregator>();
 
+            var goHomeCommand = new DelegateCommand(() => navigationManager.Navigate<MainView>(AppGlobals.PrismRegions.Main));
+            toolBarRegistry.AddItem(AppGlobals.ToolBarIds.Main, new ToolBarButton
+            {
+                Command = goHomeCommand,
+                Description = Resources.ToolBarHomeDescription,
+                IconTemplateName = "Icon_Home_16x"
+            });
+
             var goBackCommand = new DelegateCommand(() => navigationManager.GoBack(AppGlobals.PrismRegions.Main), () => navigationManager.CanGoBack(AppGlobals.PrismRegions.Main));
             eventAggregator.GetEvent<ApplicationEvents.Navigated>().Subscribe(info => goBackCommand.RaiseCanExecuteChanged());
             toolBarRegistry.AddItem(AppGlobals.ToolBarIds.Main, new ToolBarButton
