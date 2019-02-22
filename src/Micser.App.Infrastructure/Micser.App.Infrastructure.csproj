@@ -57,8 +57,9 @@
     <Compile Include="AppGlobals.cs" />
     <Compile Include="ApplicationEvents.cs" />
     <Compile Include="ApplicationStateService.cs" />
+    <Compile Include="Behaviors\TextBoxMaskBehavior.cs" />
     <Compile Include="Bindable.cs" />
-    <Compile Include="CheckBoxLabelBehavior.cs" />
+    <Compile Include="Behaviors\CheckBoxLabelBehavior.cs" />
     <Compile Include="CommandBindingToCommand.cs" />
     <Compile Include="Controls\BusyPanel.cs" />
     <Compile Include="Controls\CustomPopup.cs" />

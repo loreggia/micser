@@ -1,7 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 
-namespace Micser.App.Infrastructure
+namespace Micser.App.Infrastructure.Behaviors
 {
     public static class CheckBoxLabelBehavior
     {

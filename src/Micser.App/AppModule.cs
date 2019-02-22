@@ -37,6 +37,27 @@ namespace Micser.App
                 GetCustomSetting = StartupSettingHelper.GetStartupSetting,
                 SetCustomSetting = StartupSettingHelper.SetStartupSetting
             });
+            settingsRegistry.Add(new SettingDefinition
+            {
+                Key = "IntTest",
+                Name = "Integer test",
+                DefaultValue = 42,
+                Type = SettingType.Integer
+            });
+            settingsRegistry.Add(new SettingDefinition
+            {
+                Key = "DecimalTest",
+                Name = "Decimal test",
+                DefaultValue = 42.123456789,
+                Type = SettingType.Decimal
+            });
+            settingsRegistry.Add(new SettingDefinition
+            {
+                Key = "StringTest",
+                Name = "String test",
+                DefaultValue = "Bla bla bla",
+                Type = SettingType.String
+            });
 
             var navigationManager = containerProvider.Resolve<INavigationManager>();
 
