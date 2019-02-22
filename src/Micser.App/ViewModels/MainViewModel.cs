@@ -28,7 +28,6 @@ namespace Micser.App.ViewModels
         private IEnumerable<WidgetDescription> _availableWidgets;
         private bool _isLoaded;
         private bool _isLoading;
-        private ICommand _refreshCommand;
 
         public MainViewModel(IWidgetFactory widgetFactory, IWidgetRegistry widgetRegistry, ILogger logger, INavigationManager navigationManager)
         {
@@ -50,6 +49,9 @@ namespace Micser.App.ViewModels
 
             RefreshCommand = new DelegateCommand(LoadData, () => !IsBusy);
             AddCommandBinding(CustomApplicationCommands.Refresh, RefreshCommand);
+
+            DeleteCommand = new DelegateCommand(Delete, () => !IsBusy);
+            AddCommandBinding(CustomApplicationCommands.Delete, DeleteCommand);
         }
 
         public IEnumerable<WidgetDescription> AvailableWidgets
@@ -60,11 +62,9 @@ namespace Micser.App.ViewModels
 
         public IEnumerable<ConnectionViewModel> Connections => _connections;
 
-        public ICommand RefreshCommand
-        {
-            get => _refreshCommand;
-            set => SetProperty(ref _refreshCommand, value);
-        }
+        public ICommand DeleteCommand { get; }
+
+        public ICommand RefreshCommand { get; }
 
         public IWidgetFactory WidgetFactory { get; }
 
@@ -129,6 +129,15 @@ namespace Micser.App.ViewModels
             else
             {
                 // TODO error handling / remove it
+            }
+        }
+
+        private void Delete()
+        {
+            var selectedWidgets = Widgets.Where(w => w.IsSelected).ToArray();
+            foreach (var widget in selectedWidgets)
+            {
+                _widgets.Remove(widget);
             }
         }
 

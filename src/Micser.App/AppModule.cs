@@ -120,7 +120,12 @@ namespace Micser.App
                 Description = Resources.ToolBarSaveDescription,
                 IconTemplateName = "Icon_Save_16x"
             });
-            toolBarRegistry.AddItem(AppGlobals.ToolBarIds.Main, new ToolBarSeparator());
+            toolBarRegistry.AddItem(AppGlobals.ToolBarIds.Main, new ToolBarButton
+            {
+                Command = CustomApplicationCommands.Delete,
+                Description = Resources.ToolBarDeleteDescription,
+                IconTemplateName = "Icon_Delete_16x"
+            });
             toolBarRegistry.AddItem(AppGlobals.ToolBarIds.Main, new ToolBarButton
             {
                 Command = CustomApplicationCommands.Refresh,

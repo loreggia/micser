@@ -178,6 +178,15 @@ namespace Micser.App.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Delete.
+        /// </summary>
+        public static string ToolBarDeleteDescription {
+            get {
+                return ResourceManager.GetString("ToolBarDeleteDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Forward.
         /// </summary>
         public static string ToolBarForwardDescription {

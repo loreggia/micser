@@ -1,7 +1,8 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:widgets="clr-namespace:Micser.App.Infrastructure.Widgets"
-                    xmlns:themes="clr-namespace:Micser.App.Infrastructure.Themes">
+                    xmlns:themes="clr-namespace:Micser.App.Infrastructure.Themes"
+                    xmlns:infrastructure="clr-namespace:Micser.App.Infrastructure">
 
     <DataTemplate x:Key="DefaultHeaderTemplate">
         <Grid MinHeight="16">
@@ -10,7 +11,7 @@
             <widgets:DragThumb>
                 <widgets:DragThumb.ContextMenu>
                     <ContextMenu>
-                        <!--<MenuItem Header="Delete" Command="{Binding DeleteCommand, RelativeSource={RelativeSource FindAncestor, AncestorType=widgets:Widget}}" />-->
+                        <MenuItem Header="Delete" Command="{x:Static infrastructure:CustomApplicationCommands.Delete}" />
                     </ContextMenu>
                 </widgets:DragThumb.ContextMenu>
             </widgets:DragThumb>
@@ -33,6 +34,7 @@
         <Setter Property="HeaderTemplate" Value="{StaticResource DefaultHeaderTemplate}" />
         <Setter Property="InputConnectorsSource" Value="{Binding InputConnectors}" />
         <Setter Property="OutputConnectorsSource" Value="{Binding OutputConnectors}" />
+        <Setter Property="IsSelected" Value="{Binding IsSelected, Mode=TwoWay}" />
         <Setter Property="Position" Value="{Binding Position, Mode=TwoWay}" />
         <Setter Property="Size" Value="{Binding Size, Mode=TwoWay}" />
         <Setter Property="Focusable" Value="True" />

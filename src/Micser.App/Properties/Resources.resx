@@ -156,6 +156,9 @@
   <data name="ToolBarBackDescription" xml:space="preserve">
     <value>Go back</value>
   </data>
+  <data name="ToolBarDeleteDescription" xml:space="preserve">
+    <value>Delete</value>
+  </data>
   <data name="ToolBarForwardDescription" xml:space="preserve">
     <value>Forward</value>
   </data>
