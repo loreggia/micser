@@ -187,6 +187,15 @@ namespace Micser.App.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Home.
+        /// </summary>
+        public static string ToolBarHomeDescription {
+            get {
+                return ResourceManager.GetString("ToolBarHomeDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Load.
         /// </summary>
         public static string ToolBarLoadDescription {

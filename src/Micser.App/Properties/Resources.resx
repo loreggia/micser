@@ -159,6 +159,9 @@
   <data name="ToolBarForwardDescription" xml:space="preserve">
     <value>Forward</value>
   </data>
+  <data name="ToolBarHomeDescription" xml:space="preserve">
+    <value>Home</value>
+  </data>
   <data name="ToolBarLoadDescription" xml:space="preserve">
     <value>Load</value>
   </data>
