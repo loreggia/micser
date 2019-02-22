@@ -13,6 +13,10 @@
         d:DataContext="{d:DesignInstance vm:SettingsViewModel}">
 
     <i:View.Resources>
+        <Style TargetType="{x:Type TextBox}">
+            <Setter Property="VerticalContentAlignment" Value="Center" />
+        </Style>
+
         <i:TypeTemplateSelector x:Key="TemplateSelector" />
 
         <DataTemplate x:Key="{x:Type vm:BooleanSettingViewModel}" DataType="{x:Type vm:BooleanSettingViewModel}">
@@ -60,5 +64,5 @@
         </DataTemplate>
     </i:View.Resources>
 
-    <settings:SettingsPanel ItemsSource="{Binding Settings}" ItemTemplateSelector="{StaticResource TemplateSelector}" />
+    <settings:SettingsPanel ItemsSource="{Binding Settings}" ItemTemplateSelector="{StaticResource TemplateSelector}" Grid.IsSharedSizeScope="True" />
 </i:View>
