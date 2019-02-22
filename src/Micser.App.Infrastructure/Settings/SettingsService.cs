@@ -6,6 +6,7 @@ using NLog;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 
 namespace Micser.App.Infrastructure.Settings
@@ -31,16 +32,38 @@ namespace Micser.App.Infrastructure.Settings
         {
             EnsureLoaded();
 
-            lock (_settings)
+            if (!_settings.TryGetValue(key, out var value))
             {
-                if (!_settings.ContainsKey(key))
-                {
-                    _logger.Warn($"Requested unregistered setting '{key}'.");
-                    return default(T);
-                }
-
-                return (T)_settings[key];
+                _logger.Warn($"Requested unregistered setting '{key}'.");
+                return default(T);
             }
+
+            if (value == null)
+            {
+                return default(T);
+            }
+
+            var valueType = value.GetType();
+            var resultType = typeof(T);
+
+            if (valueType == resultType)
+            {
+                return (T)value;
+            }
+
+            var valueConverter = TypeDescriptor.GetConverter(valueType);
+            if (valueConverter.CanConvertTo(resultType))
+            {
+                return (T)valueConverter.ConvertTo(value, resultType);
+            }
+
+            var resultConverter = TypeDescriptor.GetConverter(resultType);
+            if (resultConverter.CanConvertFrom(valueType))
+            {
+                return (T)resultConverter.ConvertFrom(value);
+            }
+
+            return default(T);
         }
 
         void ISettingsService.Load()
