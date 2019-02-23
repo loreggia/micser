@@ -3,38 +3,38 @@
                     xmlns:themes="clr-namespace:Micser.App.Infrastructure.Themes">
 
     <!-- Colors -->
-    <Color x:Key="{themes:ColorThemeKey Primary100}">#FE9500</Color>
-    <Color x:Key="{themes:ColorThemeKey Primary090}">#FFA01A</Color>
-    <Color x:Key="{themes:ColorThemeKey Primary080}">#FEAA32</Color>
-    <Color x:Key="{themes:ColorThemeKey Primary070}">#FEB44C</Color>
-    <Color x:Key="{themes:ColorThemeKey Primary060}">#FEBF66</Color>
-    <Color x:Key="{themes:ColorThemeKey Primary050}">#FECA80</Color>
-    <Color x:Key="{themes:ColorThemeKey Primary040}">#FED498</Color>
-    <Color x:Key="{themes:ColorThemeKey Primary030}">#FEDEB1</Color>
-    <Color x:Key="{themes:ColorThemeKey Primary020}">#FEE9CC</Color>
-    <Color x:Key="{themes:ColorThemeKey Primary010}">#FEF3E4</Color>
+    <Color x:Key="{themes:ColorThemeKey Primary100}">#FFDE00FF</Color>
+    <Color x:Key="{themes:ColorThemeKey Primary090}">#FFE11AFF</Color>
+    <Color x:Key="{themes:ColorThemeKey Primary080}">#FFE433FF</Color>
+    <Color x:Key="{themes:ColorThemeKey Primary070}">#FFE84CFF</Color>
+    <Color x:Key="{themes:ColorThemeKey Primary060}">#FFEB66FF</Color>
+    <Color x:Key="{themes:ColorThemeKey Primary050}">#FFEE80FF</Color>
+    <Color x:Key="{themes:ColorThemeKey Primary040}">#FFF299FF</Color>
+    <Color x:Key="{themes:ColorThemeKey Primary030}">#FFF5B2FF</Color>
+    <Color x:Key="{themes:ColorThemeKey Primary020}">#FFF8CCFF</Color>
+    <Color x:Key="{themes:ColorThemeKey Primary010}">#FFFCE6FF</Color>
 
-    <Color x:Key="{themes:ColorThemeKey Secondary100}">#006BFE</Color>
-    <Color x:Key="{themes:ColorThemeKey Secondary090}">#1A7AFE</Color>
-    <Color x:Key="{themes:ColorThemeKey Secondary080}">#3288FE</Color>
-    <Color x:Key="{themes:ColorThemeKey Secondary070}">#4C97FE</Color>
-    <Color x:Key="{themes:ColorThemeKey Secondary060}">#66A6FE</Color>
-    <Color x:Key="{themes:ColorThemeKey Secondary050}">#7EB4FE</Color>
-    <Color x:Key="{themes:ColorThemeKey Secondary040}">#98C3FE</Color>
-    <Color x:Key="{themes:ColorThemeKey Secondary030}">#B2D2FE</Color>
-    <Color x:Key="{themes:ColorThemeKey Secondary020}">#CCE1FE</Color>
-    <Color x:Key="{themes:ColorThemeKey Secondary010}">#E4EFFE</Color>
+    <Color x:Key="{themes:ColorThemeKey Secondary100}">#FF006CFF</Color>
+    <Color x:Key="{themes:ColorThemeKey Secondary090}">#FF1A7BFF</Color>
+    <Color x:Key="{themes:ColorThemeKey Secondary080}">#FF3389FF</Color>
+    <Color x:Key="{themes:ColorThemeKey Secondary070}">#FF4C98FF</Color>
+    <Color x:Key="{themes:ColorThemeKey Secondary060}">#FF66A7FF</Color>
+    <Color x:Key="{themes:ColorThemeKey Secondary050}">#FF80B6FF</Color>
+    <Color x:Key="{themes:ColorThemeKey Secondary040}">#FF99C4FF</Color>
+    <Color x:Key="{themes:ColorThemeKey Secondary030}">#FFB2D3FF</Color>
+    <Color x:Key="{themes:ColorThemeKey Secondary020}">#FFCCE2FF</Color>
+    <Color x:Key="{themes:ColorThemeKey Secondary010}">#FFE6F0FF</Color>
 
-    <Color x:Key="{themes:ColorThemeKey Neutral100}">#000000</Color>
-    <Color x:Key="{themes:ColorThemeKey Neutral090}">#1A1A1A</Color>
-    <Color x:Key="{themes:ColorThemeKey Neutral080}">#323232</Color>
-    <Color x:Key="{themes:ColorThemeKey Neutral070}">#4C4C4C</Color>
-    <Color x:Key="{themes:ColorThemeKey Neutral060}">#666666</Color>
-    <Color x:Key="{themes:ColorThemeKey Neutral050}">#7E7E7E</Color>
-    <Color x:Key="{themes:ColorThemeKey Neutral040}">#999999</Color>
-    <Color x:Key="{themes:ColorThemeKey Neutral030}">#B3B3B3</Color>
-    <Color x:Key="{themes:ColorThemeKey Neutral020}">#CDCDCD</Color>
-    <Color x:Key="{themes:ColorThemeKey Neutral010}">#E5E5E5</Color>
+    <Color x:Key="{themes:ColorThemeKey Neutral100}">#FF000000</Color>
+    <Color x:Key="{themes:ColorThemeKey Neutral090}">#FF1A171A</Color>
+    <Color x:Key="{themes:ColorThemeKey Neutral080}">#FF332E33</Color>
+    <Color x:Key="{themes:ColorThemeKey Neutral070}">#FF4C454C</Color>
+    <Color x:Key="{themes:ColorThemeKey Neutral060}">#FF665C66</Color>
+    <Color x:Key="{themes:ColorThemeKey Neutral050}">#FF807380</Color>
+    <Color x:Key="{themes:ColorThemeKey Neutral040}">#FF998A99</Color>
+    <Color x:Key="{themes:ColorThemeKey Neutral030}">#FFB2A1B2</Color>
+    <Color x:Key="{themes:ColorThemeKey Neutral020}">#FFCCB8CC</Color>
+    <Color x:Key="{themes:ColorThemeKey Neutral010}">#FFE6CFE6</Color>
     <!-- /Colors -->
 
     <!-- Brushes -->
