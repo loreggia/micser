@@ -11,7 +11,7 @@
             <widgets:DragThumb>
                 <widgets:DragThumb.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Header="Delete" Command="{x:Static infrastructure:CustomApplicationCommands.Delete}" />
+                        <MenuItem Header="Delete" Command="{x:Static infrastructure:CustomApplicationCommands.Delete}" Icon="{DynamicResource Icon_Delete_16x}" />
                     </ContextMenu>
                 </widgets:DragThumb.ContextMenu>
             </widgets:DragThumb>

@@ -137,6 +137,11 @@ namespace Micser.App.ViewModels
             var selectedWidgets = Widgets.Where(w => w.IsSelected).ToArray();
             foreach (var widget in selectedWidgets)
             {
+                var connections = Connections.Where(c => c.Source.Widget == widget || c.Target.Widget == widget).ToArray();
+                foreach (var connection in connections)
+                {
+                    _connections.Remove(connection);
+                }
                 _widgets.Remove(widget);
             }
         }
