@@ -18,13 +18,13 @@ namespace Micser.App.Infrastructure.Test
         [Fact]
         public void GenerateColorsTest()
         {
-            var primary = Color.FromRgb(221, 0, 254);
-            var secondary = Color.FromRgb(0, 108, 255);
-            var neutral = Color.FromRgb(5, 0, 5);
+            var primary = Color.FromRgb(254, 135, 0);
+            var secondary = Color.FromRgb(0, 149, 255);
+            var neutral = Colors.Black;
 
             _output.WriteLine(GetPaletteString(primary, "Primary", false, null, 1f));
             _output.WriteLine(GetPaletteString(secondary, "Secondary", false, null, 1f));
-            _output.WriteLine(GetPaletteString(neutral, "Neutral", true, 0.1f));
+            _output.WriteLine(GetPaletteString(neutral, "Neutral", true, 0f));
         }
 
         private string GetPaletteString(Color color, string name, bool increasing = false, float? saturation = null, float? value = null)
