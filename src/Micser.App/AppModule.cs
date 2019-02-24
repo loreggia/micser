@@ -37,26 +37,23 @@ namespace Micser.App
                 GetCustomSetting = StartupSettingHelper.GetStartupSetting,
                 SetCustomSetting = StartupSettingHelper.SetStartupSetting
             });
+
             settingsRegistry.Add(new SettingDefinition
             {
-                Key = "IntTest",
-                Name = "Integer test",
-                DefaultValue = 42,
-                Type = SettingType.Integer
-            });
-            settingsRegistry.Add(new SettingDefinition
-            {
-                Key = "DecimalTest",
-                Name = "Decimal test",
-                DefaultValue = 42.123456789,
-                Type = SettingType.Decimal
-            });
-            settingsRegistry.Add(new SettingDefinition
-            {
-                Key = "StringTest",
-                Name = "String test",
-                DefaultValue = "Bla bla bla",
-                Type = SettingType.String
+                Key = "ColorTest",
+                Name = "Color test",
+                DefaultValue = false,
+                Type = SettingType.Boolean,
+                StorageType = SettingStorageType.Custom,
+                GetCustomSetting = l => false,
+                SetCustomSetting = (v, l) =>
+                {
+                    //var key = new ColorThemeKeyExtension(ColorThemeKey.Primary100);
+                    //var key = new BrushThemeKeyExtension(BrushThemeKey.DefaultBackground);
+                    //var old = Application.Current.FindResource(key);
+                    //Application.Current.Resources.Remove(key);
+                    //Application.Current.Resources[key] = Color.FromRgb(255, 0, 0);
+                }
             });
 
             var navigationManager = containerProvider.Resolve<INavigationManager>();
