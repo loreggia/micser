@@ -89,6 +89,7 @@
     <Compile Include="INavigationManager.cs" />
     <Compile Include="InfrastructureModule.cs" />
     <Compile Include="IAppModule.cs" />
+    <Compile Include="IniFile.cs" />
     <Compile Include="ISelectable.cs" />
     <Compile Include="MicserRegionNavigationJournal.cs" />
     <Compile Include="Settings\ISettingsRegistry.cs" />
@@ -150,7 +151,7 @@
     <Compile Include="Widgets\WidgetViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="Themes\Default.xaml">
+    <Page Include="Themes\Colors.Default.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
