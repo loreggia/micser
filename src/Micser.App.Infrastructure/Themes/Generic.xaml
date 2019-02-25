@@ -3,7 +3,7 @@
                     xmlns:themes="clr-namespace:Micser.App.Infrastructure.Themes">
 
     <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="Default.xaml" />
+        <ResourceDictionary Source="Colors.Default.xaml" />
 
         <ResourceDictionary Source="BusyPanel.xaml" />
         <ResourceDictionary Source="Connection.xaml" />
