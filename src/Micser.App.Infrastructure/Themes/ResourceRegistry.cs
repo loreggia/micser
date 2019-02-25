@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Windows;
 
 namespace Micser.App.Infrastructure.Themes
@@ -22,26 +21,8 @@ namespace Micser.App.Infrastructure.Themes
         public static IEnumerable<ResourceDictionary> InfrastructureResources =>
             _infrastructureResources ?? (_infrastructureResources = new[]
             {
-                "Generic.xaml",
-                "Icons.xaml",
-                "BusyPanel.xaml",
-                "Connection.xaml",
-                "Connector.xaml",
-                "EditableTextBlock.xaml",
-                "Expander.xaml",
-                "Menu.xaml",
-                "SettingsPanel.xaml",
-                "Thumbs.xaml",
-                "ToolBar.xaml",
-                "View.xaml",
-                "Widget.xaml",
-                "WidgetPanel.xaml",
-                "WidgetToolboxItem.xaml",
-                "WidgetToolbox.xaml"
-            }.Select(x => new ResourceDictionary
-            {
-                Source = new Uri("Micser.App.Infrastructure;component/Themes/" + x, UriKind.Relative)
-            }));
+                new ResourceDictionary {Source = new Uri("Micser.App.Infrastructure;component/Themes/Generic.xaml", UriKind.Relative)}
+            });
 
         public static void RegisterResourcesFor(FrameworkElement element)
         {
