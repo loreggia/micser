@@ -46,7 +46,7 @@ namespace Micser.App.Infrastructure.Settings
             var valueType = value.GetType();
             var resultType = typeof(T);
 
-            if (valueType == resultType)
+            if (valueType == resultType || resultType.IsAssignableFrom(valueType))
             {
                 return (T)value;
             }
