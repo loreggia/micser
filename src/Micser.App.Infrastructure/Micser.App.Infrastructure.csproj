@@ -98,9 +98,6 @@
     <Compile Include="Settings\SettingDefinition.cs" />
     <Compile Include="Settings\SettingsPanel.cs" />
     <Compile Include="Settings\SettingsRegistry.cs" />
-    <Compile Include="TestView.xaml.cs">
-      <DependentUpon>TestView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Themes\BrushThemeKeyExtension.cs" />
     <Compile Include="Themes\ColorThemeKeyExtension.cs" />
     <Compile Include="ToolBars\IToolBarRegistry.cs" />
@@ -153,9 +150,9 @@
     <Compile Include="Widgets\WidgetViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="TestView.xaml">
-      <SubType>Designer</SubType>
+    <Page Include="Themes\Default.xaml">
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Themes\Menu.xaml">
       <Generator>MSBuild:Compile</Generator>

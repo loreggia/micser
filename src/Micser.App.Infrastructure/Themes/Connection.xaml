@@ -4,10 +4,6 @@
                     xmlns:converter="clr-namespace:Micser.App.Infrastructure.Converter"
                     xmlns:themes="clr-namespace:Micser.App.Infrastructure.Themes">
 
-    <ResourceDictionary.MergedDictionaries>
-        <ResourceDictionary Source="Generic.xaml" />
-    </ResourceDictionary.MergedDictionaries>
-
     <Style TargetType="{x:Type widgets:Connection}">
         <Style.Resources>
             <!-- Style for the ConnectorAdorner thumbs -->
