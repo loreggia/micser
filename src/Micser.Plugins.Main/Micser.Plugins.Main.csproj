@@ -108,7 +108,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Themes\Colors.Light.xaml.ini">
+    <Content Include="Themes\Colors.Light.ini">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

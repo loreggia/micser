@@ -5,6 +5,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Windows;
+using System.Windows.Markup;
 
 namespace Micser.App.Settings
 {
@@ -82,8 +84,25 @@ namespace Micser.App.Settings
             return value;
         }
 
-        private void ApplyTheme(string fileName)
+        private static void ApplyTheme(string fileName)
         {
+            if (!Application.Current.Dispatcher.CheckAccess())
+            {
+                Application.Current.Dispatcher.Invoke(() => ApplyThemeInternal(fileName));
+            }
+            else
+            {
+                ApplyThemeInternal(fileName);
+            }
+        }
+
+        private static void ApplyThemeInternal(string fileName)
+        {
+            using (var fs = new FileStream(fileName, FileMode.Open))
+            {
+                var dic = (ResourceDictionary)XamlReader.Load(fs);
+                Application.Current.Resources.MergedDictionaries.Add(dic);
+            }
         }
     }
 }
