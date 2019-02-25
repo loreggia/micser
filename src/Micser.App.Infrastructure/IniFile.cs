@@ -13,8 +13,8 @@ namespace Micser.App.Infrastructure
 
         static IniFile()
         {
-            RxSection = new Regex(@"^\W*\[(?<section>\w+)\]", RegexOptions.Compiled);
-            RxValue = new Regex(@"^[^#]*(?<key>\w+)\W*=\W*('|"")?(?<value>[^']+)('|"")?", RegexOptions.Compiled);
+            RxSection = new Regex(@"^\[(?<section>\w+)\]", RegexOptions.Compiled);
+            RxValue = new Regex(@"^(?<key>\w+)\W*=\W*('|"")?(?<value>[^'""]+)('|"")?", RegexOptions.Compiled);
         }
 
         public IniFile(string fileName)
@@ -31,7 +31,7 @@ namespace Micser.App.Infrastructure
 
         public string GetValue(string section, string key)
         {
-            if (_values.TryGetValue(section, out var sectionDict) && sectionDict.TryGetValue(key, out var value))
+            if (_values.TryGetValue(section.ToLower(), out var sectionDict) && sectionDict.TryGetValue(key.ToLower(), out var value))
             {
                 return value;
             }
@@ -45,13 +45,13 @@ namespace Micser.App.Infrastructure
 
             using (var reader = new StreamReader(_fileName))
             {
-                string line, currentSection = "Default";
+                string line, currentSection = "default";
                 while ((line = reader.ReadLine()) != null)
                 {
                     var sectionMatch = RxSection.Match(line);
                     if (sectionMatch.Success && sectionMatch.Groups["section"]?.Value is string section)
                     {
-                        currentSection = section;
+                        currentSection = section.ToLower();
 
                         if (!_values.ContainsKey(currentSection))
                         {
@@ -64,7 +64,7 @@ namespace Micser.App.Infrastructure
                     var valueMatch = RxValue.Match(line);
                     if (valueMatch.Success && valueMatch.Groups["key"]?.Value is string key)
                     {
-                        _values[currentSection][key] = valueMatch.Groups["value"]?.Value;
+                        _values[currentSection][key.ToLower()] = valueMatch.Groups["value"]?.Value;
                     }
                 }
             }

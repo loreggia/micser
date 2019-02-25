@@ -34,26 +34,17 @@ namespace Micser.App
                 DefaultValue = true,
                 Type = SettingType.Boolean,
                 StorageType = SettingStorageType.Custom,
-                GetCustomSetting = StartupSettingHelper.GetStartupSetting,
-                SetCustomSetting = StartupSettingHelper.SetStartupSetting
+                Handler = containerProvider.Resolve<StartupSettingHandler>()
             });
 
             settingsRegistry.Add(new SettingDefinition
             {
-                Key = "ColorTest",
-                Name = "Color test",
-                DefaultValue = false,
-                Type = SettingType.Boolean,
-                StorageType = SettingStorageType.Custom,
-                GetCustomSetting = l => false,
-                SetCustomSetting = (v, l) =>
-                {
-                    //var key = new ColorThemeKeyExtension(ColorThemeKey.Primary100);
-                    //var key = new BrushThemeKeyExtension(BrushThemeKey.DefaultBackground);
-                    //var old = Application.Current.FindResource(key);
-                    //Application.Current.Resources.Remove(key);
-                    //Application.Current.Resources[key] = Color.FromRgb(255, 0, 0);
-                }
+                Key = "ColorTheme",
+                Name = "Color theme",
+                DefaultValue = "Default",
+                Type = SettingType.List,
+                StorageType = SettingStorageType.Internal,
+                Handler = containerProvider.Resolve<ColorThemeSettingHandler>()
             });
 
             var navigationManager = containerProvider.Resolve<INavigationManager>();

@@ -70,7 +70,8 @@
     <Compile Include="MainShell.xaml.cs">
       <DependentUpon>MainShell.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Settings\StartupSettingHelper.cs" />
+    <Compile Include="Settings\ColorThemeSettingHandler.cs" />
+    <Compile Include="Settings\StartupSettingHandler.cs" />
     <Compile Include="ViewModels\AboutViewModel.cs" />
     <Compile Include="ViewModels\SettingsViewModel.cs" />
     <Compile Include="ViewModels\StatusViewModel.cs" />

@@ -2,9 +2,9 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Target Name="CopyPluginsToApp" BeforeTargets="AfterBuild">
     <ItemGroup>
-      <PluginFiles Include="$(SolutionDir)Micser.Plugins.*\bin\$(ConfigurationName)\**\*.*" />
+      <PluginDirs Include="$([System.IO.Directory]::GetDirectories(&quot;$(SolutionDir)&quot;, &quot;Micser.Plugins.*&quot;))" />
     </ItemGroup>
-    <Message Text="%(PluginFiles.Identity)" Importance="High" />
-    <Copy SourceFiles="@(PluginFiles)" DestinationFolder="$(OutDir)" />
+    <Message Text="Copying plugin files" Importance="High" />
+    <Exec Command="xcopy &quot;%(PluginDirs.Identity)\bin\$(ConfigurationName)&quot; &quot;$(ProjectDir)$(OutDir)&quot; /f /s /i /y" WorkingDirectory="$(ProjectDir)" />
   </Target>
 </Project>

@@ -3,6 +3,7 @@
     public static class AppGlobals
     {
         public const string NavigationParameterKey = "_NavigationParameter";
+        public const string ThemesDirectoryName = "Themes";
 
         public static class MenuItemIds
         {
@@ -29,6 +30,12 @@
         {
             public const string ExitOnClose = "ExitOnClose";
             public const string Startup = "Startup";
+        }
+
+        public static class ThemeIni
+        {
+            public const string GeneralSection = "General";
+            public const string NameKey = "Name";
         }
 
         public static class ToolBarIds
