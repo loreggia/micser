@@ -28,6 +28,7 @@
 
         public static class SettingKeys
         {
+            public const string ColorTheme = "ColorTheme";
             public const string ExitOnClose = "ExitOnClose";
             public const string Startup = "Startup";
         }

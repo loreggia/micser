@@ -153,6 +153,24 @@
   <data name="MenuItemToolsHeader" xml:space="preserve">
     <value>_Tools</value>
   </data>
+  <data name="SettingColorThemeDescription" xml:space="preserve">
+    <value>Sets the active color theme of the user interface.</value>
+  </data>
+  <data name="SettingColorThemeName" xml:space="preserve">
+    <value>Color theme</value>
+  </data>
+  <data name="SettingExitOnCloseDescription" xml:space="preserve">
+    <value>If enabled, the program will minimize to the system tray instead of exiting when the window is closed.</value>
+  </data>
+  <data name="SettingExitOnCloseName" xml:space="preserve">
+    <value>Exit on close</value>
+  </data>
+  <data name="SettingStartupDescription" xml:space="preserve">
+    <value>If enabled, the program will start when you log in.</value>
+  </data>
+  <data name="SettingStartupName" xml:space="preserve">
+    <value>Startup</value>
+  </data>
   <data name="ToolBarBackDescription" xml:space="preserve">
     <value>Go back</value>
   </data>

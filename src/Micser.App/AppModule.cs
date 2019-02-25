@@ -21,16 +21,16 @@ namespace Micser.App
             settingsRegistry.Add(new SettingDefinition
             {
                 Key = AppGlobals.SettingKeys.ExitOnClose,
-                Name = "Exit on close",
-                Description = "If enabled, the program will minimize to the system tray instead of exiting when the window is closed.",
+                Name = Resources.SettingExitOnCloseName,
+                Description = Resources.SettingExitOnCloseDescription,
                 DefaultValue = true,
                 Type = SettingType.Boolean
             });
             settingsRegistry.Add(new SettingDefinition
             {
                 Key = AppGlobals.SettingKeys.Startup,
-                Name = "Startup",
-                Description = "If enabled, the program will start when you log in.",
+                Name = Resources.SettingStartupName,
+                Description = Resources.SettingStartupDescription,
                 DefaultValue = true,
                 Type = SettingType.Boolean,
                 StorageType = SettingStorageType.Custom,
@@ -39,8 +39,9 @@ namespace Micser.App
 
             settingsRegistry.Add(new SettingDefinition
             {
-                Key = "ColorTheme",
-                Name = "Color theme",
+                Key = AppGlobals.SettingKeys.ColorTheme,
+                Name = Resources.SettingColorThemeName,
+                Description = Resources.SettingColorThemeDescription,
                 DefaultValue = "Default",
                 Type = SettingType.List,
                 StorageType = SettingStorageType.Internal,

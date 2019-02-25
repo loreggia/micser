@@ -169,6 +169,60 @@ namespace Micser.App.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Sets the active color theme of the user interface..
+        /// </summary>
+        public static string SettingColorThemeDescription {
+            get {
+                return ResourceManager.GetString("SettingColorThemeDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Color theme.
+        /// </summary>
+        public static string SettingColorThemeName {
+            get {
+                return ResourceManager.GetString("SettingColorThemeName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to If enabled, the program will minimize to the system tray instead of exiting when the window is closed..
+        /// </summary>
+        public static string SettingExitOnCloseDescription {
+            get {
+                return ResourceManager.GetString("SettingExitOnCloseDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Exit on close.
+        /// </summary>
+        public static string SettingExitOnCloseName {
+            get {
+                return ResourceManager.GetString("SettingExitOnCloseName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to If enabled, the program will start when you log in..
+        /// </summary>
+        public static string SettingStartupDescription {
+            get {
+                return ResourceManager.GetString("SettingStartupDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Startup.
+        /// </summary>
+        public static string SettingStartupName {
+            get {
+                return ResourceManager.GetString("SettingStartupName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Go back.
         /// </summary>
         public static string ToolBarBackDescription {
