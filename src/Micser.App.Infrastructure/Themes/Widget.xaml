@@ -25,7 +25,7 @@
         <Setter Property="Background" Value="{DynamicResource {themes:BrushThemeKey WidgetBackground}}" />
         <Setter Property="Foreground" Value="{DynamicResource {themes:BrushThemeKey WidgetForeground}}" />
         <Setter Property="BorderBrush" Value="{DynamicResource {themes:BrushThemeKey WidgetBorder}}" />
-        <Setter Property="BorderThickness" Value="1" />
+        <Setter Property="BorderThickness" Value="2" />
         <Setter Property="MinWidth" Value="25" />
         <Setter Property="MinHeight" Value="35" />
         <Setter Property="Width" Value="Auto" />

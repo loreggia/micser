@@ -50,7 +50,7 @@
     <SolidColorBrush x:Key="{themes:BrushThemeKey WidgetBackground}" Color="{DynamicResource {themes:ColorThemeKey Neutral010}}" />
     <SolidColorBrush x:Key="{themes:BrushThemeKey WidgetForeground}" Color="{DynamicResource {themes:ColorThemeKey Neutral090}}" />
     <SolidColorBrush x:Key="{themes:BrushThemeKey WidgetBorder}" Color="{DynamicResource {themes:ColorThemeKey Neutral100}}" />
-    <SolidColorBrush x:Key="{themes:BrushThemeKey WidgetBorderSelected}" Color="{DynamicResource {themes:ColorThemeKey Primary100}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey WidgetBorderSelected}" Color="{DynamicResource {themes:ColorThemeKey Secondary100}}" />
     <SolidColorBrush x:Key="{themes:BrushThemeKey WidgetHeaderBackground}" Color="{DynamicResource {themes:ColorThemeKey Primary050}}" />
 
     <SolidColorBrush x:Key="{themes:BrushThemeKey WidgetPanelBackground}" Color="{DynamicResource {themes:ColorThemeKey Neutral080}}" />

@@ -50,7 +50,7 @@ namespace Micser.App.ViewModels
             RefreshCommand = new DelegateCommand(LoadData, () => !IsBusy);
             AddCommandBinding(CustomApplicationCommands.Refresh, RefreshCommand);
 
-            DeleteCommand = new DelegateCommand(Delete, () => !IsBusy);
+            DeleteCommand = new DelegateCommand(Delete, () => !IsBusy && Widgets.Any(w => w.IsSelected));
             AddCommandBinding(CustomApplicationCommands.Delete, DeleteCommand);
         }
 
