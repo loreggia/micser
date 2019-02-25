@@ -1,5 +1,4 @@
-﻿using NLog;
-using System;
+﻿using System.Collections.Generic;
 
 namespace Micser.App.Infrastructure.Settings
 {
@@ -14,7 +13,8 @@ namespace Micser.App.Infrastructure.Settings
         Boolean,
         String,
         Integer,
-        Decimal
+        Decimal,
+        List
     }
 
     public class SettingDefinition
@@ -27,10 +27,10 @@ namespace Micser.App.Infrastructure.Settings
 
         public object DefaultValue { get; set; }
         public string Description { get; set; }
-        public Func<ILogger, object> GetCustomSetting { get; set; }
+        public ISettingHandler Handler { get; set; }
         public string Key { get; set; }
+        public IDictionary<object, string> List { get; set; }
         public string Name { get; set; }
-        public Action<object, ILogger> SetCustomSetting { get; set; }
         public SettingStorageType StorageType { get; set; }
         public SettingType Type { get; set; }
     }

@@ -1,4 +1,5 @@
 ﻿using IWshRuntimeLibrary;
+using Micser.App.Infrastructure.Settings;
 using Micser.App.Properties;
 using NLog;
 using System;
@@ -8,12 +9,18 @@ using File = System.IO.File;
 
 namespace Micser.App.Settings
 {
-    public static class StartupSettingHelper
+    public class StartupSettingHandler : ISettingHandler
     {
         private static readonly string StartupFolder = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
         private static readonly string StartupShortcutFileName = Resources.ApplicationTitle + ".lnk";
+        private readonly ILogger _logger;
 
-        public static object GetStartupSetting(ILogger logger)
+        public StartupSettingHandler(ILogger logger)
+        {
+            _logger = logger;
+        }
+
+        public object OnLoadSetting(object value)
         {
             try
             {
@@ -22,12 +29,12 @@ namespace Micser.App.Settings
             }
             catch (Exception ex)
             {
-                logger.Error(ex);
+                _logger.Error(ex);
                 return false;
             }
         }
 
-        public static void SetStartupSetting(object value, ILogger logger)
+        public object OnSaveSetting(object value)
         {
             value = value ?? false;
 
@@ -49,7 +56,7 @@ namespace Micser.App.Settings
                     }
                     catch (Exception ex)
                     {
-                        logger.Error(ex, "Could not create the startup shortcut.");
+                        _logger.Error(ex, "Could not create the startup shortcut.");
                     }
                 }
                 else if (!isEnabled && fileExists)
@@ -61,14 +68,16 @@ namespace Micser.App.Settings
                     }
                     catch (Exception ex)
                     {
-                        logger.Error(ex, "Could not delete the startup shortcut.");
+                        _logger.Error(ex, "Could not delete the startup shortcut.");
                     }
                 }
             }
             else
             {
-                logger.Warn($"Invalid value '{value}', expected a boolean.");
+                _logger.Warn($"Invalid value '{value}', expected a boolean.");
             }
+
+            return value;
         }
     }
 }
