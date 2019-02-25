@@ -57,6 +57,9 @@ namespace Micser.App.ViewModels
                         case SettingType.Decimal:
                             return new DecimalSettingViewModel(s, _settingsService.GetSetting<double>(s.Key));
 
+                        case SettingType.List:
+                            return new ListSettingViewModel(s, _settingsService.GetSetting<object>(s.Key), s.List);
+
                         default:
                             return new StringSettingViewModel(s, _settingsService.GetSetting<string>(s.Key));
                     }
@@ -128,7 +131,6 @@ namespace Micser.App.ViewModels
         public DecimalSettingViewModel(SettingDefinition setting, double value)
             : base(setting, value)
         {
-            Value = value;
         }
     }
 
@@ -137,7 +139,23 @@ namespace Micser.App.ViewModels
         public IntegerSettingViewModel(SettingDefinition setting, long value)
             : base(setting, value)
         {
-            Value = value;
+        }
+    }
+
+    internal class ListSettingViewModel : SettingViewModel<object>
+    {
+        private IDictionary<object, string> _list;
+
+        public ListSettingViewModel(SettingDefinition setting, object value, IDictionary<object, string> list)
+            : base(setting, value)
+        {
+            List = list;
+        }
+
+        public IDictionary<object, string> List
+        {
+            get => _list;
+            set => SetProperty(ref _list, value);
         }
     }
 
@@ -146,7 +164,6 @@ namespace Micser.App.ViewModels
         public StringSettingViewModel(SettingDefinition setting, string value)
             : base(setting, value)
         {
-            Value = value;
         }
     }
 }
