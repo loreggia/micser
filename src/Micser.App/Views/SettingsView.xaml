@@ -23,7 +23,7 @@
                             <Grid>
                                 <ContentControl ContentTemplate="{DynamicResource Icon_InformationSymbol_16x}" HorizontalAlignment="Center" VerticalAlignment="Center" />
 
-                                <Popup IsOpen="{Binding IsChecked, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" StaysOpen="False" Placement="Relative" PlacementTarget="{Binding ElementName=Border}" VerticalOffset="{Binding ActualHeight, ElementName=Border}" HorizontalOffset="{Binding ActualWidth, ElementName=Border, Converter={converter:RelativeCenterPlacementConverter}}">
+                                <Popup x:Name="Popup" MaxWidth="200" IsOpen="{Binding IsChecked, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" StaysOpen="False" Placement="Relative" PlacementTarget="{Binding ElementName=Border}" VerticalOffset="{Binding ActualHeight, ElementName=Border}" HorizontalOffset="{Binding ActualWidth, ElementName=Popup, Converter={converter:RelativeCenterPlacementConverter}}">
                                     <Border Background="{DynamicResource {themes:BrushThemeKey DefaultBackground}}" BorderBrush="{DynamicResource {themes:BrushThemeKey DefaultBorder}}" BorderThickness="1">
                                         <Border.Effect>
                                             <DropShadowEffect BlurRadius="5" Opacity="0.8" ShadowDepth="5" Direction="-45" RenderingBias="Quality" />
