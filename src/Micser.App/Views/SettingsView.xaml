@@ -8,18 +8,33 @@
         xmlns:settings="clr-namespace:Micser.App.Infrastructure.Settings;assembly=Micser.App.Infrastructure"
         xmlns:behaviors="clr-namespace:Micser.App.Infrastructure.Behaviors;assembly=Micser.App.Infrastructure"
         xmlns:themes="clr-namespace:Micser.App.Infrastructure.Themes;assembly=Micser.App.Infrastructure"
+        xmlns:converter="clr-namespace:Micser.App.Infrastructure.Converter;assembly=Micser.App.Infrastructure"
         mc:Ignorable="d"
         d:DesignHeight="500"
         d:DesignWidth="800"
         d:DataContext="{d:DesignInstance vm:SettingsViewModel}">
 
     <i:View.Resources>
-        <Style x:Key="DescriptionLabelStyle" TargetType="{x:Type Label}">
-            <Setter Property="Content">
+        <Style x:Key="DescriptionButtonStyle" TargetType="{x:Type ToggleButton}">
+            <Setter Property="Template">
                 <Setter.Value>
-                    <Border Width="20" Height="20" CornerRadius="10" BorderThickness="1" BorderBrush="{DynamicResource {themes:BrushThemeKey DefaultIconPrimary}}" Background="{DynamicResource {themes:BrushThemeKey DefaultIcon}}">
-                        <ContentControl ContentTemplate="{DynamicResource Icon_InformationSymbol_16x}" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                    </Border>
+                    <ControlTemplate TargetType="{x:Type ToggleButton}">
+                        <Border x:Name="Border" Width="20" Height="20" CornerRadius="10" BorderThickness="1" BorderBrush="{DynamicResource {themes:BrushThemeKey DefaultIconPrimary}}" Background="{DynamicResource {themes:BrushThemeKey DefaultIcon}}">
+                            <Grid>
+                                <ContentControl ContentTemplate="{DynamicResource Icon_InformationSymbol_16x}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+
+                                <Popup IsOpen="{Binding IsChecked, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" StaysOpen="False" Placement="Relative" PlacementTarget="{Binding ElementName=Border}" VerticalOffset="{Binding ActualHeight, ElementName=Border}" HorizontalOffset="{Binding ActualWidth, ElementName=Border, Converter={converter:RelativeCenterPlacementConverter}}">
+                                    <Border Background="{DynamicResource {themes:BrushThemeKey DefaultBackground}}" BorderBrush="{DynamicResource {themes:BrushThemeKey DefaultBorder}}" BorderThickness="1">
+                                        <Border.Effect>
+                                            <DropShadowEffect BlurRadius="5" Opacity="0.8" ShadowDepth="5" Direction="-45" RenderingBias="Quality" />
+                                        </Border.Effect>
+
+                                        <TextBlock Text="{TemplateBinding Content}" Foreground="{DynamicResource {themes:BrushThemeKey DefaultForeground}}" />
+                                    </Border>
+                                </Popup>
+                            </Grid>
+                        </Border>
+                    </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
@@ -39,7 +54,7 @@
                 </Grid.ColumnDefinitions>
                 <Label Content="{Binding Definition.Name}" ToolTip="{Binding Definition.Description}" Target="{Binding ElementName=CheckBox}" behaviors:CheckBoxLabelBehavior.IsEnabled="True" />
                 <CheckBox x:Name="CheckBox" Grid.Column="1" IsChecked="{Binding Value, Mode=TwoWay}" VerticalAlignment="Center" />
-                <Label Grid.Column="2" Style="{StaticResource DescriptionLabelStyle}" />
+                <ToggleButton Grid.Column="2" Style="{StaticResource DescriptionButtonStyle}" Content="{Binding Definition.Description}" />
             </Grid>
         </DataTemplate>
 
@@ -48,9 +63,11 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition SharedSizeGroup="Label" Width="Auto" />
                     <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Label Content="{Binding Definition.Name}" ToolTip="{Binding Definition.Description}" Target="{Binding ElementName=TextBox}" />
                 <TextBox x:Name="TextBox" Grid.Column="1" Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" behaviors:TextBoxMaskBehavior.Mask="Integer" />
+                <ToggleButton Grid.Column="2" Style="{StaticResource DescriptionButtonStyle}" Content="{Binding Definition.Description}" />
             </Grid>
         </DataTemplate>
 
@@ -59,9 +76,11 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition SharedSizeGroup="Label" Width="Auto" />
                     <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Label Content="{Binding Definition.Name}" ToolTip="{Binding Definition.Description}" Target="{Binding ElementName=TextBox}" />
                 <TextBox x:Name="TextBox" Grid.Column="1" Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" behaviors:TextBoxMaskBehavior.Mask="Decimal" />
+                <ToggleButton Grid.Column="2" Style="{StaticResource DescriptionButtonStyle}" Content="{Binding Definition.Description}" />
             </Grid>
         </DataTemplate>
 
@@ -70,9 +89,11 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition SharedSizeGroup="Label" Width="Auto" />
                     <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Label Content="{Binding Definition.Name}" ToolTip="{Binding Definition.Description}" Target="{Binding ElementName=TextBox}" />
                 <TextBox x:Name="TextBox" Grid.Column="1" Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <ToggleButton Grid.Column="2" Style="{StaticResource DescriptionButtonStyle}" Content="{Binding Definition.Description}" />
             </Grid>
         </DataTemplate>
 
@@ -81,9 +102,11 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition SharedSizeGroup="Label" Width="Auto" />
                     <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Label Content="{Binding Definition.Name}" ToolTip="{Binding Definition.Description}" Target="{Binding ElementName=ComboBox}" />
                 <ComboBox x:Name="ComboBox" Grid.Column="1" SelectedValue="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Key" DisplayMemberPath="Value" ItemsSource="{Binding List}" />
+                <ToggleButton Grid.Column="2" Style="{StaticResource DescriptionButtonStyle}" Content="{Binding Definition.Description}" />
             </Grid>
         </DataTemplate>
     </i:View.Resources>

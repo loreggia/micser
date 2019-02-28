@@ -76,6 +76,7 @@
     <Compile Include="Converter\EmptyStringToVisibilityConverter.cs" />
     <Compile Include="Converter\NullToBooleanConverter.cs" />
     <Compile Include="Converter\NullToVisibilityConverter.cs" />
+    <Compile Include="Converter\RelativeCenterPlacementConverter.cs" />
     <Compile Include="CustomApplicationCommands.cs" />
     <Compile Include="DataAccess\AppDbContext.cs" />
     <Compile Include="DataAccess\Models\SettingValue.cs" />
