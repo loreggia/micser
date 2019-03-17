@@ -26,6 +26,10 @@ namespace Micser.Engine.Test.Audio
 
             void AddOutput(IModule module);
 
+            void RemoveInput(IModule module);
+
+            void RemoveOutput(IModule module);
+
             void Write(WaveFormat waveFormat, byte[] buffer, int offset, int count);
         }
 
@@ -196,9 +200,16 @@ namespace Micser.Engine.Test.Audio
                 GC.SuppressFinalize(this);
             }
 
+            public virtual void RemoveInput(IModule module)
+            {
+                _inputs.Remove(module);
+                module.RemoveOutput(this);
+            }
+
             public virtual void RemoveOutput(IModule module)
             {
                 _outputs.Remove(module);
+                module.RemoveInput(this);
             }
 
             public virtual void Write(WaveFormat waveFormat, byte[] buffer, int offset, int count)
