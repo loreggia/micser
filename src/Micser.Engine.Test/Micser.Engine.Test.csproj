@@ -46,6 +46,7 @@
     <Content Include="Audio\DeviceOutputTest.cs" />
     <Content Include="Audio\MixerTest.cs" />
     <Content Include="Audio\VolumeChangeTest.cs" />
+    <Compile Include="Audio\GeneralAudioTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
