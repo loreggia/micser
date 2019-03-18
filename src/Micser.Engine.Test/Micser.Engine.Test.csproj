@@ -58,6 +58,10 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Micser.Engine.Infrastructure\Micser.Engine.Infrastructure.csproj">
+      <Project>{c5d0038c-8258-4bb4-9723-f3855f583e95}</Project>
+      <Name>Micser.Engine.Infrastructure</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Micser.Engine\Micser.Engine.csproj">
       <Project>{88134b7e-e212-413b-881e-2cddffd527d6}</Project>
       <Name>Micser.Engine</Name>

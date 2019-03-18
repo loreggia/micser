@@ -3,7 +3,7 @@ using Micser.Common.Modules;
 using NLog;
 using System;
 
-namespace Micser.Engine.Infrastructure
+namespace Micser.Engine.Infrastructure.Audio
 {
     public abstract class AudioModule : IAudioModule
     {

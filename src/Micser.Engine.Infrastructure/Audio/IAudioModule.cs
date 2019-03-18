@@ -2,7 +2,7 @@
 using Micser.Common.Modules;
 using System;
 
-namespace Micser.Engine.Infrastructure
+namespace Micser.Engine.Infrastructure.Audio
 {
     public interface IAudioModule : IDisposable
     {
