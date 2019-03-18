@@ -2,7 +2,7 @@
 using CSCore.SoundOut;
 using Micser.Common.Devices;
 using Micser.Common.Modules;
-using Micser.Engine.Infrastructure;
+using Micser.Engine.Infrastructure.Audio;
 using System;
 using System.Diagnostics;
 using System.Linq;

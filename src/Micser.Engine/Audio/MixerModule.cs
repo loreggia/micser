@@ -1,5 +1,6 @@
 ﻿using Micser.Common.Modules;
 using Micser.Engine.Infrastructure;
+using Micser.Engine.Infrastructure.Audio;
 using System;
 
 namespace Micser.Engine.Audio

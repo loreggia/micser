@@ -3,7 +3,7 @@ using CSCore.SoundIn;
 using CSCore.Streams;
 using Micser.Common.Devices;
 using Micser.Common.Modules;
-using Micser.Engine.Infrastructure;
+using Micser.Engine.Infrastructure.Audio;
 using NLog;
 using System;
 using System.Linq;
