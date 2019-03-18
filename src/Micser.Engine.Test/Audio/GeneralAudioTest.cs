@@ -26,7 +26,7 @@ namespace Micser.Engine.Test.Audio
         {
             long Id { get; }
 
-            void AddOutput(IAudioModule audioModule);
+            void AddOutput(IAudioModule module);
 
             void Write(IAudioModule source, WaveFormat waveFormat, byte[] buffer, int offset, int count);
         }
@@ -61,20 +61,28 @@ namespace Micser.Engine.Test.Audio
 
             public long Id { get; }
 
-            public virtual void AddOutput(IAudioModule audioModule)
+            public virtual void AddOutput(IAudioModule module)
             {
-                if (_outputs.Contains(audioModule))
+                if (_outputs.Contains(module))
                 {
                     return;
                 }
 
-                _outputs.Add(audioModule);
+                _outputs.Add(module);
             }
 
             public void Dispose()
             {
                 Dispose(true);
                 GC.SuppressFinalize(this);
+            }
+
+            public virtual void RemoveOutput(IAudioModule module)
+            {
+                if (_outputs.Contains(module))
+                {
+                    _outputs.Remove(module);
+                }
             }
 
             public virtual void Write(IAudioModule source, WaveFormat waveFormat, byte[] buffer, int offset, int count)
@@ -96,24 +104,20 @@ namespace Micser.Engine.Test.Audio
 
         public class DeviceInputModule : AudioModule
         {
-            private readonly WasapiCapture _capture;
+            private WasapiCapture _capture;
 
             public DeviceInputModule(long id)
                 : base(id)
             {
+                string deviceId;
+
                 using (var deviceEnumerator = new MMDeviceEnumerator())
                 {
                     var device = deviceEnumerator.GetDefaultAudioEndpoint(DataFlow.Capture, Role.Console);
-
-                    _capture = new WasapiCapture(true, AudioClientShareMode.Shared) { Device = device };
-
-                    _capture.Initialize();
-                    _capture.DataAvailable += (s, e) =>
-                    {
-                        Write(this, e.Format, e.Data, e.Offset, e.ByteCount);
-                    };
-                    _capture.Start();
+                    deviceId = device.DeviceID;
                 }
+
+                SetDevice(deviceId);
             }
 
             protected override void Dispose(bool disposing)
@@ -126,14 +130,43 @@ namespace Micser.Engine.Test.Audio
 
                 base.Dispose(disposing);
             }
+
+            private void SetDevice(string deviceId)
+            {
+                if (string.IsNullOrEmpty(deviceId) || _capture != null && _capture.Device.DeviceID != deviceId)
+                {
+                    _capture.Stop();
+                    _capture.Dispose();
+                    _capture = null;
+                }
+
+                using (var deviceEnumerator = new MMDeviceEnumerator())
+                {
+                    var device = deviceEnumerator.GetDevice(deviceId);
+
+                    if (device == null)
+                    {
+                        return;
+                    }
+
+                    _capture = new WasapiCapture(true, AudioClientShareMode.Shared) { Device = device };
+
+                    _capture.Initialize();
+                    _capture.DataAvailable += (s, e) =>
+                    {
+                        Write(this, e.Format, e.Data, e.Offset, e.ByteCount);
+                    };
+                    _capture.Start();
+                }
+            }
         }
 
         public class DeviceOutputModule : AudioModule
         {
             private readonly IDictionary<long, WriteableBufferingSource> _inputBuffers;
             private readonly IDictionary<long, ISampleSource> _inputSources;
-            private readonly WasapiOut _output;
             private int _channelCount;
+            private WasapiOut _output;
             private MixerSampleSource _outputBuffer;
 
             public DeviceOutputModule(long id)
@@ -154,9 +187,13 @@ namespace Micser.Engine.Test.Audio
                 }
             }
 
-            public override void AddOutput(IAudioModule audioModule)
+            public override void AddOutput(IAudioModule module)
             {
                 throw new InvalidOperationException();
+            }
+
+            public override void RemoveOutput(IAudioModule module)
+            {
             }
 
             public override void Write(IAudioModule source, WaveFormat waveFormat, byte[] buffer, int offset, int count)
@@ -178,6 +215,28 @@ namespace Micser.Engine.Test.Audio
                 }
 
                 base.Dispose(disposing);
+            }
+
+            private void SetDevice(string deviceId)
+            {
+                if (string.IsNullOrEmpty(deviceId) || _output != null && _output.Device.DeviceID != deviceId)
+                {
+                    _output.Stop();
+                    _output.Dispose();
+                    _output = null;
+                }
+
+                using (var deviceEnumerator = new MMDeviceEnumerator())
+                {
+                    var device = deviceEnumerator.GetDevice(deviceId);
+
+                    if (device == null)
+                    {
+                        return;
+                    }
+
+                    _output = new WasapiOut(true, AudioClientShareMode.Shared, 1) { Device = device };
+                }
             }
 
             private void SetInputBuffer(long id, WaveFormat format)
@@ -202,6 +261,13 @@ namespace Micser.Engine.Test.Audio
             {
                 var restart = _outputBuffer != null;
 
+                _outputBuffer = new MixerSampleSource(format.Channels, format.SampleRate) { DivideResult = false, FillWithZeros = true };
+
+                foreach (var sampleSource in _inputSources.Values)
+                {
+                    _outputBuffer.AddSource(sampleSource);
+                }
+
                 if (restart)
                 {
                     void OnStopped(object sender, PlaybackStoppedEventArgs e)
@@ -216,7 +282,6 @@ namespace Micser.Engine.Test.Audio
                 }
                 else
                 {
-                    _outputBuffer = new MixerSampleSource(format.Channels, format.SampleRate) { DivideResult = false, FillWithZeros = true };
                     _output.Initialize(_outputBuffer.ToWaveSource());
                     _output.Play();
                 }
