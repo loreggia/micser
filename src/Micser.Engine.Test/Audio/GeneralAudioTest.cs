@@ -3,7 +3,9 @@ using CSCore.CoreAudioAPI;
 using CSCore.SoundIn;
 using CSCore.SoundOut;
 using CSCore.Streams;
+using Micser.Engine.Infrastructure.Audio;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
@@ -20,25 +22,21 @@ namespace Micser.Engine.Test.Audio
             _outputHelper = outputHelper;
         }
 
-        public interface IModule
+        public interface IAudioModule
         {
-            void AddInput(IModule module);
+            long Id { get; }
 
-            void AddOutput(IModule module);
+            void AddOutput(IAudioModule audioModule);
 
-            void RemoveInput(IModule module);
-
-            void RemoveOutput(IModule module);
-
-            void Write(WaveFormat waveFormat, byte[] buffer, int offset, int count);
+            void Write(IAudioModule source, WaveFormat waveFormat, byte[] buffer, int offset, int count);
         }
 
         [Fact]
         public async Task Test()
         {
-            var inputModule = new DeviceInputModule();
-            var inputModule2 = new DeviceInputModule();
-            var outputModule = new DeviceOutputModule();
+            var inputModule = new DeviceInputModule(1);
+            var inputModule2 = new DeviceInputModule(2);
+            var outputModule = new DeviceOutputModule(3);
 
             inputModule.AddOutput(outputModule);
             inputModule2.AddOutput(outputModule);
@@ -46,11 +44,62 @@ namespace Micser.Engine.Test.Audio
             await Task.Delay(20000);
         }
 
-        public class DeviceInputModule : Module
+        public abstract class AudioModule : IAudioModule, IDisposable
+        {
+            private readonly IList<IAudioModule> _outputs;
+
+            protected AudioModule(long id)
+            {
+                Id = id;
+                _outputs = new List<IAudioModule>(2);
+            }
+
+            ~AudioModule()
+            {
+                Dispose(false);
+            }
+
+            public long Id { get; }
+
+            public virtual void AddOutput(IAudioModule audioModule)
+            {
+                if (_outputs.Contains(audioModule))
+                {
+                    return;
+                }
+
+                _outputs.Add(audioModule);
+            }
+
+            public void Dispose()
+            {
+                Dispose(true);
+                GC.SuppressFinalize(this);
+            }
+
+            public virtual void Write(IAudioModule source, WaveFormat waveFormat, byte[] buffer, int offset, int count)
+            {
+                foreach (var module in _outputs)
+                {
+                    module.Write(source, waveFormat, buffer, offset, count);
+                }
+            }
+
+            protected virtual void Dispose(bool disposing)
+            {
+                if (disposing)
+                {
+                    _outputs.Clear();
+                }
+            }
+        }
+
+        public class DeviceInputModule : AudioModule
         {
             private readonly WasapiCapture _capture;
 
-            public DeviceInputModule()
+            public DeviceInputModule(long id)
+                : base(id)
             {
                 using (var deviceEnumerator = new MMDeviceEnumerator())
                 {
@@ -61,7 +110,7 @@ namespace Micser.Engine.Test.Audio
                     _capture.Initialize();
                     _capture.DataAvailable += (s, e) =>
                     {
-                        Write(e.Format, e.Data, e.Offset, e.ByteCount);
+                        Write(this, e.Format, e.Data, e.Offset, e.ByteCount);
                     };
                     _capture.Start();
                 }
@@ -79,14 +128,20 @@ namespace Micser.Engine.Test.Audio
             }
         }
 
-        public class DeviceOutputModule : Module
+        public class DeviceOutputModule : AudioModule
         {
+            private readonly IDictionary<long, WriteableBufferingSource> _inputBuffers;
+            private readonly IDictionary<long, ISampleSource> _inputSources;
             private readonly WasapiOut _output;
+            private int _channelCount;
+            private MixerSampleSource _outputBuffer;
 
-            private WriteableBufferingSource _outputBuffer;
-
-            public DeviceOutputModule()
+            public DeviceOutputModule(long id)
+                : base(id)
             {
+                _inputBuffers = new ConcurrentDictionary<long, WriteableBufferingSource>();
+                _inputSources = new ConcurrentDictionary<long, ISampleSource>();
+
                 using (var deviceEnumerator = new MMDeviceEnumerator())
                 {
                     var device = deviceEnumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console);
@@ -99,24 +154,19 @@ namespace Micser.Engine.Test.Audio
                 }
             }
 
-            public override void AddOutput(IModule module)
+            public override void AddOutput(IAudioModule audioModule)
             {
                 throw new InvalidOperationException();
             }
 
-            public override void RemoveOutput(IModule module)
+            public override void Write(IAudioModule source, WaveFormat waveFormat, byte[] buffer, int offset, int count)
             {
-                throw new InvalidOperationException();
-            }
-
-            public override void Write(WaveFormat waveFormat, byte[] buffer, int offset, int count)
-            {
-                if (_outputBuffer == null || !waveFormat.Equals(_outputBuffer.WaveFormat))
+                if (!_inputBuffers.ContainsKey(source.Id) || !waveFormat.Equals(_inputBuffers[source.Id].WaveFormat))
                 {
-                    SetBuffer(waveFormat);
+                    SetInputBuffer(source.Id, waveFormat);
                 }
 
-                _outputBuffer.Write(buffer, offset, count);
+                _inputBuffers[source.Id].Write(buffer, offset, count);
             }
 
             protected override void Dispose(bool disposing)
@@ -130,17 +180,33 @@ namespace Micser.Engine.Test.Audio
                 base.Dispose(disposing);
             }
 
-            private void SetBuffer(WaveFormat format)
+            private void SetInputBuffer(long id, WaveFormat format)
+            {
+                if (_inputBuffers.ContainsKey(id))
+                {
+                    _outputBuffer.RemoveSource(_inputSources[id]);
+                }
+
+                _inputBuffers[id] = new WriteableBufferingSource(format);
+
+                if (_outputBuffer == null || format.Channels > _channelCount)
+                {
+                    SetOutputBuffer(format);
+                }
+
+                _inputSources[id] = _inputBuffers[id].ToSampleSource();
+                _outputBuffer.AddSource(_inputSources[id]);
+            }
+
+            private void SetOutputBuffer(WaveFormat format)
             {
                 var restart = _outputBuffer != null;
-
-                _outputBuffer = new WriteableBufferingSource(format);
 
                 if (restart)
                 {
                     void OnStopped(object sender, PlaybackStoppedEventArgs e)
                     {
-                        _output.Initialize(_outputBuffer);
+                        _output.Initialize(_outputBuffer.ToWaveSource());
                         _output.Stopped -= OnStopped;
                         _output.Play();
                     }
@@ -150,82 +216,12 @@ namespace Micser.Engine.Test.Audio
                 }
                 else
                 {
-                    _output.Initialize(_outputBuffer);
+                    _outputBuffer = new MixerSampleSource(format.Channels, format.SampleRate) { DivideResult = false, FillWithZeros = true };
+                    _output.Initialize(_outputBuffer.ToWaveSource());
                     _output.Play();
                 }
-            }
-        }
 
-        public abstract class Module : IModule, IDisposable
-        {
-            private readonly IList<IModule> _inputs;
-            private readonly IList<IModule> _outputs;
-
-            protected Module()
-            {
-                _inputs = new List<IModule>(2);
-                _outputs = new List<IModule>(2);
-            }
-
-            ~Module()
-            {
-                Dispose(false);
-            }
-
-            public virtual void AddInput(IModule module)
-            {
-                if (_inputs.Contains(module))
-                {
-                    return;
-                }
-
-                _inputs.Add(module);
-                module.AddOutput(this);
-            }
-
-            public virtual void AddOutput(IModule module)
-            {
-                if (_outputs.Contains(module))
-                {
-                    return;
-                }
-
-                _outputs.Add(module);
-                module.AddInput(this);
-            }
-
-            public void Dispose()
-            {
-                Dispose(true);
-                GC.SuppressFinalize(this);
-            }
-
-            public virtual void RemoveInput(IModule module)
-            {
-                _inputs.Remove(module);
-                module.RemoveOutput(this);
-            }
-
-            public virtual void RemoveOutput(IModule module)
-            {
-                _outputs.Remove(module);
-                module.RemoveInput(this);
-            }
-
-            public virtual void Write(WaveFormat waveFormat, byte[] buffer, int offset, int count)
-            {
-                foreach (var module in _outputs)
-                {
-                    module.Write(waveFormat, buffer, offset, count);
-                }
-            }
-
-            protected virtual void Dispose(bool disposing)
-            {
-                if (disposing)
-                {
-                    _outputs.Clear();
-                }
+                _channelCount = format.Channels;
             }
         }
     }
