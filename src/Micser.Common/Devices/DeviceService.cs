@@ -1,24 +1,48 @@
-﻿using System.Collections.Generic;
-using CSCore.CoreAudioAPI;
+﻿using CSCore.CoreAudioAPI;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace Micser.Common.Devices
 {
     public class DeviceService
     {
+        public DeviceDescription GetDescription(MMDevice device)
+        {
+            if (device == null)
+            {
+                return null;
+            }
+
+            return new DeviceDescription
+            {
+                Id = device.DeviceID,
+                Name = device.FriendlyName,
+                //IconPath = audioEndPoint.IconPath,
+                IsActive = device.DeviceState == DeviceState.Active,
+                Type = device.DataFlow == DataFlow.Capture ? DeviceType.Input : DeviceType.Output
+            };
+        }
+
+        public DeviceDescription GetDescription(string id)
+        {
+            using (var deviceEnumerator = new MMDeviceEnumerator())
+            {
+                var device = deviceEnumerator.GetDevice(id);
+                return GetDescription(device);
+            }
+        }
+
         public IEnumerable<DeviceDescription> GetDevices(DeviceType type)
         {
-            var deviceEnumerator = new MMDeviceEnumerator();
-            foreach (var audioEndPoint in deviceEnumerator.EnumAudioEndpoints(type == DeviceType.Input ? DataFlow.Capture : DataFlow.Render,
-                                                                              DeviceState.Active | DeviceState.UnPlugged))
+            using (var deviceEnumerator = new MMDeviceEnumerator())
             {
-                yield return new DeviceDescription
-                {
-                    Id = audioEndPoint.DeviceID,
-                    Name = audioEndPoint.FriendlyName,
-                    //IconPath = audioEndPoint.IconPath,
-                    IsActive = audioEndPoint.DeviceState == DeviceState.Active,
-                    Type = type
-                };
+                return deviceEnumerator.EnumAudioEndpoints(
+                    type == DeviceType.Input
+                        ? DataFlow.Capture
+                        : DataFlow.Render,
+                    DeviceState.Active | DeviceState.UnPlugged)
+                    .Select(GetDescription)
+                    .ToArray();
             }
         }
     }

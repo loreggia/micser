@@ -1,11 +1,8 @@
 ﻿using CSCore.CoreAudioAPI;
 using CSCore.SoundIn;
-using CSCore.Streams;
 using Micser.Common.Devices;
 using Micser.Common.Modules;
 using Micser.Engine.Infrastructure.Audio;
-using NLog;
-using System;
 using System.Linq;
 
 namespace Micser.Plugins.Main.Modules
@@ -15,7 +12,11 @@ namespace Micser.Plugins.Main.Modules
         private const string DeviceIdKey = "DeviceId";
         private WasapiCapture _capture;
         private DeviceDescription _deviceDescription;
-        private SoundInSource _soundInSource;
+
+        public DeviceInputModule(long id)
+            : base(id)
+        {
+        }
 
         public DeviceDescription DeviceDescription
         {
@@ -44,7 +45,8 @@ namespace Micser.Plugins.Main.Modules
         {
             base.Initialize(description);
 
-            var deviceId = description.ModuleState?.Data.GetObject<string>(DeviceIdKey);
+            var deviceId = description.ModuleState?.Data.GetObject<string>(DeviceIdKey) ??
+                           description.WidgetState?.Data.GetObject<string>(DeviceIdKey);
             if (deviceId != null)
             {
                 var deviceService = new DeviceService();
@@ -54,30 +56,23 @@ namespace Micser.Plugins.Main.Modules
 
         protected override void Dispose(bool disposing)
         {
-            base.Dispose(disposing);
-
             if (disposing)
-            {
-                DisposeCapture();
-            }
-        }
-
-        private void DisposeCapture()
-        {
-            _soundInSource?.Dispose();
-            _soundInSource = null;
-
-            if (_capture != null)
             {
                 _capture.Stop();
                 _capture.Dispose();
-                _capture = null;
             }
+
+            base.Dispose(disposing);
         }
 
         private void InitializeDevice()
         {
-            DisposeCapture();
+            if (string.IsNullOrEmpty(DeviceDescription?.Id) || _capture != null && _capture.Device.DeviceID != DeviceDescription.Id)
+            {
+                _capture?.Stop();
+                _capture?.Dispose();
+                _capture = null;
+            }
 
             if (DeviceDescription == null)
             {
@@ -87,27 +82,20 @@ namespace Micser.Plugins.Main.Modules
             using (var deviceEnumerator = new MMDeviceEnumerator())
             {
                 var device = deviceEnumerator.GetDevice(DeviceDescription.Id);
-                if (!device.DataFlow.HasFlag(DataFlow.Capture))
+
+                if (device == null)
                 {
                     return;
                 }
 
-                _capture = new WasapiCapture(true, AudioClientShareMode.Shared)
-                {
-                    Device = device
-                };
+                _capture = new WasapiCapture(true, AudioClientShareMode.Shared) { Device = device };
 
-                try
+                _capture.Initialize();
+                _capture.DataAvailable += (s, e) =>
                 {
-                    _capture.Initialize();
-                    _soundInSource = new SoundInSource(_capture) { FillWithZeros = true };
-                    Output = _soundInSource;
-                    _capture.Start();
-                }
-                catch (Exception ex)
-                {
-                    Logger.Log(LogLevel.Error, ex);
-                }
+                    Write(this, e.Format, e.Data, e.Offset, e.ByteCount);
+                };
+                _capture.Start();
             }
         }
     }
