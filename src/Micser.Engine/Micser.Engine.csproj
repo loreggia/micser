@@ -55,8 +55,6 @@
     <Compile Include="Api\Server.cs" />
     <Compile Include="Audio\AudioEngine.cs" />
     <Compile Include="Audio\IAudioEngine.cs" />
-    <Compile Include="Audio\MixerModule.cs" />
-    <Compile Include="Audio\MixerSource.cs" />
     <Compile Include="ProjectInstaller.cs">
       <SubType>Component</SubType>
     </Compile>

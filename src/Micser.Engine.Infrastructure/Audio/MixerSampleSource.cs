@@ -66,11 +66,7 @@ namespace Micser.Engine.Infrastructure.Audio
         {
             lock (_lockObj)
             {
-                foreach (var sampleSource in _sampleSources.ToArray())
-                {
-                    sampleSource.Dispose();
-                    _sampleSources.Remove(sampleSource);
-                }
+                _sampleSources.Clear();
             }
         }
 

@@ -1,4 +1,5 @@
-﻿using Micser.Engine.Infrastructure.Audio;
+﻿using Micser.Common;
+using Micser.Engine.Infrastructure.Audio;
 using Micser.Engine.Infrastructure.Services;
 using NLog;
 using System;
@@ -27,6 +28,18 @@ namespace Micser.Engine.Audio
 
         public bool IsRunning { get; private set; }
 
+        public void AddConnection(long id)
+        {
+            var connectionDto = _moduleConnectionService.GetById(id);
+            var source = _modules.FirstOrDefault(m => m.Id == connectionDto.SourceId);
+            var target = _modules.FirstOrDefault(m => m.Id == connectionDto.TargetId);
+
+            if (source != null && target != null)
+            {
+                source.AddOutput(target);
+            }
+        }
+
         public void AddModule(long id)
         {
             var moduleDto = _moduleService.GetById(id);
@@ -34,7 +47,7 @@ namespace Micser.Engine.Audio
             var type = Type.GetType(moduleDto.ModuleType);
             if (type != null)
             {
-                if (_container.Resolve(type) is IAudioModule audioModule)
+                if (_container.Resolve(type, new OrderedParametersOverride(id)) is IAudioModule audioModule)
                 {
                     audioModule.Initialize(moduleDto);
                     _modules.Add(audioModule);
@@ -65,6 +78,18 @@ namespace Micser.Engine.Audio
         public void Dispose()
         {
             Stop();
+        }
+
+        public void RemoveConnection(long id)
+        {
+            var connectionDto = _moduleConnectionService.GetById(id);
+            var source = _modules.FirstOrDefault(m => m.Id == connectionDto.SourceId);
+            var target = _modules.FirstOrDefault(m => m.Id == connectionDto.TargetId);
+
+            if (source != null && target != null)
+            {
+                source.RemoveOutput(target);
+            }
         }
 
         public void Start()
@@ -103,7 +128,7 @@ namespace Micser.Engine.Audio
                     continue;
                 }
 
-                target.Input = source;
+                source.AddOutput(target);
             }
 
             IsRunning = true;

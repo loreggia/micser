@@ -27,6 +27,8 @@ namespace Micser.Engine.Api.Controllers
 
         private dynamic DeleteConnection(long id)
         {
+            _audioEngine.RemoveConnection(id);
+
             var connection = _moduleConnectionService.Delete(id);
 
             if (connection == null)
@@ -56,6 +58,8 @@ namespace Micser.Engine.Api.Controllers
                 return HttpStatusCode.InternalServerError;
             }
 
+            _audioEngine.AddConnection(connectionDto.Id);
+
             return connectionDto;
         }
 
@@ -71,10 +75,14 @@ namespace Micser.Engine.Api.Controllers
             this.BindTo(connectionDto);
             connectionDto.Id = id;
 
+            _audioEngine.RemoveConnection(connectionDto.Id);
+
             if (!_moduleConnectionService.Update(connectionDto))
             {
                 return HttpStatusCode.InternalServerError;
             }
+
+            _audioEngine.AddConnection(connectionDto.Id);
 
             return connectionDto;
         }

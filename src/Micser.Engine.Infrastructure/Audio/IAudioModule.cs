@@ -6,16 +6,18 @@ namespace Micser.Engine.Infrastructure.Audio
 {
     public interface IAudioModule : IDisposable
     {
-        event EventHandler InputChanged;
-
-        event EventHandler OutputChanged;
-
         ModuleDto Description { get; }
-        IAudioModule Input { get; set; }
-        IWaveSource Output { get; }
+
+        long Id { get; }
+
+        void AddOutput(IAudioModule module);
 
         ModuleState GetState();
 
         void Initialize(ModuleDto description);
+
+        void RemoveOutput(IAudioModule module);
+
+        void Write(IAudioModule source, WaveFormat waveFormat, byte[] buffer, int offset, int count);
     }
 }

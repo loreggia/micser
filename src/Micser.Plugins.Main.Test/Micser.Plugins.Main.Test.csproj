@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{B3383CB9-7839-4DFE-BFED-6E89E9512565}</ProjectGuid>
+    <ProjectGuid>{32A852E1-D13D-4589-9963-3F9D32AF243E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Micser.Engine.Test</RootNamespace>
-    <AssemblyName>Micser.Engine.Test</AssemblyName>
+    <RootNamespace>Micser.Plugins.Main.Test</RootNamespace>
+    <AssemblyName>Micser.Plugins.Main.Test</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -19,7 +19,6 @@
     <TestProjectType>UnitTest</TestProjectType>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -43,9 +42,7 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Audio\DeviceOutputTest.cs" />
-    <Content Include="Audio\MixerTest.cs" />
-    <Content Include="Audio\VolumeChangeTest.cs" />
+    <Compile Include="DeviceInputTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -57,17 +54,17 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Micser.Common\Micser.Common.csproj">
+      <Project>{E14431B4-F54A-4D36-B505-1D3407252430}</Project>
+      <Name>Micser.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Micser.Engine.Infrastructure\Micser.Engine.Infrastructure.csproj">
-      <Project>{c5d0038c-8258-4bb4-9723-f3855f583e95}</Project>
+      <Project>{C5D0038C-8258-4BB4-9723-F3855F583E95}</Project>
       <Name>Micser.Engine.Infrastructure</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Micser.Engine\Micser.Engine.csproj">
-      <Project>{88134b7e-e212-413b-881e-2cddffd527d6}</Project>
-      <Name>Micser.Engine</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Micser.Common\Micser.Common.csproj">
-      <Project>{e14431b4-f54a-4d36-b505-1d3407252430}</Project>
-      <Name>Micser.Common</Name>
+    <ProjectReference Include="..\Micser.Plugins.Main\Micser.Plugins.Main.csproj">
+      <Project>{6824c944-0750-41d6-898e-f05cdf0fb90a}</Project>
+      <Name>Micser.Plugins.Main</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />

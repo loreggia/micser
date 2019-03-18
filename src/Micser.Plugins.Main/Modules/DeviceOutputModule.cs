@@ -1,10 +1,13 @@
-﻿using CSCore.CoreAudioAPI;
+﻿using CSCore;
+using CSCore.CoreAudioAPI;
 using CSCore.SoundOut;
+using CSCore.Streams;
 using Micser.Common.Devices;
 using Micser.Common.Modules;
 using Micser.Engine.Infrastructure.Audio;
 using System;
-using System.Diagnostics;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Micser.Plugins.Main.Modules
@@ -12,13 +15,23 @@ namespace Micser.Plugins.Main.Modules
     public class DeviceOutputModule : AudioModule
     {
         private const string DeviceIdKey = "DeviceId";
+        private readonly IDictionary<long, WriteableBufferingSource> _inputBuffers;
+        private readonly IDictionary<long, ISampleSource> _inputSources;
+        private int _channelCount;
         private DeviceDescription _deviceDescription;
         private int _latency;
+
         private WasapiOut _output;
 
-        public DeviceOutputModule()
+        private MixerSampleSource _outputBuffer;
+
+        public DeviceOutputModule(long id)
+            : base(id)
         {
-            Latency = 25;
+            _inputBuffers = new ConcurrentDictionary<long, WriteableBufferingSource>();
+            _inputSources = new ConcurrentDictionary<long, ISampleSource>();
+
+            Latency = 5;
         }
 
         /// <summary>
@@ -55,6 +68,11 @@ namespace Micser.Plugins.Main.Modules
             }
         }
 
+        public override void AddOutput(IAudioModule module)
+        {
+            throw new InvalidOperationException();
+        }
+
         public override ModuleState GetState()
         {
             return new ModuleState
@@ -67,7 +85,8 @@ namespace Micser.Plugins.Main.Modules
         {
             base.Initialize(description);
 
-            var deviceId = description.ModuleState?.Data.GetObject<string>(DeviceIdKey);
+            var deviceId = description.ModuleState?.Data.GetObject<string>(DeviceIdKey) ??
+                           description.WidgetState?.Data.GetObject<string>(DeviceIdKey);
             if (deviceId != null)
             {
                 var deviceService = new DeviceService();
@@ -75,46 +94,42 @@ namespace Micser.Plugins.Main.Modules
             }
         }
 
+        public override void RemoveOutput(IAudioModule module)
+        {
+            throw new InvalidOperationException();
+        }
+
+        public override void Write(IAudioModule source, WaveFormat waveFormat, byte[] buffer, int offset, int count)
+        {
+            if (!_inputBuffers.ContainsKey(source.Id) || !waveFormat.Equals(_inputBuffers[source.Id].WaveFormat))
+            {
+                SetInputBuffer(source.Id, waveFormat);
+            }
+
+            _inputBuffers[source.Id].Write(buffer, offset, count);
+        }
+
         protected override void Dispose(bool disposing)
         {
-            base.Dispose(disposing);
-
             if (disposing)
             {
-                DisposeOutput();
-            }
-        }
-
-        protected override void OnInputChanged()
-        {
-            base.OnInputChanged();
-
-            InitializeDevice();
-        }
-
-        protected override void OnInputOutputChanged(object sender, EventArgs e)
-        {
-            base.OnInputOutputChanged(sender, e);
-
-            InitializeDevice();
-        }
-
-        private void DisposeOutput()
-        {
-            if (_output != null)
-            {
-                _output.Stopped -= OnOutputStopped;
-                _output.Stop();
                 _output.Dispose();
-                _output = null;
+                _outputBuffer.Dispose();
             }
+
+            base.Dispose(disposing);
         }
 
         private void InitializeDevice()
         {
-            DisposeOutput();
+            if (string.IsNullOrEmpty(DeviceDescription?.Id) || _output != null && _output.Device.DeviceID != DeviceDescription.Id)
+            {
+                _output?.Stop();
+                _output?.Dispose();
+                _output = null;
+            }
 
-            if (string.IsNullOrEmpty(DeviceDescription?.Id) || Input?.Output == null)
+            if (DeviceDescription == null)
             {
                 return;
             }
@@ -122,25 +137,91 @@ namespace Micser.Plugins.Main.Modules
             using (var deviceEnumerator = new MMDeviceEnumerator())
             {
                 var device = deviceEnumerator.GetDevice(DeviceDescription.Id);
-                if (!device.DataFlow.HasFlag(DataFlow.Render))
+
+                if (device == null)
                 {
                     return;
                 }
 
-                _output = new WasapiOut(true, AudioClientShareMode.Shared, Latency)
+                _output = new WasapiOut(true, AudioClientShareMode.Shared, Latency) { Device = device };
+
+                if (_outputBuffer != null)
                 {
-                    Device = device
-                };
-                _output.Initialize(Input.Output);
-                _output.Stopped += OnOutputStopped;
-                _output.Play();
+                    _output.Initialize(_outputBuffer.ToWaveSource());
+                    _output.Play();
+                }
             }
         }
 
-        private void OnOutputStopped(object sender, PlaybackStoppedEventArgs e)
+        private void SetInputBuffer(long id, WaveFormat format)
         {
-            Debug.WriteLine("Warning: Output stopped!");
-            //_output.Play();
+            if (_inputBuffers.ContainsKey(id))
+            {
+                _outputBuffer.RemoveSource(_inputSources[id]);
+            }
+
+            _inputBuffers[id] = new MyWriteableBufferingSource(format);
+
+            if (_outputBuffer == null || format.Channels > _channelCount)
+            {
+                SetOutputBuffer(format);
+            }
+
+            if (_inputSources.ContainsKey(id))
+            {
+                _outputBuffer.RemoveSource(_inputSources[id]);
+            }
+
+            _inputSources[id] = _inputBuffers[id].ToSampleSource();
+            _outputBuffer.AddSource(_inputSources[id]);
+        }
+
+        private void SetOutputBuffer(WaveFormat format)
+        {
+            var restart = _outputBuffer != null;
+
+            _outputBuffer = new MixerSampleSource(format.Channels, format.SampleRate) { DivideResult = false, FillWithZeros = true };
+
+            foreach (var sampleSource in _inputSources.Values)
+            {
+                _outputBuffer.AddSource(sampleSource);
+            }
+
+            if (restart)
+            {
+                void OnStopped(object sender, PlaybackStoppedEventArgs e)
+                {
+                    _output.Initialize(_outputBuffer.ToWaveSource());
+                    _output.Stopped -= OnStopped;
+                    _output.Play();
+                }
+
+                _output.Stopped += OnStopped;
+                _output.Stop();
+            }
+            else if (_output != null)
+            {
+                _output.Initialize(_outputBuffer.ToWaveSource());
+                _output.Play();
+            }
+
+            _channelCount = format.Channels;
+        }
+    }
+
+    internal class MyWriteableBufferingSource : WriteableBufferingSource
+    {
+        public MyWriteableBufferingSource(WaveFormat waveFormat) : base(waveFormat)
+        {
+        }
+
+        public MyWriteableBufferingSource(WaveFormat waveFormat, int bufferSize) : base(waveFormat, bufferSize)
+        {
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            base.Dispose(disposing);
         }
     }
 }

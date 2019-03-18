@@ -6,9 +6,13 @@ namespace Micser.Engine.Audio
     {
         bool IsRunning { get; }
 
+        void AddConnection(long id);
+
         void AddModule(long id);
 
         void DeleteModule(long id);
+
+        void RemoveConnection(long id);
 
         void Start();
 

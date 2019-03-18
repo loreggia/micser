@@ -2,60 +2,38 @@
 using Micser.Common.Modules;
 using NLog;
 using System;
+using System.Collections.Generic;
 
 namespace Micser.Engine.Infrastructure.Audio
 {
-    public abstract class AudioModule : IAudioModule
+    public abstract class AudioModule : IAudioModule, IDisposable
     {
         protected static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
-        private IAudioModule _input;
-        private IWaveSource _output;
 
-        public event EventHandler InputChanged;
+        private readonly IList<IAudioModule> _outputs;
 
-        public event EventHandler OutputChanged;
-
-        public ModuleDto Description { get; set; }
-
-        public IAudioModule Input
+        protected AudioModule(long id)
         {
-            get => _input;
-            set
-            {
-                if (_input == value)
-                {
-                    return;
-                }
-
-                if (_input != null)
-                {
-                    _input.OutputChanged -= OnInputOutputChanged;
-                }
-
-                _input = value;
-
-                if (value != null)
-                {
-                    _input.OutputChanged += OnInputOutputChanged;
-                }
-
-                OnInputChanged();
-            }
+            Id = id;
+            _outputs = new List<IAudioModule>(2);
         }
 
-        public IWaveSource Output
+        ~AudioModule()
         {
-            get => _output;
-            protected set
-            {
-                if (_output == value)
-                {
-                    return;
-                }
+            Dispose(false);
+        }
 
-                _output = value;
-                OnOutputChanged();
+        public ModuleDto Description { get; set; }
+        public long Id { get; }
+
+        public virtual void AddOutput(IAudioModule module)
+        {
+            if (_outputs.Contains(module))
+            {
+                return;
             }
+
+            _outputs.Add(module);
         }
 
         public void Dispose()
@@ -71,23 +49,28 @@ namespace Micser.Engine.Infrastructure.Audio
             Description = description;
         }
 
+        public virtual void RemoveOutput(IAudioModule module)
+        {
+            if (_outputs.Contains(module))
+            {
+                _outputs.Remove(module);
+            }
+        }
+
+        public virtual void Write(IAudioModule source, WaveFormat waveFormat, byte[] buffer, int offset, int count)
+        {
+            foreach (var module in _outputs)
+            {
+                module.Write(source, waveFormat, buffer, offset, count);
+            }
+        }
+
         protected virtual void Dispose(bool disposing)
         {
-            Input = null;
-        }
-
-        protected virtual void OnInputChanged()
-        {
-            InputChanged?.Invoke(this, EventArgs.Empty);
-        }
-
-        protected virtual void OnInputOutputChanged(object sender, EventArgs e)
-        {
-        }
-
-        protected virtual void OnOutputChanged()
-        {
-            OutputChanged?.Invoke(this, EventArgs.Empty);
+            if (disposing)
+            {
+                _outputs.Clear();
+            }
         }
     }
 }
