@@ -58,6 +58,10 @@
       <Project>{26b45a3b-725b-48e1-b272-4b0875b0c04a}</Project>
       <Name>Micser.App.Infrastructure</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Micser.Common\Micser.Common.csproj">
+      <Project>{E14431B4-F54A-4D36-B505-1D3407252430}</Project>
+      <Name>Micser.Common</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Content Include="Test.ini">

@@ -72,6 +72,7 @@
     <Compile Include="Modules\ModuleState.cs" />
     <Compile Include="Modules\ModuleStateChangeDto.cs" />
     <Compile Include="OrderedParameterOverride.cs" />
+    <Compile Include="Properties\GlobalAssemblyInfo.cs" />
     <Compile Include="ServiceStatus.cs" />
     <Compile Include="StateDictionary.cs" />
     <Compile Include="Widgets\WidgetState.cs" />
