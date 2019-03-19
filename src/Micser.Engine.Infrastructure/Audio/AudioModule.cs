@@ -25,7 +25,9 @@ namespace Micser.Engine.Infrastructure.Audio
             Dispose(false);
         }
 
-        public long Id { get; }
+        public virtual long Id { get; }
+
+        public virtual float Volume { get; set; } = 1f;
 
         public virtual void AddOutput(IAudioModule module)
         {
@@ -43,6 +45,10 @@ namespace Micser.Engine.Infrastructure.Audio
             GC.SuppressFinalize(this);
         }
 
+        public virtual ModuleState GetState()
+        {
+        }
+
         public virtual void Initialize(ModuleState state)
         {
         }
@@ -55,11 +61,13 @@ namespace Micser.Engine.Infrastructure.Audio
             }
         }
 
-        public virtual ModuleState UpdateModuleState(WidgetState widgetState)
+        public virtual ModuleState SetState(WidgetState widgetState)
         {
             return new ModuleState
             {
-                Data = new StateDictionary(widgetState.Data)
+                Data = new StateDictionary(widgetState.Data),
+                Volume = widgetState.Volume,
+                IsMuted = widgetState.IsMuted
             };
         }
 

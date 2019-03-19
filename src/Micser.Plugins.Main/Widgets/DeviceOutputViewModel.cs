@@ -17,6 +17,10 @@ namespace Micser.Plugins.Main.Widgets
         private IEnumerable<DeviceDescription> _deviceDescriptions;
         private DeviceDescription _selectedDeviceDescription;
 
+        private bool _useSystemVolume;
+
+        private float _volume;
+
         public DeviceOutputViewModel()
         {
             Header = "Device Output";
@@ -35,6 +39,18 @@ namespace Micser.Plugins.Main.Widgets
         {
             get => _selectedDeviceDescription;
             set => SetProperty(ref _selectedDeviceDescription, value);
+        }
+
+        public bool UseSystemVolume
+        {
+            get => _useSystemVolume;
+            set => SetProperty(ref _useSystemVolume, value);
+        }
+
+        public float Volume
+        {
+            get => _volume;
+            set => SetProperty(ref _volume, value);
         }
 
         public override WidgetState GetState()

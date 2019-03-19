@@ -18,6 +18,7 @@ namespace Micser.App.Infrastructure.Widgets
         private string _name;
         private Point _position;
         private Size _size;
+        private float _volume;
 
         protected WidgetViewModel()
         {
@@ -67,6 +68,12 @@ namespace Micser.App.Infrastructure.Widgets
         {
             get => _size;
             set => SetProperty(ref _size, value);
+        }
+
+        public float Volume
+        {
+            get => _volume;
+            set => SetProperty(ref _volume, value);
         }
 
         public virtual WidgetState GetState()
