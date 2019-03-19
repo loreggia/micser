@@ -15,6 +15,7 @@ namespace Micser.Plugins.Main.Modules
     public class DeviceOutputModule : AudioModule
     {
         private const string DeviceIdKey = "DeviceId";
+        private readonly MMDeviceEnumerator _deviceEnumerator;
         private readonly IDictionary<long, WriteableBufferingSource> _inputBuffers;
         private readonly IDictionary<long, ISampleSource> _inputSources;
         private int _channelCount;
@@ -30,6 +31,9 @@ namespace Micser.Plugins.Main.Modules
         {
             _inputBuffers = new ConcurrentDictionary<long, WriteableBufferingSource>();
             _inputSources = new ConcurrentDictionary<long, ISampleSource>();
+
+            _deviceEnumerator = new MMDeviceEnumerator();
+            _deviceEnumerator.DeviceStateChanged += OnDeviceStateChanged;
 
             Latency = 5;
         }
@@ -104,11 +108,26 @@ namespace Micser.Plugins.Main.Modules
         {
             if (disposing)
             {
-                _output.Dispose();
-                _outputBuffer.Dispose();
+                _deviceEnumerator.Dispose();
+                _output?.Dispose();
+                _outputBuffer?.Dispose();
+                _inputBuffers.Clear();
+                _inputSources.Clear();
             }
 
             base.Dispose(disposing);
+        }
+
+        protected virtual void OnDeviceStateChanged(object sender, DeviceStateChangedEventArgs e)
+        {
+            if (_output != null &&
+                _outputBuffer != null &&
+                _output.Device.DeviceID == e.DeviceId &&
+                e.DeviceState == DeviceState.Active)
+            {
+                _output.Initialize(_outputBuffer.ToWaveSource());
+                _output.Play();
+            }
         }
 
         private void InitializeDevice()
@@ -125,22 +144,19 @@ namespace Micser.Plugins.Main.Modules
                 return;
             }
 
-            using (var deviceEnumerator = new MMDeviceEnumerator())
+            var device = _deviceEnumerator.GetDevice(DeviceDescription.Id);
+
+            if (device == null)
             {
-                var device = deviceEnumerator.GetDevice(DeviceDescription.Id);
+                return;
+            }
 
-                if (device == null)
-                {
-                    return;
-                }
+            _output = new WasapiOut(true, AudioClientShareMode.Shared, Latency) { Device = device };
 
-                _output = new WasapiOut(true, AudioClientShareMode.Shared, Latency) { Device = device };
-
-                if (_outputBuffer != null)
-                {
-                    _output.Initialize(_outputBuffer.ToWaveSource());
-                    _output.Play();
-                }
+            if (_outputBuffer != null && device.DeviceState == DeviceState.Active)
+            {
+                _output.Initialize(_outputBuffer.ToWaveSource());
+                _output.Play();
             }
         }
 
@@ -182,15 +198,18 @@ namespace Micser.Plugins.Main.Modules
             {
                 void OnStopped(object sender, PlaybackStoppedEventArgs e)
                 {
-                    _output.Initialize(_outputBuffer.ToWaveSource());
-                    _output.Stopped -= OnStopped;
-                    _output.Play();
+                    if (_output.Device.DeviceState == DeviceState.Active)
+                    {
+                        _output.Initialize(_outputBuffer.ToWaveSource());
+                        _output.Stopped -= OnStopped;
+                        _output.Play();
+                    }
                 }
 
                 _output.Stopped += OnStopped;
                 _output.Stop();
             }
-            else if (_output != null)
+            else if (_output != null && _output.Device.DeviceState == DeviceState.Active)
             {
                 _output.Initialize(_outputBuffer.ToWaveSource());
                 _output.Play();

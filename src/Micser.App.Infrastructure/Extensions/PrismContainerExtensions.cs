@@ -38,7 +38,7 @@ namespace Micser.App.Infrastructure.Extensions
                 var widget = c.Resolve<TWidget>();
                 return widget;
             }));
-            container.RegisterInstance(typeof(TWidget).AssemblyQualifiedName, new WidgetDescription
+            container.RegisterInstance(typeof(TViewModel).AssemblyQualifiedName, new WidgetDescription
             {
                 Name = defaultName,
                 ViewType = typeof(TWidget),

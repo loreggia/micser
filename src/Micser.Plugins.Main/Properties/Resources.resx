@@ -126,6 +126,9 @@
   <data name="DeviceOutputWidgetName" xml:space="preserve">
     <value>Device Output</value>
   </data>
+  <data name="LoopbackDeviceInputWidgetName" xml:space="preserve">
+    <value>Loopback Device Input</value>
+  </data>
   <data name="Name" xml:space="preserve">
     <value>Name</value>
   </data>

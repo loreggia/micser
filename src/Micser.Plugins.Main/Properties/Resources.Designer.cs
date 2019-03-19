@@ -88,6 +88,15 @@ namespace Micser.Plugins.Main.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Loopback Device Input.
+        /// </summary>
+        public static string LoopbackDeviceInputWidgetName {
+            get {
+                return ResourceManager.GetString("LoopbackDeviceInputWidgetName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Name.
         /// </summary>
         public static string Name {
