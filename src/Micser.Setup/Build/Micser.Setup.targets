@@ -3,6 +3,9 @@
   <PropertyGroup>
     <BinDir>$(SolutionDir)..\bin\$(ConfigurationName)\</BinDir>
   </PropertyGroup>
+  <Target Name="CleanBinDir" AfterTargets="Clean">
+    <RemoveDir Directories="$(BinDir)" ContinueOnError="True" />
+  </Target>
   <Target Name="CopyMsiToBinDir" AfterTargets="AfterBuild">
     <MakeDir Directories="$(BinDir)Installer" />
     <Copy SourceFiles="$(ProjectDir)Micser.msi" DestinationFolder="$(BinDir)Installer" />
@@ -13,9 +16,9 @@
       <DrvDir>$(BinDir)Driver</DrvDir>
     </PropertyGroup>
     <ItemGroup>
-      <AppFiles Include="$(SolutionDir)Micser.App\bin\$(ConfigurationName)\**\*.*" />
-      <AppFiles Include="$(SolutionDir)Micser.Engine\bin\$(ConfigurationName)\**\*.*" />
-      <AppFiles Include="$(SolutionDir)Micser.Plugins.*\bin\$(ConfigurationName)\**\*.*" />
+      <AppFiles Include="$(SolutionDir)Micser.App\bin\$(ConfigurationName)\**\*.*" Exclude="$(SolutionDir)Micser.App\bin\$(ConfigurationName)\**\*.pdb" />
+      <AppFiles Include="$(SolutionDir)Micser.Engine\bin\$(ConfigurationName)\**\*.*" Exclude="$(SolutionDir)Micser.Engine\bin\$(ConfigurationName)\**\*.pdb" />
+      <AppFiles Include="$(SolutionDir)Micser.Plugins.*\bin\$(ConfigurationName)\**\*.*" Exclude="$(SolutionDir)Micser.Plugins.*\bin\$(ConfigurationName)\**\*.pdb" />
     </ItemGroup>
     <ItemGroup>
       <DrvFiles Include="$(SolutionDir)Micser.Vac.Package\bin\$(ConfigurationName)\**\*.*" />

@@ -1,5 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="CleanOutput" BeforeTargets="Clean">
+    <RemoveDir Directories="$(OutDir)"/>
+  </Target>
   <Target Name="CopyPluginsToApp" BeforeTargets="AfterBuild">
     <ItemGroup>
       <PluginDirs Include="$([System.IO.Directory]::GetDirectories(&quot;$(SolutionDir)&quot;, &quot;Micser.Plugins.*&quot;))" />
