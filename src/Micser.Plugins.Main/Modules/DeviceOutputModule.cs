@@ -73,20 +73,11 @@ namespace Micser.Plugins.Main.Modules
             throw new InvalidOperationException();
         }
 
-        public override ModuleState GetState()
+        public override void Initialize(ModuleState state)
         {
-            return new ModuleState
-            {
-                Data = { { DeviceIdKey, DeviceDescription?.Id } }
-            };
-        }
+            base.Initialize(state);
 
-        public override void Initialize(ModuleDto description)
-        {
-            base.Initialize(description);
-
-            var deviceId = description.ModuleState?.Data.GetObject<string>(DeviceIdKey) ??
-                           description.WidgetState?.Data.GetObject<string>(DeviceIdKey);
+            var deviceId = state?.Data.GetObject<string>(DeviceIdKey);
             if (deviceId != null)
             {
                 var deviceService = new DeviceService();

@@ -1,7 +1,6 @@
 ﻿using CSCore;
 using CSCore.CoreAudioAPI;
 using Micser.Common.Devices;
-using Micser.Common.Modules;
 using Micser.Engine.Infrastructure.Audio;
 using Micser.Plugins.Main.Modules;
 using System;
@@ -59,11 +58,6 @@ namespace Micser.Plugins.Main.Test
                 : base(-1)
             {
                 _writeCallback = writeCallback;
-            }
-
-            public override ModuleState GetState()
-            {
-                return null;
             }
 
             public override void Write(IAudioModule source, WaveFormat waveFormat, byte[] buffer, int offset, int count)

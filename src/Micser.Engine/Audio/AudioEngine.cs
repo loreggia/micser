@@ -49,7 +49,7 @@ namespace Micser.Engine.Audio
             {
                 if (_container.Resolve(type, new OrderedParametersOverride(id)) is IAudioModule audioModule)
                 {
-                    audioModule.Initialize(moduleDto);
+                    audioModule.Initialize(moduleDto.ModuleState);
                     _modules.Add(audioModule);
                 }
                 else
@@ -67,7 +67,7 @@ namespace Micser.Engine.Audio
 
         public void DeleteModule(long id)
         {
-            var audioModule = _modules.SingleOrDefault(m => m.Description.Id == id);
+            var audioModule = _modules.SingleOrDefault(m => m.Id == id);
             if (audioModule != null)
             {
                 _modules.Remove(audioModule);
@@ -113,8 +113,8 @@ namespace Micser.Engine.Audio
 
             foreach (var connection in _moduleConnectionService.GetAll())
             {
-                var source = _modules.FirstOrDefault(m => m.Description.Id == connection.SourceId);
-                var target = _modules.FirstOrDefault(m => m.Description.Id == connection.TargetId);
+                var source = _modules.FirstOrDefault(m => m.Id == connection.SourceId);
+                var target = _modules.FirstOrDefault(m => m.Id == connection.TargetId);
 
                 if (source == null)
                 {
@@ -158,9 +158,16 @@ namespace Micser.Engine.Audio
 
         public void UpdateModule(long id)
         {
-            var audioModule = _modules.SingleOrDefault(m => m.Description.Id == id);
-            var moduleDto = _moduleService.GetById(id);
-            audioModule?.Initialize(moduleDto);
+            var audioModule = _modules.SingleOrDefault(m => m.Id == id);
+            if (audioModule != null)
+            {
+                var moduleDto = _moduleService.GetById(id);
+                var moduleState = audioModule.UpdateModuleState(moduleDto.WidgetState);
+                moduleDto.ModuleState = moduleState;
+                _moduleService.Update(moduleDto);
+
+                audioModule.Initialize(moduleState);
+            }
         }
     }
 }

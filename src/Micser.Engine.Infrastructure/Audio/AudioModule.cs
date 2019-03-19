@@ -1,5 +1,7 @@
 ﻿using CSCore;
+using Micser.Common;
 using Micser.Common.Modules;
+using Micser.Common.Widgets;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -23,7 +25,6 @@ namespace Micser.Engine.Infrastructure.Audio
             Dispose(false);
         }
 
-        public ModuleDto Description { get; set; }
         public long Id { get; }
 
         public virtual void AddOutput(IAudioModule module)
@@ -42,11 +43,8 @@ namespace Micser.Engine.Infrastructure.Audio
             GC.SuppressFinalize(this);
         }
 
-        public abstract ModuleState GetState();
-
-        public virtual void Initialize(ModuleDto description)
+        public virtual void Initialize(ModuleState state)
         {
-            Description = description;
         }
 
         public virtual void RemoveOutput(IAudioModule module)
@@ -55,6 +53,14 @@ namespace Micser.Engine.Infrastructure.Audio
             {
                 _outputs.Remove(module);
             }
+        }
+
+        public virtual ModuleState UpdateModuleState(WidgetState widgetState)
+        {
+            return new ModuleState
+            {
+                Data = new StateDictionary(widgetState.Data)
+            };
         }
 
         public virtual void Write(IAudioModule source, WaveFormat waveFormat, byte[] buffer, int offset, int count)
