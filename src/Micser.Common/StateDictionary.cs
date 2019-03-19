@@ -4,6 +4,18 @@ namespace Micser.Common
 {
     public class StateDictionary : Dictionary<string, object>
     {
+        public StateDictionary()
+        {
+        }
+
+        public StateDictionary(StateDictionary other)
+        {
+            foreach (var key in other.Keys)
+            {
+                this[key] = other[key];
+            }
+        }
+
         public T GetObject<T>(string key, T defaultValue = default(T))
         {
             if (ContainsKey(key))

@@ -75,7 +75,6 @@ namespace Micser.Engine.Api.Controllers
 
             var moduleDto = this.Bind<ModuleDto>();
 
-            module.ModuleState = moduleDto.ModuleState;
             module.WidgetState = moduleDto.WidgetState;
 
             if (!_moduleService.Update(module))
