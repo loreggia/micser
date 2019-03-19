@@ -1,39 +1,35 @@
-﻿using System.Threading;
+﻿using CSCore.CoreAudioAPI;
+using System.Threading.Tasks;
+using Xunit;
+using Xunit.Abstractions;
 
 namespace Micser.Engine.Test.Audio
 {
-    [TestClass]
     public class VolumeChangeTest
     {
-        [TestMethod]
-        [TestCategory("Sound")]
-        [TestCategory("SkipWhenLiveUnitTesting")]
-        public void ChangeVolumeOfSineGeneratorToDeviceOutput()
+        private readonly ITestOutputHelper _testOutputHelper;
+
+        public VolumeChangeTest(ITestOutputHelper testOutputHelper)
         {
-            var deviceOutput = new DeviceOutputModule();
+            _testOutputHelper = testOutputHelper;
+        }
 
-            var deviceDescription = new DeviceDescription
+        [Fact]
+        public async Task DeviceEnumeratorPropertyChange()
+        {
+            var enumerator = new MMDeviceEnumerator();
+            var device = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console);
+            var volume = AudioEndpointVolume.FromDevice(device);
+            var callback = new AudioEndpointVolumeCallback();
+            callback.NotifyRecived += (s, e) =>
             {
-                // Speakers (Sound Blaster Z) on Nemesis
-                Id = "{0.0.0.00000000}.{c8f64c30-5862-45d5-8ef0-8f592e950eb9}"
+                _testOutputHelper.WriteLine($"{e.IsMuted} - {e.MasterVolume}");
             };
+            volume.RegisterControlChangeNotify(callback);
 
-            deviceOutput.DeviceDescription = deviceDescription;
+            await Task.Delay(5000);
 
-            //var sineGenerator = new WaveGenerator
-            //{
-            //    Frequency = 220
-            //};
-
-            //deviceOutput.Input = sineGenerator;
-
-            for (var i = 0; i < 500; i++)
-            {
-                //sineGenerator.Volume = i * 0.001f;
-                Thread.Sleep(10);
-            }
-
-            deviceOutput.Dispose();
+            enumerator.Dispose();
         }
     }
 }
