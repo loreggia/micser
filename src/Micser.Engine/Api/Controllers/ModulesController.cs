@@ -23,6 +23,28 @@ namespace Micser.Engine.Api.Controllers
             Post["/"] = _ => InsertModule();
             Put["/{id:long}"] = p => UpdateModule(p.id);
             Delete["/{id:long}"] = p => DeleteModule(p.id);
+            Post["/{id:long}/changestatedata"] = p => ChangeStateData(p.id);
+        }
+
+        private dynamic ChangeStateData(long id)
+        {
+            var moduleDto = _moduleService.GetById(id);
+
+            if (moduleDto == null)
+            {
+                return HttpStatusCode.NotFound;
+            }
+
+            var changeDto = this.Bind<ModuleStateChangeDto>();
+
+            if (string.IsNullOrEmpty(changeDto?.Key))
+            {
+                return HttpStatusCode.UnprocessableEntity;
+            }
+
+            moduleDto.WidgetState.Data[changeDto.Key] = changeDto.Value;
+            //todo _audioEngine.
+            return null;
         }
 
         private dynamic DeleteModule(long id)
