@@ -46,7 +46,8 @@ namespace Micser.Plugins.Main.Widgets
 
         public override void Initialize()
         {
-            UpdateDeviceDescriptions();
+            var deviceService = new DeviceService();
+            UpdateDeviceDescriptions(deviceService);
             base.Initialize();
         }
 
@@ -61,9 +62,8 @@ namespace Micser.Plugins.Main.Widgets
             }
         }
 
-        private void UpdateDeviceDescriptions()
+        protected virtual void UpdateDeviceDescriptions(DeviceService deviceService)
         {
-            var deviceService = new DeviceService();
             DeviceDescriptions = deviceService.GetDevices(DeviceType.Input).ToArray();
         }
     }

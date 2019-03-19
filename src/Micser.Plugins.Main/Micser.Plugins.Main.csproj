@@ -50,6 +50,7 @@
     <Compile Include="MainEngineModule.cs" />
     <Compile Include="Modules\DeviceInputModule.cs" />
     <Compile Include="Modules\DeviceOutputModule.cs" />
+    <Compile Include="Modules\LoopbackDeviceInputModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -64,6 +65,7 @@
     <Compile Include="Widgets\DeviceOutputWidget.xaml.cs">
       <DependentUpon>DeviceOutputWidget.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Widgets\LoopbackDeviceInputViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Themes\Colors.Light.xaml">
