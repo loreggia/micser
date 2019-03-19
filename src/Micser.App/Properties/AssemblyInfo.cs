@@ -1,6 +1,5 @@
 ﻿using Micser.Common.Properties;
 using System.Reflection;
-using System.Resources;
 using System.Runtime.InteropServices;
 using System.Windows;
 
@@ -9,7 +8,7 @@ using System.Windows;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyTrademark("")]
 [assembly: ComVisible(false)]
-[assembly: NeutralResourcesLanguage(GlobalAssemblyInfo.Culture, UltimateResourceFallbackLocation.Satellite)]
+//[assembly: NeutralResourcesLanguage(GlobalAssemblyInfo.Culture, UltimateResourceFallbackLocation.Satellite)]
 [assembly: ThemeInfo(ResourceDictionaryLocation.None, ResourceDictionaryLocation.SourceAssembly)]
 [assembly: AssemblyProduct(GlobalAssemblyInfo.Product)]
 [assembly: AssemblyCopyright(GlobalAssemblyInfo.Copyright)]

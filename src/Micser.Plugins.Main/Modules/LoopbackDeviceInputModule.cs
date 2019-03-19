@@ -41,7 +41,8 @@ namespace Micser.Plugins.Main.Modules
             if (deviceId != null)
             {
                 var deviceService = new DeviceService();
-                DeviceDescription = deviceService.GetDevices(DeviceType.Input).FirstOrDefault(d => d.Id == deviceId);
+                var devices = deviceService.GetDevices(DeviceType.Output).ToArray();
+                DeviceDescription = devices.FirstOrDefault(d => d.Id == deviceId);
             }
         }
 
