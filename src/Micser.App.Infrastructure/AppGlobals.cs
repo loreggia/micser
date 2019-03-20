@@ -18,6 +18,15 @@
             public const string ToolsSettings = Tools + "Settings";
         }
 
+        public static class ModuleStateKeys
+        {
+            public const string Height = "Height";
+            public const string Left = "Left";
+            public const string Name = "Name";
+            public const string Top = "Top";
+            public const string Width = "Width";
+        }
+
         public static class PrismRegions
         {
             public const string Main = "MainRegion";

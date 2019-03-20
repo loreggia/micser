@@ -1,6 +1,6 @@
 ﻿using Micser.App.Infrastructure.Widgets;
 using Micser.Common.Devices;
-using Micser.Common.Widgets;
+using Micser.Common.Modules;
 using Micser.Plugins.Main.Modules;
 using System;
 using System.Collections.Generic;
@@ -11,15 +11,13 @@ namespace Micser.Plugins.Main.Widgets
     public class DeviceOutputViewModel : WidgetViewModel
     {
         public const string InputConnectorName = "Input1";
-        public const string SettingKeyDeviceId = "DeviceId";
+        public const string StateKeyDeviceId = "DeviceId";
 
         private readonly ConnectorViewModel _inputViewModel;
         private IEnumerable<DeviceDescription> _deviceDescriptions;
         private DeviceDescription _selectedDeviceDescription;
 
         private bool _useSystemVolume;
-
-        private float _volume;
 
         public DeviceOutputViewModel()
         {
@@ -47,16 +45,10 @@ namespace Micser.Plugins.Main.Widgets
             set => SetProperty(ref _useSystemVolume, value);
         }
 
-        public float Volume
-        {
-            get => _volume;
-            set => SetProperty(ref _volume, value);
-        }
-
-        public override WidgetState GetState()
+        public override ModuleState GetState()
         {
             var state = base.GetState();
-            state.Data[SettingKeyDeviceId] = SelectedDeviceDescription?.Id;
+            state.Data[StateKeyDeviceId] = SelectedDeviceDescription?.Id;
             return state;
         }
 
@@ -66,11 +58,11 @@ namespace Micser.Plugins.Main.Widgets
             base.Initialize();
         }
 
-        public override void LoadState(WidgetState state)
+        public override void LoadState(ModuleState state)
         {
             base.LoadState(state);
 
-            var deviceId = state?.Data.GetObject<string>(SettingKeyDeviceId);
+            var deviceId = state?.Data.GetObject<string>(StateKeyDeviceId);
             if (deviceId != null)
             {
                 SelectedDeviceDescription = DeviceDescriptions?.FirstOrDefault(d => d.Id == deviceId);

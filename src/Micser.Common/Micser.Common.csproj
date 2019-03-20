@@ -75,7 +75,6 @@
     <Compile Include="Properties\GlobalAssemblyInfo.cs" />
     <Compile Include="ServiceStatus.cs" />
     <Compile Include="StateDictionary.cs" />
-    <Compile Include="Widgets\WidgetState.cs" />
     <Compile Include="Modules\ModuleDto.cs" />
     <Compile Include="Modules\ModuleConnectionDto.cs" />
     <Compile Include="Extensions\EnumerableExtensions.cs" />

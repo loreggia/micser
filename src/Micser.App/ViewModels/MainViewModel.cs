@@ -113,16 +113,16 @@ namespace Micser.App.ViewModels
             {
                 ModuleType = viewModel.ModuleType.AssemblyQualifiedName,
                 WidgetType = viewModel.GetType().AssemblyQualifiedName,
-                WidgetState = viewModel.GetState()
+                State = viewModel.GetState()
             };
             var result = await _modulesApiClient.CreateAsync(moduleDto);
 
             if (result.IsSuccess)
             {
                 viewModel.Id = result.Data.Id;
-                if (moduleDto.WidgetState != null)
+                if (moduleDto.State != null)
                 {
-                    viewModel.LoadState(moduleDto.WidgetState);
+                    viewModel.LoadState(moduleDto.State);
                 }
                 viewModel.PropertyChanged += OnWidgetPropertyChanged;
             }
@@ -254,7 +254,7 @@ namespace Micser.App.ViewModels
                             var type = Type.GetType(module.WidgetType);
                             var vm = WidgetFactory.CreateViewModel(type);
                             vm.Id = module.Id;
-                            vm.LoadState(module.WidgetState);
+                            vm.LoadState(module.State);
                             vm.PropertyChanged += OnWidgetPropertyChanged;
                             _widgets.Add(vm);
                         }
@@ -335,7 +335,7 @@ namespace Micser.App.ViewModels
                 var moduleDto = new ModuleDto
                 {
                     Id = vm.Id,
-                    WidgetState = vm.GetState()
+                    State = vm.GetState()
                 };
                 var result = await _modulesApiClient.UpdateAsync(moduleDto);
 

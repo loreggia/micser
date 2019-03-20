@@ -12,6 +12,8 @@ namespace Micser.Common.Modules
         }
 
         [JsonExtensionData]
+        // ReSharper disable once MemberCanBePrivate.Global
+        // ReSharper disable once AutoPropertyCanBeMadeGetOnly.Global
         public StateDictionary Data { get; set; }
 
         public bool IsMuted { get; set; }

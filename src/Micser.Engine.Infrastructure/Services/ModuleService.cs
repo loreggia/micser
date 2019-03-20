@@ -1,6 +1,5 @@
 ﻿using Micser.Common.DataAccess;
 using Micser.Common.Modules;
-using Micser.Common.Widgets;
 using Micser.Engine.Infrastructure.DataAccess.Models;
 using Micser.Engine.Infrastructure.DataAccess.Repositories;
 using Newtonsoft.Json;
@@ -87,8 +86,7 @@ namespace Micser.Engine.Infrastructure.Services
                     return false;
                 }
 
-                module.ModuleStateJson = JsonConvert.SerializeObject(moduleDto.ModuleState);
-                module.WidgetStateJson = JsonConvert.SerializeObject(moduleDto.WidgetState);
+                module.StateJson = JsonConvert.SerializeObject(moduleDto.State);
 
                 return uow.Complete() >= 0;
             }
@@ -105,8 +103,7 @@ namespace Micser.Engine.Infrastructure.Services
             {
                 ModuleType = moduleDto.ModuleType,
                 WidgetType = moduleDto.WidgetType,
-                ModuleStateJson = JsonConvert.SerializeObject(moduleDto.ModuleState),
-                WidgetStateJson = JsonConvert.SerializeObject(moduleDto.WidgetState)
+                StateJson = JsonConvert.SerializeObject(moduleDto.State)
             };
         }
 
@@ -120,10 +117,9 @@ namespace Micser.Engine.Infrastructure.Services
             return new ModuleDto
             {
                 Id = module.Id,
-                ModuleState = JsonConvert.DeserializeObject<ModuleState>(module.ModuleStateJson),
                 ModuleType = module.ModuleType,
-                WidgetState = JsonConvert.DeserializeObject<WidgetState>(module.WidgetStateJson),
-                WidgetType = module.WidgetType
+                WidgetType = module.WidgetType,
+                State = JsonConvert.DeserializeObject<ModuleState>(module.StateJson)
             };
         }
     }
