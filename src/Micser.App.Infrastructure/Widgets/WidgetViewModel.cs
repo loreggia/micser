@@ -1,4 +1,4 @@
-﻿using Micser.Common.Widgets;
+﻿using Micser.Common.Modules;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -14,7 +14,7 @@ namespace Micser.App.Infrastructure.Widgets
         private string _header;
         private long _id;
         private bool _isSelected;
-        private WidgetState _loadingWidgetState;
+        private ModuleState _loadingWidgetState;
         private string _name;
         private Point _position;
         private Size _size;
@@ -76,13 +76,18 @@ namespace Micser.App.Infrastructure.Widgets
             set => SetProperty(ref _volume, value);
         }
 
-        public virtual WidgetState GetState()
+        public virtual ModuleState GetState()
         {
-            return new WidgetState
+            return new ModuleState
             {
-                Name = Name,
-                Position = Position,
-                Size = Size
+                Data =
+                {
+                    {AppGlobals.ModuleStateKeys.Name, Name},
+                    {AppGlobals.ModuleStateKeys.Left, Position.X},
+                    {AppGlobals.ModuleStateKeys.Top, Position.Y},
+                    {AppGlobals.ModuleStateKeys.Width, Size.Width},
+                    {AppGlobals.ModuleStateKeys.Height, Size.Height}
+                }
             };
         }
 
@@ -97,7 +102,7 @@ namespace Micser.App.Infrastructure.Widgets
             }
         }
 
-        public virtual void LoadState(WidgetState state)
+        public virtual void LoadState(ModuleState state)
         {
             if (!IsInitialized)
             {
@@ -105,9 +110,15 @@ namespace Micser.App.Infrastructure.Widgets
                 return;
             }
 
-            Name = state.Name;
-            Position = state.Position;
-            Size = state.Size;
+            Name = state.Data.GetObject<string>(AppGlobals.ModuleStateKeys.Name);
+
+            var left = state.Data.GetObject<double>(AppGlobals.ModuleStateKeys.Left);
+            var top = state.Data.GetObject<double>(AppGlobals.ModuleStateKeys.Top);
+            Position = new Point(left, top);
+
+            var width = state.Data.GetObject<double>(AppGlobals.ModuleStateKeys.Width);
+            var height = state.Data.GetObject<double>(AppGlobals.ModuleStateKeys.Height);
+            Size = new Size(width, height);
         }
 
         protected ConnectorViewModel AddInput(string name)

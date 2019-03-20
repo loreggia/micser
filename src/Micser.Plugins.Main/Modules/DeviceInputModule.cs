@@ -33,9 +33,9 @@ namespace Micser.Plugins.Main.Modules
             }
         }
 
-        public override void Initialize(ModuleState state)
+        public override void SetState(ModuleState state)
         {
-            base.Initialize(state);
+            base.SetState(state);
 
             var deviceId = state?.Data.GetObject<string>(DeviceIdKey);
             if (deviceId != null)

@@ -42,7 +42,7 @@ namespace Micser.Engine.Api.Controllers
                 return HttpStatusCode.UnprocessableEntity;
             }
 
-            moduleDto.WidgetState.Data[changeDto.Key] = changeDto.Value;
+            moduleDto.State.Data[changeDto.Key] = changeDto.Value;
             //todo _audioEngine.
             return null;
         }
@@ -97,7 +97,7 @@ namespace Micser.Engine.Api.Controllers
 
             var moduleDto = this.Bind<ModuleDto>();
 
-            module.WidgetState = moduleDto.WidgetState;
+            module.State = moduleDto.State;
 
             if (!_moduleService.Update(module))
             {

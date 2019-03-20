@@ -49,7 +49,7 @@ namespace Micser.Engine.Audio
             {
                 if (_container.Resolve(type, new OrderedParametersOverride(id)) is IAudioModule audioModule)
                 {
-                    audioModule.Initialize(moduleDto.ModuleState);
+                    audioModule.SetState(moduleDto.State);
                     _modules.Add(audioModule);
                 }
                 else
@@ -162,11 +162,7 @@ namespace Micser.Engine.Audio
             if (audioModule != null)
             {
                 var moduleDto = _moduleService.GetById(id);
-                var moduleState = audioModule.UpdateModuleState(moduleDto.WidgetState);
-                moduleDto.ModuleState = moduleState;
-                _moduleService.Update(moduleDto);
-
-                audioModule.Initialize(moduleState);
+                audioModule.SetState(moduleDto.State);
             }
         }
     }
