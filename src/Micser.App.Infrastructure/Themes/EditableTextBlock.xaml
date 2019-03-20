@@ -11,17 +11,17 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type controls:EditableTextBlock}">
-                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="0,5,0,5">
-                        <Grid>
+                    <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" Padding="0,5,0,5" IsHitTestVisible="False">
+                        <Grid IsHitTestVisible="False">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
 
-                            <TextBlock Grid.Column="0" Text="{TemplateBinding Text}" Visibility="{TemplateBinding IsEditing, Converter={converter:BooleanToVisibilityConverter FalseValue=Visible, TrueValue=Hidden}}" VerticalAlignment="Center" />
-                            <TextBox x:Name="PART_TextBox" Grid.Column="0" Text="{Binding Text, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" Visibility="{TemplateBinding IsEditing, Converter={converter:BooleanToVisibilityConverter FalseValue=Hidden, TrueValue=Visible}}" VerticalAlignment="Stretch" />
+                            <TextBlock Grid.Column="0" Text="{TemplateBinding Text}" Visibility="{TemplateBinding IsEditing, Converter={converter:BooleanToVisibilityConverter FalseValue=Visible, TrueValue=Hidden}}" VerticalAlignment="Center" IsHitTestVisible="False" />
+                            <TextBox x:Name="PART_TextBox" Grid.Column="0" Text="{Binding Text, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" Visibility="{TemplateBinding IsEditing, Converter={converter:BooleanToVisibilityConverter FalseValue=Hidden, TrueValue=Visible}}" VerticalAlignment="Stretch" IsHitTestVisible="True" />
 
-                            <ToggleButton x:Name="PART_ToggleButton" Grid.Column="1" IsChecked="{Binding IsEditing, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" DockPanel.Dock="Right">
+                            <ToggleButton x:Name="PART_ToggleButton" Grid.Column="1" IsChecked="{Binding IsEditing, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" DockPanel.Dock="Right" IsHitTestVisible="True">
                                 <ContentControl x:Name="Icon" Width="16" Height="16" ContentTemplate="{DynamicResource Icon_Edit_16x}" />
                             </ToggleButton>
                         </Grid>
