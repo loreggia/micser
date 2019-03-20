@@ -72,7 +72,8 @@ namespace Micser.Engine.Infrastructure.Audio
             }
 
             IsMuted = state.IsMuted;
-            Volume = state.Volume;
+            //todo Volume = state.Volume;
+            Volume = 0.5f;
         }
 
         public virtual void Write(IAudioModule source, WaveFormat waveFormat, byte[] buffer, int offset, int count)
@@ -101,7 +102,7 @@ namespace Micser.Engine.Infrastructure.Audio
                     Array.Copy(buffer, offset, _waveBuffer.ByteBuffer, 0, count);
                 }
 
-                if (waveFormat.WaveFormatTag == AudioEncoding.Pcm)
+                if (waveFormat.WaveFormatTag == AudioEncoding.Pcm || waveFormat.WaveFormatTag == AudioEncoding.Extensible)
                 {
                     switch (waveFormat.BytesPerSample)
                     {
