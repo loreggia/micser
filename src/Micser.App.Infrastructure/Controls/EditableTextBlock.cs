@@ -22,7 +22,7 @@ namespace Micser.App.Infrastructure.Controls
             nameof(ShowButton), typeof(bool), typeof(EditableTextBlock), new PropertyMetadata(true));
 
         public static readonly DependencyProperty TextProperty = DependencyProperty.Register(
-            nameof(Text), typeof(string), typeof(EditableTextBlock), new PropertyMetadata(null));
+            nameof(Text), typeof(string), typeof(EditableTextBlock), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
         private TextBox _textBox;
 
