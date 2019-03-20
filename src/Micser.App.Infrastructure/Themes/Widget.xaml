@@ -3,20 +3,20 @@
                     xmlns:widgets="clr-namespace:Micser.App.Infrastructure.Widgets"
                     xmlns:themes="clr-namespace:Micser.App.Infrastructure.Themes"
                     xmlns:infrastructure="clr-namespace:Micser.App.Infrastructure"
-                    xmlns:controls="clr-namespace:Micser.App.Infrastructure.Controls">
+                    xmlns:controls="clr-namespace:Micser.App.Infrastructure.Controls"
+                    xmlns:converter="clr-namespace:Micser.App.Infrastructure.Converter">
 
-    <DataTemplate x:Key="DefaultHeaderTemplate">
+    <DataTemplate x:Key="DefaultHeaderTemplate" DataType="{x:Type widgets:WidgetViewModel}">
         <Grid MinHeight="16">
             <Border Background="{DynamicResource {themes:BrushThemeKey WidgetHeaderBackground}}" />
-            <!--<ContentPresenter Margin="3" Content="{Binding}" />-->
-            <widgets:DragThumb>
+            <controls:EditableTextBlock x:Name="TextBlock" Text="{Binding Name}" Margin="8,0,8,0" HorizontalAlignment="Stretch" />
+            <widgets:DragThumb Margin="0,0,32,0" Visibility="{Binding Path=IsEditing, ElementName=TextBlock, Converter={converter:BooleanToVisibilityConverter TrueValue=Collapsed, FalseValue=Visible}}">
                 <widgets:DragThumb.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="Delete" Command="{x:Static infrastructure:CustomApplicationCommands.Delete}" Icon="{DynamicResource Icon_Delete_16x}" />
                     </ContextMenu>
                 </widgets:DragThumb.ContextMenu>
             </widgets:DragThumb>
-            <controls:EditableTextBlock Text="{Binding Path=., Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="8,0,8,0" HorizontalAlignment="Stretch" />
         </Grid>
     </DataTemplate>
 
@@ -32,7 +32,7 @@
         <Setter Property="MinHeight" Value="35" />
         <Setter Property="Width" Value="Auto" />
         <Setter Property="Height" Value="Auto" />
-        <Setter Property="Header" Value="{Binding Name}" />
+        <Setter Property="Header" Value="{Binding}" />
         <Setter Property="HeaderTemplate" Value="{StaticResource DefaultHeaderTemplate}" />
         <Setter Property="InputConnectorsSource" Value="{Binding InputConnectors}" />
         <Setter Property="OutputConnectorsSource" Value="{Binding OutputConnectors}" />
