@@ -2,12 +2,13 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:widgets="clr-namespace:Micser.App.Infrastructure.Widgets"
                     xmlns:themes="clr-namespace:Micser.App.Infrastructure.Themes"
-                    xmlns:infrastructure="clr-namespace:Micser.App.Infrastructure">
+                    xmlns:infrastructure="clr-namespace:Micser.App.Infrastructure"
+                    xmlns:controls="clr-namespace:Micser.App.Infrastructure.Controls">
 
     <DataTemplate x:Key="DefaultHeaderTemplate">
         <Grid MinHeight="16">
             <Border Background="{DynamicResource {themes:BrushThemeKey WidgetHeaderBackground}}" />
-            <ContentPresenter Margin="3" Content="{Binding}" />
+            <!--<ContentPresenter Margin="3" Content="{Binding}" />-->
             <widgets:DragThumb>
                 <widgets:DragThumb.ContextMenu>
                     <ContextMenu>
@@ -15,6 +16,7 @@
                     </ContextMenu>
                 </widgets:DragThumb.ContextMenu>
             </widgets:DragThumb>
+            <controls:EditableTextBlock Text="{Binding Path=., Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Margin="8,0,8,0" HorizontalAlignment="Stretch" />
         </Grid>
     </DataTemplate>
 
@@ -30,7 +32,7 @@
         <Setter Property="MinHeight" Value="35" />
         <Setter Property="Width" Value="Auto" />
         <Setter Property="Height" Value="Auto" />
-        <Setter Property="Header" Value="{Binding Header}" />
+        <Setter Property="Header" Value="{Binding Name}" />
         <Setter Property="HeaderTemplate" Value="{StaticResource DefaultHeaderTemplate}" />
         <Setter Property="InputConnectorsSource" Value="{Binding InputConnectors}" />
         <Setter Property="OutputConnectorsSource" Value="{Binding OutputConnectors}" />
