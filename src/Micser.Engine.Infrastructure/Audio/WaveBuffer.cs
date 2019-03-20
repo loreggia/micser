@@ -33,7 +33,7 @@ namespace Micser.Engine.Infrastructure.Audio
             sizeToAllocateInBytes = (aligned4Bytes == 0) ? sizeToAllocateInBytes : sizeToAllocateInBytes + 4 - aligned4Bytes;
             // Allocating the byteBuffer is co-allocating the floatBuffer and the intBuffer
             _byteBuffer = new byte[sizeToAllocateInBytes];
-            _byteCount = 0;
+            _byteCount = sizeToAllocateInBytes;
         }
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace Micser.Engine.Infrastructure.Audio
                 throw new ArgumentException("The byte buffer to bound must be 4 bytes aligned");
             }*/
             _byteBuffer = bufferToBoundTo;
-            _byteCount = 0;
+            _byteCount = bufferToBoundTo.Length;
         }
 
         /// <summary>

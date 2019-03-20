@@ -16,6 +16,7 @@ namespace Micser.Plugins.Main.Modules
         public LoopbackDeviceInputModule(long id)
             : base(id)
         {
+            Volume = 0.5f;
         }
 
         public DeviceDescription DeviceDescription
