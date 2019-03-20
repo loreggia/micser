@@ -43,7 +43,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApiController.cs" />
+    <Compile Include="Audio\IWaveBuffer.cs" />
     <Compile Include="Audio\MixerSampleSource.cs" />
+    <Compile Include="Audio\WaveBuffer.cs" />
     <Compile Include="DataAccess\EngineDbContext.cs" />
     <Compile Include="DataAccess\Models\Module.cs" />
     <Compile Include="DataAccess\Models\ModuleConnection.cs" />
@@ -51,6 +53,7 @@
     <Compile Include="DataAccess\Repositories\IModuleRepository.cs" />
     <Compile Include="DataAccess\Repositories\ModuleConnectionRepository.cs" />
     <Compile Include="DataAccess\Repositories\ModuleRepository.cs" />
+    <Compile Include="Extensions\MathExtensions.cs" />
     <Compile Include="Extensions\UnityContainerExtensions.cs" />
     <Compile Include="IEngineModule.cs" />
     <Compile Include="Audio\IAudioModule.cs" />
