@@ -1,4 +1,5 @@
 ﻿using CSCore;
+using Micser.Common.Extensions;
 using Micser.Common.Modules;
 using Micser.Engine.Infrastructure.Extensions;
 using NLog;
@@ -10,9 +11,10 @@ namespace Micser.Engine.Infrastructure.Audio
     public abstract class AudioModule : IAudioModule
     {
         protected static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
-
+        protected readonly float Epsilon = float.Epsilon;
         private readonly IList<IAudioModule> _outputs;
 
+        private float _volume = 1f;
         private IWaveBuffer _waveBuffer;
 
         protected AudioModule(long id)
@@ -29,7 +31,16 @@ namespace Micser.Engine.Infrastructure.Audio
         public virtual long Id { get; }
 
         public bool IsMuted { get; set; }
-        public virtual float Volume { get; set; } = 1f;
+
+        public virtual float Volume
+        {
+            get => _volume;
+            set
+            {
+                _volume = value;
+                MathExtensions.Clamp(ref _volume, 0f, 1f);
+            }
+        }
 
         public virtual void AddOutput(IAudioModule module)
         {
@@ -78,7 +89,7 @@ namespace Micser.Engine.Infrastructure.Audio
 
         public virtual void Write(IAudioModule source, WaveFormat waveFormat, byte[] buffer, int offset, int count)
         {
-            if (IsMuted)
+            if (IsMuted || Math.Abs(Volume) < Epsilon)
             {
                 return;
             }
@@ -86,7 +97,7 @@ namespace Micser.Engine.Infrastructure.Audio
             byte[] nextBuffer;
             int nextOffset;
 
-            if (Volume == 1f)
+            if (Math.Abs(Volume - 1f) < Epsilon)
             {
                 nextBuffer = buffer;
                 nextOffset = offset;
@@ -99,10 +110,10 @@ namespace Micser.Engine.Infrastructure.Audio
                 if (waveFormat.BytesPerSample != 3 && (_waveBuffer == null || _waveBuffer.MaxSize < count))
                 {
                     _waveBuffer = new WaveBuffer(count);
-                    Array.Copy(buffer, offset, _waveBuffer.ByteBuffer, 0, count);
                 }
+                Array.Copy(buffer, offset, _waveBuffer.ByteBuffer, 0, count);
 
-                if (waveFormat.WaveFormatTag == AudioEncoding.Pcm || waveFormat.WaveFormatTag == AudioEncoding.Extensible)
+                if (waveFormat.IsPCM())
                 {
                     switch (waveFormat.BytesPerSample)
                     {
@@ -110,7 +121,7 @@ namespace Micser.Engine.Infrastructure.Audio
                             for (var iB = 0; iB < _waveBuffer.ByteBufferCount; iB++)
                             {
                                 var volB = _waveBuffer.ByteBuffer[iB] * Volume;
-                                MathExtensions.Clamp(ref volB, byte.MinValue, byte.MaxValue);
+                                //MathExtensions.Clamp(ref volB, byte.MinValue, byte.MaxValue);
                                 _waveBuffer.ByteBuffer[iB] = (byte)volB;
                             }
 
@@ -121,7 +132,7 @@ namespace Micser.Engine.Infrastructure.Audio
                             for (var iS = 0; iS < _waveBuffer.ShortBufferCount; iS++)
                             {
                                 var volS = _waveBuffer.ShortBuffer[iS] * Volume;
-                                MathExtensions.Clamp(ref volS, short.MinValue, short.MaxValue);
+                                //MathExtensions.Clamp(ref volS, short.MinValue, short.MaxValue);
                                 _waveBuffer.ShortBuffer[iS] = (short)volS;
                             }
 
@@ -134,7 +145,7 @@ namespace Micser.Engine.Infrastructure.Audio
                             {
                                 var vol24 = (((sbyte)buffer[offset + i24 + 2] << 16) | (buffer[offset + i24 + 1] << 8) | buffer[offset + i24]) /
                                             8388608f * Volume;
-                                MathExtensions.Clamp(ref vol24, -1f, 1f);
+                                //MathExtensions.Clamp(ref vol24, -1f, 1f);
                                 var sample24 = (int)(vol24 * 8388607.0);
                                 nextBuffer[i24] = (byte)(sample24);
                                 nextBuffer[i24 + 1] = (byte)(sample24 >> 8);
@@ -147,7 +158,7 @@ namespace Micser.Engine.Infrastructure.Audio
                             for (var iI = 0; iI < _waveBuffer.IntBufferCount; iI++)
                             {
                                 var volI = _waveBuffer.IntBuffer[iI] * Volume;
-                                MathExtensions.Clamp(ref volI, int.MinValue, int.MaxValue);
+                                //MathExtensions.Clamp(ref volI, int.MinValue, int.MaxValue);
                                 _waveBuffer.IntBuffer[iI] = (int)volI;
                             }
 
@@ -159,15 +170,16 @@ namespace Micser.Engine.Infrastructure.Audio
                             return;
                     }
                 }
-                else if (waveFormat.WaveFormatTag == AudioEncoding.IeeeFloat)
+                else if (waveFormat.IsIeeeFloat())
                 {
                     switch (waveFormat.BytesPerSample)
                     {
                         case 4:
                             for (var iF = 0; iF < _waveBuffer.FloatBufferCount; iF++)
                             {
-                                var volF = _waveBuffer.FloatBuffer[iF] * Volume;
-                                MathExtensions.Clamp(ref volF, -1f, 1f);
+                                var volF = _waveBuffer.FloatBuffer[iF];
+                                volF *= Volume;
+                                //MathExtensions.Clamp(ref volF, -1f, 1f);
                                 _waveBuffer.FloatBuffer[iF] = volF;
                             }
 

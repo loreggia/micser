@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ApiController.cs" />
+    <Compile Include="Audio\DeviceModule.cs" />
     <Compile Include="Audio\IWaveBuffer.cs" />
     <Compile Include="Audio\MixerSampleSource.cs" />
     <Compile Include="Audio\WaveBuffer.cs" />
