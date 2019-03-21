@@ -129,7 +129,16 @@
   <data name="LoopbackDeviceInputWidgetName" xml:space="preserve">
     <value>Loopback Device Input</value>
   </data>
+  <data name="Mute" xml:space="preserve">
+    <value>Mute</value>
+  </data>
   <data name="Name" xml:space="preserve">
     <value>Name</value>
+  </data>
+  <data name="UseSystemVolume" xml:space="preserve">
+    <value>Use system volume</value>
+  </data>
+  <data name="Volume" xml:space="preserve">
+    <value>Volume</value>
   </data>
 </root>

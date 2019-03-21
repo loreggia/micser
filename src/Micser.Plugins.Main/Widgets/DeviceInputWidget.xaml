@@ -14,15 +14,26 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <Label Grid.Row="1" Grid.Column="0" Target="{Binding ElementName=CbxDevice}" Content="{x:Static p:Resources.Device}"
+        <Label Grid.Row="0" Grid.Column="0" Target="{Binding ElementName=CkbUseSystemVolume}" Content="{x:Static p:Resources.UseSystemVolume}" VerticalAlignment="Center" />
+        <CheckBox Grid.Row="0" Grid.Column="1" x:Name="CkbUseSystemVolume" HorizontalAlignment="Stretch" VerticalAlignment="Center" IsChecked="{Binding UseSystemVolume}" />
+
+        <Label Grid.Row="1" Grid.Column="0" Target="{Binding ElementName=SldVolume}" Content="{x:Static p:Resources.Volume}" VerticalAlignment="Center" />
+        <Slider Grid.Row="1" Grid.Column="1" x:Name="SldVolume" HorizontalAlignment="Stretch" VerticalAlignment="Center" Minimum="0" Maximum="1" Value="{Binding Volume, Mode=TwoWay}" />
+
+        <Label Grid.Row="2" Grid.Column="0" Target="{Binding ElementName=CkbMute}" Content="{x:Static p:Resources.Mute}" VerticalAlignment="Center" />
+        <CheckBox Grid.Row="2" Grid.Column="1" x:Name="CkbMute" HorizontalAlignment="Stretch" VerticalAlignment="Center" IsChecked="{Binding IsMuted, Mode=TwoWay}" />
+
+        <Label Grid.Row="3" Grid.Column="0" Target="{Binding ElementName=CbxDevice}" Content="{x:Static p:Resources.Device}"
                VerticalAlignment="Center" />
-        <ComboBox Grid.Row="1" Grid.Column="1" x:Name="CbxDevice" MinWidth="100" ItemsSource="{Binding DeviceDescriptions}" DisplayMemberPath="Name"
+        <ComboBox Grid.Row="3" Grid.Column="1" x:Name="CbxDevice" MinWidth="100" ItemsSource="{Binding DeviceDescriptions}" DisplayMemberPath="Name"
                   SelectedItem="{Binding SelectedDeviceDescription, Mode=TwoWay}" HorizontalAlignment="Stretch" />
     </Grid>
 </widgets:Widget>
