@@ -93,6 +93,11 @@
     <Compile Include="IniFile.cs" />
     <Compile Include="ISelectable.cs" />
     <Compile Include="MicserRegionNavigationJournal.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="Settings\ISettingHandler.cs" />
     <Compile Include="Settings\ISettingsRegistry.cs" />
     <Compile Include="Settings\ISettingsService.cs" />
@@ -129,6 +134,10 @@
     <Compile Include="View.cs" />
     <Compile Include="ViewModel.cs" />
     <Compile Include="ViewModelNavigationAware.cs" />
+    <Compile Include="Widgets\AudioWidgetControls.xaml.cs">
+      <DependentUpon>AudioWidgetControls.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Widgets\AudioWidgetViewModel.cs" />
     <Compile Include="Widgets\Connection.cs" />
     <Compile Include="Widgets\ConnectionAdorner.cs" />
     <Compile Include="Widgets\ConnectionChangedEventHandler.cs" />
@@ -222,6 +231,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="Widgets\AudioWidgetControls.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Micser.Common\Micser.Common.csproj">
@@ -238,6 +251,12 @@
     <Content Include="Themes\Colors.Default.ini">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>PublicResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

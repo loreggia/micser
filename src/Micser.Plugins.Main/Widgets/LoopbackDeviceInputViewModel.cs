@@ -8,8 +8,6 @@ namespace Micser.Plugins.Main.Widgets
     {
         public LoopbackDeviceInputViewModel()
         {
-            Header = "Loopback Device Input";
-
             Volume = 1f;
         }
 

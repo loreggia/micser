@@ -8,8 +8,8 @@
                  xmlns:widgets="clr-namespace:Micser.App.Infrastructure.Widgets;assembly=Micser.App.Infrastructure"
                  mc:Ignorable="d"
                  d:DataContext="{d:DesignInstance local:DeviceOutputViewModel}"
-                 MinWidth="180"
-                 MinHeight="90">
+                 MinWidth="250"
+                 MinHeight="150">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -19,6 +19,8 @@
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
+
+        <widgets:AudioWidgetControls Grid.Row="0" Grid.ColumnSpan="2" />
 
         <Label Grid.Row="1" Grid.Column="0" Target="{Binding ElementName=CbxDevice}" Content="{x:Static p:Resources.Device}"
                VerticalAlignment="Center" />

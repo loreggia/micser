@@ -1,13 +1,13 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Target Name="CleanOutput" BeforeTargets="Clean">
-    <RemoveDir Directories="$(OutDir)"/>
-  </Target>
-  <Target Name="CopyPluginsToApp" BeforeTargets="AfterBuild">
+  <!--<Target Name="CleanOutput" BeforeTargets="Clean">
+    <RemoveDir Directories="$(OutDir)" />
+  </Target>-->
+  <!--<Target Name="CopyPluginsToApp" BeforeTargets="AfterBuild">
     <ItemGroup>
       <PluginDirs Include="$([System.IO.Directory]::GetDirectories(&quot;$(SolutionDir)&quot;, &quot;Micser.Plugins.*&quot;))" />
     </ItemGroup>
     <Message Text="Copying plugin files" Importance="High" />
     <Exec Command="xcopy &quot;%(PluginDirs.Identity)\bin\$(ConfigurationName)&quot; &quot;$(ProjectDir)$(OutDir)&quot; /f /s /i /y" WorkingDirectory="$(ProjectDir)" />
-  </Target>
+  </Target>-->
 </Project>
