@@ -8,7 +8,7 @@ using System.Linq;
 
 namespace Micser.Plugins.Main.Widgets
 {
-    public class DeviceOutputViewModel : WidgetViewModel
+    public class DeviceOutputViewModel : AudioWidgetViewModel
     {
         public const string InputConnectorName = "Input1";
         public const string StateKeyDeviceId = "DeviceId";
@@ -17,11 +17,8 @@ namespace Micser.Plugins.Main.Widgets
         private IEnumerable<DeviceDescription> _deviceDescriptions;
         private DeviceDescription _selectedDeviceDescription;
 
-        private bool _useSystemVolume;
-
         public DeviceOutputViewModel()
         {
-            Header = "Device Output";
             _inputViewModel = AddInput(InputConnectorName);
         }
 
@@ -39,12 +36,6 @@ namespace Micser.Plugins.Main.Widgets
             set => SetProperty(ref _selectedDeviceDescription, value);
         }
 
-        public bool UseSystemVolume
-        {
-            get => _useSystemVolume;
-            set => SetProperty(ref _useSystemVolume, value);
-        }
-
         public override ModuleState GetState()
         {
             var state = base.GetState();
@@ -58,9 +49,9 @@ namespace Micser.Plugins.Main.Widgets
             base.Initialize();
         }
 
-        public override void LoadState(ModuleState state)
+        public override void SetState(ModuleState state)
         {
-            base.LoadState(state);
+            base.SetState(state);
 
             var deviceId = state?.Data.GetObject<string>(StateKeyDeviceId);
             if (deviceId != null)

@@ -83,8 +83,7 @@ namespace Micser.Engine.Infrastructure.Audio
             }
 
             IsMuted = state.IsMuted;
-            //todo Volume = state.Volume;
-            Volume = 0.5f;
+            Volume = state.Volume;
         }
 
         public virtual void Write(IAudioModule source, WaveFormat waveFormat, byte[] buffer, int offset, int count)

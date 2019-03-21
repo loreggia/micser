@@ -1,2 +1,3 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:String x:Key="/Default/Environment/Hierarchy/Build/SolutionBuilderNext/AlwaysBuildProjects/@EntryValue">99e23c7a-3483-4963-bc40-de7062a45461;6824c944-0750-41d6-898e-f05cdf0fb90a</s:String>
 	<s:Boolean x:Key="/Default/UserDictionary/Words/=Micser/@EntryIndexedValue">True</s:Boolean></wpf:ResourceDictionary>

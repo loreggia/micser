@@ -10,28 +10,17 @@ namespace Micser.App.Infrastructure.Widgets
     {
         private readonly ObservableCollection<ConnectorViewModel> _inputConnectors;
         private readonly ObservableCollection<ConnectorViewModel> _outputConnectors;
-
-        private string _header;
         private long _id;
-        private bool _isMuted;
         private bool _isSelected;
         private ModuleState _loadingWidgetState;
         private string _name;
         private Point _position;
         private Size _size;
-        private bool _useSystemVolume;
-        private float _volume;
 
         protected WidgetViewModel()
         {
             _inputConnectors = new ObservableCollection<ConnectorViewModel>();
             _outputConnectors = new ObservableCollection<ConnectorViewModel>();
-        }
-
-        public string Header
-        {
-            get => _header;
-            set => SetProperty(ref _header, value);
         }
 
         public long Id
@@ -41,14 +30,7 @@ namespace Micser.App.Infrastructure.Widgets
         }
 
         public IEnumerable<ConnectorViewModel> InputConnectors => _inputConnectors;
-
         public bool IsInitialized { get; protected set; }
-
-        public bool IsMuted
-        {
-            get => _isMuted;
-            set => SetProperty(ref _isMuted, value);
-        }
 
         public bool IsSelected
         {
@@ -78,18 +60,6 @@ namespace Micser.App.Infrastructure.Widgets
             set => SetProperty(ref _size, value);
         }
 
-        public bool UseSystemVolume
-        {
-            get => _useSystemVolume;
-            set => SetProperty(ref _useSystemVolume, value);
-        }
-
-        public float Volume
-        {
-            get => _volume;
-            set => SetProperty(ref _volume, value);
-        }
-
         public virtual ModuleState GetState()
         {
             return new ModuleState
@@ -116,7 +86,7 @@ namespace Micser.App.Infrastructure.Widgets
             }
         }
 
-        public virtual void LoadState(ModuleState state)
+        public void LoadState(ModuleState state)
         {
             if (!IsInitialized)
             {
@@ -124,6 +94,11 @@ namespace Micser.App.Infrastructure.Widgets
                 return;
             }
 
+            SetState(state);
+        }
+
+        public virtual void SetState(ModuleState state)
+        {
             Name = state.Data.GetObject<string>(AppGlobals.ModuleStateKeys.Name);
 
             var left = state.Data.GetObject<double>(AppGlobals.ModuleStateKeys.Left);

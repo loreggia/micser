@@ -129,4 +129,5 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="$(SolutionDir)Micser.Common\Build\Micser.Plugin.targets" />
 </Project>

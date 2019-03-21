@@ -17,6 +17,7 @@ namespace Micser.Common.Modules
         public StateDictionary Data { get; set; }
 
         public bool IsMuted { get; set; }
+        public bool UseSystemVolume { get; set; }
         public float Volume { get; set; }
     }
 }

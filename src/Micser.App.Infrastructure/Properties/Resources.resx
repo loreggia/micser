@@ -117,19 +117,13 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Device" xml:space="preserve">
-    <value>Device</value>
+  <data name="Mute" xml:space="preserve">
+    <value>Mute</value>
   </data>
-  <data name="DeviceInputWidgetName" xml:space="preserve">
-    <value>Device Input</value>
+  <data name="UseSystemVolume" xml:space="preserve">
+    <value>Use system volume</value>
   </data>
-  <data name="DeviceOutputWidgetName" xml:space="preserve">
-    <value>Device Output</value>
-  </data>
-  <data name="LoopbackDeviceInputWidgetName" xml:space="preserve">
-    <value>Loopback Device Input</value>
-  </data>
-  <data name="Name" xml:space="preserve">
-    <value>Name</value>
+  <data name="Volume" xml:space="preserve">
+    <value>Volume</value>
   </data>
 </root>

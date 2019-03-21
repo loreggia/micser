@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Micser.Plugins.Main.Properties {
+namespace Micser.App.Infrastructure.Properties {
     using System;
     
     
@@ -39,7 +39,7 @@ namespace Micser.Plugins.Main.Properties {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Micser.Plugins.Main.Properties.Resources", typeof(Resources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Micser.App.Infrastructure.Properties.Resources", typeof(Resources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,47 +61,29 @@ namespace Micser.Plugins.Main.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Device.
+        ///   Looks up a localized string similar to Mute.
         /// </summary>
-        public static string Device {
+        public static string Mute {
             get {
-                return ResourceManager.GetString("Device", resourceCulture);
+                return ResourceManager.GetString("Mute", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Device Input.
+        ///   Looks up a localized string similar to Use system volume.
         /// </summary>
-        public static string DeviceInputWidgetName {
+        public static string UseSystemVolume {
             get {
-                return ResourceManager.GetString("DeviceInputWidgetName", resourceCulture);
+                return ResourceManager.GetString("UseSystemVolume", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Device Output.
+        ///   Looks up a localized string similar to Volume.
         /// </summary>
-        public static string DeviceOutputWidgetName {
+        public static string Volume {
             get {
-                return ResourceManager.GetString("DeviceOutputWidgetName", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Loopback Device Input.
-        /// </summary>
-        public static string LoopbackDeviceInputWidgetName {
-            get {
-                return ResourceManager.GetString("LoopbackDeviceInputWidgetName", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Name.
-        /// </summary>
-        public static string Name {
-            get {
-                return ResourceManager.GetString("Name", resourceCulture);
+                return ResourceManager.GetString("Volume", resourceCulture);
             }
         }
     }
