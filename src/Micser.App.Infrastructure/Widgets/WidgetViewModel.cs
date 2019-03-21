@@ -13,11 +13,13 @@ namespace Micser.App.Infrastructure.Widgets
 
         private string _header;
         private long _id;
+        private bool _isMuted;
         private bool _isSelected;
         private ModuleState _loadingWidgetState;
         private string _name;
         private Point _position;
         private Size _size;
+        private bool _useSystemVolume;
         private float _volume;
 
         protected WidgetViewModel()
@@ -41,6 +43,12 @@ namespace Micser.App.Infrastructure.Widgets
         public IEnumerable<ConnectorViewModel> InputConnectors => _inputConnectors;
 
         public bool IsInitialized { get; protected set; }
+
+        public bool IsMuted
+        {
+            get => _isMuted;
+            set => SetProperty(ref _isMuted, value);
+        }
 
         public bool IsSelected
         {
@@ -68,6 +76,12 @@ namespace Micser.App.Infrastructure.Widgets
         {
             get => _size;
             set => SetProperty(ref _size, value);
+        }
+
+        public bool UseSystemVolume
+        {
+            get => _useSystemVolume;
+            set => SetProperty(ref _useSystemVolume, value);
         }
 
         public float Volume
