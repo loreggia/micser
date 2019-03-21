@@ -9,6 +9,7 @@ namespace Micser.Plugins.Main.Modules
         public LoopbackDeviceInputModule(long id)
             : base(id)
         {
+            Latency = 1;
         }
 
         public int Latency

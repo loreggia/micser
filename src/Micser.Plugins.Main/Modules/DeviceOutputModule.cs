@@ -26,7 +26,7 @@ namespace Micser.Plugins.Main.Modules
             _inputBuffers = new ConcurrentDictionary<long, WriteableBufferingSource>();
             _inputSources = new ConcurrentDictionary<long, ISampleSource>();
 
-            Latency = 5;
+            Latency = 1;
         }
 
         /// <summary>
