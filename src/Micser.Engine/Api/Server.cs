@@ -1,8 +1,11 @@
 ﻿using Micser.Common;
+using Micser.Common.Api;
 using Micser.Engine.Infrastructure;
-using Nancy.Hosting.Self;
 using NLog;
 using System;
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
 using Unity;
 
 namespace Micser.Engine.Api
@@ -11,7 +14,7 @@ namespace Micser.Engine.Api
     {
         private readonly IUnityContainer _container;
         private readonly ILogger _logger;
-        private NancyHost _host;
+        private Socket _listener;
 
         public Server(IUnityContainer container, ILogger logger)
         {
@@ -28,11 +31,14 @@ namespace Micser.Engine.Api
         {
             _logger.Info("Starting API server");
 
-            _host?.Dispose();
+            var hostEntry = Dns.GetHostEntry(IPAddress.Loopback);
+            var address = hostEntry.AddressList[0];
+            var endPoint = new IPEndPoint(address, Globals.ApiPort);
+            _listener = new Socket(SocketType.Stream, ProtocolType.Tcp);
+            _listener.Bind(endPoint);
+            _listener.Listen(5);
 
-            _host = new NancyHost(new Uri($"http://localhost:{Globals.ApiPort}"), new Bootstrapper(_container),
-                                  new HostConfiguration { RewriteLocalhost = false });
-            _host.Start();
+            _listener.BeginAccept(AcceptCallback, null);
 
             _logger.Info("API server started");
         }
@@ -41,9 +47,18 @@ namespace Micser.Engine.Api
         {
             _logger.Info("Stopping API server");
 
-            _host?.Dispose();
-
             _logger.Info("API server stopped");
+        }
+
+        private void AcceptCallback(IAsyncResult ar)
+        {
+            var socket = _listener.EndAccept(ar);
+            var buffer = new MessageBuffer(socket, OnMessageReceived);
+            buffer.BeginReceive();
+        }
+
+        private void OnMessageReceived(StringBuilder content)
+        {
         }
     }
 }
