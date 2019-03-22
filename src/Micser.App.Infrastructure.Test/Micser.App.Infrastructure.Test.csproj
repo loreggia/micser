@@ -44,6 +44,7 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Api\ApiClientTest.cs" />
     <Compile Include="GenerateColorsHelperTest.cs" />
     <Compile Include="IniFileTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -68,6 +69,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
