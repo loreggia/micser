@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using Micser.Common.Api;
+using System.Threading.Tasks;
 
 namespace Micser.App.Infrastructure.Api
 {

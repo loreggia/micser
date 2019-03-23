@@ -52,7 +52,6 @@
     <Compile Include="Api\Controllers\ModulesController.cs" />
     <Compile Include="Api\Controllers\StatusController.cs" />
     <Compile Include="Api\MicserJsonSerializer.cs" />
-    <Compile Include="Api\Server.cs" />
     <Compile Include="Audio\AudioEngine.cs" />
     <Compile Include="Audio\IAudioEngine.cs" />
     <Compile Include="ProjectInstaller.cs">

@@ -1,7 +1,7 @@
 ﻿using Micser.Common;
+using Micser.Common.Api;
 using Micser.Common.DataAccess;
 using Micser.Common.Extensions;
-using Micser.Engine.Api;
 using Micser.Engine.Audio;
 using Micser.Engine.Infrastructure;
 using Micser.Engine.Infrastructure.DataAccess;
@@ -26,7 +26,7 @@ namespace Micser.Engine
         private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
         private readonly ICollection<IEngineModule> _plugins;
         private IAudioEngine _engine;
-        private IServer _server;
+        private IApiServer _server;
 
         static MicserService()
         {
@@ -60,10 +60,10 @@ namespace Micser.Engine
             container.RegisterType<IModuleConnectionService, ModuleConnectionService>();
 
             container.RegisterSingleton<IAudioEngine, AudioEngine>();
-            container.RegisterSingleton<IServer, Server>();
+            container.RegisterSingleton<IApiServer, ApiServer>();
 
             _engine = container.Resolve<IAudioEngine>();
-            _server = container.Resolve<IServer>();
+            _server = container.Resolve<IApiServer>();
 
             LoadPlugins(container);
 

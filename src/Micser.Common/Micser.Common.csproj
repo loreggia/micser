@@ -51,7 +51,12 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Api\MessageBuffer.cs" />
+    <Compile Include="Api\ApiClient.cs" />
+    <Compile Include="Api\IApiClient.cs" />
+    <Compile Include="Api\JsonMessageConverter.cs" />
+    <Compile Include="Api\IApiServer.cs" />
+    <Compile Include="Api\ApiServer.cs" />
+    <Compile Include="Api\JsonMessage.cs" />
     <Compile Include="DataAccess\IRepositoryFactory.cs" />
     <Compile Include="DataAccess\IUnitOfWorkFactory.cs" />
     <Compile Include="DataAccess\IRepository.cs" />
@@ -64,6 +69,7 @@
     <Compile Include="Extensions\ComparableExtensions.cs" />
     <Compile Include="Extensions\PropertyExtensions.cs" />
     <Compile Include="Extensions\SerializationExtensions.cs" />
+    <Compile Include="Extensions\SocketExtensions.cs" />
     <Compile Include="Extensions\StringBuilderExtensions.cs" />
     <Compile Include="Extensions\UnityContainerExtensions.cs" />
     <Compile Include="Extensions\WaveFormatExtensions.cs" />
