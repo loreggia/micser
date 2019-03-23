@@ -16,5 +16,12 @@ namespace Micser.Common.Extensions
 
             return true;
         }
+
+        public static char[] ToCharArray(this StringBuilder sb)
+        {
+            var result = new char[sb.Length];
+            sb.CopyTo(0, result, 0, sb.Length);
+            return result;
+        }
     }
 }
