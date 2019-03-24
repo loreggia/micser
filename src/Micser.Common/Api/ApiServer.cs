@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
 
 #pragma warning disable 4014
@@ -14,6 +15,7 @@ namespace Micser.Common.Api
     {
         private readonly TcpListener _listener;
         private readonly IRequestProcessorFactory _requestProcessorFactory;
+        private readonly SemaphoreSlim _sendMessageSemaphore;
         private TcpClient _inClient;
         private StreamReader _inReader;
         private StreamWriter _inWriter;
@@ -25,6 +27,7 @@ namespace Micser.Common.Api
         public ApiServer(IRequestProcessorFactory requestProcessorFactory)
         {
             _requestProcessorFactory = requestProcessorFactory;
+            _sendMessageSemaphore = new SemaphoreSlim(1, 1);
             var endPoint = new IPEndPoint(IPAddress.Loopback, Globals.ApiPort);
             _listener = new TcpListener(endPoint);
         }
@@ -46,6 +49,8 @@ namespace Micser.Common.Api
                 await StartAcceptConnectionsAsync();
             }
 
+            await _sendMessageSemaphore.WaitAsync();
+
             try
             {
                 var json = JsonConvert.SerializeObject(message);
@@ -62,6 +67,10 @@ namespace Micser.Common.Api
                 }
 
                 throw;
+            }
+            finally
+            {
+                _sendMessageSemaphore.Release();
             }
         }
 
