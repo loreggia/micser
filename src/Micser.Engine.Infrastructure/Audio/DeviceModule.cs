@@ -50,6 +50,10 @@ namespace Micser.Engine.Infrastructure.Audio
                 var deviceService = new DeviceService();
                 DeviceDescription = deviceService.GetDescription(deviceId);
             }
+            else
+            {
+                DeviceDescription = null;
+            }
         }
 
         protected override void Dispose(bool disposing)

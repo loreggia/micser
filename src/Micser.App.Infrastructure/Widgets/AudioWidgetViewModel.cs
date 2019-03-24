@@ -5,8 +5,15 @@ namespace Micser.App.Infrastructure.Widgets
     public abstract class AudioWidgetViewModel : WidgetViewModel
     {
         private bool _isMuted;
+
         private bool _useSystemVolume;
+
         private float _volume;
+
+        protected AudioWidgetViewModel()
+        {
+            Volume = 1f;
+        }
 
         public bool IsMuted
         {
