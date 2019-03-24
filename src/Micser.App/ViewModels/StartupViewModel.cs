@@ -1,7 +1,7 @@
 ﻿using Micser.App.Infrastructure;
-using Micser.App.Infrastructure.Api;
 using Micser.App.Infrastructure.Settings;
 using Micser.App.Views;
+using Micser.Common.Api;
 using Prism.Events;
 using System.Threading.Tasks;
 
@@ -9,20 +9,20 @@ namespace Micser.App.ViewModels
 {
     public class StartupViewModel : ViewModelNavigationAware
     {
+        private readonly IApiClient _apiClient;
         private readonly INavigationManager _navigationManager;
         private readonly ISettingsService _settingsService;
-        private readonly StatusApiClient _statusApiClient;
 
         public StartupViewModel(
             IApplicationStateService applicationStateService,
             IEventAggregator eventAggregator,
             INavigationManager navigationManager,
-            ISettingsService settingsService)
+            ISettingsService settingsService,
+            IApiClient apiClient)
         {
             _navigationManager = navigationManager;
             _settingsService = settingsService;
-
-            _statusApiClient = new StatusApiClient();
+            _apiClient = apiClient;
 
             IsBusy = true;
 
@@ -41,7 +41,7 @@ namespace Micser.App.ViewModels
         {
             await Task.Run(() => { _settingsService.Load(); });
 
-            var statusResult = await _statusApiClient.GetStatus();
+            var statusResult = await _apiClient.SendMessageAsync(new JsonRequest("status"));
 
             if (statusResult.IsSuccess)
             {

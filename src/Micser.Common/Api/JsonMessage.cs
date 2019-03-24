@@ -24,7 +24,7 @@ namespace Micser.Common.Api
         {
         }
 
-        public JsonRequest(string resource, string action, object content)
+        public JsonRequest(string resource, string action = null, object content = null)
             : base(content)
         {
             Resource = resource;
