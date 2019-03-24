@@ -3,11 +3,11 @@
 namespace Micser.Engine.Api
 {
     [RequestProcessorName("status")]
-    public class StatusProcessor : IRequestProcessor
+    public class StatusProcessor : RequestProcessor
     {
-        public JsonResponse Process(string action, object content)
+        public StatusProcessor()
         {
-            return new JsonResponse(true, null, null);
+            this[""] = _ => true;
         }
     }
 }

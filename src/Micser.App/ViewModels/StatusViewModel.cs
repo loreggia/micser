@@ -15,11 +15,10 @@ namespace Micser.App.ViewModels
         private StatusType _currentStatus;
         private string _statusText;
 
-        public StatusViewModel(INavigationManager navigationManager)
+        public StatusViewModel(INavigationManager navigationManager, StatusApiClient statusApiClient)
         {
             _navigationManager = navigationManager;
-
-            _statusApiClient = new StatusApiClient();
+            _statusApiClient = statusApiClient;
 
             ActionCommand = new DelegateCommand(OnActionCommand, () => CanExecuteAction).ObservesProperty(() => CanExecuteAction);
         }

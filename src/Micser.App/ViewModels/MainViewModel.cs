@@ -29,14 +29,13 @@ namespace Micser.App.ViewModels
         private bool _isLoaded;
         private bool _isLoading;
 
-        public MainViewModel(IWidgetFactory widgetFactory, IWidgetRegistry widgetRegistry, ILogger logger, INavigationManager navigationManager)
+        public MainViewModel(IWidgetFactory widgetFactory, IWidgetRegistry widgetRegistry, ILogger logger, INavigationManager navigationManager, ModulesApiClient modulesApiClient, ModuleConnectionsApiClient connectionsApiClient)
         {
             _widgetRegistry = widgetRegistry;
             _logger = logger;
             _navigationManager = navigationManager;
-
-            _modulesApiClient = new ModulesApiClient();
-            _connectionsApiClient = new ModuleConnectionsApiClient();
+            _modulesApiClient = modulesApiClient;
+            _connectionsApiClient = connectionsApiClient;
 
             _widgets = new ObservableCollection<WidgetViewModel>();
             _widgets.CollectionChanged += OnWidgetsCollectionChanged;

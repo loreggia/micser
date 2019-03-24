@@ -59,6 +59,7 @@
     <Compile Include="Api\IApiServer.cs" />
     <Compile Include="Api\ApiServer.cs" />
     <Compile Include="Api\JsonMessage.cs" />
+    <Compile Include="Api\RequestProcessor.cs" />
     <Compile Include="Api\RequestProcessorFactory.cs" />
     <Compile Include="Api\RequestProcessorNameAttribute.cs" />
     <Compile Include="DataAccess\IRepositoryFactory.cs" />
