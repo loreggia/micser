@@ -24,13 +24,15 @@ namespace Micser.Common.Api
         {
         }
 
-        public JsonRequest(string action, object content)
+        public JsonRequest(string resource, string action, object content)
             : base(content)
         {
+            Resource = resource;
             Action = action;
         }
 
         public string Action { get; set; }
+        public string Resource { get; set; }
     }
 
     public class JsonResponse : JsonMessage

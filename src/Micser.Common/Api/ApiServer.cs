@@ -13,7 +13,7 @@ namespace Micser.Common.Api
     public class ApiServer : IApiServer
     {
         private readonly TcpListener _listener;
-
+        private readonly IRequestProcessorFactory _requestProcessorFactory;
         private TcpClient _inClient;
         private StreamReader _inReader;
         private StreamWriter _inWriter;
@@ -22,8 +22,9 @@ namespace Micser.Common.Api
         private StreamReader _outReader;
         private StreamWriter _outWriter;
 
-        public ApiServer()
+        public ApiServer(IRequestProcessorFactory requestProcessorFactory)
         {
+            _requestProcessorFactory = requestProcessorFactory;
             var endPoint = new IPEndPoint(IPAddress.Loopback, Globals.ApiPort);
             _listener = new TcpListener(endPoint);
         }
@@ -82,7 +83,9 @@ namespace Micser.Common.Api
             try
             {
                 var message = JsonConvert.DeserializeObject<JsonRequest>(content);
-                return JsonConvert.SerializeObject(new JsonResponse(true, null, null));
+                var processor = _requestProcessorFactory.Create(message.Resource);
+                var response = processor.Process(message.Action, message.Content);
+                return JsonConvert.SerializeObject(response);
             }
             catch (Exception ex)
             {

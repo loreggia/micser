@@ -2,6 +2,7 @@
 using Micser.Common.Api;
 using Micser.Common.DataAccess;
 using Micser.Common.Extensions;
+using Micser.Engine.Api;
 using Micser.Engine.Audio;
 using Micser.Engine.Infrastructure;
 using Micser.Engine.Infrastructure.DataAccess;
@@ -59,8 +60,14 @@ namespace Micser.Engine
             container.RegisterType<IModuleService, ModuleService>();
             container.RegisterType<IModuleConnectionService, ModuleConnectionService>();
 
+            container.RegisterRequestProcessor<StatusProcessor>();
+            container.RegisterRequestProcessor<ModulesProcessor>();
+            container.RegisterRequestProcessor<ModuleConnectionsProcessor>();
+
             container.RegisterSingleton<IAudioEngine, AudioEngine>();
             container.RegisterSingleton<IApiServer, ApiServer>();
+
+            container.RegisterSingleton<IRequestProcessorFactory, RequestProcessorFactory>();
 
             _engine = container.Resolve<IAudioEngine>();
             _server = container.Resolve<IApiServer>();

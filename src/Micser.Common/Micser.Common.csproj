@@ -53,10 +53,14 @@
   <ItemGroup>
     <Compile Include="Api\ApiClient.cs" />
     <Compile Include="Api\IApiClient.cs" />
+    <Compile Include="Api\IRequestProcessor.cs" />
+    <Compile Include="Api\IRequestProcessorFactory.cs" />
     <Compile Include="Api\JsonMessageConverter.cs" />
     <Compile Include="Api\IApiServer.cs" />
     <Compile Include="Api\ApiServer.cs" />
     <Compile Include="Api\JsonMessage.cs" />
+    <Compile Include="Api\RequestProcessorFactory.cs" />
+    <Compile Include="Api\RequestProcessorNameAttribute.cs" />
     <Compile Include="DataAccess\IRepositoryFactory.cs" />
     <Compile Include="DataAccess\IUnitOfWorkFactory.cs" />
     <Compile Include="DataAccess\IRepository.cs" />

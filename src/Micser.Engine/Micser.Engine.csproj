@@ -47,11 +47,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Api\Bootstrapper.cs" />
     <Compile Include="Api\Controllers\ModuleConnectionsController.cs" />
     <Compile Include="Api\Controllers\ModulesController.cs" />
     <Compile Include="Api\Controllers\StatusController.cs" />
-    <Compile Include="Api\MicserJsonSerializer.cs" />
+    <Compile Include="Api\ModuleConnectionsProcessor.cs" />
+    <Compile Include="Api\ModulesProcessor.cs" />
+    <Compile Include="Api\StatusProcessor.cs" />
     <Compile Include="Audio\AudioEngine.cs" />
     <Compile Include="Audio\IAudioEngine.cs" />
     <Compile Include="ProjectInstaller.cs">

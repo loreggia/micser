@@ -14,7 +14,7 @@ namespace Micser.Common
 
         public IEnumerable<T> Items => _items.AsEnumerable();
 
-        public void Add(T item)
+        public virtual void Add(T item)
         {
             if (item != null)
             {

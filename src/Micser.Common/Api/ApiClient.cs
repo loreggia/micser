@@ -12,6 +12,7 @@ namespace Micser.Common.Api
 {
     public class ApiClient : IApiClient
     {
+        private readonly IRequestProcessorFactory _requestProcessorFactory;
         private TcpClient _inClient;
         private StreamReader _inReader;
         private StreamWriter _inWriter;
@@ -19,6 +20,11 @@ namespace Micser.Common.Api
         private TcpClient _outClient;
         private StreamReader _outReader;
         private StreamWriter _outWriter;
+
+        public ApiClient(IRequestProcessorFactory requestProcessorFactory)
+        {
+            _requestProcessorFactory = requestProcessorFactory;
+        }
 
         public async Task ConnectAsync()
         {
@@ -107,7 +113,9 @@ namespace Micser.Common.Api
             try
             {
                 var message = JsonConvert.DeserializeObject<JsonRequest>(content);
-                return JsonConvert.SerializeObject(new JsonResponse(true, null, null));
+                var processor = _requestProcessorFactory.Create(message.Resource);
+                var response = processor.Process(message.Action, message.Content);
+                return JsonConvert.SerializeObject(response);
             }
             catch (Exception ex)
             {

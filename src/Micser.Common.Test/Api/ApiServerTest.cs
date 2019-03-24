@@ -1,16 +1,27 @@
 ﻿using Micser.Common.Api;
+using Micser.Common.Extensions;
 using System.Threading.Tasks;
+using Unity;
 using Xunit;
 
 namespace Micser.Common.Test.Api
 {
     public class ApiServerTest
     {
+        private readonly IRequestProcessorFactory _factory;
+
+        public ApiServerTest()
+        {
+            var container = new UnityContainer();
+            container.RegisterRequestProcessor<TestProcessor>();
+            _factory = new RequestProcessorFactory(container);
+        }
+
         [Fact]
         public async Task ClientReconnect()
         {
-            using (var server = new ApiServer())
-            using (var client = new ApiClient())
+            using (var server = new ApiServer(_factory))
+            using (var client = new ApiClient(_factory))
             {
                 server.Start();
 
@@ -32,8 +43,8 @@ namespace Micser.Common.Test.Api
         [Fact]
         public async Task SendClientToServer()
         {
-            using (var server = new ApiServer())
-            using (var client = new ApiClient())
+            using (var server = new ApiServer(_factory))
+            using (var client = new ApiClient(_factory))
             {
                 server.Start();
 
@@ -50,8 +61,8 @@ namespace Micser.Common.Test.Api
         [Fact]
         public async Task SendServerToClient()
         {
-            using (var server = new ApiServer())
-            using (var client = new ApiClient())
+            using (var server = new ApiServer(_factory))
+            using (var client = new ApiClient(_factory))
             {
                 server.Start();
 
@@ -68,8 +79,8 @@ namespace Micser.Common.Test.Api
         [Fact]
         public async Task ServerReconnect()
         {
-            using (var server = new ApiServer())
-            using (var client = new ApiClient())
+            using (var server = new ApiServer(_factory))
+            using (var client = new ApiClient(_factory))
             {
                 server.Start();
 
@@ -82,7 +93,7 @@ namespace Micser.Common.Test.Api
 
                 client.Dispose();
 
-                using (var client2 = new ApiClient())
+                using (var client2 = new ApiClient(_factory))
                 {
                     await client2.ConnectAsync();
 
@@ -94,6 +105,14 @@ namespace Micser.Common.Test.Api
             }
 
             await Task.Delay(1000);
+        }
+
+        public class TestProcessor : IRequestProcessor
+        {
+            public JsonResponse Process(string action, object content)
+            {
+                return new JsonResponse(true, null, null);
+            }
         }
     }
 }
