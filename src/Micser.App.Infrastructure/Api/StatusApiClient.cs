@@ -1,9 +1,8 @@
-﻿using Micser.Common.Api;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
 namespace Micser.App.Infrastructure.Api
 {
-    public class StatusApiClient : ApiClient
+    public class StatusApiClient
     {
         public async Task<ServiceResult<bool>> GetStatus()
         {

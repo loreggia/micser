@@ -1,11 +1,10 @@
-﻿using Micser.Common.Api;
-using Micser.Common.Modules;
+﻿using Micser.Common.Modules;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Micser.App.Infrastructure.Api
 {
-    public class ModulesApiClient : ApiClient
+    public class ModulesApiClient
     {
         public async Task<ServiceResult<ModuleDto>> CreateAsync(ModuleDto moduleDto)
         {
