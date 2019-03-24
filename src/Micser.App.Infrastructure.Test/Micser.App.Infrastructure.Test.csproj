@@ -44,7 +44,6 @@
     <Reference Include="System.Drawing" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Api\ApiClientTest.cs" />
     <Compile Include="GenerateColorsHelperTest.cs" />
     <Compile Include="IniFileTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

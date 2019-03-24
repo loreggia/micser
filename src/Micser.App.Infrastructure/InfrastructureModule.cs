@@ -4,6 +4,7 @@ using Micser.App.Infrastructure.Settings;
 using Micser.App.Infrastructure.Themes;
 using Micser.App.Infrastructure.ToolBars;
 using Micser.App.Infrastructure.Widgets;
+using Micser.Common.Api;
 using Prism.Ioc;
 
 namespace Micser.App.Infrastructure
@@ -25,6 +26,8 @@ namespace Micser.App.Infrastructure
             containerRegistry.RegisterSingleton<IWidgetFactory, WidgetFactory>();
             containerRegistry.RegisterSingleton<ISettingsRegistry, SettingsRegistry>();
             containerRegistry.RegisterSingleton<ISettingsService, SettingsService>();
+            containerRegistry.RegisterSingleton<IRequestProcessorFactory, RequestProcessorFactory>();
+            containerRegistry.RegisterSingleton<IApiClient, ApiClient>();
 
             containerRegistry.Register<ISettingValueRepository, SettingValueRepository>();
 
@@ -33,6 +36,8 @@ namespace Micser.App.Infrastructure
 
         public void OnInitialized(IContainerProvider containerProvider)
         {
+            var apiClient = containerProvider.Resolve<IApiClient>();
+            apiClient.ConnectAsync();
         }
 
         public void RegisterTypes(IContainerRegistry containerRegistry)
