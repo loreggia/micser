@@ -90,15 +90,6 @@
     <PackageReference Include="CSCore">
       <Version>1.2.1.2</Version>
     </PackageReference>
-    <PackageReference Include="Nancy">
-      <Version>1.4.5</Version>
-    </PackageReference>
-    <PackageReference Include="Nancy.Hosting.Self">
-      <Version>1.4.1</Version>
-    </PackageReference>
-    <PackageReference Include="Nancy.Serialization.JsonNet">
-      <Version>1.4.1</Version>
-    </PackageReference>
     <PackageReference Include="NLog">
       <Version>4.6.0</Version>
     </PackageReference>
