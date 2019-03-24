@@ -41,7 +41,7 @@ namespace Micser.Common.Api
         {
         }
 
-        public JsonResponse(bool isSuccess, object content, string message)
+        public JsonResponse(bool isSuccess, object content = null, string message = null)
             : base(content)
         {
             IsSuccess = isSuccess;
