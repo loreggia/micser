@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Diagnostics;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -394,6 +395,10 @@ namespace Micser.App.Infrastructure.Widgets
                 source.Connection = connection;
                 target.Connection = connection;
                 _connections.Add(connection);
+            }
+            else
+            {
+                Debug.WriteLine("oopsie");
             }
         }
 

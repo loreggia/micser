@@ -145,6 +145,7 @@
     <Compile Include="Widgets\ConnectorChangedEventHandler.cs" />
     <Compile Include="Widgets\ConnectorInfo.cs" />
     <Compile Include="Widgets\ConnectorViewModel.cs" />
+    <Compile Include="Widgets\DeviceWidgetViewModel.cs" />
     <Compile Include="Widgets\DragThumb.cs" />
     <Compile Include="Widgets\IWidgetFactory.cs" />
     <Compile Include="Widgets\IWidgetRegistry.cs" />

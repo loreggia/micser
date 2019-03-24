@@ -204,6 +204,10 @@ namespace Micser.App.ViewModels
                                 cvm.SourceChanged += OnConnectionSourceChanged;
                                 cvm.TargetChanged += OnConnectionTargetChanged;
                             }
+                            else
+                            {
+                                _logger.Warn($"Could not load widget connection. ID: {connectionDto.Id}");
+                            }
                         }
                         catch (Exception ex)
                         {
@@ -218,6 +222,7 @@ namespace Micser.App.ViewModels
         {
             try
             {
+                IsBusy = true;
                 _isLoading = true;
                 AvailableWidgets = _widgetRegistry.Widgets;
 
@@ -227,10 +232,12 @@ namespace Micser.App.ViewModels
                 }
 
                 await LoadWidgets();
+                await Task.Delay(50);
                 await LoadConnections();
             }
             finally
             {
+                IsBusy = false;
                 _isLoading = false;
                 _isLoaded = true;
             }
@@ -328,7 +335,7 @@ namespace Micser.App.ViewModels
                 }
 
                 _savingBuffer.Add(vm);
-                await Task.Delay(500);
+                await Task.Delay(50);
                 _savingBuffer.Remove(vm);
 
                 var moduleDto = new ModuleDto

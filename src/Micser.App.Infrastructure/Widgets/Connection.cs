@@ -1,6 +1,7 @@
 ﻿using Micser.App.Infrastructure.Extensions;
 using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -299,6 +300,10 @@ namespace Micser.App.Infrastructure.Widgets
 
                     PathGeometry = geometry;
                 }
+            }
+            else
+            {
+                Debug.WriteLine("oops");
             }
         }
     }
