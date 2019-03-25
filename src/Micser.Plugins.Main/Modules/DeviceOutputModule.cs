@@ -1,8 +1,8 @@
 ﻿using CSCore;
 using CSCore.CoreAudioAPI;
 using CSCore.SoundOut;
-using CSCore.Streams;
 using Micser.Engine.Infrastructure.Audio;
+using Micser.Plugins.Main.Audio;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -91,10 +91,19 @@ namespace Micser.Plugins.Main.Modules
 
         protected override void OnInitializeDevice()
         {
+            var resetBuffer = _output == null;
             _output = new WasapiOut(true, AudioClientShareMode.Shared, Latency) { Device = Device };
 
             if (_outputBuffer != null)
             {
+                if (resetBuffer)
+                {
+                    foreach (var buffer in _inputBuffers.Values)
+                    {
+                        buffer.Clear();
+                    }
+                }
+
                 _output.Initialize(_outputBuffer.ToWaveSource());
                 _output.Play();
             }
@@ -138,10 +147,11 @@ namespace Micser.Plugins.Main.Modules
             {
                 void OnStopped(object sender, PlaybackStoppedEventArgs e)
                 {
+                    _output.Stopped -= OnStopped;
+
                     if (Device.DeviceState == DeviceState.Active)
                     {
                         _output.Initialize(_outputBuffer.ToWaveSource());
-                        _output.Stopped -= OnStopped;
                         _output.Play();
                     }
                 }
