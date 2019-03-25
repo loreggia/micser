@@ -1,127 +1,29 @@
 ﻿using Micser.Common.Extensions;
-using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading;
 using System.Threading.Tasks;
 
 #pragma warning disable 4014
 
 namespace Micser.Common.Api
 {
-    public class ApiServer : IApiServer
+    public class ApiServer : ApiEndPoint, IApiServer
     {
         private readonly TcpListener _listener;
-        private readonly IRequestProcessorFactory _requestProcessorFactory;
-        private readonly SemaphoreSlim _sendMessageSemaphore;
-        private TcpClient _inClient;
-        private StreamReader _inReader;
-        private StreamWriter _inWriter;
         private bool _isStarting;
-        private TcpClient _outClient;
-        private StreamReader _outReader;
-        private StreamWriter _outWriter;
 
         public ApiServer(IRequestProcessorFactory requestProcessorFactory)
+            : base(requestProcessorFactory)
         {
-            _requestProcessorFactory = requestProcessorFactory;
-            _sendMessageSemaphore = new SemaphoreSlim(1, 1);
             var endPoint = new IPEndPoint(IPAddress.Loopback, Globals.ApiPort);
             _listener = new TcpListener(endPoint);
         }
 
         public bool IsRunning { get; private set; }
 
-        public Task StartupTask { get; private set; }
-
-        public void Dispose()
-        {
-            _listener.Stop();
-            Stop();
-        }
-
-        public async Task<JsonResponse> SendMessageAsync(JsonRequest message, int numRetries = 5)
-        {
-            if (_outClient == null || !_outClient.Connected)
-            {
-                await StartAcceptConnectionsAsync();
-            }
-
-            await _sendMessageSemaphore.WaitAsync();
-
-            try
-            {
-                var json = JsonConvert.SerializeObject(message);
-                await _outWriter.WriteLineAsync(json);
-                json = await _outReader.ReadLineAsync();
-                return JsonConvert.DeserializeObject<JsonResponse>(json);
-            }
-            catch
-            {
-                if (numRetries > 0)
-                {
-                    await Task.Delay(10);
-                    return await SendMessageAsync(message, --numRetries);
-                }
-
-                throw;
-            }
-            finally
-            {
-                _sendMessageSemaphore.Release();
-            }
-        }
-
-        public void Start()
-        {
-            _listener.Start();
-            StartupTask = StartAcceptConnectionsAsync();
-        }
-
-        public void Stop()
-        {
-            IsRunning = false;
-            _inClient?.Close();
-            _outClient?.Close();
-        }
-
-        private string ProcessMessage(string content)
-        {
-            try
-            {
-                var message = JsonConvert.DeserializeObject<JsonRequest>(content);
-                var processor = _requestProcessorFactory.Create(message.Resource);
-                var response = processor.Process(message.Action, message.Content);
-                return JsonConvert.SerializeObject(response);
-            }
-            catch (Exception ex)
-            {
-                return JsonConvert.SerializeObject(new JsonResponse(false, ex.ToString(), ex.Message));
-            }
-        }
-
-        private async void ReaderThread()
-        {
-            while (IsRunning)
-            {
-                try
-                {
-                    var message = await _inReader.ReadLineAsync();
-                    var response = ProcessMessage(message);
-                    await _inWriter.WriteLineAsync(response);
-                }
-                catch
-                {
-                    StartupTask = StartAcceptConnectionsAsync();
-                    await StartupTask;
-                    return;
-                }
-            }
-        }
-
-        private async Task StartAcceptConnectionsAsync()
+        public override async Task ConnectAsync()
         {
             if (_isStarting)
             {
@@ -159,6 +61,30 @@ namespace Micser.Common.Api
             {
                 _isStarting = false;
             }
+        }
+
+        public void Start()
+        {
+            _listener.Start();
+            _connectTask = ConnectAsync();
+        }
+
+        public void Stop()
+        {
+            IsRunning = false;
+            _inClient?.Close();
+            _outClient?.Close();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _listener.Stop();
+                Stop();
+            }
+
+            base.Dispose(disposing);
         }
     }
 }
