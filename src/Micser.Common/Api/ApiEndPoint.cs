@@ -9,13 +9,13 @@ namespace Micser.Common.Api
 {
     public abstract class ApiEndPoint : IDisposable
     {
-        protected Task _connectTask;
-        protected TcpClient _inClient;
-        protected StreamReader _inReader;
-        protected StreamWriter _inWriter;
-        protected TcpClient _outClient;
-        protected StreamReader _outReader;
-        protected StreamWriter _outWriter;
+        protected Task ConnectTask;
+        protected TcpClient InClient;
+        protected StreamReader InReader;
+        protected StreamWriter InWriter;
+        protected TcpClient OutClient;
+        protected StreamReader OutReader;
+        protected StreamWriter OutWriter;
         private readonly IRequestProcessorFactory _requestProcessorFactory;
         private readonly SemaphoreSlim _sendMessageSemaphore;
 
@@ -35,7 +35,7 @@ namespace Micser.Common.Api
 
         public async Task<JsonResponse> SendMessageAsync(JsonRequest message, int numRetries = 5)
         {
-            if (_outClient == null || !_outClient.Connected)
+            if (OutClient == null || !OutClient.Connected)
             {
                 await ConnectAsync();
             }
@@ -45,8 +45,8 @@ namespace Micser.Common.Api
             try
             {
                 var json = JsonConvert.SerializeObject(message);
-                await _outWriter.WriteLineAsync(json);
-                json = await _outReader.ReadLineAsync();
+                await OutWriter.WriteLineAsync(json);
+                json = await OutReader.ReadLineAsync();
                 return JsonConvert.DeserializeObject<JsonResponse>(json);
             }
             catch
@@ -69,33 +69,33 @@ namespace Micser.Common.Api
         {
             if (disposing)
             {
-                _inReader?.Dispose();
-                _inWriter?.Dispose();
-                _inClient?.Dispose();
-                _outReader?.Dispose();
-                _outWriter?.Dispose();
-                _outClient?.Dispose();
+                InReader?.Dispose();
+                InWriter?.Dispose();
+                InClient?.Dispose();
+                OutReader?.Dispose();
+                OutWriter?.Dispose();
+                OutClient?.Dispose();
                 _sendMessageSemaphore?.Dispose();
             }
         }
 
         protected async void ReaderThread()
         {
-            while (_inClient?.Connected == true)
+            while (InClient?.Connected == true)
             {
                 try
                 {
-                    var message = await _inReader.ReadLineAsync();
+                    var message = await InReader.ReadLineAsync();
                     if (message != null)
                     {
                         var response = ProcessMessage(message);
-                        await _inWriter.WriteLineAsync(response);
+                        await InWriter.WriteLineAsync(response);
                     }
                 }
                 catch
                 {
-                    _connectTask = ConnectAsync();
-                    await _connectTask;
+                    ConnectTask = ConnectAsync();
+                    await ConnectTask;
                     return;
                 }
             }
