@@ -2,7 +2,6 @@
 using System;
 using System.IO;
 using System.Net.Sockets;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace Micser.Common.Api
@@ -17,12 +16,12 @@ namespace Micser.Common.Api
         protected StreamReader OutReader;
         protected StreamWriter OutWriter;
         private readonly IRequestProcessorFactory _requestProcessorFactory;
-        private readonly SemaphoreSlim _sendMessageSemaphore;
+        private readonly SemaphoreQueue _sendMessageSemaphore;
 
         protected ApiEndPoint(IRequestProcessorFactory requestProcessorFactory)
         {
             _requestProcessorFactory = requestProcessorFactory;
-            _sendMessageSemaphore = new SemaphoreSlim(1, 1);
+            _sendMessageSemaphore = new SemaphoreQueue(1);
         }
 
         public abstract Task ConnectAsync();
@@ -75,7 +74,6 @@ namespace Micser.Common.Api
                 OutReader?.Dispose();
                 OutWriter?.Dispose();
                 OutClient?.Dispose();
-                _sendMessageSemaphore?.Dispose();
             }
         }
 

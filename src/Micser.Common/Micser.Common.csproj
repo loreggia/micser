@@ -88,6 +88,7 @@
     <Compile Include="Modules\ModuleStateChangeDto.cs" />
     <Compile Include="OrderedParameterOverride.cs" />
     <Compile Include="Properties\GlobalAssemblyInfo.cs" />
+    <Compile Include="SemaphoreQueue.cs" />
     <Compile Include="ServiceStatus.cs" />
     <Compile Include="StateDictionary.cs" />
     <Compile Include="Modules\ModuleDto.cs" />
