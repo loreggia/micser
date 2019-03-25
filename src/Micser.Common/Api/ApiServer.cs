@@ -34,20 +34,20 @@ namespace Micser.Common.Api
             {
                 _isStarting = true;
 
-                _inClient = null;
-                _outClient = null;
+                InClient = null;
+                OutClient = null;
 
-                _inClient = await _listener.AcceptTcpClientAsync();
-                _inClient.Client.SetKeepAlive();
-                var inStream = _inClient.GetStream();
-                _inReader = new StreamReader(inStream);
-                _inWriter = new StreamWriter(inStream) { AutoFlush = true };
+                InClient = await _listener.AcceptTcpClientAsync();
+                InClient.Client.SetKeepAlive();
+                var inStream = InClient.GetStream();
+                InReader = new StreamReader(inStream);
+                InWriter = new StreamWriter(inStream) { AutoFlush = true };
 
-                _outClient = await _listener.AcceptTcpClientAsync();
-                _outClient.Client.SetKeepAlive();
-                var outStream = _outClient.GetStream();
-                _outReader = new StreamReader(outStream);
-                _outWriter = new StreamWriter(outStream) { AutoFlush = true };
+                OutClient = await _listener.AcceptTcpClientAsync();
+                OutClient.Client.SetKeepAlive();
+                var outStream = OutClient.GetStream();
+                OutReader = new StreamReader(outStream);
+                OutWriter = new StreamWriter(outStream) { AutoFlush = true };
 
                 IsRunning = true;
 
@@ -66,14 +66,14 @@ namespace Micser.Common.Api
         public void Start()
         {
             _listener.Start();
-            _connectTask = ConnectAsync();
+            ConnectTask = ConnectAsync();
         }
 
         public void Stop()
         {
             IsRunning = false;
-            _inClient?.Close();
-            _outClient?.Close();
+            InClient?.Close();
+            OutClient?.Close();
         }
 
         protected override void Dispose(bool disposing)

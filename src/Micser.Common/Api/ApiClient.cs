@@ -29,22 +29,22 @@ namespace Micser.Common.Api
             {
                 _isConnecting = true;
 
-                _inClient?.Dispose();
-                _outClient?.Dispose();
+                InClient?.Dispose();
+                OutClient?.Dispose();
 
-                _outClient = new TcpClient();
-                await _outClient.ConnectAsync(IPAddress.Loopback, Globals.ApiPort);
-                _outClient.Client.SetKeepAlive();
-                var outStream = _outClient.GetStream();
-                _outReader = new StreamReader(outStream);
-                _outWriter = new StreamWriter(outStream) { AutoFlush = true };
+                OutClient = new TcpClient();
+                await OutClient.ConnectAsync(IPAddress.Loopback, Globals.ApiPort);
+                OutClient.Client.SetKeepAlive();
+                var outStream = OutClient.GetStream();
+                OutReader = new StreamReader(outStream);
+                OutWriter = new StreamWriter(outStream) { AutoFlush = true };
 
-                _inClient = new TcpClient();
-                await _inClient.ConnectAsync(IPAddress.Loopback, Globals.ApiPort);
-                _inClient.Client.SetKeepAlive();
-                var inStream = _inClient.GetStream();
-                _inReader = new StreamReader(inStream);
-                _inWriter = new StreamWriter(inStream) { AutoFlush = true };
+                InClient = new TcpClient();
+                await InClient.ConnectAsync(IPAddress.Loopback, Globals.ApiPort);
+                InClient.Client.SetKeepAlive();
+                var inStream = InClient.GetStream();
+                InReader = new StreamReader(inStream);
+                InWriter = new StreamWriter(inStream) { AutoFlush = true };
 
                 Task.Run(() => ReaderThread());
             }
