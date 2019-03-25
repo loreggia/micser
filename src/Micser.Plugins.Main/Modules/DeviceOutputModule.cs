@@ -1,11 +1,12 @@
 ﻿using CSCore;
 using CSCore.CoreAudioAPI;
 using CSCore.SoundOut;
+using CSCore.Streams;
 using Micser.Engine.Infrastructure.Audio;
-using Micser.Plugins.Main.Audio;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using WriteableBufferingSource = Micser.Plugins.Main.Audio.WriteableBufferingSource;
 
 namespace Micser.Plugins.Main.Modules
 {
@@ -14,11 +15,12 @@ namespace Micser.Plugins.Main.Modules
         private readonly IDictionary<long, WriteableBufferingSource> _inputBuffers;
         private readonly IDictionary<long, ISampleSource> _inputSources;
         private int _channelCount;
+        private bool _isMuted;
         private int _latency;
-
         private WasapiOut _output;
-
-        private MixerSampleSource _outputBuffer;
+        private MixerSampleSource _outputMixer;
+        private float _volume;
+        private VolumeSource _volumeSource;
 
         public DeviceOutputModule(long id)
             : base(id)
@@ -29,8 +31,22 @@ namespace Micser.Plugins.Main.Modules
             Latency = 1;
         }
 
+        public override bool IsMuted
+        {
+            get => _isMuted;
+            set
+            {
+                _isMuted = value;
+
+                if (_volumeSource != null)
+                {
+                    _volumeSource.Volume = value ? 0f : _volume;
+                }
+            }
+        }
+
         /// <summary>
-        ///     Gets or sets the output latency in milliseconds.
+        /// Gets or sets the output latency in milliseconds.
         /// </summary>
         public int Latency
         {
@@ -41,6 +57,20 @@ namespace Micser.Plugins.Main.Modules
                 {
                     _latency = value;
                     InitializeDevice();
+                }
+            }
+        }
+
+        public override float Volume
+        {
+            get => _volume;
+            set
+            {
+                _volume = value;
+
+                if (_volumeSource != null && !IsMuted)
+                {
+                    _volumeSource.Volume = value;
                 }
             }
         }
@@ -69,7 +99,8 @@ namespace Micser.Plugins.Main.Modules
         {
             if (disposing)
             {
-                _outputBuffer?.Dispose();
+                _volumeSource?.Dispose();
+                _outputMixer?.Dispose();
                 _inputBuffers.Clear();
                 _inputSources.Clear();
             }
@@ -94,7 +125,7 @@ namespace Micser.Plugins.Main.Modules
             var resetBuffer = _output == null;
             _output = new WasapiOut(true, AudioClientShareMode.Shared, Latency) { Device = Device };
 
-            if (_outputBuffer != null)
+            if (_outputMixer != null)
             {
                 if (resetBuffer)
                 {
@@ -104,7 +135,7 @@ namespace Micser.Plugins.Main.Modules
                     }
                 }
 
-                _output.Initialize(_outputBuffer.ToWaveSource());
+                _output.Initialize(_volumeSource.ToWaveSource());
                 _output.Play();
             }
         }
@@ -113,34 +144,35 @@ namespace Micser.Plugins.Main.Modules
         {
             if (_inputBuffers.ContainsKey(id))
             {
-                _outputBuffer.RemoveSource(_inputSources[id]);
+                _outputMixer.RemoveSource(_inputSources[id]);
             }
 
             _inputBuffers[id] = new WriteableBufferingSource(format);
 
-            if (_outputBuffer == null || format.Channels > _channelCount)
+            if (_outputMixer == null || format.Channels > _channelCount)
             {
                 SetOutputBuffer(format);
             }
 
             if (_inputSources.ContainsKey(id))
             {
-                _outputBuffer.RemoveSource(_inputSources[id]);
+                _outputMixer.RemoveSource(_inputSources[id]);
             }
 
             _inputSources[id] = _inputBuffers[id].ToSampleSource();
-            _outputBuffer.AddSource(_inputSources[id]);
+            _outputMixer.AddSource(_inputSources[id]);
         }
 
         private void SetOutputBuffer(WaveFormat format)
         {
-            var restart = _outputBuffer != null;
+            var restart = _outputMixer != null;
 
-            _outputBuffer = new MixerSampleSource(format.Channels, format.SampleRate) { DivideResult = false, FillWithZeros = true };
+            _outputMixer = new MixerSampleSource(format.Channels, format.SampleRate) { DivideResult = false, FillWithZeros = true };
+            _volumeSource = new VolumeSource(_outputMixer);
 
             foreach (var sampleSource in _inputSources.Values)
             {
-                _outputBuffer.AddSource(sampleSource);
+                _outputMixer.AddSource(sampleSource);
             }
 
             if (restart)
@@ -151,7 +183,7 @@ namespace Micser.Plugins.Main.Modules
 
                     if (Device.DeviceState == DeviceState.Active)
                     {
-                        _output.Initialize(_outputBuffer.ToWaveSource());
+                        _output.Initialize(_volumeSource.ToWaveSource());
                         _output.Play();
                     }
                 }
@@ -161,7 +193,7 @@ namespace Micser.Plugins.Main.Modules
             }
             else if (_output != null && Device.DeviceState == DeviceState.Active)
             {
-                _output.Initialize(_outputBuffer.ToWaveSource());
+                _output.Initialize(_volumeSource.ToWaveSource());
                 _output.Play();
             }
 

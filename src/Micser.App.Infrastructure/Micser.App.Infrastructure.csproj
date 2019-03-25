@@ -47,6 +47,8 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Api\ApiEvent.cs" />
+    <Compile Include="Api\ApiEventRequestProcessor.cs" />
     <Compile Include="Api\Error.cs" />
     <Compile Include="Api\ErrorList.cs" />
     <Compile Include="Api\ModuleConnectionsApiClient.cs" />
@@ -67,6 +69,7 @@
     <Compile Include="Controls\RelativePositionPanel.cs" />
     <Compile Include="Controls\ToolBarTrayHelper.cs" />
     <Compile Include="Converter\BooleanConverter.cs" />
+    <Compile Include="Converter\BooleanInvertConverter.cs" />
     <Compile Include="Converter\BooleanToVisibilityConverter.cs" />
     <Compile Include="Converter\ConverterExtension.cs" />
     <Compile Include="Converter\DoubleToPointConverter.cs" />

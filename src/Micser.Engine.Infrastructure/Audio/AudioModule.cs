@@ -30,7 +30,9 @@ namespace Micser.Engine.Infrastructure.Audio
 
         public virtual long Id { get; }
 
-        public bool IsMuted { get; set; }
+        public virtual bool IsMuted { get; set; }
+
+        public virtual bool UseSystemVolume { get; set; }
 
         public virtual float Volume
         {
@@ -63,7 +65,8 @@ namespace Micser.Engine.Infrastructure.Audio
             return new ModuleState
             {
                 IsMuted = IsMuted,
-                Volume = Volume
+                Volume = Volume,
+                UseSystemVolume = UseSystemVolume
             };
         }
 
@@ -84,6 +87,7 @@ namespace Micser.Engine.Infrastructure.Audio
 
             IsMuted = state.IsMuted;
             Volume = state.Volume;
+            UseSystemVolume = state.UseSystemVolume;
         }
 
         public virtual void Write(IAudioModule source, WaveFormat waveFormat, byte[] buffer, int offset, int count)

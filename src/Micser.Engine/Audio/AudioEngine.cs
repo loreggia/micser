@@ -1,4 +1,6 @@
-﻿using Micser.Common;
+﻿using CSCore.CoreAudioAPI;
+using Micser.Common;
+using Micser.Common.Api;
 using Micser.Engine.Infrastructure.Audio;
 using Micser.Engine.Infrastructure.Services;
 using NLog;
@@ -11,19 +13,28 @@ namespace Micser.Engine.Audio
 {
     public sealed class AudioEngine : IAudioEngine
     {
+        private readonly IApiServer _apiServer;
         private readonly IUnityContainer _container;
+        private readonly MMDeviceEnumerator _deviceEnumerator;
+        private readonly AudioEndpointVolumeCallback _endpointVolumeCallback;
         private readonly ILogger _logger;
         private readonly IModuleConnectionService _moduleConnectionService;
         private readonly List<IAudioModule> _modules;
         private readonly IModuleService _moduleService;
+        private AudioEndpointVolume _endpointVolume;
 
-        public AudioEngine(IUnityContainer container, ILogger logger, IModuleService moduleService, IModuleConnectionService moduleConnectionService)
+        public AudioEngine(IUnityContainer container, ILogger logger, IModuleService moduleService, IModuleConnectionService moduleConnectionService, IApiServer apiServer)
         {
             _container = container;
             _logger = logger;
             _moduleService = moduleService;
             _moduleConnectionService = moduleConnectionService;
+            _apiServer = apiServer;
             _modules = new List<IAudioModule>();
+            _deviceEnumerator = new MMDeviceEnumerator();
+            _deviceEnumerator.DefaultDeviceChanged += DefaultDeviceChanged;
+            _endpointVolumeCallback = new AudioEndpointVolumeCallback();
+            _endpointVolumeCallback.NotifyRecived += VolumeNotifyReceived;
         }
 
         public bool IsRunning { get; private set; }
@@ -77,6 +88,8 @@ namespace Micser.Engine.Audio
 
         public void Dispose()
         {
+            _endpointVolumeCallback.NotifyRecived -= VolumeNotifyReceived;
+
             Stop();
         }
 
@@ -97,6 +110,8 @@ namespace Micser.Engine.Audio
             _logger.Info("Starting audio engine");
 
             Stop();
+
+            SetupDefaultEndpoint();
 
             foreach (var module in _moduleService.GetAll())
             {
@@ -137,6 +152,9 @@ namespace Micser.Engine.Audio
 
         public void Stop()
         {
+            _endpointVolume?.UnregisterControlChangeNotify(_endpointVolumeCallback);
+            _endpointVolume?.Dispose();
+
             if (_modules.Count == 0)
             {
                 return;
@@ -163,6 +181,49 @@ namespace Micser.Engine.Audio
             {
                 var moduleDto = _moduleService.GetById(id);
                 audioModule.SetState(moduleDto.State);
+            }
+        }
+
+        private void DefaultDeviceChanged(object sender, DefaultDeviceChangedEventArgs e)
+        {
+            SetupDefaultEndpoint();
+        }
+
+        private void SetupDefaultEndpoint()
+        {
+            if (_endpointVolume != null)
+            {
+                _endpointVolume.UnregisterControlChangeNotify(_endpointVolumeCallback);
+                _endpointVolume.Dispose();
+            }
+
+            var defaultDevice = _deviceEnumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console);
+            _endpointVolume = AudioEndpointVolume.FromDevice(defaultDevice);
+            _endpointVolume.RegisterControlChangeNotify(_endpointVolumeCallback);
+        }
+
+        private void VolumeNotifyReceived(object sender, AudioEndpointVolumeCallbackEventArgs e)
+        {
+            var modules = _modules.OfType<AudioModule>().Where(m => m.UseSystemVolume).ToArray();
+            foreach (var module in modules)
+            {
+                module.Volume = e.MasterVolume;
+                module.IsMuted = e.IsMuted;
+
+                var moduleDto = _moduleService.GetById(module.Id);
+
+                if (moduleDto.State == null)
+                {
+                    moduleDto.State = module.GetState();
+                }
+
+                moduleDto.State.UseSystemVolume = true;
+                moduleDto.State.IsMuted = e.IsMuted;
+                moduleDto.State.Volume = e.MasterVolume;
+
+                _moduleService.Update(moduleDto);
+
+                _apiServer.SendMessageAsync(new JsonRequest("modules", "updatevolume", moduleDto));
             }
         }
     }

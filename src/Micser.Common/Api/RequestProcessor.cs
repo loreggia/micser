@@ -41,7 +41,8 @@ namespace Micser.Common.Api
 
         public virtual JsonResponse Process(string action, object param)
         {
-            if (_actions.TryGetValue(action ?? "", out var actionFunction))
+            if (_actions.TryGetValue(action ?? "", out var actionFunction) ||
+                _actions.TryGetValue("", out actionFunction))
             {
                 try
                 {

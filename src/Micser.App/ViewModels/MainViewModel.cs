@@ -4,6 +4,7 @@ using Micser.App.Infrastructure.Widgets;
 using Micser.Common.Modules;
 using NLog;
 using Prism.Commands;
+using Prism.Events;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -19,21 +20,31 @@ namespace Micser.App.ViewModels
     {
         private readonly ObservableCollection<ConnectionViewModel> _connections;
         private readonly ModuleConnectionsApiClient _connectionsApiClient;
+        private readonly IEventAggregator _eventAggregator;
         private readonly ILogger _logger;
         private readonly ModulesApiClient _modulesApiClient;
         private readonly INavigationManager _navigationManager;
         private readonly ICollection<WidgetViewModel> _savingBuffer;
         private readonly IWidgetRegistry _widgetRegistry;
         private readonly ObservableCollection<WidgetViewModel> _widgets;
+        private SubscriptionToken _apiEventSubscription;
         private IEnumerable<WidgetDescription> _availableWidgets;
         private bool _isLoaded;
         private bool _isLoading;
 
-        public MainViewModel(IWidgetFactory widgetFactory, IWidgetRegistry widgetRegistry, ILogger logger, INavigationManager navigationManager, ModulesApiClient modulesApiClient, ModuleConnectionsApiClient connectionsApiClient)
+        public MainViewModel(
+            IWidgetFactory widgetFactory,
+            IWidgetRegistry widgetRegistry,
+            ILogger logger,
+            INavigationManager navigationManager,
+            IEventAggregator eventAggregator,
+            ModulesApiClient modulesApiClient,
+            ModuleConnectionsApiClient connectionsApiClient)
         {
             _widgetRegistry = widgetRegistry;
             _logger = logger;
             _navigationManager = navigationManager;
+            _eventAggregator = eventAggregator;
             _modulesApiClient = modulesApiClient;
             _connectionsApiClient = connectionsApiClient;
 
@@ -69,9 +80,18 @@ namespace Micser.App.ViewModels
 
         public IEnumerable<WidgetViewModel> Widgets => _widgets;
 
+        protected override void OnNavigatedFrom(object parameter)
+        {
+            _apiEventSubscription.Dispose();
+
+            base.OnNavigatedFrom(parameter);
+        }
+
         protected override void OnNavigatedTo(object parameter)
         {
             base.OnNavigatedTo(parameter);
+
+            _apiEventSubscription = _eventAggregator.GetEvent<ApiEvent>().Subscribe(OnApiEvent);
 
             if (_isLoaded)
             {
@@ -274,6 +294,27 @@ namespace Micser.App.ViewModels
             else
             {
                 _logger.Error(modulesResult);
+            }
+        }
+
+        private void OnApiEvent(ApiEvent.ApiData data)
+        {
+            if (data.Action == "updatevolume" && data.Content is ModuleDto moduleDto && moduleDto.State != null)
+            {
+                if (Widgets.FirstOrDefault(w => w.Id == moduleDto.Id) is AudioWidgetViewModel widget)
+                {
+                    try
+                    {
+                        _isLoading = true;
+                        widget.UseSystemVolume = moduleDto.State.UseSystemVolume;
+                        widget.Volume = moduleDto.State.Volume;
+                        widget.IsMuted = moduleDto.State.IsMuted;
+                    }
+                    finally
+                    {
+                        _isLoading = false;
+                    }
+                }
             }
         }
 
