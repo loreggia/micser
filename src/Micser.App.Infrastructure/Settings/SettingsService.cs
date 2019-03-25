@@ -97,7 +97,7 @@ namespace Micser.App.Infrastructure.Settings
             using (var uow = _database.Create())
             {
                 var settingRepo = uow.GetRepository<ISettingValueRepository>();
-                var settingValue = settingRepo.GetByKey(key) ?? new SettingValue();
+                var settingValue = settingRepo.GetByKey(key) ?? new SettingValue { Key = key };
 
                 var type = value?.GetType();
 
@@ -162,6 +162,10 @@ namespace Micser.App.Infrastructure.Settings
                                 {
                                     value = JsonConvert.DeserializeObject(settingValue.ValueJson, type);
                                 }
+                            }
+                            else
+                            {
+                                value = setting.DefaultValue;
                             }
                         }
 
