@@ -12,6 +12,7 @@
         <ResourceDictionary Source="Expander.xaml" />
         <ResourceDictionary Source="Icons.xaml" />
         <ResourceDictionary Source="Menu.xaml" />
+        <ResourceDictionary Source="Slider.xaml" />
         <ResourceDictionary Source="SettingsPanel.xaml" />
         <ResourceDictionary Source="Thumbs.xaml" />
         <ResourceDictionary Source="ToolBar.xaml" />
