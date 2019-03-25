@@ -5,6 +5,7 @@ using Micser.Engine.Infrastructure.Extensions;
 using NLog;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Micser.Engine.Infrastructure.Audio
 {
@@ -14,6 +15,7 @@ namespace Micser.Engine.Infrastructure.Audio
         protected readonly float Epsilon = float.Epsilon;
         private readonly IList<IAudioModule> _outputs;
 
+        private readonly IList<ISampleProcessor> _sampleProcessors;
         private float _volume = 1f;
         private IWaveBuffer _waveBuffer;
 
@@ -21,6 +23,10 @@ namespace Micser.Engine.Infrastructure.Audio
         {
             Id = id;
             _outputs = new List<IAudioModule>(2);
+            _sampleProcessors = new List<ISampleProcessor>
+            {
+                new VolumeSampleProcessor(this)
+            };
         }
 
         ~AudioModule()
@@ -100,13 +106,15 @@ namespace Micser.Engine.Infrastructure.Audio
             byte[] nextBuffer;
             int nextOffset;
 
-            if (Math.Abs(Volume - 1f) < Epsilon)
+            if (Math.Abs(Volume - 1f) < Epsilon && _sampleProcessors.All(p => p is VolumeSampleProcessor))
             {
                 nextBuffer = buffer;
                 nextOffset = offset;
             }
             else
             {
+                var sampleProcessors = _sampleProcessors.Where(p => p.IsEnabled).OrderByDescending(p => p.Priority).ToArray();
+
                 nextOffset = 0;
 
                 // when adjusting volume we need to make a copy of the buffer
@@ -121,22 +129,28 @@ namespace Micser.Engine.Infrastructure.Audio
                     switch (waveFormat.BytesPerSample)
                     {
                         case 1:
-                            for (var iB = 0; iB < _waveBuffer.ByteBufferCount; iB++)
+                            for (var i8 = 0; i8 < _waveBuffer.ByteBufferCount; i8++)
                             {
-                                var volB = _waveBuffer.ByteBuffer[iB] * Volume;
-                                //MathExtensions.Clamp(ref volB, byte.MinValue, byte.MaxValue);
-                                _waveBuffer.ByteBuffer[iB] = (byte)volB;
+                                var fSample8 = _waveBuffer.ByteBuffer[i8] / 256f;
+                                foreach (var sampleProcessor in sampleProcessors)
+                                {
+                                    sampleProcessor.Process(ref fSample8);
+                                }
+                                _waveBuffer.ByteBuffer[i8] = (byte)(fSample8 * 255f);
                             }
 
                             nextBuffer = _waveBuffer.ByteBuffer;
                             break;
 
                         case 2:
-                            for (var iS = 0; iS < _waveBuffer.ShortBufferCount; iS++)
+                            for (var i16 = 0; i16 < _waveBuffer.ShortBufferCount; i16++)
                             {
-                                var volS = _waveBuffer.ShortBuffer[iS] * Volume;
-                                //MathExtensions.Clamp(ref volS, short.MinValue, short.MaxValue);
-                                _waveBuffer.ShortBuffer[iS] = (short)volS;
+                                var fSample16 = _waveBuffer.ShortBuffer[i16] / 32767f;
+                                foreach (var sampleProcessor in sampleProcessors)
+                                {
+                                    sampleProcessor.Process(ref fSample16);
+                                }
+                                _waveBuffer.ShortBuffer[i16] = (short)(fSample16 * 32768f);
                             }
 
                             nextBuffer = _waveBuffer.ByteBuffer;
@@ -146,10 +160,12 @@ namespace Micser.Engine.Infrastructure.Audio
                             nextBuffer = new byte[count];
                             for (var i24 = 0; i24 < count / 3; i24 += 3)
                             {
-                                var vol24 = (((sbyte)buffer[offset + i24 + 2] << 16) | (buffer[offset + i24 + 1] << 8) | buffer[offset + i24]) /
-                                            8388608f * Volume;
-                                //MathExtensions.Clamp(ref vol24, -1f, 1f);
-                                var sample24 = (int)(vol24 * 8388607.0);
+                                var fSample24 = (((sbyte)buffer[offset + i24 + 2] << 16) | (buffer[offset + i24 + 1] << 8) | buffer[offset + i24]) / 8388608f;
+                                foreach (var sampleProcessor in sampleProcessors)
+                                {
+                                    sampleProcessor.Process(ref fSample24);
+                                }
+                                var sample24 = (int)(fSample24 * 8388607f);
                                 nextBuffer[i24] = (byte)(sample24);
                                 nextBuffer[i24 + 1] = (byte)(sample24 >> 8);
                                 nextBuffer[i24 + 2] = (byte)(sample24 >> 16);
@@ -158,11 +174,14 @@ namespace Micser.Engine.Infrastructure.Audio
                             break;
 
                         case 4:
-                            for (var iI = 0; iI < _waveBuffer.IntBufferCount; iI++)
+                            for (var i32 = 0; i32 < _waveBuffer.IntBufferCount; i32++)
                             {
-                                var volI = _waveBuffer.IntBuffer[iI] * Volume;
-                                //MathExtensions.Clamp(ref volI, int.MinValue, int.MaxValue);
-                                _waveBuffer.IntBuffer[iI] = (int)volI;
+                                var fSample32 = _waveBuffer.IntBuffer[i32] / 2147483648f;
+                                foreach (var sampleProcessor in sampleProcessors)
+                                {
+                                    sampleProcessor.Process(ref fSample32);
+                                }
+                                _waveBuffer.IntBuffer[i32] = (int)(fSample32 * 2147483647f);
                             }
 
                             nextBuffer = _waveBuffer.ByteBuffer;
@@ -180,10 +199,12 @@ namespace Micser.Engine.Infrastructure.Audio
                         case 4:
                             for (var iF = 0; iF < _waveBuffer.FloatBufferCount; iF++)
                             {
-                                var volF = _waveBuffer.FloatBuffer[iF];
-                                volF *= Volume;
-                                //MathExtensions.Clamp(ref volF, -1f, 1f);
-                                _waveBuffer.FloatBuffer[iF] = volF;
+                                var fSample = _waveBuffer.FloatBuffer[iF];
+                                foreach (var sampleProcessor in sampleProcessors)
+                                {
+                                    sampleProcessor.Process(ref fSample);
+                                }
+                                _waveBuffer.FloatBuffer[iF] = fSample;
                             }
 
                             nextBuffer = _waveBuffer.ByteBuffer;
@@ -207,11 +228,33 @@ namespace Micser.Engine.Infrastructure.Audio
             }
         }
 
+        protected void AddSampleProcessor(ISampleProcessor sampleProcessor)
+        {
+            if (!_sampleProcessors.Contains(sampleProcessor))
+            {
+                _sampleProcessors.Add(sampleProcessor);
+            }
+        }
+
         protected virtual void Dispose(bool disposing)
         {
             if (disposing)
             {
                 _outputs.Clear();
+            }
+        }
+
+        protected void RemoveSampleProcessor<T>()
+        {
+            var processor = _sampleProcessors.FirstOrDefault(p => p is T);
+            RemoveSampleProcessor(processor);
+        }
+
+        protected void RemoveSampleProcessor(ISampleProcessor sampleProcessor)
+        {
+            if (_sampleProcessors.Contains(sampleProcessor))
+            {
+                _sampleProcessors.Remove(sampleProcessor);
             }
         }
     }
