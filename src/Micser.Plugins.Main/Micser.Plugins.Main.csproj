@@ -46,9 +46,11 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Audio\CompressorSampleProcessor.cs" />
     <Compile Include="Audio\WriteableBufferingSource.cs" />
     <Compile Include="MainAppModule.cs" />
     <Compile Include="MainEngineModule.cs" />
+    <Compile Include="Modules\CompressorModule.cs" />
     <Compile Include="Modules\DeviceInputModule.cs" />
     <Compile Include="Modules\DeviceOutputModule.cs" />
     <Compile Include="Modules\LoopbackDeviceInputModule.cs" />
@@ -58,7 +60,11 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Widgets\CompressorViewModel.cs" />
     <Compile Include="Widgets\DeviceInputViewModel.cs" />
+    <Compile Include="Widgets\CompressorWidget.xaml.cs">
+      <DependentUpon>CompressorWidget.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Widgets\DeviceOutputViewModel.cs" />
     <Compile Include="Widgets\DeviceInputWidget.xaml.cs">
       <DependentUpon>DeviceInputWidget.xaml</DependentUpon>
@@ -75,6 +81,10 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Page Include="Themes\Generic.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Widgets\CompressorWidget.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

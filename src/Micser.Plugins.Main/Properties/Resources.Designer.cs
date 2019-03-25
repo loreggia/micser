@@ -61,6 +61,15 @@ namespace Micser.Plugins.Main.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Compressor.
+        /// </summary>
+        public static string CompressorWidgetName {
+            get {
+                return ResourceManager.GetString("CompressorWidgetName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Device.
         /// </summary>
         public static string Device {

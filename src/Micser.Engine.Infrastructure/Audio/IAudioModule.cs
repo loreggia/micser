@@ -7,6 +7,9 @@ namespace Micser.Engine.Infrastructure.Audio
     public interface IAudioModule : IDisposable
     {
         long Id { get; }
+        bool IsMuted { get; set; }
+        bool UseSystemVolume { get; set; }
+        float Volume { get; set; }
 
         void AddOutput(IAudioModule module);
 

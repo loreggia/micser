@@ -1,0 +1,24 @@
+﻿<widgets:Widget x:Class="Micser.Plugins.Main.Widgets.CompressorWidget"
+                 xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                 xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                 xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                 xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                 xmlns:local="clr-namespace:Micser.Plugins.Main.Widgets"
+                 xmlns:widgets="clr-namespace:Micser.App.Infrastructure.Widgets;assembly=Micser.App.Infrastructure"
+                 mc:Ignorable="d"
+                 d:DataContext="{d:DesignInstance local:CompressorViewModel}"
+                 MinWidth="250"
+                 MinHeight="150">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <widgets:AudioWidgetControls Grid.Row="0" Grid.ColumnSpan="2" />
+    </Grid>
+</widgets:Widget>
