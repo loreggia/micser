@@ -1,4 +1,5 @@
-﻿using Micser.App.Infrastructure.DataAccess.Repositories;
+﻿using Micser.App.Infrastructure.Api;
+using Micser.App.Infrastructure.DataAccess.Repositories;
 using Micser.App.Infrastructure.Menu;
 using Micser.App.Infrastructure.Settings;
 using Micser.App.Infrastructure.Themes;
@@ -28,6 +29,8 @@ namespace Micser.App.Infrastructure
             containerRegistry.RegisterSingleton<ISettingsService, SettingsService>();
             containerRegistry.RegisterSingleton<IRequestProcessorFactory, RequestProcessorFactory>();
             containerRegistry.RegisterSingleton<IApiClient, ApiClient>();
+
+            containerRegistry.Register<IRequestProcessor, ApiEventRequestProcessor>();
 
             containerRegistry.Register<ISettingValueRepository, SettingValueRepository>();
 

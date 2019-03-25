@@ -1,4 +1,5 @@
-﻿using Unity;
+﻿using Micser.Common.Extensions;
+using Unity;
 
 namespace Micser.Common.Api
 {
@@ -18,7 +19,9 @@ namespace Micser.Common.Api
                 name = RequestProcessorNameAttribute.DefaultName;
             }
 
-            return _container.Resolve<IRequestProcessor>(name);
+            return _container.TryResolve<IRequestProcessor>(name) ??
+                   _container.TryResolve<IRequestProcessor>() ??
+                   new DefaultRequestProcessor();
         }
     }
 }

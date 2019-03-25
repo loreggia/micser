@@ -8,17 +8,13 @@ namespace Micser.Engine.Infrastructure.Audio
     {
         public const string DeviceIdKey = "DeviceId";
 
-        private readonly AudioEndpointVolumeCallback _endpointVolumeCallback;
         private DeviceDescription _deviceDescription;
-        private AudioEndpointVolume _endpointVolume;
 
         protected DeviceModule(long id)
-                            : base(id)
+            : base(id)
         {
             DeviceEnumerator = new MMDeviceEnumerator();
             DeviceEnumerator.DeviceStateChanged += DeviceStateChanged;
-            _endpointVolumeCallback = new AudioEndpointVolumeCallback();
-            _endpointVolumeCallback.NotifyRecived += VolumeNotifyReceived;
         }
 
         public virtual DeviceDescription DeviceDescription
@@ -60,7 +56,6 @@ namespace Micser.Engine.Infrastructure.Audio
         {
             if (disposing)
             {
-                _endpointVolumeCallback.NotifyRecived -= VolumeNotifyReceived;
                 DeviceEnumerator.Dispose();
                 DisposeDevice();
             }
@@ -70,8 +65,6 @@ namespace Micser.Engine.Infrastructure.Audio
 
         protected virtual void DisposeDevice()
         {
-            _endpointVolume?.UnregisterControlChangeNotify(_endpointVolumeCallback);
-            _endpointVolume?.Dispose();
             Device?.Dispose();
         }
 
@@ -104,12 +97,6 @@ namespace Micser.Engine.Infrastructure.Audio
 
         protected virtual void OnInitializeDevice()
         {
-            _endpointVolume = AudioEndpointVolume.FromDevice(Device);
-            _endpointVolume.RegisterControlChangeNotify(_endpointVolumeCallback);
-        }
-
-        protected virtual void OnVolumeChanged(float volume, bool isMuted, int channelCount, float[] channelVolumes)
-        {
         }
 
         private void DeviceStateChanged(object sender, DeviceStateChangedEventArgs e)
@@ -118,11 +105,6 @@ namespace Micser.Engine.Infrastructure.Audio
             {
                 OnDeviceStateChanged(e.DeviceState);
             }
-        }
-
-        private void VolumeNotifyReceived(object sender, AudioEndpointVolumeCallbackEventArgs e)
-        {
-            OnVolumeChanged(e.MasterVolume, e.IsMuted, e.Channels, e.ChannelVolumes);
         }
     }
 }

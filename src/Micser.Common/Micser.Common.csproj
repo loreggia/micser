@@ -53,6 +53,7 @@
   <ItemGroup>
     <Compile Include="Api\ApiClient.cs" />
     <Compile Include="Api\ApiEndPoint.cs" />
+    <Compile Include="Api\DefaultRequestProcessor.cs" />
     <Compile Include="Api\IApiClient.cs" />
     <Compile Include="Api\IRequestProcessor.cs" />
     <Compile Include="Api\IRequestProcessorFactory.cs" />

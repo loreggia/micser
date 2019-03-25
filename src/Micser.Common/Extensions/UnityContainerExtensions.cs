@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using Unity;
+using Unity.Exceptions;
 
 namespace Micser.Common.Extensions
 {
@@ -44,6 +45,18 @@ namespace Micser.Common.Extensions
         public static void RegisterTypes<TFrom>(this IUnityContainer container, IEnumerable<Type> types)
         {
             container.RegisterTypes(typeof(TFrom), types);
+        }
+
+        public static T TryResolve<T>(this IUnityContainer container, string name = null)
+        {
+            try
+            {
+                return container.Resolve<T>(name);
+            }
+            catch (ResolutionFailedException)
+            {
+                return default(T);
+            }
         }
     }
 }
