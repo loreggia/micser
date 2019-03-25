@@ -28,7 +28,9 @@
         MenuItemArrowHover,
         ToolBarButtonBackground,
         ToolBarButtonBackgroundHover,
-        ToolBarButtonBackgroundActive
+        ToolBarButtonBackgroundActive,
+        SliderThumbBackground,
+        SliderLeftBackground
     }
 
     public class BrushThemeKeyExtension : ThemeKeyExtension<BrushThemeKey>

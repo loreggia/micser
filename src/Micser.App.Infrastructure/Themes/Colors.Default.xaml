@@ -73,5 +73,9 @@
     <SolidColorBrush x:Key="{themes:BrushThemeKey ToolBarButtonBackground}" Color="{DynamicResource {themes:ColorThemeKey Neutral070}}" />
     <SolidColorBrush x:Key="{themes:BrushThemeKey ToolBarButtonBackgroundHover}" Color="{DynamicResource {themes:ColorThemeKey Neutral050}}" />
     <SolidColorBrush x:Key="{themes:BrushThemeKey ToolBarButtonBackgroundActive}" Color="{DynamicResource {themes:ColorThemeKey Primary050}}" />
+
+    <SolidColorBrush x:Key="{themes:BrushThemeKey SliderThumbBackground}" Color="{DynamicResource {themes:ColorThemeKey Primary100}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey SliderLeftBackground}" Color="{DynamicResource {themes:ColorThemeKey Secondary050}}" />
+
     <!-- /Brushes -->
 </ResourceDictionary>
