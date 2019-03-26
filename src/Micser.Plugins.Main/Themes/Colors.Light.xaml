@@ -47,8 +47,8 @@
     <SolidColorBrush x:Key="{themes:BrushThemeKey DefaultIconPrimary}" Color="{DynamicResource {themes:ColorThemeKey Primary100}}" />
     <SolidColorBrush x:Key="{themes:BrushThemeKey DefaultIconHover}" Color="{DynamicResource {themes:ColorThemeKey Primary050}}" />
 
-    <SolidColorBrush x:Key="{themes:BrushThemeKey WidgetBackground}" Color="{DynamicResource {themes:ColorThemeKey Neutral010}}" />
-    <SolidColorBrush x:Key="{themes:BrushThemeKey WidgetForeground}" Color="{DynamicResource {themes:ColorThemeKey Neutral090}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey WidgetBackground}" Color="{DynamicResource {themes:ColorThemeKey Neutral100}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey WidgetForeground}" Color="{DynamicResource {themes:ColorThemeKey Neutral010}}" />
     <SolidColorBrush x:Key="{themes:BrushThemeKey WidgetBorder}" Color="{DynamicResource {themes:ColorThemeKey Neutral100}}" />
     <SolidColorBrush x:Key="{themes:BrushThemeKey WidgetBorderSelected}" Color="{DynamicResource {themes:ColorThemeKey Primary100}}" />
     <SolidColorBrush x:Key="{themes:BrushThemeKey WidgetHeaderBackground}" Color="{DynamicResource {themes:ColorThemeKey Primary050}}" />
@@ -64,7 +64,7 @@
 
     <SolidColorBrush x:Key="{themes:BrushThemeKey StatusBarBackground}" Color="{DynamicResource {themes:ColorThemeKey Secondary090}}" />
 
-    <SolidColorBrush x:Key="{themes:BrushThemeKey MenuItemBackgroundHover}" Color="{DynamicResource {themes:ColorThemeKey Neutral050}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey MenuItemBackgroundHover}" Color="{DynamicResource {themes:ColorThemeKey Neutral080}}" />
     <SolidColorBrush x:Key="{themes:BrushThemeKey MenuItemBackgroundActive}" Color="{DynamicResource {themes:ColorThemeKey Neutral100}}" />
     <SolidColorBrush x:Key="{themes:BrushThemeKey MenuItemPopupBorder}" Color="{DynamicResource {themes:ColorThemeKey Neutral070}}" />
     <SolidColorBrush x:Key="{themes:BrushThemeKey MenuItemArrow}" Color="{DynamicResource {themes:ColorThemeKey Neutral030}}" />
@@ -73,5 +73,9 @@
     <SolidColorBrush x:Key="{themes:BrushThemeKey ToolBarButtonBackground}" Color="{DynamicResource {themes:ColorThemeKey Neutral070}}" />
     <SolidColorBrush x:Key="{themes:BrushThemeKey ToolBarButtonBackgroundHover}" Color="{DynamicResource {themes:ColorThemeKey Neutral050}}" />
     <SolidColorBrush x:Key="{themes:BrushThemeKey ToolBarButtonBackgroundActive}" Color="{DynamicResource {themes:ColorThemeKey Primary050}}" />
+
+    <SolidColorBrush x:Key="{themes:BrushThemeKey SliderThumbBackground}" Color="{DynamicResource {themes:ColorThemeKey Primary100}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey SliderLeftBackground}" Color="{DynamicResource {themes:ColorThemeKey Secondary020}}" />
+
     <!-- /Brushes -->
 </ResourceDictionary>
