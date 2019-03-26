@@ -6,6 +6,7 @@
                  xmlns:p="clr-namespace:Micser.Plugins.Main.Properties"
                  xmlns:local="clr-namespace:Micser.Plugins.Main.Widgets"
                  xmlns:widgets="clr-namespace:Micser.App.Infrastructure.Widgets;assembly=Micser.App.Infrastructure"
+                 xmlns:i="clr-namespace:Micser.App.Infrastructure;assembly=Micser.App.Infrastructure"
                  mc:Ignorable="d"
                  d:DataContext="{d:DesignInstance local:DeviceInputViewModel}"
                  MinWidth="250"
@@ -16,7 +17,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" SharedSizeGroup="{x:Static i:AppGlobals+Widgets.LabelsSharedSizeGroup}" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 

@@ -52,5 +52,10 @@
         {
             public const string Main = "MainToolBar";
         }
+
+        public static class Widgets
+        {
+            public const string LabelsSharedSizeGroup = "Labels";
+        }
     }
 }

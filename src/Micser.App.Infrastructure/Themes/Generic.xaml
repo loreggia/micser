@@ -8,6 +8,7 @@
         <ResourceDictionary Source="BusyPanel.xaml" />
         <ResourceDictionary Source="Connection.xaml" />
         <ResourceDictionary Source="Connector.xaml" />
+        <ResourceDictionary Source="EditableSlider.xaml" />
         <ResourceDictionary Source="EditableTextBlock.xaml" />
         <ResourceDictionary Source="Expander.xaml" />
         <ResourceDictionary Source="Icons.xaml" />

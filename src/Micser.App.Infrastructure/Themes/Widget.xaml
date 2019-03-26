@@ -40,6 +40,7 @@
         <Setter Property="Position" Value="{Binding Position, Mode=TwoWay}" />
         <Setter Property="Size" Value="{Binding Size, Mode=TwoWay}" />
         <Setter Property="Focusable" Value="True" />
+        <Setter Property="Grid.IsSharedSizeScope" Value="True" />
         <Setter Property="InputConnectorTemplate">
             <Setter.Value>
                 <DataTemplate>

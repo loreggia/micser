@@ -64,6 +64,7 @@
     <Compile Include="CommandBindingToCommand.cs" />
     <Compile Include="Controls\BusyPanel.cs" />
     <Compile Include="Controls\CustomPopup.cs" />
+    <Compile Include="Controls\EditableSlider.cs" />
     <Compile Include="Controls\EditableTextBlock.cs" />
     <Compile Include="Controls\LoadingSpinner.cs" />
     <Compile Include="Controls\RelativePositionPanel.cs" />
@@ -72,9 +73,11 @@
     <Compile Include="Converter\BooleanInvertConverter.cs" />
     <Compile Include="Converter\BooleanToVisibilityConverter.cs" />
     <Compile Include="Converter\ConverterExtension.cs" />
+    <Compile Include="Converter\DoubleDivisionConverter.cs" />
     <Compile Include="Converter\DoubleToPointConverter.cs" />
     <Compile Include="Converter\DoubleToRectConverter.cs" />
     <Compile Include="Converter\EmptyStringToVisibilityConverter.cs" />
+    <Compile Include="Converter\EnumToBooleanConverter.cs" />
     <Compile Include="Converter\NullToBooleanConverter.cs" />
     <Compile Include="Converter\NullToVisibilityConverter.cs" />
     <Compile Include="Converter\RelativeCenterPlacementConverter.cs" />
@@ -169,6 +172,10 @@
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Page Include="Themes\EditableSlider.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Themes\Slider.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

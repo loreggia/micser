@@ -2,28 +2,42 @@
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 
 namespace Micser.App.Infrastructure.Behaviors
 {
-    #region Documentation Tags
+    public enum MaskType
+    {
+        Any,
+        Integer,
+        Decimal
+    }
+
     /// <summary>
-    ///     WPF Maskable TextBox class. Just specify the TextBoxMaskBehavior.Mask attached property to a TextBox. 
+    ///     WPF Maskable TextBox class. Just specify the TextBoxMaskBehavior.Mask attached property to a TextBox.
     ///     It protect your TextBox from unwanted non numeric symbols and make it easy to modify your numbers.
     /// </summary>
     /// <remarks>
-    /// <para>
-    ///     Class Information:
-    ///	    <list type="bullet">
-    ///         <item name="authors">Authors: Ruben Hakopian</item>
-    ///         <item name="date">February 2009</item>
-    ///         <item name="originalURL">http://www.rubenhak.com/?p=8</item>
-    ///     </list>
-    /// </para>
+    ///     <para>
+    ///         Class Information:
+    ///         <list type="bullet">
+    ///             <item name="authors">Authors: Ruben Hakopian</item>
+    ///             <item name="date">February 2009</item>
+    ///             <item name="originalURL">http://www.rubenhak.com/?p=8</item>
+    ///         </list>
+    ///     </para>
     /// </remarks>
-    #endregion
     public class TextBoxMaskBehavior
     {
         #region MinimumValue Property
+
+        public static readonly DependencyProperty MinimumValueProperty =
+            DependencyProperty.RegisterAttached(
+                "MinimumValue",
+                typeof(double),
+                typeof(TextBoxMaskBehavior),
+                new FrameworkPropertyMetadata(double.NaN, MinimumValueChangedCallback)
+            );
 
         public static double GetMinimumValue(DependencyObject obj)
         {
@@ -35,22 +49,23 @@ namespace Micser.App.Infrastructure.Behaviors
             obj.SetValue(MinimumValueProperty, value);
         }
 
-        public static readonly DependencyProperty MinimumValueProperty =
-            DependencyProperty.RegisterAttached(
-                "MinimumValue",
-                typeof(double),
-                typeof(TextBoxMaskBehavior),
-                new FrameworkPropertyMetadata(double.NaN, MinimumValueChangedCallback)
-                );
-
         private static void MinimumValueChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            TextBox _this = (d as TextBox);
+            var _this = d as TextBox;
             ValidateTextBox(_this);
         }
-        #endregion
+
+        #endregion MinimumValue Property
 
         #region MaximumValue Property
+
+        public static readonly DependencyProperty MaximumValueProperty =
+            DependencyProperty.RegisterAttached(
+                "MaximumValue",
+                typeof(double),
+                typeof(TextBoxMaskBehavior),
+                new FrameworkPropertyMetadata(double.NaN, MaximumValueChangedCallback)
+            );
 
         public static double GetMaximumValue(DependencyObject obj)
         {
@@ -62,22 +77,23 @@ namespace Micser.App.Infrastructure.Behaviors
             obj.SetValue(MaximumValueProperty, value);
         }
 
-        public static readonly DependencyProperty MaximumValueProperty =
-            DependencyProperty.RegisterAttached(
-                "MaximumValue",
-                typeof(double),
-                typeof(TextBoxMaskBehavior),
-                new FrameworkPropertyMetadata(double.NaN, MaximumValueChangedCallback)
-                );
-
         private static void MaximumValueChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            TextBox _this = (d as TextBox);
+            var _this = d as TextBox;
             ValidateTextBox(_this);
         }
-        #endregion
+
+        #endregion MaximumValue Property
 
         #region Mask Property
+
+        public static readonly DependencyProperty MaskProperty =
+            DependencyProperty.RegisterAttached(
+                "Mask",
+                typeof(MaskType),
+                typeof(TextBoxMaskBehavior),
+                new FrameworkPropertyMetadata(MaskChangedCallback)
+            );
 
         public static MaskType GetMask(DependencyObject obj)
         {
@@ -89,76 +105,108 @@ namespace Micser.App.Infrastructure.Behaviors
             obj.SetValue(MaskProperty, value);
         }
 
-        public static readonly DependencyProperty MaskProperty =
-            DependencyProperty.RegisterAttached(
-                "Mask",
-                typeof(MaskType),
-                typeof(TextBoxMaskBehavior),
-                new FrameworkPropertyMetadata(MaskChangedCallback)
-                );
-
         private static void MaskChangedCallback(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
-            if (e.OldValue is TextBox)
+            if (e.OldValue is TextBox textBox)
             {
-                (e.OldValue as TextBox).PreviewTextInput -= TextBox_PreviewTextInput;
-                DataObject.RemovePastingHandler((e.OldValue as TextBox), (DataObjectPastingEventHandler)TextBoxPastingEventHandler);
+                textBox.PreviewTextInput -= TextBox_PreviewTextInput;
+                textBox.TextChanged -= TextBox_TextChanged;
+                DataObject.RemovePastingHandler(textBox, TextBoxPastingEventHandler);
             }
 
-            TextBox _this = (d as TextBox);
-            if (_this == null)
+            if (!(d is TextBox _this))
+            {
                 return;
+            }
 
             if ((MaskType)e.NewValue != MaskType.Any)
             {
                 _this.PreviewTextInput += TextBox_PreviewTextInput;
-                DataObject.AddPastingHandler(_this, (DataObjectPastingEventHandler)TextBoxPastingEventHandler);
+                _this.TextChanged += TextBox_TextChanged;
+                DataObject.AddPastingHandler(_this, TextBoxPastingEventHandler);
             }
 
             ValidateTextBox(_this);
         }
 
-        #endregion
+        #endregion Mask Property
+
+        #region Decimals Property
+
+        public static readonly DependencyProperty DecimalsProperty = DependencyProperty.RegisterAttached(
+            "Decimals", typeof(int), typeof(TextBoxMaskBehavior), new PropertyMetadata(2));
+
+        public static int GetDecimals(DependencyObject element)
+        {
+            return (int)element.GetValue(DecimalsProperty);
+        }
+
+        public static void SetDecimals(DependencyObject element, int value)
+        {
+            element.SetValue(DecimalsProperty, value);
+        }
+
+        #endregion Decimals Property
 
         #region Private Static Methods
 
-        private static void ValidateTextBox(TextBox _this)
+        private static bool IsSymbolValid(MaskType mask, string str)
         {
-            if (GetMask(_this) != MaskType.Any)
+            switch (mask)
             {
-                _this.Text = ValidateValue(GetMask(_this), _this.Text, GetMinimumValue(_this), GetMaximumValue(_this));
+                case MaskType.Any:
+                    return true;
+
+                case MaskType.Integer:
+                    if (str == NumberFormatInfo.CurrentInfo.NegativeSign)
+                    {
+                        return true;
+                    }
+
+                    break;
+
+                case MaskType.Decimal:
+                    if (str == NumberFormatInfo.CurrentInfo.NumberDecimalSeparator ||
+                        str == NumberFormatInfo.CurrentInfo.NegativeSign)
+                    {
+                        return true;
+                    }
+
+                    break;
             }
+
+            if (mask.Equals(MaskType.Integer) || mask.Equals(MaskType.Decimal))
+            {
+                foreach (var ch in str)
+                {
+                    if (!char.IsDigit(ch))
+                    {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+
+            return false;
         }
 
-        private static void TextBoxPastingEventHandler(object sender, DataObjectPastingEventArgs e)
+        private static void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
-            TextBox _this = (sender as TextBox);
-            string clipboard = e.DataObject.GetData(typeof(string)) as string;
-            clipboard = ValidateValue(GetMask(_this), clipboard, GetMinimumValue(_this), GetMaximumValue(_this));
-            if (!string.IsNullOrEmpty(clipboard))
-            {
-                _this.Text = clipboard;
-            }
-            e.CancelCommand();
-            e.Handled = true;
-        }
-
-        private static void TextBox_PreviewTextInput(object sender, System.Windows.Input.TextCompositionEventArgs e)
-        {
-            TextBox _this = (sender as TextBox);
-            bool isValid = IsSymbolValid(GetMask(_this), e.Text);
+            var _this = sender as TextBox;
+            var isValid = IsSymbolValid(GetMask(_this), e.Text);
             e.Handled = !isValid;
             if (isValid)
             {
-                int caret = _this.CaretIndex;
-                string text = _this.Text;
-                bool textInserted = false;
-                int selectionLength = 0;
+                var caret = _this.CaretIndex;
+                var text = _this.Text;
+                var textInserted = false;
+                var selectionLength = 0;
 
                 if (_this.SelectionLength > 0)
                 {
                     text = text.Substring(0, _this.SelectionStart) +
-                            text.Substring(_this.SelectionStart + _this.SelectionLength);
+                           text.Substring(_this.SelectionStart + _this.SelectionLength);
                     caret = _this.SelectionStart;
                 }
 
@@ -166,13 +214,17 @@ namespace Micser.App.Infrastructure.Behaviors
                 {
                     while (true)
                     {
-                        int ind = text.IndexOf(NumberFormatInfo.CurrentInfo.NumberDecimalSeparator);
+                        var ind = text.IndexOf(NumberFormatInfo.CurrentInfo.NumberDecimalSeparator);
                         if (ind == -1)
+                        {
                             break;
+                        }
 
                         text = text.Substring(0, ind) + text.Substring(ind + 1);
                         if (caret > ind)
+                        {
                             caret--;
+                        }
                     }
 
                     if (caret == 0)
@@ -204,7 +256,9 @@ namespace Micser.App.Infrastructure.Behaviors
                     {
                         text = text.Replace(NumberFormatInfo.CurrentInfo.NegativeSign, string.Empty);
                         if (caret != 0)
+                        {
                             caret--;
+                        }
                     }
                     else
                     {
@@ -216,15 +270,15 @@ namespace Micser.App.Infrastructure.Behaviors
                 if (!textInserted)
                 {
                     text = text.Substring(0, caret) + e.Text +
-                        ((caret < _this.Text.Length) ? text.Substring(caret) : string.Empty);
+                           (caret < _this.Text.Length ? text.Substring(caret) : string.Empty);
 
                     caret++;
                 }
 
                 try
                 {
-                    double val = Convert.ToDouble(text);
-                    double newVal = ValidateLimits(GetMinimumValue(_this), GetMaximumValue(_this), val);
+                    var val = Convert.ToDouble(text);
+                    var newVal = ValidateLimits(GetMinimumValue(_this), GetMaximumValue(_this), val);
                     if (val != newVal)
                     {
                         text = newVal.ToString();
@@ -232,7 +286,9 @@ namespace Micser.App.Infrastructure.Behaviors
                     else if (val == 0)
                     {
                         if (!text.Contains(NumberFormatInfo.CurrentInfo.NumberDecimalSeparator))
+                        {
                             text = "0";
+                        }
                     }
                 }
                 catch
@@ -244,18 +300,25 @@ namespace Micser.App.Infrastructure.Behaviors
                 {
                     text = text.Substring(1);
                     if (caret > 0)
+                    {
                         caret--;
+                    }
                 }
 
-                while (text.Length > 2 && string.Empty + text[0] == NumberFormatInfo.CurrentInfo.NegativeSign && text[1] == '0' && string.Empty + text[2] != NumberFormatInfo.CurrentInfo.NumberDecimalSeparator)
+                while (text.Length > 2 && string.Empty + text[0] == NumberFormatInfo.CurrentInfo.NegativeSign && text[1] == '0' &&
+                       string.Empty + text[2] != NumberFormatInfo.CurrentInfo.NumberDecimalSeparator)
                 {
                     text = NumberFormatInfo.CurrentInfo.NegativeSign + text.Substring(2);
                     if (caret > 1)
+                    {
                         caret--;
+                    }
                 }
 
                 if (caret > text.Length)
+                {
                     caret = text.Length;
+                }
 
                 _this.Text = text;
                 _this.CaretIndex = caret;
@@ -265,10 +328,80 @@ namespace Micser.App.Infrastructure.Behaviors
             }
         }
 
+        private static void TextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            var _this = (TextBox)sender;
+            var text = _this.Text;
+            var decimals = GetDecimals(_this);
+
+            if (decimals < 0)
+            {
+                return;
+            }
+
+            var decimalIndex = text.IndexOf(NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, StringComparison.Ordinal);
+            if (decimalIndex >= 0 && text.Length > decimalIndex + decimals)
+            {
+                text = text.Substring(0, decimalIndex + 1 + decimals);
+            }
+
+            if (_this.CaretIndex > text.Length)
+            {
+                _this.CaretIndex = text.Length;
+            }
+
+            _this.Text = text;
+        }
+
+        private static void TextBoxPastingEventHandler(object sender, DataObjectPastingEventArgs e)
+        {
+            var _this = sender as TextBox;
+            var clipboard = e.DataObject.GetData(typeof(string)) as string;
+            clipboard = ValidateValue(GetMask(_this), clipboard, GetMinimumValue(_this), GetMaximumValue(_this));
+            if (!string.IsNullOrEmpty(clipboard))
+            {
+                _this.Text = clipboard;
+            }
+
+            e.CancelCommand();
+            e.Handled = true;
+        }
+
+        private static double ValidateLimits(double min, double max, double value)
+        {
+            if (!min.Equals(double.NaN))
+            {
+                if (value < min)
+                {
+                    return min;
+                }
+            }
+
+            if (!max.Equals(double.NaN))
+            {
+                if (value > max)
+                {
+                    return max;
+                }
+            }
+
+            return value;
+        }
+
+        private static void ValidateTextBox(TextBox _this)
+        {
+            if (GetMask(_this) != MaskType.Any)
+            {
+                _this.Text = ValidateValue(GetMask(_this), _this.Text, GetMinimumValue(_this), GetMaximumValue(_this));
+            }
+        }
+
         private static string ValidateValue(MaskType mask, string value, double min, double max)
         {
             if (string.IsNullOrEmpty(value))
+            {
                 return string.Empty;
+            }
 
             value = value.Trim();
             switch (mask)
@@ -282,6 +415,7 @@ namespace Micser.App.Infrastructure.Behaviors
                     catch
                     {
                     }
+
                     return string.Empty;
 
                 case MaskType.Decimal:
@@ -294,69 +428,13 @@ namespace Micser.App.Infrastructure.Behaviors
                     catch
                     {
                     }
+
                     return string.Empty;
             }
 
             return value;
         }
 
-        private static double ValidateLimits(double min, double max, double value)
-        {
-            if (!min.Equals(double.NaN))
-            {
-                if (value < min)
-                    return min;
-            }
-
-            if (!max.Equals(double.NaN))
-            {
-                if (value > max)
-                    return max;
-            }
-
-            return value;
-        }
-
-        private static bool IsSymbolValid(MaskType mask, string str)
-        {
-            switch (mask)
-            {
-                case MaskType.Any:
-                    return true;
-
-                case MaskType.Integer:
-                    if (str == NumberFormatInfo.CurrentInfo.NegativeSign)
-                        return true;
-                    break;
-
-                case MaskType.Decimal:
-                    if (str == NumberFormatInfo.CurrentInfo.NumberDecimalSeparator ||
-                        str == NumberFormatInfo.CurrentInfo.NegativeSign)
-                        return true;
-                    break;
-            }
-
-            if (mask.Equals(MaskType.Integer) || mask.Equals(MaskType.Decimal))
-            {
-                foreach (char ch in str)
-                {
-                    if (!Char.IsDigit(ch))
-                        return false;
-                }
-
-                return true;
-            }
-
-            return false;
-        }
-
-        #endregion
-    }
-
-    public enum MaskType
-    {
-        Any,
-        Integer,
-        Decimal
+        #endregion Private Static Methods
     }
 }
