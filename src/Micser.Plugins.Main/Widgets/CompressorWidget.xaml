@@ -25,6 +25,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" SharedSizeGroup="{x:Static i:AppGlobals+Widgets.LabelsSharedSizeGroup}" />
@@ -33,8 +34,11 @@
 
         <widgets:AudioWidgetControls Grid.Row="0" Grid.ColumnSpan="2" />
 
-        <Label Grid.Row="1" Grid.Column="0" Content="{x:Static p:Resources.CompressorType}" />
-        <Grid Grid.Row="1" Grid.Column="1">
+        <Label Grid.Row="1" Grid.Column="0" Content="{x:Static p:Resources.CompressorAmount}" />
+        <controls:EditableSlider Grid.Row="1" Grid.Column="1" Value="{Binding Amount, Mode=TwoWay}" Minimum="0" Maximum="1" />
+
+        <Label Grid.Row="2" Grid.Column="0" Content="{x:Static p:Resources.CompressorType}" />
+        <Grid Grid.Row="2" Grid.Column="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition />
                 <ColumnDefinition />
@@ -45,10 +49,10 @@
                          IsChecked="{Binding Type, Mode=TwoWay, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static audio:CompressorType.Downward}}" />
         </Grid>
 
-        <Label Grid.Row="2" Grid.Column="0" Content="{x:Static p:Resources.CompressorRatio}" />
-        <controls:EditableSlider Grid.Row="2" Grid.Column="1" Value="{Binding Ratio, Mode=TwoWay}" Minimum="0" Maximum="1" />
+        <Label Grid.Row="3" Grid.Column="0" Content="{x:Static p:Resources.CompressorRatio}" />
+        <controls:EditableSlider Grid.Row="3" Grid.Column="1" Value="{Binding Ratio, Mode=TwoWay}" Minimum="0" Maximum="1" />
 
-        <Label Grid.Row="3" Grid.Column="0" Content="{x:Static p:Resources.CompressorThreshold}" />
-        <controls:EditableSlider Grid.Row="3" Grid.Column="1" Value="{Binding Threshold, Mode=TwoWay}" Minimum="0" Maximum="1" />
+        <Label Grid.Row="4" Grid.Column="0" Content="{x:Static p:Resources.CompressorThreshold}" />
+        <controls:EditableSlider Grid.Row="4" Grid.Column="1" Value="{Binding Threshold, Mode=TwoWay}" Minimum="0" Maximum="1" />
     </Grid>
 </widgets:Widget>

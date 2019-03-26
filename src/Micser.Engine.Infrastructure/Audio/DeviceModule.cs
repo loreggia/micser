@@ -36,6 +36,13 @@ namespace Micser.Engine.Infrastructure.Audio
 
         protected MMDeviceEnumerator DeviceEnumerator { get; }
 
+        public override ModuleState GetState()
+        {
+            var state = base.GetState();
+            state.Data[DeviceIdKey] = DeviceDescription?.Id;
+            return state;
+        }
+
         public override void SetState(ModuleState state)
         {
             base.SetState(state);

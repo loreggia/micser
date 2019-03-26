@@ -61,6 +61,15 @@ namespace Micser.Plugins.Main.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Amount.
+        /// </summary>
+        public static string CompressorAmount {
+            get {
+                return ResourceManager.GetString("CompressorAmount", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Ratio.
         /// </summary>
         public static string CompressorRatio {
