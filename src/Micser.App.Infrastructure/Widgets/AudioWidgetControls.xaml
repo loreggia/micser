@@ -6,6 +6,8 @@
              xmlns:p="clr-namespace:Micser.App.Infrastructure.Properties"
              xmlns:widgets="clr-namespace:Micser.App.Infrastructure.Widgets"
              xmlns:converter="clr-namespace:Micser.App.Infrastructure.Converter"
+             xmlns:controls="clr-namespace:Micser.App.Infrastructure.Controls"
+             xmlns:i="clr-namespace:Micser.App.Infrastructure"
              mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800"
              d:DataContext="{d:DesignInstance widgets:AudioWidgetViewModel}"
@@ -18,7 +20,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="Auto" SharedSizeGroup="{x:Static i:AppGlobals+Widgets.LabelsSharedSizeGroup}" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
@@ -26,7 +28,7 @@
         <CheckBox Grid.Row="0" Grid.Column="1" x:Name="CkbUseSystemVolume" HorizontalAlignment="Stretch" VerticalAlignment="Center" IsChecked="{Binding UseSystemVolume, Mode=TwoWay}" />
 
         <Label Grid.Row="1" Grid.Column="0" Target="{Binding ElementName=SldVolume}" Content="{x:Static p:Resources.Volume}" VerticalAlignment="Center" IsEnabled="{Binding UseSystemVolume, Converter={converter:BooleanInvertConverter}}" />
-        <Slider Grid.Row="1" Grid.Column="1" x:Name="SldVolume" HorizontalAlignment="Stretch" VerticalAlignment="Center" Minimum="0" Maximum="1" Value="{Binding Volume, Mode=TwoWay}" IsEnabled="{Binding UseSystemVolume, Converter={converter:BooleanInvertConverter}}" />
+        <controls:EditableSlider Grid.Row="1" Grid.Column="1" x:Name="SldVolume" HorizontalAlignment="Stretch" VerticalAlignment="Center" Minimum="0" Maximum="1" Value="{Binding Volume, Mode=TwoWay}" IsEnabled="{Binding UseSystemVolume, Converter={converter:BooleanInvertConverter}}" />
 
         <Label Grid.Row="2" Grid.Column="0" Target="{Binding ElementName=CkbMute}" Content="{x:Static p:Resources.Mute}" VerticalAlignment="Center" IsEnabled="{Binding UseSystemVolume, Converter={converter:BooleanInvertConverter}}" />
         <CheckBox Grid.Row="2" Grid.Column="1" x:Name="CkbMute" HorizontalAlignment="Stretch" VerticalAlignment="Center" IsChecked="{Binding IsMuted, Mode=TwoWay}" IsEnabled="{Binding UseSystemVolume, Converter={converter:BooleanInvertConverter}}" />

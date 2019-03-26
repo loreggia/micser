@@ -61,6 +61,33 @@ namespace Micser.Plugins.Main.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Ratio.
+        /// </summary>
+        public static string CompressorRatio {
+            get {
+                return ResourceManager.GetString("CompressorRatio", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Threshold.
+        /// </summary>
+        public static string CompressorThreshold {
+            get {
+                return ResourceManager.GetString("CompressorThreshold", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Type.
+        /// </summary>
+        public static string CompressorType {
+            get {
+                return ResourceManager.GetString("CompressorType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Compressor.
         /// </summary>
         public static string CompressorWidgetName {
