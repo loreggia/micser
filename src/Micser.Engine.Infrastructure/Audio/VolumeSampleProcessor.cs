@@ -1,4 +1,5 @@
-﻿using Micser.Engine.Infrastructure.Extensions;
+﻿using CSCore;
+using Micser.Engine.Infrastructure.Extensions;
 
 namespace Micser.Engine.Infrastructure.Audio
 {
@@ -10,13 +11,13 @@ namespace Micser.Engine.Infrastructure.Audio
         {
             _module = module;
             IsEnabled = true;
-            Priority = 100;
+            Priority = int.MaxValue;
         }
 
         public bool IsEnabled { get; set; }
         public int Priority { get; set; }
 
-        public void Process(ref float value)
+        public void Process(WaveFormat waveFormat, ref float value)
         {
             value *= _module.Volume;
             MathExtensions.Clamp(ref value, -1f, 1f);

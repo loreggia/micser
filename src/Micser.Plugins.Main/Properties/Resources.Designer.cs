@@ -70,11 +70,29 @@ namespace Micser.Plugins.Main.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Attack.
+        /// </summary>
+        public static string CompressorAttack {
+            get {
+                return ResourceManager.GetString("CompressorAttack", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Ratio.
         /// </summary>
         public static string CompressorRatio {
             get {
                 return ResourceManager.GetString("CompressorRatio", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Release.
+        /// </summary>
+        public static string CompressorRelease {
+            get {
+                return ResourceManager.GetString("CompressorRelease", resourceCulture);
             }
         }
         

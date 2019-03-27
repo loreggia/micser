@@ -50,9 +50,15 @@
         </Grid>
 
         <Label Grid.Row="3" Grid.Column="0" Content="{x:Static p:Resources.CompressorRatio}" />
-        <controls:EditableSlider Grid.Row="3" Grid.Column="1" Value="{Binding Ratio, Mode=TwoWay}" Minimum="0" Maximum="1" />
+        <controls:EditableSlider Grid.Row="3" Grid.Column="1" Value="{Binding Ratio, Mode=TwoWay}" Minimum="0" Maximum="60" />
 
         <Label Grid.Row="4" Grid.Column="0" Content="{x:Static p:Resources.CompressorThreshold}" />
         <controls:EditableSlider Grid.Row="4" Grid.Column="1" Value="{Binding Threshold, Mode=TwoWay}" Minimum="0" Maximum="1" />
+
+        <Label Grid.Row="4" Grid.Column="0" Content="{x:Static p:Resources.CompressorAttack}" />
+        <controls:EditableSlider Grid.Row="4" Grid.Column="1" Value="{Binding Threshold, Mode=TwoWay}" Minimum="0" Maximum="100" />
+
+        <Label Grid.Row="4" Grid.Column="0" Content="{x:Static p:Resources.CompressorRelease}" />
+        <controls:EditableSlider Grid.Row="4" Grid.Column="1" Value="{Binding Threshold, Mode=TwoWay}" Minimum="0" Maximum="100" />
     </Grid>
 </widgets:Widget>

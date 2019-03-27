@@ -1,4 +1,5 @@
-﻿using Micser.Engine.Infrastructure.Audio;
+﻿using CSCore;
+using Micser.Engine.Infrastructure.Audio;
 using Micser.Engine.Infrastructure.Extensions;
 using Micser.Plugins.Main.Modules;
 
@@ -18,7 +19,7 @@ namespace Micser.Plugins.Main.Audio
         public bool IsEnabled { get; set; }
         public int Priority { get; set; }
 
-        public void Process(ref float value)
+        public void Process(WaveFormat waveFormat, ref float value)
         {
             if (_module.Type == CompressorType.Upward)
             {

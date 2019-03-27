@@ -120,8 +120,14 @@
   <data name="CompressorAmount" xml:space="preserve">
     <value>Amount</value>
   </data>
+  <data name="CompressorAttack" xml:space="preserve">
+    <value>Attack</value>
+  </data>
   <data name="CompressorRatio" xml:space="preserve">
     <value>Ratio</value>
+  </data>
+  <data name="CompressorRelease" xml:space="preserve">
+    <value>Release</value>
   </data>
   <data name="CompressorThreshold" xml:space="preserve">
     <value>Threshold</value>
