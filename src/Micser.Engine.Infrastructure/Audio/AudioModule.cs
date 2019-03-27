@@ -68,12 +68,16 @@ namespace Micser.Engine.Infrastructure.Audio
 
         public virtual ModuleState GetState()
         {
-            return new ModuleState
+            var state = new ModuleState
             {
                 IsMuted = IsMuted,
                 Volume = Volume,
                 UseSystemVolume = UseSystemVolume
             };
+
+            this.GetStateProperties(state);
+
+            return state;
         }
 
         public virtual void RemoveOutput(IAudioModule module)
@@ -94,6 +98,8 @@ namespace Micser.Engine.Infrastructure.Audio
             IsMuted = state.IsMuted;
             Volume = state.Volume;
             UseSystemVolume = state.UseSystemVolume;
+
+            this.SetStateProperties(state);
         }
 
         public virtual void Write(IAudioModule source, WaveFormat waveFormat, byte[] buffer, int offset, int count)
@@ -134,7 +140,7 @@ namespace Micser.Engine.Infrastructure.Audio
                                 var fSample8 = _waveBuffer.ByteBuffer[i8] / 256f;
                                 foreach (var sampleProcessor in sampleProcessors)
                                 {
-                                    sampleProcessor.Process(ref fSample8);
+                                    sampleProcessor.Process(waveFormat, ref fSample8);
                                 }
                                 _waveBuffer.ByteBuffer[i8] = (byte)(fSample8 * 255f);
                             }
@@ -148,7 +154,7 @@ namespace Micser.Engine.Infrastructure.Audio
                                 var fSample16 = _waveBuffer.ShortBuffer[i16] / 32767f;
                                 foreach (var sampleProcessor in sampleProcessors)
                                 {
-                                    sampleProcessor.Process(ref fSample16);
+                                    sampleProcessor.Process(waveFormat, ref fSample16);
                                 }
                                 _waveBuffer.ShortBuffer[i16] = (short)(fSample16 * 32768f);
                             }
@@ -163,7 +169,7 @@ namespace Micser.Engine.Infrastructure.Audio
                                 var fSample24 = (((sbyte)buffer[offset + i24 + 2] << 16) | (buffer[offset + i24 + 1] << 8) | buffer[offset + i24]) / 8388608f;
                                 foreach (var sampleProcessor in sampleProcessors)
                                 {
-                                    sampleProcessor.Process(ref fSample24);
+                                    sampleProcessor.Process(waveFormat, ref fSample24);
                                 }
                                 var sample24 = (int)(fSample24 * 8388607f);
                                 nextBuffer[i24] = (byte)(sample24);
@@ -179,7 +185,7 @@ namespace Micser.Engine.Infrastructure.Audio
                                 var fSample32 = _waveBuffer.IntBuffer[i32] / 2147483648f;
                                 foreach (var sampleProcessor in sampleProcessors)
                                 {
-                                    sampleProcessor.Process(ref fSample32);
+                                    sampleProcessor.Process(waveFormat, ref fSample32);
                                 }
                                 _waveBuffer.IntBuffer[i32] = (int)(fSample32 * 2147483647f);
                             }
@@ -202,7 +208,7 @@ namespace Micser.Engine.Infrastructure.Audio
                                 var fSample = _waveBuffer.FloatBuffer[iF];
                                 foreach (var sampleProcessor in sampleProcessors)
                                 {
-                                    sampleProcessor.Process(ref fSample);
+                                    sampleProcessor.Process(waveFormat, ref fSample);
                                 }
                                 _waveBuffer.FloatBuffer[iF] = fSample;
                             }

@@ -1,4 +1,5 @@
-﻿using Micser.Common.Modules;
+﻿using Micser.Common.Extensions;
+using Micser.Common.Modules;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -40,6 +41,7 @@ namespace Micser.App.Infrastructure.Widgets
 
         public abstract Type ModuleType { get; }
 
+        [SaveState(null)]
         public string Name
         {
             get => _name;
@@ -62,17 +64,20 @@ namespace Micser.App.Infrastructure.Widgets
 
         public virtual ModuleState GetState()
         {
-            return new ModuleState
+            var state = new ModuleState
             {
                 Data =
                 {
-                    {AppGlobals.ModuleStateKeys.Name, Name},
                     {AppGlobals.ModuleStateKeys.Left, Position.X},
                     {AppGlobals.ModuleStateKeys.Top, Position.Y},
                     {AppGlobals.ModuleStateKeys.Width, Size.Width},
                     {AppGlobals.ModuleStateKeys.Height, Size.Height}
                 }
             };
+
+            this.GetStateProperties(state);
+
+            return state;
         }
 
         public virtual void Initialize()
@@ -99,8 +104,6 @@ namespace Micser.App.Infrastructure.Widgets
 
         public virtual void SetState(ModuleState state)
         {
-            Name = state.Data.GetObject<string>(AppGlobals.ModuleStateKeys.Name);
-
             var left = state.Data.GetObject<double>(AppGlobals.ModuleStateKeys.Left);
             var top = state.Data.GetObject<double>(AppGlobals.ModuleStateKeys.Top);
             Position = new Point(left, top);
@@ -108,6 +111,8 @@ namespace Micser.App.Infrastructure.Widgets
             var width = state.Data.GetObject<double>(AppGlobals.ModuleStateKeys.Width);
             var height = state.Data.GetObject<double>(AppGlobals.ModuleStateKeys.Height);
             Size = new Size(width, height);
+
+            this.SetStateProperties(state);
         }
 
         protected ConnectorViewModel AddInput(string name)
