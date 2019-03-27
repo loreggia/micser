@@ -36,6 +36,18 @@ namespace Micser.Plugins.Main.Audio
 
         public void ProcessDownward(WaveFormat waveFormat, ref float value)
         {
+            var threshold = _module.Threshold;
+            var abs = Math.Abs(value);
+
+            if (abs > threshold)
+            {
+                var amount = _module.Amount;
+                var ratio = _module.Ratio;
+
+                // WA: plot y=x; y=(x+0.5)/2;y=0.5; from x=-1 to 1; from y=-1 to 1
+                var newValue = abs - (abs - (abs + threshold) / ratio) * amount;
+                value = Math.Sign(value) * newValue;
+            }
         }
 
         public void ProcessUpward(WaveFormat waveFormat, ref float value)
@@ -49,7 +61,8 @@ namespace Micser.Plugins.Main.Audio
                 var ratio = _module.Ratio;
 
                 // WA: plot y=x; y=(x+0.5)/2;y=0.5; from x=-1 to 1; from y=-1 to 1
-                var newValue = abs + ((abs + threshold) / ratio - abs) * amount;
+                //var newValue = abs + ((abs + threshold) / ratio - abs) * amount;
+                var newValue = (abs + threshold) / ratio;
                 value = Math.Sign(value) * newValue;
             }
         }

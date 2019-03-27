@@ -59,6 +59,7 @@ namespace Micser.Common.Extensions
             foreach (var property in properties)
             {
                 object value;
+                var propertyType = property.Key.PropertyType;
                 if (state.Data.ContainsKey(property.Key.Name))
                 {
                     value = state.Data[property.Key.Name];
@@ -68,23 +69,32 @@ namespace Micser.Common.Extensions
                     value = property.Value.DefaultValue;
                 }
 
-                if (value != null && value.GetType() != property.Key.PropertyType)
+                if (value != null && value.GetType() != propertyType)
                 {
-                    var toConverter = TypeDescriptor.GetConverter(property.Key.PropertyType);
-                    if (toConverter.CanConvertFrom(value.GetType()))
+                    var valueType = value.GetType();
+
+                    if (propertyType.IsEnum)
                     {
-                        value = toConverter.ConvertFrom(value);
+                        value = Enum.ToObject(propertyType, value);
                     }
                     else
                     {
-                        var fromConverter = TypeDescriptor.GetConverter(value.GetType());
-                        if (fromConverter.CanConvertTo(property.Key.PropertyType))
+                        var toConverter = TypeDescriptor.GetConverter(propertyType);
+                        if (toConverter.CanConvertFrom(valueType))
                         {
-                            value = fromConverter.ConvertTo(value, property.Key.PropertyType);
+                            value = toConverter.ConvertFrom(value);
                         }
                         else
                         {
-                            value = property.Value.DefaultValue;
+                            var fromConverter = TypeDescriptor.GetConverter(valueType);
+                            if (fromConverter.CanConvertTo(propertyType))
+                            {
+                                value = fromConverter.ConvertTo(value, propertyType);
+                            }
+                            else
+                            {
+                                value = property.Value.DefaultValue;
+                            }
                         }
                     }
                 }
