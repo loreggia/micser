@@ -2,17 +2,13 @@
 using Micser.Engine.Infrastructure.Audio;
 using Micser.Engine.Infrastructure.Extensions;
 using Micser.Plugins.Main.Modules;
+using System;
 
 namespace Micser.Plugins.Main.Audio
 {
     public class CompressorSampleProcessor : ISampleProcessor
     {
         private readonly CompressorModule _module;
-
-        private int _attackSamples;
-
-        private bool _isCompressing;
-        private int _releaseSamples;
 
         public CompressorSampleProcessor(CompressorModule module)
         {
@@ -44,34 +40,17 @@ namespace Micser.Plugins.Main.Audio
 
         public void ProcessUpward(WaveFormat waveFormat, ref float value)
         {
-            if (_attackSamples > 0)
+            var threshold = _module.Threshold;
+            var abs = Math.Abs(value);
+
+            if (abs < threshold)
             {
-                _attackSamples--;
-                if (_attackSamples == 0)
-                {
-                    _isCompressing = true;
-                }
+                var amount = _module.Amount;
+                var ratio = _module.Ratio;
 
-                return;
-            }
-
-            if (_releaseSamples > 0)
-            {
-                _releaseSamples--;
-                return;
-            }
-
-            if (value < _module.Threshold)
-            {
-                var samplesPerMs = waveFormat.SampleRate / 1000f;
-
-                if (_isCompressing)
-                {
-                    _releaseSamples = (int)(samplesPerMs * _module.Release);
-                    return;
-                }
-
-                _attackSamples = (int)(samplesPerMs * _module.Attack);
+                // WA: plot y=x; y=(x+0.5)/2;y=0.5; from x=-1 to 1; from y=-1 to 1
+                var newValue = abs + ((abs + threshold) / ratio - abs) * amount;
+                value = Math.Sign(value) * newValue;
             }
         }
     }

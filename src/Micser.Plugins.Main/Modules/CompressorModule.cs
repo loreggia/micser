@@ -1,11 +1,14 @@
 ﻿using Micser.Common.Modules;
 using Micser.Engine.Infrastructure.Audio;
+using Micser.Engine.Infrastructure.Extensions;
 using Micser.Plugins.Main.Audio;
 
 namespace Micser.Plugins.Main.Modules
 {
     public class CompressorModule : AudioModule
     {
+        private float _ratio;
+
         public CompressorModule(long id)
             : base(id)
         {
@@ -19,7 +22,15 @@ namespace Micser.Plugins.Main.Modules
         public float Attack { get; set; }
 
         [SaveState(Defaults.Ratio)]
-        public float Ratio { get; set; }
+        public float Ratio
+        {
+            get => _ratio;
+            set
+            {
+                MathExtensions.Clamp(ref value, 1f, 60f);
+                _ratio = value;
+            }
+        }
 
         [SaveState(Defaults.Release)]
         public float Release { get; set; }
