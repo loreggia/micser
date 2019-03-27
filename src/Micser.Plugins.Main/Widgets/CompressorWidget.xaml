@@ -12,8 +12,8 @@
                 xmlns:i="clr-namespace:Micser.App.Infrastructure;assembly=Micser.App.Infrastructure"
                 mc:Ignorable="d"
                 d:DataContext="{d:DesignInstance local:CompressorViewModel}"
-                MinWidth="250"
-                MinHeight="200">
+                MinWidth="380"
+                MinHeight="280">
 
     <widgets:Widget.Resources>
         <converter:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
@@ -42,11 +42,11 @@
         <Label Grid.Row="2" Grid.Column="0" Content="{x:Static p:Resources.CompressorType}" />
         <Grid Grid.Row="2" Grid.Column="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition />
-                <ColumnDefinition />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <RadioButton Grid.Column="0" GroupName="CompressorType" Content="Upward" VerticalAlignment="Center"
-                         IsChecked="{Binding Type, Mode=TwoWay, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static audio:CompressorType.Upward}}" />
+                         IsChecked="{Binding Type, Mode=TwoWay, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static audio:CompressorType.Upward}}" Margin="0,0,5,0" />
             <RadioButton Grid.Column="1" GroupName="CompressorType" Content="Downward" VerticalAlignment="Center"
                          IsChecked="{Binding Type, Mode=TwoWay, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static audio:CompressorType.Downward}}" />
         </Grid>
