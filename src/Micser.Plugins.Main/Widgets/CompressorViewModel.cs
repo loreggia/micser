@@ -19,19 +19,16 @@ namespace Micser.Plugins.Main.Widgets
         {
             AddInput("Input1");
             AddOutput("Output1");
-
-            Amount = 1f;
-            Ratio = 2f;
-            Threshold = 0f;
-            Type = CompressorType.Upward;
         }
 
+        [SaveState(CompressorModule.Defaults.Amount)]
         public float Amount
         {
             get => _amount;
             set => SetProperty(ref _amount, value);
         }
 
+        [SaveState(CompressorModule.Defaults.Attack)]
         public float Attack
         {
             get => _attack;
@@ -40,51 +37,32 @@ namespace Micser.Plugins.Main.Widgets
 
         public override Type ModuleType => typeof(CompressorModule);
 
+        [SaveState(CompressorModule.Defaults.Ratio)]
         public float Ratio
         {
             get => _ratio;
             set => SetProperty(ref _ratio, value);
         }
 
+        [SaveState(CompressorModule.Defaults.Release)]
         public float Release
         {
             get => _release;
             set => SetProperty(ref _release, value);
         }
 
+        [SaveState(CompressorModule.Defaults.Threshold)]
         public float Threshold
         {
             get => _threshold;
             set => SetProperty(ref _threshold, value);
         }
 
+        [SaveState(CompressorModule.Defaults.Type)]
         public CompressorType Type
         {
             get => _type;
             set => SetProperty(ref _type, value);
-        }
-
-        public override ModuleState GetState()
-        {
-            var state = base.GetState();
-            state.Data[CompressorModule.StateKeys.Amount] = Amount;
-            state.Data[CompressorModule.StateKeys.Attack] = Attack;
-            state.Data[CompressorModule.StateKeys.Ratio] = Ratio;
-            state.Data[CompressorModule.StateKeys.Release] = Release;
-            state.Data[CompressorModule.StateKeys.Threshold] = Threshold;
-            state.Data[CompressorModule.StateKeys.Type] = Type;
-            return state;
-        }
-
-        public override void SetState(ModuleState state)
-        {
-            base.SetState(state);
-            Amount = state.Data.GetObject(CompressorModule.StateKeys.Amount, CompressorModule.Defaults.Amount);
-            Attack = state.Data.GetObject(CompressorModule.StateKeys.Attack, CompressorModule.Defaults.Attack);
-            Ratio = state.Data.GetObject(CompressorModule.StateKeys.Ratio, CompressorModule.Defaults.Ratio);
-            Release = state.Data.GetObject(CompressorModule.StateKeys.Release, CompressorModule.Defaults.Release);
-            Threshold = state.Data.GetObject(CompressorModule.StateKeys.Threshold, CompressorModule.Defaults.Threshold);
-            Type = state.Data.GetObject(CompressorModule.StateKeys.Type, CompressorModule.Defaults.Type);
         }
     }
 }

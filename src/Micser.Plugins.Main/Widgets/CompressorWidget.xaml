@@ -26,6 +26,8 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" SharedSizeGroup="{x:Static i:AppGlobals+Widgets.LabelsSharedSizeGroup}" />
@@ -55,10 +57,10 @@
         <Label Grid.Row="4" Grid.Column="0" Content="{x:Static p:Resources.CompressorThreshold}" />
         <controls:EditableSlider Grid.Row="4" Grid.Column="1" Value="{Binding Threshold, Mode=TwoWay}" Minimum="0" Maximum="1" />
 
-        <Label Grid.Row="4" Grid.Column="0" Content="{x:Static p:Resources.CompressorAttack}" />
-        <controls:EditableSlider Grid.Row="4" Grid.Column="1" Value="{Binding Threshold, Mode=TwoWay}" Minimum="0" Maximum="100" />
+        <Label Grid.Row="5" Grid.Column="0" Content="{x:Static p:Resources.CompressorAttack}" />
+        <controls:EditableSlider Grid.Row="5" Grid.Column="1" Value="{Binding Attack, Mode=TwoWay}" Minimum="0" Maximum="100" />
 
-        <Label Grid.Row="4" Grid.Column="0" Content="{x:Static p:Resources.CompressorRelease}" />
-        <controls:EditableSlider Grid.Row="4" Grid.Column="1" Value="{Binding Threshold, Mode=TwoWay}" Minimum="0" Maximum="100" />
+        <Label Grid.Row="6" Grid.Column="0" Content="{x:Static p:Resources.CompressorRelease}" />
+        <controls:EditableSlider Grid.Row="6" Grid.Column="1" Value="{Binding Release, Mode=TwoWay}" Minimum="0" Maximum="100" />
     </Grid>
 </widgets:Widget>

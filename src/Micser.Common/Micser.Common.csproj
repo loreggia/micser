@@ -87,6 +87,7 @@
     <Compile Include="IIdentifiable.cs" />
     <Compile Include="Modules\ModuleState.cs" />
     <Compile Include="Modules\ModuleStateChangeDto.cs" />
+    <Compile Include="Modules\SaveStateAttribute.cs" />
     <Compile Include="OrderedParameterOverride.cs" />
     <Compile Include="Properties\GlobalAssemblyInfo.cs" />
     <Compile Include="SemaphoreQueue.cs" />
