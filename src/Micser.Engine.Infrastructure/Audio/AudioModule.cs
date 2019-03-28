@@ -11,8 +11,9 @@ namespace Micser.Engine.Infrastructure.Audio
 {
     public abstract class AudioModule : IAudioModule
     {
+        public static readonly float Epsilon = float.Epsilon;
+
         protected static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
-        protected readonly float Epsilon = float.Epsilon;
         private readonly IList<IAudioModule> _outputs;
 
         private readonly IList<ISampleProcessor> _sampleProcessors;
