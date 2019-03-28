@@ -82,7 +82,7 @@ namespace Micser.Plugins.Main.Audio
                 var ratio = _module.Ratio;
 
                 // WA: plot y=x; y=(x+0.5)/2;y=0.5; from x=-1 to 1; from y=-1 to 1
-                var y = (_rms + threshold) / ratio;
+                var y = (_rms - threshold) / ratio + threshold;
                 var f = y / _rms;
                 var fa = (f - 1f) * amount + 1f;
                 value *= fa;
