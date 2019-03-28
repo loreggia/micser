@@ -45,6 +45,7 @@
   <ItemGroup>
     <Compile Include="Api\ApiServerTest.cs" />
     <Compile Include="Api\JsonMessageTest.cs" />
+    <Compile Include="CircularBufferTest.cs" />
     <Compile Include="DataAccess\UnitOfWorkTest.cs" />
     <Compile Include="DeviceServiceTest.cs" />
     <Compile Include="SerializationTest.cs" />
