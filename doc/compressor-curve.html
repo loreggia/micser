@@ -123,21 +123,19 @@ function makecurve(threshold, knee, ratio){
 	var linearknee = db2lin(knee);
 	var k = 2; // initial guess
 
-	function kneecurve(x) {
-		// B(t) = (1-t)*(1-t)*p0 + 2*(1-t)*t*p1+t*t*p2;
-		var t = x;
-		var p0 = linearthreshold;
-		// y = x | y = x / 2 | 
-		var p1 = linearthreshold + linearknee / 2;
-		var p2 = linearthreshold + linearknee;
-		return (1 - t) * (1 - t) * p0 + 2 * (1 - t) * t * p1 + t * t * p2;
-	}
+    var a, b, c;
 
-	// this function is courtesy of http://www.derivative-calculator.net/
-	// it is the derivative of lin2db(kneecurve(db2lin(x))), simplified a bit and made linear
-	function kneeslope(x){
-		return k * x / ((k * linearthreshold + 1) * Math.exp(k * (x - linearthreshold)) - 1);
-	}
+    // f(x) = ax^2 + bx + c;
+    // f'(x) = 2ax + b
+    // f'(threshold) = 1
+    // f'(threshold + knee) = slope
+    // 2at + b = 1    | 2a(t+k) + b = s
+    a = (slope - 1) / 2 * linearknee;
+    b = (linearknee - slope * linearthreshold + linearthreshold) / linearknee;
+
+    function kneecurve(x) {
+        return a * x * x + b * x + c;
+    }
 
 	// so how do we calculate the right k value, given a ratio? we do that by simply searching for
 	// a k value that gives us the right slope at the end of the knee
