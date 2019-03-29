@@ -50,6 +50,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Micser.App.Infrastructure.T
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Micser.Plugins.Main.Test", "Micser.Plugins.Main.Test\Micser.Plugins.Main.Test.csproj", "{32A852E1-D13D-4589-9963-3F9D32AF243E}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Doc", "Doc", "{3C6959B4-BB20-417E-A105-BD99D25F229B}"
+	ProjectSection(SolutionItems) = preProject
+		..\doc\compressor-curve.html = ..\doc\compressor-curve.html
+		..\doc\compressor-curve2.html = ..\doc\compressor-curve2.html
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
