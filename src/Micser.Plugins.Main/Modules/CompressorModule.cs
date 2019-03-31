@@ -47,7 +47,7 @@ namespace Micser.Plugins.Main.Modules
             public const float Attack = 1f;
             public const float Ratio = 2f;
             public const float Release = 10f;
-            public const float Threshold = 0.5f;
+            public const float Threshold = -20f;
             public const CompressorType Type = CompressorType.Upward;
         }
     }

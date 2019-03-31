@@ -24,6 +24,7 @@ namespace Micser.Plugins.Main.Audio
         private float _adaptiveReleaseCoeffB;
         private float _adaptiveReleaseCoeffC;
         private float _adaptiveReleaseCoeffD;
+        private float _attack;
         private float _attackSamplesInv;
         private int _channelCount;
         private float _compGain;
@@ -36,6 +37,8 @@ namespace Micser.Plugins.Main.Audio
         private float _maxCompDiffDb;
         private float _meterGain;
         private float _meterRelease;
+        private float _ratio;
+        private float _release;
         private int _samplePosition;
         private int _sampleRate;
         private float _satReleaseSamplesInv;
@@ -60,14 +63,18 @@ namespace Micser.Plugins.Main.Audio
         {
             if (waveFormat.SampleRate != _sampleRate ||
                 waveFormat.Channels != _channelCount ||
-                Math.Abs(_wet - _module.Amount) > AudioModule.Epsilon)
+                Math.Abs(_wet - _module.Amount) > AudioModule.Epsilon ||
+                Math.Abs(_attack - _module.Attack) > AudioModule.Epsilon ||
+                Math.Abs(_release - _module.Release) > AudioModule.Epsilon ||
+                Math.Abs(_ratio - _module.Ratio) > AudioModule.Epsilon ||
+                Math.Abs(_threshold - _module.Threshold) > AudioModule.Epsilon)
             {
                 _sampleRate = waveFormat.SampleRate;
                 _channelCount = waveFormat.Channels;
                 _samplePosition = 0;
 
                 // todo params
-                Initialize(waveFormat.SampleRate, 0f, -40f, 30f, 12f, 0.003f, 0.25f, 0.09f, 0.16f, 0.42f, 0.98f, 0f, _module.Amount);
+                Initialize(waveFormat.SampleRate, 0f, _module.Threshold, 10f, _module.Ratio, _module.Attack, _module.Release, 0.09f, 0.16f, 0.42f, 0.98f, 0.1f, _module.Amount);
                 PrepareChunk();
             }
 
@@ -143,6 +150,9 @@ namespace Micser.Plugins.Main.Audio
             var d = y1;
 
             // save everything
+            _attack = attack;
+            _release = release;
+            _ratio = ratio;
             _meterGain = meterGain;
             _meterRelease = meterRelease;
             _threshold = threshold;
