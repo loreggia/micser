@@ -24,7 +24,6 @@ namespace Micser.Plugins.Main.Audio
         private float _adaptiveReleaseCoeffB;
         private float _adaptiveReleaseCoeffC;
         private float _adaptiveReleaseCoeffD;
-        private float _adaptiveReleaseConst;
         private float _attackSamplesInv;
         private int _channelCount;
         private float _compGain;
@@ -32,10 +31,7 @@ namespace Micser.Plugins.Main.Audio
         private float _dry;
         private float _envelopeRate;
         private float _knee;
-        private float _kneeDbOffset;
         private float _linearPreGain;
-        private float _linearThreshold;
-        private float _linearThresholdKnee;
         private float _masterGain;
         private float _maxCompDiffDb;
         private float _meterGain;
@@ -88,6 +84,14 @@ namespace Micser.Plugins.Main.Audio
             MathExtensions.Clamp(ref value, -1f, 1f);
         }
 
+        private static float Fixf(float v, float def)
+        {
+            // fix NaN and infinity values that sneak in... not sure why this is needed, but it is
+            if (float.IsNaN(v) || float.IsInfinity(v))
+                return def;
+            return v;
+        }
+
         /// <summary>
         /// this is the main initialization function
         /// it does a bunch of pre-calculation so that the inner loop of signal processing is fast
@@ -109,7 +113,6 @@ namespace Micser.Plugins.Main.Audio
         {
             // useful values
             var linearPreGain = AudioHelper.DbToLinear(preGain);
-            var linearThreshold = AudioHelper.DbToLinear(threshold);
             var slope = 1.0f / ratio;
             var attackSamples = rate * attack;
             var attackSamplesInv = 1.0f / attackSamples;
@@ -123,39 +126,9 @@ namespace Micser.Plugins.Main.Audio
             var meterFallOff = 0.325f; // seconds
             var meterRelease = 1.0f - (float)Math.Exp(-1d / (rate * meterFallOff));
 
-            // calculate knee curve parameters
-            var k = 5.0f; // initial guess
-            var kneeDbOffset = 0.0f;
-            var linearThresholdKnee = 0.0f;
-
-            if (knee > 0.0f)
-            { // if a knee exists, search for a good k value
-                var xKnee = AudioHelper.DbToLinear(threshold + knee);
-                var mink = 0.1f;
-                var maxk = 10000.0f;
-
-                // search by comparing the knee slope at the current k guess, to the ideal slope
-                for (var i = 0; i < 15; i++)
-                {
-                    if (AudioHelper.KneeSlope(xKnee, k, linearThreshold) < slope)
-                    {
-                        maxk = k;
-                    }
-                    else
-                    {
-                        mink = k;
-                    }
-
-                    k = (float)Math.Sqrt(mink * maxk);
-                }
-
-                kneeDbOffset = AudioHelper.LinearToDb(AudioHelper.KneeCurve(xKnee, k, linearThreshold));
-                linearThresholdKnee = AudioHelper.DbToLinear(threshold + knee);
-            }
-
             // calculate a master gain based on what sounds good
-            var fullLevel = AudioHelper.CompCurve(1.0f, k, slope, linearThreshold, linearThresholdKnee, threshold, knee, kneeDbOffset);
-            var masterGain = AudioHelper.DbToLinear(postGain) * (float)Math.Pow(1.0f / fullLevel, 0.6f);
+            var fullLevel = AudioHelper.CompressorCurve(AudioHelper.LinearToDb(1f), slope, threshold, knee);
+            var masterGain = AudioHelper.DbToLinear(postGain) * (float)Math.Pow(1.0f / AudioHelper.DbToLinear(fullLevel), 0.6f);
 
             // calculate the adaptive release curve parameters
             // solve a,b,c,d in `y = a*x^3 + b*x^2 + c*x + d`
@@ -176,14 +149,10 @@ namespace Micser.Plugins.Main.Audio
             _knee = knee;
             _wet = wet;
             _linearPreGain = linearPreGain;
-            _linearThreshold = linearThreshold;
             _slope = slope;
             _attackSamplesInv = attackSamplesInv;
             _satReleaseSamplesInv = satReleaseSamplesInv;
             _dry = dry;
-            _adaptiveReleaseConst = k;
-            _kneeDbOffset = kneeDbOffset;
-            _linearThresholdKnee = linearThresholdKnee;
             _masterGain = masterGain;
             _adaptiveReleaseCoeffA = a;
             _adaptiveReleaseCoeffB = b;
@@ -196,7 +165,7 @@ namespace Micser.Plugins.Main.Audio
 
         private void PrepareChunk()
         {
-            //detectoravg = fixf(detectoravg, 1.0f);
+            _detectorAvg = Fixf(_detectorAvg, 1.0f);
             _scaledDesiredGain = (float)Math.Asin(_detectorAvg) * Ang90Inv;
             var compDiffDb = AudioHelper.LinearToDb(_compGain / _scaledDesiredGain);
 
@@ -204,7 +173,7 @@ namespace Micser.Plugins.Main.Audio
             if (compDiffDb < 0.0f)
             {
                 // compgain < scaleddesiredgain, so we're releasing
-                //compdiffdb = fixf(compdiffdb, -1.0f);
+                compDiffDb = Fixf(compDiffDb, -1.0f);
                 _maxCompDiffDb = -1; // reset for a future attack mode
                 // apply the adaptive release curve
                 // scale compdiffdb between 0-3
@@ -215,7 +184,7 @@ namespace Micser.Plugins.Main.Audio
             else
             {
                 // compresorgain > scaleddesiredgain, so we're attacking
-                //compdiffdb = fixf(compdiffdb, 1.0f);
+                compDiffDb = Fixf(compDiffDb, 1.0f);
                 if (_maxCompDiffDb == -1 || _maxCompDiffDb < compDiffDb)
                     _maxCompDiffDb = compDiffDb;
                 var attenuate = _maxCompDiffDb;
@@ -242,8 +211,8 @@ namespace Micser.Plugins.Main.Audio
             }
             else
             {
-                var inputcomp = AudioHelper.CompCurve(input, _adaptiveReleaseConst, _slope, _linearThreshold, _linearThresholdKnee, _threshold, _knee, _kneeDbOffset);
-                attenuation = inputcomp / input;
+                var inputcompDb = AudioHelper.CompressorCurve(AudioHelper.LinearToDb(input), _slope, _threshold, _knee);
+                attenuation = AudioHelper.DbToLinear(inputcompDb) / input;
             }
 
             float rate;
@@ -267,7 +236,7 @@ namespace Micser.Plugins.Main.Audio
             {
                 _detectorAvg = 1.0f;
             }
-            //detectoravg = fixf(detectoravg, 1.0f);
+            _detectorAvg = Fixf(_detectorAvg, 1.0f);
 
             if (_envelopeRate < 1)
             {
