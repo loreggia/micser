@@ -18,6 +18,16 @@ namespace Micser.Common.Audio
 
         public static float CompressorCurve(float db, float slope, float threshold, float knee)
         {
+            if (slope > 0)
+            {
+                return CompressorCurveDown(db, slope, threshold, knee);
+            }
+
+            return CompressorCurveUp(db, -slope, threshold, knee);
+        }
+
+        public static float CompressorCurveDown(float db, float slope, float threshold, float knee)
+        {
             // no knee in curve
             if (knee <= 0f)
             {
@@ -25,15 +35,38 @@ namespace Micser.Common.Audio
             }
 
             // below knee
-            if (2f * (db - threshold) < -knee)
+            if (db - threshold < -knee / 2f)
             {
                 return db;
             }
 
             // knee
-            if (2f * Math.Abs(db - threshold) <= knee)
+            if (Math.Abs(db - threshold) <= knee / 2f)
             {
-                return KneeCurve(db, slope, threshold, knee);
+                return KneeCurveDown(db, slope, threshold, knee);
+            }
+
+            return threshold + slope * (db - threshold);
+        }
+
+        public static float CompressorCurveUp(float db, float slope, float threshold, float knee)
+        {
+            // no knee in curve
+            if (knee <= 0f)
+            {
+                return db > threshold ? db : threshold + slope * (db - threshold);
+            }
+
+            // below knee
+            if (db - threshold > knee / 2f)
+            {
+                return db;
+            }
+
+            // knee
+            if (Math.Abs(db - threshold) <= knee / 2f)
+            {
+                return KneeCurveUp(db, slope, threshold, knee);
             }
 
             return threshold + slope * (db - threshold);
@@ -52,8 +85,24 @@ namespace Micser.Common.Audio
         /// </remarks>
         public static float KneeCurve(float db, float slope, float threshold, float knee)
         {
+            if (slope > 0)
+            {
+                return CompressorCurveDown(db, slope, threshold, knee);
+            }
+
+            return CompressorCurveUp(db, -slope, threshold, knee);
+        }
+
+        public static float KneeCurveDown(float db, float slope, float threshold, float knee)
+        {
             var a = db - threshold + knee / 2f;
             return db + (slope - 1f) * a * a / (2f * knee);
+        }
+
+        public static float KneeCurveUp(float db, float slope, float threshold, float knee)
+        {
+            var a = -db + threshold + knee / 2f;
+            return db - (slope - 1f) * a * a / (2f * knee);
         }
 
         public static float LinearToDb(float value)
