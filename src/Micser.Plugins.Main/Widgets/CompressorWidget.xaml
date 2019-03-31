@@ -52,7 +52,7 @@
         </Grid>
 
         <Label Grid.Row="3" Grid.Column="0" Content="{x:Static p:Resources.CompressorRatio}" />
-        <controls:EditableSlider Grid.Row="3" Grid.Column="1" Value="{Binding Ratio, Mode=TwoWay}" Minimum="0" Maximum="60" />
+        <controls:EditableSlider Grid.Row="3" Grid.Column="1" Value="{Binding Ratio, Mode=TwoWay}" Minimum="-20" Maximum="20" />
 
         <Label Grid.Row="4" Grid.Column="0" Content="{x:Static p:Resources.CompressorThreshold}" />
         <controls:EditableSlider Grid.Row="4" Grid.Column="1" Value="{Binding Threshold, Mode=TwoWay}" Minimum="-60" Maximum="0" />

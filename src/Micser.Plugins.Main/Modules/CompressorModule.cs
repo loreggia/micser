@@ -21,13 +21,16 @@ namespace Micser.Plugins.Main.Modules
         [SaveState(Defaults.Attack)]
         public float Attack { get; set; }
 
+        [SaveState(Defaults.Knee)]
+        public float Knee { get; set; }
+
         [SaveState(Defaults.Ratio)]
         public float Ratio
         {
             get => _ratio;
             set
             {
-                MathExtensions.Clamp(ref value, 1f, 60f);
+                MathExtensions.Clamp(ref value, -60f, 60f);
                 _ratio = value;
             }
         }
@@ -45,6 +48,7 @@ namespace Micser.Plugins.Main.Modules
         {
             public const float Amount = 1f;
             public const float Attack = 1f;
+            public const float Knee = 5f;
             public const float Ratio = 2f;
             public const float Release = 10f;
             public const float Threshold = -20f;
