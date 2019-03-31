@@ -87,6 +87,11 @@ namespace Micser.Plugins.Main.Modules
 
         public override void Write(IAudioModule source, WaveFormat waveFormat, byte[] buffer, int offset, int count)
         {
+            if (_volumeSource != null)
+            {
+                _volumeSource.Volume = IsMuted ? 0f : _volume;
+            }
+
             if (!_inputBuffers.ContainsKey(source.Id) || !waveFormat.Equals(_inputBuffers[source.Id].WaveFormat))
             {
                 SetInputBuffer(source.Id, waveFormat);

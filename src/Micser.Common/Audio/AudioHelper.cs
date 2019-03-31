@@ -16,25 +16,27 @@ namespace Micser.Common.Audio
             return a * x2 * x + b * x2 + c * x + d;
         }
 
-        public static float CompCurve(float x, float k, float slope, float linearThreshold, float linearThresholdKnee, float threshold, float knee, float kneeDbOffset)
+        public static float CompressorCurve(float db, float slope, float threshold, float knee)
         {
-            if (x < linearThreshold)
-            {
-                return x;
-            }
-
+            // no knee in curve
             if (knee <= 0f)
             {
-                // no knee in curve
-                return DbToLinear(threshold + slope * (LinearToDb(x) - threshold));
+                return db < threshold ? db : threshold + slope * (db - threshold);
             }
 
-            if (x < linearThresholdKnee)
+            // below knee
+            if (2f * (db - threshold) < -knee)
             {
-                return KneeCurve(x, k, linearThreshold);
+                return db;
             }
 
-            return DbToLinear(kneeDbOffset + slope * (LinearToDb(x) - threshold - knee));
+            // knee
+            if (2f * Math.Abs(db - threshold) <= knee)
+            {
+                return KneeCurve(db, slope, threshold, knee);
+            }
+
+            return threshold + slope * (db - threshold);
         }
 
         public static float DbToLinear(float value)
@@ -46,16 +48,12 @@ namespace Micser.Common.Audio
         /// Calculates a soft knee curve.
         /// </summary>
         /// <remarks>
-        /// for more information on the knee curve, check out the compressor-curve.html demo + source code included in this repo -> https://github.com/voidqk/sndfilter
+        /// see doc/compressor-curve.html
         /// </remarks>
-        public static float KneeCurve(float x, float k, float linearThreshold)
+        public static float KneeCurve(float db, float slope, float threshold, float knee)
         {
-            return linearThreshold + (1.0f - (float)Math.Exp(-k * (x - linearThreshold))) / k;
-        }
-
-        public static float KneeSlope(float x, float k, float linearThreshold)
-        {
-            return k * x / ((k * linearThreshold + 1.0f) * (float)Math.Exp(k * (x - linearThreshold)) - 1);
+            var a = db - threshold + knee / 2f;
+            return db + (slope - 1f) * a * a / (2f * knee);
         }
 
         public static float LinearToDb(float value)

@@ -229,7 +229,7 @@ namespace Micser.Engine.Infrastructure.Audio
                 }
             }
 
-            foreach (var module in _outputs)
+            foreach (var module in _outputs.ToArray())
             {
                 module.Write(source, waveFormat, nextBuffer, nextOffset, count);
             }
