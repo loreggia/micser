@@ -71,6 +71,7 @@
     <Compile Include="Controls\ToolBarTrayHelper.cs" />
     <Compile Include="Converter\BooleanConverter.cs" />
     <Compile Include="Converter\BooleanInvertConverter.cs" />
+    <Compile Include="Converter\BooleanToDoubleConverter.cs" />
     <Compile Include="Converter\BooleanToVisibilityConverter.cs" />
     <Compile Include="Converter\ConverterExtension.cs" />
     <Compile Include="Converter\DoubleDivisionConverter.cs" />

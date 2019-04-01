@@ -116,7 +116,8 @@ namespace Micser.Plugins.Main.Audio
 
             // Ballistics - smoothing of the gain
             float dbEnv;
-            if (dbDiff > _envelope)
+            if (_type == CompressorType.Downward && dbDiff > _envelope ||
+                _type == CompressorType.Upward && dbDiff < _envelope)
             {
                 dbEnv = _alphaAttack * _envelope + (1 - _alphaAttack) * dbDiff;
             }
@@ -127,7 +128,9 @@ namespace Micser.Plugins.Main.Audio
             _envelope = dbEnv;
 
             // find control
-            var lGain = AudioHelper.DbToLinear(_makeUpGain * _amount - dbEnv);
+            var dbGain = _makeUpGain * _amount - dbEnv;
+
+            var lGain = AudioHelper.DbToLinear(dbGain);
             lInput *= lGain;
 
             _samplePosition++;

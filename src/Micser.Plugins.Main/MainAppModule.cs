@@ -23,6 +23,7 @@ namespace Micser.Plugins.Main
             containerRegistry.RegisterWidget<DeviceInputWidget, LoopbackDeviceInputViewModel>(Resources.LoopbackDeviceInputWidgetName);
             containerRegistry.RegisterWidget<DeviceOutputWidget, DeviceOutputViewModel>(Resources.DeviceOutputWidgetName);
             containerRegistry.RegisterWidget<CompressorWidget, CompressorViewModel>(Resources.CompressorWidgetName);
+            containerRegistry.RegisterWidget<GainWidget, GainViewModel>(Resources.GainWidgetName);
         }
     }
 }

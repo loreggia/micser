@@ -9,7 +9,12 @@ namespace Micser.Plugins.Main
     {
         public void RegisterTypes(IUnityContainer container)
         {
-            container.RegisterAudioModules(typeof(DeviceInputModule), typeof(LoopbackDeviceInputModule), typeof(DeviceOutputModule), typeof(CompressorModule));
+            container.RegisterAudioModules(
+                typeof(DeviceInputModule),
+                typeof(LoopbackDeviceInputModule),
+                typeof(DeviceOutputModule),
+                typeof(CompressorModule),
+                typeof(GainModule));
         }
     }
 }

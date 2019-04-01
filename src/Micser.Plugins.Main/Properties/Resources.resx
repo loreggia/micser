@@ -123,6 +123,12 @@
   <data name="CompressorAttack" xml:space="preserve">
     <value>Attack</value>
   </data>
+  <data name="CompressorEnableAdvancedControls" xml:space="preserve">
+    <value>Advanced controls</value>
+  </data>
+  <data name="CompressorKnee" xml:space="preserve">
+    <value>Knee</value>
+  </data>
   <data name="CompressorMakeUpGain" xml:space="preserve">
     <value>Make up gain</value>
   </data>
@@ -149,6 +155,12 @@
   </data>
   <data name="DeviceOutputWidgetName" xml:space="preserve">
     <value>Device Output</value>
+  </data>
+  <data name="Gain" xml:space="preserve">
+    <value>Gain</value>
+  </data>
+  <data name="GainWidgetName" xml:space="preserve">
+    <value>Gain</value>
   </data>
   <data name="LoopbackDeviceInputWidgetName" xml:space="preserve">
     <value>Loopback Device Input</value>
