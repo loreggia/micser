@@ -54,6 +54,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Doc", "Doc", "{3C6959B4-BB2
 	ProjectSection(SolutionItems) = preProject
 		..\doc\compressor-curve.html = ..\doc\compressor-curve.html
 		..\doc\compressor-curve2.html = ..\doc\compressor-curve2.html
+		..\doc\Reiss-Tutorialondynamicrangecompression.pdf = ..\doc\Reiss-Tutorialondynamicrangecompression.pdf
 	EndProjectSection
 EndProject
 Global

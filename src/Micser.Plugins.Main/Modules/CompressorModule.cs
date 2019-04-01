@@ -1,14 +1,11 @@
 ﻿using Micser.Common.Modules;
 using Micser.Engine.Infrastructure.Audio;
-using Micser.Engine.Infrastructure.Extensions;
 using Micser.Plugins.Main.Audio;
 
 namespace Micser.Plugins.Main.Modules
 {
     public class CompressorModule : AudioModule
     {
-        private float _ratio;
-
         public CompressorModule(long id)
             : base(id)
         {
@@ -24,16 +21,11 @@ namespace Micser.Plugins.Main.Modules
         [SaveState(Defaults.Knee)]
         public float Knee { get; set; }
 
+        [SaveState(Defaults.MakeUpGain)]
+        public float MakeUpGain { get; set; }
+
         [SaveState(Defaults.Ratio)]
-        public float Ratio
-        {
-            get => _ratio;
-            set
-            {
-                MathExtensions.Clamp(ref value, -60f, 60f);
-                _ratio = value;
-            }
-        }
+        public float Ratio { get; set; }
 
         [SaveState(Defaults.Release)]
         public float Release { get; set; }
@@ -49,6 +41,7 @@ namespace Micser.Plugins.Main.Modules
             public const float Amount = 1f;
             public const float Attack = 1f;
             public const float Knee = 5f;
+            public const float MakeUpGain = 0f;
             public const float Ratio = 2f;
             public const float Release = 10f;
             public const float Threshold = -20f;
