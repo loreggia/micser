@@ -28,6 +28,7 @@ namespace Micser.Plugins.Main.Audio
         private int _sampleRate;
         private float _slope;
         private float _threshold;
+        private CompressorType _type;
 
         public CompressorSampleProcessor(CompressorModule module)
         {
@@ -43,6 +44,7 @@ namespace Micser.Plugins.Main.Audio
 
         public void Process(WaveFormat waveFormat, ref float value)
         {
+            var typeChanged = _type != _module.Type;
             if (waveFormat.SampleRate != _sampleRate ||
                 waveFormat.Channels != _channelCount ||
                 Math.Abs(_amount - _module.Amount) > AudioModule.Epsilon ||
@@ -50,56 +52,47 @@ namespace Micser.Plugins.Main.Audio
                 Math.Abs(_makeUpGain - _module.MakeUpGain) > AudioModule.Epsilon ||
                 Math.Abs(_release - _module.Release) > AudioModule.Epsilon ||
                 Math.Abs(_ratio - _module.Ratio) > AudioModule.Epsilon ||
-                Math.Abs(_threshold - _module.Threshold) > AudioModule.Epsilon)
+                Math.Abs(_threshold - _module.Threshold) > AudioModule.Epsilon ||
+                typeChanged)
             {
-                _sampleRate = waveFormat.SampleRate;
-                _channelCount = waveFormat.Channels;
-                _samplePosition = 0;
+                Initialize(waveFormat);
 
-                Initialize(waveFormat.SampleRate, _module.Threshold, _module.Knee, _module.Ratio, _module.Attack, _module.Release, _module.Amount, _module.MakeUpGain);
-                //PrepareChunk();
+                if (typeChanged)
+                {
+                    _envelope = 0f;
+                }
             }
 
-            ProcessCompressor(ref value);
+            if (Math.Abs(_slope) < 1f)
+            {
+                ProcessCompressor(ref value);
+            }
 
             MathExtensions.Clamp(ref value, -1f, 1f);
         }
 
-        /// <summary>
-        /// this is the main initialization function
-        /// it does a bunch of pre-calculation so that the inner loop of signal processing is fast
-        /// </summary>
-        private void Initialize(
-            int sampleRate,
-            float threshold,
-            float knee,
-            float ratio,
-            float attack,
-            float release,
-            float amount,
-            float makeUpGain)
+        private void Initialize(WaveFormat waveFormat)
         {
-            // useful values
-            var slope = 1.0f / ratio;
-            var attackSamples = sampleRate * attack;
-            var releaseSamples = sampleRate * release;
+            _channelCount = waveFormat.Channels;
+            _sampleRate = waveFormat.SampleRate;
+            _samplePosition = 0;
+
+            _slope = 1.0f / _module.Ratio;
+
+            var attackSamples = _sampleRate * _module.Attack;
             _alphaAttack = (float)Math.Exp(-1f / attackSamples);
+
+            var releaseSamples = _sampleRate * _module.Release;
             _alphaRelease = (float)Math.Exp(-1f / releaseSamples);
 
-            // calculate a master gain based on what sounds good
-            //var fullLevel = AudioHelper.CompressorCurve(AudioHelper.LinearToDb(1f), slope, threshold, knee);
-            //var masterGain = AudioHelper.DbToLinear(postGain) * (float)Math.Pow(1.0f / AudioHelper.DbToLinear(fullLevel), 0.6f);
-
-            // save everything
-            _attack = attack;
-            _release = release;
-            _ratio = ratio;
-            _threshold = threshold;
-            _knee = knee;
-            _amount = amount;
-            _slope = slope;
-            _envelope = 0f;
-            _makeUpGain = makeUpGain;
+            _type = _module.Type;
+            _attack = _module.Attack;
+            _release = _module.Release;
+            _ratio = _module.Ratio;
+            _threshold = _module.Threshold;
+            _knee = _module.Knee;
+            _amount = _module.Amount;
+            _makeUpGain = _module.MakeUpGain;
         }
 
         private void ProcessCompressor(ref float lInput)
@@ -109,9 +102,12 @@ namespace Micser.Plugins.Main.Audio
             var dbInput = lInputAbs < 0.000001 ? -120f : AudioHelper.LinearToDb(lInputAbs);
 
             // Gain computer - static apply input/output curve
-            var dbCompressed = AudioHelper.CompressorCurve(dbInput, _slope, _threshold, _knee);
+            var dbCompressed = _type == CompressorType.Downward ?
+                AudioHelper.CompressorCurveDown(dbInput, _slope, _threshold, _knee) :
+                AudioHelper.CompressorCurveUp(dbInput, _slope, _threshold, _knee);
 
             var dbDiff = dbInput - dbCompressed;
+            dbDiff *= _amount;
 
             if ((_samplePosition %= ChunkSize) == 0)
             {
@@ -120,7 +116,7 @@ namespace Micser.Plugins.Main.Audio
 
             // Ballistics - smoothing of the gain
             float dbEnv;
-            if (_chunkDbDiff > _envelope)
+            if (dbDiff > _envelope)
             {
                 dbEnv = _alphaAttack * _envelope + (1 - _alphaAttack) * dbDiff;
             }
@@ -131,7 +127,7 @@ namespace Micser.Plugins.Main.Audio
             _envelope = dbEnv;
 
             // find control
-            var lGain = AudioHelper.DbToLinear(_makeUpGain - dbEnv);
+            var lGain = AudioHelper.DbToLinear(_makeUpGain * _amount - dbEnv);
             lInput *= lGain;
 
             _samplePosition++;

@@ -28,6 +28,7 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" SharedSizeGroup="{x:Static i:AppGlobals+Widgets.LabelsSharedSizeGroup}" />
@@ -52,15 +53,18 @@
         </Grid>
 
         <Label Grid.Row="3" Grid.Column="0" Content="{x:Static p:Resources.CompressorRatio}" />
-        <controls:EditableSlider Grid.Row="3" Grid.Column="1" Value="{Binding Ratio, Mode=TwoWay}" Minimum="-20" Maximum="20" />
+        <controls:EditableSlider Grid.Row="3" Grid.Column="1" Value="{Binding Ratio, Mode=TwoWay}" Minimum="1" Maximum="60" />
 
         <Label Grid.Row="4" Grid.Column="0" Content="{x:Static p:Resources.CompressorThreshold}" />
         <controls:EditableSlider Grid.Row="4" Grid.Column="1" Value="{Binding Threshold, Mode=TwoWay}" Minimum="-60" Maximum="0" />
 
-        <Label Grid.Row="5" Grid.Column="0" Content="{x:Static p:Resources.CompressorAttack}" />
-        <controls:EditableSlider Grid.Row="5" Grid.Column="1" Value="{Binding Attack, Mode=TwoWay}" Minimum="0" Maximum="100" />
+        <Label Grid.Row="5" Grid.Column="0" Content="{x:Static p:Resources.CompressorMakeUpGain}" />
+        <controls:EditableSlider Grid.Row="5" Grid.Column="1" Value="{Binding MakeUpGain, Mode=TwoWay}" Minimum="0" Maximum="60" />
 
-        <Label Grid.Row="6" Grid.Column="0" Content="{x:Static p:Resources.CompressorRelease}" />
-        <controls:EditableSlider Grid.Row="6" Grid.Column="1" Value="{Binding Release, Mode=TwoWay}" Minimum="0" Maximum="100" />
+        <Label Grid.Row="6" Grid.Column="0" Content="{x:Static p:Resources.CompressorAttack}" />
+        <controls:EditableSlider Grid.Row="6" Grid.Column="1" Value="{Binding Attack, Mode=TwoWay}" Minimum="0" Maximum="1" />
+
+        <Label Grid.Row="7" Grid.Column="0" Content="{x:Static p:Resources.CompressorRelease}" />
+        <controls:EditableSlider Grid.Row="7" Grid.Column="1" Value="{Binding Release, Mode=TwoWay}" Minimum="0" Maximum="1" />
     </Grid>
 </widgets:Widget>

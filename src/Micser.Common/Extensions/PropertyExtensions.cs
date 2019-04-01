@@ -24,21 +24,7 @@ namespace Micser.Common.Extensions
             var properties = obj.GetStateProperties();
             foreach (var property in properties)
             {
-                var value = property.Key.GetValue(obj);
-                if (value == null)
-                {
-                    value = property.Value.DefaultValue;
-                }
-                else
-                {
-                    var type = value.GetType();
-                    var typeDefault = type.IsValueType ? Activator.CreateInstance(type) : null;
-
-                    if (Equals(value, typeDefault))
-                    {
-                        value = property.Value.DefaultValue;
-                    }
-                }
+                var value = property.Key.GetValue(obj) ?? property.Value.DefaultValue;
 
                 state.Data[property.Key.Name] = value;
             }

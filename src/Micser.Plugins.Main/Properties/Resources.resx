@@ -123,6 +123,9 @@
   <data name="CompressorAttack" xml:space="preserve">
     <value>Attack</value>
   </data>
+  <data name="CompressorMakeUpGain" xml:space="preserve">
+    <value>Make up gain</value>
+  </data>
   <data name="CompressorRatio" xml:space="preserve">
     <value>Ratio</value>
   </data>

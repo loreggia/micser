@@ -180,6 +180,16 @@ namespace Micser.Engine.Audio
             if (audioModule != null)
             {
                 var moduleDto = _moduleService.GetById(id);
+
+                var applySystemVolume = !audioModule.UseSystemVolume && moduleDto.State.UseSystemVolume;
+                if (applySystemVolume && _endpointVolume != null)
+                {
+                    moduleDto.State.IsMuted = _endpointVolume.IsMuted;
+                    moduleDto.State.Volume = _endpointVolume.MasterVolumeLevelScalar;
+                    _moduleService.Update(moduleDto);
+                    _apiServer.SendMessageAsync(new JsonRequest("modules", "updatevolume", moduleDto));
+                }
+
                 audioModule.SetState(moduleDto.State);
             }
         }
