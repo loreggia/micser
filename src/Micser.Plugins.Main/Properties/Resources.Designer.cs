@@ -79,6 +79,24 @@ namespace Micser.Plugins.Main.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Advanced controls.
+        /// </summary>
+        public static string CompressorEnableAdvancedControls {
+            get {
+                return ResourceManager.GetString("CompressorEnableAdvancedControls", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Knee.
+        /// </summary>
+        public static string CompressorKnee {
+            get {
+                return ResourceManager.GetString("CompressorKnee", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Make up gain.
         /// </summary>
         public static string CompressorMakeUpGain {
@@ -156,6 +174,24 @@ namespace Micser.Plugins.Main.Properties {
         public static string DeviceOutputWidgetName {
             get {
                 return ResourceManager.GetString("DeviceOutputWidgetName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Gain.
+        /// </summary>
+        public static string Gain {
+            get {
+                return ResourceManager.GetString("Gain", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Gain.
+        /// </summary>
+        public static string GainWidgetName {
+            get {
+                return ResourceManager.GetString("GainWidgetName", resourceCulture);
             }
         }
         

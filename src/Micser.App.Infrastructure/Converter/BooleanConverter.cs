@@ -5,6 +5,10 @@ namespace Micser.App.Infrastructure.Converter
 {
     public class BooleanConverter<T> : ConverterExtension
     {
+        public BooleanConverter()
+        {
+        }
+
         public BooleanConverter(T trueValue, T falseValue)
         {
             TrueValue = trueValue;

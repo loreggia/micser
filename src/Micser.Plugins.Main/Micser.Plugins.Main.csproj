@@ -48,12 +48,14 @@
   <ItemGroup>
     <Compile Include="Audio\CompressorSampleProcessor.cs" />
     <Compile Include="Audio\CompressorType.cs" />
+    <Compile Include="Audio\GainSampleProcessor.cs" />
     <Compile Include="Audio\WriteableBufferingSource.cs" />
     <Compile Include="MainAppModule.cs" />
     <Compile Include="MainEngineModule.cs" />
     <Compile Include="Modules\CompressorModule.cs" />
     <Compile Include="Modules\DeviceInputModule.cs" />
     <Compile Include="Modules\DeviceOutputModule.cs" />
+    <Compile Include="Modules\GainModule.cs" />
     <Compile Include="Modules\LoopbackDeviceInputModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -65,6 +67,10 @@
     <Compile Include="Widgets\DeviceInputViewModel.cs" />
     <Compile Include="Widgets\CompressorWidget.xaml.cs">
       <DependentUpon>CompressorWidget.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Widgets\GainViewModel.cs" />
+    <Compile Include="Widgets\GainWidget.xaml.cs">
+      <DependentUpon>GainWidget.xaml</DependentUpon>
     </Compile>
     <Compile Include="Widgets\DeviceOutputViewModel.cs" />
     <Compile Include="Widgets\DeviceInputWidget.xaml.cs">
@@ -86,6 +92,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="Widgets\CompressorWidget.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Widgets\GainWidget.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

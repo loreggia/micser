@@ -38,13 +38,13 @@ namespace Micser.Plugins.Main.Modules
 
         public class Defaults
         {
-            public const float Amount = 1f;
-            public const float Attack = 1f;
+            public const float Amount = 0f;
+            public const float Attack = 0.05f;
             public const float Knee = 5f;
             public const float MakeUpGain = 0f;
             public const float Ratio = 2f;
-            public const float Release = 10f;
-            public const float Threshold = -20f;
+            public const float Release = 0.1f;
+            public const float Threshold = -10f;
             public const CompressorType Type = CompressorType.Upward;
         }
     }

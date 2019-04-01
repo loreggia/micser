@@ -18,5 +18,10 @@
                 value = max;
             }
         }
+
+        public static float Lerp(float min, float max, float amount)
+        {
+            return min * (1 - amount) + max * amount;
+        }
     }
 }

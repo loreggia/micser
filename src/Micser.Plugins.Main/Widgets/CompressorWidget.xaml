@@ -10,10 +10,11 @@
                 xmlns:audio="clr-namespace:Micser.Plugins.Main.Audio"
                 xmlns:p="clr-namespace:Micser.Plugins.Main.Properties"
                 xmlns:i="clr-namespace:Micser.App.Infrastructure;assembly=Micser.App.Infrastructure"
+                xmlns:behaviors="clr-namespace:Micser.App.Infrastructure.Behaviors;assembly=Micser.App.Infrastructure"
                 mc:Ignorable="d"
                 d:DataContext="{d:DesignInstance local:CompressorViewModel}"
-                MinWidth="380"
-                MinHeight="280">
+                MinWidth="{Binding EnableAdvancedControls, Converter={converter:BooleanToDoubleConverter TrueValue=300, FalseValue=300}}"
+                MinHeight="{Binding EnableAdvancedControls, Converter={converter:BooleanToDoubleConverter TrueValue=360, FalseValue=200}}">
 
     <widgets:Widget.Resources>
         <converter:EnumToBooleanConverter x:Key="EnumToBooleanConverter" />
@@ -21,9 +22,6 @@
 
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -52,19 +50,41 @@
                          IsChecked="{Binding Type, Mode=TwoWay, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static audio:CompressorType.Downward}}" />
         </Grid>
 
-        <Label Grid.Row="3" Grid.Column="0" Content="{x:Static p:Resources.CompressorRatio}" />
-        <controls:EditableSlider Grid.Row="3" Grid.Column="1" Value="{Binding Ratio, Mode=TwoWay}" Minimum="1" Maximum="60" />
+        <Label Grid.Row="3" Grid.Column="0" Content="{x:Static p:Resources.CompressorEnableAdvancedControls}" Target="{Binding ElementName=CkbEnableAdvancedControls}" behaviors:CheckBoxLabelBehavior.IsEnabled="True" />
+        <CheckBox Grid.Row="3" Grid.Column="1" x:Name="CkbEnableAdvancedControls" HorizontalAlignment="Stretch" VerticalAlignment="Center" IsChecked="{Binding EnableAdvancedControls, Mode=TwoWay}" />
 
-        <Label Grid.Row="4" Grid.Column="0" Content="{x:Static p:Resources.CompressorThreshold}" />
-        <controls:EditableSlider Grid.Row="4" Grid.Column="1" Value="{Binding Threshold, Mode=TwoWay}" Minimum="-60" Maximum="0" />
+        <Grid Grid.Row="4" Grid.ColumnSpan="2" Visibility="{Binding EnableAdvancedControls, Converter={converter:BooleanToVisibilityConverter}}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-        <Label Grid.Row="5" Grid.Column="0" Content="{x:Static p:Resources.CompressorMakeUpGain}" />
-        <controls:EditableSlider Grid.Row="5" Grid.Column="1" Value="{Binding MakeUpGain, Mode=TwoWay}" Minimum="0" Maximum="60" />
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" SharedSizeGroup="{x:Static i:AppGlobals+Widgets.LabelsSharedSizeGroup}" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
-        <Label Grid.Row="6" Grid.Column="0" Content="{x:Static p:Resources.CompressorAttack}" />
-        <controls:EditableSlider Grid.Row="6" Grid.Column="1" Value="{Binding Attack, Mode=TwoWay}" Minimum="0" Maximum="1" />
+            <Label Grid.Row="0" Grid.Column="0" Content="{x:Static p:Resources.CompressorRatio}" />
+            <controls:EditableSlider Grid.Row="0" Grid.Column="1" Value="{Binding Ratio, Mode=TwoWay}" Minimum="1" Maximum="60" />
 
-        <Label Grid.Row="7" Grid.Column="0" Content="{x:Static p:Resources.CompressorRelease}" />
-        <controls:EditableSlider Grid.Row="7" Grid.Column="1" Value="{Binding Release, Mode=TwoWay}" Minimum="0" Maximum="1" />
+            <Label Grid.Row="1" Grid.Column="0" Content="{x:Static p:Resources.CompressorThreshold}" />
+            <controls:EditableSlider Grid.Row="1" Grid.Column="1" Value="{Binding Threshold, Mode=TwoWay}" Minimum="-60" Maximum="0" />
+
+            <Label Grid.Row="2" Grid.Column="0" Content="{x:Static p:Resources.CompressorKnee}" />
+            <controls:EditableSlider Grid.Row="2" Grid.Column="1" Value="{Binding Knee, Mode=TwoWay}" Minimum="0" Maximum="60" />
+
+            <Label Grid.Row="3" Grid.Column="0" Content="{x:Static p:Resources.CompressorMakeUpGain}" />
+            <controls:EditableSlider Grid.Row="3" Grid.Column="1" Value="{Binding MakeUpGain, Mode=TwoWay}" Minimum="0" Maximum="60" />
+
+            <Label Grid.Row="4" Grid.Column="0" Content="{x:Static p:Resources.CompressorAttack}" />
+            <controls:EditableSlider Grid.Row="4" Grid.Column="1" Value="{Binding Attack, Mode=TwoWay}" Minimum="0" Maximum="1" />
+
+            <Label Grid.Row="5" Grid.Column="0" Content="{x:Static p:Resources.CompressorRelease}" />
+            <controls:EditableSlider Grid.Row="5" Grid.Column="1" Value="{Binding Release, Mode=TwoWay}" Minimum="0" Maximum="1" />
+        </Grid>
     </Grid>
 </widgets:Widget>
