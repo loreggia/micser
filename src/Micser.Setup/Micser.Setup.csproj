@@ -101,5 +101,5 @@
     <PostBuildEvent>
     </PostBuildEvent>
   </PropertyGroup>
-  <UsingTask AssemblyFile="$(SolutionDir)packages\WixSharp.1.6.4.0\build\SetEnvVar.dll" TaskName="SetEnvVar" />
+  <UsingTask AssemblyFile="$(NuGetPackageRoot)wixsharp\1.9.5\build\SetEnvVar.dll" TaskName="SetEnvVar" />
 </Project>
