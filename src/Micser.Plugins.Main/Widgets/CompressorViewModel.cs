@@ -10,6 +10,7 @@ namespace Micser.Plugins.Main.Widgets
     {
         private float _amount;
         private float _attack;
+        private float _makeUpGain;
         private float _ratio;
         private float _release;
         private float _threshold;
@@ -33,6 +34,13 @@ namespace Micser.Plugins.Main.Widgets
         {
             get => _attack;
             set => SetProperty(ref _attack, value);
+        }
+
+        [SaveState(CompressorModule.Defaults.MakeUpGain)]
+        public float MakeUpGain
+        {
+            get => _makeUpGain;
+            set => SetProperty(ref _makeUpGain, value);
         }
 
         public override Type ModuleType => typeof(CompressorModule);

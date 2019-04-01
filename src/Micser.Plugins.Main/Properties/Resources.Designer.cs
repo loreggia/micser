@@ -79,6 +79,15 @@ namespace Micser.Plugins.Main.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Make up gain.
+        /// </summary>
+        public static string CompressorMakeUpGain {
+            get {
+                return ResourceManager.GetString("CompressorMakeUpGain", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Ratio.
         /// </summary>
         public static string CompressorRatio {

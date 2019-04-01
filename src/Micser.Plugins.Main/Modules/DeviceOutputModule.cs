@@ -1,5 +1,6 @@
 ﻿using CSCore;
 using CSCore.CoreAudioAPI;
+using CSCore.DSP;
 using CSCore.SoundOut;
 using CSCore.Streams;
 using Micser.Engine.Infrastructure.Audio;
@@ -164,7 +165,20 @@ namespace Micser.Plugins.Main.Modules
                 _outputMixer.RemoveSource(_inputSources[id]);
             }
 
-            _inputSources[id] = _inputBuffers[id].ToSampleSource();
+            IWaveSource waveSource = _inputBuffers[id];
+
+            if (waveSource.WaveFormat.SampleRate != _outputMixer.WaveFormat.SampleRate)
+            {
+                waveSource = waveSource.ChangeSampleRate(_outputMixer.WaveFormat.SampleRate);
+            }
+
+            if (waveSource.WaveFormat.Channels != _outputMixer.WaveFormat.Channels)
+            {
+                waveSource = new DmoChannelResampler(waveSource, ChannelMatrix.GetMatrix(waveSource.WaveFormat, _outputMixer.WaveFormat));
+            }
+
+            _inputSources[id] = waveSource.ToSampleSource();
+
             _outputMixer.AddSource(_inputSources[id]);
         }
 
