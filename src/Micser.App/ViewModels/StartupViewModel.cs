@@ -1,6 +1,7 @@
 ﻿using Micser.App.Infrastructure;
 using Micser.App.Infrastructure.Api;
 using Micser.App.Infrastructure.Settings;
+using Micser.App.Settings;
 using Micser.App.Views;
 using Prism.Events;
 using System.Threading.Tasks;
@@ -40,6 +41,17 @@ namespace Micser.App.ViewModels
         private async void OnModulesLoaded()
         {
             await Task.Run(() => { _settingsService.Load(); });
+
+            var shellState = _settingsService.GetSetting<ShellState>(AppGlobals.SettingKeys.ShellState);
+            var shell = Application.Current.MainWindow;
+
+            if (shellState != null && shell != null)
+            {
+                shell.Width = shellState.Width;
+                shell.Height = shellState.Height;
+                shell.Top = shellState.Top;
+                shell.Left = shellState.Left;
+            }
 
             var statusResult = await _statusApiClient.GetStatus();
 

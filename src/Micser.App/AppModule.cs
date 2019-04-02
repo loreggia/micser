@@ -36,7 +36,6 @@ namespace Micser.App
                 StorageType = SettingStorageType.Custom,
                 Handler = containerProvider.Resolve<StartupSettingHandler>()
             });
-
             settingsRegistry.Add(new SettingDefinition
             {
                 Key = AppGlobals.SettingKeys.ColorTheme,
@@ -46,6 +45,13 @@ namespace Micser.App
                 Type = SettingType.List,
                 StorageType = SettingStorageType.Internal,
                 Handler = containerProvider.Resolve<ColorThemeSettingHandler>()
+            });
+            settingsRegistry.Add(new SettingDefinition
+            {
+                Key = AppGlobals.SettingKeys.ShellState,
+                Type = SettingType.Object,
+                StorageType = SettingStorageType.Internal,
+                IsHidden = true
             });
 
             var navigationManager = containerProvider.Resolve<INavigationManager>();

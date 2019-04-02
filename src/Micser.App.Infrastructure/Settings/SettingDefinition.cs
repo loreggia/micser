@@ -14,7 +14,8 @@ namespace Micser.App.Infrastructure.Settings
         String,
         Integer,
         Decimal,
-        List
+        List,
+        Object
     }
 
     public class SettingDefinition
@@ -28,6 +29,7 @@ namespace Micser.App.Infrastructure.Settings
         public object DefaultValue { get; set; }
         public string Description { get; set; }
         public ISettingHandler Handler { get; set; }
+        public bool IsHidden { get; set; }
         public string Key { get; set; }
         public IDictionary<object, string> List { get; set; }
         public string Name { get; set; }

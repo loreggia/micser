@@ -44,26 +44,29 @@ namespace Micser.App.ViewModels
             IsBusy = true;
             await Task.Run(() =>
             {
-                var settings = _settingsRegistry.Items.Select(s =>
-                {
-                    switch (s.Type)
+                var settings = _settingsRegistry
+                    .Items
+                    .Where(s => !s.IsHidden)
+                    .Select(s =>
                     {
-                        case SettingType.Boolean:
-                            return (SettingViewModel)new BooleanSettingViewModel(s, _settingsService.GetSetting<bool>(s.Key));
+                        switch (s.Type)
+                        {
+                            case SettingType.Boolean:
+                                return (SettingViewModel)new BooleanSettingViewModel(s, _settingsService.GetSetting<bool>(s.Key));
 
-                        case SettingType.Integer:
-                            return new IntegerSettingViewModel(s, _settingsService.GetSetting<long>(s.Key));
+                            case SettingType.Integer:
+                                return new IntegerSettingViewModel(s, _settingsService.GetSetting<long>(s.Key));
 
-                        case SettingType.Decimal:
-                            return new DecimalSettingViewModel(s, _settingsService.GetSetting<double>(s.Key));
+                            case SettingType.Decimal:
+                                return new DecimalSettingViewModel(s, _settingsService.GetSetting<double>(s.Key));
 
-                        case SettingType.List:
-                            return new ListSettingViewModel(s, _settingsService.GetSetting<object>(s.Key), s.List);
+                            case SettingType.List:
+                                return new ListSettingViewModel(s, _settingsService.GetSetting<object>(s.Key), s.List);
 
-                        default:
-                            return new StringSettingViewModel(s, _settingsService.GetSetting<string>(s.Key));
-                    }
-                });
+                            default:
+                                return new StringSettingViewModel(s, _settingsService.GetSetting<object>(s.Key)?.ToString());
+                        }
+                    });
 
                 Settings = settings.ToArray();
             });
