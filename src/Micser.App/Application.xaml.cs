@@ -1,7 +1,9 @@
 ﻿using CommonServiceLocator;
 using Micser.App.Infrastructure;
 using Micser.App.Infrastructure.DataAccess;
+using Micser.App.Infrastructure.Settings;
 using Micser.App.Infrastructure.Themes;
+using Micser.App.Settings;
 using Micser.Common;
 using Micser.Common.DataAccess;
 using NLog;
@@ -29,6 +31,8 @@ namespace Micser.App
     /// </summary>
     public partial class Application
     {
+        private MainShell _shell;
+
         public static T GetService<T>()
         {
             return ServiceLocator.Current.GetInstance<T>();
@@ -46,7 +50,19 @@ namespace Micser.App
 
         protected override Window CreateShell()
         {
-            return GetService<MainShell>();
+            _shell = GetService<MainShell>();
+            var settingsService = GetService<ISettingsService>();
+            var shellState = settingsService.GetSetting<ShellState>(AppGlobals.SettingKeys.ShellState);
+
+            if (shellState != null)
+            {
+                _shell.Width = shellState.Width;
+                _shell.Height = shellState.Height;
+                _shell.Top = shellState.Top;
+                _shell.Left = shellState.Left;
+            }
+
+            return _shell;
         }
 
         protected override void InitializeModules()
@@ -68,6 +84,22 @@ namespace Micser.App
 
         protected override void OnExit(ExitEventArgs e)
         {
+            if (_shell != null)
+            {
+                var state = new ShellState
+                {
+                    Width = _shell.ActualWidth,
+                    Height = _shell.ActualHeight,
+                    Top = _shell.Top,
+                    Left = _shell.Left
+                };
+
+                var settingsService = GetService<ISettingsService>();
+                settingsService.SetSetting(AppGlobals.SettingKeys.ShellState, state);
+            }
+
+            _shell = null;
+
             base.OnExit(e);
 
             var logger = LogManager.GetCurrentClassLogger();
