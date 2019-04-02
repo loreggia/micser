@@ -4,6 +4,7 @@ using NLog;
 using NLog.Config;
 using NLog.Targets;
 using System;
+using System.Diagnostics;
 using System.IO;
 
 namespace Micser.DriverUtility
@@ -33,6 +34,18 @@ namespace Micser.DriverUtility
         }
 
         private static int Main(string[] args)
+        {
+            var result = MainInternal(args);
+
+            if (Debugger.IsAttached)
+            {
+                Console.ReadLine();
+            }
+
+            return result;
+        }
+
+        private static int MainInternal(string[] args)
         {
             InitLogging();
 
