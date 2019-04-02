@@ -50,19 +50,7 @@ namespace Micser.App
 
         protected override Window CreateShell()
         {
-            _shell = GetService<MainShell>();
-            var settingsService = GetService<ISettingsService>();
-            var shellState = settingsService.GetSetting<ShellState>(AppGlobals.SettingKeys.ShellState);
-
-            if (shellState != null)
-            {
-                _shell.Width = shellState.Width;
-                _shell.Height = shellState.Height;
-                _shell.Top = shellState.Top;
-                _shell.Left = shellState.Left;
-            }
-
-            return _shell;
+            return _shell = GetService<MainShell>();
         }
 
         protected override void InitializeModules()
@@ -96,9 +84,9 @@ namespace Micser.App
 
                 var settingsService = GetService<ISettingsService>();
                 settingsService.SetSetting(AppGlobals.SettingKeys.ShellState, state);
-            }
 
-            _shell = null;
+                _shell = null;
+            }
 
             base.OnExit(e);
 
