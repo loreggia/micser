@@ -18,11 +18,11 @@
     <ItemGroup>
       <AppFiles Include="$(SolutionDir)Micser.App\bin\$(ConfigurationName)\**\*.*" Exclude="$(SolutionDir)Micser.App\bin\$(ConfigurationName)\**\*.pdb" />
       <AppFiles Include="$(SolutionDir)Micser.Engine\bin\$(ConfigurationName)\**\*.*" Exclude="$(SolutionDir)Micser.Engine\bin\$(ConfigurationName)\**\*.pdb" />
+      <AppFiles Include="$(SolutionDir)Micser.DriverUtility\bin\$(ConfigurationName)\**\*.*" Exclude="$(SolutionDir)Micser.DriverUtility\bin\$(ConfigurationName)\**\*.pdb" />
+      <AppFiles Include="$(SolutionDir)Micser.Vac.Package\bin\$(ConfigurationName)\**\*.*" />
     </ItemGroup>
     <ItemGroup>
-      <DrvFiles Include="$(SolutionDir)Micser.Vac.Package\bin\$(ConfigurationName)\**\*.*" />
     </ItemGroup>
     <Copy SourceFiles="@(AppFiles)" DestinationFolder="$(AppDir)\%(RecursiveDir)" />
-    <Copy SourceFiles="@(DrvFiles)" DestinationFolder="$(DrvDir)\%(RecursiveDir)" />
   </Target>
 </Project>

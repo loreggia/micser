@@ -17,10 +17,7 @@ namespace Micser.Setup
 
             var project =
                 new ManagedProject("Micser",
-                                   new Dir(@"%ProgramFiles%\Micser",
-                                           new Dir(@"App", new Files(@"App\*.*", FileFilter)),
-                                           //new Dir(@"Engine", new Files(@"Engine\*.*", FileFilter)),
-                                           new Dir(@"Driver", new Files(@"Driver\*.*"))),
+                                   new Dir(@"%ProgramFiles%\Micser", new Files(@"App\*.*", FileFilter)),
                                    new Dir(@"%ProgramMenu%\Micser",
                                        new ExeFileShortcut("Micser", @"[INSTALLDIR]\App\Micser.App.exe", ""),
                                        new ExeFileShortcut("Uninstall Micser", "[SystemFolder]msiexec.exe", "/x [ProductCode]")))
