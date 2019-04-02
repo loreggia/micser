@@ -68,7 +68,7 @@ namespace Micser.DriverUtility
 
                     try
                     {
-                        var elevationResultSize = Marshal.SizeOf(typeof(TOKEN_ELEVATION_TYPE));
+                        var elevationResultSize = Marshal.SizeOf(typeof(int));
 
                         var elevationTypePtr = Marshal.AllocHGlobal(elevationResultSize);
                         try
