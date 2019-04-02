@@ -39,6 +39,7 @@
         {
             public const string ColorTheme = "ColorTheme";
             public const string ExitOnClose = "ExitOnClose";
+            public const string ShellState = "ShellState";
             public const string Startup = "Startup";
         }
 

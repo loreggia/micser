@@ -71,6 +71,7 @@
       <DependentUpon>MainShell.xaml</DependentUpon>
     </Compile>
     <Compile Include="Settings\ColorThemeSettingHandler.cs" />
+    <Compile Include="Settings\ShellState.cs" />
     <Compile Include="Settings\StartupSettingHandler.cs" />
     <Compile Include="ViewModels\AboutViewModel.cs" />
     <Compile Include="ViewModels\SettingsViewModel.cs" />
