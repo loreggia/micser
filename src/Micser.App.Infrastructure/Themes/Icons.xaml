@@ -232,4 +232,65 @@
             </Rectangle>
         </Viewbox>
     </DataTemplate>
+
+    <DataTemplate x:Key="Icon_Restart_16x">
+        <Viewbox Width="16" Height="16">
+            <Rectangle Width="16" Height="16">
+                <Rectangle.Fill>
+                    <DrawingBrush>
+                        <DrawingBrush.Drawing>
+                            <DrawingGroup>
+                                <DrawingGroup.Children>
+                                    <GeometryDrawing Brush="#00FFFFFF" Geometry="F1M16,16L0,16 0,0 16,0z" />
+                                    <!--<GeometryDrawing Brush="#FFF6F6F6" Geometry="F1M16,8C16,12.411 12.411,16 8,16 5.314,16 2.822,14.663 1.333,12.425L0.779999999999999,11.592 4.112,9.377 4.666,10.21C5.41,11.331 6.656,12 8,12 10.206,12 12,10.206 12,8 12,5.794 10.206,4 8,4L8,8 0,8 0,0 4,0 4,1.088C5.212,0.384 6.597,0 8,0 12.411,0 16,3.589 16,8" />-->
+                                    <GeometryDrawing Brush="{DynamicResource {t:BrushThemeKey DefaultIconPrimary}}" Geometry="F1M8,1C6.076,1,4.291,1.801,3,3.121L3,1 1,1 1,7 7,7 7,5 4.002,5C4.93,3.766 6.401,3 8,3 10.757,3 13,5.243 13,8 13,10.757 10.757,13 8,13 6.321,13 4.763,12.164 3.833,10.764L2.167,11.871C3.469,13.83 5.649,15 8,15 11.859,15 15,11.859 15,8 15,4.14 11.859,1 8,1" />
+                                </DrawingGroup.Children>
+                            </DrawingGroup>
+                        </DrawingBrush.Drawing>
+                    </DrawingBrush>
+                </Rectangle.Fill>
+            </Rectangle>
+        </Viewbox>
+    </DataTemplate>
+
+    <DataTemplate x:Key="Icon_Start_16x">
+        <Viewbox Width="16" Height="16">
+            <Rectangle Width="16" Height="16">
+                <Rectangle.Fill>
+                    <DrawingBrush>
+                        <DrawingBrush.Drawing>
+                            <DrawingGroup>
+                                <DrawingGroup.Children>
+                                    <GeometryDrawing Brush="#00FFFFFF" Geometry="F1M16,16L0,16 0,0 16,0z" />
+                                    <!--<GeometryDrawing Brush="#FFF6F6F6" Geometry="F1M2.9997,-0.000199999999999534L2.9997,15.9998 13.6677,7.9998z" />-->
+                                    <GeometryDrawing Brush="{DynamicResource {t:BrushThemeKey DefaultIconPrimary}}" Geometry="F1M4,2L4,14 11.999,8z M6,6L8.667,8 6,10z" />
+                                    <!--<GeometryDrawing Brush="#FFF0EFF1" Geometry="F1M8.667,8L6,10 6,6z" />-->
+                                </DrawingGroup.Children>
+                            </DrawingGroup>
+                        </DrawingBrush.Drawing>
+                    </DrawingBrush>
+                </Rectangle.Fill>
+            </Rectangle>
+        </Viewbox>
+    </DataTemplate>
+
+    <DataTemplate x:Key="Icon_Stop_16x">
+        <Viewbox Width="16" Height="16">
+            <Rectangle Width="16" Height="16">
+                <Rectangle.Fill>
+                    <DrawingBrush>
+                        <DrawingBrush.Drawing>
+                            <DrawingGroup>
+                                <DrawingGroup.Children>
+                                    <GeometryDrawing Brush="#00FFFFFF" Geometry="F1M16,16L0,16 0,0 16,0z" />
+                                    <!--<GeometryDrawing Brush="#FFF6F6F6" Geometry="F1M13,13L3,13 3,3 13,3z" />-->
+                                    <GeometryDrawing Brush="{DynamicResource {t:BrushThemeKey DefaultIconPrimary}}" Geometry="F1M12,12L4,12 4,4 12,4z" />
+                                </DrawingGroup.Children>
+                            </DrawingGroup>
+                        </DrawingBrush.Drawing>
+                    </DrawingBrush>
+                </Rectangle.Fill>
+            </Rectangle>
+        </Viewbox>
+    </DataTemplate>
 </ResourceDictionary>

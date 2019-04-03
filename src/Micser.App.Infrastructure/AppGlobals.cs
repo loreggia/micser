@@ -9,13 +9,16 @@
         {
             public const string File = "File";
             public const string FileExit = File + "Exit";
-            public const string FileLoad = "FileLoad";
-            public const string FileSave = "FileSave";
+            public const string FileLoad = File + "Load";
+            public const string FileSave = File + "Save";
             public const string Help = "Help";
             public const string HelpAbout = Help + "About";
             public const string Tools = "Tools";
-            public const string ToolsRefresh = "ToolsRefresh";
+            public const string ToolsRefresh = Tools + "Refresh";
+            public const string ToolsRestart = Tools + "Restart";
             public const string ToolsSettings = Tools + "Settings";
+            public const string ToolsStart = Tools + "Start";
+            public const string ToolsStop = Tools + "Stop";
         }
 
         public static class ModuleStateKeys

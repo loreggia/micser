@@ -142,13 +142,22 @@
     <value>_Load</value>
   </data>
   <data name="MenuItemRefreshHeader" xml:space="preserve">
-    <value>_Refresh</value>
+    <value>Re_fresh</value>
+  </data>
+  <data name="MenuItemRestartHeader" xml:space="preserve">
+    <value>_Restart</value>
   </data>
   <data name="MenuItemSaveHeader" xml:space="preserve">
     <value>_Save</value>
   </data>
   <data name="MenuItemSettingsHeader" xml:space="preserve">
     <value>_Settings</value>
+  </data>
+  <data name="MenuItemStartHeader" xml:space="preserve">
+    <value>_Start</value>
+  </data>
+  <data name="MenuItemStopHeader" xml:space="preserve">
+    <value>Sto_p</value>
   </data>
   <data name="MenuItemToolsHeader" xml:space="preserve">
     <value>_Tools</value>
