@@ -15,7 +15,7 @@ namespace Micser.Engine.Api
             this["start"] = _ => Start();
             this["stop"] = _ => Stop();
             this["restart"] = _ => Restart();
-            this["status"] = _ => GetStatus();
+            this["getstatus"] = _ => GetStatus();
         }
 
         private bool GetStatus()

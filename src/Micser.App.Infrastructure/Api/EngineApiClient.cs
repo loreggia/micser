@@ -13,6 +13,12 @@ namespace Micser.App.Infrastructure.Api
             _apiClient = apiClient;
         }
 
+        public async Task<ServiceResult<bool>> GetStatusAsync()
+        {
+            var response = await _apiClient.SendMessageAsync(new JsonRequest(ResourceName, "getstatus"));
+            return new ServiceResult<bool>(response);
+        }
+
         public async Task<ServiceResult<bool>> RestartAsync()
         {
             var response = await _apiClient.SendMessageAsync(new JsonRequest(ResourceName, "restart"));
