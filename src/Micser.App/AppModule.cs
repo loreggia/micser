@@ -1,4 +1,5 @@
 ﻿using Micser.App.Infrastructure;
+using Micser.App.Infrastructure.Api;
 using Micser.App.Infrastructure.Extensions;
 using Micser.App.Infrastructure.Menu;
 using Micser.App.Infrastructure.Settings;
@@ -101,12 +102,15 @@ namespace Micser.App
             });
             menuItemRegistry.Add(new MenuItemDescription { IsSeparator = true, ParentId = AppGlobals.MenuItemIds.Tools });
             // Tools->Start
+            var engineApiClient = containerProvider.Resolve<EngineApiClient>();
             menuItemRegistry.Add(new MenuItemDescription
             {
                 Header = Resources.MenuItemStartHeader,
                 Id = AppGlobals.MenuItemIds.ToolsStart,
                 ParentId = AppGlobals.MenuItemIds.Tools,
-                //Command = CustomApplicationCommands.Refresh,
+                // todo canexecute
+                // , () => !engineApiClient.GetStatusAsync().ConfigureAwait(true).GetAwaiter().GetResult().Data
+                Command = new DelegateCommand(async () => await engineApiClient.StartAsync()),
                 IconTemplateName = "Icon_Start_16x"
             });
             // Tools->Stop
@@ -115,7 +119,7 @@ namespace Micser.App
                 Header = Resources.MenuItemStopHeader,
                 Id = AppGlobals.MenuItemIds.ToolsStop,
                 ParentId = AppGlobals.MenuItemIds.Tools,
-                //Command = CustomApplicationCommands.Refresh,
+                Command = new DelegateCommand(async () => await engineApiClient.StopAsync()),
                 IconTemplateName = "Icon_Stop_16x"
             });
             // Tools->Restart
@@ -124,7 +128,7 @@ namespace Micser.App
                 Header = Resources.MenuItemRestartHeader,
                 Id = AppGlobals.MenuItemIds.ToolsRestart,
                 ParentId = AppGlobals.MenuItemIds.Tools,
-                //Command = CustomApplicationCommands.Refresh,
+                Command = new DelegateCommand(async () => await engineApiClient.RestartAsync()),
                 IconTemplateName = "Icon_Restart_16x"
             });
             menuItemRegistry.Add(new MenuItemDescription { IsSeparator = true, ParentId = AppGlobals.MenuItemIds.Tools });
