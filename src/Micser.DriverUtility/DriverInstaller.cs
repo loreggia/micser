@@ -1,4 +1,5 @@
 ﻿using NLog;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
 namespace Micser.Plugins.Main.Driver
@@ -51,6 +52,11 @@ namespace Micser.Plugins.Main.Driver
         public DriverInstaller(string deviceId)
         {
             _deviceId = deviceId;
+        }
+
+        public IEnumerable<string> GetInstalledDevices()
+        {
+            return null;
         }
 
         public void Install()
