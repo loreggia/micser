@@ -58,19 +58,97 @@ namespace Micser.App
 
             var menuItemRegistry = containerProvider.Resolve<IMenuItemRegistry>();
 
+            // File
             menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemFileHeader, Id = AppGlobals.MenuItemIds.File });
-            menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemLoadHeader, Id = AppGlobals.MenuItemIds.FileLoad, ParentId = AppGlobals.MenuItemIds.File, Command = CustomApplicationCommands.Load, IconTemplateName = "Icon_OpenFile_16x" });
-            menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemSaveHeader, Id = AppGlobals.MenuItemIds.FileSave, ParentId = AppGlobals.MenuItemIds.File, Command = CustomApplicationCommands.Save, IconTemplateName = "Icon_Save_16x" });
+            // File->Load
+            menuItemRegistry.Add(new MenuItemDescription
+            {
+                Header = Resources.MenuItemLoadHeader,
+                Id = AppGlobals.MenuItemIds.FileLoad,
+                ParentId = AppGlobals.MenuItemIds.File,
+                Command = CustomApplicationCommands.Load,
+                IconTemplateName = "Icon_OpenFile_16x"
+            });
+            // File->Save
+            menuItemRegistry.Add(new MenuItemDescription
+            {
+                Header = Resources.MenuItemSaveHeader,
+                Id = AppGlobals.MenuItemIds.FileSave,
+                ParentId = AppGlobals.MenuItemIds.File,
+                Command = CustomApplicationCommands.Save,
+                IconTemplateName = "Icon_Save_16x"
+            });
             menuItemRegistry.Add(new MenuItemDescription { IsSeparator = true, ParentId = AppGlobals.MenuItemIds.File });
-            menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemExitHeader, Id = AppGlobals.MenuItemIds.FileExit, ParentId = AppGlobals.MenuItemIds.File, Command = CustomApplicationCommands.Exit });
+            // File->Exit
+            menuItemRegistry.Add(new MenuItemDescription
+            {
+                Header = Resources.MenuItemExitHeader,
+                Id = AppGlobals.MenuItemIds.FileExit,
+                ParentId = AppGlobals.MenuItemIds.File,
+                Command = CustomApplicationCommands.Exit
+            });
 
+            // Tools
             menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemToolsHeader, Id = AppGlobals.MenuItemIds.Tools });
-            menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemRefreshHeader, Id = AppGlobals.MenuItemIds.ToolsRefresh, ParentId = AppGlobals.MenuItemIds.Tools, Command = CustomApplicationCommands.Refresh, IconTemplateName = "Icon_Refresh_16x" });
+            // Tools->Refresh
+            menuItemRegistry.Add(new MenuItemDescription
+            {
+                Header = Resources.MenuItemRefreshHeader,
+                Id = AppGlobals.MenuItemIds.ToolsRefresh,
+                ParentId = AppGlobals.MenuItemIds.Tools,
+                Command = CustomApplicationCommands.Refresh,
+                IconTemplateName = "Icon_Refresh_16x"
+            });
             menuItemRegistry.Add(new MenuItemDescription { IsSeparator = true, ParentId = AppGlobals.MenuItemIds.Tools });
-            menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemSettingsHeader, Id = AppGlobals.MenuItemIds.ToolsSettings, ParentId = AppGlobals.MenuItemIds.Tools, Command = new NavigationCommand<SettingsView>(AppGlobals.PrismRegions.Main), IconTemplateName = "Icon_Settings_16x" });
+            // Tools->Start
+            menuItemRegistry.Add(new MenuItemDescription
+            {
+                Header = Resources.MenuItemStartHeader,
+                Id = AppGlobals.MenuItemIds.ToolsStart,
+                ParentId = AppGlobals.MenuItemIds.Tools,
+                //Command = CustomApplicationCommands.Refresh,
+                IconTemplateName = "Icon_Start_16x"
+            });
+            // Tools->Stop
+            menuItemRegistry.Add(new MenuItemDescription
+            {
+                Header = Resources.MenuItemStopHeader,
+                Id = AppGlobals.MenuItemIds.ToolsStop,
+                ParentId = AppGlobals.MenuItemIds.Tools,
+                //Command = CustomApplicationCommands.Refresh,
+                IconTemplateName = "Icon_Stop_16x"
+            });
+            // Tools->Restart
+            menuItemRegistry.Add(new MenuItemDescription
+            {
+                Header = Resources.MenuItemRestartHeader,
+                Id = AppGlobals.MenuItemIds.ToolsRestart,
+                ParentId = AppGlobals.MenuItemIds.Tools,
+                //Command = CustomApplicationCommands.Refresh,
+                IconTemplateName = "Icon_Restart_16x"
+            });
+            menuItemRegistry.Add(new MenuItemDescription { IsSeparator = true, ParentId = AppGlobals.MenuItemIds.Tools });
+            // Tools->Settings
+            menuItemRegistry.Add(new MenuItemDescription
+            {
+                Header = Resources.MenuItemSettingsHeader,
+                Id = AppGlobals.MenuItemIds.ToolsSettings,
+                ParentId = AppGlobals.MenuItemIds.Tools,
+                Command = new NavigationCommand<SettingsView>(AppGlobals.PrismRegions.Main),
+                IconTemplateName = "Icon_Settings_16x"
+            });
 
+            // Help
             menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemHelpHeader, Id = AppGlobals.MenuItemIds.Help });
-            menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemAboutHeader, Id = AppGlobals.MenuItemIds.HelpAbout, ParentId = AppGlobals.MenuItemIds.Help, Command = new NavigationCommand<AboutView>(AppGlobals.PrismRegions.Main), IconTemplateName = "Icon_HelpApplication_16x" });
+            // Help->About
+            menuItemRegistry.Add(new MenuItemDescription
+            {
+                Header = Resources.MenuItemAboutHeader,
+                Id = AppGlobals.MenuItemIds.HelpAbout,
+                ParentId = AppGlobals.MenuItemIds.Help,
+                Command = new NavigationCommand<AboutView>(AppGlobals.PrismRegions.Main),
+                IconTemplateName = "Icon_HelpApplication_16x"
+            });
 
             // main tool bar
             var toolBarRegistry = containerProvider.Resolve<IToolBarRegistry>();

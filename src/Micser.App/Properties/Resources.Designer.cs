@@ -133,11 +133,20 @@ namespace Micser.App.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to _Refresh.
+        ///   Looks up a localized string similar to Re_fresh.
         /// </summary>
         public static string MenuItemRefreshHeader {
             get {
                 return ResourceManager.GetString("MenuItemRefreshHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Restart.
+        /// </summary>
+        public static string MenuItemRestartHeader {
+            get {
+                return ResourceManager.GetString("MenuItemRestartHeader", resourceCulture);
             }
         }
         
@@ -156,6 +165,24 @@ namespace Micser.App.Properties {
         public static string MenuItemSettingsHeader {
             get {
                 return ResourceManager.GetString("MenuItemSettingsHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to _Start.
+        /// </summary>
+        public static string MenuItemStartHeader {
+            get {
+                return ResourceManager.GetString("MenuItemStartHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sto_p.
+        /// </summary>
+        public static string MenuItemStopHeader {
+            get {
+                return ResourceManager.GetString("MenuItemStopHeader", resourceCulture);
             }
         }
         
