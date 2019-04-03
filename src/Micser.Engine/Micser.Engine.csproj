@@ -47,6 +47,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Api\EngineProcessor.cs" />
     <Compile Include="Api\ModuleConnectionsProcessor.cs" />
     <Compile Include="Api\ModulesProcessor.cs" />
     <Compile Include="Api\StatusProcessor.cs" />
