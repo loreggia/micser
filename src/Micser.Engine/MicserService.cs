@@ -60,6 +60,7 @@ namespace Micser.Engine
             container.RegisterType<IModuleService, ModuleService>();
             container.RegisterType<IModuleConnectionService, ModuleConnectionService>();
 
+            container.RegisterRequestProcessor<EngineProcessor>();
             container.RegisterRequestProcessor<StatusProcessor>();
             container.RegisterRequestProcessor<ModulesProcessor>();
             container.RegisterRequestProcessor<ModuleConnectionsProcessor>();
