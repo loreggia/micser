@@ -16,16 +16,15 @@ The main modules (Device In-/Output, Gain, Compressor) are provided in the Micse
 
 ## Credits
 This project uses the following libraries:
-* Prism.Wpf
-* Prism.Unity
-* CommonServiceLocator
-* Unity
-* CSCore
-* WixSharp
-* NLog
-* System.Data.SQLite
-* System.Data.SQLite.Core
-* System.Data.SQLite.EF6.Migrations
-* SQLite.CodeFirst
-* Hardcodet.NotifyIcon.Wpf
-* Newtonsoft.Json
+* [CommonServiceLocator](https://github.com/unitycontainer/commonservicelocator)
+* [CSCore](https://github.com/filoe/cscore)
+* [Hardcodet.NotifyIcon.Wpf](http://www.hardcodet.net/wpf-notifyicon)
+* [Newtonsoft.Json](https://www.newtonsoft.com/json)
+* [NLog](https://nlog-project.org/)
+* [Prism](https://github.com/PrismLibrary/Prism)
+* [SQLite.CodeFirst](https://github.com/msallin/SQLiteCodeFirst)
+* [System.Data.SQLite](https://system.data.sqlite.org/index.html/doc/trunk/www/index.wiki)
+* [System.Data.SQLite.EF6.Migrations](https://github.com/bubibubi/db2ef6migrations)
+* [Unity](https://github.com/unitycontainer/unity)
+* [WixSharp](https://github.com/oleg-shilo/wixsharp)
+* [Windows Driver Samples](https://github.com/Microsoft/Windows-driver-samples)
