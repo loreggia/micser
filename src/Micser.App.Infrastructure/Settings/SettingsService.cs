@@ -6,6 +6,7 @@ using NLog;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 
@@ -64,6 +65,12 @@ namespace Micser.App.Infrastructure.Settings
             }
 
             return default(T);
+        }
+
+        public IReadOnlyDictionary<string, object> GetSettings()
+        {
+            EnsureLoaded();
+            return new ReadOnlyDictionary<string, object>(_settings);
         }
 
         void ISettingsService.Load()

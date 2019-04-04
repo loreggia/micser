@@ -111,6 +111,7 @@
     <Compile Include="ResourceBinding.cs" />
     <Compile Include="SetPropertyAction.cs" />
     <Compile Include="Settings\SettingDefinition.cs" />
+    <Compile Include="Settings\SettingsExporter.cs" />
     <Compile Include="Settings\SettingsPanel.cs" />
     <Compile Include="Settings\SettingsRegistry.cs" />
     <Compile Include="Themes\BrushThemeKeyExtension.cs" />
