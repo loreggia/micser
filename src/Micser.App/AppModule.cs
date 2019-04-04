@@ -108,9 +108,7 @@ namespace Micser.App
                 Header = Resources.MenuItemStartHeader,
                 Id = AppGlobals.MenuItemIds.ToolsStart,
                 ParentId = AppGlobals.MenuItemIds.Tools,
-                // todo canexecute
-                // , () => !engineApiClient.GetStatusAsync().ConfigureAwait(true).GetAwaiter().GetResult().Data
-                Command = new DelegateCommand(async () => await engineApiClient.StartAsync()),
+                Command = new AsyncDelegateCommand(async () => await engineApiClient.StartAsync(), async () => !(await engineApiClient.GetStatusAsync()).IsSuccess),
                 IconTemplateName = "Icon_Start_16x"
             });
             // Tools->Stop
@@ -119,7 +117,7 @@ namespace Micser.App
                 Header = Resources.MenuItemStopHeader,
                 Id = AppGlobals.MenuItemIds.ToolsStop,
                 ParentId = AppGlobals.MenuItemIds.Tools,
-                Command = new DelegateCommand(async () => await engineApiClient.StopAsync()),
+                Command = new AsyncDelegateCommand(async () => await engineApiClient.StopAsync(), async () => (await engineApiClient.GetStatusAsync()).IsSuccess),
                 IconTemplateName = "Icon_Stop_16x"
             });
             // Tools->Restart
@@ -128,7 +126,7 @@ namespace Micser.App
                 Header = Resources.MenuItemRestartHeader,
                 Id = AppGlobals.MenuItemIds.ToolsRestart,
                 ParentId = AppGlobals.MenuItemIds.Tools,
-                Command = new DelegateCommand(async () => await engineApiClient.RestartAsync()),
+                Command = new AsyncDelegateCommand(async () => await engineApiClient.RestartAsync(), async () => (await engineApiClient.GetStatusAsync()).IsSuccess),
                 IconTemplateName = "Icon_Restart_16x"
             });
             menuItemRegistry.Add(new MenuItemDescription { IsSeparator = true, ParentId = AppGlobals.MenuItemIds.Tools });

@@ -59,6 +59,7 @@
     <Compile Include="AppGlobals.cs" />
     <Compile Include="ApplicationEvents.cs" />
     <Compile Include="ApplicationStateService.cs" />
+    <Compile Include="AsyncDelegateCommand.cs" />
     <Compile Include="Behaviors\TextBoxMaskBehavior.cs" />
     <Compile Include="Bindable.cs" />
     <Compile Include="Behaviors\CheckBoxLabelBehavior.cs" />

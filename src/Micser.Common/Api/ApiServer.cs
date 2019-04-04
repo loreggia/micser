@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
 
 #pragma warning disable 4014
@@ -12,27 +13,23 @@ namespace Micser.Common.Api
     public class ApiServer : ApiEndPoint, IApiServer
     {
         private readonly TcpListener _listener;
-        private bool _isStarting;
+        private readonly SemaphoreSlim _startSemaphore;
 
         public ApiServer(IRequestProcessorFactory requestProcessorFactory)
             : base(requestProcessorFactory)
         {
             var endPoint = new IPEndPoint(IPAddress.Loopback, Globals.ApiPort);
             _listener = new TcpListener(endPoint);
+            _startSemaphore = new SemaphoreSlim(1, 1);
         }
 
         public bool IsRunning { get; private set; }
 
         public override async Task ConnectAsync()
         {
-            if (_isStarting)
-            {
-                return;
-            }
-
             try
             {
-                _isStarting = true;
+                await _startSemaphore.WaitAsync();
 
                 InClient = null;
                 OutClient = null;
@@ -59,7 +56,7 @@ namespace Micser.Common.Api
             }
             finally
             {
-                _isStarting = false;
+                _startSemaphore.Release();
             }
         }
 
