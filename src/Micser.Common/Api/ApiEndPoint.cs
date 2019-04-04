@@ -34,12 +34,12 @@ namespace Micser.Common.Api
 
         public async Task<JsonResponse> SendMessageAsync(JsonRequest message, int numRetries = 5)
         {
+            await _sendMessageSemaphore.WaitAsync();
+
             if (OutClient == null || !OutClient.Connected)
             {
                 await ConnectAsync();
             }
-
-            await _sendMessageSemaphore.WaitAsync();
 
             try
             {

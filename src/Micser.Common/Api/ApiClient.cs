@@ -3,6 +3,7 @@ using System;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 using System.Threading.Tasks;
 
 #pragma warning disable 4014
@@ -11,23 +12,19 @@ namespace Micser.Common.Api
 {
     public class ApiClient : ApiEndPoint, IApiClient
     {
-        private bool _isConnecting;
+        private readonly SemaphoreSlim _connectSemaphore;
 
         public ApiClient(IRequestProcessorFactory requestProcessorFactory)
             : base(requestProcessorFactory)
         {
+            _connectSemaphore = new SemaphoreSlim(1, 1);
         }
 
         public override async Task ConnectAsync()
         {
-            if (_isConnecting)
-            {
-                return;
-            }
-
             try
             {
-                _isConnecting = true;
+                await _connectSemaphore.WaitAsync();
 
                 InClient?.Dispose();
                 OutClient?.Dispose();
@@ -55,7 +52,7 @@ namespace Micser.Common.Api
             }
             finally
             {
-                _isConnecting = false;
+                _connectSemaphore.Release();
             }
         }
     }

@@ -39,8 +39,6 @@ namespace Micser.App.Infrastructure
 
         public void OnInitialized(IContainerProvider containerProvider)
         {
-            var apiClient = containerProvider.Resolve<IApiClient>();
-            apiClient.ConnectAsync();
         }
 
         public void RegisterTypes(IContainerRegistry containerRegistry)
