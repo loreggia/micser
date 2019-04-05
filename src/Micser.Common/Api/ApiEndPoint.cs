@@ -46,23 +46,19 @@ namespace Micser.Common.Api
                 var json = JsonConvert.SerializeObject(message);
                 await OutWriter.WriteLineAsync(json);
                 json = await OutReader.ReadLineAsync();
+                _sendMessageSemaphore.Release();
                 return JsonConvert.DeserializeObject<JsonResponse>(json);
             }
             catch
             {
-                _sendMessageSemaphore.Release();
-
                 if (numRetries > 0)
                 {
+                    _sendMessageSemaphore.Release();
                     await Task.Delay(10);
                     return await SendMessageAsync(message, --numRetries);
                 }
 
                 throw;
-            }
-            finally
-            {
-                _sendMessageSemaphore.Release();
             }
         }
 
@@ -70,12 +66,18 @@ namespace Micser.Common.Api
         {
             if (disposing)
             {
-                InReader?.Dispose();
-                InWriter?.Dispose();
-                InClient?.Dispose();
-                OutReader?.Dispose();
-                OutWriter?.Dispose();
-                OutClient?.Dispose();
+                try
+                {
+                    InReader?.Dispose();
+                    InWriter?.Dispose();
+                    InClient?.Dispose();
+                    OutReader?.Dispose();
+                    OutWriter?.Dispose();
+                    OutClient?.Dispose();
+                }
+                catch
+                {
+                }
             }
         }
 

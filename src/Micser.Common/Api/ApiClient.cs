@@ -1,4 +1,5 @@
 ﻿using Micser.Common.Extensions;
+using NLog;
 using System;
 using System.IO;
 using System.Net;
@@ -13,10 +14,12 @@ namespace Micser.Common.Api
     public class ApiClient : ApiEndPoint, IApiClient
     {
         private readonly SemaphoreSlim _connectSemaphore;
+        private readonly ILogger _logger;
 
-        public ApiClient(IRequestProcessorFactory requestProcessorFactory)
+        public ApiClient(IRequestProcessorFactory requestProcessorFactory, ILogger logger)
             : base(requestProcessorFactory)
         {
+            _logger = logger;
             _connectSemaphore = new SemaphoreSlim(1, 1);
         }
 
@@ -47,8 +50,7 @@ namespace Micser.Common.Api
             }
             catch (Exception ex)
             {
-                //todo
-                Console.WriteLine(ex);
+                _logger.Error(ex);
             }
             finally
             {

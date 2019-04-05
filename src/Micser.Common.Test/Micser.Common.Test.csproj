@@ -51,6 +51,7 @@
     <Compile Include="DeviceServiceTest.cs" />
     <Compile Include="SerializationTest.cs" />
     <Compile Include="TestFileManager.cs" />
+    <Compile Include="TestOutputHelperTarget.cs" />
     <Compile Include="TreeNodeTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -69,6 +70,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="Moq">
+      <Version>4.10.1</Version>
+    </PackageReference>
     <PackageReference Include="xunit">
       <Version>2.4.1</Version>
     </PackageReference>
