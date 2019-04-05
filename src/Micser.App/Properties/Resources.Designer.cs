@@ -88,11 +88,29 @@ namespace Micser.App.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Export configuration to file....
+        /// </summary>
+        public static string ExportConfigurationDialogTitle {
+            get {
+                return ResourceManager.GetString("ExportConfigurationDialogTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Export settings to file....
         /// </summary>
         public static string ExportSettingsDialogTitle {
             get {
                 return ResourceManager.GetString("ExportSettingsDialogTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Import configuration from file....
+        /// </summary>
+        public static string ImportConfigurationDialogTitle {
+            get {
+                return ResourceManager.GetString("ImportConfigurationDialogTitle", resourceCulture);
             }
         }
         
