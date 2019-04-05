@@ -186,11 +186,11 @@
   <data name="SettingColorThemeName" xml:space="preserve">
     <value>Color theme</value>
   </data>
-  <data name="SettingExitOnCloseDescription" xml:space="preserve">
+  <data name="SettingMinimizeToTrayDescription" xml:space="preserve">
     <value>If enabled, the program will minimize to the system tray instead of exiting when the window is closed.</value>
   </data>
-  <data name="SettingExitOnCloseName" xml:space="preserve">
-    <value>Exit on close</value>
+  <data name="SettingMinimizeToTrayName" xml:space="preserve">
+    <value>Minimize to tray</value>
   </data>
   <data name="SettingStartupDescription" xml:space="preserve">
     <value>If enabled, the program will start when you log in.</value>

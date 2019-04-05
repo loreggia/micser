@@ -21,9 +21,9 @@ namespace Micser.App
             var settingsRegistry = containerProvider.Resolve<ISettingsRegistry>();
             settingsRegistry.Add(new SettingDefinition
             {
-                Key = AppGlobals.SettingKeys.ExitOnClose,
-                Name = Resources.SettingExitOnCloseName,
-                Description = Resources.SettingExitOnCloseDescription,
+                Key = AppGlobals.SettingKeys.MinimizeToTray,
+                Name = Resources.SettingMinimizeToTrayName,
+                Description = Resources.SettingMinimizeToTrayDescription,
                 DefaultValue = true,
                 Type = SettingType.Boolean
             });
