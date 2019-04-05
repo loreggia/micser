@@ -70,6 +70,11 @@ namespace Micser.App.ViewModels
             confirmation.AddFilter(Resources.JsonFiles, "*.json");
             ExportFileRequest.Raise(confirmation, c =>
             {
+                if (!c.Confirmed)
+                {
+                    return;
+                }
+
                 var fileName = c.Content as string;
                 var result = _settingsExporter.Save(fileName);
                 // todo show notification
@@ -82,6 +87,11 @@ namespace Micser.App.ViewModels
             confirmation.AddFilter(Resources.JsonFiles, "*.json");
             ImportFileRequest.Raise(confirmation, async c =>
             {
+                if (!c.Confirmed)
+                {
+                    return;
+                }
+
                 var fileName = c.Content as string;
                 var result = _settingsExporter.Load(fileName);
                 if (result)

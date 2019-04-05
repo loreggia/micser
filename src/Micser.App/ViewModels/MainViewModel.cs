@@ -1,10 +1,13 @@
 ﻿using Micser.App.Infrastructure;
 using Micser.App.Infrastructure.Api;
+using Micser.App.Infrastructure.Interaction;
 using Micser.App.Infrastructure.Widgets;
+using Micser.App.Properties;
 using Micser.Common.Modules;
 using NLog;
 using Prism.Commands;
 using Prism.Events;
+using Prism.Interactivity.InteractionRequest;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -57,11 +60,19 @@ namespace Micser.App.ViewModels
 
             WidgetFactory = widgetFactory;
 
-            RefreshCommand = new DelegateCommand(LoadData, () => !IsBusy);
+            RefreshCommand = new DelegateCommand(async () => await LoadDataAsync(), () => !IsBusy);
             AddCommandBinding(CustomApplicationCommands.Refresh, RefreshCommand);
 
             DeleteCommand = new DelegateCommand(Delete, () => !IsBusy && Widgets.Any(w => w.IsSelected));
             AddCommandBinding(CustomApplicationCommands.Delete, DeleteCommand);
+
+            ImportFileCommand = new DelegateCommand(async () => await ImportFileAsync(), () => !IsBusy);
+            AddCommandBinding(CustomApplicationCommands.Import, ImportFileCommand);
+            ImportFileRequest = new InteractionRequest<IConfirmation>();
+
+            ExportFileCommand = new DelegateCommand(async () => await ExportFileAsync(), () => !IsBusy);
+            AddCommandBinding(CustomApplicationCommands.Export, ExportFileCommand);
+            ExportFileRequest = new InteractionRequest<IConfirmation>();
         }
 
         public IEnumerable<WidgetDescription> AvailableWidgets
@@ -73,6 +84,14 @@ namespace Micser.App.ViewModels
         public IEnumerable<ConnectionViewModel> Connections => _connections;
 
         public ICommand DeleteCommand { get; }
+
+        public ICommand ExportFileCommand { get; }
+
+        public InteractionRequest<IConfirmation> ExportFileRequest { get; set; }
+
+        public ICommand ImportFileCommand { get; }
+
+        public InteractionRequest<IConfirmation> ImportFileRequest { get; set; }
 
         public ICommand RefreshCommand { get; }
 
@@ -87,7 +106,7 @@ namespace Micser.App.ViewModels
             base.OnNavigatedFrom(parameter);
         }
 
-        protected override void OnNavigatedTo(object parameter)
+        protected override async void OnNavigatedTo(object parameter)
         {
             base.OnNavigatedTo(parameter);
 
@@ -100,7 +119,7 @@ namespace Micser.App.ViewModels
 
             _navigationManager.ClearJournal(AppGlobals.PrismRegions.Main);
 
-            LoadData();
+            await LoadDataAsync();
         }
 
         private async void CreateConnection(ConnectionViewModel viewModel)
@@ -190,6 +209,40 @@ namespace Micser.App.ViewModels
             viewModel.PropertyChanged -= OnWidgetPropertyChanged;
         }
 
+        private async Task ExportFileAsync()
+        {
+            await LoadDataAsync();
+
+            var confirmation = new FileDialogConfirmation { Title = Resources.ExportConfigurationDialogTitle, DefaultExtension = ".json" };
+            confirmation.AddFilter(Resources.JsonFiles, "*.json");
+            ExportFileRequest.Raise(confirmation, async c =>
+            {
+                if (!c.Confirmed)
+                {
+                    return;
+                }
+
+                var fileName = c.Content as string;
+            });
+        }
+
+        private async Task ImportFileAsync()
+        {
+            var confirmation = new FileDialogConfirmation { Title = Resources.ImportConfigurationDialogTitle, DefaultExtension = ".json" };
+            confirmation.AddFilter(Resources.JsonFiles, "*.json");
+            ImportFileRequest.Raise(confirmation, async c =>
+            {
+                if (!c.Confirmed)
+                {
+                    return;
+                }
+
+                var fileName = c.Content as string;
+
+                await LoadDataAsync();
+            });
+        }
+
         private async Task LoadConnections()
         {
             var connectionsResult = await _connectionsApiClient.GetAllAsync();
@@ -238,7 +291,7 @@ namespace Micser.App.ViewModels
             }
         }
 
-        private async void LoadData()
+        private async Task LoadDataAsync()
         {
             try
             {
@@ -251,7 +304,7 @@ namespace Micser.App.ViewModels
                     UnloadData();
                 }
 
-                await LoadWidgets();
+                await LoadWidgetsAsync();
                 await Task.Delay(50);
                 await LoadConnections();
             }
@@ -263,7 +316,7 @@ namespace Micser.App.ViewModels
             }
         }
 
-        private async Task LoadWidgets()
+        private async Task LoadWidgetsAsync()
         {
             var modulesResult = await _modulesApiClient.GetAllAsync();
 

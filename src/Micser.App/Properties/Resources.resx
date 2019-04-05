@@ -126,8 +126,14 @@
   <data name="ApplicationTitle" xml:space="preserve">
     <value>Micser</value>
   </data>
+  <data name="ExportConfigurationDialogTitle" xml:space="preserve">
+    <value>Export configuration to file...</value>
+  </data>
   <data name="ExportSettingsDialogTitle" xml:space="preserve">
     <value>Export settings to file...</value>
+  </data>
+  <data name="ImportConfigurationDialogTitle" xml:space="preserve">
+    <value>Import configuration from file...</value>
   </data>
   <data name="ImportSettingsDialogTitle" xml:space="preserve">
     <value>Import settings from file...</value>

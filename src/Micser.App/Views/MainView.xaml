@@ -8,8 +8,10 @@
     xmlns:w="clr-namespace:Micser.App.Infrastructure.Widgets;assembly=Micser.App.Infrastructure"
     xmlns:vm="clr-namespace:Micser.App.ViewModels"
     xmlns:themes="clr-namespace:Micser.App.Infrastructure.Themes;assembly=Micser.App.Infrastructure"
-    xmlns:interactivity="http://schemas.microsoft.com/expression/2010/interactivity"
+    xmlns:in="http://schemas.microsoft.com/expression/2010/interactivity"
     xmlns:converter="clr-namespace:Micser.App.Infrastructure.Converter;assembly=Micser.App.Infrastructure"
+    xmlns:ir="http://prismlibrary.com/"
+    xmlns:ii="clr-namespace:Micser.App.Infrastructure.Interaction;assembly=Micser.App.Infrastructure"
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance vm:MainViewModel}"
     d:DesignWidth="300"
@@ -73,11 +75,20 @@
         <Expander x:Name="ToolboxExpander" Grid.Row="3" Header="Widgets" IsExpanded="False" ExpandDirection="Up">
             <w:WidgetToolbox ItemsSource="{Binding AvailableWidgets}" />
 
-            <interactivity:Interaction.Triggers>
-                <interactivity:EventTrigger EventName="Collapsed">
+            <in:Interaction.Triggers>
+                <in:EventTrigger EventName="Collapsed">
                     <i:SetPropertyAction TargetObject="{Binding ElementName=ToolboxRow}" PropertyName="Height" PropertyValue="Auto" />
-                </interactivity:EventTrigger>
-            </interactivity:Interaction.Triggers>
+                </in:EventTrigger>
+            </in:Interaction.Triggers>
         </Expander>
     </Grid>
+
+    <in:Interaction.Triggers>
+        <ir:InteractionRequestTrigger SourceObject="{Binding ImportFileRequest}">
+            <ii:OpenFileDialogAction />
+        </ir:InteractionRequestTrigger>
+        <ir:InteractionRequestTrigger SourceObject="{Binding ExportFileRequest}">
+            <ii:SaveFileDialogAction />
+        </ir:InteractionRequestTrigger>
+    </in:Interaction.Triggers>
 </i:View>
