@@ -26,14 +26,17 @@ namespace Micser.App.ViewModels
         private readonly IEventAggregator _eventAggregator;
         private readonly ILogger _logger;
         private readonly ModulesApiClient _modulesApiClient;
+        private readonly ModulesExporter _modulesExporter;
         private readonly INavigationManager _navigationManager;
         private readonly ICollection<WidgetViewModel> _savingBuffer;
         private readonly IWidgetRegistry _widgetRegistry;
         private readonly ObservableCollection<WidgetViewModel> _widgets;
         private SubscriptionToken _apiEventSubscription;
         private IEnumerable<WidgetDescription> _availableWidgets;
+        private IEnumerable<ModuleConnectionDto> _connectionDtos;
         private bool _isLoaded;
         private bool _isLoading;
+        private IEnumerable<ModuleDto> _moduleDtos;
 
         public MainViewModel(
             IWidgetFactory widgetFactory,
@@ -42,7 +45,8 @@ namespace Micser.App.ViewModels
             INavigationManager navigationManager,
             IEventAggregator eventAggregator,
             ModulesApiClient modulesApiClient,
-            ModuleConnectionsApiClient connectionsApiClient)
+            ModuleConnectionsApiClient connectionsApiClient,
+            ModulesExporter modulesExporter)
         {
             _widgetRegistry = widgetRegistry;
             _logger = logger;
@@ -50,6 +54,7 @@ namespace Micser.App.ViewModels
             _eventAggregator = eventAggregator;
             _modulesApiClient = modulesApiClient;
             _connectionsApiClient = connectionsApiClient;
+            _modulesExporter = modulesExporter;
 
             _widgets = new ObservableCollection<WidgetViewModel>();
             _widgets.CollectionChanged += OnWidgetsCollectionChanged;
@@ -66,11 +71,11 @@ namespace Micser.App.ViewModels
             DeleteCommand = new DelegateCommand(Delete, () => !IsBusy && Widgets.Any(w => w.IsSelected));
             AddCommandBinding(CustomApplicationCommands.Delete, DeleteCommand);
 
-            ImportFileCommand = new DelegateCommand(async () => await ImportFileAsync(), () => !IsBusy);
+            ImportFileCommand = new DelegateCommand(ImportFile, () => !IsBusy);
             AddCommandBinding(CustomApplicationCommands.Import, ImportFileCommand);
             ImportFileRequest = new InteractionRequest<IConfirmation>();
 
-            ExportFileCommand = new DelegateCommand(async () => await ExportFileAsync(), () => !IsBusy);
+            ExportFileCommand = new DelegateCommand(ExportFile, () => !IsBusy);
             AddCommandBinding(CustomApplicationCommands.Export, ExportFileCommand);
             ExportFileRequest = new InteractionRequest<IConfirmation>();
         }
@@ -209,10 +214,8 @@ namespace Micser.App.ViewModels
             viewModel.PropertyChanged -= OnWidgetPropertyChanged;
         }
 
-        private async Task ExportFileAsync()
+        private void ExportFile()
         {
-            await LoadDataAsync();
-
             var confirmation = new FileDialogConfirmation { Title = Resources.ExportConfigurationDialogTitle, DefaultExtension = ".json" };
             confirmation.AddFilter(Resources.JsonFiles, "*.json");
             ExportFileRequest.Raise(confirmation, async c =>
@@ -222,11 +225,22 @@ namespace Micser.App.ViewModels
                     return;
                 }
 
-                var fileName = c.Content as string;
+                if (c.Content is string fileName)
+                {
+                    await LoadDataAsync();
+
+                    var data = new ModulesExportDto
+                    {
+                        Modules = _moduleDtos.ToArray(),
+                        Connections = _connectionDtos.ToArray()
+                    };
+
+                    _modulesExporter.Export(fileName, data);
+                }
             });
         }
 
-        private async Task ImportFileAsync()
+        private void ImportFile()
         {
             var confirmation = new FileDialogConfirmation { Title = Resources.ImportConfigurationDialogTitle, DefaultExtension = ".json" };
             confirmation.AddFilter(Resources.JsonFiles, "*.json");
@@ -237,9 +251,23 @@ namespace Micser.App.ViewModels
                     return;
                 }
 
-                var fileName = c.Content as string;
+                if (c.Content is string fileName)
+                {
+                    var dto = _modulesExporter.Import(fileName);
 
-                await LoadDataAsync();
+                    if (dto == null)
+                    {
+                        _logger.Error("Import data is empty.");
+                        return;
+                    }
+
+                    if (await _modulesApiClient.ImportConfigurationAsync(dto))
+                    {
+                        _logger.Warn("Import failed. See engine log for details.");
+                    }
+
+                    await LoadDataAsync();
+                }
             });
         }
 
@@ -249,11 +277,11 @@ namespace Micser.App.ViewModels
 
             if (connectionsResult.IsSuccess)
             {
-                var connections = connectionsResult.Data;
+                _connectionDtos = connectionsResult.Data;
 
-                if (connections != null)
+                if (_connectionDtos != null)
                 {
-                    foreach (var connectionDto in connections)
+                    foreach (var connectionDto in _connectionDtos)
                     {
                         try
                         {
@@ -322,11 +350,11 @@ namespace Micser.App.ViewModels
 
             if (modulesResult.IsSuccess)
             {
-                var modules = modulesResult.Data;
+                _moduleDtos = modulesResult.Data;
 
-                if (modules != null)
+                if (_moduleDtos != null)
                 {
-                    foreach (var module in modules)
+                    foreach (var module in _moduleDtos)
                     {
                         try
                         {

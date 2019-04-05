@@ -76,7 +76,7 @@ namespace Micser.App.ViewModels
                 }
 
                 var fileName = c.Content as string;
-                var result = _settingsExporter.Save(fileName);
+                var result = _settingsExporter.Export(fileName);
                 // todo show notification
             });
         }
@@ -93,7 +93,7 @@ namespace Micser.App.ViewModels
                 }
 
                 var fileName = c.Content as string;
-                var result = _settingsExporter.Load(fileName);
+                var result = _settingsExporter.Import(fileName);
                 if (result)
                 {
                     await LoadAsync();

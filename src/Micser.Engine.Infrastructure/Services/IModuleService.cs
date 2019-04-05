@@ -13,6 +13,8 @@ namespace Micser.Engine.Infrastructure.Services
 
         bool Insert(ModuleDto moduleDto);
 
+        bool Truncate();
+
         bool Update(ModuleDto moduleDto);
     }
 }

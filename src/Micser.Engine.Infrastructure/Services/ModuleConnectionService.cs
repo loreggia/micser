@@ -77,6 +77,17 @@ namespace Micser.Engine.Infrastructure.Services
             return false;
         }
 
+        public bool Truncate()
+        {
+            using (var uow = _uowFactory.Create())
+            {
+                var repository = uow.GetRepository<IModuleConnectionRepository>();
+                var connections = repository.GetAll();
+                repository.RemoveRange(connections);
+                return uow.Complete() >= 0;
+            }
+        }
+
         public bool Update(ModuleConnectionDto dto)
         {
             using (var uow = _uowFactory.Create())

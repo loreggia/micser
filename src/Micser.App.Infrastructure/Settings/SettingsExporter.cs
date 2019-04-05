@@ -17,7 +17,29 @@ namespace Micser.App.Infrastructure.Settings
             _settingsService = settingsService;
         }
 
-        public bool Load(string fileName)
+        public bool Export(string fileName)
+        {
+            try
+            {
+                var dict = _settingsService.GetSettings();
+
+                using (var fs = new StreamWriter(fileName))
+                using (var jsonWriter = new JsonTextWriter(fs))
+                {
+                    var serializer = JsonSerializer.CreateDefault();
+                    serializer.Serialize(jsonWriter, dict);
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex);
+                return false;
+            }
+        }
+
+        public bool Import(string fileName)
         {
             try
             {
@@ -37,28 +59,6 @@ namespace Micser.App.Infrastructure.Settings
                     {
                         _settingsService.SetSetting(setting.Key, setting.Value);
                     }
-                }
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex);
-                return false;
-            }
-        }
-
-        public bool Save(string fileName)
-        {
-            try
-            {
-                var dict = _settingsService.GetSettings();
-
-                using (var fs = new StreamWriter(fileName))
-                using (var jsonWriter = new JsonTextWriter(fs))
-                {
-                    var serializer = JsonSerializer.CreateDefault();
-                    serializer.Serialize(jsonWriter, dict);
                 }
 
                 return true;
