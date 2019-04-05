@@ -33,6 +33,12 @@ namespace Micser.App.Infrastructure.Api
             return new ServiceResult<IEnumerable<ModuleDto>>(response);
         }
 
+        public async Task<bool> ImportConfigurationAsync(ModulesExportDto dto)
+        {
+            var response = await _apiClient.SendMessageAsync(new JsonRequest(ResourceName, "import", dto));
+            return response.IsSuccess;
+        }
+
         public async Task<ServiceResult<ModuleDto>> UpdateAsync(ModuleDto moduleDto)
         {
             var response = await _apiClient.SendMessageAsync(new JsonRequest(ResourceName, "update", moduleDto));

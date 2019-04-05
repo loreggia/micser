@@ -103,6 +103,7 @@
     <Compile Include="MicserRegionNavigationJournal.cs" />
     <Compile Include="Interaction\OpenFileDialogAction.cs" />
     <Compile Include="Interaction\FileDialogConfirmation.cs" />
+    <Compile Include="ModulesExporter.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>

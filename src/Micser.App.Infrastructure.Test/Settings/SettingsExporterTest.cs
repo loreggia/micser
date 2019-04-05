@@ -40,7 +40,7 @@ namespace Micser.App.Infrastructure.Test.Settings
                 .Callback<string, object>((key, value) => settings.Add(key, value));
 
             var importer = new SettingsExporter(LogManager.GetCurrentClassLogger(), settingsServiceMock.Object);
-            var result = importer.Load(fileName);
+            var result = importer.Import(fileName);
 
             Assert.True(result);
             Assert.Contains("DecimalKey", settings);
@@ -69,7 +69,7 @@ namespace Micser.App.Infrastructure.Test.Settings
 
             var exporter = new SettingsExporter(LogManager.GetCurrentClassLogger(), settingsServiceMock.Object);
 
-            var result = exporter.Save(fileName);
+            var result = exporter.Export(fileName);
 
             Assert.True(result);
             Assert.True(File.Exists(fileName));
