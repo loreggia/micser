@@ -270,18 +270,18 @@ namespace Micser.App.Properties {
         /// <summary>
         ///   Looks up a localized string similar to If enabled, the program will minimize to the system tray instead of exiting when the window is closed..
         /// </summary>
-        public static string SettingExitOnCloseDescription {
+        public static string SettingMinimizeToTrayDescription {
             get {
-                return ResourceManager.GetString("SettingExitOnCloseDescription", resourceCulture);
+                return ResourceManager.GetString("SettingMinimizeToTrayDescription", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Exit on close.
+        ///   Looks up a localized string similar to Minimize to tray.
         /// </summary>
-        public static string SettingExitOnCloseName {
+        public static string SettingMinimizeToTrayName {
             get {
-                return ResourceManager.GetString("SettingExitOnCloseName", resourceCulture);
+                return ResourceManager.GetString("SettingMinimizeToTrayName", resourceCulture);
             }
         }
         
