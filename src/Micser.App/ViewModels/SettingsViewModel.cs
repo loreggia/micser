@@ -1,6 +1,9 @@
 ﻿using Micser.App.Infrastructure;
+using Micser.App.Infrastructure.Interaction;
 using Micser.App.Infrastructure.Settings;
+using Micser.App.Properties;
 using Prism.Commands;
+using Prism.Interactivity.InteractionRequest;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -10,19 +13,39 @@ namespace Micser.App.ViewModels
 {
     public class SettingsViewModel : ViewModelNavigationAware
     {
+        private readonly SettingsExporter _settingsExporter;
         private readonly ISettingsRegistry _settingsRegistry;
         private readonly ISettingsService _settingsService;
-
         private IEnumerable<SettingViewModel> _settings;
 
-        public SettingsViewModel(ISettingsRegistry settingsRegistry, ISettingsService settingsService)
+        public SettingsViewModel(ISettingsRegistry settingsRegistry, ISettingsService settingsService, SettingsExporter settingsExporter)
         {
             _settingsRegistry = settingsRegistry;
             _settingsService = settingsService;
+            _settingsExporter = settingsExporter;
 
-            SaveCommand = new DelegateCommand(Save, () => !IsBusy);
+            SaveCommand = new DelegateCommand(async () => await SaveAsync(), () => !IsBusy);
+            RefreshCommand = new DelegateCommand(async () => await LoadAsync(), () => !IsBusy);
+            ImportCommand = new DelegateCommand(async () => await ImportAsync(), () => !IsBusy);
+            ExportCommand = new DelegateCommand(async () => await ExportAsync(), () => !IsBusy);
             AddCommandBinding(CustomApplicationCommands.Save, SaveCommand);
+            AddCommandBinding(CustomApplicationCommands.Refresh, RefreshCommand);
+            AddCommandBinding(CustomApplicationCommands.Import, ImportCommand);
+            AddCommandBinding(CustomApplicationCommands.Export, ExportCommand);
+
+            ImportFileRequest = new InteractionRequest<IConfirmation>();
+            ExportFileRequest = new InteractionRequest<IConfirmation>();
         }
+
+        public ICommand ExportCommand { get; }
+
+        public InteractionRequest<IConfirmation> ExportFileRequest { get; }
+
+        public ICommand ImportCommand { get; }
+
+        public InteractionRequest<IConfirmation> ImportFileRequest { get; }
+
+        public ICommand RefreshCommand { get; }
 
         public ICommand SaveCommand { get; }
 
@@ -37,6 +60,36 @@ namespace Micser.App.ViewModels
             base.OnNavigatedTo(parameter);
 
             await LoadAsync();
+        }
+
+        private async Task ExportAsync()
+        {
+            await SaveAsync();
+
+            var confirmation = new FileDialogConfirmation { Title = Resources.ExportSettingsDialogTitle, DefaultExtension = ".json" };
+            confirmation.AddFilter(Resources.JsonFiles, "*.json");
+            ExportFileRequest.Raise(confirmation, c =>
+            {
+                var fileName = c.Content as string;
+                var result = _settingsExporter.Save(fileName);
+                // todo show notification
+            });
+        }
+
+        private Task ImportAsync()
+        {
+            var confirmation = new FileDialogConfirmation { Title = Resources.ImportSettingsDialogTitle, DefaultExtension = ".json" };
+            confirmation.AddFilter(Resources.JsonFiles, "*.json");
+            ImportFileRequest.Raise(confirmation, async c =>
+            {
+                var fileName = c.Content as string;
+                var result = _settingsExporter.Load(fileName);
+                if (result)
+                {
+                    await LoadAsync();
+                }
+            });
+            return Task.CompletedTask;
         }
 
         private async Task LoadAsync()
@@ -73,7 +126,7 @@ namespace Micser.App.ViewModels
             IsBusy = false;
         }
 
-        private async void Save()
+        private async Task SaveAsync()
         {
             IsBusy = true;
             await Task.Run(() =>

@@ -23,9 +23,14 @@ namespace Micser.App.Infrastructure
         public static readonly RoutedUICommand Exit;
 
         /// <summary>
-        /// Performs a load action in the current context.
+        /// Performs an export action in the current context.
         /// </summary>
-        public static readonly RoutedUICommand Load;
+        public static readonly RoutedUICommand Export;
+
+        /// <summary>
+        /// Performs an import action in the current context.
+        /// </summary>
+        public static readonly RoutedUICommand Import;
 
         /// <summary>
         /// Refreshes the current view.
@@ -46,7 +51,8 @@ namespace Micser.App.Infrastructure
         {
             Close = CreateCommand(() => Close);
             Exit = CreateCommand(() => Exit);
-            Load = CreateCommand(() => Load);
+            Import = CreateCommand(() => Import);
+            Export = CreateCommand(() => Export);
             Refresh = CreateCommand(() => Refresh);
             Restore = CreateCommand(() => Restore);
             Save = CreateCommand(() => Save);

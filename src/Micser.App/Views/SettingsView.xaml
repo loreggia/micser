@@ -9,6 +9,9 @@
         xmlns:behaviors="clr-namespace:Micser.App.Infrastructure.Behaviors;assembly=Micser.App.Infrastructure"
         xmlns:themes="clr-namespace:Micser.App.Infrastructure.Themes;assembly=Micser.App.Infrastructure"
         xmlns:converter="clr-namespace:Micser.App.Infrastructure.Converter;assembly=Micser.App.Infrastructure"
+        xmlns:int="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:ir="http://prismlibrary.com/"
+        xmlns:interaction="clr-namespace:Micser.App.Infrastructure.Interaction;assembly=Micser.App.Infrastructure"
         mc:Ignorable="d"
         d:DesignHeight="500"
         d:DesignWidth="800"
@@ -118,4 +121,13 @@
     </i:View.Resources>
 
     <settings:SettingsPanel ItemsSource="{Binding Settings}" ItemTemplateSelector="{StaticResource TemplateSelector}" Grid.IsSharedSizeScope="True" />
+
+    <int:Interaction.Triggers>
+        <ir:InteractionRequestTrigger SourceObject="{Binding ImportFileRequest}">
+            <interaction:OpenFileDialogAction />
+        </ir:InteractionRequestTrigger>
+        <ir:InteractionRequestTrigger SourceObject="{Binding ExportFileRequest}">
+            <interaction:SaveFileDialogAction />
+        </ir:InteractionRequestTrigger>
+    </int:Interaction.Triggers>
 </i:View>

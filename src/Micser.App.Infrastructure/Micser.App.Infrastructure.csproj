@@ -93,6 +93,7 @@
     <Compile Include="Extensions\DependencyObjectExtensions.cs" />
     <Compile Include="Extensions\ItemsControlExtensions.cs" />
     <Compile Include="Extensions\PrismContainerExtensions.cs" />
+    <Compile Include="Interaction\FileDialogAction.cs" />
     <Compile Include="IApplicationStateService.cs" />
     <Compile Include="INavigationManager.cs" />
     <Compile Include="InfrastructureModule.cs" />
@@ -100,11 +101,14 @@
     <Compile Include="IniFile.cs" />
     <Compile Include="ISelectable.cs" />
     <Compile Include="MicserRegionNavigationJournal.cs" />
+    <Compile Include="Interaction\OpenFileDialogAction.cs" />
+    <Compile Include="Interaction\FileDialogConfirmation.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <Compile Include="Interaction\SaveFileDialogAction.cs" />
     <Compile Include="Settings\ISettingHandler.cs" />
     <Compile Include="Settings\ISettingsRegistry.cs" />
     <Compile Include="Settings\ISettingsService.cs" />

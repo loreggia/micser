@@ -5,6 +5,7 @@ namespace Micser.App.Infrastructure
     public class ApplicationStateService : IApplicationStateService
     {
         private readonly IEventAggregator _eventAggregator;
+
         private bool _isInitialized;
 
         public ApplicationStateService(IEventAggregator eventAggregator)

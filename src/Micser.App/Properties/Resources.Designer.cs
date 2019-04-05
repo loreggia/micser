@@ -88,6 +88,33 @@ namespace Micser.App.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Export settings to file....
+        /// </summary>
+        public static string ExportSettingsDialogTitle {
+            get {
+                return ResourceManager.GetString("ExportSettingsDialogTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Import settings from file....
+        /// </summary>
+        public static string ImportSettingsDialogTitle {
+            get {
+                return ResourceManager.GetString("ImportSettingsDialogTitle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to JSON files.
+        /// </summary>
+        public static string JsonFiles {
+            get {
+                return ResourceManager.GetString("JsonFiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to _About.
         /// </summary>
         public static string MenuItemAboutHeader {
@@ -102,6 +129,15 @@ namespace Micser.App.Properties {
         public static string MenuItemExitHeader {
             get {
                 return ResourceManager.GetString("MenuItemExitHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Export....
+        /// </summary>
+        public static string MenuItemExportHeader {
+            get {
+                return ResourceManager.GetString("MenuItemExportHeader", resourceCulture);
             }
         }
         
@@ -124,11 +160,11 @@ namespace Micser.App.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to _Load.
+        ///   Looks up a localized string similar to _Import....
         /// </summary>
-        public static string MenuItemLoadHeader {
+        public static string MenuItemImportHeader {
             get {
-                return ResourceManager.GetString("MenuItemLoadHeader", resourceCulture);
+                return ResourceManager.GetString("MenuItemImportHeader", resourceCulture);
             }
         }
         
@@ -142,7 +178,7 @@ namespace Micser.App.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to _Restart.
+        ///   Looks up a localized string similar to _Restart Engine.
         /// </summary>
         public static string MenuItemRestartHeader {
             get {
@@ -169,7 +205,7 @@ namespace Micser.App.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to _Start.
+        ///   Looks up a localized string similar to _Start Engine.
         /// </summary>
         public static string MenuItemStartHeader {
             get {
@@ -178,7 +214,7 @@ namespace Micser.App.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Sto_p.
+        ///   Looks up a localized string similar to Sto_p Engine.
         /// </summary>
         public static string MenuItemStopHeader {
             get {
