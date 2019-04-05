@@ -9,7 +9,8 @@
         {
             public const string File = "File";
             public const string FileExit = File + "Exit";
-            public const string FileLoad = File + "Load";
+            public const string FileExport = File + "Export";
+            public const string FileImport = File + "Import";
             public const string FileSave = File + "Save";
             public const string Help = "Help";
             public const string HelpAbout = Help + "About";

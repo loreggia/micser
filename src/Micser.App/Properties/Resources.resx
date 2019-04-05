@@ -126,11 +126,23 @@
   <data name="ApplicationTitle" xml:space="preserve">
     <value>Micser</value>
   </data>
+  <data name="ExportSettingsDialogTitle" xml:space="preserve">
+    <value>Export settings to file...</value>
+  </data>
+  <data name="ImportSettingsDialogTitle" xml:space="preserve">
+    <value>Import settings from file...</value>
+  </data>
+  <data name="JsonFiles" xml:space="preserve">
+    <value>JSON files</value>
+  </data>
   <data name="MenuItemAboutHeader" xml:space="preserve">
     <value>_About</value>
   </data>
   <data name="MenuItemExitHeader" xml:space="preserve">
     <value>E_xit</value>
+  </data>
+  <data name="MenuItemExportHeader" xml:space="preserve">
+    <value>Export...</value>
   </data>
   <data name="MenuItemFileHeader" xml:space="preserve">
     <value>_File</value>
@@ -138,14 +150,14 @@
   <data name="MenuItemHelpHeader" xml:space="preserve">
     <value>_Help</value>
   </data>
-  <data name="MenuItemLoadHeader" xml:space="preserve">
-    <value>_Load</value>
+  <data name="MenuItemImportHeader" xml:space="preserve">
+    <value>_Import...</value>
   </data>
   <data name="MenuItemRefreshHeader" xml:space="preserve">
     <value>Re_fresh</value>
   </data>
   <data name="MenuItemRestartHeader" xml:space="preserve">
-    <value>_Restart</value>
+    <value>_Restart Engine</value>
   </data>
   <data name="MenuItemSaveHeader" xml:space="preserve">
     <value>_Save</value>
@@ -154,10 +166,10 @@
     <value>_Settings</value>
   </data>
   <data name="MenuItemStartHeader" xml:space="preserve">
-    <value>_Start</value>
+    <value>_Start Engine</value>
   </data>
   <data name="MenuItemStopHeader" xml:space="preserve">
-    <value>Sto_p</value>
+    <value>Sto_p Engine</value>
   </data>
   <data name="MenuItemToolsHeader" xml:space="preserve">
     <value>_Tools</value>

@@ -61,22 +61,22 @@ namespace Micser.App
 
             // File
             menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemFileHeader, Id = AppGlobals.MenuItemIds.File });
-            // File->Load
+            // File->Import
             menuItemRegistry.Add(new MenuItemDescription
             {
-                Header = Resources.MenuItemLoadHeader,
-                Id = AppGlobals.MenuItemIds.FileLoad,
+                Header = Resources.MenuItemImportHeader,
+                Id = AppGlobals.MenuItemIds.FileImport,
                 ParentId = AppGlobals.MenuItemIds.File,
-                Command = CustomApplicationCommands.Load,
+                Command = CustomApplicationCommands.Import,
                 IconTemplateName = "Icon_OpenFile_16x"
             });
-            // File->Save
+            // File->Export
             menuItemRegistry.Add(new MenuItemDescription
             {
-                Header = Resources.MenuItemSaveHeader,
-                Id = AppGlobals.MenuItemIds.FileSave,
+                Header = Resources.MenuItemExportHeader,
+                Id = AppGlobals.MenuItemIds.FileExport,
                 ParentId = AppGlobals.MenuItemIds.File,
-                Command = CustomApplicationCommands.Save,
+                Command = CustomApplicationCommands.Export,
                 IconTemplateName = "Icon_Save_16x"
             });
             menuItemRegistry.Add(new MenuItemDescription { IsSeparator = true, ParentId = AppGlobals.MenuItemIds.File });
@@ -183,12 +183,6 @@ namespace Micser.App
             });
 
             toolBarRegistry.AddItem(AppGlobals.ToolBarIds.Main, new ToolBarSeparator());
-            toolBarRegistry.AddItem(AppGlobals.ToolBarIds.Main, new ToolBarButton
-            {
-                Command = CustomApplicationCommands.Load,
-                Description = Resources.ToolBarLoadDescription,
-                IconTemplateName = "Icon_OpenFile_16x"
-            });
             toolBarRegistry.AddItem(AppGlobals.ToolBarIds.Main, new ToolBarButton
             {
                 Command = CustomApplicationCommands.Save,
