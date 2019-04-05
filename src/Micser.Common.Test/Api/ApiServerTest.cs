@@ -1,27 +1,25 @@
 ﻿using Micser.Common.Api;
-using Micser.Common.Extensions;
+using Moq;
+using NLog;
 using System.Threading.Tasks;
-using Unity;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Micser.Common.Test.Api
 {
     public class ApiServerTest
     {
-        private readonly IRequestProcessorFactory _factory;
-
-        public ApiServerTest()
+        public ApiServerTest(ITestOutputHelper testOutputHelper)
         {
-            var container = new UnityContainer();
-            container.RegisterRequestProcessor<TestProcessor>();
-            _factory = new RequestProcessorFactory(container);
+            TestOutputHelperTarget.ConfigureLogger(testOutputHelper);
         }
 
         [Fact]
         public async Task ClientReconnect()
         {
-            using (var server = new ApiServer(_factory))
-            using (var client = new ApiClient(_factory))
+            var factory = GetFactory();
+            using (var server = new ApiServer(factory, LogManager.GetCurrentClassLogger()))
+            using (var client = new ApiClient(factory, LogManager.GetCurrentClassLogger()))
             {
                 server.Start();
 
@@ -43,8 +41,9 @@ namespace Micser.Common.Test.Api
         [Fact]
         public async Task SendClientToServer()
         {
-            using (var server = new ApiServer(_factory))
-            using (var client = new ApiClient(_factory))
+            var factory = GetFactory();
+            using (var server = new ApiServer(factory, LogManager.GetCurrentClassLogger()))
+            using (var client = new ApiClient(factory, LogManager.GetCurrentClassLogger()))
             {
                 server.Start();
 
@@ -53,6 +52,7 @@ namespace Micser.Common.Test.Api
                 var result = await client.SendMessageAsync(new JsonRequest());
 
                 Assert.NotNull(result);
+                Assert.True(result.IsSuccess);
             }
 
             await Task.Delay(1000);
@@ -61,8 +61,9 @@ namespace Micser.Common.Test.Api
         [Fact]
         public async Task SendServerToClient()
         {
-            using (var server = new ApiServer(_factory))
-            using (var client = new ApiClient(_factory))
+            var factory = GetFactory();
+            using (var server = new ApiServer(factory, LogManager.GetCurrentClassLogger()))
+            using (var client = new ApiClient(factory, LogManager.GetCurrentClassLogger()))
             {
                 server.Start();
 
@@ -71,6 +72,7 @@ namespace Micser.Common.Test.Api
                 var result = await server.SendMessageAsync(new JsonRequest());
 
                 Assert.NotNull(result);
+                Assert.True(result.IsSuccess);
             }
 
             await Task.Delay(1000);
@@ -79,8 +81,9 @@ namespace Micser.Common.Test.Api
         [Fact]
         public async Task ServerReconnect()
         {
-            using (var server = new ApiServer(_factory))
-            using (var client = new ApiClient(_factory))
+            var factory = GetFactory();
+            using (var server = new ApiServer(factory, LogManager.GetCurrentClassLogger()))
+            using (var client = new ApiClient(factory, LogManager.GetCurrentClassLogger()))
             {
                 server.Start();
 
@@ -93,7 +96,7 @@ namespace Micser.Common.Test.Api
 
                 client.Dispose();
 
-                using (var client2 = new ApiClient(_factory))
+                using (var client2 = new ApiClient(factory, LogManager.GetCurrentClassLogger()))
                 {
                     await client2.ConnectAsync();
 
@@ -107,12 +110,13 @@ namespace Micser.Common.Test.Api
             await Task.Delay(1000);
         }
 
-        public class TestProcessor : IRequestProcessor
+        private static IRequestProcessorFactory GetFactory()
         {
-            public JsonResponse Process(string action, object content)
-            {
-                return new JsonResponse(true, null, null);
-            }
+            var processorMock = new Mock<IRequestProcessor>();
+            processorMock.Setup(p => p.Process(It.IsAny<string>(), It.IsAny<object>())).Returns<string, object>((n, c) => new JsonResponse(true, c));
+            var factoryMock = new Mock<IRequestProcessorFactory>();
+            factoryMock.Setup(f => f.Create(It.IsAny<string>())).Returns(processorMock.Object);
+            return factoryMock.Object;
         }
     }
 }

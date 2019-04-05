@@ -1,19 +1,35 @@
 ﻿using Micser.App.Infrastructure.Settings;
+using Micser.Common.Test;
 using Moq;
 using Newtonsoft.Json.Linq;
 using NLog;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace Micser.App.Infrastructure.Test.Settings
 {
-    public class SettingsExporterTest
+    public class SettingsExporterTest : IDisposable
     {
+        private readonly TestFileManager _testFileManager;
+
+        public SettingsExporterTest(ITestOutputHelper testOutputHelper)
+        {
+            _testFileManager = new TestFileManager(testOutputHelper);
+            TestOutputHelperTarget.ConfigureLogger(testOutputHelper);
+        }
+
+        public void Dispose()
+        {
+            _testFileManager.DeleteFiles();
+        }
+
         [Fact]
         public void LoadFromFile()
         {
-            const string fileName = "loadTest.json";
+            var fileName = _testFileManager.GetFileName();
             const string json = "{\"DecimalKey\":1.23,\"IntKey\":1,\"ObjectKey\":{\"Property\":\"Value\"},\"StringKey\":\"Value\"}";
             File.WriteAllText(fileName, json);
 
@@ -23,7 +39,7 @@ namespace Micser.App.Infrastructure.Test.Settings
                 .Setup(s => s.SetSetting(It.IsAny<string>(), It.IsAny<object>()))
                 .Callback<string, object>((key, value) => settings.Add(key, value));
 
-            var importer = new SettingsExporter(new NullLogger(new LogFactory()), settingsServiceMock.Object);
+            var importer = new SettingsExporter(LogManager.GetCurrentClassLogger(), settingsServiceMock.Object);
             var result = importer.Load(fileName);
 
             Assert.True(result);
@@ -40,7 +56,7 @@ namespace Micser.App.Infrastructure.Test.Settings
         [Fact]
         public void WriteToFile()
         {
-            const string fileName = "saveTest.json";
+            var fileName = _testFileManager.GetFileName();
 
             var settingsServiceMock = new Mock<ISettingsService>();
             settingsServiceMock.Setup(s => s.GetSettings()).Returns(new Dictionary<string, object>
@@ -51,7 +67,7 @@ namespace Micser.App.Infrastructure.Test.Settings
                 {"StringKey", "Value"}
             });
 
-            var exporter = new SettingsExporter(new NullLogger(new LogFactory()), settingsServiceMock.Object);
+            var exporter = new SettingsExporter(LogManager.GetCurrentClassLogger(), settingsServiceMock.Object);
 
             var result = exporter.Save(fileName);
 
