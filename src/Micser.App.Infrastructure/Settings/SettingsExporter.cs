@@ -32,6 +32,11 @@ namespace Micser.App.Infrastructure.Settings
                 {
                     var serializer = JsonSerializer.CreateDefault();
                     var settings = serializer.Deserialize<Dictionary<string, object>>(jsonReader);
+
+                    foreach (var setting in settings)
+                    {
+                        _settingsService.SetSetting(setting.Key, setting.Value);
+                    }
                 }
 
                 return true;
