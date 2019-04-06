@@ -195,6 +195,12 @@
   <data name="SettingStartupDescription" xml:space="preserve">
     <value>If enabled, the program will start when you log in.</value>
   </data>
+  <data name="SettingStartupMinimizedDescription" xml:space="preserve">
+    <value>If enabled, the program will start minimized on system startup (when "Startup" is enabled)</value>
+  </data>
+  <data name="SettingStartupMinimizedName" xml:space="preserve">
+    <value>Start minimized</value>
+  </data>
   <data name="SettingStartupName" xml:space="preserve">
     <value>Startup</value>
   </data>
@@ -215,9 +221,6 @@
   </data>
   <data name="ToolBarRefreshDescription" xml:space="preserve">
     <value>Refresh</value>
-  </data>
-  <data name="ToolBarSaveDescription" xml:space="preserve">
-    <value>Save</value>
   </data>
   <data name="ToolBarSettingsDescription" xml:space="preserve">
     <value>Settings</value>

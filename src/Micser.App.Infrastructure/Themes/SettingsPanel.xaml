@@ -22,7 +22,8 @@
                     <Setter Property="Template">
                         <Setter.Value>
                             <ControlTemplate TargetType="{x:Type ContentControl}">
-                                <Border Margin="5" BorderThickness="1" BorderBrush="{DynamicResource {themes:BrushThemeKey DefaultBorder}}" Background="{DynamicResource {themes:BrushThemeKey DefaultBackground}}">
+                                <Border Margin="5" BorderThickness="1" BorderBrush="{DynamicResource {themes:BrushThemeKey DefaultBorder}}"
+                                        Background="{DynamicResource {themes:BrushThemeKey DefaultBackground}}">
                                     <ContentPresenter />
                                 </Border>
                             </ControlTemplate>

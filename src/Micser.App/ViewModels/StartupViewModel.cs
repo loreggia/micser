@@ -4,7 +4,6 @@ using Micser.App.Infrastructure.Settings;
 using Micser.App.Settings;
 using Micser.App.Views;
 using Prism.Events;
-using System.Threading.Tasks;
 
 namespace Micser.App.ViewModels
 {
@@ -40,7 +39,7 @@ namespace Micser.App.ViewModels
 
         private async void OnModulesLoaded()
         {
-            await Task.Run(() => { _settingsService.Load(); });
+            await _settingsService.LoadAsync();
 
             var shellState = _settingsService.GetSetting<ShellState>(AppGlobals.SettingKeys.ShellState);
             var shell = Application.Current.MainWindow;

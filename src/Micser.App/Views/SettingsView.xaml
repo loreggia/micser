@@ -54,7 +54,7 @@
         <i:TypeTemplateSelector x:Key="TemplateSelector" />
 
         <DataTemplate x:Key="{x:Type vm:BooleanSettingViewModel}" DataType="{x:Type vm:BooleanSettingViewModel}">
-            <Grid>
+            <Grid IsEnabled="{Binding IsEnabled}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition SharedSizeGroup="Label" Width="Auto" />
                     <ColumnDefinition Width="*" />
@@ -67,7 +67,7 @@
         </DataTemplate>
 
         <DataTemplate x:Key="{x:Type vm:IntegerSettingViewModel}" DataType="{x:Type vm:IntegerSettingViewModel}">
-            <Grid>
+            <Grid IsEnabled="{Binding IsEnabled}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition SharedSizeGroup="Label" Width="Auto" />
                     <ColumnDefinition Width="*" />
@@ -80,7 +80,7 @@
         </DataTemplate>
 
         <DataTemplate x:Key="{x:Type vm:DecimalSettingViewModel}" DataType="{x:Type vm:DecimalSettingViewModel}">
-            <Grid>
+            <Grid IsEnabled="{Binding IsEnabled}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition SharedSizeGroup="Label" Width="Auto" />
                     <ColumnDefinition Width="*" />
@@ -93,7 +93,7 @@
         </DataTemplate>
 
         <DataTemplate x:Key="{x:Type vm:StringSettingViewModel}" DataType="{x:Type vm:StringSettingViewModel}">
-            <Grid>
+            <Grid IsEnabled="{Binding IsEnabled}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition SharedSizeGroup="Label" Width="Auto" />
                     <ColumnDefinition Width="*" />
@@ -106,7 +106,7 @@
         </DataTemplate>
 
         <DataTemplate x:Key="{x:Type vm:ListSettingViewModel}" DataType="{x:Type vm:ListSettingViewModel}">
-            <Grid>
+            <Grid IsEnabled="{Binding IsEnabled}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition SharedSizeGroup="Label" Width="Auto" />
                     <ColumnDefinition Width="*" />

@@ -24,11 +24,9 @@ namespace Micser.App.ViewModels
             _settingsService = settingsService;
             _settingsExporter = settingsExporter;
 
-            SaveCommand = new DelegateCommand(async () => await SaveAsync(), () => !IsBusy);
             RefreshCommand = new DelegateCommand(async () => await LoadAsync(), () => !IsBusy);
             ImportCommand = new DelegateCommand(async () => await ImportAsync(), () => !IsBusy);
             ExportCommand = new DelegateCommand(async () => await ExportAsync(), () => !IsBusy);
-            AddCommandBinding(CustomApplicationCommands.Save, SaveCommand);
             AddCommandBinding(CustomApplicationCommands.Refresh, RefreshCommand);
             AddCommandBinding(CustomApplicationCommands.Import, ImportCommand);
             AddCommandBinding(CustomApplicationCommands.Export, ExportCommand);
@@ -47,8 +45,6 @@ namespace Micser.App.ViewModels
 
         public ICommand RefreshCommand { get; }
 
-        public ICommand SaveCommand { get; }
-
         public IEnumerable<SettingViewModel> Settings
         {
             get => _settings;
@@ -64,8 +60,6 @@ namespace Micser.App.ViewModels
 
         private async Task ExportAsync()
         {
-            await SaveAsync();
-
             var confirmation = new FileDialogConfirmation { Title = Resources.ExportSettingsDialogTitle, DefaultExtension = ".json" };
             confirmation.AddFilter(Resources.JsonFiles, "*.json");
             ExportFileRequest.Raise(confirmation, c =>
@@ -110,24 +104,24 @@ namespace Micser.App.ViewModels
                 var settings = _settingsRegistry
                     .Items
                     .Where(s => !s.IsHidden)
-                    .Select(s =>
+                    .Select<SettingDefinition, SettingViewModel>(s =>
                     {
                         switch (s.Type)
                         {
                             case SettingType.Boolean:
-                                return (SettingViewModel)new BooleanSettingViewModel(s, _settingsService.GetSetting<bool>(s.Key));
+                                return new BooleanSettingViewModel(s, _settingsService);
 
                             case SettingType.Integer:
-                                return new IntegerSettingViewModel(s, _settingsService.GetSetting<long>(s.Key));
+                                return new IntegerSettingViewModel(s, _settingsService);
 
                             case SettingType.Decimal:
-                                return new DecimalSettingViewModel(s, _settingsService.GetSetting<double>(s.Key));
+                                return new DecimalSettingViewModel(s, _settingsService);
 
                             case SettingType.List:
-                                return new ListSettingViewModel(s, _settingsService.GetSetting<object>(s.Key), s.List);
+                                return new ListSettingViewModel(s, _settingsService);
 
                             default:
-                                return new StringSettingViewModel(s, _settingsService.GetSetting<object>(s.Key)?.ToString());
+                                return new StringSettingViewModel(s, _settingsService);
                         }
                     });
 
@@ -135,23 +129,12 @@ namespace Micser.App.ViewModels
             });
             IsBusy = false;
         }
-
-        private async Task SaveAsync()
-        {
-            IsBusy = true;
-            await Task.Run(() =>
-            {
-                foreach (var settingVm in Settings)
-                {
-                    _settingsService.SetSetting(settingVm.Definition.Key, settingVm.GetValue());
-                }
-            });
-            IsBusy = false;
-        }
     }
 
     public abstract class SettingViewModel : ViewModel
     {
+        private bool _isEnabled;
+
         protected SettingViewModel(SettingDefinition definition)
         {
             Definition = definition;
@@ -159,51 +142,64 @@ namespace Micser.App.ViewModels
 
         public SettingDefinition Definition { get; }
 
-        public abstract object GetValue();
+        public bool IsEnabled
+        {
+            get => _isEnabled;
+            set => SetProperty(ref _isEnabled, value);
+        }
     }
 
     public abstract class SettingViewModel<T> : SettingViewModel
     {
+        private readonly ISettingsService _settingsService;
         private T _value;
 
-        protected SettingViewModel(SettingDefinition setting, T value)
-                    : base(setting)
+        protected SettingViewModel(SettingDefinition setting, ISettingsService settingsService)
+            : base(setting)
         {
-            Value = value;
+            _settingsService = settingsService;
+            settingsService.SettingChanged += OnSettingChanged;
+            Value = settingsService.GetSetting<T>(setting.Key);
         }
 
         public T Value
         {
             get => _value;
-            set => SetProperty(ref _value, value);
+            set
+            {
+                if (SetProperty(ref _value, value))
+                {
+                    _settingsService.SetSetting(Definition.Key, Value);
+                }
+            }
         }
 
-        public override object GetValue()
+        private void OnSettingChanged(object sender, SettingChangedEventArgs e)
         {
-            return Value;
+            IsEnabled = Definition.IsEnabled?.Invoke(_settingsService) != false;
         }
     }
 
     internal class BooleanSettingViewModel : SettingViewModel<bool>
     {
-        public BooleanSettingViewModel(SettingDefinition setting, bool value)
-            : base(setting, value)
+        public BooleanSettingViewModel(SettingDefinition setting, ISettingsService settingsService)
+            : base(setting, settingsService)
         {
         }
     }
 
     internal class DecimalSettingViewModel : SettingViewModel<double>
     {
-        public DecimalSettingViewModel(SettingDefinition setting, double value)
-            : base(setting, value)
+        public DecimalSettingViewModel(SettingDefinition setting, ISettingsService settingsService)
+            : base(setting, settingsService)
         {
         }
     }
 
     internal class IntegerSettingViewModel : SettingViewModel<long>
     {
-        public IntegerSettingViewModel(SettingDefinition setting, long value)
-            : base(setting, value)
+        public IntegerSettingViewModel(SettingDefinition setting, ISettingsService settingsService)
+            : base(setting, settingsService)
         {
         }
     }
@@ -212,10 +208,10 @@ namespace Micser.App.ViewModels
     {
         private IDictionary<object, string> _list;
 
-        public ListSettingViewModel(SettingDefinition setting, object value, IDictionary<object, string> list)
-            : base(setting, value)
+        public ListSettingViewModel(SettingDefinition setting, ISettingsService settingsService)
+            : base(setting, settingsService)
         {
-            List = list;
+            List = setting.List;
         }
 
         public IDictionary<object, string> List
@@ -227,8 +223,8 @@ namespace Micser.App.ViewModels
 
     internal class StringSettingViewModel : SettingViewModel<string>
     {
-        public StringSettingViewModel(SettingDefinition setting, string value)
-            : base(setting, value)
+        public StringSettingViewModel(SettingDefinition setting, ISettingsService settingsService)
+            : base(setting, settingsService)
         {
         }
     }

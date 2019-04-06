@@ -39,6 +39,16 @@ namespace Micser.App
             });
             settingsRegistry.Add(new SettingDefinition
             {
+                Key = AppGlobals.SettingKeys.StartupMinimized,
+                Name = Resources.SettingStartupMinimizedName,
+                Description = Resources.SettingStartupMinimizedDescription,
+                DefaultValue = true,
+                Type = SettingType.Boolean,
+                StorageType = SettingStorageType.Internal,
+                IsEnabled = s => s.GetSetting<bool>(AppGlobals.SettingKeys.Startup)
+            });
+            settingsRegistry.Add(new SettingDefinition
+            {
                 Key = AppGlobals.SettingKeys.ColorTheme,
                 Name = Resources.SettingColorThemeName,
                 Description = Resources.SettingColorThemeDescription,
@@ -183,12 +193,6 @@ namespace Micser.App
             });
 
             toolBarRegistry.AddItem(AppGlobals.ToolBarIds.Main, new ToolBarSeparator());
-            toolBarRegistry.AddItem(AppGlobals.ToolBarIds.Main, new ToolBarButton
-            {
-                Command = CustomApplicationCommands.Save,
-                Description = Resources.ToolBarSaveDescription,
-                IconTemplateName = "Icon_Save_16x"
-            });
             toolBarRegistry.AddItem(AppGlobals.ToolBarIds.Main, new ToolBarButton
             {
                 Command = CustomApplicationCommands.Delete,

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Micser.App.Infrastructure.Settings
 {
@@ -29,6 +30,7 @@ namespace Micser.App.Infrastructure.Settings
         public object DefaultValue { get; set; }
         public string Description { get; set; }
         public ISettingHandler Handler { get; set; }
+        public Func<ISettingsService, bool> IsEnabled { get; set; }
         public bool IsHidden { get; set; }
         public string Key { get; set; }
         public IDictionary<object, string> List { get; set; }

@@ -1,4 +1,5 @@
 ﻿using IWshRuntimeLibrary;
+using Micser.App.Infrastructure;
 using Micser.App.Infrastructure.Settings;
 using Micser.App.Properties;
 using NLog;
@@ -52,6 +53,7 @@ namespace Micser.App.Settings
                         var shortcut = (IWshShortcut)shell.CreateShortcut(fileName);
                         shortcut.TargetPath = Assembly.GetExecutingAssembly().Location;
                         shortcut.WorkingDirectory = Path.GetDirectoryName(shortcut.TargetPath);
+                        shortcut.Arguments = "-" + AppGlobals.ProgramArguments.Startup;
                         shortcut.Save();
                     }
                     catch (Exception ex)

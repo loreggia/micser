@@ -71,6 +71,9 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="Build\Micser.Engine.targets" />
+    <Content Include="ManualStart.ps1">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="ProjectInstaller.resx">
