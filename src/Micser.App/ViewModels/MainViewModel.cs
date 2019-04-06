@@ -333,7 +333,6 @@ namespace Micser.App.ViewModels
                 }
 
                 await LoadWidgetsAsync();
-                await Task.Delay(50);
                 await LoadConnections();
             }
             finally
