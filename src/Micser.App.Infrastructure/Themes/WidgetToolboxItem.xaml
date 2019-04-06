@@ -2,8 +2,9 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:widgets="clr-namespace:Micser.App.Infrastructure.Widgets"
                     xmlns:themes="clr-namespace:Micser.App.Infrastructure.Themes">
+
     <DataTemplate x:Key="WidgetToolboxItemContentTemplate" DataType="{x:Type widgets:WidgetDescription}">
-        <TextBlock Text="{Binding Name}" Foreground="{DynamicResource {themes:BrushThemeKey WidgetForeground}}" />
+        <TextBlock Text="{Binding Name}" Foreground="{DynamicResource {themes:BrushThemeKey WidgetForeground}}" ToolTip="{Binding Description}" />
     </DataTemplate>
 
     <Style TargetType="{x:Type widgets:WidgetToolboxItem}">
@@ -18,6 +19,7 @@
         <Setter Property="MinWidth" Value="25" />
         <Setter Property="MinHeight" Value="25" />
         <Setter Property="Margin" Value="5" />
+        <Setter Property="ContentTemplate" Value="{StaticResource WidgetToolboxItemContentTemplate}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type widgets:WidgetToolboxItem}">
@@ -28,7 +30,7 @@
                                        StrokeDashArray="2"
                                        Fill="Transparent" />
                             <ContentPresenter Content="{TemplateBinding ContentControl.Content}"
-                                              ContentTemplate="{StaticResource WidgetToolboxItemContentTemplate}"
+                                              ContentTemplate="{TemplateBinding ContentTemplate}"
                                               Margin="{TemplateBinding Padding}" />
                         </Grid>
                     </Border>

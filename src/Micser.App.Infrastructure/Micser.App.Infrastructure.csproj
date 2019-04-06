@@ -68,6 +68,7 @@
     <Compile Include="Controls\CustomPopup.cs" />
     <Compile Include="Controls\EditableSlider.cs" />
     <Compile Include="Controls\EditableTextBlock.cs" />
+    <Compile Include="Controls\InfoButton.cs" />
     <Compile Include="Controls\LoadingSpinner.cs" />
     <Compile Include="Controls\RelativePositionPanel.cs" />
     <Compile Include="Controls\ToolBarTrayHelper.cs" />
@@ -183,6 +184,10 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Page Include="Themes\EditableSlider.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Themes\InfoButton.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
