@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -33,8 +34,9 @@ namespace Micser.App.Infrastructure.Widgets
         private readonly ObservableCollection<Connection> _connections;
 
         private readonly ObservableCollection<Widget> _widgets;
+        private bool _isLoaded;
 
-        // start point of the rubberband drag operation
+        // start point of the rubber band drag operation
         private Point? _rubberbandSelectionStartPoint;
 
         public WidgetPanel()
@@ -43,6 +45,7 @@ namespace Micser.App.Infrastructure.Widgets
             _widgets.CollectionChanged += Widgets_CollectionChanged;
             _connections = new ObservableCollection<Connection>();
             _connections.CollectionChanged += Connections_CollectionChanged;
+            Loaded += OnLoaded;
         }
 
         public IEnumerable<ConnectionViewModel> ConnectionsSource
@@ -146,22 +149,6 @@ namespace Micser.App.Infrastructure.Widgets
             if (!(WidgetsSource is INotifyCollectionChanged))
             {
                 _widgets.Remove(widget);
-            }
-        }
-
-        public void UpdateConnections()
-        {
-            if (ConnectionsSource != null)
-            {
-                foreach (var connectionViewModel in ConnectionsSource)
-                {
-                    if (_connections.Select(c => (ConnectionViewModel)c.DataContext).Any(vm => vm.Id == connectionViewModel.Id))
-                    {
-                        continue;
-                    }
-
-                    AddConnection(connectionViewModel);
-                }
             }
         }
 
@@ -303,7 +290,7 @@ namespace Micser.App.Infrastructure.Widgets
             // point value is set we do have one
             if (_rubberbandSelectionStartPoint.HasValue)
             {
-                // create rubberband adorner
+                // create rubber band adorner
                 var adornerLayer = AdornerLayer.GetAdornerLayer(this);
                 if (adornerLayer != null)
                 {
@@ -329,7 +316,10 @@ namespace Micser.App.Infrastructure.Widgets
                 newCollection.CollectionChanged += panel.ConnectionsSource_CollectionChanged;
             }
 
-            panel.RefreshConnections();
+            if (panel._isLoaded)
+            {
+                panel.LoadConnectionsSource();
+            }
         }
 
         private static void OnIsGridVisiblePropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -344,12 +334,9 @@ namespace Micser.App.Infrastructure.Widgets
         private static void OnWidgetFactoryPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
         {
             var panel = (WidgetPanel)d;
-            if (e.NewValue is IWidgetFactory factory && !panel._widgets.Any() && panel.WidgetsSource != null)
+            if (panel._isLoaded && e.NewValue != null && !panel._widgets.Any() && panel.WidgetsSource != null)
             {
-                foreach (var item in panel.WidgetsSource)
-                {
-                    panel._widgets.Add(factory.CreateWidget(item));
-                }
+                panel.LoadWidgetsSource();
             }
         }
 
@@ -367,14 +354,9 @@ namespace Micser.App.Infrastructure.Widgets
                 newCollection.CollectionChanged += panel.WidgetsSource_CollectionChanged;
             }
 
-            panel._widgets.Clear();
-
-            if (e.NewValue is IEnumerable<WidgetViewModel> enumerable && panel.WidgetFactory != null)
+            if (panel._isLoaded)
             {
-                foreach (var item in enumerable)
-                {
-                    panel._widgets.Add(panel.WidgetFactory.CreateWidget(item));
-                }
+                panel.LoadWidgetsSource();
             }
         }
 
@@ -455,6 +437,11 @@ namespace Micser.App.Infrastructure.Widgets
 
         private void ConnectionsSource_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
+            if (_isLoaded)
+            {
+                return;
+            }
+
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:
@@ -506,7 +493,7 @@ namespace Micser.App.Infrastructure.Widgets
             }
         }
 
-        private void RefreshConnections()
+        private void LoadConnectionsSource()
         {
             _connections.Clear();
             if (ConnectionsSource != null)
@@ -516,6 +503,26 @@ namespace Micser.App.Infrastructure.Widgets
                     AddConnection(vm);
                 }
             }
+        }
+
+        private void LoadWidgetsSource()
+        {
+            _widgets.Clear();
+            if (WidgetsSource != null && WidgetFactory != null)
+            {
+                foreach (var item in WidgetsSource)
+                {
+                    _widgets.Add(WidgetFactory.CreateWidget(item));
+                }
+            }
+        }
+
+        private async void OnLoaded(object sender, RoutedEventArgs e)
+        {
+            LoadWidgetsSource();
+            await Task.Delay(100);
+            LoadConnectionsSource();
+            _isLoaded = true;
         }
 
         private void SnapValueToGridSize(ref double value)
@@ -604,6 +611,11 @@ namespace Micser.App.Infrastructure.Widgets
 
         private void WidgetsSource_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
+            if (_isLoaded)
+            {
+                return;
+            }
+
             switch (e.Action)
             {
                 case NotifyCollectionChangedAction.Add:

@@ -9,12 +9,15 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace Micser.App.Infrastructure.Settings
 {
     public class SettingsService : ISettingsService
     {
         private readonly IUnitOfWorkFactory _database;
+        private readonly SemaphoreSlim _loadSemaphore;
         private readonly ILogger _logger;
         private readonly ISettingsRegistry _registry;
         private readonly IDictionary<string, object> _settings;
@@ -23,16 +26,16 @@ namespace Micser.App.Infrastructure.Settings
         public SettingsService(IUnitOfWorkFactory database, ISettingsRegistry registry, ILogger logger)
         {
             _settings = new ConcurrentDictionary<string, object>();
-
+            _loadSemaphore = new SemaphoreSlim(1, 1);
             _database = database;
             _registry = registry;
             _logger = logger;
         }
 
+        public event SettingChangedEventHandler SettingChanged;
+
         public T GetSetting<T>(string key)
         {
-            EnsureLoaded();
-
             if (!_settings.TryGetValue(key, out var value))
             {
                 _logger.Warn($"Requested unregistered setting '{key}'.");
@@ -69,18 +72,17 @@ namespace Micser.App.Infrastructure.Settings
 
         public IReadOnlyDictionary<string, object> GetSettings()
         {
-            EnsureLoaded();
             return new ReadOnlyDictionary<string, object>(_settings);
         }
 
-        void ISettingsService.Load()
+        Task ISettingsService.LoadAsync()
         {
-            EnsureLoaded();
+            return EnsureLoadedAsync();
         }
 
-        public void SetSetting(string key, object value)
+        public async void SetSetting(string key, object value)
         {
-            EnsureLoaded();
+            await EnsureLoadedAsync();
 
             var setting = _registry.Items.FirstOrDefault(i => string.Equals(i.Key, key, StringComparison.InvariantCultureIgnoreCase));
 
@@ -94,7 +96,11 @@ namespace Micser.App.Infrastructure.Settings
                 value = setting.Handler.OnSaveSetting(value);
             }
 
+            var oldValue = _settings.ContainsKey(key) ? _settings[key] : null;
+
             _settings[key] = value;
+
+            OnSettingChanged(new SettingChangedEventArgs(setting, oldValue, value));
 
             if (setting?.StorageType == SettingStorageType.Custom)
             {
@@ -127,25 +133,29 @@ namespace Micser.App.Infrastructure.Settings
             }
         }
 
-        private void EnsureLoaded()
+        protected virtual void OnSettingChanged(SettingChangedEventArgs e)
+        {
+            SettingChanged?.Invoke(this, e);
+        }
+
+        private async Task EnsureLoadedAsync()
         {
             if (_isLoaded)
             {
                 return;
             }
-
-            lock (_settings)
+            await _loadSemaphore.WaitAsync();
+            if (_isLoaded)
             {
-                if (_isLoaded)
-                {
-                    return;
-                }
-
-                Load();
+                _loadSemaphore.Release();
+                return;
             }
+
+            await LoadAsync();
+            _loadSemaphore.Release();
         }
 
-        private void Load()
+        private async Task LoadAsync()
         {
             try
             {
@@ -183,7 +193,7 @@ namespace Micser.App.Infrastructure.Settings
                                 setting.List = listHandler.CreateList();
                             }
 
-                            value = setting.Handler.OnLoadSetting(value ?? setting.DefaultValue);
+                            value = await Task.Run(() => setting.Handler.OnLoadSetting(value ?? setting.DefaultValue));
                         }
 
                         _settings[setting.Key] = value;

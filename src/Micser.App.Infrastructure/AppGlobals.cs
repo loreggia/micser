@@ -11,7 +11,6 @@
             public const string FileExit = File + "Exit";
             public const string FileExport = File + "Export";
             public const string FileImport = File + "Import";
-            public const string FileSave = File + "Save";
             public const string Help = "Help";
             public const string HelpAbout = Help + "About";
             public const string Tools = "Tools";
@@ -39,12 +38,18 @@
             public const string TopToolBar = "TopToolBarRegion";
         }
 
+        public static class ProgramArguments
+        {
+            public const string Startup = "startup";
+        }
+
         public static class SettingKeys
         {
             public const string ColorTheme = "ColorTheme";
             public const string MinimizeToTray = "MinimizeToTray";
             public const string ShellState = "ShellState";
             public const string Startup = "Startup";
+            public const string StartupMinimized = "StartupMinimized";
         }
 
         public static class ThemeIni

@@ -19,6 +19,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows;
 using Unity;
 using Unity.Injection;
@@ -31,6 +32,7 @@ namespace Micser.App
     /// </summary>
     public partial class Application
     {
+        private bool _isStartup;
         private MainShell _shell;
 
         public static T GetService<T>()
@@ -50,7 +52,8 @@ namespace Micser.App
 
         protected override Window CreateShell()
         {
-            return _shell = GetService<MainShell>();
+            _shell = GetService<MainShell>();
+            return _shell;
         }
 
         protected override void InitializeModules()
@@ -94,15 +97,36 @@ namespace Micser.App
             logger.Info("Exiting...");
         }
 
-        protected override void OnInitialized()
+        protected override async void OnInitialized()
         {
-            base.OnInitialized();
+            var settingsService = GetService<ISettingsService>();
+
+            await Task.Run(() => settingsService.LoadAsync());
+
+            var showWindow = true;
+
+            if (_isStartup)
+            {
+                var startMinimized = settingsService.GetSetting<bool>(AppGlobals.SettingKeys.StartupMinimized);
+
+                if (startMinimized)
+                {
+                    showWindow = false;
+                }
+            }
+
+            if (showWindow)
+            {
+                MainWindow?.Show();
+            }
+
             SetStatus("Ready");
         }
 
         protected override void OnStartup(StartupEventArgs e)
         {
-            base.OnStartup(e);
+            var argumentDictionary = new ArgumentDictionary(e.Args);
+            _isStartup = argumentDictionary.HasFlag(AppGlobals.ProgramArguments.Startup);
 
             Directory.CreateDirectory(Globals.AppDataFolder);
 
@@ -126,6 +150,8 @@ namespace Micser.App
             LogManager.Configuration = config;
             var logger = LogManager.GetCurrentClassLogger();
             logger.Info("Starting...");
+
+            base.OnStartup(e);
         }
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)

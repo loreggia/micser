@@ -42,11 +42,6 @@ namespace Micser.App.Infrastructure
         /// </summary>
         public static readonly RoutedUICommand Restore;
 
-        /// <summary>
-        /// Performs a save action in the current context.
-        /// </summary>
-        public static readonly RoutedUICommand Save;
-
         static CustomApplicationCommands()
         {
             Close = CreateCommand(() => Close);
@@ -55,7 +50,6 @@ namespace Micser.App.Infrastructure
             Export = CreateCommand(() => Export);
             Refresh = CreateCommand(() => Refresh);
             Restore = CreateCommand(() => Restore);
-            Save = CreateCommand(() => Save);
             Delete = CreateCommand(() => Delete);
         }
 

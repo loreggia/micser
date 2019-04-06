@@ -295,6 +295,24 @@ namespace Micser.App.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to If enabled, the program will start minimized on system startup (when &quot;Startup&quot; is enabled).
+        /// </summary>
+        public static string SettingStartupMinimizedDescription {
+            get {
+                return ResourceManager.GetString("SettingStartupMinimizedDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Start minimized.
+        /// </summary>
+        public static string SettingStartupMinimizedName {
+            get {
+                return ResourceManager.GetString("SettingStartupMinimizedName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Startup.
         /// </summary>
         public static string SettingStartupName {
@@ -354,15 +372,6 @@ namespace Micser.App.Properties {
         public static string ToolBarRefreshDescription {
             get {
                 return ResourceManager.GetString("ToolBarRefreshDescription", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Save.
-        /// </summary>
-        public static string ToolBarSaveDescription {
-            get {
-                return ResourceManager.GetString("ToolBarSaveDescription", resourceCulture);
             }
         }
         
