@@ -437,7 +437,7 @@ namespace Micser.App.Infrastructure.Widgets
 
         private void ConnectionsSource_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            if (_isLoaded)
+            if (!_isLoaded)
             {
                 return;
             }
@@ -611,7 +611,7 @@ namespace Micser.App.Infrastructure.Widgets
 
         private void WidgetsSource_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            if (_isLoaded)
+            if (!_isLoaded)
             {
                 return;
             }
