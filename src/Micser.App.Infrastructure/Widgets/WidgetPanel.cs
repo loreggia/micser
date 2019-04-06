@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -33,6 +34,7 @@ namespace Micser.App.Infrastructure.Widgets
 
         private readonly ObservableCollection<Connection> _connections;
 
+        private readonly SemaphoreSlim _loadSemaphore;
         private readonly ObservableCollection<Widget> _widgets;
         private bool _isLoaded;
 
@@ -41,6 +43,8 @@ namespace Micser.App.Infrastructure.Widgets
 
         public WidgetPanel()
         {
+            _loadSemaphore = new SemaphoreSlim(1, 1);
+
             _widgets = new ObservableCollection<Widget>();
             _widgets.CollectionChanged += Widgets_CollectionChanged;
             _connections = new ObservableCollection<Connection>();
@@ -360,9 +364,18 @@ namespace Micser.App.Infrastructure.Widgets
             }
         }
 
-        private void AddConnection(ConnectionViewModel vm)
+        private async void AddConnection(ConnectionViewModel vm)
         {
-            //return;
+            for (var i = 0; i < 10; i++)
+            {
+                if (_widgets.All(w => w.IsLoaded))
+                {
+                    break;
+                }
+
+                await Task.Delay(100);
+            }
+
             var source = _widgets
                 .SelectMany(w => w.OutputConnectors ?? new Connector[0])
                 .FirstOrDefault(c => c.DataContext == vm.Source);
@@ -435,9 +448,13 @@ namespace Micser.App.Infrastructure.Widgets
             }
         }
 
-        private void ConnectionsSource_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private async void ConnectionsSource_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            if (!_isLoaded)
+            await _loadSemaphore.WaitAsync();
+            var isLoaded = _isLoaded;
+            _loadSemaphore.Release();
+
+            if (!isLoaded)
             {
                 return;
             }
@@ -519,10 +536,25 @@ namespace Micser.App.Infrastructure.Widgets
 
         private async void OnLoaded(object sender, RoutedEventArgs e)
         {
-            LoadWidgetsSource();
-            await Task.Delay(100);
-            LoadConnectionsSource();
-            _isLoaded = true;
+            try
+            {
+                await _loadSemaphore.WaitAsync();
+                LoadWidgetsSource();
+                for (var i = 0; i < 10; i++)
+                {
+                    await Task.Delay(100);
+                    if (_widgets.All(w => w.IsLoaded))
+                    {
+                        LoadConnectionsSource();
+                        break;
+                    }
+                }
+            }
+            finally
+            {
+                _isLoaded = true;
+                _loadSemaphore.Release();
+            }
         }
 
         private void SnapValueToGridSize(ref double value)
@@ -609,9 +641,13 @@ namespace Micser.App.Infrastructure.Widgets
             }
         }
 
-        private void WidgetsSource_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private async void WidgetsSource_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            if (!_isLoaded)
+            await _loadSemaphore.WaitAsync();
+            var isLoaded = _isLoaded;
+            _loadSemaphore.Release();
+
+            if (!isLoaded)
             {
                 return;
             }
