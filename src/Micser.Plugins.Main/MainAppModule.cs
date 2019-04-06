@@ -19,11 +19,11 @@ namespace Micser.Plugins.Main
 
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            containerRegistry.RegisterWidget<DeviceInputWidget, DeviceInputViewModel>(Resources.DeviceInputWidgetName);
-            containerRegistry.RegisterWidget<DeviceInputWidget, LoopbackDeviceInputViewModel>(Resources.LoopbackDeviceInputWidgetName);
-            containerRegistry.RegisterWidget<DeviceOutputWidget, DeviceOutputViewModel>(Resources.DeviceOutputWidgetName);
-            containerRegistry.RegisterWidget<CompressorWidget, CompressorViewModel>(Resources.CompressorWidgetName);
-            containerRegistry.RegisterWidget<GainWidget, GainViewModel>(Resources.GainWidgetName);
+            containerRegistry.RegisterWidget<DeviceInputWidget, DeviceInputViewModel>(Resources.DeviceInputWidgetName, Resources.DeviceInputWidgetDescription);
+            containerRegistry.RegisterWidget<DeviceInputWidget, LoopbackDeviceInputViewModel>(Resources.LoopbackDeviceInputWidgetName, Resources.LoopbackDeviceInputWidgetDescription);
+            containerRegistry.RegisterWidget<DeviceOutputWidget, DeviceOutputViewModel>(Resources.DeviceOutputWidgetName, Resources.DeviceOutputWidgetDescription);
+            containerRegistry.RegisterWidget<CompressorWidget, CompressorViewModel>(Resources.CompressorWidgetName, Resources.CompressorWidgetDescription);
+            containerRegistry.RegisterWidget<GainWidget, GainViewModel>(Resources.GainWidgetName, Resources.GainWidgetDescription);
         }
     }
 }
