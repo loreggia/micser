@@ -144,14 +144,23 @@
   <data name="CompressorType" xml:space="preserve">
     <value>Type</value>
   </data>
+  <data name="CompressorWidgetDescription" xml:space="preserve">
+    <value>Compresses the audio that is routed through this widget. In "upward" mode this means that silent sounds will get louder; in "downward" mode loud sounds are getting quieter.</value>
+  </data>
   <data name="CompressorWidgetName" xml:space="preserve">
     <value>Compressor</value>
   </data>
   <data name="Device" xml:space="preserve">
     <value>Device</value>
   </data>
+  <data name="DeviceInputWidgetDescription" xml:space="preserve">
+    <value>Captures the audio from an input device (i.e. microphone).</value>
+  </data>
   <data name="DeviceInputWidgetName" xml:space="preserve">
     <value>Device Input</value>
+  </data>
+  <data name="DeviceOutputWidgetDescription" xml:space="preserve">
+    <value>Sends audio to an output device (i.e. speakers, headphones).</value>
   </data>
   <data name="DeviceOutputWidgetName" xml:space="preserve">
     <value>Device Output</value>
@@ -159,8 +168,14 @@
   <data name="Gain" xml:space="preserve">
     <value>Gain</value>
   </data>
+  <data name="GainWidgetDescription" xml:space="preserve">
+    <value>Changes the gain (in dB) of the audio that is routed through this widget, which allows amplifying the input volume. This can cause the audio to clip if it gets too loud.</value>
+  </data>
   <data name="GainWidgetName" xml:space="preserve">
     <value>Gain</value>
+  </data>
+  <data name="LoopbackDeviceInputWidgetDescription" xml:space="preserve">
+    <value>Captures the audio that is sent to an output device (i.e. speakers, headphones).</value>
   </data>
   <data name="LoopbackDeviceInputWidgetName" xml:space="preserve">
     <value>Loopback Device Input</value>

@@ -28,7 +28,7 @@ namespace Micser.App.Infrastructure.Extensions
             //container.RegisterTypeForNavigation<TView>();
         }
 
-        public static void RegisterWidget<TWidget, TViewModel>(this IContainerRegistry containerRegistry, string defaultName)
+        public static void RegisterWidget<TWidget, TViewModel>(this IContainerRegistry containerRegistry, string defaultName, string description)
             where TWidget : Widget
             where TViewModel : WidgetViewModel
         {
@@ -41,6 +41,7 @@ namespace Micser.App.Infrastructure.Extensions
             container.RegisterInstance(typeof(TViewModel).AssemblyQualifiedName, new WidgetDescription
             {
                 Name = defaultName,
+                Description = description,
                 ViewType = typeof(TWidget),
                 ViewModelType = typeof(TViewModel)
             });

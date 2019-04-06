@@ -142,6 +142,15 @@ namespace Micser.Plugins.Main.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Compresses the audio that is routed through this widget. In &quot;upward&quot; mode this means that silent sounds will get louder; in &quot;downward&quot; mode loud sounds are getting quieter..
+        /// </summary>
+        public static string CompressorWidgetDescription {
+            get {
+                return ResourceManager.GetString("CompressorWidgetDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Compressor.
         /// </summary>
         public static string CompressorWidgetName {
@@ -160,11 +169,29 @@ namespace Micser.Plugins.Main.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Captures the audio from an input device (i.e. microphone)..
+        /// </summary>
+        public static string DeviceInputWidgetDescription {
+            get {
+                return ResourceManager.GetString("DeviceInputWidgetDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Device Input.
         /// </summary>
         public static string DeviceInputWidgetName {
             get {
                 return ResourceManager.GetString("DeviceInputWidgetName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Sends audio to an output device (i.e. speakers, headphones)..
+        /// </summary>
+        public static string DeviceOutputWidgetDescription {
+            get {
+                return ResourceManager.GetString("DeviceOutputWidgetDescription", resourceCulture);
             }
         }
         
@@ -187,11 +214,29 @@ namespace Micser.Plugins.Main.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Changes the gain (in dB) of the audio that is routed through this widget, which allows amplifying the input volume. This can cause the audio to clip if it gets too loud..
+        /// </summary>
+        public static string GainWidgetDescription {
+            get {
+                return ResourceManager.GetString("GainWidgetDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Gain.
         /// </summary>
         public static string GainWidgetName {
             get {
                 return ResourceManager.GetString("GainWidgetName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Captures the audio that is sent to an output device (i.e. speakers, headphones)..
+        /// </summary>
+        public static string LoopbackDeviceInputWidgetDescription {
+            get {
+                return ResourceManager.GetString("LoopbackDeviceInputWidgetDescription", resourceCulture);
             }
         }
         
