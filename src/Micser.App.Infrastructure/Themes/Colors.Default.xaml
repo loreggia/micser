@@ -3,27 +3,27 @@
                     xmlns:themes="clr-namespace:Micser.App.Infrastructure.Themes;assembly=Micser.App.Infrastructure">
 
     <!-- Colors -->
-    <Color x:Key="{themes:ColorThemeKey Primary100}">#FFFF8800</Color>
-    <Color x:Key="{themes:ColorThemeKey Primary090}">#FFFF931A</Color>
-    <Color x:Key="{themes:ColorThemeKey Primary080}">#FFFF9F33</Color>
-    <Color x:Key="{themes:ColorThemeKey Primary070}">#FFFFAB4C</Color>
-    <Color x:Key="{themes:ColorThemeKey Primary060}">#FFFFB766</Color>
-    <Color x:Key="{themes:ColorThemeKey Primary050}">#FFFFC380</Color>
-    <Color x:Key="{themes:ColorThemeKey Primary040}">#FFFFCF99</Color>
-    <Color x:Key="{themes:ColorThemeKey Primary030}">#FFFFDBB2</Color>
-    <Color x:Key="{themes:ColorThemeKey Primary020}">#FFFFE7CC</Color>
-    <Color x:Key="{themes:ColorThemeKey Primary010}">#FFFFF3E6</Color>
+    <Color x:Key="{themes:ColorThemeKey Primary100}">#FF479842</Color>
+    <Color x:Key="{themes:ColorThemeKey Primary090}">#FF478943</Color>
+    <Color x:Key="{themes:ColorThemeKey Primary080}">#FF457A42</Color>
+    <Color x:Key="{themes:ColorThemeKey Primary070}">#FF426A40</Color>
+    <Color x:Key="{themes:ColorThemeKey Primary060}">#FF3E5B3C</Color>
+    <Color x:Key="{themes:ColorThemeKey Primary050}">#FF384C36</Color>
+    <Color x:Key="{themes:ColorThemeKey Primary040}">#FF303D2F</Color>
+    <Color x:Key="{themes:ColorThemeKey Primary030}">#FF262E26</Color>
+    <Color x:Key="{themes:ColorThemeKey Primary020}">#FF1B1E1B</Color>
+    <Color x:Key="{themes:ColorThemeKey Primary010}">#FF0E0F0E</Color>
 
-    <Color x:Key="{themes:ColorThemeKey Secondary100}">#FF0095FF</Color>
-    <Color x:Key="{themes:ColorThemeKey Secondary090}">#FF1AA0FF</Color>
-    <Color x:Key="{themes:ColorThemeKey Secondary080}">#FF33AAFF</Color>
-    <Color x:Key="{themes:ColorThemeKey Secondary070}">#FF4CB5FF</Color>
-    <Color x:Key="{themes:ColorThemeKey Secondary060}">#FF66BFFF</Color>
-    <Color x:Key="{themes:ColorThemeKey Secondary050}">#FF80CAFF</Color>
-    <Color x:Key="{themes:ColorThemeKey Secondary040}">#FF99D5FF</Color>
-    <Color x:Key="{themes:ColorThemeKey Secondary030}">#FFB2DFFF</Color>
-    <Color x:Key="{themes:ColorThemeKey Secondary020}">#FFCCEAFF</Color>
-    <Color x:Key="{themes:ColorThemeKey Secondary010}">#FFE6F4FF</Color>
+    <Color x:Key="{themes:ColorThemeKey Secondary100}">#FFA0C30E</Color>
+    <Color x:Key="{themes:ColorThemeKey Secondary090}">#FF93B01C</Color>
+    <Color x:Key="{themes:ColorThemeKey Secondary080}">#FF869C28</Color>
+    <Color x:Key="{themes:ColorThemeKey Secondary070}">#FF778830</Color>
+    <Color x:Key="{themes:ColorThemeKey Secondary060}">#FF687534</Color>
+    <Color x:Key="{themes:ColorThemeKey Secondary050}">#FF596234</Color>
+    <Color x:Key="{themes:ColorThemeKey Secondary040}">#FF484E31</Color>
+    <Color x:Key="{themes:ColorThemeKey Secondary030}">#FF373B2A</Color>
+    <Color x:Key="{themes:ColorThemeKey Secondary020}">#FF262720</Color>
+    <Color x:Key="{themes:ColorThemeKey Secondary010}">#FF131312</Color>
 
     <Color x:Key="{themes:ColorThemeKey Neutral100}">#FF000000</Color>
     <Color x:Key="{themes:ColorThemeKey Neutral090}">#FF1A1A1A</Color>
@@ -51,7 +51,7 @@
     <SolidColorBrush x:Key="{themes:BrushThemeKey WidgetForeground}" Color="{DynamicResource {themes:ColorThemeKey Neutral090}}" />
     <SolidColorBrush x:Key="{themes:BrushThemeKey WidgetBorder}" Color="{DynamicResource {themes:ColorThemeKey Neutral100}}" />
     <SolidColorBrush x:Key="{themes:BrushThemeKey WidgetBorderSelected}" Color="{DynamicResource {themes:ColorThemeKey Secondary100}}" />
-    <SolidColorBrush x:Key="{themes:BrushThemeKey WidgetHeaderBackground}" Color="{DynamicResource {themes:ColorThemeKey Primary050}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey WidgetHeaderBackground}" Color="{DynamicResource {themes:ColorThemeKey Primary100}}" />
 
     <SolidColorBrush x:Key="{themes:BrushThemeKey WidgetPanelBackground}" Color="{DynamicResource {themes:ColorThemeKey Neutral080}}" />
     <SolidColorBrush x:Key="{themes:BrushThemeKey WidgetPanelGridLine}" Color="{DynamicResource {themes:ColorThemeKey Neutral060}}" />
@@ -62,20 +62,20 @@
     <SolidColorBrush x:Key="{themes:BrushThemeKey ConnectionLine}" Color="{DynamicResource {themes:ColorThemeKey Secondary100}}" />
     <SolidColorBrush x:Key="{themes:BrushThemeKey ConnectionThumb}" Color="{DynamicResource {themes:ColorThemeKey Secondary050}}" />
 
-    <SolidColorBrush x:Key="{themes:BrushThemeKey StatusBarBackground}" Color="{DynamicResource {themes:ColorThemeKey Secondary090}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey StatusBarBackground}" Color="{DynamicResource {themes:ColorThemeKey Secondary100}}" />
 
     <SolidColorBrush x:Key="{themes:BrushThemeKey MenuItemBackgroundHover}" Color="{DynamicResource {themes:ColorThemeKey Neutral050}}" />
     <SolidColorBrush x:Key="{themes:BrushThemeKey MenuItemBackgroundActive}" Color="{DynamicResource {themes:ColorThemeKey Neutral100}}" />
     <SolidColorBrush x:Key="{themes:BrushThemeKey MenuItemPopupBorder}" Color="{DynamicResource {themes:ColorThemeKey Neutral070}}" />
     <SolidColorBrush x:Key="{themes:BrushThemeKey MenuItemArrow}" Color="{DynamicResource {themes:ColorThemeKey Neutral030}}" />
-    <SolidColorBrush x:Key="{themes:BrushThemeKey MenuItemArrowHover}" Color="{DynamicResource {themes:ColorThemeKey Primary050}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey MenuItemArrowHover}" Color="{DynamicResource {themes:ColorThemeKey Primary100}}" />
 
     <SolidColorBrush x:Key="{themes:BrushThemeKey ToolBarButtonBackground}" Color="{DynamicResource {themes:ColorThemeKey Neutral070}}" />
     <SolidColorBrush x:Key="{themes:BrushThemeKey ToolBarButtonBackgroundHover}" Color="{DynamicResource {themes:ColorThemeKey Neutral050}}" />
-    <SolidColorBrush x:Key="{themes:BrushThemeKey ToolBarButtonBackgroundActive}" Color="{DynamicResource {themes:ColorThemeKey Primary050}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey ToolBarButtonBackgroundActive}" Color="{DynamicResource {themes:ColorThemeKey Primary100}}" />
 
     <SolidColorBrush x:Key="{themes:BrushThemeKey SliderThumbBackground}" Color="{DynamicResource {themes:ColorThemeKey Primary100}}" />
-    <SolidColorBrush x:Key="{themes:BrushThemeKey SliderLeftBackground}" Color="{DynamicResource {themes:ColorThemeKey Secondary050}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey SliderLeftBackground}" Color="{DynamicResource {themes:ColorThemeKey Secondary100}}" />
 
     <!-- /Brushes -->
 </ResourceDictionary>

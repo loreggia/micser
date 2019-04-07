@@ -18,12 +18,12 @@ namespace Micser.App.Infrastructure.Test
         [Fact]
         public void GenerateColorsTest()
         {
-            var primary = Color.FromRgb(254, 135, 0);
-            var secondary = Color.FromRgb(0, 149, 255);
+            var primary = Color.FromRgb(48, 152, 42);
+            var secondary = Color.FromRgb(159, 195, 7);
             var neutral = Colors.White;
 
-            _output.WriteLine(GetPaletteString(primary, "Primary", false, null, 1f));
-            _output.WriteLine(GetPaletteString(secondary, "Secondary", false, null, 1f));
+            _output.WriteLine(GetPaletteString(primary, "Primary", false, null, null));
+            _output.WriteLine(GetPaletteString(secondary, "Secondary", false, null, null));
             _output.WriteLine(GetPaletteString(neutral, "Neutral", false, 0f));
         }
 
@@ -31,19 +31,23 @@ namespace Micser.App.Infrastructure.Test
         {
             var drawingColor = color.ToDrawing();
             var hue = drawingColor.GetHue();
+            var sat = drawingColor.GetSaturation();
+            var val = drawingColor.GetValue();
             const string template = "<Color x:Key=\"{{themes:ColorThemeKey {0}{1:000}}}\">{2}</Color>";
             var result = new StringBuilder();
             const int count = 10;
 
             for (var i = 0; i < count; i++)
             {
-                var step = 1f / count * i;
+                var satStep = sat / count * i;
+                var valStep = val / count * i;
                 if (!increasing)
                 {
-                    step = 1f - step;
+                    satStep = sat - satStep;
+                    valStep = val - valStep;
                 }
 
-                var iColor = ColorExtensions.FromAhsv(color.A, hue, saturation ?? step, value ?? step);
+                var iColor = ColorExtensions.FromAhsv(color.A, hue, saturation ?? satStep, value ?? valStep);
                 result.AppendFormat(template, name, 100 - i * 10, iColor.ToWpf().ToString());
                 result.AppendLine();
             }
