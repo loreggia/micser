@@ -71,43 +71,53 @@ namespace Micser.Engine.Api
 
         private dynamic ImportConfiguration(ModulesExportDto dto)
         {
-            _audioEngine.Stop();
-
-            if (!_connectionService.Truncate())
+            try
             {
-                _logger.Error("Could not truncate the connections table.");
-                return false;
-            }
+                _audioEngine.Stop();
 
-            if (!_moduleService.Truncate())
-            {
-                _logger.Error("Could not truncate the modules table.");
-                return false;
-            }
-
-            var moduleIdMap = new Dictionary<long, long>();
-
-            foreach (var moduleDto in dto.Modules)
-            {
-                var oldId = moduleDto.Id;
-                _moduleService.Insert(moduleDto);
-                moduleIdMap.Add(oldId, moduleDto.Id);
-            }
-
-            foreach (var connectionDto in dto.Connections)
-            {
-                if (moduleIdMap.TryGetValue(connectionDto.SourceId, out var newSourceId) &&
-                    moduleIdMap.TryGetValue(connectionDto.TargetId, out var newTargetId))
+                if (dto?.Modules == null)
                 {
-                    connectionDto.SourceId = newSourceId;
-                    connectionDto.TargetId = newTargetId;
-                    _connectionService.Insert(connectionDto);
+                    return false;
                 }
+
+                if (!_connectionService.Truncate())
+                {
+                    _logger.Error("Could not truncate the connections table.");
+                    return false;
+                }
+
+                if (!_moduleService.Truncate())
+                {
+                    _logger.Error("Could not truncate the modules table.");
+                    return false;
+                }
+
+                var moduleIdMap = new Dictionary<long, long>();
+
+                foreach (var moduleDto in dto.Modules)
+                {
+                    var oldId = moduleDto.Id;
+                    _moduleService.Insert(moduleDto);
+                    moduleIdMap.Add(oldId, moduleDto.Id);
+                }
+
+                foreach (var connectionDto in dto.Connections)
+                {
+                    if (moduleIdMap.TryGetValue(connectionDto.SourceId, out var newSourceId) &&
+                        moduleIdMap.TryGetValue(connectionDto.TargetId, out var newTargetId))
+                    {
+                        connectionDto.SourceId = newSourceId;
+                        connectionDto.TargetId = newTargetId;
+                        _connectionService.Insert(connectionDto);
+                    }
+                }
+
+                return true;
             }
-
-            _audioEngine.Start();
-
-            return true;
+            finally
+            {
+                _audioEngine.Start();
+            }
         }
 
         private dynamic InsertModule(ModuleDto moduleDto)
