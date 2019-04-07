@@ -15,7 +15,7 @@
         Width="800"
         MinWidth="350"
         MinHeight="250"
-        Icon="icon.ico"
+        Icon="logo.ico"
         UseLayoutRounding="True">
 
     <Window.Resources>
@@ -49,7 +49,7 @@
                         Style="{StaticResource RegionStyle}" />
 
         <tb:TaskbarIcon Grid.Row="3" x:Name="TaskbarIcon" MenuActivation="RightClick" ToolTipText="{x:Static p:Resources.ApplicationTitle}"
-                        TrayMouseDoubleClick="OnTrayMouseDoubleClick" IconSource="icon.ico">
+                        TrayMouseDoubleClick="OnTrayMouseDoubleClick" IconSource="logo.ico">
             <tb:TaskbarIcon.ContextMenu>
                 <ContextMenu>
                     <MenuItem Header="Restore" Click="TaskbarIconRestoreClick" />
