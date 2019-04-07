@@ -38,7 +38,7 @@
     <StartupObject>Micser.App.Application</StartupObject>
   </PropertyGroup>
   <PropertyGroup>
-    <ApplicationIcon>..\..\gfx\icon.ico</ApplicationIcon>
+    <ApplicationIcon>..\..\gfx\logo.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
@@ -189,11 +189,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="..\..\gfx\icon.ico">
-      <Link>icon.ico</Link>
-    </Resource>
-  </ItemGroup>
-  <ItemGroup>
     <PackageReference Include="CommonServiceLocator">
       <Version>2.0.4</Version>
     </PackageReference>
@@ -229,6 +224,11 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="..\..\gfx\logo.ico">
+      <Link>logo.ico</Link>
+    </Resource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(ProjectDir)Build\Micser.App.targets" />

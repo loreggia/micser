@@ -12,7 +12,7 @@
         d:DataContext="{d:DesignInstance vm:AboutViewModel}">
     <Grid>
         <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <Image Source="/icon.ico" VerticalAlignment="Top" HorizontalAlignment="Center" Stretch="None" />
+            <Image Source="/logo.ico" VerticalAlignment="Top" HorizontalAlignment="Center" Stretch="None" />
             <TextBlock Text="{Binding VersionText}" HorizontalAlignment="Center" Foreground="{DynamicResource {themes:BrushThemeKey DefaultForeground}}" />
             <TextBlock Text="{Binding AboutText}" HorizontalAlignment="Center" Foreground="{DynamicResource {themes:BrushThemeKey DefaultForeground}}" />
         </StackPanel>

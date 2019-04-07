@@ -10,7 +10,6 @@
         d:DataContext="{d:DesignInstance vm:StartupViewModel, IsDesignTimeCreatable=False}">
 
     <Grid>
-        <!--todo-->
-        <!--<Image Source="~/Assets/icon.ico"></Image>-->
+        <Image Source="/logo.ico" HorizontalAlignment="Center" VerticalAlignment="Center" />
     </Grid>
 </i:View>
