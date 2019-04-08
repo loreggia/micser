@@ -14,16 +14,16 @@
     <Color x:Key="{themes:ColorThemeKey Primary020}">#FF1B1E1B</Color>
     <Color x:Key="{themes:ColorThemeKey Primary010}">#FF0E0F0E</Color>
 
-    <Color x:Key="{themes:ColorThemeKey Secondary100}">#FFA0C30E</Color>
-    <Color x:Key="{themes:ColorThemeKey Secondary090}">#FF93B01C</Color>
-    <Color x:Key="{themes:ColorThemeKey Secondary080}">#FF869C28</Color>
-    <Color x:Key="{themes:ColorThemeKey Secondary070}">#FF778830</Color>
-    <Color x:Key="{themes:ColorThemeKey Secondary060}">#FF687534</Color>
-    <Color x:Key="{themes:ColorThemeKey Secondary050}">#FF596234</Color>
-    <Color x:Key="{themes:ColorThemeKey Secondary040}">#FF484E31</Color>
-    <Color x:Key="{themes:ColorThemeKey Secondary030}">#FF373B2A</Color>
-    <Color x:Key="{themes:ColorThemeKey Secondary020}">#FF262720</Color>
-    <Color x:Key="{themes:ColorThemeKey Secondary010}">#FF131312</Color>
+    <Color x:Key="{themes:ColorThemeKey Secondary100}">#FFC6C31A</Color>
+    <Color x:Key="{themes:ColorThemeKey Secondary090}">#FFB2B027</Color>
+    <Color x:Key="{themes:ColorThemeKey Secondary080}">#FF9E9D30</Color>
+    <Color x:Key="{themes:ColorThemeKey Secondary070}">#FF8B8936</Color>
+    <Color x:Key="{themes:ColorThemeKey Secondary060}">#FF777639</Color>
+    <Color x:Key="{themes:ColorThemeKey Secondary050}">#FF636238</Color>
+    <Color x:Key="{themes:ColorThemeKey Secondary040}">#FF4F4F34</Color>
+    <Color x:Key="{themes:ColorThemeKey Secondary030}">#FF3B3B2C</Color>
+    <Color x:Key="{themes:ColorThemeKey Secondary020}">#FF282721</Color>
+    <Color x:Key="{themes:ColorThemeKey Secondary010}">#FF141412</Color>
 
     <Color x:Key="{themes:ColorThemeKey Neutral100}">#FFFFFFFF</Color>
     <Color x:Key="{themes:ColorThemeKey Neutral090}">#FFE6E6E6</Color>

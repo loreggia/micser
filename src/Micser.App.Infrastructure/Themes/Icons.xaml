@@ -2,8 +2,25 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:t="clr-namespace:Micser.App.Infrastructure.Themes">
 
+    <DataTemplate x:Key="Logo">
+        <Viewbox>
+            <Canvas Width="128.000" Height="83.000">
+                <Canvas.Resources>
+                    <LinearGradientBrush x:Key="StrokeBrush" StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Offset="0" Color="{DynamicResource {t:ColorThemeKey Primary100}}" />
+                        <GradientStop Offset="1" Color="{DynamicResource {t:ColorThemeKey Secondary100}}" />
+                    </LinearGradientBrush>
+                </Canvas.Resources>
+                <Path StrokeThickness="20.0" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Data="F1 M 10.000,73.000 L 37.000,10.000" Stroke="{StaticResource StrokeBrush}" />
+                <Path StrokeThickness="20.0" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Data="F1 M 64.000,73.000 L 37.000,10.000" Stroke="{StaticResource StrokeBrush}" />
+                <Path StrokeThickness="20.0" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Data="F1 M 64.000,73.000 L 91.000,10.000" Stroke="{StaticResource StrokeBrush}" />
+                <Path StrokeThickness="20.0" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round" Data="F1 M 118.000,73.000 L 91.000,10.000" Stroke="{StaticResource StrokeBrush}" />
+            </Canvas>
+        </Viewbox>
+    </DataTemplate>
+
     <DataTemplate x:Key="Icon_Backward_16x">
-        <Viewbox Width="16" Height="16">
+        <Viewbox>
             <Rectangle Width="16" Height="16">
                 <Rectangle.Fill>
                     <DrawingBrush>

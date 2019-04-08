@@ -10,6 +10,6 @@
         d:DataContext="{d:DesignInstance vm:StartupViewModel, IsDesignTimeCreatable=False}">
 
     <Grid>
-        <Image Source="/logo.ico" HorizontalAlignment="Center" VerticalAlignment="Center" />
+        <ContentControl ContentTemplate="{DynamicResource Logo}" Margin="50" MinWidth="64" MaxWidth="512" />
     </Grid>
 </i:View>
