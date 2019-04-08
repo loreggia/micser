@@ -99,7 +99,13 @@ namespace Micser.Plugins.Main.Widgets
         public CompressorType Type
         {
             get => _type;
-            set => SetProperty(ref _type, value);
+            set
+            {
+                if (SetProperty(ref _type, value))
+                {
+                    CalculateSimpleValues();
+                }
+            }
         }
 
         private void CalculateSimpleValues()
@@ -107,6 +113,7 @@ namespace Micser.Plugins.Main.Widgets
             var amount = Amount;
 
             Attack = Type == CompressorType.Upward ? 0.1f : 0.05f;
+            Knee = 5f;
             Release = 0.1f;
             MakeUpGain = Type == CompressorType.Upward ? 0f : MathExtensions.Lerp(0f, 25f, amount);
             Ratio = MathExtensions.Lerp(1.5f, 2.5f, amount);
