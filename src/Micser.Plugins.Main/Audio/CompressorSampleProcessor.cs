@@ -18,7 +18,7 @@ namespace Micser.Plugins.Main.Audio
         private float _amount;
         private float _attack;
         private int _channelCount;
-        private float _chunkDbDiff;
+        private float _chunkMaxDbDiff;
         private float _envelope;
         private float _knee;
         private float _makeUpGain;
@@ -111,19 +111,23 @@ namespace Micser.Plugins.Main.Audio
 
             if ((_samplePosition %= ChunkSize) == 0)
             {
-                _chunkDbDiff = dbDiff;
+                _chunkMaxDbDiff = dbDiff;
+            }
+            else
+            {
+                _chunkMaxDbDiff = Math.Max(_chunkMaxDbDiff, dbDiff);
             }
 
             // Ballistics - smoothing of the gain
             float dbEnv;
-            if (_type == CompressorType.Downward && dbDiff > _envelope ||
-                _type == CompressorType.Upward && dbDiff < _envelope)
+            if (_type == CompressorType.Downward && _chunkMaxDbDiff > _envelope ||
+                _type == CompressorType.Upward && _chunkMaxDbDiff < _envelope)
             {
-                dbEnv = _alphaAttack * _envelope + (1 - _alphaAttack) * dbDiff;
+                dbEnv = _alphaAttack * _envelope + (1 - _alphaAttack) * _chunkMaxDbDiff;
             }
             else
             {
-                dbEnv = _alphaRelease * _envelope + (1 - _alphaRelease) * dbDiff;
+                dbEnv = _alphaRelease * _envelope + (1 - _alphaRelease) * _chunkMaxDbDiff;
             }
             _envelope = dbEnv;
 
