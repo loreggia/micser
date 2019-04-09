@@ -1,32 +1,14 @@
-/*++
-
-Module Name:
-
-    driver.h
-
-Abstract:
-
-    This file contains the driver definitions.
-
-Environment:
-
-    Kernel-mode Driver Framework
-
---*/
-
 #include <ntddk.h>
 #include <wdf.h>
 #include <initguid.h>
-
-#include "device.h"
-#include "queue.h"
 #include "trace.h"
 
-EXTERN_C_START
+#define INTERFACE_GUID_AUDIO {0x6994AD04, 0x93EF, 0x11D0, 0xA3, 0xCC, 0x00, 0xA0, 0xC9, 0x22, 0x31, 0x96}
+#define INTERFACE_GUID_RENDER = {0x65E8773E, 0x8F56, 0x11D0, 0xA3, 0xB9, 0x00, 0xA0, 0xC9, 0x22, 0x31, 0x96}
+#define INTERFACE_GUID_CAPTURE = {0x65E8773D, 0x8F56, 0x11D0, 0xA3, 0xB9, 0x00, 0xA0, 0xC9, 0x22, 0x31, 0x96}
+#define INTERFACE_GUID_REALTIME = {0xEB115FFC, 0x10C8, 0x4964, 0x83, 0x1D, 0x6D, 0xCB, 0x02, 0xE6, 0xF2, 0x3F}
 
-//
-// WDFDRIVER Events
-//
+EXTERN_C_START
 
 DRIVER_INITIALIZE DriverEntry;
 EVT_WDF_DRIVER_DEVICE_ADD MicserVacDriverEvtDeviceAdd;

@@ -1,0 +1,2 @@
+cd /d "C:\Users\lucas\Source\Repos\micser\src\Micser.Vac.Package" &msbuild "Micser.Vac.Package.vcxproj" /t:sdvViewer /p:configuration="Debug" /p:platform="Win32" /p:SolutionDir="C:\Users\lucas\Source\Repos\micser\src" 
+exit %errorlevel% 

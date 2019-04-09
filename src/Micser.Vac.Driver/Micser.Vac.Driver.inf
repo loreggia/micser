@@ -72,7 +72,7 @@ KmdfLibraryVersion = $KMDFVERSION$
 
 [Strings]
 SPSVCINST_ASSOCSERVICE= 0x00000002
-ManufacturerName="Micser" ; DONE: Replace with your manufacturer name
+ManufacturerName="Lucas Loreggia" ; DONE: Replace with your manufacturer name
 ClassName="Micser" ; DONE: edit ClassName
 DiskName = "Micser.Vac.Driver Installation Disk"
 Micser.Vac.Driver.DeviceDesc = "Micser.Vac.Driver Device"
