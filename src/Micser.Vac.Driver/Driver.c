@@ -12,25 +12,21 @@ NTSTATUS DriverEntry(_In_ PDRIVER_OBJECT  DriverObject, _In_ PUNICODE_STRING Reg
     WDF_DRIVER_CONFIG config;
     NTSTATUS status = STATUS_SUCCESS;
     WDF_OBJECT_ATTRIBUTES attributes;
-    //
+
     // Initialize WPP Tracing
-    //
     WPP_INIT_TRACING(DriverObject, RegistryPath);
 
     TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! Entry");
 
-    //
     // Register a cleanup callback so that we can call WPP_CLEANUP when
     // the framework driver object is deleted during driver unload.
-    //
     WDF_OBJECT_ATTRIBUTES_INIT(&attributes);
     attributes.EvtCleanupCallback = MicserVacDriverEvtDriverContextCleanup;
 
-    WDF_DRIVER_CONFIG_INIT(&config,
-        MicserVacDriverEvtDeviceAdd
-    );
+    WDF_DRIVER_CONFIG_INIT(&config, MicserVacDriverEvtDeviceAdd);
 
-    status = WdfDriverCreate(DriverObject,
+    status = WdfDriverCreate(
+        DriverObject,
         RegistryPath,
         &attributes,
         &config,
@@ -67,11 +63,13 @@ NTSTATUS MicserVacDriverEvtDeviceAdd(_In_ WDFDRIVER Driver, _Inout_ PWDFDEVICE_I
     }
 
     // Create device interface
-    UNICODE_STRING referenceString = "Micser.Vac.Driver.0";
-    status = WdfDeviceCreateDeviceInterface(hDevice, &INTERFACE_GUID_AUDIO, &referenceString);
-
+    status = MicserVacDriverCreateDeviceInterface(hDevice, &INTERFACE_GUID_AUDIO);
     if (!NT_SUCCESS(status)) {
-        TraceEvents(TRACE_LEVEL_ERROR, TRACE_DRIVER, "WdfDeviceCreateDeviceInterface failed %!STATUS!", status);
+        return status;
+    }
+
+    status = MicserVacDriverCreateDeviceInterface(hDevice, &INTERFACE_GUID_RENDER);
+    if (!NT_SUCCESS(status)) {
         return status;
     }
 
@@ -87,8 +85,20 @@ VOID MicserVacDriverEvtDriverContextCleanup(_In_ WDFOBJECT DriverObject)
 
     TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! Entry");
 
-    //
     // Stop WPP Tracing
-    //
     WPP_CLEANUP(WdfDriverWdmGetDriverObject((WDFDRIVER)DriverObject));
+}
+
+NTSTATUS MicserVacDriverCreateDeviceInterface(_In_ WDFDEVICE Device, _In_ const GUID *InterfaceClassGUID)
+{
+    NTSTATUS status;
+
+    InterfaceReferenceString.Buffer = L"Micser.Vac.Driver.0";
+    status = WdfDeviceCreateDeviceInterface(Device, InterfaceClassGUID, &InterfaceReferenceString);
+
+    if (!NT_SUCCESS(status)) {
+        TraceEvents(TRACE_LEVEL_ERROR, TRACE_DRIVER, "WdfDeviceCreateDeviceInterface (AUDIO) failed %!STATUS!", status);
+    }
+
+    return status;
 }
