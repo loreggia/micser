@@ -67,11 +67,8 @@ NTSTATUS MicserVacDriverEvtDeviceAdd(_In_ WDFDRIVER Driver, _Inout_ PWDFDEVICE_I
     }
 
     // Create device interface
-    GUID interfaceGuid;
-    PCUNICODE_STRING referenceString;
-
-    referenceString = "Micser.Vac.Driver.0";
-    status = WdfDeviceCreateDeviceInterface(hDevice, (LPGUID)&GUID_CLASS_AUDIO, &referenceString);
+    UNICODE_STRING referenceString = "Micser.Vac.Driver.0";
+    status = WdfDeviceCreateDeviceInterface(hDevice, &INTERFACE_GUID_AUDIO, &referenceString);
 
     if (!NT_SUCCESS(status)) {
         TraceEvents(TRACE_LEVEL_ERROR, TRACE_DRIVER, "WdfDeviceCreateDeviceInterface failed %!STATUS!", status);
