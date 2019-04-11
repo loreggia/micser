@@ -35,11 +35,16 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Driver.c" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Driver.h" />
-    <ClInclude Include="Trace.h" />
+    <ClInclude Include="common.h" />
+    <ClInclude Include="hw.h" />
+    <ClInclude Include="kshelper.h" />
+    <ClInclude Include="sonicsaudio.h" />
+    <ClInclude Include="topo.h" />
+    <ClInclude Include="toptable.h" />
+    <ClInclude Include="trace.h" />
+    <ClInclude Include="wave.h" />
+    <ClInclude Include="wavestream.h" />
+    <ClInclude Include="wavtable.h" />
   </ItemGroup>
   <ItemGroup>
     <Inf Include="Micser.Vac.Driver.inf" />
@@ -163,6 +168,7 @@
       <WppScanConfigurationData Condition="'%(ClCompile.ScanConfigurationData)' == ''">trace.h</WppScanConfigurationData>
       <WppKernelMode>true</WppKernelMode>
       <AdditionalOptions>/Qspectre %(AdditionalOptions)</AdditionalOptions>
+      <PreprocessorDefinitions>PC_IMPLEMENTATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -179,6 +185,8 @@
       <WppRecorderEnabled>true</WppRecorderEnabled>
       <WppScanConfigurationData Condition="'%(ClCompile.ScanConfigurationData)' == ''">trace.h</WppScanConfigurationData>
       <WppKernelMode>true</WppKernelMode>
+      <PreprocessorDefinitions>PC_IMPLEMENTATION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <WppAddControlGUID>8c39308c-7a9b-438b-be7c-e9fa8fd5c03b</WppAddControlGUID>
     </ClCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -223,6 +231,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <FilesToPackage Include="$(TargetPath)" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="adapter.cpp" />
+    <ClCompile Include="common.cpp" />
+    <ClCompile Include="hw.cpp" />
+    <ClCompile Include="kshelper.cpp" />
+    <ClCompile Include="topo.cpp" />
+    <ClCompile Include="wave.cpp" />
+    <ClCompile Include="wavestream.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
