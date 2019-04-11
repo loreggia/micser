@@ -5,11 +5,9 @@ Module Name:
 Abstract:
   WaveCyclicStream-Miniport and IDmaChannel implementation. Does nothing HW related.
 */
-#include "sonicsaudio.h"
-#include "common.h"
-#include "wave.h"
+
 #include "wavestream.h"
-#include "trace.h"
+#include "wavestream.tmh"
 
 #define DBGMESSAGE "[SONICS-Audio] wavestream.cpp: "
 #define DBGPRINT(x) DbgPrint(DBGMESSAGE x)
@@ -183,7 +181,7 @@ Return Value:
         }
         else {
             //DPF(D_TERSE, ("[SamplingFrequency Sync failed: %08X]", ntStatus));
-            TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, ("%!FUNC! - SamplingFrequency Sync failed: %08X", ntStatus));
+            TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! - SamplingFrequency Sync failed: %08X", ntStatus);
         }
     }
 
@@ -396,7 +394,7 @@ Return Value:
                     m_ulDmaMovementRate = pWfx->nAvgBytesPerSec;
 
                     //DPF(D_TERSE, ("New Format: %d", pWfx->nSamplesPerSec));
-                    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, ("%!FUNC! - New Format: %d", pWfx->nSamplesPerSec));
+                    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! - New Format: %d", pWfx->nSamplesPerSec);
                 }
                 KeReleaseMutex(&m_pMiniport->m_SampleRateSync, FALSE);
             }

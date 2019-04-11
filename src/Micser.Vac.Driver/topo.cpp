@@ -6,12 +6,8 @@ Abstract:
   Implementation of topology miniport.
 */
 
-#include "sonicsaudio.h"
-#include "common.h"
-#include "wave.h"
 #include "topo.h"
-#include "toptable.h"
-#include "trace.h"
+#include "topo.tmh"
 
 /*********************************************************************
 * Topology/Wave bridge connection                                    *
@@ -853,7 +849,7 @@ Return Value:
         if (!NT_SUCCESS(ntStatus))
         {
             //DPF(D_TERSE, ("[%s - ntStatus=0x%08x]", __FUNCTION__, ntStatus));
-            TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, ("%!FUNC! - ntStatus=0x%08x", ntStatus));
+            TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! - ntStatus=0x%08x", ntStatus);
         }
     }
 

@@ -13,9 +13,9 @@ Abstract:
     for the topology.
 
 --*/
-#include "sonicsaudio.h"
+
 #include "hw.h"
-#include "trace.h"
+#include "hw.tmh"
 
 //=============================================================================
 // CSONICSAudioHW

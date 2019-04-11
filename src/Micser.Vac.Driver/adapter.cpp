@@ -6,49 +6,8 @@ Abstract:
   Setup and miniport installation.  No resources are used by msvad.
 */
 
-// All the GUIDS for all the miniports end up in this object.
-#define PUT_GUIDS_HERE
-
-#include "sonicsaudio.h"
-#include "common.h"
-#include "trace.h"
-
-//-----------------------------------------------------------------------------
-// Defines
-//-----------------------------------------------------------------------------
-// BUGBUG set this to number of miniports
-#define MAX_MINIPORTS 2     // Number of maximum miniports.
-
-//-----------------------------------------------------------------------------
-// Externals
-//-----------------------------------------------------------------------------
-NTSTATUS CreateMiniportWaveCyclic(
-    OUT PUNKNOWN *,
-    IN  REFCLSID,
-    IN  PUNKNOWN,
-    IN  POOL_TYPE
-);
-
-NTSTATUS CreateMiniportTopology(
-    OUT PUNKNOWN *,
-    IN  REFCLSID,
-    IN  PUNKNOWN,
-    IN  POOL_TYPE
-);
-
-//-----------------------------------------------------------------------------
-// Referenced forward.
-//-----------------------------------------------------------------------------
-extern "C" NTSTATUS AddDevice(
-    IN  PDRIVER_OBJECT,
-    IN  PDEVICE_OBJECT
-);
-
-NTSTATUS StartDevice(
-    IN  PDEVICE_OBJECT,
-    IN  PIRP,
-    IN  PRESOURCELIST
-);
+#include "adapter.h"
+#include "adapter.tmh"
 
 //-----------------------------------------------------------------------------
 // Functions
@@ -201,7 +160,7 @@ NTSTATUS InstallSubdevice(
     PUNKNOWN	miniport = NULL;
 
     //DPF_ENTER(("[InstallSubDevice %s]", Name));
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, ("%!FUNC! - %s", Name));
+    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC!");
 
     // Create the port driver object
     ntStatus = PcNewPort(&port, PortClassId);

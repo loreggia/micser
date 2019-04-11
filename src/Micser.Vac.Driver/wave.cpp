@@ -6,12 +6,8 @@ Abstract:
     Implementation of wavecyclic miniport.
 */
 
-#include "sonicsaudio.h"
-#include "common.h"
 #include "wave.h"
-#include "wavestream.h"
-#include "wavtable.h"
-#include "trace.h"
+#include "wave.tmh"
 
 #pragma code_seg("PAGE")
 

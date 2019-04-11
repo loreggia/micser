@@ -6,10 +6,8 @@ Abstract:
   Implementation of the AdapterCommon class.
 */
 
-#include "sonicsaudio.h"
 #include "common.h"
-#include "hw.h"
-#include "trace.h"
+#include "common.tmh"
 
 //=============================================================================
 // Classes
@@ -817,7 +815,8 @@ Return Value:
             //    D_VERBOSE,
             //    ("Entering D%d", ULONG(m_PowerState) - ULONG(PowerDeviceD0))
             //);
-            TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, ("%!FUNC! - Entering D%d", ULONG(m_PowerState) - ULONG(PowerDeviceD0)));
+            //TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, ("%!FUNC! - Entering D%d", ULONG(m_PowerState) - ULONG(PowerDeviceD0)));
+            TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! - Entering D%d", ULONG(m_PowerState) - ULONG(PowerDeviceD0));
 
             break;
 

@@ -11,6 +11,8 @@ Abstract:
 
 #include <ntddk.h>
 #include <wdf.h>
+#include "sonicsaudio.h"
+#include "hw.h"
 #include "trace.h"
 
 //=============================================================================
