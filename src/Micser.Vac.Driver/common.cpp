@@ -7,7 +7,7 @@ Abstract:
 */
 
 #include "common.h"
-#include "common.tmh"
+#include "hw.h"
 
 //=============================================================================
 // Classes
@@ -166,9 +166,8 @@ CAdapterCommon::CAdapterCommon(PUNKNOWN pUnknownOuter) :CUnknown(pUnknownOuter)
 {
     PAGED_CODE();
 
-    //DPF_ENTER(("[CAdapterCommon::CAdapterCommon]"));
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC!");
-
+    DPF_ENTER(("[CAdapterCommon::CAdapterCommon]"));
+    ////
     m_PowerState = PowerDeviceD0;
 }
 //=============================================================================
@@ -185,8 +184,7 @@ Return Value:
 {
     PAGED_CODE();
 
-    //DPF_ENTER(("[CAdapterCommon::~CAdapterCommon]"));
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC!");
+    DPF_ENTER(("[CAdapterCommon::~CAdapterCommon]"));
 
     if (m_pHW)
         delete m_pHW;
@@ -251,8 +249,7 @@ Return Value:
 
     NTSTATUS                    ntStatus = STATUS_SUCCESS;
 
-    //DPF_ENTER(("[CAdapterCommon::Init]"));
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC!");
+    DPF_ENTER(("[CAdapterCommon::Init]"));
 
     m_pDeviceObject = DeviceObject;
     m_PowerState = PowerDeviceD0;
@@ -262,8 +259,7 @@ Return Value:
     m_pHW = new (NonPagedPool, SONICSAUDIO_POOLTAG)  CSONICSAudioHW;
     if (!m_pHW)
     {
-        //DPF(D_TERSE, ("Insufficient memory for MSVAD HW"));
-        TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! - Insufficient memory for MSVAD HW");
+        DPF(D_TERSE, ("Insufficient memory for MSVAD HW"));
         ntStatus = STATUS_INSUFFICIENT_RESOURCES;
     }
     else
@@ -377,8 +373,7 @@ Return Value:
 {
     PAGED_CODE();
 
-    //DPF_ENTER(("[CAdapterCommon::SetWaveServiceGroup]"));
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC!");
+    DPF_ENTER(("[CAdapterCommon::SetWaveServiceGroup]"));
 
     if (m_pServiceGroupWave)
     {
@@ -793,8 +788,7 @@ Return Value:
 {
     //UINT i;
 
-    //DPF_ENTER(("[CAdapterCommon::PowerChangeState]"));
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC!");
+    DPF_ENTER(("[CAdapterCommon::PowerChangeState]"));
 
     // is this actually a state change??
     //
@@ -810,19 +804,17 @@ Return Value:
         case PowerDeviceD3:
             m_PowerState = NewState.DeviceState;
 
-            //DPF
-            //(
-            //    D_VERBOSE,
-            //    ("Entering D%d", ULONG(m_PowerState) - ULONG(PowerDeviceD0))
-            //);
-            //TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, ("%!FUNC! - Entering D%d", ULONG(m_PowerState) - ULONG(PowerDeviceD0)));
-            TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! - Entering D%d", ULONG(m_PowerState) - ULONG(PowerDeviceD0));
+            DPF
+            (
+                D_VERBOSE,
+                ("Entering D%d", ULONG(m_PowerState) - ULONG(PowerDeviceD0))
+            );
 
             break;
 
         default:
-            //DPF(D_VERBOSE, ("Unknown Device Power State"));
-            TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! - Unknown Device Power State");
+
+            DPF(D_VERBOSE, ("Unknown Device Power State"));
             break;
         }
     }
@@ -853,9 +845,7 @@ Return Value:
 --*/
 {
     UNREFERENCED_PARAMETER(PowerDeviceCaps);
-
-    //DPF_ENTER(("[CAdapterCommon::QueryDeviceCapabilities]"));
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC!");
+    DPF_ENTER(("[CAdapterCommon::QueryDeviceCapabilities]"));
 
     return (STATUS_SUCCESS);
 } // QueryDeviceCapabilities
@@ -883,9 +873,7 @@ Return Value:
 --*/
 {
     UNREFERENCED_PARAMETER(NewStateQuery);
-
-    //DPF_ENTER(("[CAdapterCommon::QueryPowerChangeState]"));
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC!");
+    DPF_ENTER(("[CAdapterCommon::QueryPowerChangeState]"));
 
     return STATUS_SUCCESS;
 } // QueryPowerChangeState

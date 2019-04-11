@@ -6,14 +6,24 @@ Abstract:
   Setup and miniport installation.  No resources are used by msvad.
 */
 
+// All the GUIDS for all the miniports end up in this object.
+#define PUT_GUIDS_HERE
+
 #include "adapter.h"
-#include "adapter.tmh"
+#include "wave.h"
+#include "topo.h"
+
+//-----------------------------------------------------------------------------
+// Defines
+//-----------------------------------------------------------------------------
+// BUGBUG set this to number of miniports
+#define MAX_MINIPORTS 2     // Number of maximum miniports.
 
 //-----------------------------------------------------------------------------
 // Functions
 //-----------------------------------------------------------------------------
 #pragma code_seg("INIT")
-extern "C" NTSTATUS DriverEntry(
+NTSTATUS DriverEntry(
     IN  PDRIVER_OBJECT          DriverObject,
     IN  PUNICODE_STRING         RegistryPathName
 )
@@ -38,10 +48,7 @@ extern "C" NTSTATUS DriverEntry(
 
     NTSTATUS ntStatus;
 
-    WPP_INIT_TRACING(DriverObject, RegistryPathName);
-
-    //DPF(D_TERSE, ("[DriverEntry]"));
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC!");
+    DPF(D_TERSE, ("[DriverEntry]"));
 
     // Tell the class driver to initialize the driver.
     ntStatus = PcInitializeAdapterDriver(
@@ -50,18 +57,13 @@ extern "C" NTSTATUS DriverEntry(
         AddDevice
     );
 
-    if (!NT_SUCCESS(ntStatus)) {
-        TraceEvents(TRACE_LEVEL_ERROR, TRACE_DRIVER, "%!FUNC! - WdfDriverCreate failed %!STATUS!", ntStatus);
-        WPP_CLEANUP(DriverObject);
-    }
-
     return ntStatus;
 } // DriverEntry
 #pragma code_seg()
 
 #pragma code_seg("PAGE")
 //=============================================================================
-extern "C" NTSTATUS AddDevice(
+NTSTATUS AddDevice(
     IN  PDRIVER_OBJECT          DriverObject,
     IN  PDEVICE_OBJECT          PhysicalDeviceObject
 )
@@ -92,8 +94,7 @@ Return Value:
 
     NTSTATUS ntStatus;
 
-    //DPF(D_TERSE, ("[AddDevice]"));
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC!");
+    DPF(D_TERSE, ("[AddDevice]"));
 
     // Tell the class driver to add the device.
     ntStatus = PcAddAdapterDevice(
@@ -159,8 +160,7 @@ NTSTATUS InstallSubdevice(
     PPORT		port = NULL;
     PUNKNOWN	miniport = NULL;
 
-    //DPF_ENTER(("[InstallSubDevice %s]", Name));
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC!");
+    DPF_ENTER(("[InstallSubDevice %s]", Name));
 
     // Create the port driver object
     ntStatus = PcNewPort(&port, PortClassId);
@@ -268,8 +268,7 @@ NTSTATUS StartDevice
     PADAPTERCOMMON	pAdapterCommon = NULL;
     PUNKNOWN		pUnknownCommon = NULL;
 
-    //DPF_ENTER(("[StartDevice]"));
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC!");
+    DPF_ENTER(("[StartDevice]"));
 
     // create a new adapter common object
     ntStatus = NewAdapterCommon(

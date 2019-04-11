@@ -12,7 +12,6 @@ Abstract:
 #define __HW_H_
 
 #include "sonicsaudio.h"
-#include "trace.h"
 
 //=============================================================================
 // Defines

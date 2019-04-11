@@ -7,7 +7,8 @@ Abstract:
 */
 
 #include "wave.h"
-#include "wave.tmh"
+#include "wavestream.h"
+#include "wavtable.h"
 
 #pragma code_seg("PAGE")
 
@@ -71,9 +72,7 @@ Return Value:
 */
 {
     PAGED_CODE();
-
-    //DPF_ENTER(("[CMiniportWaveCyclic::~CMiniportWaveCyclic]"));
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC!");
+    DPF_ENTER(("[CMiniportWaveCyclic::~CMiniportWaveCyclic]"));
 
     if (m_Port)
         m_Port->Release();
@@ -175,9 +174,7 @@ Return Value:
         (((PKSDATARANGE_AUDIO)ClientDataRange)->MinimumSampleFrequency >
         ((PKSDATARANGE_AUDIO)MyDataRange)->MaximumSampleFrequency))
     {
-        //DPF(D_TERSE, ("[No intersection in sample rate ranges]"));
-        TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! - [No intersection in sample rate ranges]");
-
+        DPF(D_TERSE, ("[No intersection in sample rate ranges]"));
         return STATUS_NO_MATCH;
     }
     pWfxExt->Format.nSamplesPerSec =
@@ -191,9 +188,7 @@ Return Value:
         (((PKSDATARANGE_AUDIO)ClientDataRange)->MinimumBitsPerSample >
         ((PKSDATARANGE_AUDIO)MyDataRange)->MaximumBitsPerSample))
     {
-        //DPF(D_TERSE, ("[No intersection in bits per sample ranges]"));
-        TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! - [No intersection in bits per sample ranges]");
-
+        DPF(D_TERSE, ("[No intersection in bits per sample ranges]"));
         return STATUS_NO_MATCH;
     }
     pWfxExt->Format.wBitsPerSample =
@@ -291,9 +286,7 @@ Return Value:
 {
     PAGED_CODE();
     ASSERT(OutFilterDescriptor);
-
-    //DPF_ENTER(("[CMiniportWaveCyclic::GetDescription]"));
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC!");
+    DPF_ENTER(("[CMiniportWaveCyclic::GetDescription]"));
 
     *OutFilterDescriptor = m_FilterDescriptor;
     return (STATUS_SUCCESS);
@@ -326,9 +319,7 @@ Return Value:
     PAGED_CODE();
     ASSERT(UnknownAdapter_);
     ASSERT(Port_);
-
-    //DPF_ENTER(("[CMiniportWaveCyclic::Init]"));
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC!");
+    DPF_ENTER(("[CMiniportWaveCyclic::Init]"));
 
     NTSTATUS ntStatus;
 
@@ -383,9 +374,7 @@ Return Value:
         m_pvTranBuf = (PVOID)ExAllocatePoolWithTag(NonPagedPool, TRAN_BUFFER_SIZE, SONICSAUDIO_POOLTAG);
         if (!m_pvTranBuf)
         {
-            //DPF_ENTER(("Cann't ALLOC BUFFER!"));
-            TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! - Cann't ALLOC BUFFER!");
-
+            DPF_ENTER(("Cann't ALLOC BUFFER!"));
             ntStatus = STATUS_INSUFFICIENT_RESOURCES;
         }
         else
@@ -463,8 +452,7 @@ Return Value:
     ASSERT(OutDmaChannel);
     ASSERT(OutServiceGroup);
 
-    //DPF_ENTER(("[CMiniportWaveCyclic::NewStream]"));
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC!");
+    DPF_ENTER(("[CMiniportWaveCyclic::NewStream]"));
 
     NTSTATUS                    ntStatus = STATUS_SUCCESS;
     PCMiniportWaveCyclicStream  stream = NULL;
@@ -472,17 +460,13 @@ Return Value:
     // Check if we have enough streams.
     if (Capture) {
         if (m_fCaptureAllocated) {
-            //DPF(D_TERSE, ("[Only one capture stream supported]"));
-            TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! - [Only one capture stream supported]");
-
+            DPF(D_TERSE, ("[Only one capture stream supported]"));
             ntStatus = STATUS_INSUFFICIENT_RESOURCES;
         }
     }
     else {
         if (m_fRenderAllocated) {
-            //DPF(D_TERSE, ("[Only one render stream supported]"));
-            TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! - [Only one render stream supported]");
-
+            DPF(D_TERSE, ("[Only one render stream supported]"));
             ntStatus = STATUS_INSUFFICIENT_RESOURCES;
         }
     }
@@ -593,9 +577,7 @@ Return Value:
 */
 {
     PAGED_CODE();
-
-    //DPF_ENTER(("[PropertyHandlerComponentId]"));
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC!");
+    DPF_ENTER(("[PropertyHandlerComponentId]"));
 
     NTSTATUS ntStatus = STATUS_INVALID_DEVICE_REQUEST;
 
@@ -624,9 +606,7 @@ Return Value:
             }
         }
         else {
-            //DPF(D_TERSE, ("[PropertyHandlerComponentId - Invalid parameter]"));
-            TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! - Invalid parameter");
-
+            DPF(D_TERSE, ("[PropertyHandlerComponentId - Invalid parameter]"));
             ntStatus = STATUS_INVALID_PARAMETER;
         }
     }
@@ -660,8 +640,7 @@ Return Value:
         break;
 
     default:
-        //DPF(D_TERSE, ("[PropertyHandler_WaveFilter: Invalid Device Request]"));
-        TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! - Invalid Device Request");
+        DPF(D_TERSE, ("[PropertyHandler_WaveFilter: Invalid Device Request]"));
     }
 
     return ntStatus;
@@ -694,8 +673,7 @@ Return Value:
 
     NTSTATUS                    ntStatus = STATUS_INVALID_DEVICE_REQUEST;
 
-    //DPF_ENTER(("[CMiniportWaveCyclic::PropertyHandlerChannelConfig]"));
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC!");
+    DPF_ENTER(("[CMiniportWaveCyclic::PropertyHandlerChannelConfig]"));
 
     // Validate the property request structure.
     ntStatus = ValidatePropertyParams(PropertyRequest, sizeof(KSAUDIO_CHANNEL_CONFIG), 0);
@@ -772,9 +750,7 @@ Return Value:
             }
             return STATUS_NOT_SUPPORTED;
         default:
-            //DPF(D_TERSE, ("[Channel Mask not supported]"));
-            TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! - Channel Mask not supported");
-
+            DPF(D_TERSE, ("[Channel Mask not supported]"));
             return STATUS_NOT_SUPPORTED;
         }
 
@@ -802,9 +778,7 @@ Return Value:
 {
     PAGED_CODE();
     ASSERT(PropertyRequest);
-
-    //DPF_ENTER(("[CMiniportWaveCyclic::PropertyHandlerCpuResources]"));
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC!");
+    DPF_ENTER(("[CMiniportWaveCyclic::PropertyHandlerCpuResources]"));
 
     NTSTATUS ntStatus = STATUS_INVALID_DEVICE_REQUEST;
 
@@ -855,9 +829,7 @@ Return Value:
         break;
 
     default:
-        //DPF(D_TERSE, ("[PropertyHandlerGeneric: Invalid Device Request]"));
-        TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! - Invalid Device Request");
-
+        DPF(D_TERSE, ("[PropertyHandlerGeneric: Invalid Device Request]"));
         ntStatus = STATUS_INVALID_DEVICE_REQUEST;
     }
 
@@ -883,9 +855,7 @@ Return Value:
 {
     PAGED_CODE();
     ASSERT(pDataFormat);
-
-    //DPF_ENTER(("[CMiniportWaveCyclic::ValidateFormat]"));
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC!");
+    DPF_ENTER(("[CMiniportWaveCyclic::ValidateFormat]"));
 
     NTSTATUS                    ntStatus = STATUS_INVALID_PARAMETER;
     PWAVEFORMATEX               pwfx;
@@ -909,15 +879,12 @@ Return Value:
                 }
                 break;
             default:
-                //DPF(D_TERSE, ("Invalid format EXTRACT_WAVEFORMATEX_ID!"));
-                TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! - Invalid format EXTRACT_WAVEFORMATEX_ID!");
-
+                DPF(D_TERSE, ("Invalid format EXTRACT_WAVEFORMATEX_ID!"));
                 break;
             }
         }
         else {
-            //DPF(D_TERSE, ("Invalid pDataFormat->SubFormat!"));
-            TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! - Invalid pDataFormat->SubFormat!");
+            DPF(D_TERSE, ("Invalid pDataFormat->SubFormat!"));
         }
     }
 
@@ -941,9 +908,7 @@ Return Value:
 */
 {
     PAGED_CODE();
-
-    //DPF_ENTER(("CMiniportWaveCyclic::ValidatePcm"));
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC!");
+    DPF_ENTER(("CMiniportWaveCyclic::ValidatePcm"));
 
     if (pWfx &&
         (pWfx->cbSize == 0) &&
@@ -957,9 +922,7 @@ Return Value:
         return STATUS_SUCCESS;
     }
 
-    //DPF(D_TERSE, ("Invalid PCM format"));
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! - Invalid PCM format");
-
+    DPF(D_TERSE, ("Invalid PCM format"));
     return STATUS_INVALID_PARAMETER;
 } // ValidatePcm
 
@@ -991,8 +954,7 @@ Return Value:
 {
     PAGED_CODE();
 
-    //DPF_ENTER(("[CMiniportWaveCyclic::ValidateWfxExtPcm]"));
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC!");
+    DPF_ENTER(("[CMiniportWaveCyclic::ValidateWfxExtPcm]"));
 
     // First verify that the subformat is OK
     //
@@ -1021,8 +983,7 @@ Return Value:
         }
     }
 
-    //DPF(D_TERSE, ("Invalid PCM format"));
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! - Invalid PCM format");
+    DPF(D_TERSE, ("Invalid PCM format"));
 
     return STATUS_INVALID_PARAMETER;
 } // ValidateWfxExtPcm
@@ -1053,8 +1014,7 @@ Return Value:
 
     ASSERT(PropertyRequest);
 
-    //DPF_ENTER(("[PropertyHandler_Wave]"));
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC!");
+    DPF_ENTER(("[PropertyHandler_Wave]"));
 
     return ((PCMiniportWaveCyclic)
         (PropertyRequest->MajorTarget))->PropertyHandlerGeneric

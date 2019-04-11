@@ -9,7 +9,6 @@ Abstract:
 #ifndef __TOPTABLE_H_
 #define __TOPTABLE_H_
 
-
 //=============================================================================
 static KSDATARANGE PinDataRangesBridge[] = {
  {
@@ -30,132 +29,132 @@ static PKSDATARANGE PinDataRangePointersBridge[] = {
 
 //=============================================================================
 static PCPIN_DESCRIPTOR MiniportPins[] = {
-  // KSPIN_TOPO_WAVEOUT_SOURCE
-  {
-    0,
-    0,
-    0,                                              // InstanceCount
-    NULL,                                           // AutomationTable
-    {                                               // KsPinDescriptor
-      0,                                            // InterfacesCount
-      NULL,                                         // Interfaces
-      0,                                            // MediumsCount
-      NULL,                                         // Mediums
-      SIZEOF_ARRAY(PinDataRangePointersBridge),     // DataRangesCount
-      PinDataRangePointersBridge,                   // DataRanges
-      KSPIN_DATAFLOW_IN,                            // DataFlow
-      KSPIN_COMMUNICATION_NONE,                     // Communication
-      &KSCATEGORY_AUDIO,                            // Category
-      NULL,                                         // Name
-      0                                             // Reserved
-    }
-  },
-/*
-  // KSPIN_TOPO_SYNTHOUT_SOURCE
-  {
-    0,
-    0, 
-    0,                                              // InstanceCount
-    NULL,                                           // AutomationTable
-    {                                               // KsPinDescriptor
-      0,                                            // InterfacesCount
-      NULL,                                         // Interfaces
-      0,                                            // MediumsCount
-      NULL,                                         // Mediums
-      SIZEOF_ARRAY(PinDataRangePointersBridge),     // DataRangesCount
-      PinDataRangePointersBridge,                   // DataRanges
-      KSPIN_DATAFLOW_IN,                            // DataFlow
-      KSPIN_COMMUNICATION_NONE,                     // Communication
-      &KSNODETYPE_SYNTHESIZER,                      // Category
-      &KSAUDFNAME_MIDI,                             // Name
-      0                                             // Reserved
-    }
-  },
+    // KSPIN_TOPO_WAVEOUT_SOURCE
+    {
+      0,
+      0,
+      0,                                              // InstanceCount
+      NULL,                                           // AutomationTable
+      {                                               // KsPinDescriptor
+        0,                                            // InterfacesCount
+        NULL,                                         // Interfaces
+        0,                                            // MediumsCount
+        NULL,                                         // Mediums
+        SIZEOF_ARRAY(PinDataRangePointersBridge),     // DataRangesCount
+        PinDataRangePointersBridge,                   // DataRanges
+        KSPIN_DATAFLOW_IN,                            // DataFlow
+        KSPIN_COMMUNICATION_NONE,                     // Communication
+        &KSCATEGORY_AUDIO,                            // Category
+        NULL,                                         // Name
+        0                                             // Reserved
+      }
+    },
+    /*
+      // KSPIN_TOPO_SYNTHOUT_SOURCE
+      {
+        0,
+        0,
+        0,                                              // InstanceCount
+        NULL,                                           // AutomationTable
+        {                                               // KsPinDescriptor
+          0,                                            // InterfacesCount
+          NULL,                                         // Interfaces
+          0,                                            // MediumsCount
+          NULL,                                         // Mediums
+          SIZEOF_ARRAY(PinDataRangePointersBridge),     // DataRangesCount
+          PinDataRangePointersBridge,                   // DataRanges
+          KSPIN_DATAFLOW_IN,                            // DataFlow
+          KSPIN_COMMUNICATION_NONE,                     // Communication
+          &KSNODETYPE_SYNTHESIZER,                      // Category
+          &KSAUDFNAME_MIDI,                             // Name
+          0                                             // Reserved
+        }
+      },
 
-  // KSPIN_TOPO_SYNTHIN_SOURCE
-  {
-    0,
-    0, 
-    0,                                              // InstanceCount
-    NULL,                                           // AutomationTable
-    {                                               // KsPinDescriptor
-      0,                                            // InterfacesCount
-      NULL,                                         // Interfaces
-      0,                                            // MediumsCount
-      NULL,                                         // Mediums
-      SIZEOF_ARRAY(PinDataRangePointersBridge),     // DataRangesCount
-      PinDataRangePointersBridge,                   // DataRanges
-      KSPIN_DATAFLOW_IN,                            // DataFlow
-      KSPIN_COMMUNICATION_NONE,                     // Communication
-      &KSNODETYPE_SYNTHESIZER,                      // Category
-      &KSAUDFNAME_MIDI,                             // Name
-      0                                             // Reserved
-    }
-  },
-*/
-  // KSPIN_TOPO_MIC_SOURCE
-  {
-    0,
-    0,
-    0,                                              // InstanceCount
-    NULL,                                           // AutomationTable
-    {                                               // KsPinDescriptor
-      0,                                            // InterfacesCount
-      NULL,                                         // Interfaces
-      0,                                            // MediumsCount
-      NULL,                                         // Mediums
-      SIZEOF_ARRAY(PinDataRangePointersBridge),     // DataRangesCount
-      PinDataRangePointersBridge,                   // DataRanges
-      KSPIN_DATAFLOW_IN,                            // DataFlow
-      KSPIN_COMMUNICATION_NONE,                     // Communication
-      &KSNODETYPE_MICROPHONE,                       // Category
-      NULL,                                         // Name
-      0                                             // Reserved
-    }
-  },
+      // KSPIN_TOPO_SYNTHIN_SOURCE
+      {
+        0,
+        0,
+        0,                                              // InstanceCount
+        NULL,                                           // AutomationTable
+        {                                               // KsPinDescriptor
+          0,                                            // InterfacesCount
+          NULL,                                         // Interfaces
+          0,                                            // MediumsCount
+          NULL,                                         // Mediums
+          SIZEOF_ARRAY(PinDataRangePointersBridge),     // DataRangesCount
+          PinDataRangePointersBridge,                   // DataRanges
+          KSPIN_DATAFLOW_IN,                            // DataFlow
+          KSPIN_COMMUNICATION_NONE,                     // Communication
+          &KSNODETYPE_SYNTHESIZER,                      // Category
+          &KSAUDFNAME_MIDI,                             // Name
+          0                                             // Reserved
+        }
+      },
+    */
+    // KSPIN_TOPO_MIC_SOURCE
+    {
+      0,
+      0,
+      0,                                              // InstanceCount
+      NULL,                                           // AutomationTable
+      {                                               // KsPinDescriptor
+        0,                                            // InterfacesCount
+        NULL,                                         // Interfaces
+        0,                                            // MediumsCount
+        NULL,                                         // Mediums
+        SIZEOF_ARRAY(PinDataRangePointersBridge),     // DataRangesCount
+        PinDataRangePointersBridge,                   // DataRanges
+        KSPIN_DATAFLOW_IN,                            // DataFlow
+        KSPIN_COMMUNICATION_NONE,                     // Communication
+        &KSNODETYPE_MICROPHONE,                       // Category
+        NULL,                                         // Name
+        0                                             // Reserved
+      }
+    },
 
-  // KSPIN_TOPO_LINEOUT_DEST
-  {
-    0,
-    0,
-    0,                                              // InstanceCount
-    NULL,                                           // AutomationTable
-    {                                               // KsPinDescriptor
-      0,                                            // InterfacesCount
-      NULL,                                         // Interfaces
-      0,                                            // MediumsCount
-      NULL,                                         // Mediums
-      SIZEOF_ARRAY(PinDataRangePointersBridge),     // DataRangesCount
-      PinDataRangePointersBridge,                   // DataRanges
-      KSPIN_DATAFLOW_OUT,                           // DataFlow
-      KSPIN_COMMUNICATION_NONE,                     // Communication
-      &KSNODETYPE_SPEAKER,                          // Category
-      &KSAUDFNAME_VOLUME_CONTROL,                   // Name (this name shows up as
-                                                    // the playback panel name in SoundVol)
-      0                                             // Reserved
-    }
-  },
+    // KSPIN_TOPO_LINEOUT_DEST
+    {
+      0,
+      0,
+      0,                                              // InstanceCount
+      NULL,                                           // AutomationTable
+      {                                               // KsPinDescriptor
+        0,                                            // InterfacesCount
+        NULL,                                         // Interfaces
+        0,                                            // MediumsCount
+        NULL,                                         // Mediums
+        SIZEOF_ARRAY(PinDataRangePointersBridge),     // DataRangesCount
+        PinDataRangePointersBridge,                   // DataRanges
+        KSPIN_DATAFLOW_OUT,                           // DataFlow
+        KSPIN_COMMUNICATION_NONE,                     // Communication
+        &KSNODETYPE_SPEAKER,                          // Category
+        &KSAUDFNAME_VOLUME_CONTROL,                   // Name (this name shows up as
+                                                      // the playback panel name in SoundVol)
+        0                                             // Reserved
+      }
+    },
 
-  // KSPIN_TOPO_WAVEIN_DEST
-  {
-    0,
-    0,
-    0,                                              // InstanceCount
-    NULL,                                           // AutomationTable
-    {                                               // KsPinDescriptor
-      0,                                            // InterfacesCount
-      NULL,                                         // Interfaces
-      0,                                            // MediumsCount
-      NULL,                                         // Mediums
-      SIZEOF_ARRAY(PinDataRangePointersBridge),     // DataRangesCount
-      PinDataRangePointersBridge,                   // DataRanges
-      KSPIN_DATAFLOW_OUT,                           // DataFlow
-      KSPIN_COMMUNICATION_NONE,                     // Communication
-      &KSCATEGORY_AUDIO,                            // Category
-      NULL,                                         // Name
-      0                                             // Reserved
+    // KSPIN_TOPO_WAVEIN_DEST
+    {
+      0,
+      0,
+      0,                                              // InstanceCount
+      NULL,                                           // AutomationTable
+      {                                               // KsPinDescriptor
+        0,                                            // InterfacesCount
+        NULL,                                         // Interfaces
+        0,                                            // MediumsCount
+        NULL,                                         // Mediums
+        SIZEOF_ARRAY(PinDataRangePointersBridge),     // DataRangesCount
+        PinDataRangePointersBridge,                   // DataRanges
+        KSPIN_DATAFLOW_OUT,                           // DataFlow
+        KSPIN_COMMUNICATION_NONE,                     // Communication
+        &KSCATEGORY_AUDIO,                            // Category
+        NULL,                                         // Name
+        0                                             // Reserved
+      }
     }
-  }
 };
 
 //=============================================================================
@@ -214,100 +213,100 @@ DEFINE_PCAUTOMATION_TABLE_PROP(AutomationMux, PropertiesMux);
 
 //=============================================================================
 static PCNODE_DESCRIPTOR TopologyNodes[] = {
-  // KSNODE_TOPO_WAVEOUT_VOLUME
-  {
-    0,                      // Flags
-    &AutomationVolume,      // AutomationTable
-    &KSNODETYPE_VOLUME,     // Type
-    &KSAUDFNAME_WAVE_VOLUME // Name
-  },
+    // KSNODE_TOPO_WAVEOUT_VOLUME
+    {
+      0,                      // Flags
+      &AutomationVolume,      // AutomationTable
+      &KSNODETYPE_VOLUME,     // Type
+      &KSAUDFNAME_WAVE_VOLUME // Name
+    },
 
-  // KSNODE_TOPO_WAVEOUT_MUTE
-  {
-    0,                      // Flags
-    &AutomationMute,        // AutomationTable
-    &KSNODETYPE_MUTE,       // Type
-    &KSAUDFNAME_WAVE_MUTE   // Name
-  },
-/*
-  // KSNODE_TOPO_SYNTHOUT_VOLUME
-  {
-    0,                      // Flags
-    &AutomationVolume,      // AutomationTable
-    &KSNODETYPE_VOLUME,     // Type
-    &KSAUDFNAME_MIDI_VOLUME // Name
-  },
+    // KSNODE_TOPO_WAVEOUT_MUTE
+    {
+      0,                      // Flags
+      &AutomationMute,        // AutomationTable
+      &KSNODETYPE_MUTE,       // Type
+      &KSAUDFNAME_WAVE_MUTE   // Name
+    },
+    /*
+      // KSNODE_TOPO_SYNTHOUT_VOLUME
+      {
+        0,                      // Flags
+        &AutomationVolume,      // AutomationTable
+        &KSNODETYPE_VOLUME,     // Type
+        &KSAUDFNAME_MIDI_VOLUME // Name
+      },
 
-  // KSNODE_TOPO_SYNTHOUT_MUTE
-  {
-    0,                      // Flags
-    &AutomationMute,        // AutomationTable
-    &KSNODETYPE_MUTE,       // Type
-    &KSAUDFNAME_MIDI_MUTE   // Name
-  },
-*/
-  // KSNODE_TOPO_MIC_VOLUME
-  {
-    0,                      // Flags
-    &AutomationVolume,      // AutomationTable
-    &KSNODETYPE_VOLUME,     // Type
-    &KSAUDFNAME_MIC_VOLUME  // Name
-  },
-/*
-  // KSNODE_TOPO_SYNTHIN_VOLUME
-  {
-    0,                      // Flags
-    &AutomationVolume,      // AutomationTable
-    &KSNODETYPE_VOLUME,     // Type
-    &KSAUDFNAME_MIDI_VOLUME // Name
-  },
-*/
-  // KSNODE_TOPO_LINEOUT_MIX
-  {
-    0,                      // Flags
-    NULL,                   // AutomationTable
-    &KSNODETYPE_SUM,        // Type
-    NULL                    // Name
-  },
+      // KSNODE_TOPO_SYNTHOUT_MUTE
+      {
+        0,                      // Flags
+        &AutomationMute,        // AutomationTable
+        &KSNODETYPE_MUTE,       // Type
+        &KSAUDFNAME_MIDI_MUTE   // Name
+      },
+    */
+    // KSNODE_TOPO_MIC_VOLUME
+    {
+      0,                      // Flags
+      &AutomationVolume,      // AutomationTable
+      &KSNODETYPE_VOLUME,     // Type
+      &KSAUDFNAME_MIC_VOLUME  // Name
+    },
+    /*
+      // KSNODE_TOPO_SYNTHIN_VOLUME
+      {
+        0,                      // Flags
+        &AutomationVolume,      // AutomationTable
+        &KSNODETYPE_VOLUME,     // Type
+        &KSAUDFNAME_MIDI_VOLUME // Name
+      },
+    */
+    // KSNODE_TOPO_LINEOUT_MIX
+    {
+      0,                      // Flags
+      NULL,                   // AutomationTable
+      &KSNODETYPE_SUM,        // Type
+      NULL                    // Name
+    },
 
-  // KSNODE_TOPO_LINEOUT_VOLUME
-  {
-    0,                      // Flags
-    &AutomationVolume,      // AutomationTable
-    &KSNODETYPE_VOLUME,     // Type
-    &KSAUDFNAME_MASTER_VOLUME // Name
-  },
+    // KSNODE_TOPO_LINEOUT_VOLUME
+    {
+      0,                      // Flags
+      &AutomationVolume,      // AutomationTable
+      &KSNODETYPE_VOLUME,     // Type
+      &KSAUDFNAME_MASTER_VOLUME // Name
+    },
 
-  // KSNODE_TOPO_WAVEIN_MUX
-  {
-    0,                      // Flags
-    &AutomationMux,         // AutomationTable
-    &KSNODETYPE_MUX,        // Type
-    &KSAUDFNAME_RECORDING_SOURCE // Name
-  },
+    // KSNODE_TOPO_WAVEIN_MUX
+    {
+      0,                      // Flags
+      &AutomationMux,         // AutomationTable
+      &KSNODETYPE_MUX,        // Type
+      &KSAUDFNAME_RECORDING_SOURCE // Name
+    },
 };
 
 //=============================================================================
 static PCCONNECTION_DESCRIPTOR MiniportConnections[] = {
-  //  FromNode,                     FromPin,                        ToNode,                      ToPin
-  {   PCFILTER_NODE,                KSPIN_TOPO_WAVEOUT_SOURCE,      KSNODE_TOPO_WAVEOUT_VOLUME,  1 },
-  {   KSNODE_TOPO_WAVEOUT_VOLUME,   0,                              KSNODE_TOPO_WAVEOUT_MUTE,    1 },
-  {   KSNODE_TOPO_WAVEOUT_MUTE,     0,                              KSNODE_TOPO_LINEOUT_MIX,     1 },
-/*
-  {   PCFILTER_NODE,                KSPIN_TOPO_SYNTHOUT_SOURCE,     KSNODE_TOPO_SYNTHOUT_VOLUME, 1 },
-  {   KSNODE_TOPO_SYNTHOUT_VOLUME,  0,                              KSNODE_TOPO_SYNTHOUT_MUTE,   1 },
-  {   KSNODE_TOPO_SYNTHOUT_MUTE,    0,                              KSNODE_TOPO_LINEOUT_MIX,     1 },
+    //  FromNode,                     FromPin,                        ToNode,                      ToPin
+    {   PCFILTER_NODE,                KSPIN_TOPO_WAVEOUT_SOURCE,      KSNODE_TOPO_WAVEOUT_VOLUME,  1 },
+    {   KSNODE_TOPO_WAVEOUT_VOLUME,   0,                              KSNODE_TOPO_WAVEOUT_MUTE,    1 },
+    {   KSNODE_TOPO_WAVEOUT_MUTE,     0,                              KSNODE_TOPO_LINEOUT_MIX,     1 },
+    /*
+      {   PCFILTER_NODE,                KSPIN_TOPO_SYNTHOUT_SOURCE,     KSNODE_TOPO_SYNTHOUT_VOLUME, 1 },
+      {   KSNODE_TOPO_SYNTHOUT_VOLUME,  0,                              KSNODE_TOPO_SYNTHOUT_MUTE,   1 },
+      {   KSNODE_TOPO_SYNTHOUT_MUTE,    0,                              KSNODE_TOPO_LINEOUT_MIX,     1 },
 
-  {   PCFILTER_NODE,                KSPIN_TOPO_SYNTHIN_SOURCE,      KSNODE_TOPO_SYNTHIN_VOLUME,  1 },
-  {   KSNODE_TOPO_SYNTHIN_VOLUME,   0,                              KSNODE_TOPO_WAVEIN_MUX,      4 },
-*/
-  {   PCFILTER_NODE,                KSPIN_TOPO_MIC_SOURCE,          KSNODE_TOPO_MIC_VOLUME,      1 },
-  {   KSNODE_TOPO_MIC_VOLUME,       0,                              KSNODE_TOPO_WAVEIN_MUX,      4 },
+      {   PCFILTER_NODE,                KSPIN_TOPO_SYNTHIN_SOURCE,      KSNODE_TOPO_SYNTHIN_VOLUME,  1 },
+      {   KSNODE_TOPO_SYNTHIN_VOLUME,   0,                              KSNODE_TOPO_WAVEIN_MUX,      4 },
+    */
+      {   PCFILTER_NODE,                KSPIN_TOPO_MIC_SOURCE,          KSNODE_TOPO_MIC_VOLUME,      1 },
+      {   KSNODE_TOPO_MIC_VOLUME,       0,                              KSNODE_TOPO_WAVEIN_MUX,      4 },
 
-  {   KSNODE_TOPO_LINEOUT_MIX,      0,                              KSNODE_TOPO_LINEOUT_VOLUME,  1 },
-  {   KSNODE_TOPO_LINEOUT_VOLUME,   0,                              PCFILTER_NODE,               KSPIN_TOPO_LINEOUT_DEST },
+      {   KSNODE_TOPO_LINEOUT_MIX,      0,                              KSNODE_TOPO_LINEOUT_VOLUME,  1 },
+      {   KSNODE_TOPO_LINEOUT_VOLUME,   0,                              PCFILTER_NODE,               KSPIN_TOPO_LINEOUT_DEST },
 
-  {   KSNODE_TOPO_WAVEIN_MUX,       0,                              PCFILTER_NODE,               KSPIN_TOPO_WAVEIN_DEST }
+      {   KSNODE_TOPO_WAVEIN_MUX,       0,                              PCFILTER_NODE,               KSPIN_TOPO_WAVEIN_DEST }
 };
 
 //=============================================================================
@@ -327,4 +326,3 @@ static PCFILTER_DESCRIPTOR MiniportFilterDescriptor = {
 };
 
 #endif
-

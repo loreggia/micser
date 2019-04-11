@@ -11,9 +11,13 @@ Abstract:
 
 #include "sonicsaudio.h"
 #include "common.h"
-#include "wave.h"
-#include "toptable.h"
-#include "trace.h"
+
+NTSTATUS CreateMiniportTopology(
+    PUNKNOWN *              Unknown,
+    REFCLSID,
+    PUNKNOWN                UnknownOuter OPTIONAL,
+    POOL_TYPE               PoolType
+);
 
 //=============================================================================
 // Classes

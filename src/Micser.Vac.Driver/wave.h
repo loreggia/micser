@@ -11,9 +11,6 @@ Abstract:
 
 #include "sonicsaudio.h"
 #include "common.h"
-#include "wavestream.h"
-#include "wavtable.h"
-#include "trace.h"
 
 //=============================================================================
 // Referenced Forward
@@ -23,6 +20,13 @@ void TimerNotify(
     IN  PVOID                   DeferredContext,
     IN  PVOID                   SA1,
     IN  PVOID                   SA2
+);
+
+NTSTATUS CreateMiniportWaveCyclic(
+    OUT PUNKNOWN *              Unknown,
+    IN  REFCLSID,
+    IN  PUNKNOWN                UnknownOuter OPTIONAL,
+    IN  POOL_TYPE               PoolType
 );
 
 //=============================================================================

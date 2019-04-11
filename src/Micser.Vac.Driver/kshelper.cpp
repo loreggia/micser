@@ -7,7 +7,6 @@ Abstract:
 */
 
 #include "kshelper.h"
-#include "kshelper.tmh"
 
 //-----------------------------------------------------------------------------
 PWAVEFORMATEX

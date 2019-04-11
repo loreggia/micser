@@ -24,9 +24,6 @@
     </Inf>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="trace.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="common.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -48,13 +45,13 @@
     <ClInclude Include="wave.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="wavestream.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="wavtable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="adapter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="wavestream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
