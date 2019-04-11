@@ -10,6 +10,7 @@ Abstract:
 
 #include <portcls.h>
 #include <ksdebug.h>
+#include "trace.h"
 
 PWAVEFORMATEX GetWaveFormatEx(IN PKSDATAFORMAT pDataFormat);
 
