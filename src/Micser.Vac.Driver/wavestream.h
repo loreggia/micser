@@ -12,7 +12,6 @@ Abstract:
 #include "sonicsaudio.h"
 #include "common.h"
 #include "wave.h"
-#include "trace.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // CMiniportWaveCyclicStream

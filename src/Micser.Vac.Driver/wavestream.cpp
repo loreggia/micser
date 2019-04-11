@@ -5,9 +5,7 @@ Module Name:
 Abstract:
   WaveCyclicStream-Miniport and IDmaChannel implementation. Does nothing HW related.
 */
-
 #include "wavestream.h"
-#include "wavestream.tmh"
 
 #define DBGMESSAGE "[SONICS-Audio] wavestream.cpp: "
 #define DBGPRINT(x) DbgPrint(DBGMESSAGE x)
@@ -17,10 +15,7 @@ Abstract:
 CMiniportWaveCyclicStream::CMiniportWaveCyclicStream(PUNKNOWN pUnknownOuter) :CUnknown(pUnknownOuter)
 {
     PAGED_CODE();
-
-    //DPF_ENTER(("[CMiniportWaveCyclicStream::CMiniportWaveCyclicStream]"));
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC!");
-
+    DPF_ENTER(("[CMiniportWaveCyclicStream::CMiniportWaveCyclicStream]"));
     ////
     m_pMiniport = NULL;
     m_fCapture = FALSE;
@@ -58,9 +53,7 @@ Return Value:
 */
 {
     PAGED_CODE();
-
-    //DPF_ENTER(("[CMiniportWaveCyclicStream::~CMiniportWaveCyclicStream]"));
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC!");
+    DPF_ENTER(("[CMiniportWaveCyclicStream::~CMiniportWaveCyclicStream]"));
 
     if (NULL != m_pMiniport) {
         if (m_fCapture)
@@ -103,10 +96,7 @@ Return Value:
 */
 {
     PAGED_CODE();
-
-    //DPF_ENTER(("[CMiniportWaveCyclicStream::Init]"));
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC!");
-
+    DPF_ENTER(("[CMiniportWaveCyclicStream::Init]"));
     ASSERT(Miniport_);
     ASSERT(DataFormat_);
 
@@ -137,9 +127,7 @@ Return Value:
 
     pWfx = GetWaveFormatEx(DataFormat_);
     if (!pWfx) {
-        //DPF(D_TERSE, ("Invalid DataFormat param in NewStream"));
-        TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! - Invalid DataFormat param in NewStream");
-
+        DPF(D_TERSE, ("Invalid DataFormat param in NewStream"));
         ntStatus = STATUS_INVALID_PARAMETER;
     }
 
@@ -180,8 +168,7 @@ Return Value:
             KeReleaseMutex(&m_pMiniport->m_SampleRateSync, FALSE);
         }
         else {
-            //DPF(D_TERSE, ("[SamplingFrequency Sync failed: %08X]", ntStatus));
-            TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! - SamplingFrequency Sync failed: %08X", ntStatus);
+            DPF(D_TERSE, ("[SamplingFrequency Sync failed: %08X]", ntStatus));
         }
     }
 
@@ -196,9 +183,7 @@ Return Value:
             SONICSAUDIO_POOLTAG
         );
         if (!m_pDpc) {
-            //DPF(D_TERSE, ("[Could not allocate memory for DPC]"));
-            TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! - Could not allocate memory for DPC");
-
+            DPF(D_TERSE, ("[Could not allocate memory for DPC]"));
             ntStatus = STATUS_INSUFFICIENT_RESOURCES;
         }
     }
@@ -210,9 +195,7 @@ Return Value:
             SONICSAUDIO_POOLTAG
         );
         if (!m_pTimer) {
-            //DPF(D_TERSE, ("[Could not allocate memory for Timer]"));
-            TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! - Could not allocate memory for Timer");
-
+            DPF(D_TERSE, ("[Could not allocate memory for Timer]"));
             ntStatus = STATUS_INSUFFICIENT_RESOURCES;
         }
     }
@@ -366,9 +349,7 @@ Return Value:
 {
     PAGED_CODE();
     ASSERT(Format);
-
-    //DPF_ENTER(("[CMiniportWaveCyclicStream::SetFormat]"));
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC!");
+    DPF_ENTER(("[CMiniportWaveCyclicStream::SetFormat]"));
 
     NTSTATUS ntStatus = STATUS_INVALID_DEVICE_REQUEST;
     PWAVEFORMATEX pWfx;
@@ -393,8 +374,7 @@ Return Value:
                     m_pMiniport->m_SamplingFrequency = pWfx->nSamplesPerSec;
                     m_ulDmaMovementRate = pWfx->nAvgBytesPerSec;
 
-                    //DPF(D_TERSE, ("New Format: %d", pWfx->nSamplesPerSec));
-                    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! - New Format: %d", pWfx->nSamplesPerSec);
+                    DPF(D_TERSE, ("New Format: %d", pWfx->nSamplesPerSec));
                 }
                 KeReleaseMutex(&m_pMiniport->m_SampleRateSync, FALSE);
             }
@@ -427,9 +407,7 @@ Return Value:
 {
     PAGED_CODE();
     ASSERT(FramingSize);
-
-    //DPF_ENTER(("[CMiniportWaveCyclicStream::SetNotificationFreq]"));
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC!");
+    DPF_ENTER(("[CMiniportWaveCyclicStream::SetNotificationFreq]"));
 
     m_pMiniport->m_NotificationInterval = Interval;
 
@@ -455,9 +433,7 @@ Return Value:
 */
 {
     PAGED_CODE();
-
-    //DPF_ENTER(("[CMiniportWaveCyclicStream::SetState]"));
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC!");
+    DPF_ENTER(("[CMiniportWaveCyclicStream::SetState]"));
 
     NTSTATUS ntStatus = STATUS_SUCCESS;
 
@@ -469,15 +445,12 @@ Return Value:
     if (m_ksState != NewState) {
         switch (NewState) {
         case KSSTATE_PAUSE:
-            //DPF(D_TERSE, ("KSSTATE_PAUSE"));
-            TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! - KSSTATE_PAUSE");
-
+            DPF(D_TERSE, ("KSSTATE_PAUSE"));
             m_fDmaActive = FALSE;
             break;
 
         case KSSTATE_RUN:
-            //DPF(D_TERSE, ("KSSTATE_RUN"));
-            TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! - KSSTATE_RUN");
+            DPF(D_TERSE, ("KSSTATE_RUN"));
 
             LARGE_INTEGER   delay;
 
@@ -493,8 +466,7 @@ Return Value:
             break;
 
         case KSSTATE_STOP:
-            //DPF(D_TERSE, ("KSSTATE_STOP"));
-            TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! - KSSTATE_STOP");
+            DPF(D_TERSE, ("KSSTATE_STOP"));
 
             m_fDmaActive = FALSE;
             m_ulDmaPosition = 0;
@@ -828,8 +800,7 @@ Return Value:
         m_ulDmaBufferSize = BufferSize;
     }
     else {
-        //DPF(D_ERROR, ("Tried to enlarge dma buffer size"));
-        TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! - Tried to enlarge dma buffer size");
+        DPF(D_ERROR, ("Tried to enlarge dma buffer size"));
     }
 } // SetBufferSize
 

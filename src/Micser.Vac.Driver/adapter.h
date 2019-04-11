@@ -1,48 +1,26 @@
 #ifndef __ADAPTER_H_
 #define __ADAPTER_H_
 
+#include <portcls.h>
 #include "sonicsaudio.h"
 #include "common.h"
-#include "trace.h"
+#include "wave.h"
 
-// All the GUIDS for all the miniports end up in this object.
-#define PUT_GUIDS_HERE
-
-//-----------------------------------------------------------------------------
-// Defines
-//-----------------------------------------------------------------------------
-// BUGBUG set this to number of miniports
-#define MAX_MINIPORTS 2     // Number of maximum miniports.
-
-//-----------------------------------------------------------------------------
-// Externals
-//-----------------------------------------------------------------------------
-NTSTATUS CreateMiniportWaveCyclic(
-    OUT PUNKNOWN *,
-    IN  REFCLSID,
-    IN  PUNKNOWN,
-    IN  POOL_TYPE
+NTSTATUS DriverEntry(
+    PDRIVER_OBJECT          DriverObject,
+    PUNICODE_STRING         RegistryPathName
 );
 
-NTSTATUS CreateMiniportTopology(
-    OUT PUNKNOWN *,
-    IN  REFCLSID,
-    IN  PUNKNOWN,
-    IN  POOL_TYPE
+NTSTATUS AddDevice(
+    PDRIVER_OBJECT          DriverObject,
+    PDEVICE_OBJECT          PhysicalDeviceObject
 );
 
-//-----------------------------------------------------------------------------
-// Referenced forward.
-//-----------------------------------------------------------------------------
-extern "C" NTSTATUS AddDevice(
-    IN  PDRIVER_OBJECT,
-    IN  PDEVICE_OBJECT
+NTSTATUS StartDevice
+(
+    PDEVICE_OBJECT          DeviceObject,
+    PIRP                    Irp,
+    PRESOURCELIST           ResourceList
 );
 
-NTSTATUS StartDevice(
-    IN  PDEVICE_OBJECT,
-    IN  PIRP,
-    IN  PRESOURCELIST
-);
-
-#endif
+#endif // __ADAPTER_H_

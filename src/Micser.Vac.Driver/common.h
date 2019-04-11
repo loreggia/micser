@@ -9,11 +9,7 @@ Abstract:
 #ifndef __COMMON_H_
 #define __COMMON_H_
 
-#include <ntddk.h>
-#include <wdf.h>
 #include "sonicsaudio.h"
-#include "hw.h"
-#include "trace.h"
 
 //=============================================================================
 // Defines

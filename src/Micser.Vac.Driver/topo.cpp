@@ -7,7 +7,8 @@ Abstract:
 */
 
 #include "topo.h"
-#include "topo.tmh"
+#include "wave.h"
+#include "toptable.h"
 
 /*********************************************************************
 * Topology/Wave bridge connection                                    *
@@ -77,9 +78,7 @@ Return Value:
 {
     PAGED_CODE();
     ASSERT(PropertyRequest);
-
-    //DPF_ENTER(("[PropertyHandler_Topology]"));
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC!");
+    DPF_ENTER(("[PropertyHandler_Topology]"));
 
     // PropertryRequest structure is filled by portcls.
     // MajorTarget is a pointer to miniport object for miniports.
@@ -89,10 +88,7 @@ Return Value:
 CMiniportTopology::CMiniportTopology(PUNKNOWN pUnknownOuter) :CUnknown(pUnknownOuter)
 {
     PAGED_CODE();
-
-    //DPF_ENTER(("[CMiniportTopology::CMiniportTopology]"));
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC!");
-
+    DPF_ENTER(("[CMiniportTopology::CMiniportTopology]"));
     m_FilterDescriptor = NULL;
 }
 //=============================================================================
@@ -108,10 +104,7 @@ Return Value:
 */
 {
     PAGED_CODE();
-
-    //DPF_ENTER(("[CMiniportTopology::~CMiniportTopology]"));
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC!");
-
+    DPF_ENTER(("[CMiniportTopology::~CMiniportTopology]"));
     if (m_AdapterCommon) {
         m_AdapterCommon->Release();
     }
@@ -157,10 +150,7 @@ Return Value:
     UNREFERENCED_PARAMETER(ResultantFormatLength);
 
     PAGED_CODE();
-
-    //DPF_ENTER(("[CMiniportTopology::DataRangeIntersection]"));
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC!");
-
+    DPF_ENTER(("[CMiniportTopology::DataRangeIntersection]"));
     return (STATUS_NOT_IMPLEMENTED);
 }
 
@@ -184,9 +174,7 @@ Return Value:
 {
     PAGED_CODE();
     ASSERT(OutFilterDescriptor);
-
-    //DPF_ENTER(("[CMiniportTopology::GetDescription]"));
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC!");
+    DPF_ENTER(("[CMiniportTopology::GetDescription]"));
 
     *OutFilterDescriptor = m_FilterDescriptor;
     return (STATUS_SUCCESS);
@@ -221,8 +209,7 @@ Return Value:
     ASSERT(UnknownAdapter);
     ASSERT(Port_);
 
-    //DPF_ENTER(("[CMiniportTopology::Init]"));
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC!");
+    DPF_ENTER(("[CMiniportTopology::Init]"));
 
     // aus dem Konstruktor
     m_AdapterCommon = NULL;
@@ -336,8 +323,7 @@ Return Value:
         break;
 
     default:
-        //DPF(D_TERSE, ("[PropertyHandlerGeneric: Invalid Device Request]"));
-        TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! - Invalid Device Request");
+        DPF(D_TERSE, ("[PropertyHandlerGeneric: Invalid Device Request]"));
     }
 
     return ntStatus;
@@ -440,9 +426,7 @@ Return Value:
 */
 {
     PAGED_CODE();
-
-    //DPF_ENTER(("[CMiniportTopology::PropertyHandlerCpuResources]"));
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC!");
+    DPF_ENTER(("[CMiniportTopology::PropertyHandlerCpuResources]"));
 
     NTSTATUS ntStatus = STATUS_INVALID_DEVICE_REQUEST;
 
@@ -480,8 +464,7 @@ Return Value:
 {
     PAGED_CODE();
 
-    //DPF_ENTER(("[CMiniportTopology::PropertyHandlerMute]"));
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC!");
+    DPF_ENTER(("[CMiniportTopology::PropertyHandlerMute]"));
 
     NTSTATUS                    ntStatus;
     LONG                        lChannel;
@@ -515,9 +498,7 @@ Return Value:
             }
         }
         else {
-            //DPF(D_TERSE, ("[PropertyHandlerMute - Invalid parameter]"));
-            TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! - Invalid parameter");
-
+            DPF(D_TERSE, ("[PropertyHandlerMute - Invalid parameter]"));
             ntStatus = STATUS_INVALID_PARAMETER;
         }
     }
@@ -540,9 +521,7 @@ Return Value:
 */
 {
     PAGED_CODE();
-
-    //DPF_ENTER(("[CMiniportTopology::PropertyHandlerMuxSource]"));
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC!");
+    DPF_ENTER(("[CMiniportTopology::PropertyHandlerMuxSource]"));
 
     NTSTATUS ntStatus = STATUS_INVALID_DEVICE_REQUEST;
 
@@ -568,9 +547,7 @@ Return Value:
             }
         }
         else {
-            //DPF(D_TERSE, ("[PropertyHandlerMuxSource - Invalid parameter]"));
-            TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! - Invalid parameter");
-
+            DPF(D_TERSE, ("[PropertyHandlerMuxSource - Invalid parameter]"));
             ntStatus = STATUS_INVALID_PARAMETER;
         }
     }
@@ -593,9 +570,7 @@ Return Value:
 */
 {
     PAGED_CODE();
-
-    //DPF_ENTER(("[CMiniportTopology::PropertyHandlerVolume]"));
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC!");
+    DPF_ENTER(("[CMiniportTopology::PropertyHandlerVolume]"));
 
     NTSTATUS ntStatus = STATUS_INVALID_DEVICE_REQUEST;
     LONG lChannel;
@@ -621,9 +596,7 @@ Return Value:
             }
         }
         else {
-            //DPF(D_TERSE, ("[PropertyHandlerVolume - Invalid parameter]"));
-            TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! - Invalid parameter");
-
+            DPF(D_TERSE, ("[PropertyHandlerVolume - Invalid parameter]"));
             ntStatus = STATUS_INVALID_PARAMETER;
         }
     }
@@ -654,8 +627,7 @@ Return Value:
 {
     PAGED_CODE();
 
-    //DPF_ENTER(("[%s]", __FUNCTION__));
-    TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC!");
+    DPF_ENTER(("[%s]", __FUNCTION__));
 
     NTSTATUS ntStatus = STATUS_SUCCESS;
 
@@ -848,8 +820,7 @@ Return Value:
 
         if (!NT_SUCCESS(ntStatus))
         {
-            //DPF(D_TERSE, ("[%s - ntStatus=0x%08x]", __FUNCTION__, ntStatus));
-            TraceEvents(TRACE_LEVEL_INFORMATION, TRACE_DRIVER, "%!FUNC! - ntStatus=0x%08x", ntStatus);
+            DPF(D_TERSE, ("[%s - ntStatus=0x%08x]", __FUNCTION__, ntStatus));
         }
     }
 

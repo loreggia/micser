@@ -21,11 +21,11 @@ static KSDATARANGE_AUDIO PinDataRangesStream[] = {
             STATICGUIDOF(KSDATAFORMAT_SUBTYPE_PCM),
             STATICGUIDOF(KSDATAFORMAT_SPECIFIER_WAVEFORMATEX)
         },
-        MAX_CHANNELS_PCM,           
-        MIN_BITS_PER_SAMPLE_PCM,    
-        MAX_BITS_PER_SAMPLE_PCM,    
-        MIN_SAMPLE_RATE,            
-        MAX_SAMPLE_RATE             
+        MAX_CHANNELS_PCM,
+        MIN_BITS_PER_SAMPLE_PCM,
+        MAX_BITS_PER_SAMPLE_PCM,
+        MIN_SAMPLE_RATE,
+        MAX_SAMPLE_RATE
     },
 };
 
@@ -68,11 +68,11 @@ static PCPIN_DESCRIPTOR MiniportPins[] = {
             KSPIN_DATAFLOW_OUT,
             KSPIN_COMMUNICATION_SINK,
             &KSCATEGORY_AUDIO,
-            &KSAUDFNAME_RECORDING_CONTROL,  
+            &KSAUDFNAME_RECORDING_CONTROL,
             0
         }
     },
-    
+
     // Wave In Bridge Pin (Capture - From Topology) KSPIN_WAVE_CAPTURE_SOURCE
     {
         0,
@@ -93,11 +93,11 @@ static PCPIN_DESCRIPTOR MiniportPins[] = {
             0
         }
     },
-  
+
     // Wave Out Streaming Pin (Renderer) KSPIN_WAVE_RENDER_SINK
     {
         MAX_INPUT_STREAMS,
-        MAX_INPUT_STREAMS, 
+        MAX_INPUT_STREAMS,
         0,
         NULL,
         {
@@ -114,7 +114,7 @@ static PCPIN_DESCRIPTOR MiniportPins[] = {
             0
         }
     },
-  
+
     // Wave Out Bridge Pin (Renderer) KSPIN_WAVE_RENDER_SOURCE
     {
         0,
@@ -142,7 +142,7 @@ static PCPROPERTY_ITEM PropertiesDAC[] =
 {
     // KSPROPERTY_AUDIO_CHANNEL_CONFIG
     {
-        &KSPROPSETID_Audio,                                     // Property Set     
+        &KSPROPSETID_Audio,                                     // Property Set
         KSPROPERTY_AUDIO_CHANNEL_CONFIG,                        // Property ID
         PCPROPERTY_ITEM_FLAG_GET | PCPROPERTY_ITEM_FLAG_SET,    // Flags
         PropertyHandler_Wave                                    // Handler
@@ -172,11 +172,11 @@ static PCNODE_DESCRIPTOR MiniportNodes[] = {
 
 //=============================================================================
 static PCCONNECTION_DESCRIPTOR MiniportConnections[] = {
-    { PCFILTER_NODE,        KSPIN_WAVE_CAPTURE_SOURCE,  KSNODE_WAVE_ADC,     1 },    
-    { KSNODE_WAVE_ADC,      0,                          PCFILTER_NODE,       KSPIN_WAVE_CAPTURE_SINK },    
+    { PCFILTER_NODE,        KSPIN_WAVE_CAPTURE_SOURCE,  KSNODE_WAVE_ADC,     1 },
+    { KSNODE_WAVE_ADC,      0,                          PCFILTER_NODE,       KSPIN_WAVE_CAPTURE_SINK },
 
-    { PCFILTER_NODE,        KSPIN_WAVE_RENDER_SINK,     KSNODE_WAVE_DAC,     1 },    
-    { KSNODE_WAVE_DAC,      0,                          PCFILTER_NODE,       KSPIN_WAVE_RENDER_SOURCE },    
+    { PCFILTER_NODE,        KSPIN_WAVE_RENDER_SINK,     KSNODE_WAVE_DAC,     1 },
+    { KSNODE_WAVE_DAC,      0,                          PCFILTER_NODE,       KSPIN_WAVE_RENDER_SOURCE },
 };
 #if 0
 //=============================================================================
