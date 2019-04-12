@@ -35,7 +35,7 @@ DEFINE_GUIDSTRUCT("946A7B1A-EBBC-422a-A81F-F07C8D40D3B4", NAME_SONICSAUDIO);
 #define NAME_SONICSAUDIO DEFINE_GUIDNAMED(NAME_SONICSAUDIO)
 
 // Pool tag used for MSVAD allocations
-#define SONICSAUDIO_POOLTAG           'INOS'  
+#define SONICSAUDIO_POOLTAG           'INOS'
 
 // Debug module name
 #define STR_MODULENAME              "SONICSAudio: "
@@ -43,9 +43,9 @@ DEFINE_GUIDSTRUCT("946A7B1A-EBBC-422a-A81F-F07C8D40D3B4", NAME_SONICSAUDIO);
 // Debug utility macros
 #define D_FUNC                      4
 #define D_BLAB                      DEBUGLVL_BLAB
-#define D_VERBOSE                   DEBUGLVL_VERBOSE        
-#define D_TERSE                     DEBUGLVL_TERSE          
-#define D_ERROR                     DEBUGLVL_ERROR          
+#define D_VERBOSE                   DEBUGLVL_VERBOSE
+#define D_TERSE                     DEBUGLVL_TERSE
+#define D_ERROR                     DEBUGLVL_ERROR
 #define DPF                         _DbgPrintF
 #define DPF_ENTER(x)                DPF(D_FUNC, x)
 
@@ -57,7 +57,7 @@ DEFINE_GUIDSTRUCT("946A7B1A-EBBC-422a-A81F-F07C8D40D3B4", NAME_SONICSAUDIO);
 // Pin properties.
 #define MAX_OUTPUT_STREAMS          1       // Number of capture streams.
 #define MAX_INPUT_STREAMS           1       // Number of render streams.
-#define MAX_TOTAL_STREAMS           MAX_OUTPUT_STREAMS + MAX_INPUT_STREAMS                      
+#define MAX_TOTAL_STREAMS           MAX_OUTPUT_STREAMS + MAX_INPUT_STREAMS
 
 // PCM Info [6,6,8,32,8000,192000]
 #define MIN_CHANNELS                8       // Min Channels.
@@ -85,16 +85,16 @@ DEFINE_GUIDSTRUCT("946A7B1A-EBBC-422a-A81F-F07C8D40D3B4", NAME_SONICSAUDIO);
 //=============================================================================
 
 // Wave pins
-enum 
+enum
 {
     KSPIN_WAVE_CAPTURE_SINK = 0,
     KSPIN_WAVE_CAPTURE_SOURCE,
-    KSPIN_WAVE_RENDER_SINK, 
+    KSPIN_WAVE_RENDER_SINK,
     KSPIN_WAVE_RENDER_SOURCE
 };
 
 // Wave Topology nodes.
-enum 
+enum
 {
     KSNODE_WAVE_ADC = 0,
     KSNODE_WAVE_DAC
