@@ -9,44 +9,44 @@ Abstract:
 #include "kshelper.h"
 
 //-----------------------------------------------------------------------------
-PWAVEFORMATEX                   
+PWAVEFORMATEX
 GetWaveFormatEx
 (
     IN  PKSDATAFORMAT           pDataFormat
 )
 /*
 Routine Description:
-  Returns the waveformatex for known formats. 
+  Returns the waveformatex for known formats.
 
 Arguments:
   pDataFormat - data format.
 
 Return Value:
-  
+
     waveformatex in DataFormat.
     NULL for unknown data formats.
 
 --*/
 {
     PWAVEFORMATEX           pWfx = NULL;
-    
+
     // If this is a known dataformat extract the waveformat info.
     //
     if
-    ( 
-        pDataFormat &&
-        ( IsEqualGUIDAligned(pDataFormat->MajorFormat, 
-                KSDATAFORMAT_TYPE_AUDIO)             &&
-          ( IsEqualGUIDAligned(pDataFormat->Specifier, 
-                KSDATAFORMAT_SPECIFIER_WAVEFORMATEX) ||
-            IsEqualGUIDAligned(pDataFormat->Specifier, 
-                KSDATAFORMAT_SPECIFIER_DSOUND) ) )
-    )
+        (
+            pDataFormat &&
+            (IsEqualGUIDAligned(pDataFormat->MajorFormat,
+                KSDATAFORMAT_TYPE_AUDIO) &&
+                (IsEqualGUIDAligned(pDataFormat->Specifier,
+                    KSDATAFORMAT_SPECIFIER_WAVEFORMATEX) ||
+                    IsEqualGUIDAligned(pDataFormat->Specifier,
+                        KSDATAFORMAT_SPECIFIER_DSOUND)))
+            )
     {
         pWfx = PWAVEFORMATEX(pDataFormat + 1);
 
-        if (IsEqualGUIDAligned(pDataFormat->Specifier, 
-                KSDATAFORMAT_SPECIFIER_DSOUND))
+        if (IsEqualGUIDAligned(pDataFormat->Specifier,
+            KSDATAFORMAT_SPECIFIER_DSOUND))
         {
             PKSDSOUND_BUFFERDESC    pwfxds;
 
@@ -59,7 +59,7 @@ Return Value:
 } // GetWaveFormatEx
 
 //-----------------------------------------------------------------------------
-NTSTATUS                        
+NTSTATUS
 PropertyHandler_BasicSupport
 (
     IN PPCPROPERTY_REQUEST         PropertyRequest,
@@ -71,19 +71,19 @@ PropertyHandler_BasicSupport
 Routine Description:
 
   Default basic support handler. Basic processing depends on the size of data.
-  For ULONG it only returns Flags. For KSPROPERTY_DESCRIPTION, the structure   
+  For ULONG it only returns Flags. For KSPROPERTY_DESCRIPTION, the structure
   is filled.
 
 Arguments:
 
-  PropertyRequest - 
+  PropertyRequest -
 
   Flags - Support flags.
 
   PropTypeSetId - PropTypeSetId
 
 Return Value:
-    
+
     NT status code.
 
 --*/
@@ -98,28 +98,28 @@ Return Value:
     {
         // if return buffer can hold a KSPROPERTY_DESCRIPTION, return it
         //
-        PKSPROPERTY_DESCRIPTION PropDesc = 
+        PKSPROPERTY_DESCRIPTION PropDesc =
             PKSPROPERTY_DESCRIPTION(PropertyRequest->Value);
 
-        PropDesc->AccessFlags       = Flags;
-        PropDesc->DescriptionSize   = sizeof(KSPROPERTY_DESCRIPTION);
-        if  (VT_ILLEGAL != PropTypeSetId)
+        PropDesc->AccessFlags = Flags;
+        PropDesc->DescriptionSize = sizeof(KSPROPERTY_DESCRIPTION);
+        if (VT_ILLEGAL != PropTypeSetId)
         {
-            PropDesc->PropTypeSet.Set   = KSPROPTYPESETID_General;
-            PropDesc->PropTypeSet.Id    = PropTypeSetId;
+            PropDesc->PropTypeSet.Set = KSPROPTYPESETID_General;
+            PropDesc->PropTypeSet.Id = PropTypeSetId;
         }
         else
         {
-            PropDesc->PropTypeSet.Set   = GUID_NULL;
-            PropDesc->PropTypeSet.Id    = 0;
+            PropDesc->PropTypeSet.Set = GUID_NULL;
+            PropDesc->PropTypeSet.Id = 0;
         }
         PropDesc->PropTypeSet.Flags = 0;
-        PropDesc->MembersListCount  = 0;
-        PropDesc->Reserved          = 0;
+        PropDesc->MembersListCount = 0;
+        PropDesc->Reserved = 0;
 
         PropertyRequest->ValueSize = sizeof(KSPROPERTY_DESCRIPTION);
         ntStatus = STATUS_SUCCESS;
-    } 
+    }
     else if (PropertyRequest->ValueSize >= sizeof(ULONG))
     {
         // if return buffer can hold a ULONG, return the access flags
@@ -127,7 +127,7 @@ Return Value:
         *(PULONG(PropertyRequest->Value)) = Flags;
 
         PropertyRequest->ValueSize = sizeof(ULONG);
-        ntStatus = STATUS_SUCCESS;                    
+        ntStatus = STATUS_SUCCESS;
     }
     else
     {
@@ -139,10 +139,10 @@ Return Value:
 } // PropertyHandler_BasicSupport
 
 //-----------------------------------------------------------------------------
-NTSTATUS 
+NTSTATUS
 ValidatePropertyParams
 (
-    IN PPCPROPERTY_REQUEST      PropertyRequest, 
+    IN PPCPROPERTY_REQUEST      PropertyRequest,
     IN ULONG                    cbSize,
     IN ULONG                    cbInstanceSize /* = 0  */
 )
@@ -154,7 +154,7 @@ Routine Description:
 
 Arguments:
 
-  PropertyRequest - 
+  PropertyRequest -
   cbSize -
   cbInstanceSize -
 
@@ -170,7 +170,7 @@ Return Value:
     {
         // If the caller is asking for ValueSize.
         //
-        if (0 == PropertyRequest->ValueSize) 
+        if (0 == PropertyRequest->ValueSize)
         {
             PropertyRequest->ValueSize = cbSize;
             ntStatus = STATUS_BUFFER_OVERFLOW;
@@ -186,14 +186,14 @@ Return Value:
             ntStatus = STATUS_BUFFER_TOO_SMALL;
         }
         // If all parameters are OK.
-        // 
+        //
         else if (PropertyRequest->ValueSize == cbSize)
         {
             if (PropertyRequest->Value)
             {
                 ntStatus = STATUS_SUCCESS;
                 //
-                // Caller should set ValueSize, if the property 
+                // Caller should set ValueSize, if the property
                 // call is successful.
                 //
             }
@@ -203,7 +203,7 @@ Return Value:
     {
         ntStatus = STATUS_INVALID_PARAMETER;
     }
-    
+
     // Clear the ValueSize if unsuccessful.
     //
     if (PropertyRequest &&
@@ -215,5 +215,3 @@ Return Value:
 
     return ntStatus;
 } // ValidatePropertyParams
-
-

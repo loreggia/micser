@@ -3,7 +3,7 @@ Module Name:
   common.cpp
 
 Abstract:
-  Implementation of the AdapterCommon class. 
+  Implementation of the AdapterCommon class.
 */
 
 #include "sonicsaudio.h"
@@ -16,103 +16,103 @@ Abstract:
 
 ///////////////////////////////////////////////////////////////////////////////
 // CAdapterCommon
-//   
+//
 
 class CAdapterCommon : public IAdapterCommon, public IAdapterPowerManagement, public CUnknown {
-	private:
-		PPORTWAVECYCLIC         m_pPortWave;    // Port interface
-		PSERVICEGROUP           m_pServiceGroupWave;
-		PDEVICE_OBJECT          m_pDeviceObject;      
-		DEVICE_POWER_STATE      m_PowerState;        
+private:
+    PPORTWAVECYCLIC         m_pPortWave;    // Port interface
+    PSERVICEGROUP           m_pServiceGroupWave;
+    PDEVICE_OBJECT          m_pDeviceObject;
+    DEVICE_POWER_STATE      m_PowerState;
 
-        PCSONICSAudioHW           m_pHW;          // VAD HW object
+    PCSONICSAudioHW           m_pHW;          // VAD HW object
 
-	public:
-		//=====================================================================
-		// Default CUnknown
-        DECLARE_STD_UNKNOWN();
-		//DEFINE_STD_CONSTRUCTOR(CAdapterCommon);
-		CAdapterCommon( PUNKNOWN pUnknownOuter);
-		~CAdapterCommon();
+public:
+    //=====================================================================
+    // Default CUnknown
+    DECLARE_STD_UNKNOWN();
+    //DEFINE_STD_CONSTRUCTOR(CAdapterCommon);
+    CAdapterCommon(PUNKNOWN pUnknownOuter);
+    ~CAdapterCommon();
 
-		//=====================================================================
-		// Default IAdapterPowerManagement
-		IMP_IAdapterPowerManagement;
+    //=====================================================================
+    // Default IAdapterPowerManagement
+    IMP_IAdapterPowerManagement;
 
-		//=====================================================================
-		// IAdapterCommon methods                                               
-		STDMETHODIMP_(NTSTATUS) Init (   
-            IN  PDEVICE_OBJECT  DeviceObject
-        );
+    //=====================================================================
+    // IAdapterCommon methods
+    STDMETHODIMP_(NTSTATUS) Init(
+        IN  PDEVICE_OBJECT  DeviceObject
+    );
 
-        STDMETHODIMP_(PDEVICE_OBJECT)   GetDeviceObject(void);
+    STDMETHODIMP_(PDEVICE_OBJECT)   GetDeviceObject(void);
 
-		STDMETHODIMP_(PUNKNOWN *)       WavePortDriverDest(void);
+    STDMETHODIMP_(PUNKNOWN *)       WavePortDriverDest(void);
 
-		STDMETHODIMP_(void)     SetWaveServiceGroup (   
-            IN  PSERVICEGROUP   ServiceGroup
-        );
-		
-        STDMETHODIMP_(BOOL)     bDevSpecificRead();
+    STDMETHODIMP_(void)     SetWaveServiceGroup(
+        IN  PSERVICEGROUP   ServiceGroup
+    );
 
-        STDMETHODIMP_(void)     bDevSpecificWrite
-        (
-            IN  BOOL            bDevSpecific
-        );
-        STDMETHODIMP_(INT)      iDevSpecificRead();
+    STDMETHODIMP_(BOOL)     bDevSpecificRead();
 
-        STDMETHODIMP_(void)     iDevSpecificWrite
-        (
-            IN  INT             iDevSpecific
-        );
-        STDMETHODIMP_(UINT)     uiDevSpecificRead();
+    STDMETHODIMP_(void)     bDevSpecificWrite
+    (
+        IN  BOOL            bDevSpecific
+    );
+    STDMETHODIMP_(INT)      iDevSpecificRead();
 
-        STDMETHODIMP_(void)     uiDevSpecificWrite
-        (
-            IN  UINT            uiDevSpecific
-        );
-		
-        STDMETHODIMP_(BOOL)     MixerMuteRead
-        (
-            IN  ULONG           Index
-        );
+    STDMETHODIMP_(void)     iDevSpecificWrite
+    (
+        IN  INT             iDevSpecific
+    );
+    STDMETHODIMP_(UINT)     uiDevSpecificRead();
 
-        STDMETHODIMP_(void)     MixerMuteWrite
-        (
-            IN  ULONG           Index,
-            IN  BOOL            Value
-        );
+    STDMETHODIMP_(void)     uiDevSpecificWrite
+    (
+        IN  UINT            uiDevSpecific
+    );
 
-        STDMETHODIMP_(ULONG)    MixerMuxRead(void);
+    STDMETHODIMP_(BOOL)     MixerMuteRead
+    (
+        IN  ULONG           Index
+    );
 
-        STDMETHODIMP_(void)     MixerMuxWrite
-        (
-            IN  ULONG           Index
-        );
+    STDMETHODIMP_(void)     MixerMuteWrite
+    (
+        IN  ULONG           Index,
+        IN  BOOL            Value
+    );
 
-		STDMETHODIMP_(void)     MixerReset(void);
+    STDMETHODIMP_(ULONG)    MixerMuxRead(void);
 
-        STDMETHODIMP_(LONG)     MixerVolumeRead
-        ( 
-            IN  ULONG           Index,
-            IN  LONG            Channel
-        );
+    STDMETHODIMP_(void)     MixerMuxWrite
+    (
+        IN  ULONG           Index
+    );
 
-        STDMETHODIMP_(void)     MixerVolumeWrite
-        ( 
-            IN  ULONG           Index,
-            IN  LONG            Channel,
-            IN  LONG            Value 
-        );
+    STDMETHODIMP_(void)     MixerReset(void);
 
-		//=====================================================================
-		// friends
+    STDMETHODIMP_(LONG)     MixerVolumeRead
+    (
+        IN  ULONG           Index,
+        IN  LONG            Channel
+    );
 
-        friend NTSTATUS		    NewAdapterCommon
-		( 
-			OUT PADAPTERCOMMON * OutAdapterCommon, 
-			IN  PRESOURCELIST   ResourceList 
-		);
+    STDMETHODIMP_(void)     MixerVolumeWrite
+    (
+        IN  ULONG           Index,
+        IN  LONG            Channel,
+        IN  LONG            Value
+    );
+
+    //=====================================================================
+    // friends
+
+    friend NTSTATUS		    NewAdapterCommon
+    (
+        OUT PADAPTERCOMMON * OutAdapterCommon,
+        IN  PRESOURCELIST   ResourceList
+    );
 };
 
 //-----------------------------------------------------------------------------
@@ -123,11 +123,11 @@ class CAdapterCommon : public IAdapterCommon, public IAdapterPowerManagement, pu
 #pragma code_seg("PAGE")
 NTSTATUS
 NewAdapterCommon
-( 
-	OUT PUNKNOWN *              Unknown,
+(
+    OUT PUNKNOWN *              Unknown,
     IN  REFCLSID,
     IN  PUNKNOWN                UnknownOuter OPTIONAL,
-    IN  POOL_TYPE               PoolType 
+    IN  POOL_TYPE               PoolType
 )
 /*++
 
@@ -137,7 +137,7 @@ Routine Description:
 
 Arguments:
 
-  Unknown - 
+  Unknown -
 
   UnknownOuter -
 
@@ -149,27 +149,27 @@ Return Value:
 
 --*/
 {
-	PAGED_CODE();
+    PAGED_CODE();
 
-	ASSERT(Unknown);
+    ASSERT(Unknown);
 
-	STD_CREATE_BODY_
-	( 
-		CAdapterCommon, 
-        Unknown, 
-        UnknownOuter, 
-        PoolType,      
-		PADAPTERCOMMON 
-	);
+    STD_CREATE_BODY_
+    (
+        CAdapterCommon,
+        Unknown,
+        UnknownOuter,
+        PoolType,
+        PADAPTERCOMMON
+    );
 } // NewAdapterCommon
 //=============================================================================
-CAdapterCommon::CAdapterCommon(PUNKNOWN pUnknownOuter):CUnknown( pUnknownOuter )
+CAdapterCommon::CAdapterCommon(PUNKNOWN pUnknownOuter) :CUnknown(pUnknownOuter)
 {
-	PAGED_CODE();
+    PAGED_CODE();
 
-	DPF_ENTER(("[CAdapterCommon::CAdapterCommon]"));
-	////
-	m_PowerState  = PowerDeviceD0;
+    DPF_ENTER(("[CAdapterCommon::CAdapterCommon]"));
+    ////
+    m_PowerState = PowerDeviceD0;
 }
 //=============================================================================
 CAdapterCommon::~CAdapterCommon(void)
@@ -183,22 +183,22 @@ Return Value:
   void
 */
 {
-	PAGED_CODE();
+    PAGED_CODE();
 
-	DPF_ENTER(("[CAdapterCommon::~CAdapterCommon]"));
+    DPF_ENTER(("[CAdapterCommon::~CAdapterCommon]"));
 
     if (m_pHW)
         delete m_pHW;
 
     if (m_pPortWave)
-	    m_pPortWave->Release();
+        m_pPortWave->Release();
 
-	if (m_pServiceGroupWave)
-	    m_pServiceGroupWave->Release();
-} // ~CAdapterCommon  
+    if (m_pServiceGroupWave)
+        m_pServiceGroupWave->Release();
+} // ~CAdapterCommon
 
 //=============================================================================
-STDMETHODIMP_(PDEVICE_OBJECT)   
+STDMETHODIMP_(PDEVICE_OBJECT)
 CAdapterCommon::GetDeviceObject
 (
     void
@@ -218,15 +218,15 @@ Return Value:
 --*/
 {
     PAGED_CODE();
-    
+
     return m_pDeviceObject;
 } // GetDeviceObject
 
 //=============================================================================
 NTSTATUS
 CAdapterCommon::Init
-( 
-    IN  PDEVICE_OBJECT          DeviceObject 
+(
+    IN  PDEVICE_OBJECT          DeviceObject
 )
 /*++
 
@@ -244,19 +244,19 @@ Return Value:
 
 --*/
 {
-	PAGED_CODE();
+    PAGED_CODE();
 
-	ASSERT(DeviceObject);
+    ASSERT(DeviceObject);
 
     NTSTATUS                    ntStatus = STATUS_SUCCESS;
 
     DPF_ENTER(("[CAdapterCommon::Init]"));
 
-	m_pDeviceObject = DeviceObject;
-	m_PowerState    = PowerDeviceD0;
+    m_pDeviceObject = DeviceObject;
+    m_PowerState = PowerDeviceD0;
 
     // Initialize HW.
-    // 
+    //
     m_pHW = new (NonPagedPool, SONICSAUDIO_POOLTAG)  CSONICSAudioHW;
     if (!m_pHW)
     {
@@ -274,8 +274,8 @@ Return Value:
 //=============================================================================
 STDMETHODIMP_(void)
 CAdapterCommon::MixerReset
-( 
-	void 
+(
+    void
 )
 /*++
 
@@ -291,8 +291,8 @@ Return Value:
 
 --*/
 {
-	PAGED_CODE();
-    
+    PAGED_CODE();
+
     if (m_pHW)
     {
         m_pHW->MixerReset();
@@ -302,9 +302,9 @@ Return Value:
 //=============================================================================
 STDMETHODIMP
 CAdapterCommon::NonDelegatingQueryInterface
-( 
-	REFIID                      Interface,
-    PVOID *                     Object 
+(
+    REFIID                      Interface,
+    PVOID *                     Object
 )
 /*++
 
@@ -314,7 +314,7 @@ Routine Description:
 
 Arguments:
 
-  Interface - 
+  Interface -
 
   Object -
 
@@ -324,46 +324,45 @@ Return Value:
 
 --*/
 {
-	PAGED_CODE();
+    PAGED_CODE();
 
-	ASSERT(Object);
+    ASSERT(Object);
 
-	if (IsEqualGUIDAligned(Interface, IID_IUnknown))
-	{
-		*Object = PVOID(PUNKNOWN(PADAPTERCOMMON(this)));
-	}
-	else if (IsEqualGUIDAligned(Interface, IID_IAdapterCommon))
-	{
-		*Object = PVOID(PADAPTERCOMMON(this));
-	}
-	else if (IsEqualGUIDAligned(Interface, IID_IAdapterPowerManagement))
-	{
-		*Object = PVOID(PADAPTERPOWERMANAGEMENT(this));
-	}
-	else
-	{
-		*Object = NULL;
-	}
+    if (IsEqualGUIDAligned(Interface, IID_IUnknown))
+    {
+        *Object = PVOID(PUNKNOWN(PADAPTERCOMMON(this)));
+    }
+    else if (IsEqualGUIDAligned(Interface, IID_IAdapterCommon))
+    {
+        *Object = PVOID(PADAPTERCOMMON(this));
+    }
+    else if (IsEqualGUIDAligned(Interface, IID_IAdapterPowerManagement))
+    {
+        *Object = PVOID(PADAPTERPOWERMANAGEMENT(this));
+    }
+    else
+    {
+        *Object = NULL;
+    }
 
-	if (*Object)
-	{
-		PUNKNOWN(*Object)->AddRef();
-		return STATUS_SUCCESS;
-	}
+    if (*Object)
+    {
+        PUNKNOWN(*Object)->AddRef();
+        return STATUS_SUCCESS;
+    }
 
-	return STATUS_INVALID_PARAMETER;
+    return STATUS_INVALID_PARAMETER;
 } // NonDelegatingQueryInterface
 
 //=============================================================================
 STDMETHODIMP_(void)
 CAdapterCommon::SetWaveServiceGroup
-( 
-	IN PSERVICEGROUP            ServiceGroup 
+(
+    IN PSERVICEGROUP            ServiceGroup
 )
 /*++
 
 Routine Description:
-
 
 Arguments:
 
@@ -374,27 +373,27 @@ Return Value:
 --*/
 {
     PAGED_CODE();
-    
+
     DPF_ENTER(("[CAdapterCommon::SetWaveServiceGroup]"));
-    
+
     if (m_pServiceGroupWave)
-	{
-		m_pServiceGroupWave->Release();
-	}
+    {
+        m_pServiceGroupWave->Release();
+    }
 
-	m_pServiceGroupWave = ServiceGroup;
+    m_pServiceGroupWave = ServiceGroup;
 
-	if (m_pServiceGroupWave)
-	{
-		m_pServiceGroupWave->AddRef();
-	}
+    if (m_pServiceGroupWave)
+    {
+        m_pServiceGroupWave->AddRef();
+    }
 } // SetWaveServiceGroup
 
 //=============================================================================
 STDMETHODIMP_(PUNKNOWN *)
 CAdapterCommon::WavePortDriverDest
-( 
-	void 
+(
+    void
 )
 /*++
 
@@ -410,9 +409,9 @@ Return Value:
 
 --*/
 {
-	PAGED_CODE();
+    PAGED_CODE();
 
-	return (PUNKNOWN *)&m_pPortWave;
+    return (PUNKNOWN *)&m_pPortWave;
 } // WavePortDriverDest
 #pragma code_seg()
 
@@ -644,7 +643,7 @@ Return Value:
 
 //=============================================================================
 STDMETHODIMP_(ULONG)
-CAdapterCommon::MixerMuxRead() 
+CAdapterCommon::MixerMuxRead()
 /*++
 
 Routine Description:
@@ -704,8 +703,8 @@ Return Value:
 //=============================================================================
 STDMETHODIMP_(LONG)
 CAdapterCommon::MixerVolumeRead
-( 
-	IN  ULONG                   Index,
+(
+    IN  ULONG                   Index,
     IN  LONG                    Channel
 )
 /*++
@@ -737,8 +736,8 @@ Return Value:
 //=============================================================================
 STDMETHODIMP_(void)
 CAdapterCommon::MixerVolumeWrite
-( 
-	IN  ULONG                   Index,
+(
+    IN  ULONG                   Index,
     IN  LONG                    Channel,
     IN  LONG                    Value
 )
@@ -771,17 +770,16 @@ Return Value:
 //=============================================================================
 STDMETHODIMP_(void)
 CAdapterCommon::PowerChangeState
-( 
-    IN  POWER_STATE             NewState 
+(
+    IN  POWER_STATE             NewState
 )
 /*++
 
 Routine Description:
 
-
 Arguments:
 
-  NewState - The requested, new power state for the device. 
+  NewState - The requested, new power state for the device.
 
 Return Value:
 
@@ -801,24 +799,24 @@ Return Value:
         //
         switch (NewState.DeviceState)
         {
-            case PowerDeviceD0:
-            case PowerDeviceD1:
-            case PowerDeviceD2:
-            case PowerDeviceD3:
-                m_PowerState = NewState.DeviceState;
+        case PowerDeviceD0:
+        case PowerDeviceD1:
+        case PowerDeviceD2:
+        case PowerDeviceD3:
+            m_PowerState = NewState.DeviceState;
 
-                DPF
-                ( 
-                    D_VERBOSE, 
-                    ("Entering D%d", ULONG(m_PowerState) - ULONG(PowerDeviceD0)) 
-                );
+            DPF
+            (
+                D_VERBOSE,
+                ("Entering D%d", ULONG(m_PowerState) - ULONG(PowerDeviceD0))
+            );
 
-                break;
-    
-            default:
-            
-                DPF(D_VERBOSE, ("Unknown Device Power State"));
-                break;
+            break;
+
+        default:
+
+            DPF(D_VERBOSE, ("Unknown Device Power State"));
+            break;
         }
     }
 } // PowerStateChange
@@ -826,20 +824,20 @@ Return Value:
 //=============================================================================
 STDMETHODIMP_(NTSTATUS)
 CAdapterCommon::QueryDeviceCapabilities
-( 
-    IN  PDEVICE_CAPABILITIES    PowerDeviceCaps 
+(
+    IN  PDEVICE_CAPABILITIES    PowerDeviceCaps
 )
 /*++
 
 Routine Description:
 
-    Called at startup to get the caps for the device.  This structure provides 
-    the system with the mappings between system power state and device power 
-    state.  This typically will not need modification by the driver.         
+    Called at startup to get the caps for the device.  This structure provides
+    the system with the mappings between system power state and device power
+    state.  This typically will not need modification by the driver.
 
 Arguments:
 
-  PowerDeviceCaps - The device's capabilities. 
+  PowerDeviceCaps - The device's capabilities.
 
 Return Value:
 
@@ -847,7 +845,7 @@ Return Value:
 
 --*/
 {
-	UNREFERENCED_PARAMETER(PowerDeviceCaps);
+    UNREFERENCED_PARAMETER(PowerDeviceCaps);
     DPF_ENTER(("[CAdapterCommon::QueryDeviceCapabilities]"));
 
     return (STATUS_SUCCESS);
@@ -856,14 +854,14 @@ Return Value:
 //=============================================================================
 STDMETHODIMP_(NTSTATUS)
 CAdapterCommon::QueryPowerChangeState
-( 
-    IN  POWER_STATE             NewStateQuery 
+(
+    IN  POWER_STATE             NewStateQuery
 )
 /*++
 
 Routine Description:
 
-  Query to see if the device can change to this power state 
+  Query to see if the device can change to this power state
 
 Arguments:
 
@@ -875,7 +873,7 @@ Return Value:
 
 --*/
 {
-	UNREFERENCED_PARAMETER(NewStateQuery);
+    UNREFERENCED_PARAMETER(NewStateQuery);
     DPF_ENTER(("[CAdapterCommon::QueryPowerChangeState]"));
 
     return STATUS_SUCCESS;
