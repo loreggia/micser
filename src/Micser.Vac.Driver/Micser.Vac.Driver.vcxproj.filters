@@ -48,9 +48,6 @@
     <ClInclude Include="wavtable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="adapter.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="wavestream.h">
       <Filter>Header Files</Filter>
     </ClInclude>
