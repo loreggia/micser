@@ -8,12 +8,13 @@ Module Name:
 
 Abstract:
 
-    Implementation of MSVAD HW class.
+    Implementation of MSVAD HW class. 
     MSVAD HW has an array for storing mixer and volume settings
     for the topology.
 
---*/
 
+--*/
+#include "sonicsaudio.h"
 #include "hw.h"
 
 //=============================================================================
@@ -23,26 +24,26 @@ Abstract:
 //=============================================================================
 #pragma code_seg("PAGE")
 CSONICSAudioHW::CSONICSAudioHW()
-    : m_ulMux(0),
+: m_ulMux(0),
     m_bDevSpecific(FALSE),
     m_iDevSpecific(0),
     m_uiDevSpecific(0)
-    /*++
+/*++
 
-    Routine Description:
+Routine Description:
 
-        Constructor for MSVADHW.
+    Constructor for MSVADHW. 
 
-    Arguments:
+Arguments:
 
-    Return Value:
+Return Value:
 
-        void
+    void
 
-    --*/
+--*/
 {
     PAGED_CODE();
-
+    
     MixerReset();
 } // CSONICSAudioHW
 #pragma code_seg()
@@ -219,7 +220,7 @@ Return Value:
 } // GetMixerMute
 
 //=============================================================================
-ULONG
+ULONG                       
 CSONICSAudioHW::GetMixerMux()
 /*++
 
@@ -241,7 +242,7 @@ Return Value:
 //=============================================================================
 LONG
 CSONICSAudioHW::GetMixerVolume
-(
+(   
     IN  ULONG                   ulNode,
     IN  LONG                    lChannel
 )
@@ -263,7 +264,7 @@ Return Value:
 
 --*/
 {
-    UNREFERENCED_PARAMETER(lChannel);
+	UNREFERENCED_PARAMETER(lChannel);
     if (ulNode < MAX_TOPOLOGY_NODES)
     {
         return m_VolumeControls[ulNode];
@@ -274,7 +275,7 @@ Return Value:
 
 //=============================================================================
 #pragma code_seg("PAGE")
-void
+void 
 CSONICSAudioHW::MixerReset()
 /*++
 
@@ -291,10 +292,10 @@ Return Value:
 --*/
 {
     PAGED_CODE();
-
+    
     RtlFillMemory(m_VolumeControls, sizeof(LONG) * MAX_TOPOLOGY_NODES, 0xFF);
     RtlFillMemory(m_MuteControls, sizeof(BOOL) * MAX_TOPOLOGY_NODES, TRUE);
-
+    
     // BUGBUG change this depending on the topology
     m_ulMux = 2;
 } // MixerReset
@@ -332,7 +333,7 @@ Return Value:
 } // SetMixerMute
 
 //=============================================================================
-void
+void                        
 CSONICSAudioHW::SetMixerMux
 (
     IN  ULONG                   ulNode
@@ -357,9 +358,9 @@ Return Value:
 } // SetMixMux
 
 //=============================================================================
-void
+void  
 CSONICSAudioHW::SetMixerVolume
-(
+(   
     IN  ULONG                   ulNode,
     IN  LONG                    lChannel,
     IN  LONG                    lVolume
@@ -384,7 +385,7 @@ Return Value:
 
 --*/
 {
-    UNREFERENCED_PARAMETER(lChannel);
+	UNREFERENCED_PARAMETER(lChannel);
     if (ulNode < MAX_TOPOLOGY_NODES)
     {
         m_VolumeControls[ulNode] = lVolume;

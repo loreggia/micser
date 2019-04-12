@@ -9,48 +9,38 @@ Abstract:
 #ifndef __TOPO_H_
 #define __TOPO_H_
 
-#include "sonicsaudio.h"
-#include "common.h"
-
-NTSTATUS CreateMiniportTopology(
-    PUNKNOWN *              Unknown,
-    REFCLSID,
-    PUNKNOWN                UnknownOuter OPTIONAL,
-    POOL_TYPE               PoolType
-);
-
 //=============================================================================
 // Classes
 //=============================================================================
 
 ///////////////////////////////////////////////////////////////////////////////
-// CMiniportTopology
-//
+// CMiniportTopology 
+//   
 
 class CMiniportTopology : public IMiniportTopology, public CUnknown {
-protected:
+  protected:
     PADAPTERCOMMON              m_AdapterCommon;    // Adapter common object.
     PPCFILTER_DESCRIPTOR        m_FilterDescriptor; // Filter descriptor.
-public:
+  public:
     DECLARE_STD_UNKNOWN();
     //DEFINE_STD_CONSTRUCTOR(CMiniportTopology);
-    CMiniportTopology(PUNKNOWN pUnknownOuter);
+	CMiniportTopology( PUNKNOWN pUnknownOuter);
     ~CMiniportTopology();
 
     IMP_IMiniportTopology;
 
-    NTSTATUS Init(
+    NTSTATUS Init( 
         IN  PUNKNOWN       UnknownAdapter,
-        IN  PPORTTOPOLOGY  Port_
+        IN  PPORTTOPOLOGY  Port_ 
     );
 
     // PropertyHandlers
     NTSTATUS PropertyHandlerBasicSupportVolume(
         IN  PPCPROPERTY_REQUEST PropertyRequest
     );
-
-    NTSTATUS PropertyHandlerCpuResources(
-        IN  PPCPROPERTY_REQUEST PropertyRequest
+    
+    NTSTATUS PropertyHandlerCpuResources( 
+        IN  PPCPROPERTY_REQUEST PropertyRequest 
     );
 
     NTSTATUS PropertyHandlerGeneric(
@@ -68,8 +58,8 @@ public:
     NTSTATUS PropertyHandlerVolume(
         IN  PPCPROPERTY_REQUEST PropertyRequest
     );
-
-    NTSTATUS PropertyHandlerDevSpecific(
+	
+	NTSTATUS PropertyHandlerDevSpecific(
         IN  PPCPROPERTY_REQUEST PropertyRequest
     );
 };
