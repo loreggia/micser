@@ -9,7 +9,7 @@ Abstract:
 #ifndef __WAVESTREAM_H_
 #define __WAVESTREAM_H_
 
-#include "wave.h"
+#include "minwave.h"
 
 ///////////////////////////////////////////////////////////////////////////////
 // CMiniportWaveCyclicStream

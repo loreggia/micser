@@ -1,6 +1,6 @@
 /*
 Module Name:
-  topo.h
+  mintopo.h
 
 Abstract:
   Declaration of topology miniport.

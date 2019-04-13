@@ -8,7 +8,7 @@ Abstract:
 
 #include "micser.h"
 #include "common.h"
-#include "wave.h"
+#include "minwave.h"
 #include "wavestream.h"
 #include "wavtable.h"
 

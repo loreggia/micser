@@ -8,8 +8,8 @@ Abstract:
 
 #include "micser.h"
 #include "common.h"
-#include "wave.h"
-#include "topo.h"
+#include "minwave.h"
+#include "mintopo.h"
 #include "toptable.h"
 
 /*********************************************************************
