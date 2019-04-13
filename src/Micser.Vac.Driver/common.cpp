@@ -10,6 +10,220 @@ Abstract:
 #include "common.h"
 #include "hw.h"
 
+//-----------------------------------------------------------------------------
+// Externals
+//-----------------------------------------------------------------------------
+typedef
+NTSTATUS
+(*PMINIPORTCREATE)
+(
+    _Out_       PUNKNOWN *,
+    _In_        REFCLSID,
+    _In_opt_    PUNKNOWN,
+    _In_        POOL_TYPE
+    );
+
+NTSTATUS
+CreateMiniportWaveCyclic
+(
+    OUT PUNKNOWN *,
+    IN  REFCLSID,
+    IN  PUNKNOWN,
+    _When_((PoolType & NonPagedPoolMustSucceed) != 0,
+        __drv_reportError("Must succeed pool allocations are forbidden. "
+            "Allocation failures cause a system crash"))
+    IN  POOL_TYPE PoolType
+);
+
+NTSTATUS
+CreateMiniportTopology
+(
+    OUT PUNKNOWN *,
+    IN  REFCLSID,
+    IN  PUNKNOWN,
+    _When_((PoolType & NonPagedPoolMustSucceed) != 0,
+        __drv_reportError("Must succeed pool allocations are forbidden. "
+            "Allocation failures cause a system crash"))
+    IN  POOL_TYPE PoolType
+);
+
+//=============================================================================
+// Helper Routines
+//=============================================================================
+//=============================================================================
+#pragma code_seg("PAGE")
+NTSTATUS
+InstallSubdevice
+(
+    _In_        PDEVICE_OBJECT          DeviceObject,
+    _In_opt_    PIRP                    Irp,
+    _In_        PWSTR                   Name,
+    _In_        REFGUID                 PortClassId,
+    _In_        REFGUID                 MiniportClassId,
+    _In_opt_    PMINIPORTCREATE         MiniportCreate,
+    _In_opt_    PUNKNOWN                UnknownAdapter,
+    _In_opt_    PRESOURCELIST           ResourceList,
+    _In_opt_    REFGUID                 PortInterfaceId,
+    _Out_opt_   PUNKNOWN *              OutPortInterface,
+    _Out_opt_   PUNKNOWN *              OutPortUnknown
+)
+{
+    /*++
+
+    Routine Description:
+
+        This function creates and registers a subdevice consisting of a port
+        driver, a minport driver and a set of resources bound together.  It will
+        also optionally place a pointer to an interface on the port driver in a
+        specified location before initializing the port driver.  This is done so
+        that a common ISR can have access to the port driver during
+        initialization, when the ISR might fire.
+
+    Arguments:
+
+        DeviceObject - pointer to the driver object
+
+        Irp - pointer to the irp object.
+
+        Name - name of the miniport. Passes to PcRegisterSubDevice
+
+        PortClassId - port class id. Passed to PcNewPort.
+
+        MiniportClassId - miniport class id. Passed to PcNewMiniport.
+
+        MiniportCreate - pointer to a miniport creation function. If NULL,
+                         PcNewMiniport is used.
+
+        UnknownAdapter - pointer to the adapter object.
+                         Used for initializing the port.
+
+        ResourceList - pointer to the resource list.
+
+        PortInterfaceId - GUID that represents the port interface.
+
+        OutPortInterface - pointer to store the port interface
+
+        OutPortUnknown - pointer to store the unknown port interface.
+
+    Return Value:
+
+        NT status code.
+
+    --*/
+    PAGED_CODE();
+
+    ASSERT(DeviceObject);
+    ASSERT(Name);
+
+    NTSTATUS                    ntStatus;
+    PPORT                       port = NULL;
+    PUNKNOWN                    miniport = NULL;
+
+    DPF_ENTER(("[InstallSubDevice %S]", Name));
+
+    // Create the port driver object
+    //
+    ntStatus = PcNewPort(&port, PortClassId);
+
+    // Create the miniport object
+    //
+    if (NT_SUCCESS(ntStatus))
+    {
+        if (MiniportCreate)
+        {
+            ntStatus =
+                MiniportCreate
+                (
+                    &miniport,
+                    MiniportClassId,
+                    NULL,
+                    NonPagedPool
+                );
+        }
+        else
+        {
+            ntStatus =
+                PcNewMiniport
+                (
+                (PMINIPORT *)&miniport,
+                    MiniportClassId
+                );
+        }
+    }
+
+    // Init the port driver and miniport in one go.
+    //
+    if (NT_SUCCESS(ntStatus))
+    {
+#pragma warning(push)
+        // IPort::Init's annotation on ResourceList requires it to be non-NULL.  However,
+        // for dynamic devices, we may no longer have the resource list and this should
+        // still succeed.
+        //
+#pragma warning(disable:6387)
+        ntStatus =
+            port->Init
+            (
+                DeviceObject,
+                Irp,
+                miniport,
+                UnknownAdapter,
+                ResourceList
+            );
+#pragma warning(pop)
+
+        if (NT_SUCCESS(ntStatus))
+        {
+            // Register the subdevice (port/miniport combination).
+            //
+            ntStatus =
+                PcRegisterSubdevice
+                (
+                    DeviceObject,
+                    Name,
+                    port
+                );
+        }
+    }
+
+    // Deposit the port interfaces if it's needed.
+    //
+    if (NT_SUCCESS(ntStatus))
+    {
+        if (OutPortUnknown)
+        {
+            ntStatus =
+                port->QueryInterface
+                (
+                    IID_IUnknown,
+                    (PVOID *)OutPortUnknown
+                );
+        }
+
+        if (OutPortInterface)
+        {
+            ntStatus =
+                miniport->QueryInterface
+                (
+                    PortInterfaceId,
+                    (PVOID *)OutPortInterface
+                );
+        }
+    }
+
+    if (port)
+    {
+        port->Release();
+    }
+
+    if (miniport)
+    {
+        miniport->Release();
+    }
+
+    return ntStatus;
+} // InstallSubDevice
+
 //=============================================================================
 // Classes
 //=============================================================================
@@ -20,19 +234,32 @@ Abstract:
 
 class CAdapterCommon : public IAdapterCommon, public IAdapterPowerManagement, public CUnknown {
 private:
-    PPORTWAVECYCLIC         m_pPortWave;    // Port interface
+    PUNKNOWN                m_pPortWave;            // Port Wave Interface
+    PUNKNOWN                m_pMiniportWave;        // Miniport Wave Interface
+    PUNKNOWN                m_pPortTopology;        // Port Mixer Topology Interface
+    PUNKNOWN                m_pMiniportTopology;    // Miniport Mixer Topology Interface
     PSERVICEGROUP           m_pServiceGroupWave;
     PDEVICE_OBJECT          m_pDeviceObject;
     DEVICE_POWER_STATE      m_PowerState;
+    PCMicserHW              m_pHW;                  // Virtual MSVAD HW object
+    BOOL                    m_bInstantiated;        // Flag indicating whether or not subdevices are exposed
+    BOOL                    m_bPluggedIn;           // Flag indicating whether or not a jack is plugged in
 
-    PCMicserHW           m_pHW;          // VAD HW object
+    //=====================================================================
+    // Helper routines for managing the states of topologies being exposed
+    STDMETHODIMP_(NTSTATUS) ExposeMixerTopology();
+    STDMETHODIMP_(NTSTATUS) ExposeWaveTopology();
+    STDMETHODIMP_(NTSTATUS) UnexposeMixerTopology();
+    STDMETHODIMP_(NTSTATUS) UnexposeWaveTopology();
+    STDMETHODIMP_(NTSTATUS) ConnectTopologies();
+    STDMETHODIMP_(NTSTATUS) DisconnectTopologies();
 
 public:
     //=====================================================================
     // Default CUnknown
     DECLARE_STD_UNKNOWN();
-    //DEFINE_STD_CONSTRUCTOR(CAdapterCommon);
-    CAdapterCommon(PUNKNOWN pUnknownOuter);
+    DEFINE_STD_CONSTRUCTOR(CAdapterCommon);
+    //CAdapterCommon(PUNKNOWN pUnknownOuter);
     ~CAdapterCommon();
 
     //=====================================================================
@@ -41,78 +268,39 @@ public:
 
     //=====================================================================
     // IAdapterCommon methods
-    STDMETHODIMP_(NTSTATUS) Init(
+    STDMETHODIMP_(NTSTATUS) Init
+    (
         IN  PDEVICE_OBJECT  DeviceObject
     );
 
     STDMETHODIMP_(PDEVICE_OBJECT)   GetDeviceObject(void);
-
+    STDMETHODIMP_(NTSTATUS)         InstantiateDevices(void);
+    STDMETHODIMP_(NTSTATUS)         UninstantiateDevices(void);
+    STDMETHODIMP_(NTSTATUS)         Plugin(void);
+    STDMETHODIMP_(NTSTATUS)         Unplug(void);
     STDMETHODIMP_(PUNKNOWN *)       WavePortDriverDest(void);
 
-    STDMETHODIMP_(void)     SetWaveServiceGroup(
-        IN  PSERVICEGROUP   ServiceGroup
-    );
-
-    STDMETHODIMP_(BOOL)     bDevSpecificRead();
-
-    STDMETHODIMP_(void)     bDevSpecificWrite
-    (
-        IN  BOOL            bDevSpecific
-    );
-    STDMETHODIMP_(INT)      iDevSpecificRead();
-
-    STDMETHODIMP_(void)     iDevSpecificWrite
-    (
-        IN  INT             iDevSpecific
-    );
-    STDMETHODIMP_(UINT)     uiDevSpecificRead();
-
-    STDMETHODIMP_(void)     uiDevSpecificWrite
-    (
-        IN  UINT            uiDevSpecific
-    );
-
-    STDMETHODIMP_(BOOL)     MixerMuteRead
-    (
-        IN  ULONG           Index
-    );
-
-    STDMETHODIMP_(void)     MixerMuteWrite
-    (
-        IN  ULONG           Index,
-        IN  BOOL            Value
-    );
-
-    STDMETHODIMP_(ULONG)    MixerMuxRead(void);
-
-    STDMETHODIMP_(void)     MixerMuxWrite
-    (
-        IN  ULONG           Index
-    );
-
-    STDMETHODIMP_(void)     MixerReset(void);
-
-    STDMETHODIMP_(LONG)     MixerVolumeRead
-    (
-        IN  ULONG           Index,
-        IN  LONG            Channel
-    );
-
-    STDMETHODIMP_(void)     MixerVolumeWrite
-    (
-        IN  ULONG           Index,
-        IN  LONG            Channel,
-        IN  LONG            Value
-    );
+    STDMETHODIMP_(void) SetWaveServiceGroup(IN PSERVICEGROUP ServiceGroup);
+    STDMETHODIMP_(BOOL) bDevSpecificRead();
+    STDMETHODIMP_(void) bDevSpecificWrite(IN BOOL bDevSpecific);
+    STDMETHODIMP_(INT) iDevSpecificRead();
+    STDMETHODIMP_(void) iDevSpecificWrite(IN INT iDevSpecific);
+    STDMETHODIMP_(UINT) uiDevSpecificRead();
+    STDMETHODIMP_(void) uiDevSpecificWrite(IN UINT uiDevSpecific);
+    STDMETHODIMP_(BOOL) MixerMuteRead(IN ULONG Index);
+    STDMETHODIMP_(void) MixerMuteWrite(IN ULONG Index, IN BOOL Value);
+    STDMETHODIMP_(ULONG) MixerMuxRead(void);
+    STDMETHODIMP_(void) MixerMuxWrite(IN ULONG Index);
+    STDMETHODIMP_(void) MixerReset(void);
+    STDMETHODIMP_(LONG) MixerVolumeRead(IN ULONG Index, IN LONG Channel);
+    STDMETHODIMP_(void) MixerVolumeWrite(IN ULONG Index, IN LONG Channel, IN LONG Value);
+    STDMETHODIMP_(BOOL) IsInstantiated() { return m_bInstantiated; };
+    STDMETHODIMP_(BOOL) IsPluggedIn() { return m_bPluggedIn; }
 
     //=====================================================================
     // friends
 
-    friend NTSTATUS		    NewAdapterCommon
-    (
-        OUT PADAPTERCOMMON * OutAdapterCommon,
-        IN  PRESOURCELIST   ResourceList
-    );
+    friend NTSTATUS NewAdapterCommon(OUT PADAPTERCOMMON* OutAdapterCommon, IN PRESOURCELIST ResourceList);
 };
 
 //-----------------------------------------------------------------------------
@@ -127,6 +315,9 @@ NewAdapterCommon
     OUT PUNKNOWN *              Unknown,
     IN  REFCLSID,
     IN  PUNKNOWN                UnknownOuter OPTIONAL,
+    _When_((PoolType & NonPagedPoolMustSucceed) != 0,
+        __drv_reportError("Must succeed pool allocations are forbidden. "
+            "Allocation failures cause a system crash"))
     IN  POOL_TYPE               PoolType
 )
 /*++
@@ -162,39 +353,63 @@ Return Value:
         PADAPTERCOMMON
     );
 } // NewAdapterCommon
-//=============================================================================
-CAdapterCommon::CAdapterCommon(PUNKNOWN pUnknownOuter) :CUnknown(pUnknownOuter)
-{
-    PAGED_CODE();
 
-    DPF_ENTER(("[CAdapterCommon::CAdapterCommon]"));
-    ////
-    m_PowerState = PowerDeviceD0;
-}
 //=============================================================================
-CAdapterCommon::~CAdapterCommon(void)
-/*
+CAdapterCommon::~CAdapterCommon
+(
+    void
+)
+/*++
+
 Routine Description:
+
   Destructor for CAdapterCommon.
 
 Arguments:
 
 Return Value:
+
   void
-*/
+
+--*/
 {
     PAGED_CODE();
 
     DPF_ENTER(("[CAdapterCommon::~CAdapterCommon]"));
 
     if (m_pHW)
+    {
         delete m_pHW;
+    }
+
+    if (m_pMiniportWave)
+    {
+        m_pMiniportWave->Release();
+        m_pMiniportWave = NULL;
+    }
 
     if (m_pPortWave)
+    {
         m_pPortWave->Release();
+        m_pPortWave = NULL;
+    }
+
+    if (m_pMiniportTopology)
+    {
+        m_pMiniportTopology->Release();
+        m_pMiniportTopology = NULL;
+    }
+
+    if (m_pPortTopology)
+    {
+        m_pPortTopology->Release();
+        m_pPortTopology = NULL;
+    }
 
     if (m_pServiceGroupWave)
+    {
         m_pServiceGroupWave->Release();
+    }
 } // ~CAdapterCommon
 
 //=============================================================================
@@ -254,10 +469,16 @@ Return Value:
 
     m_pDeviceObject = DeviceObject;
     m_PowerState = PowerDeviceD0;
+    m_pPortWave = NULL;
+    m_pMiniportWave = NULL;
+    m_pPortTopology = NULL;
+    m_pMiniportTopology = NULL;
+    m_bInstantiated = FALSE;
+    m_bPluggedIn = FALSE;
 
     // Initialize HW.
     //
-    m_pHW = new (NonPagedPool, MICSER_POOLTAG)  CMicserHW;
+    m_pHW = new (NonPagedPool, MICSER_POOLTAG) CMicserHW;
     if (!m_pHW)
     {
         DPF(D_TERSE, ("Insufficient memory for MSVAD HW"));
@@ -303,8 +524,8 @@ Return Value:
 STDMETHODIMP
 CAdapterCommon::NonDelegatingQueryInterface
 (
-    REFIID                      Interface,
-    PVOID *                     Object
+    _In_         REFIID                      Interface,
+    _COM_Outptr_ PVOID *                     Object
 )
 /*++
 
@@ -390,6 +611,577 @@ Return Value:
 } // SetWaveServiceGroup
 
 //=============================================================================
+STDMETHODIMP_(NTSTATUS)
+CAdapterCommon::InstantiateDevices
+(
+    void
+)
+/*++
+
+Routine Description:
+
+  Instantiates the wave and topology ports and exposes them.
+
+Arguments:
+
+Return Value:
+
+  NTSTATUS
+
+--*/
+{
+    PAGED_CODE();
+
+    NTSTATUS ntStatus = STATUS_SUCCESS;
+
+    if (m_bInstantiated)
+    {
+        return STATUS_SUCCESS;
+    }
+
+    // If the mixer topology port is not exposed, create and expose it.
+    //
+    ntStatus = ExposeMixerTopology();
+
+    // Create and expose the wave topology.
+    //
+    if (NT_SUCCESS(ntStatus))
+    {
+        ntStatus = ExposeWaveTopology();
+    }
+
+    // Register the physical connection between wave and mixer topologies.
+    //
+    if (NT_SUCCESS(ntStatus))
+    {
+        ntStatus = ConnectTopologies();
+    }
+
+    if (NT_SUCCESS(ntStatus))
+    {
+        m_bInstantiated = TRUE;
+        m_bPluggedIn = TRUE;
+    }
+
+    return ntStatus;
+} // InstantiateDevices
+
+//=============================================================================
+STDMETHODIMP_(NTSTATUS)
+CAdapterCommon::UninstantiateDevices
+(
+    void
+)
+/*++
+
+Routine Description:
+
+  Uninstantiates the wave and topology ports.
+
+Arguments:
+
+Return Value:
+
+  NTSTATUS
+
+--*/
+{
+    PAGED_CODE();
+
+    NTSTATUS ntStatus = STATUS_SUCCESS;
+
+    // Check if we're already uninstantiated
+    //
+    if (!m_bInstantiated)
+    {
+        return ntStatus;
+    }
+
+    // Unregister the physical connection between wave and mixer topologies
+    // and unregister/unexpose the wave topology. This is the same as being
+    // unplugged.
+    //
+    if (NT_SUCCESS(ntStatus))
+    {
+        ntStatus = Unplug();
+    }
+
+    // Unregister the topo port
+    //
+    if (NT_SUCCESS(ntStatus))
+    {
+        ntStatus = UnexposeMixerTopology();
+    }
+
+    if (NT_SUCCESS(ntStatus))
+    {
+        m_bInstantiated = FALSE;
+        m_bPluggedIn = FALSE;
+    }
+
+    return ntStatus;
+} // UninstantiateDevices
+
+//=============================================================================
+STDMETHODIMP_(NTSTATUS)
+CAdapterCommon::Plugin
+(
+    void
+)
+/*++
+
+Routine Description:
+
+  Called in response to jacks being plugged in.
+
+Arguments:
+
+Return Value:
+
+  NTSTATUS
+
+--*/
+{
+    PAGED_CODE();
+
+    NTSTATUS ntStatus = STATUS_SUCCESS;
+
+    if (!m_bInstantiated)
+    {
+        return STATUS_INVALID_DEVICE_STATE;
+    }
+
+    if (m_bPluggedIn)
+    {
+        return ntStatus;
+    }
+
+    // Create and expose the wave topology.
+    //
+    if (NT_SUCCESS(ntStatus))
+    {
+        ntStatus = ExposeWaveTopology();
+    }
+
+    // Register the physical connection between wave and mixer topologies.
+    //
+    if (NT_SUCCESS(ntStatus))
+    {
+        ntStatus = ConnectTopologies();
+    }
+
+    if (NT_SUCCESS(ntStatus))
+    {
+        m_bPluggedIn = TRUE;
+    }
+
+    return ntStatus;
+} // Plugin
+
+//=============================================================================
+STDMETHODIMP_(NTSTATUS)
+CAdapterCommon::Unplug
+(
+    void
+)
+/*++
+
+Routine Description:
+
+  Called in response to jacks being unplugged.
+
+Arguments:
+
+Return Value:
+
+  NTSTATUS
+
+--*/
+{
+    PAGED_CODE();
+
+    NTSTATUS ntStatus = STATUS_SUCCESS;
+
+    if (!m_bInstantiated)
+    {
+        return STATUS_INVALID_DEVICE_STATE;
+    }
+
+    if (!m_bPluggedIn)
+    {
+        return ntStatus;
+    }
+
+    // Unregister the physical connection between wave and mixer topologies.
+    //
+    if (NT_SUCCESS(ntStatus))
+    {
+        ntStatus = DisconnectTopologies();
+    }
+
+    // Unregister and destroy the wave port
+    //
+    if (NT_SUCCESS(ntStatus))
+    {
+        ntStatus = UnexposeWaveTopology();
+    }
+
+    if (NT_SUCCESS(ntStatus))
+    {
+        m_bPluggedIn = FALSE;
+    }
+
+    return ntStatus;
+} // Unplug
+
+STDMETHODIMP_(NTSTATUS)
+CAdapterCommon::ExposeMixerTopology
+(
+    void
+)
+/*++
+
+Routine Description:
+
+  Creates and registers the mixer topology.
+
+Arguments:
+
+Return Value:
+
+  NTSTATUS
+
+--*/
+{
+    NTSTATUS ntStatus = STATUS_SUCCESS;
+
+    PAGED_CODE();
+
+    if (m_pPortTopology)
+    {
+        return ntStatus;
+    }
+
+    ntStatus = InstallSubdevice(
+        m_pDeviceObject,
+        NULL,
+        L"Topology",
+        CLSID_PortTopology,
+        CLSID_PortTopology,
+        CreateMiniportTopology,
+        PUNKNOWN(PADAPTERCOMMON(this)),
+        NULL,
+        IID_IPortTopology,
+        &m_pPortTopology,
+        &m_pMiniportTopology);
+
+    return ntStatus;
+}
+
+STDMETHODIMP_(NTSTATUS)
+CAdapterCommon::ExposeWaveTopology
+(
+    void
+)
+/*++
+
+Routine Description:
+
+  Creates and registers wave topology.
+
+Arguments:
+
+Return Value:
+
+  NTSTATUS
+
+--*/
+{
+    NTSTATUS ntStatus = STATUS_SUCCESS;
+
+    PAGED_CODE();
+
+    if (m_pPortWave)
+    {
+        return ntStatus;
+    }
+
+    ntStatus = InstallSubdevice(
+        m_pDeviceObject,
+        NULL,
+        L"Wave",
+        CLSID_PortWaveCyclic,
+        CLSID_PortWaveCyclic,
+        CreateMiniportWaveCyclic,
+        PUNKNOWN(PADAPTERCOMMON(this)),
+        NULL,
+        IID_IPortWaveCyclic,
+        &m_pPortWave,
+        &m_pMiniportWave);
+
+    return ntStatus;
+}
+
+STDMETHODIMP_(NTSTATUS)
+CAdapterCommon::UnexposeMixerTopology
+(
+    void
+)
+/*++
+
+Routine Description:
+
+  Unregisters and releases the mixer topology.
+
+Arguments:
+
+Return Value:
+
+  NTSTATUS
+
+--*/
+{
+    NTSTATUS                        ntStatus = STATUS_SUCCESS;
+    PUNREGISTERSUBDEVICE            pUnregisterSubdevice = NULL;
+
+    PAGED_CODE();
+
+    if (NULL == m_pPortTopology)
+    {
+        return ntStatus;
+    }
+
+    // Get the IUnregisterSubdevice interface.
+    //
+    ntStatus = m_pPortTopology->QueryInterface(IID_IUnregisterSubdevice,
+        (PVOID *)&pUnregisterSubdevice);
+
+    // Unregister the topo port.
+    //
+    if (NT_SUCCESS(ntStatus))
+    {
+        ntStatus = pUnregisterSubdevice->UnregisterSubdevice(
+            m_pDeviceObject,
+            m_pPortTopology);
+
+        // Release the IUnregisterSubdevice interface.
+        //
+        pUnregisterSubdevice->Release();
+
+        // At this point, we're done with the mixer topology and
+        // the miniport.
+        //
+        if (NT_SUCCESS(ntStatus))
+        {
+            m_pPortTopology->Release();
+            m_pPortTopology = NULL;
+
+            m_pMiniportTopology->Release();
+            m_pMiniportTopology = NULL;
+        }
+    }
+
+    return ntStatus;
+}
+
+STDMETHODIMP_(NTSTATUS)
+CAdapterCommon::UnexposeWaveTopology
+(
+    void
+)
+/*++
+
+Routine Description:
+
+  Unregisters and releases the wave topology.
+
+Arguments:
+
+Return Value:
+
+  NTSTATUS
+
+--*/
+{
+    NTSTATUS                        ntStatus = STATUS_SUCCESS;
+    PUNREGISTERSUBDEVICE            pUnregisterSubdevice = NULL;
+
+    PAGED_CODE();
+
+    if (NULL == m_pPortWave)
+    {
+        return ntStatus;
+    }
+
+    // Get the IUnregisterSubdevice interface.
+    //
+    ntStatus = m_pPortWave->QueryInterface(IID_IUnregisterSubdevice,
+        (PVOID *)&pUnregisterSubdevice);
+
+    // Unregister the wave port.
+    //
+    if (NT_SUCCESS(ntStatus))
+    {
+        ntStatus = pUnregisterSubdevice->UnregisterSubdevice(
+            m_pDeviceObject,
+            m_pPortWave);
+
+        // Release the IUnregisterSubdevice interface.
+        //
+        pUnregisterSubdevice->Release();
+
+        // At this point, we're done with the mixer topology and
+        // the miniport.
+        //
+        if (NT_SUCCESS(ntStatus))
+        {
+            m_pPortWave->Release();
+            m_pPortWave = NULL;
+
+            m_pMiniportWave->Release();
+            m_pMiniportWave = NULL;
+        }
+    }
+    return ntStatus;
+}
+
+STDMETHODIMP_(NTSTATUS)
+CAdapterCommon::ConnectTopologies
+(
+    void
+)
+/*++
+
+Routine Description:
+
+  Connects the bridge pins between the wave and mixer topologies.
+
+Arguments:
+
+Return Value:
+
+  NTSTATUS
+
+--*/
+{
+    NTSTATUS ntStatus = STATUS_SUCCESS;
+
+    PAGED_CODE();
+
+    // Connect the capture path.
+    //
+    if ((TopologyPhysicalConnections.ulTopologyOut != (ULONG)-1) &&
+        (TopologyPhysicalConnections.ulWaveIn != (ULONG)-1))
+    {
+        ntStatus = PcRegisterPhysicalConnection(
+            m_pDeviceObject,
+            m_pPortTopology,
+            TopologyPhysicalConnections.ulTopologyOut,
+            m_pPortWave,
+            TopologyPhysicalConnections.ulWaveIn);
+    }
+
+    // Connect the render path.
+    //
+    if (NT_SUCCESS(ntStatus))
+    {
+        if ((TopologyPhysicalConnections.ulWaveOut != (ULONG)-1) &&
+            (TopologyPhysicalConnections.ulTopologyIn != (ULONG)-1))
+        {
+            ntStatus = PcRegisterPhysicalConnection(
+                m_pDeviceObject,
+                m_pPortWave,
+                TopologyPhysicalConnections.ulWaveOut,
+                m_pPortTopology,
+                TopologyPhysicalConnections.ulTopologyIn
+            );
+        }
+    }
+
+    return ntStatus;
+}
+
+STDMETHODIMP_(NTSTATUS)
+CAdapterCommon::DisconnectTopologies
+(
+    void
+)
+/*++
+
+Routine Description:
+
+  Disconnects the bridge pins between the wave and mixer topologies.
+
+Arguments:
+
+Return Value:
+
+  NTSTATUS
+
+--*/
+{
+    NTSTATUS                        ntStatus = STATUS_SUCCESS;
+    NTSTATUS                        ntStatus2 = STATUS_SUCCESS;
+    PUNREGISTERPHYSICALCONNECTION   pUnregisterPhysicalConnection = NULL;
+
+    PAGED_CODE();
+
+    //
+    // Get the IUnregisterPhysicalConnection interface
+    //
+    ntStatus = m_pPortTopology->QueryInterface(IID_IUnregisterPhysicalConnection,
+        (PVOID *)&pUnregisterPhysicalConnection);
+    if (NT_SUCCESS(ntStatus))
+    {
+        //
+        // Remove the render physical connection
+        //
+        if ((TopologyPhysicalConnections.ulWaveOut != (ULONG)-1) &&
+            (TopologyPhysicalConnections.ulTopologyIn != (ULONG)-1))
+        {
+            ntStatus = pUnregisterPhysicalConnection->UnregisterPhysicalConnection(
+                m_pDeviceObject,
+                m_pPortWave,
+                TopologyPhysicalConnections.ulWaveOut,
+                m_pPortTopology,
+                TopologyPhysicalConnections.ulTopologyIn);
+
+            if (!NT_SUCCESS(ntStatus))
+            {
+                DPF(D_TERSE, ("DisconnectTopologies: UnregisterPhysicalConnection(render) failed, 0x%x", ntStatus));
+            }
+        }
+
+        //
+        // Remove the capture physical connection
+        //
+        if ((TopologyPhysicalConnections.ulTopologyOut != (ULONG)-1) &&
+            (TopologyPhysicalConnections.ulWaveIn != (ULONG)-1))
+        {
+            ntStatus2 = pUnregisterPhysicalConnection->UnregisterPhysicalConnection(
+                m_pDeviceObject,
+                m_pPortTopology,
+                TopologyPhysicalConnections.ulTopologyOut,
+                m_pPortWave,
+                TopologyPhysicalConnections.ulWaveIn);
+
+            if (!NT_SUCCESS(ntStatus2))
+            {
+                DPF(D_TERSE, ("DisconnectTopologies: UnregisterPhysicalConnection(capture) failed, 0x%x", ntStatus2));
+                if (NT_SUCCESS(ntStatus))
+                {
+                    ntStatus = ntStatus2;
+                }
+            }
+        }
+    }
+
+    SAFE_RELEASE(pUnregisterPhysicalConnection);
+
+    return ntStatus;
+}
+
+//=============================================================================
 STDMETHODIMP_(PUNKNOWN *)
 CAdapterCommon::WavePortDriverDest
 (
@@ -411,7 +1203,7 @@ Return Value:
 {
     PAGED_CODE();
 
-    return (PUNKNOWN *)&m_pPortWave;
+    return &m_pPortWave;
 } // WavePortDriverDest
 #pragma code_seg()
 
@@ -846,6 +1638,7 @@ Return Value:
 --*/
 {
     UNREFERENCED_PARAMETER(PowerDeviceCaps);
+
     DPF_ENTER(("[CAdapterCommon::QueryDeviceCapabilities]"));
 
     return (STATUS_SUCCESS);

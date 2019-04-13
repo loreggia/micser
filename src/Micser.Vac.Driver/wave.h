@@ -1,6 +1,6 @@
 /*
 Module Name:
-    wave.h
+    minwave.h
 
 Abstract:
     Definition of wavecyclic miniport class.

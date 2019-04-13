@@ -157,6 +157,25 @@ static PCPIN_DESCRIPTOR MiniportPins[] = {
     }
 };
 
+static
+KSJACK_DESCRIPTION JackDescSpeakers =
+{
+    KSAUDIO_SPEAKER_STEREO, // ChannelMapping
+    0xB3C98C,               // HDAudio color spec for green - 0x00rrggbb; (NOT a COLORREF)
+    eConnType3Point5mm,     // ConnectionType
+    eGeoLocRear,            // GeoLocation
+    eGenLocPrimaryBox,      // GenLocation
+    ePortConnJack,          // PortConnection
+    TRUE                    // IsConnected
+};
+
+static
+PKSJACK_DESCRIPTION JackDescriptions[] =
+{
+    NULL,
+    &JackDescSpeakers
+};
+
 //=============================================================================
 static PCPROPERTY_ITEM PropertiesVolume[] = {
     {
@@ -310,9 +329,23 @@ static PCCONNECTION_DESCRIPTOR MiniportConnections[] = {
 };
 
 //=============================================================================
+static
+PCPROPERTY_ITEM PropertiesTopoFilter[] =
+{
+    {
+        &KSPROPSETID_Jack,
+        KSPROPERTY_JACK_DESCRIPTION,
+        KSPROPERTY_TYPE_GET | KSPROPERTY_TYPE_BASICSUPPORT,
+        PropertyHandler_TopoFilter
+    }
+};
+
+DEFINE_PCAUTOMATION_TABLE_PROP(AutomationTopoFilter, PropertiesTopoFilter);
+
+//=============================================================================
 static PCFILTER_DESCRIPTOR MiniportFilterDescriptor = {
     0,                                  // Version
-    NULL,                               // AutomationTable
+    &AutomationTopoFilter,              // AutomationTable
     sizeof(PCPIN_DESCRIPTOR),           // PinSize
     SIZEOF_ARRAY(MiniportPins),         // PinCount
     MiniportPins,                       // Pins
