@@ -240,7 +240,6 @@ private:
     DEVICE_POWER_STATE      m_PowerState;
     PCMicserHW              m_pHW;                  // Virtual MSVAD HW object
     BOOL                    m_bInstantiated;        // Flag indicating whether or not subdevices are exposed
-    BOOL                    m_bPluggedIn;           // Flag indicating whether or not a jack is plugged in
 
     //=====================================================================
     // Helper routines for managing the states of topologies being exposed
@@ -256,7 +255,6 @@ public:
     // Default CUnknown
     DECLARE_STD_UNKNOWN();
     DEFINE_STD_CONSTRUCTOR(CAdapterCommon);
-    //CAdapterCommon(PUNKNOWN pUnknownOuter);
     ~CAdapterCommon();
 
     //=====================================================================
@@ -273,8 +271,6 @@ public:
     STDMETHODIMP_(PDEVICE_OBJECT)   GetDeviceObject(void);
     STDMETHODIMP_(NTSTATUS)         InstantiateDevices(void);
     STDMETHODIMP_(NTSTATUS)         UninstantiateDevices(void);
-    STDMETHODIMP_(NTSTATUS)         Plugin(void);
-    STDMETHODIMP_(NTSTATUS)         Unplug(void);
     STDMETHODIMP_(PUNKNOWN *)       WavePortDriverDest(void);
 
     STDMETHODIMP_(void) SetWaveServiceGroup(IN PSERVICEGROUP ServiceGroup);
@@ -292,7 +288,6 @@ public:
     STDMETHODIMP_(LONG) MixerVolumeRead(IN ULONG Index, IN LONG Channel);
     STDMETHODIMP_(void) MixerVolumeWrite(IN ULONG Index, IN LONG Channel, IN LONG Value);
     STDMETHODIMP_(BOOL) IsInstantiated() { return m_bInstantiated; };
-    STDMETHODIMP_(BOOL) IsPluggedIn() { return m_bPluggedIn; }
 
     //=====================================================================
     // friends
@@ -471,7 +466,6 @@ Return Value:
     m_pPortTopology = NULL;
     m_pMiniportTopology = NULL;
     m_bInstantiated = FALSE;
-    m_bPluggedIn = FALSE;
 
     // Initialize HW.
     //
@@ -657,7 +651,6 @@ Return Value:
     if (NT_SUCCESS(ntStatus))
     {
         m_bInstantiated = TRUE;
-        m_bPluggedIn = TRUE;
     }
 
     return ntStatus;
@@ -694,121 +687,6 @@ Return Value:
         return ntStatus;
     }
 
-    // Unregister the physical connection between wave and mixer topologies
-    // and unregister/unexpose the wave topology. This is the same as being
-    // unplugged.
-    //
-    if (NT_SUCCESS(ntStatus))
-    {
-        ntStatus = Unplug();
-    }
-
-    // Unregister the topo port
-    //
-    if (NT_SUCCESS(ntStatus))
-    {
-        ntStatus = UnexposeMixerTopology();
-    }
-
-    if (NT_SUCCESS(ntStatus))
-    {
-        m_bInstantiated = FALSE;
-        m_bPluggedIn = FALSE;
-    }
-
-    return ntStatus;
-} // UninstantiateDevices
-
-//=============================================================================
-STDMETHODIMP_(NTSTATUS)
-CAdapterCommon::Plugin
-(
-    void
-)
-/*++
-
-Routine Description:
-
-  Called in response to jacks being plugged in.
-
-Arguments:
-
-Return Value:
-
-  NTSTATUS
-
---*/
-{
-    PAGED_CODE();
-
-    NTSTATUS ntStatus = STATUS_SUCCESS;
-
-    if (!m_bInstantiated)
-    {
-        return STATUS_INVALID_DEVICE_STATE;
-    }
-
-    if (m_bPluggedIn)
-    {
-        return ntStatus;
-    }
-
-    // Create and expose the wave topology.
-    //
-    if (NT_SUCCESS(ntStatus))
-    {
-        ntStatus = ExposeWaveTopology(L"1");
-    }
-
-    // Register the physical connection between wave and mixer topologies.
-    //
-    if (NT_SUCCESS(ntStatus))
-    {
-        ntStatus = ConnectTopologies();
-    }
-
-    if (NT_SUCCESS(ntStatus))
-    {
-        m_bPluggedIn = TRUE;
-    }
-
-    return ntStatus;
-} // Plugin
-
-//=============================================================================
-STDMETHODIMP_(NTSTATUS)
-CAdapterCommon::Unplug
-(
-    void
-)
-/*++
-
-Routine Description:
-
-  Called in response to jacks being unplugged.
-
-Arguments:
-
-Return Value:
-
-  NTSTATUS
-
---*/
-{
-    PAGED_CODE();
-
-    NTSTATUS ntStatus = STATUS_SUCCESS;
-
-    if (!m_bInstantiated)
-    {
-        return STATUS_INVALID_DEVICE_STATE;
-    }
-
-    if (!m_bPluggedIn)
-    {
-        return ntStatus;
-    }
-
     // Unregister the physical connection between wave and mixer topologies.
     //
     if (NT_SUCCESS(ntStatus))
@@ -823,14 +701,22 @@ Return Value:
         ntStatus = UnexposeWaveTopology();
     }
 
+    // Unregister the topo port
+    //
     if (NT_SUCCESS(ntStatus))
     {
-        m_bPluggedIn = FALSE;
+        ntStatus = UnexposeMixerTopology();
+    }
+
+    if (NT_SUCCESS(ntStatus))
+    {
+        m_bInstantiated = FALSE;
     }
 
     return ntStatus;
-} // Unplug
+} // UninstantiateDevices
 
+//=============================================================================
 STDMETHODIMP_(NTSTATUS)
 CAdapterCommon::ExposeMixerTopology
 (
