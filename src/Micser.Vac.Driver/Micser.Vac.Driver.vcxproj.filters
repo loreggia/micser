@@ -45,10 +45,10 @@
     <ClInclude Include="micser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="wave.h">
+    <ClInclude Include="minwave.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="topo.h">
+    <ClInclude Include="mintopo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -68,10 +68,10 @@
     <ClCompile Include="wavestream.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="topo.cpp">
+    <ClCompile Include="mintopo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="wave.cpp">
+    <ClCompile Include="minwave.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

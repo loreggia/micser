@@ -1,12 +1,20 @@
-/*
+/*++
+
+Copyright (c) 1997-2000  Microsoft Corporation All Rights Reserved
+
 Module Name:
+
     kshelper.cpp
 
 Abstract:
+
     Helper functions for msvad
-*/
+
+--*/
 
 #include "kshelper.h"
+
+#pragma code_seg("PAGE")
 
 //-----------------------------------------------------------------------------
 PWAVEFORMATEX
@@ -14,11 +22,14 @@ GetWaveFormatEx
 (
     IN  PKSDATAFORMAT           pDataFormat
 )
-/*
+/*++
+
 Routine Description:
+
   Returns the waveformatex for known formats.
 
 Arguments:
+
   pDataFormat - data format.
 
 Return Value:
@@ -28,6 +39,8 @@ Return Value:
 
 --*/
 {
+    PAGED_CODE();
+
     PWAVEFORMATEX           pWfx = NULL;
 
     // If this is a known dataformat extract the waveformat info.
@@ -164,6 +177,8 @@ Return Value:
 
 --*/
 {
+    PAGED_CODE();
+
     NTSTATUS ntStatus = STATUS_UNSUCCESSFUL;
 
     if (PropertyRequest && cbSize)
