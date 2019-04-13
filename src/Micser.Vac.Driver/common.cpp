@@ -63,9 +63,8 @@ InstallSubdevice
     _In_opt_    PMINIPORTCREATE         MiniportCreate,
     _In_opt_    PUNKNOWN                UnknownAdapter,
     _In_opt_    PRESOURCELIST           ResourceList,
-    _In_opt_    REFGUID                 PortInterfaceId,
-    _Out_opt_   PUNKNOWN *              OutPortInterface,
-    _Out_opt_   PUNKNOWN *              OutPortUnknown
+    _Out_opt_   PUNKNOWN *              OutPortUnknown,
+    _Out_opt_   PUNKNOWN *              OutMiniportUnknown
 )
 {
     /*++
@@ -99,11 +98,9 @@ InstallSubdevice
 
         ResourceList - pointer to the resource list.
 
-        PortInterfaceId - GUID that represents the port interface.
-
-        OutPortInterface - pointer to store the port interface
-
         OutPortUnknown - pointer to store the unknown port interface.
+
+        OutMiniportUnknown - pointer to store the unknown miniport interface.
 
     Return Value:
 
@@ -200,13 +197,13 @@ InstallSubdevice
                 );
         }
 
-        if (OutPortInterface)
+        if (OutMiniportUnknown)
         {
             ntStatus =
                 miniport->QueryInterface
                 (
-                    PortInterfaceId,
-                    (PVOID *)OutPortInterface
+                    IID_IUnknown,
+                    (PVOID *)OutMiniportUnknown
                 );
         }
     }
@@ -871,7 +868,6 @@ Return Value:
         CreateMiniportTopology,
         PUNKNOWN(PADAPTERCOMMON(this)),
         NULL,
-        IID_IPortTopology,
         &m_pPortTopology,
         &m_pMiniportTopology);
 
@@ -915,7 +911,6 @@ Return Value:
         CreateMiniportWaveCyclic,
         PUNKNOWN(PADAPTERCOMMON(this)),
         NULL,
-        IID_IPortWaveCyclic,
         &m_pPortWave,
         &m_pMiniportWave);
 
