@@ -882,7 +882,7 @@ Return Value:
                         pMI->Count = 1;
 
                         RtlCopyMemory(pDesc, JackDescriptions[nPinId], sizeof(KSJACK_DESCRIPTION));
-                        pDesc->IsConnected = m_AdapterCommon->IsPluggedIn();
+                        pDesc->IsConnected = TRUE;
                         ntStatus = STATUS_SUCCESS;
                     }
                 }
