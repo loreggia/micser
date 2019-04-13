@@ -1,13 +1,13 @@
 /*
 Module Name:
-  sonicsaudio.h
+  micser.h
 
 Abstract:
   Header file for common stuff.
 */
 
-#ifndef __SONICSAUDIO_H_
-#define __SONICSAUDIO_H_
+#ifndef __MICSER_H_
+#define __MICSER_H_
 
 #include <portcls.h>
 #include <stdunk.h>
@@ -19,26 +19,26 @@ Abstract:
 //=============================================================================
 
 // Version number. Revision numbers are specified for each sample.
-#define SONICSAUDIO_VERSION               1
-#define SONICSAUDIO_REVISION              0
+#define MICSER_VERSION               1
+#define MICSER_REVISION              0
 
 // Product Id
-// {5B722BF8-F0AB-47ee-B9C8-8D61D31375A1}
-#define STATIC_PID_SONICSAUDIO 0x5b722bf8, 0xf0ab, 0x47ee, 0xb9, 0xc8, 0x8d, 0x61, 0xd3, 0x13, 0x75, 0xa1
-DEFINE_GUIDSTRUCT("5B722BF8-F0AB-47ee-B9C8-8D61D31375A1", PID_SONICSAUDIO);
-#define PID_SONICSAUDIO DEFINE_GUIDNAMED(PID_SONICSAUDIO)
+// {C70BB5FA-E8EE-4114-8D44-BF11584EBDF6}
+// 0xc70bb5fa, 0xe8ee, 0x4114, 0x8d, 0x44, 0xbf, 0x11, 0x58, 0x4e, 0xbd, 0xf6
+DEFINE_GUIDSTRUCT("C70BB5FA-E8EE-4114-8D44-BF11584EBDF6", PID_MICSER);
+#define PID_MICSER DEFINE_GUIDNAMED(PID_MICSER);
 
 // Name Guid
-// {946A7B1A-EBBC-422a-A81F-F07C8D40D3B4}
-#define STATIC_NAME_SONICSAUDIO 0x946a7b1a, 0xebbc, 0x422a, 0xa8, 0x1f, 0xf0, 0x7c, 0x8d, 0x40, 0xd3, 0xb4
-DEFINE_GUIDSTRUCT("946A7B1A-EBBC-422a-A81F-F07C8D40D3B4", NAME_SONICSAUDIO);
-#define NAME_SONICSAUDIO DEFINE_GUIDNAMED(NAME_SONICSAUDIO)
+// {68E1267A-9254-4EBC-B752-385C99909A81}
+// 0x68e1267a, 0x9254, 0x4ebc, 0xb7, 0x52, 0x38, 0x5c, 0x99, 0x90, 0x9a, 0x81);
+DEFINE_GUIDSTRUCT("68E1267A-9254-4EBC-B752-385C99909A81", NAME_MICSER);
+#define NAME_MICSER DEFINE_GUIDNAMED(NAME_MICSER)
 
 // Pool tag used for MSVAD allocations
-#define SONICSAUDIO_POOLTAG           'INOS'
+#define MICSER_POOLTAG           'MCSR'
 
 // Debug module name
-#define STR_MODULENAME              "SONICSAudio: "
+#define STR_MODULENAME              "Micser: "
 
 // Debug utility macros
 #define D_FUNC                      4
@@ -79,6 +79,9 @@ DEFINE_GUIDSTRUCT("946A7B1A-EBBC-422a-A81F-F07C8D40D3B4", NAME_SONICSAUDIO);
 #define DEV_SPECIFIC_VT_BOOL 9
 #define DEV_SPECIFIC_VT_I4   10
 #define DEV_SPECIFIC_VT_UI4  11
+
+// Safe release.
+#define SAFE_RELEASE(p) {if (p) { (p)->Release(); (p) = nullptr; } }
 
 //=============================================================================
 // Enumerations

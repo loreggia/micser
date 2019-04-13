@@ -13,16 +13,16 @@ Abstract:
     for the topology.
 
 --*/
-#include "sonicsaudio.h"
+#include "micser.h"
 #include "hw.h"
 
 //=============================================================================
-// CSONICSAudioHW
+// CMicserHW
 //=============================================================================
 
 //=============================================================================
 #pragma code_seg("PAGE")
-CSONICSAudioHW::CSONICSAudioHW()
+CMicserHW::CMicserHW()
     : m_ulMux(0),
     m_bDevSpecific(FALSE),
     m_iDevSpecific(0),
@@ -44,12 +44,12 @@ CSONICSAudioHW::CSONICSAudioHW()
     PAGED_CODE();
 
     MixerReset();
-} // CSONICSAudioHW
+} // CMicserHW
 #pragma code_seg()
 
 //=============================================================================
 BOOL
-CSONICSAudioHW::bGetDevSpecific()
+CMicserHW::bGetDevSpecific()
 /*++
 
 Routine Description:
@@ -71,7 +71,7 @@ Return Value:
 
 //=============================================================================
 void
-CSONICSAudioHW::bSetDevSpecific
+CMicserHW::bSetDevSpecific
 (
     IN  BOOL                bDevSpecific
 )
@@ -96,7 +96,7 @@ Return Value:
 
 //=============================================================================
 INT
-CSONICSAudioHW::iGetDevSpecific()
+CMicserHW::iGetDevSpecific()
 /*++
 
 Routine Description:
@@ -118,7 +118,7 @@ Return Value:
 
 //=============================================================================
 void
-CSONICSAudioHW::iSetDevSpecific
+CMicserHW::iSetDevSpecific
 (
     IN  INT                 iDevSpecific
 )
@@ -143,7 +143,7 @@ Return Value:
 
 //=============================================================================
 UINT
-CSONICSAudioHW::uiGetDevSpecific()
+CMicserHW::uiGetDevSpecific()
 /*++
 
 Routine Description:
@@ -165,7 +165,7 @@ Return Value:
 
 //=============================================================================
 void
-CSONICSAudioHW::uiSetDevSpecific
+CMicserHW::uiSetDevSpecific
 (
     IN  UINT                uiDevSpecific
 )
@@ -190,7 +190,7 @@ Return Value:
 
 //=============================================================================
 BOOL
-CSONICSAudioHW::GetMixerMute
+CMicserHW::GetMixerMute
 (
     IN  ULONG                   ulNode
 )
@@ -220,7 +220,7 @@ Return Value:
 
 //=============================================================================
 ULONG
-CSONICSAudioHW::GetMixerMux()
+CMicserHW::GetMixerMux()
 /*++
 
 Routine Description:
@@ -240,7 +240,7 @@ Return Value:
 
 //=============================================================================
 LONG
-CSONICSAudioHW::GetMixerVolume
+CMicserHW::GetMixerVolume
 (
     IN  ULONG                   ulNode,
     IN  LONG                    lChannel
@@ -275,7 +275,7 @@ Return Value:
 //=============================================================================
 #pragma code_seg("PAGE")
 void
-CSONICSAudioHW::MixerReset()
+CMicserHW::MixerReset()
 /*++
 
 Routine Description:
@@ -302,7 +302,7 @@ Return Value:
 
 //=============================================================================
 void
-CSONICSAudioHW::SetMixerMute
+CMicserHW::SetMixerMute
 (
     IN  ULONG                   ulNode,
     IN  BOOL                    fMute
@@ -333,7 +333,7 @@ Return Value:
 
 //=============================================================================
 void
-CSONICSAudioHW::SetMixerMux
+CMicserHW::SetMixerMux
 (
     IN  ULONG                   ulNode
 )
@@ -358,7 +358,7 @@ Return Value:
 
 //=============================================================================
 void
-CSONICSAudioHW::SetMixerVolume
+CMicserHW::SetMixerVolume
 (
     IN  ULONG                   ulNode,
     IN  LONG                    lChannel,

@@ -6,7 +6,7 @@ Abstract:
   Implementation of the AdapterCommon class.
 */
 
-#include "sonicsaudio.h"
+#include "micser.h"
 #include "common.h"
 #include "hw.h"
 
@@ -25,7 +25,7 @@ private:
     PDEVICE_OBJECT          m_pDeviceObject;
     DEVICE_POWER_STATE      m_PowerState;
 
-    PCSONICSAudioHW           m_pHW;          // VAD HW object
+    PCMicserHW           m_pHW;          // VAD HW object
 
 public:
     //=====================================================================
@@ -257,7 +257,7 @@ Return Value:
 
     // Initialize HW.
     //
-    m_pHW = new (NonPagedPool, SONICSAUDIO_POOLTAG)  CSONICSAudioHW;
+    m_pHW = new (NonPagedPool, MICSER_POOLTAG)  CMicserHW;
     if (!m_pHW)
     {
         DPF(D_TERSE, ("Insufficient memory for MSVAD HW"));

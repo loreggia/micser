@@ -5,12 +5,12 @@ Module Name:
 Abstract:
   WaveCyclicStream-Miniport and IDmaChannel implementation. Does nothing HW related.
 */
-#include "sonicsaudio.h"
+#include "micser.h"
 #include "common.h"
 #include "wave.h"
 #include "wavestream.h"
 
-#define DBGMESSAGE "[SONICS-Audio] wavestream.cpp: "
+#define DBGMESSAGE "[Micser] wavestream.cpp: "
 #define DBGPRINT(x) DbgPrint(DBGMESSAGE x)
 
 //=============================================================================
@@ -183,7 +183,7 @@ Return Value:
         m_pDpc = (PRKDPC)ExAllocatePoolWithTag(
             NonPagedPool,
             sizeof(KDPC),
-            SONICSAUDIO_POOLTAG
+            MICSER_POOLTAG
         );
         if (!m_pDpc) {
             DPF(D_TERSE, ("[Could not allocate memory for DPC]"));
@@ -195,7 +195,7 @@ Return Value:
         m_pTimer = (PKTIMER)ExAllocatePoolWithTag(
             NonPagedPool,
             sizeof(KTIMER),
-            SONICSAUDIO_POOLTAG
+            MICSER_POOLTAG
         );
         if (!m_pTimer) {
             DPF(D_TERSE, ("[Could not allocate memory for Timer]"));
@@ -548,7 +548,7 @@ Return Value:
 
     //NTSTATUS ntStatus = STATUS_SUCCESS;
 
-    //m_pvDmaBuffer = (PVOID) ExAllocatePoolWithTag(NonPagedPool, BufferSize, SONICSAUDIO_POOLTAG);
+    //m_pvDmaBuffer = (PVOID) ExAllocatePoolWithTag(NonPagedPool, BufferSize, MICSER_POOLTAG);
     //if (!m_pvDmaBuffer) {
     //    ntStatus = STATUS_INSUFFICIENT_RESOURCES;
     //} else {
