@@ -33,13 +33,7 @@
     <ClInclude Include="kshelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="topo.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="toptable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="wave.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="wavtable.h">
@@ -49,6 +43,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="micser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="wave.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="topo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -65,13 +65,13 @@
     <ClCompile Include="kshelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="wavestream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="topo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="wave.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="wavestream.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

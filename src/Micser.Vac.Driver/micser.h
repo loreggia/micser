@@ -140,6 +140,23 @@ typedef struct _PHYSICALCONNECTIONTABLE {
     ULONG       ulWaveOut;
 } PHYSICALCONNECTIONTABLE, *PPHYSICALCONNECTIONTABLE;
 
+// This is the structure of the portclass FDO device extension Nt has created
+// for us.  We keep the adapter common object here.
+struct IAdapterCommon;
+typedef struct _PortClassDeviceContext              // 32       64      Byte offsets for 32 and 64 bit architectures
+{
+    ULONG_PTR m_pulReserved1[2];                    // 0-7      0-15    First two pointers are reserved.
+    PDEVICE_OBJECT m_DoNotUsePhysicalDeviceObject;  // 8-11     16-23   Reserved pointer to our Physical Device Object (PDO).
+    PVOID m_pvReserved2;                            // 12-15    24-31   Reserved pointer to our Start Device function.
+    PVOID m_pvReserved3;                            // 16-19    32-39   "Out Memory" according to DDK.
+    IAdapterCommon* m_pCommon;                      // 20-23    40-47   Pointer to our adapter common object.
+    PVOID m_pvUnused1;                              // 24-27    48-55   Unused space.
+    PVOID m_pvUnused2;                              // 28-31    56-63   Unused space.
+
+    // Anything after above line should not be used.
+    // This actually goes on for (64*sizeof(ULONG_PTR)) but it is all opaque.
+} PortClassDeviceContext;
+
 //=============================================================================
 // Externs
 //=============================================================================
