@@ -244,8 +244,8 @@ private:
 
     //=====================================================================
     // Helper routines for managing the states of topologies being exposed
-    STDMETHODIMP_(NTSTATUS) ExposeMixerTopology();
-    STDMETHODIMP_(NTSTATUS) ExposeWaveTopology();
+    STDMETHODIMP_(NTSTATUS) ExposeMixerTopology(IN PWSTR Name);
+    STDMETHODIMP_(NTSTATUS) ExposeWaveTopology(IN PWSTR Name);
     STDMETHODIMP_(NTSTATUS) UnexposeMixerTopology();
     STDMETHODIMP_(NTSTATUS) UnexposeWaveTopology();
     STDMETHODIMP_(NTSTATUS) ConnectTopologies();
@@ -638,13 +638,13 @@ Return Value:
 
     // If the mixer topology port is not exposed, create and expose it.
     //
-    ntStatus = ExposeMixerTopology();
+    ntStatus = ExposeMixerTopology(L"1");
 
     // Create and expose the wave topology.
     //
     if (NT_SUCCESS(ntStatus))
     {
-        ntStatus = ExposeWaveTopology();
+        ntStatus = ExposeWaveTopology(L"2");
     }
 
     // Register the physical connection between wave and mixer topologies.
@@ -757,7 +757,7 @@ Return Value:
     //
     if (NT_SUCCESS(ntStatus))
     {
-        ntStatus = ExposeWaveTopology();
+        ntStatus = ExposeWaveTopology(L"1");
     }
 
     // Register the physical connection between wave and mixer topologies.
@@ -834,7 +834,7 @@ Return Value:
 STDMETHODIMP_(NTSTATUS)
 CAdapterCommon::ExposeMixerTopology
 (
-    void
+    IN PWSTR Name
 )
 /*++
 
@@ -862,7 +862,7 @@ Return Value:
     ntStatus = InstallSubdevice(
         m_pDeviceObject,
         NULL,
-        L"Topology",
+        (L"Topology%s", Name),
         CLSID_PortTopology,
         CLSID_PortTopology,
         CreateMiniportTopology,
@@ -877,7 +877,7 @@ Return Value:
 STDMETHODIMP_(NTSTATUS)
 CAdapterCommon::ExposeWaveTopology
 (
-    void
+    IN PWSTR Name
 )
 /*++
 
@@ -905,7 +905,7 @@ Return Value:
     ntStatus = InstallSubdevice(
         m_pDeviceObject,
         NULL,
-        L"Wave",
+        (L"Wave%s", Name),
         CLSID_PortWaveCyclic,
         CLSID_PortWaveCyclic,
         CreateMiniportWaveCyclic,
