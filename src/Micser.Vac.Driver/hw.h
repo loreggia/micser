@@ -21,11 +21,11 @@ Abstract:
 // Classes
 //=============================================================================
 ///////////////////////////////////////////////////////////////////////////////
-// CSONICSAudioHW
+// CMicserHW
 // This class represents virtual MSVAD HW. An array representing volume
 // registers and mute registers.
 
-class CSONICSAudioHW {
+class CMicserHW {
 protected:
     BOOL   m_MuteControls[MAX_TOPOLOGY_NODES];
     LONG   m_VolumeControls[MAX_TOPOLOGY_NODES];
@@ -35,7 +35,7 @@ protected:
     UINT   m_uiDevSpecific;
 
 public:
-    CSONICSAudioHW();
+    CMicserHW();
     void MixerReset();
 
     BOOL bGetDevSpecific();
@@ -54,6 +54,6 @@ public:
     LONG GetMixerVolume(IN ULONG ulNode, IN LONG lChannel);
     void SetMixerVolume(IN ULONG ulNode, IN LONG lChannel, IN LONG lVolume);
 };
-typedef CSONICSAudioHW *PCSONICSAudioHW;
+typedef CMicserHW *PCMicserHW;
 
 #endif

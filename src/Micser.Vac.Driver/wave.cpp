@@ -6,7 +6,7 @@ Abstract:
     Implementation of wavecyclic miniport.
 */
 
-#include "sonicsaudio.h"
+#include "micser.h"
 #include "common.h"
 #include "wave.h"
 #include "wavestream.h"
@@ -373,7 +373,7 @@ Return Value:
         m_ulTranBufSize = 0;
         m_lRecPos = 0;
         m_lDataLen = 0;
-        m_pvTranBuf = (PVOID)ExAllocatePoolWithTag(NonPagedPool, TRAN_BUFFER_SIZE, SONICSAUDIO_POOLTAG);
+        m_pvTranBuf = (PVOID)ExAllocatePoolWithTag(NonPagedPool, TRAN_BUFFER_SIZE, MICSER_POOLTAG);
         if (!m_pvTranBuf)
         {
             DPF_ENTER(("Cann't ALLOC BUFFER!"));
@@ -481,7 +481,7 @@ Return Value:
     // Instantiate a stream. Stream must be in
     // NonPagedPool because of file saving.
     if (NT_SUCCESS(ntStatus)) {
-        stream = new (NonPagedPool, SONICSAUDIO_POOLTAG) CMiniportWaveCyclicStream(OuterUnknown);
+        stream = new (NonPagedPool, MICSER_POOLTAG) CMiniportWaveCyclicStream(OuterUnknown);
         if (stream) {
             stream->AddRef();
             ntStatus = stream->Init(this, Pin, Capture, DataFormat);
@@ -597,11 +597,11 @@ Return Value:
                 PKSCOMPONENTID pComponentId = (PKSCOMPONENTID)PropertyRequest->Value;
 
                 INIT_MMREG_MID(&pComponentId->Manufacturer, MM_MICROSOFT);
-                pComponentId->Product = PID_SONICSAUDIO;
-                pComponentId->Name = NAME_SONICSAUDIO;
+                pComponentId->Product = PID_MICSER;
+                pComponentId->Name = NAME_MICSER;
                 pComponentId->Component = GUID_NULL; // Not used for extended caps.
-                pComponentId->Version = SONICSAUDIO_VERSION;
-                pComponentId->Revision = SONICSAUDIO_REVISION;
+                pComponentId->Version = MICSER_VERSION;
+                pComponentId->Revision = MICSER_REVISION;
 
                 PropertyRequest->ValueSize = sizeof(KSCOMPONENTID);
                 ntStatus = STATUS_SUCCESS;

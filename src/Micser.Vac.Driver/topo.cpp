@@ -6,7 +6,7 @@ Abstract:
   Implementation of topology miniport.
 */
 
-#include "sonicsaudio.h"
+#include "micser.h"
 #include "common.h"
 #include "wave.h"
 #include "topo.h"
