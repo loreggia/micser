@@ -6,6 +6,8 @@ Abstract:
   Implementation of the AdapterCommon class.
 */
 
+#include <ntstatus.h>
+#include <ntstrsafe.h>
 #include "micser.h"
 #include "common.h"
 #include "hw.h"
@@ -243,12 +245,12 @@ private:
 
     //=====================================================================
     // Helper routines for managing the states of topologies being exposed
-    STDMETHODIMP_(NTSTATUS) ExposeMixerTopology(IN PWSTR Name);
-    STDMETHODIMP_(NTSTATUS) ExposeWaveTopology(IN PWSTR Name);
-    STDMETHODIMP_(NTSTATUS) UnexposeMixerTopology();
-    STDMETHODIMP_(NTSTATUS) UnexposeWaveTopology();
-    STDMETHODIMP_(NTSTATUS) ConnectTopologies();
-    STDMETHODIMP_(NTSTATUS) DisconnectTopologies();
+    STDMETHODIMP_(NTSTATUS) ExposeMixerTopology(IN INT Index);
+    STDMETHODIMP_(NTSTATUS) ExposeWaveTopology(IN INT Index);
+    STDMETHODIMP_(NTSTATUS) UnexposeMixerTopology(IN INT Index);
+    STDMETHODIMP_(NTSTATUS) UnexposeWaveTopology(IN INT Index);
+    STDMETHODIMP_(NTSTATUS) ConnectTopologies(IN INT Index);
+    STDMETHODIMP_(NTSTATUS) DisconnectTopologies(IN INT Index);
 
 public:
     //=====================================================================
@@ -632,20 +634,20 @@ Return Value:
 
     // If the mixer topology port is not exposed, create and expose it.
     //
-    ntStatus = ExposeMixerTopology(L"1");
+    ntStatus = ExposeMixerTopology(0);
 
     // Create and expose the wave topology.
     //
     if (NT_SUCCESS(ntStatus))
     {
-        ntStatus = ExposeWaveTopology(L"2");
+        ntStatus = ExposeWaveTopology(0);
     }
 
     // Register the physical connection between wave and mixer topologies.
     //
     if (NT_SUCCESS(ntStatus))
     {
-        ntStatus = ConnectTopologies();
+        ntStatus = ConnectTopologies(0);
     }
 
     if (NT_SUCCESS(ntStatus))
@@ -691,21 +693,21 @@ Return Value:
     //
     if (NT_SUCCESS(ntStatus))
     {
-        ntStatus = DisconnectTopologies();
+        ntStatus = DisconnectTopologies(0);
     }
 
     // Unregister and destroy the wave port
     //
     if (NT_SUCCESS(ntStatus))
     {
-        ntStatus = UnexposeWaveTopology();
+        ntStatus = UnexposeWaveTopology(0);
     }
 
     // Unregister the topo port
     //
     if (NT_SUCCESS(ntStatus))
     {
-        ntStatus = UnexposeMixerTopology();
+        ntStatus = UnexposeMixerTopology(0);
     }
 
     if (NT_SUCCESS(ntStatus))
@@ -720,7 +722,7 @@ Return Value:
 STDMETHODIMP_(NTSTATUS)
 CAdapterCommon::ExposeMixerTopology
 (
-    IN PWSTR Name
+    IN INT Index
 )
 /*++
 
@@ -748,7 +750,7 @@ Return Value:
     ntStatus = InstallSubdevice(
         m_pDeviceObject,
         NULL,
-        (L"Topology%s", Name),
+        L"Topology", //(L"Topology%i", Index),
         CLSID_PortTopology,
         CLSID_PortTopology,
         CreateMiniportTopology,
@@ -763,7 +765,7 @@ Return Value:
 STDMETHODIMP_(NTSTATUS)
 CAdapterCommon::ExposeWaveTopology
 (
-    IN PWSTR Name
+    IN INT Index
 )
 /*++
 
@@ -791,7 +793,7 @@ Return Value:
     ntStatus = InstallSubdevice(
         m_pDeviceObject,
         NULL,
-        (L"Wave%s", Name),
+        L"Wave", //(L"Wave%i", Index),
         CLSID_PortWaveCyclic,
         CLSID_PortWaveCyclic,
         CreateMiniportWaveCyclic,
@@ -806,7 +808,7 @@ Return Value:
 STDMETHODIMP_(NTSTATUS)
 CAdapterCommon::UnexposeMixerTopology
 (
-    void
+    IN INT Index
 )
 /*++
 
@@ -868,7 +870,7 @@ Return Value:
 STDMETHODIMP_(NTSTATUS)
 CAdapterCommon::UnexposeWaveTopology
 (
-    void
+    IN INT Index
 )
 /*++
 
@@ -929,7 +931,7 @@ Return Value:
 STDMETHODIMP_(NTSTATUS)
 CAdapterCommon::ConnectTopologies
 (
-    void
+    IN INT Index
 )
 /*++
 
@@ -985,7 +987,7 @@ Return Value:
 STDMETHODIMP_(NTSTATUS)
 CAdapterCommon::DisconnectTopologies
 (
-    void
+    IN INT Index
 )
 /*++
 
@@ -1066,7 +1068,7 @@ Return Value:
 STDMETHODIMP_(PUNKNOWN *)
 CAdapterCommon::WavePortDriverDest
 (
-    void
+    VOID
 )
 /*++
 
