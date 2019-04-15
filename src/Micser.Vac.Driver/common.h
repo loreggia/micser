@@ -29,7 +29,6 @@ DECLARE_INTERFACE_(IAdapterCommon, IUnknown)
     STDMETHOD_(VOID, SetWaveServiceGroup) (THIS_ IN PSERVICEGROUP ServiceGroup) PURE;
     STDMETHOD_(NTSTATUS, InstantiateDevices) (THIS) PURE;
     STDMETHOD_(NTSTATUS, UninstantiateDevices) (THIS) PURE;
-    STDMETHOD_(PUNKNOWN *, WavePortDriverDest) (THIS) PURE;
     STDMETHOD_(BOOL, bDevSpecificRead) (THIS_) PURE;
     STDMETHOD_(VOID, bDevSpecificWrite) (THIS_ IN BOOL bDevSpecific);
     STDMETHOD_(INT, iDevSpecificRead) (THIS_) PURE;
