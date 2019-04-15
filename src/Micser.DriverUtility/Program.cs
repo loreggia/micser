@@ -1,5 +1,4 @@
 ﻿using Micser.Common;
-using Micser.Plugins.Main.Driver;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
@@ -72,15 +71,13 @@ namespace Micser.DriverUtility
                     return -1;
                 }
 
-                var installer = new DriverInstaller(deviceId);
+                var installer = new DriverInstaller();
 
                 if (arguments.HasFlag(Globals.DriverUtility.InstallFlag))
                 {
-                    installer.Install();
                 }
                 else if (arguments.HasFlag(Globals.DriverUtility.UninstallFlag))
                 {
-                    installer.Uninstall();
                 }
             }
             catch (Exception ex)
