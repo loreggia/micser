@@ -16,8 +16,7 @@ DeviceInstallation_CoInstaller_CopyFiles = 11
 1 = %DiskName%,,,""
 
 [SourceDisksFiles]
-Micser.Vac.Driver.sys  = 1,,
-WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll=1 ; make sure the number matches with SourceDisksNames
+Micser.Vac.Driver.sys = 1,,
 
 ;*****************************************
 ; Install Section
@@ -47,30 +46,11 @@ StartType      = 3               ; SERVICE_DEMAND_START
 ErrorControl   = 1               ; SERVICE_ERROR_NORMAL
 ServiceBinary  = %12%\Micser.Vac.Driver.sys
 
-;
-;--- DeviceInstallation Coinstaller installation ------
-;
-
-[DeviceInstallation.NT.CoInstallers]
-AddReg=DeviceInstallation_CoInstaller_AddReg
-CopyFiles=DeviceInstallation_CoInstaller_CopyFiles
-
-[DeviceInstallation_CoInstaller_AddReg]
-HKR,,CoInstallers32,0x00010000, "WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll,WdfCoInstaller"
-
-[DeviceInstallation_CoInstaller_CopyFiles]
-WdfCoInstaller$KMDFCOINSTALLERVERSION$.dll
-
-[DeviceInstallation.NT.Wdf]
-KmdfService =  Micser.Vac.Driver, Micser.Vac.Driver_wdfsect
-[Micser.Vac.Driver_wdfsect]
-KmdfLibraryVersion = $KMDFVERSION$
-
 [Strings]
 SPSVCINST_ASSOCSERVICE= 0x00000002
 ManufacturerName="Lucas Loreggia" ; DONE: Replace with your manufacturer name
 ClassName="Micser" ; DONE: edit ClassName
 DiskName = "Micser.Vac.Driver Installation Disk"
-DeviceName = "Micser.Vac.Driver Device"
+DeviceName = "Micser Virtual Audio Cable"
 Micser.Vac.Driver.SVCDESC = "Micser.Vac.Driver Service"
 HardwareId = "Root\Micser.Vac.Driver"

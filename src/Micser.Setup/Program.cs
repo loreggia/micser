@@ -16,11 +16,17 @@ namespace Micser.Setup
             }
 
             var project =
-                new ManagedProject("Micser",
-                                   new Dir(@"%ProgramFiles%\Micser", new Files(@"App\*.*", FileFilter)),
-                                   new Dir(@"%ProgramMenu%\Micser",
-                                       new ExeFileShortcut("Micser", @"[INSTALLDIR]\App\Micser.App.exe", ""),
-                                       new ExeFileShortcut("Uninstall Micser", "[SystemFolder]msiexec.exe", "/x [ProductCode]")))
+                new ManagedProject(
+                    "Micser",
+                    new Dir(@"%ProgramFiles%\Micser",
+                        new Files(@"App\*.*", FileFilter)
+                    //, new Files(@"Driver\*.*") { Id = "asdf", ComponentId = "component-id", }
+                    ),
+                    new Dir(@"%ProgramMenu%\Micser",
+                        new ExeFileShortcut("Micser", @"[INSTALLDIR]\App\Micser.App.exe", ""),
+                        new ExeFileShortcut("Uninstall Micser", "[SystemFolder]msiexec.exe", "/x [ProductCode]")
+                    )
+                )
                 {
                     GUID = new Guid("6fe30b47-2577-43ad-9095-1861ba25889b"),
                     ManagedUI = new ManagedUI()
