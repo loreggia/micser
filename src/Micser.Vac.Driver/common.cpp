@@ -272,6 +272,7 @@ public:
 
     STDMETHODIMP_(PDEVICE_OBJECT)   GetDeviceObject(void);
     STDMETHODIMP_(NTSTATUS)         InstantiateDevices(void);
+    STDMETHODIMP_(NTSTATUS)         InstantiateDevice(IN INT Index);
     STDMETHODIMP_(NTSTATUS)         UninstantiateDevices(void);
 
     STDMETHODIMP_(void) SetWaveServiceGroup(IN PSERVICEGROUP ServiceGroup);
@@ -635,22 +636,10 @@ Return Value:
         return STATUS_SUCCESS;
     }
 
-    // If the mixer topology port is not exposed, create and expose it.
-    //
-    ntStatus = ExposeMixerTopology(0);
+    ntStatus = InstantiateDevice(0);
 
-    // Create and expose the wave topology.
-    //
-    if (NT_SUCCESS(ntStatus))
-    {
-        ntStatus = ExposeWaveTopology(0);
-    }
-
-    // Register the physical connection between wave and mixer topologies.
-    //
-    if (NT_SUCCESS(ntStatus))
-    {
-        ntStatus = ConnectTopologies(0);
+    if (NT_SUCCESS(ntStatus)) {
+        ntStatus = InstantiateDevice(1);
     }
 
     if (NT_SUCCESS(ntStatus))
@@ -660,6 +649,52 @@ Return Value:
 
     return ntStatus;
 } // InstantiateDevices
+
+STDMETHODIMP_(NTSTATUS)
+CAdapterCommon::InstantiateDevice
+(
+    IN INT Index
+)
+/*++
+
+Routine Description:
+
+  Instantiates the wave and topology ports for interface <Index> and exposes them.
+
+Arguments:
+
+    Index - Index of the interface
+
+Return Value:
+
+  NTSTATUS
+
+--*/
+{
+    PAGED_CODE();
+
+    NTSTATUS ntStatus = STATUS_SUCCESS;
+
+    // If the mixer topology port is not exposed, create and expose it.
+    //
+    ntStatus = ExposeMixerTopology(Index);
+
+    // Create and expose the wave topology.
+    //
+    if (NT_SUCCESS(ntStatus))
+    {
+        ntStatus = ExposeWaveTopology(Index);
+    }
+
+    // Register the physical connection between wave and mixer topologies.
+    //
+    if (NT_SUCCESS(ntStatus))
+    {
+        ntStatus = ConnectTopologies(Index);
+    }
+
+    return ntStatus;
+} // InstantiateDevice
 
 //=============================================================================
 STDMETHODIMP_(NTSTATUS)

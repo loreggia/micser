@@ -28,6 +28,7 @@ DECLARE_INTERFACE_(IAdapterCommon, IUnknown)
     STDMETHOD_(PDEVICE_OBJECT, GetDeviceObject) (THIS) PURE;
     STDMETHOD_(VOID, SetWaveServiceGroup) (THIS_ IN PSERVICEGROUP ServiceGroup) PURE;
     STDMETHOD_(NTSTATUS, InstantiateDevices) (THIS) PURE;
+    STDMETHOD_(NTSTATUS, InstantiateDevice) (THIS_ IN INT Index) PURE;
     STDMETHOD_(NTSTATUS, UninstantiateDevices) (THIS) PURE;
     STDMETHOD_(BOOL, bDevSpecificRead) (THIS_) PURE;
     STDMETHOD_(VOID, bDevSpecificWrite) (THIS_ IN BOOL bDevSpecific);
