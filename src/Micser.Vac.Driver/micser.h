@@ -22,6 +22,9 @@ Abstract:
 #define MICSER_VERSION               1
 #define MICSER_REVISION              0
 
+// the maximum number of interfaces/cables
+#define MAX_INTERFACES 32
+
 // Product Id
 // {C70BB5FA-E8EE-4114-8D44-BF11584EBDF6}
 // 0xc70bb5fa, 0xe8ee, 0x4114, 0x8d, 0x44, 0xbf, 0x11, 0x58, 0x4e, 0xbd, 0xf6

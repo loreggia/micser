@@ -233,10 +233,10 @@ InstallSubdevice
 
 class CAdapterCommon : public IAdapterCommon, public IAdapterPowerManagement, public CUnknown {
 private:
-    PUNKNOWN                m_pPortWave;            // Port Wave Interface
-    PUNKNOWN                m_pMiniportWave;        // Miniport Wave Interface
-    PUNKNOWN                m_pPortTopology;        // Port Mixer Topology Interface
-    PUNKNOWN                m_pMiniportTopology;    // Miniport Mixer Topology Interface
+    PUNKNOWN                m_pPortsWave[MAX_INTERFACES];            // Port Wave Interfaces
+    PUNKNOWN                m_pMiniportsWave[MAX_INTERFACES];        // Miniport Wave Interfaces
+    PUNKNOWN                m_pPortsTopology[MAX_INTERFACES];        // Port Mixer Topology Interfaces
+    PUNKNOWN                m_pMiniportsTopology[MAX_INTERFACES];    // Miniport Mixer Topology Interfaces
     PSERVICEGROUP           m_pServiceGroupWave;
     PDEVICE_OBJECT          m_pDeviceObject;
     DEVICE_POWER_STATE      m_PowerState;
@@ -273,7 +273,6 @@ public:
     STDMETHODIMP_(PDEVICE_OBJECT)   GetDeviceObject(void);
     STDMETHODIMP_(NTSTATUS)         InstantiateDevices(void);
     STDMETHODIMP_(NTSTATUS)         UninstantiateDevices(void);
-    STDMETHODIMP_(PUNKNOWN *)       WavePortDriverDest(void);
 
     STDMETHODIMP_(void) SetWaveServiceGroup(IN PSERVICEGROUP ServiceGroup);
     STDMETHODIMP_(BOOL) bDevSpecificRead();
@@ -375,29 +374,33 @@ Return Value:
     {
         delete m_pHW;
     }
+    UINT i;
 
-    if (m_pMiniportWave)
+    for (i = 0; i < MAX_INTERFACES; i++)
     {
-        m_pMiniportWave->Release();
-        m_pMiniportWave = NULL;
-    }
+        if (m_pMiniportsWave[i])
+        {
+            m_pMiniportsWave[i]->Release();
+            m_pMiniportsWave[i] = NULL;
+        }
 
-    if (m_pPortWave)
-    {
-        m_pPortWave->Release();
-        m_pPortWave = NULL;
-    }
+        if (m_pPortsWave[i])
+        {
+            m_pPortsWave[i]->Release();
+            m_pPortsWave[i] = NULL;
+        }
 
-    if (m_pMiniportTopology)
-    {
-        m_pMiniportTopology->Release();
-        m_pMiniportTopology = NULL;
-    }
+        if (m_pMiniportsTopology[i])
+        {
+            m_pMiniportsTopology[i]->Release();
+            m_pMiniportsTopology[i] = NULL;
+        }
 
-    if (m_pPortTopology)
-    {
-        m_pPortTopology->Release();
-        m_pPortTopology = NULL;
+        if (m_pPortsTopology[i])
+        {
+            m_pPortsTopology[i]->Release();
+            m_pPortsTopology[i] = NULL;
+        }
     }
 
     if (m_pServiceGroupWave)
@@ -463,10 +466,10 @@ Return Value:
 
     m_pDeviceObject = DeviceObject;
     m_PowerState = PowerDeviceD0;
-    m_pPortWave = NULL;
-    m_pMiniportWave = NULL;
-    m_pPortTopology = NULL;
-    m_pMiniportTopology = NULL;
+    //m_pPortWave = NULL;
+    //m_pMiniportWave = NULL;
+    //m_pPortTopology = NULL;
+    //m_pMiniportTopology = NULL;
     m_bInstantiated = FALSE;
 
     // Initialize HW.
@@ -742,7 +745,7 @@ Return Value:
 
     PAGED_CODE();
 
-    if (m_pPortTopology)
+    if (m_pPortsTopology[Index])
     {
         return ntStatus;
     }
@@ -756,8 +759,8 @@ Return Value:
         CreateMiniportTopology,
         PUNKNOWN(PADAPTERCOMMON(this)),
         NULL,
-        &m_pPortTopology,
-        &m_pMiniportTopology);
+        &m_pPortsTopology[Index],
+        &m_pMiniportsTopology[Index]);
 
     return ntStatus;
 }
@@ -785,7 +788,7 @@ Return Value:
 
     PAGED_CODE();
 
-    if (m_pPortWave)
+    if (m_pPortsWave[Index])
     {
         return ntStatus;
     }
@@ -799,8 +802,8 @@ Return Value:
         CreateMiniportWaveCyclic,
         PUNKNOWN(PADAPTERCOMMON(this)),
         NULL,
-        &m_pPortWave,
-        &m_pMiniportWave);
+        &m_pPortsWave[Index],
+        &m_pMiniportsWave[Index]);
 
     return ntStatus;
 }
@@ -829,14 +832,14 @@ Return Value:
 
     PAGED_CODE();
 
-    if (NULL == m_pPortTopology)
+    if (NULL == m_pPortsTopology[Index])
     {
         return ntStatus;
     }
 
     // Get the IUnregisterSubdevice interface.
     //
-    ntStatus = m_pPortTopology->QueryInterface(IID_IUnregisterSubdevice,
+    ntStatus = m_pPortsTopology[Index]->QueryInterface(IID_IUnregisterSubdevice,
         (PVOID *)&pUnregisterSubdevice);
 
     // Unregister the topo port.
@@ -845,7 +848,7 @@ Return Value:
     {
         ntStatus = pUnregisterSubdevice->UnregisterSubdevice(
             m_pDeviceObject,
-            m_pPortTopology);
+            m_pPortsTopology[Index]);
 
         // Release the IUnregisterSubdevice interface.
         //
@@ -856,11 +859,11 @@ Return Value:
         //
         if (NT_SUCCESS(ntStatus))
         {
-            m_pPortTopology->Release();
-            m_pPortTopology = NULL;
+            m_pPortsTopology[Index]->Release();
+            m_pPortsTopology[Index] = NULL;
 
-            m_pMiniportTopology->Release();
-            m_pMiniportTopology = NULL;
+            m_pMiniportsTopology[Index]->Release();
+            m_pMiniportsTopology[Index] = NULL;
         }
     }
 
@@ -891,14 +894,14 @@ Return Value:
 
     PAGED_CODE();
 
-    if (NULL == m_pPortWave)
+    if (NULL == m_pPortsWave[Index])
     {
         return ntStatus;
     }
 
     // Get the IUnregisterSubdevice interface.
     //
-    ntStatus = m_pPortWave->QueryInterface(IID_IUnregisterSubdevice,
+    ntStatus = m_pPortsWave[Index]->QueryInterface(IID_IUnregisterSubdevice,
         (PVOID *)&pUnregisterSubdevice);
 
     // Unregister the wave port.
@@ -907,7 +910,7 @@ Return Value:
     {
         ntStatus = pUnregisterSubdevice->UnregisterSubdevice(
             m_pDeviceObject,
-            m_pPortWave);
+            m_pPortsWave[Index]);
 
         // Release the IUnregisterSubdevice interface.
         //
@@ -918,11 +921,11 @@ Return Value:
         //
         if (NT_SUCCESS(ntStatus))
         {
-            m_pPortWave->Release();
-            m_pPortWave = NULL;
+            m_pPortsWave[Index]->Release();
+            m_pPortsWave[Index] = NULL;
 
-            m_pMiniportWave->Release();
-            m_pMiniportWave = NULL;
+            m_pMiniportsWave[Index]->Release();
+            m_pMiniportsWave[Index] = NULL;
         }
     }
     return ntStatus;
@@ -958,9 +961,9 @@ Return Value:
     {
         ntStatus = PcRegisterPhysicalConnection(
             m_pDeviceObject,
-            m_pPortTopology,
+            m_pPortsTopology[Index],
             TopologyPhysicalConnections.ulTopologyOut,
-            m_pPortWave,
+            m_pPortsWave[Index],
             TopologyPhysicalConnections.ulWaveIn);
     }
 
@@ -973,9 +976,9 @@ Return Value:
         {
             ntStatus = PcRegisterPhysicalConnection(
                 m_pDeviceObject,
-                m_pPortWave,
+                m_pPortsWave[Index],
                 TopologyPhysicalConnections.ulWaveOut,
-                m_pPortTopology,
+                m_pPortsTopology[Index],
                 TopologyPhysicalConnections.ulTopologyIn
             );
         }
@@ -1012,7 +1015,7 @@ Return Value:
     //
     // Get the IUnregisterPhysicalConnection interface
     //
-    ntStatus = m_pPortTopology->QueryInterface(IID_IUnregisterPhysicalConnection,
+    ntStatus = m_pPortsTopology[Index]->QueryInterface(IID_IUnregisterPhysicalConnection,
         (PVOID *)&pUnregisterPhysicalConnection);
     if (NT_SUCCESS(ntStatus))
     {
@@ -1024,9 +1027,9 @@ Return Value:
         {
             ntStatus = pUnregisterPhysicalConnection->UnregisterPhysicalConnection(
                 m_pDeviceObject,
-                m_pPortWave,
+                m_pPortsWave[Index],
                 TopologyPhysicalConnections.ulWaveOut,
-                m_pPortTopology,
+                m_pPortsTopology[Index],
                 TopologyPhysicalConnections.ulTopologyIn);
 
             if (!NT_SUCCESS(ntStatus))
@@ -1043,9 +1046,9 @@ Return Value:
         {
             ntStatus2 = pUnregisterPhysicalConnection->UnregisterPhysicalConnection(
                 m_pDeviceObject,
-                m_pPortTopology,
+                m_pPortsTopology[Index],
                 TopologyPhysicalConnections.ulTopologyOut,
-                m_pPortWave,
+                m_pPortsWave[Index],
                 TopologyPhysicalConnections.ulWaveIn);
 
             if (!NT_SUCCESS(ntStatus2))
@@ -1064,30 +1067,6 @@ Return Value:
     return ntStatus;
 }
 
-//=============================================================================
-STDMETHODIMP_(PUNKNOWN *)
-CAdapterCommon::WavePortDriverDest
-(
-    VOID
-)
-/*++
-
-Routine Description:
-
-  Returns the wave port.
-
-Arguments:
-
-Return Value:
-
-  PUNKNOWN : pointer to waveport
-
---*/
-{
-    PAGED_CODE();
-
-    return &m_pPortWave;
-} // WavePortDriverDest
 #pragma code_seg()
 
 //=============================================================================
