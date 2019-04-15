@@ -245,8 +245,9 @@ private:
 
     //=====================================================================
     // Helper routines for managing the states of topologies being exposed
-    STDMETHODIMP_(NTSTATUS) ExposeMixerTopology(IN INT Index);
-    STDMETHODIMP_(NTSTATUS) ExposeWaveTopology(IN INT Index);
+    STDMETHODIMP_(NTSTATUS) InstantiateDevice(IN INT Index, IN PWSTR TopologyName, IN PWSTR WaveName);
+    STDMETHODIMP_(NTSTATUS) ExposeMixerTopology(IN INT Index, IN PWSTR Name);
+    STDMETHODIMP_(NTSTATUS) ExposeWaveTopology(IN INT Index, IN PWSTR Name);
     STDMETHODIMP_(NTSTATUS) UnexposeMixerTopology(IN INT Index);
     STDMETHODIMP_(NTSTATUS) UnexposeWaveTopology(IN INT Index);
     STDMETHODIMP_(NTSTATUS) ConnectTopologies(IN INT Index);
@@ -272,7 +273,6 @@ public:
 
     STDMETHODIMP_(PDEVICE_OBJECT)   GetDeviceObject(void);
     STDMETHODIMP_(NTSTATUS)         InstantiateDevices(void);
-    STDMETHODIMP_(NTSTATUS)         InstantiateDevice(IN INT Index);
     STDMETHODIMP_(NTSTATUS)         UninstantiateDevices(void);
 
     STDMETHODIMP_(void) SetWaveServiceGroup(IN PSERVICEGROUP ServiceGroup);
@@ -636,10 +636,10 @@ Return Value:
         return STATUS_SUCCESS;
     }
 
-    ntStatus = InstantiateDevice(0);
+    ntStatus = InstantiateDevice(0, L"Topology0", L"Wave0");
 
     if (NT_SUCCESS(ntStatus)) {
-        ntStatus = InstantiateDevice(1);
+        ntStatus = InstantiateDevice(1, L"Topology1", L"Wave1");
     }
 
     if (NT_SUCCESS(ntStatus))
@@ -653,7 +653,9 @@ Return Value:
 STDMETHODIMP_(NTSTATUS)
 CAdapterCommon::InstantiateDevice
 (
-    IN INT Index
+    IN INT Index,
+    IN PWSTR TopologyName,
+    IN PWSTR WaveName
 )
 /*++
 
@@ -677,13 +679,13 @@ Return Value:
 
     // If the mixer topology port is not exposed, create and expose it.
     //
-    ntStatus = ExposeMixerTopology(Index);
+    ntStatus = ExposeMixerTopology(Index, TopologyName);
 
     // Create and expose the wave topology.
     //
     if (NT_SUCCESS(ntStatus))
     {
-        ntStatus = ExposeWaveTopology(Index);
+        ntStatus = ExposeWaveTopology(Index, WaveName);
     }
 
     // Register the physical connection between wave and mixer topologies.
@@ -760,7 +762,8 @@ Return Value:
 STDMETHODIMP_(NTSTATUS)
 CAdapterCommon::ExposeMixerTopology
 (
-    IN INT Index
+    IN INT Index,
+    IN PWSTR Name
 )
 /*++
 
@@ -785,10 +788,16 @@ Return Value:
         return ntStatus;
     }
 
+    //UNICODE_STRING uIndex;
+    //RtlIntegerToUnicodeString(Index, 10, &uIndex);
+    //DECLARE_UNICODE_STRING_SIZE(uName, 32);
+    //RtlAppendUnicodeToString(&uName, L"Topology");
+    //RtlAppendUnicodeStringToString(&uName, &uIndex);
+
     ntStatus = InstallSubdevice(
         m_pDeviceObject,
         NULL,
-        L"Topology", //(L"Topology%i", Index),
+        Name,
         CLSID_PortTopology,
         CLSID_PortTopology,
         CreateMiniportTopology,
@@ -803,7 +812,8 @@ Return Value:
 STDMETHODIMP_(NTSTATUS)
 CAdapterCommon::ExposeWaveTopology
 (
-    IN INT Index
+    IN INT Index,
+    IN PWSTR Name
 )
 /*++
 
@@ -828,10 +838,16 @@ Return Value:
         return ntStatus;
     }
 
+    //UNICODE_STRING uIndex;
+    //RtlIntegerToUnicodeString(Index, 10, &uIndex);
+    //DECLARE_UNICODE_STRING_SIZE(uName, 32);
+    //RtlAppendUnicodeToString(&uName, L"Wave");
+    //RtlAppendUnicodeStringToString(&uName, &uIndex);
+
     ntStatus = InstallSubdevice(
         m_pDeviceObject,
         NULL,
-        L"Wave", //(L"Wave%i", Index),
+        Name,
         CLSID_PortWaveCyclic,
         CLSID_PortWaveCyclic,
         CreateMiniportWaveCyclic,

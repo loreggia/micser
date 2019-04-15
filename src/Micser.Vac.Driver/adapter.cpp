@@ -16,7 +16,7 @@ Abstract:
 // Defines
 //-----------------------------------------------------------------------------
 // BUGBUG set this to number of miniports
-#define MAX_MINIPORTS 3     // Number of maximum miniports.
+#define MAX_MINIPORTS 64     // Number of maximum miniports.
 
 //-----------------------------------------------------------------------------
 // Referenced forward.

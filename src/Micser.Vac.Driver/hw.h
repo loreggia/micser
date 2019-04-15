@@ -15,7 +15,7 @@ Abstract:
 // Defines
 //=============================================================================
 // BUGBUG we should dynamically allocate this...
-#define MAX_TOPOLOGY_NODES 20
+#define MAX_TOPOLOGY_NODES 32
 
 //=============================================================================
 // Classes
