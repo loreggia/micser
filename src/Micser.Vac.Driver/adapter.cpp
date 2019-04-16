@@ -344,18 +344,59 @@ VOID DriverUnloadHandler(IN PDRIVER_OBJECT DriverObject)
 NTSTATUS IrpMjCreateHandler(IN PDEVICE_OBJECT DeviceObject, IN PIRP Irp)
 {
     UNREFERENCED_PARAMETER(DeviceObject);
-    UNREFERENCED_PARAMETER(Irp);
-    PAGED_CODE();
+
+    NTSTATUS status = STATUS_SUCCESS;
+    PIO_STACK_LOCATION pIoStackLocation;
+    ULONG IoControlCode;
+
     DPF_ENTER(("[IrpMjCreateHandler]"));
-    return STATUS_SUCCESS;
+
+    pIoStackLocation = IoGetCurrentIrpStackLocation(Irp);
+
+    if (Irp->AssociatedIrp.SystemBuffer != NULL &&
+        pIoStackLocation != NULL &&
+        pIoStackLocation->FileObject != NULL)
+    {
+        // check if we need to handle the IRP
+        if (RtlCompareUnicodeString(&IoInterfaceSymLink, &pIoStackLocation->FileObject->FileName, TRUE) == 0)
+        {
+            return STATUS_SUCCESS;
+        }
+    }
+
+    // we did not handle the IRP, dispatch to PortCls
+    status = PcDispatchIrp(DeviceObject, Irp);
+
+    return status;
 }
 
 NTSTATUS IrpMjCloseHandler(IN PDEVICE_OBJECT DeviceObject, IN PIRP Irp)
 {
     UNREFERENCED_PARAMETER(DeviceObject);
-    UNREFERENCED_PARAMETER(Irp);
+
+    NTSTATUS status = STATUS_SUCCESS;
+    PIO_STACK_LOCATION pIoStackLocation;
+    ULONG IoControlCode;
+
     DPF_ENTER(("[IrpMjCloseHandler]"));
-    return STATUS_SUCCESS;
+
+    pIoStackLocation = IoGetCurrentIrpStackLocation(Irp);
+
+    if (Irp->AssociatedIrp.SystemBuffer != NULL &&
+        pIoStackLocation != NULL &&
+        pIoStackLocation->FileObject != NULL)
+    {
+        // check if we need to handle the IRP
+        if (RtlCompareUnicodeString(&IoInterfaceSymLink, &pIoStackLocation->FileObject->FileName, TRUE) == 0)
+        {
+            return STATUS_SUCCESS;
+        }
+    }
+
+    // we did not handle the IRP, dispatch to PortCls
+    status = PcDispatchIrp(DeviceObject, Irp);
+
+    return status;
 }
 
 NTSTATUS IrpMjDeviceControlHandler(IN PDEVICE_OBJECT DeviceObject, IN PIRP Irp)
