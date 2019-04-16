@@ -9,16 +9,27 @@ namespace Micser.Common
 
         public const string PluginSearchPattern = "Micser.Plugins.*.dll";
 
+        public const string UserRegistryRoot = @"Software\Micser";
+
         public static readonly string AppDataFolder = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData, Environment.SpecialFolderOption.Create),
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData, Environment.SpecialFolderOption.Create),
             "Micser");
 
         public static class DriverUtility
         {
-            public const string DeviceId = "id";
-            public const string InstallFlag = "i";
-            public const string UninstallFlag = "u";
+            public const string DeviceCount = "c";
+
             public static readonly string[] ParamNameChars = { "/" };
+
+            public static class ReturnCodes
+            {
+                public const int InvalidParameter = -2;
+                public const int RegistryAccessFailed = -10;
+                public const int RequiresAdminAccess = -3;
+                public const int SendControlSignalFailed = -11;
+                public const int Success = 0;
+                public const int UnknownError = -1;
+            }
         }
     }
 }
