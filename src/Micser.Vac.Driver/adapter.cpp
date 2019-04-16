@@ -360,15 +360,15 @@ NTSTATUS IrpMjCloseHandler(IN PDEVICE_OBJECT DeviceObject, IN PIRP Irp)
 
 NTSTATUS IrpMjDeviceControlHandler(IN PDEVICE_OBJECT DeviceObject, IN PIRP Irp)
 {
-    UNREFERENCED_PARAMETER(DeviceObject);
-
     PAGED_CODE();
 
+    ASSERT(DeviceObject);
     ASSERT(Irp);
 
     NTSTATUS status = STATUS_SUCCESS;
     PIO_STACK_LOCATION pIoStackLocation;
     ULONG IoControlCode;
+    PortClassDeviceContext* pExtension;
 
     DPF_ENTER(("[IrpMjDeviceControlHandler]"));
 
@@ -389,8 +389,22 @@ NTSTATUS IrpMjDeviceControlHandler(IN PDEVICE_OBJECT DeviceObject, IN PIRP Irp)
             {
             case IOCTL_RELOAD:
                 DPF(D_TERSE, ("IOCTL RELOAD."));
-                // TODO actual reload
-                status = STATUS_SUCCESS;
+                pExtension = static_cast<PortClassDeviceContext*>(DeviceObject->DeviceExtension);
+
+                if (pExtension->m_pCommon == NULL)
+                {
+                    status = STATUS_UNSUCCESSFUL;
+                    break;
+                }
+
+                status = pExtension->m_pCommon->UninstantiateDevices();
+
+                if (!NT_SUCCESS(status))
+                {
+                    break;
+                }
+
+                status = pExtension->m_pCommon->InstantiateDevices();
                 break;
             }
 
