@@ -15,13 +15,14 @@ namespace Micser.DriverUtility
             var config = new LoggingConfiguration();
             config.AddTarget(new ColoredConsoleTarget("ConsoleTarget")
             {
-                Layout = @"${date:format=HH\:mm\:ss} ${level} ${message} ${exception}",
+                Layout = @"${date:format=HH\:mm\:ss} ${level} ${message} ${exception:format=tostring}",
                 DetectConsoleAvailable = true
             });
             config.AddTarget(new FileTarget("FileTarget")
             {
                 ArchiveNumbering = ArchiveNumberingMode.DateAndSequence,
                 ArchiveOldFileOnStartup = true,
+                Layout = @"${date:format=HH\:mm\:ss} ${level} ${message} ${exception:format=tostring}",
                 MaxArchiveFiles = 10,
                 FileName = Path.Combine(Globals.AppDataFolder, "Micser.DriverUtility.log"),
                 FileNameKind = FilePathKind.Absolute
