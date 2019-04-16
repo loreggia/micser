@@ -223,6 +223,40 @@ InstallSubdevice
     return ntStatus;
 } // InstallSubDevice
 
+NTSTATUS GetRegistrySettings(OUT PUINT DeviceCount)
+{
+    DPF(D_TERSE, ("[GetRegistrySettings]"));
+
+    PAGED_CODE();
+
+    NTSTATUS status;
+    DWORD deviceCount = 1;
+    RTL_QUERY_REGISTRY_TABLE QueryTable[] = {
+        // QueryRoutine Flags                                                     Name            EntryContext  DefaultType                                                    DefaultData   DefaultLength
+        { NULL,         RTL_QUERY_REGISTRY_DIRECT | RTL_QUERY_REGISTRY_TYPECHECK, L"DeviceCount", &deviceCount, (REG_DWORD << RTL_QUERY_REGISTRY_TYPECHECK_SHIFT) | REG_DWORD, &deviceCount, sizeof(ULONG)},
+        { NULL, 0, NULL, NULL, 0, NULL, 0}
+    };
+
+    status = RtlQueryRegistryValues(
+        RTL_REGISTRY_USER | RTL_REGISTRY_OPTIONAL,
+        L"Software\\Micser",
+        &QueryTable[0],
+        NULL,
+        NULL);
+
+    if (!NT_SUCCESS(status))
+    {
+        DPF(D_VERBOSE, ("RtlQueryRegistryValues failed, using default values, 0x%x", status));
+    }
+
+    DPF(D_VERBOSE, ("DeviceCount: %i", deviceCount));
+
+    *DeviceCount = deviceCount;
+
+    // Don't return error because we will operate with default values.
+    return STATUS_SUCCESS;
+}
+
 //=============================================================================
 // Classes
 //=============================================================================
@@ -242,6 +276,7 @@ private:
     DEVICE_POWER_STATE      m_PowerState;
     PCMicserHW              m_pHW;                  // Virtual MSVAD HW object
     BOOL                    m_bInstantiated;        // Flag indicating whether or not subdevices are exposed
+    UINT                    m_iDeviceCount;         // The number of devices (input-output-pairs) that are instantiated
 
     PWSTR TopologyNames[MAX_INTERFACES] =
     {
@@ -317,13 +352,14 @@ private:
 
     //=====================================================================
     // Helper routines for managing the states of topologies being exposed
-    STDMETHODIMP_(NTSTATUS) InstantiateDevice(IN INT Index);
-    STDMETHODIMP_(NTSTATUS) ExposeMixerTopology(IN INT Index);
-    STDMETHODIMP_(NTSTATUS) ExposeWaveTopology(IN INT Index);
-    STDMETHODIMP_(NTSTATUS) UnexposeMixerTopology(IN INT Index);
-    STDMETHODIMP_(NTSTATUS) UnexposeWaveTopology(IN INT Index);
-    STDMETHODIMP_(NTSTATUS) ConnectTopologies(IN INT Index);
-    STDMETHODIMP_(NTSTATUS) DisconnectTopologies(IN INT Index);
+    STDMETHODIMP_(NTSTATUS) InstantiateDevice(IN UINT Index);
+    STDMETHODIMP_(NTSTATUS) UninstantiateDevice(IN UINT Index);
+    STDMETHODIMP_(NTSTATUS) ExposeMixerTopology(IN UINT Index);
+    STDMETHODIMP_(NTSTATUS) ExposeWaveTopology(IN UINT Index);
+    STDMETHODIMP_(NTSTATUS) UnexposeMixerTopology(IN UINT Index);
+    STDMETHODIMP_(NTSTATUS) UnexposeWaveTopology(IN UINT Index);
+    STDMETHODIMP_(NTSTATUS) ConnectTopologies(IN UINT Index);
+    STDMETHODIMP_(NTSTATUS) DisconnectTopologies(IN UINT Index);
 
 public:
     //=====================================================================
@@ -544,6 +580,7 @@ Return Value:
     //m_pPortTopology = NULL;
     //m_pMiniportTopology = NULL;
     m_bInstantiated = FALSE;
+    m_iDeviceCount = 1;
 
     // Initialize HW.
     //
@@ -708,10 +745,25 @@ Return Value:
         return STATUS_SUCCESS;
     }
 
-    ntStatus = InstantiateDevice(0);
+    ntStatus = GetRegistrySettings(&m_iDeviceCount);
 
-    if (NT_SUCCESS(ntStatus)) {
-        ntStatus = InstantiateDevice(1);
+    if (m_iDeviceCount > MAX_INTERFACES)
+    {
+        m_iDeviceCount = MAX_INTERFACES;
+    }
+
+    if (!NT_SUCCESS(ntStatus))
+    {
+        return ntStatus;
+    }
+
+    for (UINT i = 0; i < m_iDeviceCount; i++)
+    {
+        ntStatus = InstantiateDevice(i);
+
+        if (!NT_SUCCESS(ntStatus)) {
+            return ntStatus;
+        }
     }
 
     if (NT_SUCCESS(ntStatus))
@@ -725,7 +777,7 @@ Return Value:
 STDMETHODIMP_(NTSTATUS)
 CAdapterCommon::InstantiateDevice
 (
-    IN INT Index
+    IN UINT Index
 )
 /*++
 
@@ -799,25 +851,13 @@ Return Value:
         return ntStatus;
     }
 
-    // Unregister the physical connection between wave and mixer topologies.
-    //
-    if (NT_SUCCESS(ntStatus))
+    for (UINT i = 0; i < m_iDeviceCount; i++)
     {
-        ntStatus = DisconnectTopologies(0);
-    }
+        ntStatus = UninstantiateDevice(i);
 
-    // Unregister and destroy the wave port
-    //
-    if (NT_SUCCESS(ntStatus))
-    {
-        ntStatus = UnexposeWaveTopology(0);
-    }
-
-    // Unregister the topo port
-    //
-    if (NT_SUCCESS(ntStatus))
-    {
-        ntStatus = UnexposeMixerTopology(0);
+        if (!NT_SUCCESS(ntStatus)) {
+            return ntStatus;
+        }
     }
 
     if (NT_SUCCESS(ntStatus))
@@ -828,11 +868,56 @@ Return Value:
     return ntStatus;
 } // UninstantiateDevices
 
+STDMETHODIMP_(NTSTATUS)
+CAdapterCommon::UninstantiateDevice
+(
+    IN UINT Index
+)
+/*
+
+Routine Description:
+
+  Uninstantiates the wave and topology ports for interface <Index>.
+
+Arguments:
+
+    Index - Index of the interface
+
+Return Value:
+
+  NTSTATUS
+
+*/
+{
+    PAGED_CODE();
+
+    NTSTATUS ntStatus = STATUS_SUCCESS;
+
+    // Unregister the physical connection between wave and mixer topologies.
+    ntStatus = DisconnectTopologies(Index);
+
+    // Unregister and destroy the wave port
+    //
+    if (NT_SUCCESS(ntStatus))
+    {
+        ntStatus = UnexposeWaveTopology(Index);
+    }
+
+    // Unregister the topo port
+    //
+    if (NT_SUCCESS(ntStatus))
+    {
+        ntStatus = UnexposeMixerTopology(Index);
+    }
+
+    return ntStatus;
+}
+
 //=============================================================================
 STDMETHODIMP_(NTSTATUS)
 CAdapterCommon::ExposeMixerTopology
 (
-    IN INT Index
+    IN UINT Index
 )
 /*++
 
@@ -875,7 +960,7 @@ Return Value:
 STDMETHODIMP_(NTSTATUS)
 CAdapterCommon::ExposeWaveTopology
 (
-    IN INT Index
+    IN UINT Index
 )
 /*++
 
@@ -918,7 +1003,7 @@ Return Value:
 STDMETHODIMP_(NTSTATUS)
 CAdapterCommon::UnexposeMixerTopology
 (
-    IN INT Index
+    IN UINT Index
 )
 /*++
 
@@ -980,7 +1065,7 @@ Return Value:
 STDMETHODIMP_(NTSTATUS)
 CAdapterCommon::UnexposeWaveTopology
 (
-    IN INT Index
+    IN UINT Index
 )
 /*++
 
@@ -1041,7 +1126,7 @@ Return Value:
 STDMETHODIMP_(NTSTATUS)
 CAdapterCommon::ConnectTopologies
 (
-    IN INT Index
+    IN UINT Index
 )
 /*++
 
@@ -1097,7 +1182,7 @@ Return Value:
 STDMETHODIMP_(NTSTATUS)
 CAdapterCommon::DisconnectTopologies
 (
-    IN INT Index
+    IN UINT Index
 )
 /*++
 
