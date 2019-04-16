@@ -214,11 +214,9 @@ Return Value:
 
     if (!NT_SUCCESS(ntStatus))
     {
+        DPF(D_TERSE, ("[PcAddAdapterDevice failed]"));
         return ntStatus;
     }
-
-    // Register symlink for IO access
-    ntStatus = IoCreateSymbolicLink((PUNICODE_STRING)&IoInterfaceSymLink, (PUNICODE_STRING)&DeviceName);
 
     return ntStatus;
 } // AddDevice
