@@ -182,6 +182,10 @@ InstallSubdevice
                     Name,
                     port
                 );
+
+            // TODO
+            //IPortClsSubdeviceEx* subDeviceEx;
+            //ntStatus = port->QueryInterface(IID_IPortClsSubdeviceEx, (LPVOID*)&subDeviceEx);
         }
     }
 
