@@ -1,9 +1,14 @@
 ﻿namespace Micser.DriverUtility
 {
-    public class DriverGlobals
+    public static class DriverGlobals
     {
-        public const string HardwareId = "Root\\Micser.Vac.Driver";
-        public const string InfFileName = "Micser.Vac.Driver.inf";
-        public const int MaxInterfaces = 32;
+        public const string DeviceSymLink = @"\\.\Micser.Vac.Driver.Device";
+
+        public const int MaxDeviceCount = 32;
+
+        public static class RegistryValues
+        {
+            public const string DeviceCount = "DeviceCount";
+        }
     }
 }

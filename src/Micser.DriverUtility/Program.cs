@@ -53,7 +53,7 @@ namespace Micser.DriverUtility
             if (!UacHelper.IsProcessElevated)
             {
                 logger.Error("The process must have elevated privileges to manage driver installation.");
-                return -1;
+                return Globals.DriverUtility.ReturnCodes.RequiresAdminAccess;
             }
 
             logger.Info("Starting...");
@@ -63,31 +63,31 @@ namespace Micser.DriverUtility
                 var arguments = new ArgumentDictionary(Globals.DriverUtility.ParamNameChars, args);
                 logger.Info("Arguments: " + arguments);
 
-                var deviceId = arguments[Globals.DriverUtility.DeviceId];
+                var sDeviceCount = arguments[Globals.DriverUtility.DeviceCount];
 
-                if (string.IsNullOrEmpty(deviceId))
+                if (string.IsNullOrEmpty(sDeviceCount) || !uint.TryParse(sDeviceCount, out var deviceCount))
                 {
-                    logger.Error("No device name provided.");
-                    return -1;
+                    logger.Error($"Invalid or missing device count argument '{Globals.DriverUtility.ParamNameChars[0]}{Globals.DriverUtility.DeviceCount}' provided: '{sDeviceCount}'.");
+                    return Globals.DriverUtility.ReturnCodes.InvalidParameter;
                 }
 
-                var installer = new DriverInstaller();
+                var controller = new DriverController();
+                var result = controller.SetDeviceSettingsAndReload(deviceCount);
 
-                if (arguments.HasFlag(Globals.DriverUtility.InstallFlag))
+                if (result != Globals.DriverUtility.ReturnCodes.Success)
                 {
-                }
-                else if (arguments.HasFlag(Globals.DriverUtility.UninstallFlag))
-                {
+                    logger.Error($"{nameof(DriverController.SetDeviceSettingsAndReload)} returned {result}");
+                    return result;
                 }
             }
             catch (Exception ex)
             {
                 logger.Error(ex);
-                return -1;
+                return Globals.DriverUtility.ReturnCodes.UnknownError;
             }
 
-            logger.Info("Finished");
-            return 0;
+            logger.Info("Success");
+            return Globals.DriverUtility.ReturnCodes.Success;
         }
     }
 }
