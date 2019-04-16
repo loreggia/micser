@@ -19,8 +19,16 @@ namespace Micser.Setup
                 new ManagedProject(
                     "Micser",
                     new Dir(@"%ProgramFiles%\Micser",
-                        new Files(@"App\*.*", FileFilter)
-                    //, new Files(@"Driver\*.*") { Id = "asdf", ComponentId = "component-id", }
+                        new Files(@"App\*.*", FileFilter),
+                        new Files(@"Driver\*.*"),
+                        new File(@"Driver\Micser.Vac.Package\Micser.Vac.Driver.inf",
+                            new DriverInstaller
+                            {
+                                Legacy = true,
+                                Architecture = DriverArchitecture.x64,
+                                PlugAndPlayPrompt = false
+                            }
+                        )
                     ),
                     new Dir(@"%ProgramMenu%\Micser",
                         new ExeFileShortcut("Micser", @"[INSTALLDIR]\App\Micser.App.exe", ""),
