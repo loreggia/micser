@@ -51,6 +51,6 @@ SPSVCINST_ASSOCSERVICE= 0x00000002
 ManufacturerName="Lucas Loreggia" ; DONE: Replace with your manufacturer name
 ClassName="Micser" ; DONE: edit ClassName
 DiskName = "Micser.Vac.Driver Installation Disk"
-DeviceName = "Micser Virtual Audio Cable"
+DeviceName = "Micser Virtual Audio Cable" ; THIS NEEDS TO BE EQUAL TO THE DEVICE NAME IN <micser.h>!
 Micser.Vac.Driver.SVCDESC = "Micser.Vac.Driver Service"
 HardwareId = "Root\Micser.Vac.Driver"

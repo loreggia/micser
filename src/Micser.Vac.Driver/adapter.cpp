@@ -23,14 +23,11 @@ Abstract:
 //-----------------------------------------------------------------------------
 
 DRIVER_ADD_DEVICE AddDevice;
-
-NTSTATUS
-StartDevice
-(
-    IN  PDEVICE_OBJECT,
-    IN  PIRP,
-    IN  PRESOURCELIST
-);
+NTSTATUS StartDevice(IN PDEVICE_OBJECT, IN PIRP, IN PRESOURCELIST);
+NTSTATUS IrpMjCreateHandler(IN PDEVICE_OBJECT, IN PIRP);
+NTSTATUS IrpMjCloseHandler(IN PDEVICE_OBJECT, IN PIRP);
+NTSTATUS IrpMjDeviceControlHandler(IN PDEVICE_OBJECT, IN PIRP);
+VOID DriverUnloadHandler(IN PDRIVER_OBJECT);
 
 //-----------------------------------------------------------------------------
 // Functions
@@ -127,7 +124,9 @@ DriverEntry
       STATUS_UNSUCCESSFUL otherwise.
 
     --*/
-    NTSTATUS                    ntStatus;
+    NTSTATUS       ntStatus;
+    UNICODE_STRING usDeviceName;
+    UNICODE_STRING usDeviceSymLink;
 
     DPF(D_TERSE, ("[DriverEntry]"));
 
@@ -141,14 +140,20 @@ DriverEntry
             (PDRIVER_ADD_DEVICE)AddDevice
         );
 
-    if (NT_SUCCESS(ntStatus))
+    if (!NT_SUCCESS(ntStatus))
     {
+        return ntStatus;
+    }
+
+    DriverObject->DriverUnload = DriverUnloadHandler;
 #pragma warning (push)
 #pragma warning( disable:28169 )
 #pragma warning( disable:28023 )
-        DriverObject->MajorFunction[IRP_MJ_PNP] = PnpHandler;
+    DriverObject->MajorFunction[IRP_MJ_PNP] = PnpHandler;
+    DriverObject->MajorFunction[IRP_MJ_CREATE] = IrpMjCreateHandler;
+    DriverObject->MajorFunction[IRP_MJ_CLOSE] = IrpMjCloseHandler;
+    DriverObject->MajorFunction[IRP_MJ_DEVICE_CONTROL] = IrpMjDeviceControlHandler;
 #pragma warning (pop)
-    }
 
     return ntStatus;
 } // DriverEntry
@@ -195,21 +200,25 @@ Return Value:
 {
     PAGED_CODE();
 
-    NTSTATUS                    ntStatus;
+    NTSTATUS ntStatus;
 
     DPF(D_TERSE, ("[AddDevice]"));
 
     // Tell the class driver to add the device.
-    //
-    ntStatus =
-        PcAddAdapterDevice
-        (
-            DriverObject,
-            PhysicalDeviceObject,
-            PCPFNSTARTDEVICE(StartDevice),
-            MAX_MINIPORTS,
-            0
-        );
+    ntStatus = PcAddAdapterDevice(
+        DriverObject,
+        PhysicalDeviceObject,
+        PCPFNSTARTDEVICE(StartDevice),
+        MAX_MINIPORTS,
+        0);
+
+    if (!NT_SUCCESS(ntStatus))
+    {
+        return ntStatus;
+    }
+
+    // Register symlink for IO access
+    ntStatus = IoCreateSymbolicLink((PUNICODE_STRING)&IoInterfaceSymLink, (PUNICODE_STRING)&DeviceName);
 
     return ntStatus;
 } // AddDevice
@@ -322,4 +331,78 @@ StartDevice
 
     return ntStatus;
 } // StartDevice
+
+VOID DriverUnloadHandler(IN PDRIVER_OBJECT DriverObject)
+{
+    UNREFERENCED_PARAMETER(DriverObject);
+    PAGED_CODE();
+    DPF_ENTER(("[DriverUnloadHandler]"));
+
+    IoDeleteSymbolicLink((PUNICODE_STRING)&IoInterfaceSymLink);
+}
+
+NTSTATUS IrpMjCreateHandler(IN PDEVICE_OBJECT DeviceObject, IN PIRP Irp)
+{
+    UNREFERENCED_PARAMETER(DeviceObject);
+    UNREFERENCED_PARAMETER(Irp);
+    PAGED_CODE();
+    DPF_ENTER(("[IrpMjCreateHandler]"));
+    return STATUS_SUCCESS;
+}
+
+NTSTATUS IrpMjCloseHandler(IN PDEVICE_OBJECT DeviceObject, IN PIRP Irp)
+{
+    UNREFERENCED_PARAMETER(DeviceObject);
+    UNREFERENCED_PARAMETER(Irp);
+    DPF_ENTER(("[IrpMjCloseHandler]"));
+    return STATUS_SUCCESS;
+}
+
+NTSTATUS IrpMjDeviceControlHandler(IN PDEVICE_OBJECT DeviceObject, IN PIRP Irp)
+{
+    UNREFERENCED_PARAMETER(DeviceObject);
+
+    PAGED_CODE();
+
+    ASSERT(Irp);
+
+    NTSTATUS status = STATUS_SUCCESS;
+    PIO_STACK_LOCATION pIoStackLocation;
+    ULONG IoControlCode;
+
+    DPF_ENTER(("[IrpMjDeviceControlHandler]"));
+
+    pIoStackLocation = IoGetCurrentIrpStackLocation(Irp);
+
+    if (Irp->AssociatedIrp.SystemBuffer != NULL &&
+        pIoStackLocation != NULL &&
+        pIoStackLocation->FileObject != NULL)
+    {
+        // check if we need to handle the IRP
+        if (RtlCompareUnicodeString(&IoInterfaceSymLink, &pIoStackLocation->FileObject->FileName, TRUE) == 0)
+        {
+            IoControlCode = pIoStackLocation->Parameters.DeviceIoControl.IoControlCode;
+
+            DPF(D_TERSE, ("Control code received: %i", IoControlCode));
+
+            switch (IoControlCode)
+            {
+            case IOCTL_RELOAD:
+                DPF(D_TERSE, ("IOCTL RELOAD."));
+                // TODO actual reload
+                status = STATUS_SUCCESS;
+                break;
+            }
+
+            Irp->IoStatus.Status = status;
+            IoCompleteRequest(Irp, IO_NO_INCREMENT);
+            return status;
+        }
+    }
+
+    // we did not handle the IRP, dispatch to PortCls
+    status = PcDispatchIrp(DeviceObject, Irp);
+
+    return status;
+}
 #pragma code_seg()
