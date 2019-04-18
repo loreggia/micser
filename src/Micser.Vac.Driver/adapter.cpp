@@ -18,6 +18,9 @@ Abstract:
 // BUGBUG set this to number of miniports
 #define MAX_MINIPORTS 64     // Number of maximum miniports.
 
+// Globals
+PDEVICE_OBJECT g_IoDevice;
+
 //-----------------------------------------------------------------------------
 // Referenced forward.
 //-----------------------------------------------------------------------------
@@ -67,20 +70,37 @@ DriverEntry
 
     --*/
     NTSTATUS       ntStatus;
-    UNICODE_STRING usDeviceName;
-    UNICODE_STRING usDeviceSymLink;
 
     DPF(D_TERSE, ("[DriverEntry]"));
 
+    // Create the IO device
+    ntStatus = IoCreateDevice(
+        DriverObject,
+        0,
+        (PUNICODE_STRING)&IoDeviceName,
+        FILE_DEVICE_UNKNOWN,
+        0,
+        FALSE,
+        &g_IoDevice);
+
+    // Create symlink for user mode application access
+    if (!NT_SUCCESS(ntStatus))
+    {
+        return ntStatus;
+    }
+
+    ntStatus = IoCreateSymbolicLink((PUNICODE_STRING)&IoDeviceSymLink, (PUNICODE_STRING)&IoDeviceName);
+
+    if (!NT_SUCCESS(ntStatus))
+    {
+        return ntStatus;
+    }
+
     // Tell the class driver to initialize the driver.
-    //
-    ntStatus =
-        PcInitializeAdapterDriver
-        (
-            DriverObject,
-            RegistryPathName,
-            (PDRIVER_ADD_DEVICE)AddDevice
-        );
+    ntStatus = PcInitializeAdapterDriver(
+        DriverObject,
+        RegistryPathName,
+        (PDRIVER_ADD_DEVICE)AddDevice);
 
     if (!NT_SUCCESS(ntStatus))
     {
@@ -278,7 +298,7 @@ VOID DriverUnloadHandler(IN PDRIVER_OBJECT DriverObject)
     PAGED_CODE();
     DPF_ENTER(("[DriverUnloadHandler]"));
 
-    IoDeleteSymbolicLink((PUNICODE_STRING)&IoInterfaceSymLink);
+    IoDeleteSymbolicLink((PUNICODE_STRING)&IoDeviceSymLink);
 }
 
 NTSTATUS IrpMjPnpHandler
@@ -315,6 +335,11 @@ Return Value:
 
     DPF_ENTER(("[PnpHandler]"));
 
+    if (DeviceObject == g_IoDevice)
+    {
+        return STATUS_SUCCESS;
+    }
+
     // Check for the REMOVE_DEVICE irp.  If we're being unloaded,
     // uninstantiate our devices and release the adapter common
     // object.
@@ -350,17 +375,9 @@ NTSTATUS IrpMjCreateHandler(IN PDEVICE_OBJECT DeviceObject, IN PIRP Irp)
 
     DPF_ENTER(("[IrpMjCreateHandler]"));
 
-    pIoStackLocation = IoGetCurrentIrpStackLocation(Irp);
-
-    if (Irp->AssociatedIrp.SystemBuffer != NULL &&
-        pIoStackLocation != NULL &&
-        pIoStackLocation->FileObject != NULL)
+    if (DeviceObject == g_IoDevice)
     {
-        // check if we need to handle the IRP
-        if (RtlCompareUnicodeString(&IoInterfaceSymLink, &pIoStackLocation->FileObject->FileName, TRUE) == 0)
-        {
-            return STATUS_SUCCESS;
-        }
+        return STATUS_SUCCESS;
     }
 
     // we did not handle the IRP, dispatch to PortCls
@@ -379,17 +396,9 @@ NTSTATUS IrpMjCloseHandler(IN PDEVICE_OBJECT DeviceObject, IN PIRP Irp)
 
     DPF_ENTER(("[IrpMjCloseHandler]"));
 
-    pIoStackLocation = IoGetCurrentIrpStackLocation(Irp);
-
-    if (Irp->AssociatedIrp.SystemBuffer != NULL &&
-        pIoStackLocation != NULL &&
-        pIoStackLocation->FileObject != NULL)
+    if (DeviceObject == g_IoDevice)
     {
-        // check if we need to handle the IRP
-        if (RtlCompareUnicodeString(&IoInterfaceSymLink, &pIoStackLocation->FileObject->FileName, TRUE) == 0)
-        {
-            return STATUS_SUCCESS;
-        }
+        return STATUS_SUCCESS;
     }
 
     // we did not handle the IRP, dispatch to PortCls
@@ -407,51 +416,45 @@ NTSTATUS IrpMjDeviceControlHandler(IN PDEVICE_OBJECT DeviceObject, IN PIRP Irp)
 
     NTSTATUS status = STATUS_SUCCESS;
     PIO_STACK_LOCATION pIoStackLocation;
-    ULONG IoControlCode;
+    ULONG ioControlCode;
     PortClassDeviceContext* pExtension;
 
     DPF_ENTER(("[IrpMjDeviceControlHandler]"));
 
-    pIoStackLocation = IoGetCurrentIrpStackLocation(Irp);
-
-    if (Irp->AssociatedIrp.SystemBuffer != NULL &&
-        pIoStackLocation != NULL &&
-        pIoStackLocation->FileObject != NULL)
+    // check if we need to handle the IRP
+    if (DeviceObject == g_IoDevice)
     {
-        // check if we need to handle the IRP
-        if (RtlCompareUnicodeString(&IoInterfaceSymLink, &pIoStackLocation->FileObject->FileName, TRUE) == 0)
+        pIoStackLocation = IoGetCurrentIrpStackLocation(Irp);
+        ioControlCode = pIoStackLocation->Parameters.DeviceIoControl.IoControlCode;
+
+        DPF(D_TERSE, ("Control code received: %i", ioControlCode));
+
+        switch (ioControlCode)
         {
-            IoControlCode = pIoStackLocation->Parameters.DeviceIoControl.IoControlCode;
+        case IOCTL_RELOAD:
+            DPF(D_TERSE, ("IOCTL RELOAD."));
+            pExtension = static_cast<PortClassDeviceContext*>(DeviceObject->DeviceExtension);
 
-            DPF(D_TERSE, ("Control code received: %i", IoControlCode));
-
-            switch (IoControlCode)
+            if (pExtension->m_pCommon == NULL)
             {
-            case IOCTL_RELOAD:
-                DPF(D_TERSE, ("IOCTL RELOAD."));
-                pExtension = static_cast<PortClassDeviceContext*>(DeviceObject->DeviceExtension);
-
-                if (pExtension->m_pCommon == NULL)
-                {
-                    status = STATUS_UNSUCCESSFUL;
-                    break;
-                }
-
-                status = pExtension->m_pCommon->UninstantiateDevices();
-
-                if (!NT_SUCCESS(status))
-                {
-                    break;
-                }
-
-                status = pExtension->m_pCommon->InstantiateDevices();
+                status = STATUS_UNSUCCESSFUL;
                 break;
             }
 
-            Irp->IoStatus.Status = status;
-            IoCompleteRequest(Irp, IO_NO_INCREMENT);
-            return status;
+            status = pExtension->m_pCommon->UninstantiateDevices();
+
+            if (!NT_SUCCESS(status))
+            {
+                break;
+            }
+
+            status = pExtension->m_pCommon->InstantiateDevices();
+            break;
         }
+
+        Irp->IoStatus.Status = status;
+        IoCompleteRequest(Irp, IO_NO_INCREMENT);
+        return status;
     }
 
     // we did not handle the IRP, dispatch to PortCls
