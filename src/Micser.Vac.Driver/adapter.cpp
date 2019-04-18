@@ -27,70 +27,12 @@ NTSTATUS StartDevice(IN PDEVICE_OBJECT, IN PIRP, IN PRESOURCELIST);
 NTSTATUS IrpMjCreateHandler(IN PDEVICE_OBJECT, IN PIRP);
 NTSTATUS IrpMjCloseHandler(IN PDEVICE_OBJECT, IN PIRP);
 NTSTATUS IrpMjDeviceControlHandler(IN PDEVICE_OBJECT, IN PIRP);
+NTSTATUS IrpMjPnpHandler(IN PDEVICE_OBJECT, IN PIRP);
 VOID DriverUnloadHandler(IN PDRIVER_OBJECT);
 
 //-----------------------------------------------------------------------------
 // Functions
 //-----------------------------------------------------------------------------
-
-//=============================================================================
-#pragma code_seg("PAGE")
-NTSTATUS PnpHandler
-(
-    _In_ DEVICE_OBJECT *_DeviceObject,
-    _In_ IRP *_Irp
-)
-/*++
-
-Routine Description:
-
-  Handles PnP IRPs
-
-Arguments:
-
-  _Fdo - Functional Device object pointer.
-
-  _Irp - The Irp being passed
-
-Return Value:
-
-  NT status code.
-
---*/
-{
-    NTSTATUS ntStatus = STATUS_UNSUCCESSFUL;
-    IO_STACK_LOCATION *stack;
-    PortClassDeviceContext *ext;
-
-    PAGED_CODE();
-
-    ASSERT(_DeviceObject);
-    ASSERT(_Irp);
-
-    // Check for the REMOVE_DEVICE irp.  If we're being unloaded,
-    // uninstantiate our devices and release the adapter common
-    // object.
-    //
-    stack = IoGetCurrentIrpStackLocation(_Irp);
-
-    if ((IRP_MN_REMOVE_DEVICE == stack->MinorFunction) ||
-        (IRP_MN_SURPRISE_REMOVAL == stack->MinorFunction) ||
-        (IRP_MN_STOP_DEVICE == stack->MinorFunction))
-    {
-        ext = static_cast<PortClassDeviceContext*>(_DeviceObject->DeviceExtension);
-
-        if (ext->m_pCommon != NULL)
-        {
-            ext->m_pCommon->UninstantiateDevices();
-            ext->m_pCommon->Release();
-            ext->m_pCommon = NULL;
-        }
-    }
-
-    ntStatus = PcDispatchIrp(_DeviceObject, _Irp);
-
-    return ntStatus;
-}
 
 //=============================================================================
 #pragma code_seg("INIT")
@@ -149,7 +91,7 @@ DriverEntry
 #pragma warning (push)
 #pragma warning( disable:28169 )
 #pragma warning( disable:28023 )
-    DriverObject->MajorFunction[IRP_MJ_PNP] = PnpHandler;
+    DriverObject->MajorFunction[IRP_MJ_PNP] = IrpMjPnpHandler;
     DriverObject->MajorFunction[IRP_MJ_CREATE] = IrpMjCreateHandler;
     DriverObject->MajorFunction[IRP_MJ_CLOSE] = IrpMjCloseHandler;
     DriverObject->MajorFunction[IRP_MJ_DEVICE_CONTROL] = IrpMjDeviceControlHandler;
@@ -337,6 +279,65 @@ VOID DriverUnloadHandler(IN PDRIVER_OBJECT DriverObject)
     DPF_ENTER(("[DriverUnloadHandler]"));
 
     IoDeleteSymbolicLink((PUNICODE_STRING)&IoInterfaceSymLink);
+}
+
+NTSTATUS IrpMjPnpHandler
+(
+    IN PDEVICE_OBJECT DeviceObject,
+    IN PIRP Irp
+)
+/*++
+
+Routine Description:
+
+  Handles PnP IRPs
+
+Arguments:
+
+  _Fdo - Functional Device object pointer.
+
+  _Irp - The Irp being passed
+
+Return Value:
+
+  NT status code.
+
+--*/
+{
+    NTSTATUS ntStatus = STATUS_UNSUCCESSFUL;
+    PIO_STACK_LOCATION stack;
+    PortClassDeviceContext *ext;
+
+    PAGED_CODE();
+
+    ASSERT(DeviceObject);
+    ASSERT(Irp);
+
+    DPF_ENTER(("[PnpHandler]"));
+
+    // Check for the REMOVE_DEVICE irp.  If we're being unloaded,
+    // uninstantiate our devices and release the adapter common
+    // object.
+    //
+    stack = IoGetCurrentIrpStackLocation(Irp);
+
+    if ((IRP_MN_REMOVE_DEVICE == stack->MinorFunction) ||
+        (IRP_MN_SURPRISE_REMOVAL == stack->MinorFunction) ||
+        (IRP_MN_STOP_DEVICE == stack->MinorFunction))
+    {
+        ext = static_cast<PortClassDeviceContext*>(DeviceObject->DeviceExtension);
+
+        if (ext->m_pCommon != NULL)
+        {
+            ext->m_pCommon->UninstantiateDevices();
+            ext->m_pCommon->Release();
+            ext->m_pCommon = NULL;
+        }
+    }
+
+    ntStatus = PcDispatchIrp(DeviceObject, Irp);
+
+    return ntStatus;
 }
 
 NTSTATUS IrpMjCreateHandler(IN PDEVICE_OBJECT DeviceObject, IN PIRP Irp)
