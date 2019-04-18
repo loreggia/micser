@@ -90,8 +90,8 @@ DEFINE_GUIDSTRUCT("68E1267A-9254-4EBC-B752-385C99909A81", NAME_MICSER);
 #define SIOCTL_TYPE 666
 #define IOCTL_RELOAD CTL_CODE(SIOCTL_TYPE, 0x800, METHOD_BUFFERED, FILE_READ_DATA|FILE_WRITE_DATA)
 
-DECLARE_GLOBAL_CONST_UNICODE_STRING(DeviceName, L"Micser Virtual Audio Cable"); // THIS NEEDS TO BE EQUAL TO THE DEVICE NAME IN THE INF FILE!
-DECLARE_GLOBAL_CONST_UNICODE_STRING(IoInterfaceSymLink, L"\\DosDevices\\Micser.Vac.Driver.Device");
+DECLARE_GLOBAL_CONST_UNICODE_STRING(IoDeviceName, L"\\Device\\Micser.Vac.Driver.Device");
+DECLARE_GLOBAL_CONST_UNICODE_STRING(IoDeviceSymLink, L"\\DosDevices\\Micser.Vac.Driver.Device");
 
 //=============================================================================
 // Enumerations
