@@ -250,6 +250,15 @@ namespace Micser.App.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Virtual Audio Cables.
+        /// </summary>
+        public static string MenuItemVacHeader {
+            get {
+                return ResourceManager.GetString("MenuItemVacHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Sets the active color theme of the user interface..
         /// </summary>
         public static string SettingColorThemeDescription {
