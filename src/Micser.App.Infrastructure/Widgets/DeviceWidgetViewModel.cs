@@ -1,4 +1,5 @@
-﻿using Micser.Common.Devices;
+﻿using CSCore.CoreAudioAPI;
+using Micser.Common.Devices;
 using Micser.Common.Modules;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,8 +9,17 @@ namespace Micser.App.Infrastructure.Widgets
     public abstract class DeviceWidgetViewModel : AudioWidgetViewModel
     {
         public const string StateKeyDeviceId = "DeviceId";
+        private readonly MMDeviceEnumerator _deviceEnumerator;
         private IEnumerable<DeviceDescription> _deviceDescriptions;
         private DeviceDescription _selectedDeviceDescription;
+
+        protected DeviceWidgetViewModel()
+        {
+            _deviceEnumerator = new MMDeviceEnumerator();
+            _deviceEnumerator.DeviceAdded += OnDeviceAdded;
+            _deviceEnumerator.DeviceRemoved += OnDeviceRemoved;
+            _deviceEnumerator.DeviceStateChanged += OnDeviceStateChanged;
+        }
 
         public IEnumerable<DeviceDescription> DeviceDescriptions
         {
@@ -41,8 +51,7 @@ namespace Micser.App.Infrastructure.Widgets
 
         public override void Initialize()
         {
-            var deviceService = new DeviceService();
-            UpdateDeviceDescriptions(deviceService);
+            UpdateDeviceDescriptions();
             base.Initialize();
         }
 
@@ -54,8 +63,37 @@ namespace Micser.App.Infrastructure.Widgets
             SelectedDeviceDescription = deviceId != null ? DeviceDescriptions?.FirstOrDefault(d => d.Id == deviceId) : null;
         }
 
-        protected virtual void UpdateDeviceDescriptions(DeviceService deviceService)
+        protected override void Dispose(bool disposing)
         {
+            base.Dispose(disposing);
+
+            if (disposing)
+            {
+                _deviceEnumerator.DeviceAdded -= OnDeviceAdded;
+                _deviceEnumerator.DeviceRemoved -= OnDeviceRemoved;
+                _deviceEnumerator.DeviceStateChanged -= OnDeviceStateChanged;
+                _deviceEnumerator.Dispose();
+            }
+        }
+
+        protected virtual void OnDeviceAdded(object sender, DeviceNotificationEventArgs e)
+        {
+            UpdateDeviceDescriptions();
+        }
+
+        protected virtual void OnDeviceRemoved(object sender, DeviceNotificationEventArgs e)
+        {
+            UpdateDeviceDescriptions();
+        }
+
+        protected virtual void OnDeviceStateChanged(object sender, DeviceStateChangedEventArgs e)
+        {
+            UpdateDeviceDescriptions();
+        }
+
+        protected virtual void UpdateDeviceDescriptions()
+        {
+            var deviceService = new DeviceService();
             DeviceDescriptions = deviceService.GetDevices(DeviceType).ToArray();
         }
     }
