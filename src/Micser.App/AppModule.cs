@@ -140,6 +140,15 @@ namespace Micser.App
                 IconTemplateName = "Icon_Restart_16x"
             });
             menuItemRegistry.Add(new MenuItemDescription { IsSeparator = true, ParentId = AppGlobals.MenuItemIds.Tools });
+            // Tools->Virtual Audio Cables
+            menuItemRegistry.Add(new MenuItemDescription
+            {
+                Header = Resources.MenuItemVacHeader,
+                Id = AppGlobals.MenuItemIds.ToolsVac,
+                ParentId = AppGlobals.MenuItemIds.Tools,
+                Command = new NavigationCommand<VacView>(AppGlobals.PrismRegions.Main),
+                IconTemplateName = "Icon_Link_16x"
+            });
             // Tools->Settings
             menuItemRegistry.Add(new MenuItemDescription
             {
@@ -230,6 +239,7 @@ namespace Micser.App
             containerRegistry.RegisterView<StatusView, StatusViewModel>();
             containerRegistry.RegisterView<MainView, MainViewModel>();
             containerRegistry.RegisterView<SettingsView, SettingsViewModel>();
+            containerRegistry.RegisterView<VacView, VacViewModel>();
             containerRegistry.RegisterView<AboutView, AboutViewModel>();
         }
     }

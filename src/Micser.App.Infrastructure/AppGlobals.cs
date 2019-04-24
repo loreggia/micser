@@ -19,6 +19,7 @@
             public const string ToolsSettings = Tools + "Settings";
             public const string ToolsStart = Tools + "Start";
             public const string ToolsStop = Tools + "Stop";
+            public const string ToolsVac = Tools + "Vac";
         }
 
         public static class ModuleStateKeys

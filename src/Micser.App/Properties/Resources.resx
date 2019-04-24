@@ -180,6 +180,9 @@
   <data name="MenuItemToolsHeader" xml:space="preserve">
     <value>_Tools</value>
   </data>
+  <data name="MenuItemVacHeader" xml:space="preserve">
+    <value>Virtual Audio Cables</value>
+  </data>
   <data name="SettingColorThemeDescription" xml:space="preserve">
     <value>Sets the active color theme of the user interface.</value>
   </data>
