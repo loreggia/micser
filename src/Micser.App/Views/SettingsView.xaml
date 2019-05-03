@@ -90,7 +90,9 @@
         </DataTemplate>
     </i:View.Resources>
 
-    <settings:SettingsPanel ItemsSource="{Binding Settings}" ItemTemplateSelector="{StaticResource TemplateSelector}" Grid.IsSharedSizeScope="True" />
+    <ScrollViewer HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
+        <settings:SettingsPanel ItemsSource="{Binding Settings}" ItemTemplateSelector="{StaticResource TemplateSelector}" Grid.IsSharedSizeScope="True" MaxWidth="800" />
+    </ScrollViewer>
 
     <int:Interaction.Triggers>
         <ir:InteractionRequestTrigger SourceObject="{Binding ImportFileRequest}">
