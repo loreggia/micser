@@ -9,5 +9,7 @@
         d:DesignHeight="450"
         d:DesignWidth="800"
         d:DataContext="{d:DesignInstance vm:VacViewModel}">
-    <TextBlock>test</TextBlock>
+    <Grid MaxWidth="800">
+        <TextBlock>test</TextBlock>
+    </Grid>
 </i:View>
