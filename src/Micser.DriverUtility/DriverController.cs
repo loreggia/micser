@@ -60,6 +60,8 @@ namespace Micser.DriverUtility
 
                 try
                 {
+                    Logger.Info($"Sending control code [{DriverGlobals.IoControlCodes.Reload}], encoded: [{ioCtlReload:X}]");
+
                     uint bytesReturned = 0;
                     var overlapped = new NativeOverlapped();
                     var success = DriverInterop.DeviceIoControl(hFileHandle, ioCtlReload, null, 0, null, 0, ref bytesReturned, ref overlapped);

@@ -20,6 +20,7 @@ Abstract:
 
 // Globals
 PDEVICE_OBJECT g_IoDevice;
+PDEVICE_OBJECT g_AudioDevice;
 
 //-----------------------------------------------------------------------------
 // Referenced forward.
@@ -231,6 +232,8 @@ StartDevice
 
     DPF_ENTER(("[StartDevice]"));
 
+    g_AudioDevice = DeviceObject;
+
     // create a new adapter common object
     //
     ntStatus =
@@ -424,6 +427,10 @@ NTSTATUS IrpMjDeviceControlHandler(IN PDEVICE_OBJECT DeviceObject, IN PIRP Irp)
     // check if we need to handle the IRP
     if (DeviceObject == g_IoDevice)
     {
+        ioControlCode = IOCTL_RELOAD;
+
+        DPF(D_TERSE, ("Expected control code: %i", ioControlCode));
+
         pIoStackLocation = IoGetCurrentIrpStackLocation(Irp);
         ioControlCode = pIoStackLocation->Parameters.DeviceIoControl.IoControlCode;
 
@@ -433,7 +440,7 @@ NTSTATUS IrpMjDeviceControlHandler(IN PDEVICE_OBJECT DeviceObject, IN PIRP Irp)
         {
         case IOCTL_RELOAD:
             DPF(D_TERSE, ("IOCTL RELOAD."));
-            pExtension = static_cast<PortClassDeviceContext*>(DeviceObject->DeviceExtension);
+            pExtension = static_cast<PortClassDeviceContext*>(g_AudioDevice->DeviceExtension);
 
             if (pExtension->m_pCommon == NULL)
             {

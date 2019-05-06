@@ -7,7 +7,7 @@
 
         public static class IoControlCodes
         {
-            public const uint Reload = 666;
+            public const uint Reload = 0x800;
         }
 
         public static class RegistryValues
