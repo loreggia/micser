@@ -7,6 +7,8 @@ namespace Micser.Common
     {
         public const int ApiPort = 60666;
 
+        public const string DeviceInterfaceName = "Micser Virtual Audio Cable";
+
         public const string PluginSearchPattern = "Micser.Plugins.*.dll";
 
         public const string UserRegistryRoot = @"Software\Micser";
