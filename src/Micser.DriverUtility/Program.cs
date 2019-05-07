@@ -80,6 +80,11 @@ namespace Micser.DriverUtility
                     logger.Error($"{nameof(DriverController.SetDeviceSettingsAndReload)} returned {result}");
                     return result;
                 }
+
+                using (var deviceService = new DeviceService())
+                {
+                    deviceService.RenameDevices();
+                }
             }
             catch (Exception ex)
             {
