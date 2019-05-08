@@ -14,7 +14,7 @@ namespace Micser.DriverUtility
     {
         private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
-        public int SetDeviceSettingsAndReload(uint deviceCount)
+        public int SetDeviceSettingsAndReload(int deviceCount)
         {
             if (deviceCount > DriverGlobals.MaxDeviceCount)
             {
@@ -24,7 +24,7 @@ namespace Micser.DriverUtility
             try
             {
                 var registryKey = Registry.CurrentUser.CreateSubKey(Globals.UserRegistryRoot, true);
-                registryKey.SetValue(DriverGlobals.RegistryValues.DeviceCount, deviceCount, RegistryValueKind.DWord);
+                registryKey.SetValue(DriverGlobals.RegistryValues.DeviceCount, (uint)deviceCount, RegistryValueKind.DWord);
             }
             catch (Exception ex)
             {

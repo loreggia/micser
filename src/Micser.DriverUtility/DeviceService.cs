@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 
 namespace Micser.DriverUtility
 {
@@ -29,35 +30,58 @@ namespace Micser.DriverUtility
             _deviceEnumerator.Dispose();
         }
 
-        public void RenameDevices()
+        public async Task<bool> RenameDevices(int expectedCount)
         {
-            var devices = _deviceEnumerator.EnumAudioEndpoints(DataFlow.All, DeviceState.Active | DeviceState.Disabled);
+            const int numRetries = 10;
+            var retries = 0;
 
-            var interfaceNamePropertyKey = new PropertyKey(new Guid("b3f8fa53-0004-438e-9003-51a46e139bfc"), 6);
+            do
+            {
+                var renderDevices = GetDevices(DataFlow.Render);
+                var captureDevices = GetDevices(DataFlow.Capture);
 
-            var devicesR = new List<MMDevice>();
-            var devicesC = new List<MMDevice>();
+                if (renderDevices.Count == expectedCount && captureDevices.Count == expectedCount)
+                {
+                    try
+                    {
+                        RenameDevices(renderDevices);
+                        RenameDevices(captureDevices);
+                        return true;
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.Error(ex);
+                        return false;
+                    }
+                }
+
+                Logger.Info($"Expected number of devices: {expectedCount}, current number of devices: {renderDevices.Count} (render), {captureDevices.Count} (capture). Retrying ({retries + 1}/{numRetries})...");
+                await Task.Delay(2000);
+
+                retries++;
+            } while (retries < numRetries);
+
+            return false;
+        }
+
+        private List<MMDevice> GetDevices(DataFlow dataFlow)
+        {
+            var devices = _deviceEnumerator.EnumAudioEndpoints(dataFlow, DeviceState.Active | DeviceState.Disabled);
+
+            var result = new List<MMDevice>();
 
             foreach (var device in devices)
             {
-                var interfaceNameProperty = device.PropertyStore.GetValue(interfaceNamePropertyKey);
-                var interfaceName = interfaceNameProperty.GetValue()?.ToString();
+                var deviceNameProperty = device.PropertyStore.GetValue(DriverGlobals.PropertyKeys.DeviceName);
+                var deviceName = deviceNameProperty.GetValue()?.ToString();
 
-                if (interfaceName == Globals.DeviceInterfaceName)
+                if (deviceName == Globals.DeviceInterfaceName)
                 {
-                    if (device.DataFlow.HasFlag(DataFlow.Capture))
-                    {
-                        devicesC.Add(device);
-                    }
-                    else if (device.DataFlow.HasFlag(DataFlow.Render))
-                    {
-                        devicesR.Add(device);
-                    }
+                    result.Add(device);
                 }
             }
 
-            RenameDevices(devicesR);
-            RenameDevices(devicesC);
+            return result;
         }
 
         private void RenameDevices(List<MMDevice> devices)

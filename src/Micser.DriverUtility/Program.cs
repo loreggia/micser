@@ -66,7 +66,7 @@ namespace Micser.DriverUtility
 
                 var sDeviceCount = arguments[Globals.DriverUtility.DeviceCount];
 
-                if (string.IsNullOrEmpty(sDeviceCount) || !uint.TryParse(sDeviceCount, out var deviceCount))
+                if (string.IsNullOrEmpty(sDeviceCount) || !int.TryParse(sDeviceCount, out var deviceCount))
                 {
                     logger.Error($"Invalid or missing device count argument '{Globals.DriverUtility.ParamNameChars[0]}{Globals.DriverUtility.DeviceCount}' provided: '{sDeviceCount}'.");
                     return Globals.DriverUtility.ReturnCodes.InvalidParameter;
@@ -83,7 +83,11 @@ namespace Micser.DriverUtility
 
                 using (var deviceService = new DeviceService())
                 {
-                    deviceService.RenameDevices();
+                    var renameResult = deviceService.RenameDevices(deviceCount).GetAwaiter().GetResult();
+                    if (!renameResult)
+                    {
+                        logger.Error("Renaming failed.");
+                    }
                 }
             }
             catch (Exception ex)
