@@ -98,7 +98,7 @@
     <VerifyDrivers />
     <VerifyFlags>133563</VerifyFlags>
     <Inf2CatUseLocalTime>true</Inf2CatUseLocalTime>
-    <OutDir>$(SolutionDir)..\bin\$(ConfigurationName)\Driver\$(Platform)\</OutDir>
+    <OutDir>$(ProjectDir)bin\$(ConfigurationName)\</OutDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
@@ -124,7 +124,7 @@
     <VerifyDrivers />
     <VerifyFlags>133563</VerifyFlags>
     <Inf2CatUseLocalTime>true</Inf2CatUseLocalTime>
-    <OutDir>$(SolutionDir)..\bin\$(ConfigurationName)\Driver\$(Platform)\</OutDir>
+    <OutDir>$(ProjectDir)bin\$(ConfigurationName)\</OutDir>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

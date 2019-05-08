@@ -86,18 +86,24 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
     <Inf2CatUseLocalTime>true</Inf2CatUseLocalTime>
-    <OutDir>$(ProjectDir)bin\$(Platform)\$(ConfigurationName)\</OutDir>
+    <OutDir>$(ProjectDir)bin\$(ConfigurationName)\</OutDir>
+    <IntDir>$(ProjectDir)obj\$(ConfigurationName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
+    <OutDir>$(ProjectDir)bin\$(ConfigurationName)\</OutDir>
+    <IntDir>$(ProjectDir)obj\$(ConfigurationName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
-    <OutDir>$(ProjectDir)bin\$(Platform)\$(ConfigurationName)\</OutDir>
+    <OutDir>$(ProjectDir)bin\$(ConfigurationName)\</OutDir>
     <Inf2CatUseLocalTime>true</Inf2CatUseLocalTime>
+    <IntDir>$(ProjectDir)obj\$(ConfigurationName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <DebuggerFlavor>DbgengKernelDebugger</DebuggerFlavor>
+    <OutDir>$(ProjectDir)bin\$(ConfigurationName)\</OutDir>
+    <IntDir>$(ProjectDir)obj\$(ConfigurationName)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
