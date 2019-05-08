@@ -5,6 +5,7 @@ using NLog;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 
 namespace Micser.DriverUtility
 {
@@ -55,26 +56,48 @@ namespace Micser.DriverUtility
                 }
             }
 
-            var defMmDeviceR = _deviceEnumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia);
-            var defComDeviceR = _deviceEnumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Communications);
-            var defConDeviceR = _deviceEnumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console);
             RenameDevices(devicesR);
+            RenameDevices(devicesC);
         }
 
-        private void RenameDevices(
-            IList<MMDevice> devices
-        //,MMDevice defaultMultimediaDevice,
-        //MMDevice defaultCommunicationDevice,
-        //MMDevice defaultConsoleDevice
-        )
+        private void RenameDevices(List<MMDevice> devices)
         {
+            var rxTopologyName = new Regex(@"\\wave(\d+)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+            devices.Sort((d1, d2) =>
+            {
+                // HACK - this property is not documented my microsoft
+                var topologyInfo1 = d1.PropertyStore.GetValue(DriverGlobals.PropertyKeys.TopologyInfo).GetValue()?.ToString();
+                var topologyInfo2 = d2.PropertyStore.GetValue(DriverGlobals.PropertyKeys.TopologyInfo).GetValue()?.ToString();
+
+                if (!string.IsNullOrEmpty(topologyInfo1) &&
+                    !string.IsNullOrEmpty(topologyInfo2))
+                {
+                    var match1 = rxTopologyName.Match(topologyInfo1);
+                    var match2 = rxTopologyName.Match(topologyInfo2);
+
+                    if (match1.Success && match2.Success)
+                    {
+                        var value1 = match1.Groups.Count > 1 ? match1.Groups[1].Value : match1.Value;
+                        var value2 = match2.Groups.Count > 1 ? match2.Groups[1].Value : match2.Value;
+
+                        return string.Compare(value1, value2, StringComparison.OrdinalIgnoreCase);
+                    }
+                }
+
+                return 0;
+            });
+
             for (var i = 0; i < devices.Count; i++)
             {
                 var device = devices[i];
-                var deviceName = Globals.DeviceInterfaceName + (i + 1);
+                var deviceName = $"{Globals.DeviceInterfaceName} {i + 1}";
                 var pName = Marshal.StringToHGlobalUni(deviceName);
-                // todo access denied??
-                device.PropertyStore.SetValue(PropertyStore.FriendlyName, new PropertyVariant { DataType = VarEnum.VT_LPWSTR, PointerValue = pName });
+                var propertyStore = device.OpenPropertyStore(StorageAccess.ReadWrite);
+                propertyStore.SetValue(
+                    DriverGlobals.PropertyKeys.DeviceDescription,
+                    new PropertyVariant { DataType = VarEnum.VT_LPWSTR, PointerValue = pName });
+                propertyStore.Commit();
             }
         }
     }
