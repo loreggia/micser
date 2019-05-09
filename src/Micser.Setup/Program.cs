@@ -35,7 +35,6 @@ namespace Micser.Setup
             project.SourceBaseDir = @"..\..\bin\Debug\";
 #else
             project.SourceBaseDir = @"..\..\bin\Release\";
-#endif
 
             project.DigitalSignature = new DigitalSignature
             {
@@ -44,6 +43,7 @@ namespace Micser.Setup
                 Description = "Micser",
                 TimeUrl = new Uri("http://timestamp.verisign.com/scripts/timstamp.dll")
             };
+#endif
 
             project.Dirs = new[]
             {
