@@ -262,4 +262,5 @@ __pycache__/
 *.msi
 
 # Micser specific
+/crt/
 /src/Micser.Setup/wix/Micser.Setup.g.wxs

@@ -10,14 +10,20 @@ namespace Micser.DriverUtility
 {
     internal class Program
     {
-        private static void InitLogging()
+        private static void InitLogging(bool isInstallation)
         {
             var config = new LoggingConfiguration();
-            config.AddTarget(new ColoredConsoleTarget("ConsoleTarget")
+
+            if (!isInstallation)
             {
-                Layout = @"${date:format=HH\:mm\:ss} ${level} ${message} ${exception:format=tostring}",
-                DetectConsoleAvailable = true
-            });
+                config.AddTarget(new ColoredConsoleTarget("ConsoleTarget")
+                {
+                    Layout = @"${date:format=HH\:mm\:ss} ${level} ${message} ${exception:format=tostring}",
+                    DetectConsoleAvailable = true
+                });
+                config.AddRuleForAllLevels("ConsoleTarget");
+            }
+
             config.AddTarget(new FileTarget("FileTarget")
             {
                 ArchiveNumbering = ArchiveNumberingMode.DateAndSequence,
@@ -27,7 +33,6 @@ namespace Micser.DriverUtility
                 FileName = Path.Combine(Globals.AppDataFolder, "Micser.DriverUtility.log"),
                 FileNameKind = FilePathKind.Absolute
             });
-            config.AddRuleForAllLevels("ConsoleTarget");
             config.AddRuleForAllLevels("FileTarget");
 
             LogManager.Configuration = config;
@@ -47,7 +52,15 @@ namespace Micser.DriverUtility
 
         private static int MainInternal(string[] args)
         {
-            InitLogging();
+            var arguments = new ArgumentDictionary(Globals.DriverUtility.ParamNameChars, args);
+            var silent = arguments.HasFlag(Globals.DriverUtility.Silent);
+            InitLogging(silent);
+
+            if (silent)
+            {
+                // In silent mode the console log is deactivated; only show the following:
+                Console.WriteLine("Configuring virtual audio cable...");
+            }
 
             var logger = LogManager.GetCurrentClassLogger();
 
@@ -61,7 +74,6 @@ namespace Micser.DriverUtility
 
             try
             {
-                var arguments = new ArgumentDictionary(Globals.DriverUtility.ParamNameChars, args);
                 logger.Info("Arguments: " + arguments);
 
                 var sDeviceCount = arguments[Globals.DriverUtility.DeviceCount];

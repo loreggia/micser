@@ -23,6 +23,9 @@
       <Project>{6eebbc22-f44c-400d-8fbb-2e42960d287b}</Project>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\crt\Certificate.pfx" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{353EAF8B-CDFD-4216-BE5A-1D44CA2583EC}</ProjectGuid>
     <TemplateGuid>{4605da2c-74a5-4865-98e1-152ef136825f}</TemplateGuid>
