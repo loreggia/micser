@@ -3,6 +3,9 @@ using System.Windows.Controls;
 
 namespace Micser.App.Infrastructure.Behaviors
 {
+    /// <summary>
+    /// Connects a <see cref="Label"/> with a <see cref="CheckBox"/> so the checkbox value is changed when clicking on the label.
+    /// </summary>
     public static class CheckBoxLabelBehavior
     {
         public static readonly DependencyProperty IsEnabledProperty = DependencyProperty.RegisterAttached(

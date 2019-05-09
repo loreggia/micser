@@ -4,6 +4,10 @@ using System.Linq;
 
 namespace Micser.App.Infrastructure
 {
+    /// <summary>
+    /// A basic hierarchical tree node.
+    /// </summary>
+    /// <typeparam name="T">Type of the attached data.</typeparam>
     public class TreeNode<T>
     {
         public TreeNode(T item)
@@ -11,9 +15,9 @@ namespace Micser.App.Infrastructure
             Item = item;
         }
 
-        public IEnumerable<TreeNode<T>> Children { get; set; }
+        public IEnumerable<TreeNode<T>> Children { get; private set; }
         public T Item { get; }
-        public TreeNode<T> Parent { get; set; }
+        public TreeNode<T> Parent { get; private set; }
 
         public static IEnumerable<TreeNode<T>> CreateTree<TId>(IEnumerable<T> source, Func<T, TId> idSelector,
                                                                Func<T, TId> parentIdSelector, Func<T, object> orderFunc)

@@ -4,6 +4,9 @@ using System.Text.RegularExpressions;
 
 namespace Micser.App.Infrastructure
 {
+    /// <summary>
+    /// Handles a .ini file.
+    /// </summary>
     public class IniFile
     {
         private static readonly Regex RxSection;

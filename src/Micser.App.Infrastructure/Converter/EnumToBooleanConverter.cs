@@ -3,6 +3,9 @@ using System.Globalization;
 
 namespace Micser.App.Infrastructure.Converter
 {
+    /// <summary>
+    /// Converter that simplifies binding an enum value to radio buttons.
+    /// </summary>
     public class EnumToBooleanConverter : ConverterExtension
     {
         public object Value { get; set; }

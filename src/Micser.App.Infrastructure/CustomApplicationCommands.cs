@@ -53,6 +53,9 @@ namespace Micser.App.Infrastructure
             Delete = CreateCommand(() => Delete);
         }
 
+        /// <summary>
+        /// Helper function to create a <see cref="RoutedUICommand"/>.
+        /// </summary>
         private static RoutedUICommand CreateCommand<T>(Expression<Func<T>> command)
         {
             var name = PropertyExtensions.GetName(command);

@@ -2,6 +2,7 @@
 
 namespace Micser.App.Infrastructure
 {
+    /// <inheritdoc cref="IApplicationStateService" />
     public class ApplicationStateService : IApplicationStateService
     {
         private readonly IEventAggregator _eventAggregator;

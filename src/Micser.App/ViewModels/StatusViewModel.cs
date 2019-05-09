@@ -6,6 +6,12 @@ using System;
 
 namespace Micser.App.ViewModels
 {
+    public enum StatusType
+    {
+        Unknown,
+        ConnectionFailed
+    }
+
     public class StatusViewModel : ViewModelNavigationAware
     {
         private readonly INavigationManager _navigationManager;

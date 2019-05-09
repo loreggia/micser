@@ -33,6 +33,9 @@
         SliderLeftBackground
     }
 
+    /// <summary>
+    /// Strongly typed resource keys for dynamic brush resources.
+    /// </summary>
     public class BrushThemeKeyExtension : ThemeKeyExtension<BrushThemeKey>
     {
         public BrushThemeKeyExtension(BrushThemeKey key)

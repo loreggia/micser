@@ -3,6 +3,7 @@ using System.Linq;
 
 namespace Micser.Common
 {
+    /// <inheritdoc cref="IItemRegistry{T}"/> />
     public class ItemRegistry<T> : IItemRegistry<T>
     {
         private readonly IList<T> _items;

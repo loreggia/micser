@@ -71,9 +71,14 @@ namespace Micser.Engine.Api
 
         private dynamic ImportConfiguration(ModulesExportDto dto)
         {
+            var state = _audioEngine.IsRunning;
+
             try
             {
-                _audioEngine.Stop();
+                if (state)
+                {
+                    _audioEngine.Stop();
+                }
 
                 if (dto?.Modules == null)
                 {
@@ -116,7 +121,10 @@ namespace Micser.Engine.Api
             }
             finally
             {
-                _audioEngine.Start();
+                if (state)
+                {
+                    _audioEngine.Start();
+                }
             }
         }
 

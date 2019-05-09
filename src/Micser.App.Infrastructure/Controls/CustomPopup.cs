@@ -5,6 +5,9 @@ using System.Windows.Media;
 
 namespace Micser.App.Infrastructure.Controls
 {
+    /// <summary>
+    /// An extended popup control that allows the binding of additional properties unavailable in the default <see cref="Popup"/> control.
+    /// </summary>
     public class CustomPopup : Popup
     {
         public static readonly DependencyProperty ActualHorizontalOffsetProperty;
@@ -29,18 +32,27 @@ namespace Micser.App.Infrastructure.Controls
             ActualVerticalOffsetProperty = ActualVerticalOffsetPropertyKey.DependencyProperty;
         }
 
+        /// <summary>
+        /// Gets the actual horizontal offset taking opposite placement when close to a screen edge into account.
+        /// </summary>
         public double ActualHorizontalOffset
         {
             get => (double)GetValue(ActualHorizontalOffsetProperty);
             protected set => SetValue(ActualHorizontalOffsetPropertyKey, value);
         }
 
+        /// <summary>
+        /// Gets the actual vertical offset taking opposite placement when close to a screen edge into account.
+        /// </summary>
         public double ActualVerticalOffset
         {
             get => (double)GetValue(ActualVerticalOffsetProperty);
             protected set => SetValue(ActualVerticalOffsetPropertyKey, value);
         }
 
+        /// <summary>
+        /// Gets a value indicating whether the popup is currently placed on the opposite side due to being close to a screen edge.
+        /// </summary>
         public bool IsOppositePlacement
         {
             get => (bool)GetValue(IsOppositePlacementProperty);

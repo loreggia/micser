@@ -50,8 +50,6 @@
     <Compile Include="Api\ApiEvent.cs" />
     <Compile Include="Api\ApiEventRequestProcessor.cs" />
     <Compile Include="Api\EngineApiClient.cs" />
-    <Compile Include="Api\Error.cs" />
-    <Compile Include="Api\ErrorList.cs" />
     <Compile Include="Api\ModuleConnectionsApiClient.cs" />
     <Compile Include="Api\ModulesApiClient.cs" />
     <Compile Include="Api\ServiceResult.cs" />
@@ -70,8 +68,6 @@
     <Compile Include="Controls\EditableTextBlock.cs" />
     <Compile Include="Controls\InfoButton.cs" />
     <Compile Include="Controls\LoadingSpinner.cs" />
-    <Compile Include="Controls\RelativePositionPanel.cs" />
-    <Compile Include="Controls\ToolBarTrayHelper.cs" />
     <Compile Include="Converter\BooleanConverter.cs" />
     <Compile Include="Converter\BooleanInvertConverter.cs" />
     <Compile Include="Converter\BooleanToDoubleConverter.cs" />
@@ -133,7 +129,6 @@
     <Compile Include="PathFinder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Settings\SettingsService.cs" />
-    <Compile Include="StatusType.cs" />
     <Compile Include="Themes\IResourceRegistry.cs" />
     <Compile Include="Themes\ResourceRegistry.cs" />
     <Compile Include="Themes\ThemeKeyExtension.cs" />

@@ -5,6 +5,9 @@ using System.Windows.Input;
 
 namespace Micser.App.Infrastructure.Controls
 {
+    /// <summary>
+    /// Control that looks like a <see cref="TextBlock"/> but allows switching to a <see cref="TextBox"/> to change the contents.
+    /// </summary>
     [TemplatePart(Name = PartNameTextBox, Type = typeof(TextBox))]
     [TemplatePart(Name = PartNameToggleButton, Type = typeof(ButtonBase))]
     public class EditableTextBlock : Control

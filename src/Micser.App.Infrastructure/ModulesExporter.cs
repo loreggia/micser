@@ -6,6 +6,9 @@ using System.IO;
 
 namespace Micser.App.Infrastructure
 {
+    /// <summary>
+    /// Exports/imports (audio) module data to and from JSON files.
+    /// </summary>
     public class ModulesExporter
     {
         private readonly ILogger _logger;

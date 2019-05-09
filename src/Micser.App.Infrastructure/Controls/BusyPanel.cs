@@ -3,6 +3,9 @@ using System.Windows.Controls;
 
 namespace Micser.App.Infrastructure.Controls
 {
+    /// <summary>
+    /// A simple control that shows a loading spinner.
+    /// </summary>
     public class BusyPanel : Control
     {
         static BusyPanel()

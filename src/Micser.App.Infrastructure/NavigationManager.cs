@@ -4,6 +4,7 @@ using System;
 
 namespace Micser.App.Infrastructure
 {
+    /// <inheritdoc cref="INavigationManager" />
     public class NavigationManager : INavigationManager, IDisposable
     {
         private readonly IEventAggregator _eventAggregator;

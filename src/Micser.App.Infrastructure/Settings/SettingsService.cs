@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 
 namespace Micser.App.Infrastructure.Settings
 {
+    /// <inheritdoc cref="ISettingsService"/>
     public class SettingsService : ISettingsService
     {
         private readonly IUnitOfWorkFactory _database;

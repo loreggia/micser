@@ -3,6 +3,9 @@ using System.Globalization;
 
 namespace Micser.App.Infrastructure.Converter
 {
+    /// <summary>
+    /// Converts from the type <typeparamref name="T"/> to <see cref="bool"/>.
+    /// </summary>
     public class BooleanConverter<T> : ConverterExtension
     {
         public BooleanConverter()
@@ -15,7 +18,14 @@ namespace Micser.App.Infrastructure.Converter
             FalseValue = falseValue;
         }
 
+        /// <summary>
+        /// Gets or sets the value that corresponds to false.
+        /// </summary>
         public T FalseValue { get; set; }
+
+        /// <summary>
+        /// Gets or sets the value that corresponds to true.
+        /// </summary>
         public T TrueValue { get; set; }
 
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)

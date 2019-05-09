@@ -5,6 +5,9 @@ using System.Windows.Interactivity;
 
 namespace Micser.App.Infrastructure.Interaction
 {
+    /// <summary>
+    /// Base class for open/save file dialog actions.
+    /// </summary>
     public abstract class FileDialogAction : TriggerAction<FrameworkElement>
     {
         protected abstract FileDialog CreateDialog();
