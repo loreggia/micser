@@ -15,6 +15,7 @@ namespace Micser.Engine.Test.Audio
         }
 
         [Fact]
+        [Trait("Category", "Sound")]
         public async Task DeviceEnumeratorPropertyChange()
         {
             var enumerator = new MMDeviceEnumerator();
