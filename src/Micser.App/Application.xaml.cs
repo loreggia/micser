@@ -15,12 +15,12 @@ using Prism.Modularity;
 using Prism.Unity;
 using System;
 using System.Data.Entity;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
 using Unity;
 using Unity.Injection;
 using Unity.Resolution;
@@ -28,12 +28,18 @@ using Unity.Resolution;
 namespace Micser.App
 {
     /// <summary>
-    ///     Interaction logic for App.xaml
+    /// Interaction logic for App.xaml
     /// </summary>
     public partial class Application
     {
+        private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
         private bool _isStartup;
         private MainShell _shell;
+
+        public Application()
+        {
+            DispatcherUnhandledException += OnDispatcherUnhandledException;
+        }
 
         public static T GetService<T>()
         {
@@ -93,8 +99,7 @@ namespace Micser.App
 
             base.OnExit(e);
 
-            var logger = LogManager.GetCurrentClassLogger();
-            logger.Info("Exiting...");
+            Logger.Info("Exiting...");
         }
 
         protected override async void OnInitialized()
@@ -120,6 +125,7 @@ namespace Micser.App
                 MainWindow?.Show();
             }
 
+            Logger.Info("Ready");
             SetStatus("Ready");
         }
 
@@ -148,8 +154,7 @@ namespace Micser.App
             config.AddRuleForAllLevels("FileTarget");
 
             LogManager.Configuration = config;
-            var logger = LogManager.GetCurrentClassLogger();
-            logger.Info("Starting...");
+            Logger.Info("Starting...");
 
             base.OnStartup(e);
         }
@@ -171,6 +176,7 @@ namespace Micser.App
 
         private static void LoadPlugins(IModuleCatalog moduleCatalog)
         {
+            Logger.Debug("Loading plugins");
             SetStatus("Loading plugins...");
 
             var executingFile = new FileInfo(Assembly.GetExecutingAssembly().Location);
@@ -191,11 +197,11 @@ namespace Micser.App
                 }
                 catch (Exception ex)
                 {
-                    var logger = GetService<ILogger>();
-                    logger.Debug(ex);
-                    Debug.WriteLine(ex);
+                    Logger.Warn(ex);
                 }
             }
+
+            Logger.Debug("Plugins loaded");
         }
 
         private static void SetStatus(string text)
@@ -203,6 +209,12 @@ namespace Micser.App
             var eventAggregator = GetService<IEventAggregator>();
             var statusChangeEvent = eventAggregator.GetEvent<ApplicationEvents.StatusChange>();
             statusChangeEvent.Publish(text);
+        }
+
+        private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+        {
+            Logger.Error(e.Exception, "Unhandled application exception.");
+            e.Handled = true;
         }
     }
 }

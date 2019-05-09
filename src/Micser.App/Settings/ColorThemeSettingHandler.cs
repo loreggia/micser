@@ -98,7 +98,7 @@ namespace Micser.App.Settings
 
         private static void ApplyThemeInternal(string fileName)
         {
-            using (var fs = new FileStream(fileName, FileMode.Open))
+            using (var fs = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
             {
                 var dic = (ResourceDictionary)XamlReader.Load(fs);
                 Application.Current.Resources.MergedDictionaries.Add(dic);

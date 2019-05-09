@@ -1,4 +1,6 @@
 ﻿using Micser.App.Infrastructure.DataAccess.Models;
+using Micser.Common;
+using System;
 using System.Data.Entity;
 using System.Data.Entity.Migrations;
 using System.Data.SQLite.EF6.Migrations;
@@ -7,6 +9,11 @@ namespace Micser.App.Infrastructure.DataAccess
 {
     public class AppDbContext : DbContext
     {
+        static AppDbContext()
+        {
+            AppDomain.CurrentDomain.SetData("DataDirectory", Globals.AppDataFolder);
+        }
+
         public AppDbContext()
             : base("DefaultConnection")
         {
