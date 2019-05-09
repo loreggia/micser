@@ -64,7 +64,8 @@ namespace Micser.DriverUtility
 
             var logger = LogManager.GetCurrentClassLogger();
 
-            if (!UacHelper.IsProcessElevated)
+            // TODO the check doesn't work during msi installation..
+            if (!silent && !UacHelper.IsProcessElevated)
             {
                 logger.Error("The process must have elevated privileges to manage driver installation.");
                 return Globals.DriverUtility.ReturnCodes.RequiresAdminAccess;
