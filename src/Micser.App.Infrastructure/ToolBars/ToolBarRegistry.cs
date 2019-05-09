@@ -2,6 +2,7 @@
 
 namespace Micser.App.Infrastructure.ToolBars
 {
+    /// <inheritdoc cref="IToolBarRegistry"/>
     public class ToolBarRegistry : IToolBarRegistry
     {
         private readonly Dictionary<string, ToolBarDescription> _toolBars;

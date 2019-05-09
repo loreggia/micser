@@ -2,6 +2,9 @@
 
 namespace Micser.App.Infrastructure.Widgets
 {
+    /// <summary>
+    /// Base class for widgets that handle audio streams. Add an <see cref="AudioWidgetControls"/> element to the view to handle this view model's properties automatically.
+    /// </summary>
     public abstract class AudioWidgetViewModel : WidgetViewModel
     {
         private bool _isMuted;

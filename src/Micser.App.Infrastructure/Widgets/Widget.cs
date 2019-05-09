@@ -8,6 +8,9 @@ using System.Windows.Media;
 
 namespace Micser.App.Infrastructure.Widgets
 {
+    /// <summary>
+    /// Base view class for widgets.
+    /// </summary>
     [TemplatePart(Name = PartNameInputConnectors, Type = typeof(ItemsControl))]
     [TemplatePart(Name = PartNameOutputConnectors, Type = typeof(ItemsControl))]
     public class Widget : ContentControl, ISelectable
@@ -67,18 +70,27 @@ namespace Micser.App.Infrastructure.Widgets
             set => SetValue(DeleteCommandProperty, value);
         }
 
+        /// <summary>
+        /// Gets or sets the content that is shown in the widget's header using the <see cref="HeaderTemplate"/>.
+        /// </summary>
         public object Header
         {
             get => GetValue(HeaderProperty);
             set => SetValue(HeaderProperty, value);
         }
 
+        /// <summary>
+        /// Gets or sets the template to display the <see cref="Header"/> content.
+        /// </summary>
         public DataTemplate HeaderTemplate
         {
             get => (DataTemplate)GetValue(HeaderTemplateProperty);
             set => SetValue(HeaderTemplateProperty, value);
         }
 
+        /// <summary>
+        /// Gets the widget's input connector controls.
+        /// </summary>
         public IEnumerable<Connector> InputConnectors => _inputConnectorsControl?.GetItemsChildren<Connector>();
 
         public IEnumerable<ConnectorViewModel> InputConnectorsSource
@@ -94,8 +106,8 @@ namespace Micser.App.Infrastructure.Widgets
         }
 
         /// <summary>
-        ///     While drag connection procedure is ongoing and the mouse moves over this item this value is true; if true the ConnectorDecorator is triggered to
-        ///     be visible, see template.
+        /// While drag connection procedure is ongoing and the mouse moves over this item this value is true;
+        /// if true the ConnectorDecorator is triggered to be visible, see template.
         /// </summary>
         public bool IsDragConnectionOver
         {
