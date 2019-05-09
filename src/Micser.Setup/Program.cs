@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using WixSharp;
 using WixSharp.Forms;
 using Action = WixSharp.Action;
@@ -11,10 +12,17 @@ namespace Micser.Setup
         {
             bool FileFilter(string file)
             {
-                return !file.EndsWith(".test.dll", StringComparison.InvariantCultureIgnoreCase) &&
-                       !file.EndsWith(".xml", StringComparison.InvariantCultureIgnoreCase) &&
-                       !file.EndsWith(".pdb", StringComparison.InvariantCultureIgnoreCase) &&
-                       !file.EndsWith("Micser.DriverUtility.exe", StringComparison.InvariantCultureIgnoreCase);
+                var excludedFiles = new[]
+                {
+                    ".test.dll",
+                    ".xml",
+                    ".pdb",
+                    "Micser.App.exe",
+                    "Micser.DriverUtility.exe",
+                    "Micser.Engine.exe"
+                };
+
+                return !excludedFiles.Any(x => file.EndsWith(x, StringComparison.InvariantCultureIgnoreCase));
             }
 
             var project = new ManagedProject("Micser")
@@ -41,8 +49,26 @@ namespace Micser.Setup
             {
                 new Dir(@"%ProgramFiles%\Micser",
                     new Files(@"App\*.*", FileFilter),
-                    new File(new Id("DriverUtilityExe"), @"App\Micser.DriverUtility.exe"),
-                    new Files(@"Driver\Micser.Vac.Package\*.*")
+                    new Files(@"Driver\Micser.Vac.Package\*.*"),
+                    new File(new Id("MicserAppExe"), @"App\Micser.App.exe"),
+                    new File(new Id("MicserDriverUtilityExe"), @"App\Micser.DriverUtility.exe"),
+                    new File(new Id("MicserEngineExe"), @"App\Micser.Engine.exe")
+                    {
+                        ServiceInstaller = new ServiceInstaller("Micser.Engine")
+                        {
+                            StartOn = SvcEvent.Install,
+                            StopOn = SvcEvent.InstallUninstall_Wait,
+                            RemoveOn = SvcEvent.Uninstall_Wait,
+                            Type = SvcType.ownProcess,
+                            Account = "LocalSystem",
+                            Description = "Micser Audio Engine Service",
+                            DisplayName = "Micser Engine",
+                            Start = SvcStartType.auto,
+                            DelayedAutoStart = false,
+                            Vital = true,
+                            Interactive = false
+                        }
+                    }
                 ),
                 new Dir(@"%ProgramMenu%\Micser",
                     new ExeFileShortcut("Micser", @"[INSTALLDIR]\Micser.App.exe", ""),
@@ -57,7 +83,7 @@ namespace Micser.Setup
 
             project.Actions = new Action[]
             {
-                new BinaryFileAction("DevconExe", @"install ""[INSTALLDIR]Micser.Vac.Driver.inf"" Root\Micser.Vac.Driver", Return.check, When.After, Step.InstallFiles, Condition.NOT_Installed)
+                new BinaryFileAction("DevconExe", @"install ""[INSTALLDIR]Micser.Vac.Driver.inf"" Root\Micser.Vac.Driver", Return.check, When.After, Step.InstallServices, Condition.NOT_Installed)
                 {
                     Execute = Execute.deferred,
                     Impersonate = false
@@ -67,25 +93,27 @@ namespace Micser.Setup
                     Execute = Execute.deferred,
                     Impersonate = false
                 },
-                new InstalledFileAction("DriverUtilityExe", @"/c 1 /s", Return.check, When.After, Step.InstallFiles, Condition.NOT_Installed)
+                new InstalledFileAction("MicserDriverUtilityExe", @"/c 1 /s", Return.check, When.After, Step.InstallServices, Condition.NOT_Installed)
                 {
                     Execute = Execute.deferred,
                     Impersonate = false
                 },
             };
 
-            project.ManagedUI.InstallDialogs.Add(Dialogs.Welcome)
-                   .Add(Dialogs.Licence)
-                   .Add(Dialogs.SetupType)
-                   .Add(Dialogs.Features)
-                   .Add(Dialogs.InstallDir)
-                   .Add(Dialogs.Progress)
-                   .Add(Dialogs.Exit);
+            project.ManagedUI.InstallDialogs
+                .Add(Dialogs.Welcome)
+                .Add(Dialogs.Licence)
+                //.Add(Dialogs.SetupType)
+                //.Add(Dialogs.Features)
+                .Add(Dialogs.InstallDir)
+                .Add(Dialogs.Progress)
+                .Add(Dialogs.Exit);
 
-            project.ManagedUI.ModifyDialogs.Add(Dialogs.MaintenanceType)
-                   .Add(Dialogs.Features)
-                   .Add(Dialogs.Progress)
-                   .Add(Dialogs.Exit);
+            project.ManagedUI.ModifyDialogs
+                .Add(Dialogs.MaintenanceType)
+                //.Add(Dialogs.Features)
+                .Add(Dialogs.Progress)
+                .Add(Dialogs.Exit);
 
             project.BuildMsi();
         }

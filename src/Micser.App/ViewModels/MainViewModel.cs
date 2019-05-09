@@ -457,7 +457,16 @@ namespace Micser.App.ViewModels
 
                 _savingBuffer.Add(vm);
                 await Task.Delay(50);
-                _savingBuffer.Remove(vm);
+
+                lock (_savingBuffer)
+                {
+                    if (!_savingBuffer.Contains(vm))
+                    {
+                        return;
+                    }
+
+                    _savingBuffer.Remove(vm);
+                }
 
                 var moduleDto = new ModuleDto
                 {
