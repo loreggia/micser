@@ -3,6 +3,9 @@ using System.Globalization;
 
 namespace Micser.App.Infrastructure.Converter
 {
+    /// <summary>
+    /// Converts a <see cref="double"/> value using the formula y = -x/2.
+    /// </summary>
     public class RelativeCenterPlacementConverter : ConverterExtension
     {
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)

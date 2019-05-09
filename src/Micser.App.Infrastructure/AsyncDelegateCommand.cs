@@ -5,6 +5,9 @@ using System.Threading.Tasks;
 
 namespace Micser.App.Infrastructure
 {
+    /// <summary>
+    /// Similar to <see cref="DelegateCommand"/>, but can be supplied with async "execute" and "canExecute" methods. The "canExecute" method is periodically checked using a <see cref="Timer"/>.
+    /// </summary>
     public class AsyncDelegateCommand : DelegateCommandBase, IDisposable
     {
         private readonly Func<Task<bool>> _canExecuteMethod;

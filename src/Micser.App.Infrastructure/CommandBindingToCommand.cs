@@ -2,6 +2,9 @@
 
 namespace Micser.App.Infrastructure
 {
+    /// <summary>
+    /// Connects an <see cref="ICommand"/> to a WPF <see cref="RoutedUICommand"/>.
+    /// </summary>
     public class CommandBindingToCommand : CommandBinding
     {
         public CommandBindingToCommand(RoutedUICommand applicationCommand, ICommand boundCommand)

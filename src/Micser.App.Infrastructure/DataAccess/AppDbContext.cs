@@ -12,12 +12,8 @@ namespace Micser.App.Infrastructure.DataAccess
         {
         }
 
+        // ReSharper disable once UnusedMember.Global
         public IDbSet<SettingValue> Settings { get; set; }
-
-        protected override void Dispose(bool disposing)
-        {
-            base.Dispose(disposing);
-        }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

@@ -7,10 +7,14 @@ using System.Windows.Markup;
 
 namespace Micser.App.Infrastructure
 {
-    // https://stackoverflow.com/a/28647821
+    /// <summary>
+    /// Markup extension that allows binding the key of a dynamic resource.
+    /// </summary>
+    /// <remarks>
+    /// https://stackoverflow.com/a/28647821
+    /// </remarks>
     public class ResourceBinding : MarkupExtension
     {
-        // Using a DependencyProperty as the backing store for ResourceBindingKeyHelper.  This enables animation, styling, binding, etc...
         public static readonly DependencyProperty ResourceBindingKeyHelperProperty =
             DependencyProperty.RegisterAttached("ResourceBindingKeyHelper", typeof(object), typeof(ResourceBinding), new PropertyMetadata(null, ResourceKeyChanged));
 
@@ -27,7 +31,9 @@ namespace Micser.App.Infrastructure
             Path = new PropertyPath(path);
         }
 
-        /// <summary> The Converter to apply </summary>
+        /// <summary>
+        /// The Converter to apply.
+        /// </summary>
         [DefaultValue(null)]
         public IValueConverter Converter
         {
@@ -35,7 +41,9 @@ namespace Micser.App.Infrastructure
             set => _binding.Converter = value;
         }
 
-        /// <summary> Culture in which to evaluate the converter </summary>
+        /// <summary>
+        /// Culture in which to evaluate the converter.
+        /// </summary>
         [DefaultValue(null)]
         [TypeConverter(typeof(CultureInfoIetfLanguageTagConverter))]
         public CultureInfo ConverterCulture
@@ -45,9 +53,8 @@ namespace Micser.App.Infrastructure
         }
 
         /// <summary>
-        ///     The parameter to pass to converter.
+        /// The parameter to pass to converter.
         /// </summary>
-        /// <value></value>
         [DefaultValue(null)]
         public object ConverterParameter
         {
@@ -55,7 +62,9 @@ namespace Micser.App.Infrastructure
             set => _binding.ConverterParameter = value;
         }
 
-        /// <summary> Name of the element to use as the source </summary>
+        /// <summary>
+        /// Name of the element to use as the source.
+        /// </summary>
         [DefaultValue(null)]
         public string ElementName
         {
@@ -63,10 +72,12 @@ namespace Micser.App.Infrastructure
             set => _binding.ElementName = value;
         }
 
-        /// <summary> Value to use when source cannot provide a value </summary>
+        /// <summary>
+        /// Value to use when source cannot provide a value.
+        /// </summary>
         /// <remarks>
-        ///     Initialized to DependencyProperty.UnsetValue; if FallbackValue is not set, BindingExpression
-        ///     will return target property's default when Binding cannot get a real value.
+        /// Initialized to DependencyProperty.UnsetValue; if FallbackValue is not set, BindingExpression
+        /// will return target property's default when Binding cannot get a real value.
         /// </remarks>
         public object FallbackValue
         {
@@ -74,7 +85,9 @@ namespace Micser.App.Infrastructure
             set => _binding.FallbackValue = value;
         }
 
-        /// <summary> Binding mode </summary>
+        /// <summary>
+        /// Binding mode.
+        /// </summary>
         [DefaultValue(BindingMode.Default)]
         public BindingMode Mode
         {
@@ -82,7 +95,9 @@ namespace Micser.App.Infrastructure
             set => _binding.Mode = value;
         }
 
-        /// <summary> The source path (for CLR bindings).</summary>
+        /// <summary>
+        /// The source path (for CLR bindings).
+        /// </summary>
         public PropertyPath Path
         {
             get => _binding.Path;
@@ -90,7 +105,7 @@ namespace Micser.App.Infrastructure
         }
 
         /// <summary>
-        ///     Description of the object to use as the source, relative to the target element.
+        /// Description of the object to use as the source, relative to the target element.
         /// </summary>
         [DefaultValue(null)]
         public RelativeSource RelativeSource
@@ -99,14 +114,18 @@ namespace Micser.App.Infrastructure
             set => _binding.RelativeSource = value;
         }
 
-        /// <summary> The source path (for CLR bindings).</summary>
+        /// <summary>
+        /// The source path (for CLR bindings).
+        /// </summary>
         public object Source
         {
             get => _binding.Source;
             set => _binding.Source = value;
         }
 
-        /// <summary> Update type </summary>
+        /// <summary>
+        /// Update type.
+        /// </summary>
         [DefaultValue(UpdateSourceTrigger.Default)]
         public UpdateSourceTrigger UpdateSourceTrigger
         {
@@ -114,7 +133,9 @@ namespace Micser.App.Infrastructure
             set => _binding.UpdateSourceTrigger = value;
         }
 
-        /// <summary> The XPath path (for XML bindings).</summary>
+        /// <summary>
+        /// The XPath path (for XML bindings).
+        /// </summary>
         [DefaultValue(null)]
         public string XPath
         {

@@ -3,6 +3,9 @@ using Prism.Commands;
 
 namespace Micser.App.Infrastructure
 {
+    /// <summary>
+    /// A delegate command that navigates to a specific view when executed.
+    /// </summary>
     public class NavigationCommand<TView> : DelegateCommandBase
     {
         public NavigationCommand(string regionName, object parameter = null)

@@ -10,6 +10,9 @@ using Prism.Ioc;
 
 namespace Micser.App.Infrastructure
 {
+    /// <summary>
+    /// UI module performing default initialization tasks.
+    /// </summary>
     public class InfrastructureModule : IAppModule
     {
         private static bool _isRegistered;

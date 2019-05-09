@@ -34,6 +34,9 @@
         Neutral010
     }
 
+    /// <summary>
+    /// Strongly typed resource keys for dynamic color resources.
+    /// </summary>
     public class ColorThemeKeyExtension : ThemeKeyExtension<ColorThemeKey>
     {
         public ColorThemeKeyExtension(ColorThemeKey key)

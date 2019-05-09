@@ -5,6 +5,9 @@ using System.Windows.Media;
 
 namespace Micser.App.Infrastructure.Controls
 {
+    /// <summary>
+    /// A loading spinner consisting of a number of rotating circles.
+    /// </summary>
     [TemplatePart(Name = PartCanvas, Type = typeof(Canvas))]
     [TemplatePart(Name = PartRotationTransform, Type = typeof(RotateTransform))]
     public class LoadingSpinner : Control

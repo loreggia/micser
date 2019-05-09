@@ -6,6 +6,9 @@ using System.IO;
 
 namespace Micser.App.Infrastructure.Settings
 {
+    /// <summary>
+    /// Exports/imports all application settings to or from a JSON file.
+    /// </summary>
     public class SettingsExporter
     {
         private readonly ILogger _logger;

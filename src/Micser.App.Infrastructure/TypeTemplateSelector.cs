@@ -3,6 +3,9 @@ using System.Windows.Controls;
 
 namespace Micser.App.Infrastructure
 {
+    /// <summary>
+    /// Generic template selector that selects a template using the object's type as a template resource key.
+    /// </summary>
     public class TypeTemplateSelector : DataTemplateSelector
     {
         public override DataTemplate SelectTemplate(object item, DependencyObject container)

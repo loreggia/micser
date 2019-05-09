@@ -6,10 +6,8 @@ using System.Windows.Interactivity;
 namespace Micser.App.Infrastructure
 {
     /// <summary>
-    ///     Sets the designated property to the supplied value. TargetObject
-    ///     optionally designates the object on which to set the property. If
-    ///     TargetObject is not supplied then the property is set on the object
-    ///     to which the trigger is attached.
+    /// Sets the designated property to the supplied value. <see cref="TargetObject"/> optionally designates the object on which to set the property.
+    /// If <see cref="TargetObject"/> is not supplied then the property is set on the object to which the trigger is attached.
     /// </summary>
     public class SetPropertyAction : TriggerAction<FrameworkElement>
     {
@@ -26,10 +24,8 @@ namespace Micser.App.Infrastructure
             set => SetValue(PropertyNameProperty, value);
         }
 
-        // PropertyValue DependencyProperty.
-
         /// <summary>
-        ///     The value to set the property to.
+        /// The value to set the property to.
         /// </summary>
         public object PropertyValue
         {
@@ -37,10 +33,8 @@ namespace Micser.App.Infrastructure
             set => SetValue(PropertyValueProperty, value);
         }
 
-        // TargetObject DependencyProperty.
-
         /// <summary>
-        ///     Specifies the object upon which to set the property.
+        /// Specifies the object upon which to set the property.
         /// </summary>
         public object TargetObject
         {

@@ -4,6 +4,10 @@ using System.Windows;
 
 namespace Micser.App.Infrastructure.Themes
 {
+    /// <summary>
+    /// Base class for strongly typed dynamic resource keys.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class ThemeKeyExtension<T> : ResourceKey
     {
         private readonly T _key;

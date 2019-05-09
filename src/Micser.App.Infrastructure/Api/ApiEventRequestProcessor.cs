@@ -3,6 +3,9 @@ using Prism.Events;
 
 namespace Micser.App.Infrastructure.Api
 {
+    /// <summary>
+    /// Processes incoming requests from the engine and publishes an <see cref="ApiEvent"/>.
+    /// </summary>
     public class ApiEventRequestProcessor : IRequestProcessor
     {
         private readonly IEventAggregator _eventAggregator;
