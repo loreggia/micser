@@ -20,8 +20,8 @@
       <AppFiles Include="$(SolutionDir)Micser.Engine\bin\$(ConfigurationName)\**\*.*" Exclude="$(SolutionDir)Micser.Engine\bin\$(ConfigurationName)\**\*.pdb" />
       <AppFiles Include="$(SolutionDir)Micser.DriverUtility\bin\$(ConfigurationName)\**\*.*" Exclude="$(SolutionDir)Micser.DriverUtility\bin\$(ConfigurationName)\**\*.pdb" />
       <DriverFiles Include="$(SolutionDir)Micser.Vac.Package\bin\$(ConfigurationName)\**\*.*" />
-    </ItemGroup>
-    <ItemGroup>
+      <DriverFiles Include="$(ProjectDir)Resources\$(Platform)\devcon.exe" Condition="'$(Platform)' == 'x86'" />
+      <DriverFiles Include="$(ProjectDir)Resources\$(Platform)\devcon.exe" Condition="'$(Platform)' == 'x64'" />
     </ItemGroup>
     <Copy SourceFiles="@(AppFiles)" DestinationFolder="$(AppDir)\%(RecursiveDir)" />
     <Copy SourceFiles="@(DriverFiles)" DestinationFolder="$(DrvDir)\%(RecursiveDir)" />

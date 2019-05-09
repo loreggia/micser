@@ -14,12 +14,13 @@ namespace Micser.Common
         public const string UserRegistryRoot = @"Software\Micser";
 
         public static readonly string AppDataFolder = Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData, Environment.SpecialFolderOption.Create),
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData, Environment.SpecialFolderOption.Create),
             "Micser");
 
         public static class DriverUtility
         {
             public const string DeviceCount = "c";
+            public const string Silent = "s";
 
             public static readonly string[] ParamNameChars = { "/" };
 
