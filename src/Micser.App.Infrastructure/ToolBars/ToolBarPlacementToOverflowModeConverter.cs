@@ -5,6 +5,9 @@ using System.Windows.Controls;
 
 namespace Micser.App.Infrastructure.ToolBars
 {
+    /// <summary>
+    /// Converts a <see cref="ToolBarItemPlacement"/> value to it's corresponding <see cref="OverflowMode"/>.
+    /// </summary>
     public class ToolBarPlacementToOverflowModeConverter : ConverterExtension
     {
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
