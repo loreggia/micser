@@ -52,6 +52,7 @@ namespace Micser.Common
             return _flags.Contains(name.ToLower(CultureInfo.InvariantCulture));
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             var flags = _flags.Count > 0 ? "Flags: " + string.Join(", ", _flags) : null;

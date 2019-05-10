@@ -4,10 +4,17 @@ using System;
 
 namespace Micser.Common.Api
 {
+    /// <summary>
+    /// A JSON converter that handles the serialization of a <see cref="JsonMessage"/>'s content.
+    /// </summary>
     public class JsonMessageConverter : JsonConverter<JsonMessage>
     {
+        /// <summary>
+        /// Always false.
+        /// </summary>
         public override bool CanWrite => false;
 
+        /// <inheritdoc />
         public override JsonMessage ReadJson(JsonReader reader, Type objectType, JsonMessage existingValue, bool hasExistingValue, JsonSerializer serializer)
         {
             var result = hasExistingValue ? existingValue : (JsonMessage)Activator.CreateInstance(objectType);
@@ -47,6 +54,10 @@ namespace Micser.Common.Api
             return result;
         }
 
+        /// <summary>
+        /// Not implemented.
+        /// </summary>
+        /// <exception cref="NotImplementedException"></exception>
         public override void WriteJson(JsonWriter writer, JsonMessage value, JsonSerializer serializer)
         {
             throw new NotImplementedException();
