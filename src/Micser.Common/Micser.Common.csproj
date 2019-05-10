@@ -78,6 +78,7 @@
     <Compile Include="DataAccess\UnitOfWorkFactory.cs" />
     <Compile Include="Devices\DeviceService.cs" />
     <Compile Include="Extensions\ComparableExtensions.cs" />
+    <Compile Include="Extensions\MathExtensions.cs" />
     <Compile Include="Extensions\PropertyExtensions.cs" />
     <Compile Include="Extensions\SerializationExtensions.cs" />
     <Compile Include="Extensions\SocketExtensions.cs" />

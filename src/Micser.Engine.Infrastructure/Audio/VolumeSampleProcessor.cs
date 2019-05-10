@@ -1,5 +1,5 @@
 ﻿using CSCore;
-using Micser.Engine.Infrastructure.Extensions;
+using Micser.Common.Extensions;
 
 namespace Micser.Engine.Infrastructure.Audio
 {
@@ -10,6 +10,10 @@ namespace Micser.Engine.Infrastructure.Audio
     {
         private readonly IAudioModule _module;
 
+        /// <summary>
+        /// Creates an instance of the <see cref="VolumeSampleProcessor"/> class.
+        /// </summary>
+        /// <param name="module">Reference to the module this processor belongs to.</param>
         public VolumeSampleProcessor(IAudioModule module)
         {
             _module = module;
@@ -17,6 +21,7 @@ namespace Micser.Engine.Infrastructure.Audio
             Priority = int.MaxValue;
         }
 
+        /// <inheritdoc />
         public bool IsEnabled { get; set; }
 
         /// <summary>
@@ -24,6 +29,7 @@ namespace Micser.Engine.Infrastructure.Audio
         /// </summary>
         public int Priority { get; set; }
 
+        /// <inheritdoc />
         public void Process(WaveFormat waveFormat, ref float value)
         {
             value *= _module.Volume;

@@ -180,9 +180,6 @@
   <data name="MenuItemToolsHeader" xml:space="preserve">
     <value>_Tools</value>
   </data>
-  <data name="MenuItemVacHeader" xml:space="preserve">
-    <value>Virtual Audio Cables</value>
-  </data>
   <data name="SettingColorThemeDescription" xml:space="preserve">
     <value>Sets the active color theme of the user interface.</value>
   </data>
@@ -206,6 +203,12 @@
   </data>
   <data name="SettingStartupName" xml:space="preserve">
     <value>Startup</value>
+  </data>
+  <data name="SettingsVacCountDescription" xml:space="preserve">
+    <value>Configures the number of virtual audio cables. Changing this requires administrative privileges.</value>
+  </data>
+  <data name="SettingsVacCountName" xml:space="preserve">
+    <value>Virtual Audio Cables</value>
   </data>
   <data name="ToolBarBackDescription" xml:space="preserve">
     <value>Go back</value>

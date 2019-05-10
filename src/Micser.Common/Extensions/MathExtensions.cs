@@ -1,5 +1,8 @@
-﻿namespace Micser.Engine.Infrastructure.Extensions
+﻿namespace Micser.Common.Extensions
 {
+    /// <summary>
+    /// Contains math related helper functions.
+    /// </summary>
     public static class MathExtensions
     {
         /// <summary>
@@ -9,6 +12,24 @@
         /// <param name="min">The minimum value (inclusive).</param>
         /// <param name="max">The maximum value (inclusive).</param>
         public static void Clamp(ref float value, float min, float max)
+        {
+            if (value < min)
+            {
+                value = min;
+            }
+            else if (value > max)
+            {
+                value = max;
+            }
+        }
+
+        /// <summary>
+        /// Clamps a value to a range.
+        /// </summary>
+        /// <param name="value">The value to clamp.</param>
+        /// <param name="min">The minimum value (inclusive).</param>
+        /// <param name="max">The maximum value (inclusive).</param>
+        public static void Clamp(ref int value, int min, int max)
         {
             if (value < min)
             {

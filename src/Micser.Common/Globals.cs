@@ -19,6 +19,11 @@ namespace Micser.Common
         public const string DeviceInterfaceName = "Micser Virtual Audio Cable";
 
         /// <summary>
+        /// The maximum number of virtual audio cables.
+        /// </summary>
+        public const int MaxVacCount = 8;
+
+        /// <summary>
         /// Search pattern for plugin DLLs.
         /// </summary>
         public const string PluginSearchPattern = "Micser.Plugins.*.dll";
@@ -40,6 +45,11 @@ namespace Micser.Common
         /// </summary>
         public static class DriverUtility
         {
+            /// <summary>
+            /// The file name of the driver utility program.
+            /// </summary>
+            public const string ProgramName = "Micser.DriverUtility.exe";
+
             /// <summary>
             /// The prefix(es) for argument names.
             /// </summary>
@@ -73,6 +83,17 @@ namespace Micser.Common
                 public const int Success = 0;
                 public const int UnknownError = -1;
             }
+        }
+
+        /// <summary>
+        /// Contains registry value names.
+        /// </summary>
+        public static class RegistryValues
+        {
+            /// <summary>
+            /// Stores the number of virtual audio cables.
+            /// </summary>
+            public const string VacCount = "DeviceCount";
         }
     }
 }

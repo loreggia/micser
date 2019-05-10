@@ -73,6 +73,7 @@
     <Compile Include="Settings\ColorThemeSettingHandler.cs" />
     <Compile Include="Settings\ShellState.cs" />
     <Compile Include="Settings\StartupSettingHandler.cs" />
+    <Compile Include="Settings\VacCountSettingHandler.cs" />
     <Compile Include="ViewModels\AboutViewModel.cs" />
     <Compile Include="ViewModels\SettingsViewModel.cs" />
     <Compile Include="ViewModels\StatusViewModel.cs" />
@@ -81,10 +82,6 @@
     <Compile Include="ViewModels\MainViewModel.cs" />
     <Compile Include="ViewModels\StartupViewModel.cs" />
     <Compile Include="ViewModels\ToolBarViewModel.cs" />
-    <Compile Include="ViewModels\VacViewModel.cs" />
-    <Compile Include="Views\VacView.xaml.cs">
-      <DependentUpon>VacView.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Views\AboutView.xaml.cs">
       <DependentUpon>AboutView.xaml</DependentUpon>
     </Compile>
@@ -117,10 +114,6 @@
       <DependentUpon>Application.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Page Include="Views\VacView.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Include="Views\AboutView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -171,6 +164,7 @@
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <SubType>Designer</SubType>
     </EmbeddedResource>
     <None Include="..\..\gfx\logo.psd">
       <Link>logo.psd</Link>
@@ -194,6 +188,10 @@
     <ProjectReference Include="..\Micser.Common\Micser.Common.csproj">
       <Project>{e14431b4-f54a-4d36-b505-1d3407252430}</Project>
       <Name>Micser.Common</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Micser.DriverUtility\Micser.DriverUtility.csproj">
+      <Project>{b63ffc5b-c668-4a79-9e01-e01659c63c44}</Project>
+      <Name>Micser.DriverUtility</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
