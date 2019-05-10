@@ -1,5 +1,8 @@
 ﻿namespace Micser.App.Infrastructure.Widgets
 {
+    /// <summary>
+    /// Represents a widget connector (input/output).
+    /// </summary>
     public class ConnectorViewModel : ViewModel
     {
         private ConnectionViewModel _connection;
@@ -10,6 +13,8 @@
             Widget = widget;
             Data = data;
         }
+
+        public event ConnectionChangedEventHandler ConnectionChanged;
 
         public ConnectionViewModel Connection
         {
@@ -27,8 +32,6 @@
         public object Data { get; }
         public string Name { get; }
         public WidgetViewModel Widget { get; }
-
-        public event ConnectionChangedEventHandler ConnectionChanged;
 
         protected virtual void OnConnectionChanged(ConnectionChangedEventArgs e)
         {

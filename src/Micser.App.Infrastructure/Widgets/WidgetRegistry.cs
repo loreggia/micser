@@ -3,6 +3,7 @@ using Unity;
 
 namespace Micser.App.Infrastructure.Widgets
 {
+    /// <inheritdoc cref="IWidgetRegistry"/>
     public class WidgetRegistry : IWidgetRegistry
     {
         private readonly IUnityContainer _container;

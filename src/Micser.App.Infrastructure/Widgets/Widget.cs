@@ -93,12 +93,18 @@ namespace Micser.App.Infrastructure.Widgets
         /// </summary>
         public IEnumerable<Connector> InputConnectors => _inputConnectorsControl?.GetItemsChildren<Connector>();
 
+        /// <summary>
+        /// Gets or sets an enumerable of <see cref="ConnectionViewModel"/> from which to create this widget's input connectors.
+        /// </summary>
         public IEnumerable<ConnectorViewModel> InputConnectorsSource
         {
             get => (IEnumerable<ConnectorViewModel>)GetValue(InputConnectorsSourceProperty);
             set => SetValue(InputConnectorsSourceProperty, value);
         }
 
+        /// <summary>
+        /// Gets or sets the template to apply for each input connector when using <see cref="InputConnectorsSource"/>.
+        /// </summary>
         public DataTemplate InputConnectorTemplate
         {
             get => (DataTemplate)GetValue(InputConnectorTemplateProperty);
@@ -115,32 +121,50 @@ namespace Micser.App.Infrastructure.Widgets
             set => SetValue(IsDragConnectionOverProperty, value);
         }
 
+        /// <summary>
+        /// Gets or sets a value whether this widget is currently selected.
+        /// </summary>
         public bool IsSelected
         {
             get => (bool)GetValue(IsSelectedProperty);
             set => SetValue(IsSelectedProperty, value);
         }
 
+        /// <summary>
+        /// Gets this widget's output connector controls.
+        /// </summary>
         public IEnumerable<Connector> OutputConnectors => _outputConnectorsControl?.GetItemsChildren<Connector>();
 
+        /// <summary>
+        /// Gets or sets an enumerable of <see cref="ConnectionViewModel"/> from which to create this widget's output connectors.
+        /// </summary>
         public IEnumerable<ConnectorViewModel> OutputConnectorsSource
         {
             get => (IEnumerable<ConnectorViewModel>)GetValue(OutputConnectorsSourceProperty);
             set => SetValue(OutputConnectorsSourceProperty, value);
         }
 
+        /// <summary>
+        /// Gets or sets the template to apply for each output connector when using <see cref="OutputConnectorsSource"/>.
+        /// </summary>
         public DataTemplate OutputConnectorTemplate
         {
             get => (DataTemplate)GetValue(OutputConnectorTemplateProperty);
             set => SetValue(OutputConnectorTemplateProperty, value);
         }
 
+        /// <summary>
+        /// Gets or sets the widget's position (top left).
+        /// </summary>
         public Point Position
         {
             get => (Point)GetValue(PositionProperty);
             set => SetValue(PositionProperty, value);
         }
 
+        /// <summary>
+        /// Gets or sets the widget's size (width, height).
+        /// </summary>
         public Size Size
         {
             get => (Size)GetValue(SizeProperty);

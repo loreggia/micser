@@ -4,6 +4,7 @@ using Unity;
 
 namespace Micser.App.Infrastructure.Widgets
 {
+    /// <inheritdoc cref="IWidgetFactory"/>
     public class WidgetFactory : IWidgetFactory
     {
         private readonly IUnityContainer _container;

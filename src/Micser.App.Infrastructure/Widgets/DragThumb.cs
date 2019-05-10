@@ -5,6 +5,9 @@ using System.Windows.Controls.Primitives;
 
 namespace Micser.App.Infrastructure.Widgets
 {
+    /// <summary>
+    /// A <see cref="Thumb"/> control handling moving of a widget.
+    /// </summary>
     public class DragThumb : Thumb
     {
         public DragThumb()
