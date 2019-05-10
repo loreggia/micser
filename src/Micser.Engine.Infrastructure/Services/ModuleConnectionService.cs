@@ -7,6 +7,7 @@ using System.Linq;
 
 namespace Micser.Engine.Infrastructure.Services
 {
+    /// <inheritdoc cref="IModuleConnectionService"/>
     public class ModuleConnectionService : IModuleConnectionService
     {
         private readonly IUnitOfWorkFactory _uowFactory;

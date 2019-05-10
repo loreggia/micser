@@ -52,8 +52,8 @@ namespace Micser.DriverUtility
 
         private static int MainInternal(string[] args)
         {
-            var arguments = new ArgumentDictionary(Globals.DriverUtility.ParamNameChars, args);
-            var silent = arguments.HasFlag(Globals.DriverUtility.Silent);
+            var arguments = new ArgumentDictionary(Globals.DriverUtility.ArgumentNameChars, args);
+            var silent = arguments.HasFlag(Globals.DriverUtility.Arguments.Silent);
             InitLogging(silent);
 
             if (silent)
@@ -77,11 +77,11 @@ namespace Micser.DriverUtility
             {
                 logger.Info("Arguments: " + arguments);
 
-                var sDeviceCount = arguments[Globals.DriverUtility.DeviceCount];
+                var sDeviceCount = arguments[Globals.DriverUtility.Arguments.DeviceCount];
 
                 if (string.IsNullOrEmpty(sDeviceCount) || !int.TryParse(sDeviceCount, out var deviceCount))
                 {
-                    logger.Error($"Invalid or missing device count argument '{Globals.DriverUtility.ParamNameChars[0]}{Globals.DriverUtility.DeviceCount}' provided: '{sDeviceCount}'.");
+                    logger.Error($"Invalid or missing device count argument '{Globals.DriverUtility.ArgumentNameChars[0]}{Globals.DriverUtility.Arguments.DeviceCount}' provided: '{sDeviceCount}'.");
                     return Globals.DriverUtility.ReturnCodes.InvalidParameter;
                 }
 

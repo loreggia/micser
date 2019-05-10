@@ -4,17 +4,26 @@ using System.Linq;
 
 namespace Micser.Common
 {
+    /// <summary>
+    /// Dictionary handling program arguments of the format "-name value -flag".
+    /// </summary>
     public class ArgumentDictionary
     {
         private readonly IList<string> _flags;
         private readonly string[] _nameChars;
         private readonly IDictionary<string, string> _namedValues;
 
+        /// <summary>
+        /// Creates an instance of the <see cref="ArgumentDictionary"/> class using the default name prefixes ("-", "/", "--").
+        /// </summary>
         public ArgumentDictionary(params string[] args)
             : this(new[] { "-", "/", "--" }, args)
         {
         }
 
+        /// <summary>
+        /// Creates an instance of the <see cref="ArgumentDictionary"/> class using custom name prefixes.
+        /// </summary>
         public ArgumentDictionary(string[] nameChars, params string[] args)
         {
             _nameChars = nameChars;
@@ -23,6 +32,9 @@ namespace Micser.Common
             Initialize(args);
         }
 
+        /// <summary>
+        /// Gets the value of the specified argument or null if the argument was not present.
+        /// </summary>
         public string this[string arg]
         {
             get
@@ -32,6 +44,9 @@ namespace Micser.Common
             }
         }
 
+        /// <summary>
+        /// Checks whether an argument flag with the specified name has been supplied.
+        /// </summary>
         public bool HasFlag(string name)
         {
             return _flags.Contains(name.ToLower(CultureInfo.InvariantCulture));

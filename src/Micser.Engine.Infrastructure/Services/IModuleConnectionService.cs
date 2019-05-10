@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace Micser.Engine.Infrastructure.Services
 {
+    /// <summary>
+    /// Provides access to saved engine module connections.
+    /// </summary>
     public interface IModuleConnectionService
     {
         ModuleConnectionDto Delete(long id);

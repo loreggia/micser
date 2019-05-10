@@ -1,5 +1,8 @@
 ﻿namespace Micser.Engine.Infrastructure.Audio
 {
+    /// <summary>
+    /// A wrapper that allows differently typed access to the same data.
+    /// </summary>
     public interface IWaveBuffer
     {
         /// <summary>

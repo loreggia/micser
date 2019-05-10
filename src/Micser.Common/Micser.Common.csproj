@@ -22,6 +22,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\Micser.Common.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -30,6 +31,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\Micser.Common.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="PresentationCore" />
@@ -66,7 +68,6 @@
     <Compile Include="Api\RequestProcessorNameAttribute.cs" />
     <Compile Include="ArgumentDictionary.cs" />
     <Compile Include="Audio\AudioHelper.cs" />
-    <Compile Include="CircularBuffer.cs" />
     <Compile Include="DataAccess\IRepositoryFactory.cs" />
     <Compile Include="DataAccess\IUnitOfWorkFactory.cs" />
     <Compile Include="DataAccess\IRepository.cs" />

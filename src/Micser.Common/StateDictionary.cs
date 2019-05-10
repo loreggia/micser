@@ -2,6 +2,10 @@
 
 namespace Micser.Common
 {
+    /// <summary>
+    /// A string/object dictionary that provides typed access to the values.
+    /// Used for generic state serialization.
+    /// </summary>
     public class StateDictionary : Dictionary<string, object>
     {
         public StateDictionary()

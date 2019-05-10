@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 
 namespace Micser.Engine.Infrastructure.Audio
 {
+    /// <inheritdoc cref="IWaveBuffer"/>
     [StructLayout(LayoutKind.Explicit, Pack = 2)]
     public class WaveBuffer : IWaveBuffer
     {

@@ -4,6 +4,9 @@ using System.Collections.Generic;
 
 namespace Micser.Engine.Infrastructure.Audio
 {
+    /// <summary>
+    /// A sample source that mixes multiple inputs together.
+    /// </summary>
     public class MixerSampleSource : ISampleSource
     {
         private readonly object _lockObj = new object();
@@ -26,39 +29,72 @@ namespace Micser.Engine.Infrastructure.Audio
             FillWithZeros = false;
         }
 
+        /// <summary>
+        /// This is always false.
+        /// </summary>
         public bool CanSeek => false;
+
+        /// <summary>
+        /// Gets or sets a value whether the resulting sample values are divided by the number of sources.
+        /// </summary>
         public bool DivideResult { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value whether the output is filled with zeroes if no input is available. Prevents stopping of playback.
+        /// </summary>
         public bool FillWithZeros { get; set; }
+
+        /// <summary>
+        /// This is always 0.
+        /// </summary>
         public long Length => 0;
 
+        /// <summary>
+        /// Not implemented.
+        /// </summary>
         public long Position
         {
             get => 0;
             set => throw new NotSupportedException();
         }
 
+        /// <summary>
+        /// Gets the common wave format.
+        /// </summary>
         public WaveFormat WaveFormat { get; }
 
+        /// <summary>
+        /// Adds a new source to the mixer. The source's number of channels and sample rate have to be equal to the mixer's.
+        /// </summary>
         public void AddSource(ISampleSource source)
         {
             if (source == null)
+            {
                 throw new ArgumentNullException("source");
+            }
 
             if (source.WaveFormat.Channels != WaveFormat.Channels ||
                source.WaveFormat.SampleRate != WaveFormat.SampleRate)
+            {
                 throw new ArgumentException("Invalid format.", "source");
+            }
 
             lock (_lockObj)
             {
                 if (!Contains(source))
+                {
                     _sampleSources.Add(source);
+                }
             }
         }
 
         public bool Contains(ISampleSource source)
         {
             if (source == null)
+            {
                 return false;
+            }
+
             return _sampleSources.Contains(source);
         }
 
@@ -87,15 +123,23 @@ namespace Micser.Engine.Infrastructure.Audio
                         for (int i = offset, n = 0; n < read; i++, n++)
                         {
                             if (numberOfStoredSamples <= i)
+                            {
                                 buffer[i] = _mixerBuffer[n];
+                            }
                             else
+                            {
                                 buffer[i] += _mixerBuffer[n];
+                            }
                         }
                         if (read > numberOfStoredSamples)
+                        {
                             numberOfStoredSamples = read;
+                        }
 
                         if (read > 0)
+                        {
                             numberOfReadSamples.Add(read);
+                        }
                         else
                         {
                             //raise event here
@@ -112,7 +156,9 @@ namespace Micser.Engine.Infrastructure.Audio
                         foreach (var readSamples in numberOfReadSamples)
                         {
                             if (remainingSources == 0)
+                            {
                                 break;
+                            }
 
                             while (currentOffset < offset + readSamples)
                             {

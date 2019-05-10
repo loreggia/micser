@@ -9,6 +9,9 @@ using System.Linq;
 
 namespace Micser.Engine.Infrastructure.Audio
 {
+    /// <summary>
+    /// Base implementation of an audio module. Handles sample processors and state management.
+    /// </summary>
     public abstract class AudioModule : IAudioModule
     {
         public static readonly float Epsilon = float.Epsilon;

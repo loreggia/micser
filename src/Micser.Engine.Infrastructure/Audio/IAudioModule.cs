@@ -4,6 +4,9 @@ using System;
 
 namespace Micser.Engine.Infrastructure.Audio
 {
+    /// <summary>
+    /// Describes an audio module that can be used by the audio engine.
+    /// </summary>
     public interface IAudioModule : IDisposable
     {
         long Id { get; }
