@@ -11,12 +11,16 @@ using System.Threading.Tasks;
 
 namespace Micser.Common.Api
 {
+    /// <inheritdoc cref="IApiServer" />
     public class ApiServer : ApiEndPoint, IApiServer
     {
         private readonly TcpListener _listener;
         private readonly ILogger _logger;
         private readonly SemaphoreSlim _startSemaphore;
 
+        /// <summary>
+        /// Creates an instance of the <see cref="ApiServer"/> class.
+        /// </summary>
         public ApiServer(IRequestProcessorFactory requestProcessorFactory, ILogger logger)
             : base(requestProcessorFactory)
         {
@@ -26,8 +30,10 @@ namespace Micser.Common.Api
             _startSemaphore = new SemaphoreSlim(1, 1);
         }
 
+        /// <inheritdoc />
         public bool IsRunning { get; private set; }
 
+        /// <inheritdoc />
         public override async Task ConnectAsync()
         {
             try
@@ -51,7 +57,7 @@ namespace Micser.Common.Api
 
                 IsRunning = true;
 
-                Task.Run(() => ReaderThread());
+                Task.Run(ReaderThread);
             }
             catch (Exception ex)
             {
@@ -63,12 +69,14 @@ namespace Micser.Common.Api
             }
         }
 
+        /// <inheritdoc />
         public void Start()
         {
             _listener.Start();
             ConnectTask = ConnectAsync();
         }
 
+        /// <inheritdoc />
         public void Stop()
         {
             IsRunning = false;
@@ -76,6 +84,7 @@ namespace Micser.Common.Api
             OutClient?.Close();
         }
 
+        /// <inheritdoc />
         protected override void Dispose(bool disposing)
         {
             if (disposing)

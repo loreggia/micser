@@ -9,11 +9,11 @@ namespace Micser.App.Infrastructure.Api
     public class EngineApiClient
     {
         private const string ResourceName = "engine";
-        private readonly IApiClient _apiClient;
+        private readonly IApiEndPoint _apiEndPoint;
 
-        public EngineApiClient(IApiClient apiClient)
+        public EngineApiClient(IApiEndPoint apiEndPoint)
         {
-            _apiClient = apiClient;
+            _apiEndPoint = apiEndPoint;
         }
 
         /// <summary>
@@ -21,7 +21,7 @@ namespace Micser.App.Infrastructure.Api
         /// </summary>
         public async Task<ServiceResult<bool>> GetStatusAsync()
         {
-            var response = await _apiClient.SendMessageAsync(new JsonRequest(ResourceName, "getstatus"));
+            var response = await _apiEndPoint.SendMessageAsync(new JsonRequest(ResourceName, "getstatus"));
             return new ServiceResult<bool>(response);
         }
 
@@ -30,7 +30,7 @@ namespace Micser.App.Infrastructure.Api
         /// </summary>
         public async Task<ServiceResult<bool>> RestartAsync()
         {
-            var response = await _apiClient.SendMessageAsync(new JsonRequest(ResourceName, "restart"));
+            var response = await _apiEndPoint.SendMessageAsync(new JsonRequest(ResourceName, "restart"));
             return new ServiceResult<bool>(response);
         }
 
@@ -39,7 +39,7 @@ namespace Micser.App.Infrastructure.Api
         /// </summary>
         public async Task<ServiceResult<bool>> StartAsync()
         {
-            var response = await _apiClient.SendMessageAsync(new JsonRequest(ResourceName, "start"));
+            var response = await _apiEndPoint.SendMessageAsync(new JsonRequest(ResourceName, "start"));
             return new ServiceResult<bool>(response);
         }
 
@@ -48,7 +48,7 @@ namespace Micser.App.Infrastructure.Api
         /// </summary>
         public async Task<ServiceResult<bool>> StopAsync()
         {
-            var response = await _apiClient.SendMessageAsync(new JsonRequest(ResourceName, "stop"));
+            var response = await _apiEndPoint.SendMessageAsync(new JsonRequest(ResourceName, "stop"));
             return new ServiceResult<bool>(response);
         }
     }

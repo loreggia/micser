@@ -31,7 +31,7 @@ namespace Micser.App.Infrastructure
             containerRegistry.RegisterSingleton<ISettingsRegistry, SettingsRegistry>();
             containerRegistry.RegisterSingleton<ISettingsService, SettingsService>();
             containerRegistry.RegisterSingleton<IRequestProcessorFactory, RequestProcessorFactory>();
-            containerRegistry.RegisterSingleton<IApiClient, ApiClient>();
+            containerRegistry.RegisterSingleton<IApiEndPoint, ApiClient>();
 
             containerRegistry.Register<IRequestProcessor, ApiEventRequestProcessor>();
 

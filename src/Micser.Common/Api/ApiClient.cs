@@ -11,11 +11,17 @@ using System.Threading.Tasks;
 
 namespace Micser.Common.Api
 {
-    public class ApiClient : ApiEndPoint, IApiClient
+    /// <summary>
+    /// An API endpoint that acts as the client upon connection. Communication is otherwise bidirectional.
+    /// </summary>
+    public class ApiClient : ApiEndPoint
     {
         private readonly SemaphoreSlim _connectSemaphore;
         private readonly ILogger _logger;
 
+        /// <summary>
+        /// Creates a new instance of the <see cref="ApiClient"/> class.
+        /// </summary>
         public ApiClient(IRequestProcessorFactory requestProcessorFactory, ILogger logger)
             : base(requestProcessorFactory)
         {
@@ -23,6 +29,9 @@ namespace Micser.Common.Api
             _connectSemaphore = new SemaphoreSlim(1, 1);
         }
 
+        /// <summary>
+        /// Tries to connect to an <see cref="ApiServer"/>. Waits until a connection is established.
+        /// </summary>
         public override async Task ConnectAsync()
         {
             try
@@ -46,7 +55,7 @@ namespace Micser.Common.Api
                 InReader = new StreamReader(inStream);
                 InWriter = new StreamWriter(inStream) { AutoFlush = true };
 
-                Task.Run(() => ReaderThread());
+                Task.Run(ReaderThread);
             }
             catch (Exception ex)
             {

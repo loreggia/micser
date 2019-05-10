@@ -11,11 +11,11 @@ namespace Micser.App.Infrastructure.Api
     public class ModulesApiClient
     {
         private const string ResourceName = "modules";
-        private readonly IApiClient _apiClient;
+        private readonly IApiEndPoint _apiEndPoint;
 
-        public ModulesApiClient(IApiClient apiClient)
+        public ModulesApiClient(IApiEndPoint apiEndPoint)
         {
-            _apiClient = apiClient;
+            _apiEndPoint = apiEndPoint;
         }
 
         /// <summary>
@@ -23,7 +23,7 @@ namespace Micser.App.Infrastructure.Api
         /// </summary>
         public async Task<ServiceResult<ModuleDto>> CreateAsync(ModuleDto moduleDto)
         {
-            var response = await _apiClient.SendMessageAsync(new JsonRequest(ResourceName, "insert", moduleDto));
+            var response = await _apiEndPoint.SendMessageAsync(new JsonRequest(ResourceName, "insert", moduleDto));
             return new ServiceResult<ModuleDto>(response);
         }
 
@@ -32,7 +32,7 @@ namespace Micser.App.Infrastructure.Api
         /// </summary>
         public async Task<ServiceResult<ModuleDto>> DeleteAsync(long id)
         {
-            var response = await _apiClient.SendMessageAsync(new JsonRequest(ResourceName, "delete", id));
+            var response = await _apiEndPoint.SendMessageAsync(new JsonRequest(ResourceName, "delete", id));
             return new ServiceResult<ModuleDto>(response);
         }
 
@@ -41,7 +41,7 @@ namespace Micser.App.Infrastructure.Api
         /// </summary>
         public async Task<ServiceResult<IEnumerable<ModuleDto>>> GetAllAsync()
         {
-            var response = await _apiClient.SendMessageAsync(new JsonRequest(ResourceName, "getall"));
+            var response = await _apiEndPoint.SendMessageAsync(new JsonRequest(ResourceName, "getall"));
             return new ServiceResult<IEnumerable<ModuleDto>>(response);
         }
 
@@ -51,7 +51,7 @@ namespace Micser.App.Infrastructure.Api
         /// </summary>
         public async Task<bool> ImportConfigurationAsync(ModulesExportDto dto)
         {
-            var response = await _apiClient.SendMessageAsync(new JsonRequest(ResourceName, "import", dto));
+            var response = await _apiEndPoint.SendMessageAsync(new JsonRequest(ResourceName, "import", dto));
             return response.IsSuccess;
         }
 
@@ -60,7 +60,7 @@ namespace Micser.App.Infrastructure.Api
         /// </summary>
         public async Task<ServiceResult<ModuleDto>> UpdateAsync(ModuleDto moduleDto)
         {
-            var response = await _apiClient.SendMessageAsync(new JsonRequest(ResourceName, "update", moduleDto));
+            var response = await _apiEndPoint.SendMessageAsync(new JsonRequest(ResourceName, "update", moduleDto));
             return new ServiceResult<ModuleDto>(response);
         }
     }
