@@ -3,6 +3,9 @@ using Micser.Engine.Infrastructure.Extensions;
 
 namespace Micser.Engine.Infrastructure.Audio
 {
+    /// <summary>
+    /// Multiplies each sample value by the module's <see cref="AudioModule.Volume"/> property.
+    /// </summary>
     public class VolumeSampleProcessor : ISampleProcessor
     {
         private readonly IAudioModule _module;
@@ -15,6 +18,10 @@ namespace Micser.Engine.Infrastructure.Audio
         }
 
         public bool IsEnabled { get; set; }
+
+        /// <summary>
+        /// Defaults to int.MaxValue.
+        /// </summary>
         public int Priority { get; set; }
 
         public void Process(WaveFormat waveFormat, ref float value)

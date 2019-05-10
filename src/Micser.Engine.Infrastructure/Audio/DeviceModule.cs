@@ -4,6 +4,9 @@ using Micser.Common.Modules;
 
 namespace Micser.Engine.Infrastructure.Audio
 {
+    /// <summary>
+    /// Base module for audio modules that are associated with a hardware device.
+    /// </summary>
     public abstract class DeviceModule : AudioModule
     {
         public const string DeviceIdKey = "DeviceId";
@@ -102,6 +105,9 @@ namespace Micser.Engine.Infrastructure.Audio
             }
         }
 
+        /// <summary>
+        /// Callback that is executed after the device has been initialized and is active.
+        /// </summary>
         protected virtual void OnInitializeDevice()
         {
         }

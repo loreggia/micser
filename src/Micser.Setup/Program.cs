@@ -15,7 +15,6 @@ namespace Micser.Setup
                 var excludedFiles = new[]
                 {
                     ".test.dll",
-                    ".xml",
                     ".pdb",
                     "Micser.App.exe",
                     "Micser.DriverUtility.exe",

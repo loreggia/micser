@@ -7,6 +7,9 @@ using Unity.Resolution;
 
 namespace Micser.Common
 {
+    /// <summary>
+    /// Unity override to allow passing of parameters without having to specify the names during dependency resolution.
+    /// </summary>
     public class OrderedParametersOverride : ResolverOverride
     {
         private readonly Queue<InjectionParameterValue> _parameterValues;
