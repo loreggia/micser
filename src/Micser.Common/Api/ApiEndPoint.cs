@@ -6,32 +6,72 @@ using System.Threading.Tasks;
 
 namespace Micser.Common.Api
 {
-    public abstract class ApiEndPoint : IDisposable
+    /// <summary>
+    /// Base API endpoint implementation. Contains functionality shared between <see cref="ApiServer"/> and <see cref="ApiClient"/>.
+    /// </summary>
+    /// <inheritdoc cref="IApiEndPoint"/>
+    public abstract class ApiEndPoint : IApiEndPoint, IDisposable
     {
+        /// <summary>
+        /// The task that is created by the <see cref="ConnectAsync"/> method.
+        /// </summary>
         protected Task ConnectTask;
+
+        /// <summary>
+        /// Client that handles incoming messages.
+        /// </summary>
         protected TcpClient InClient;
+
+        /// <summary>
+        /// Reader that reads incoming messages.
+        /// </summary>
         protected StreamReader InReader;
+
+        /// <summary>
+        /// Writer that responds to incoming messages.
+        /// </summary>
         protected StreamWriter InWriter;
+
+        /// <summary>
+        /// Handles outgoing messages.
+        /// </summary>
         protected TcpClient OutClient;
+
+        /// <summary>
+        /// Handles the response after sending a message.
+        /// </summary>
         protected StreamReader OutReader;
+
+        /// <summary>
+        /// Writes outgoing messages.
+        /// </summary>
         protected StreamWriter OutWriter;
+
         private readonly IRequestProcessorFactory _requestProcessorFactory;
         private readonly SemaphoreQueue _sendMessageSemaphore;
 
+        /// <summary>
+        /// Creates an instance of the <see cref="ApiEndPoint"/> class.
+        /// </summary>
         protected ApiEndPoint(IRequestProcessorFactory requestProcessorFactory)
         {
             _requestProcessorFactory = requestProcessorFactory;
             _sendMessageSemaphore = new SemaphoreQueue(1);
         }
 
+        /// <summary>
+        /// Tries to connect to the API counterpart.
+        /// </summary>
         public abstract Task ConnectAsync();
 
+        /// <inheritdoc />
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
+        /// <inheritdoc />
         public async Task<JsonResponse> SendMessageAsync(JsonRequest message, int numRetries = 5)
         {
             await _sendMessageSemaphore.WaitAsync();
@@ -62,6 +102,9 @@ namespace Micser.Common.Api
             }
         }
 
+        /// <summary>
+        /// Disposes resources.
+        /// </summary>
         protected virtual void Dispose(bool disposing)
         {
             if (disposing)
@@ -77,10 +120,14 @@ namespace Micser.Common.Api
                 }
                 catch
                 {
+                    // ignored
                 }
             }
         }
 
+        /// <summary>
+        /// Thread loop that awaits and reads incoming messages.
+        /// </summary>
         protected async void ReaderThread()
         {
             while (InClient?.Connected == true)
