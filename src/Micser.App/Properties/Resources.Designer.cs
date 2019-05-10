@@ -250,15 +250,6 @@ namespace Micser.App.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Virtual Audio Cables.
-        /// </summary>
-        public static string MenuItemVacHeader {
-            get {
-                return ResourceManager.GetString("MenuItemVacHeader", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Sets the active color theme of the user interface..
         /// </summary>
         public static string SettingColorThemeDescription {
@@ -327,6 +318,24 @@ namespace Micser.App.Properties {
         public static string SettingStartupName {
             get {
                 return ResourceManager.GetString("SettingStartupName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Configures the number of virtual audio cables. Changing this requires administrative privileges..
+        /// </summary>
+        public static string SettingsVacCountDescription {
+            get {
+                return ResourceManager.GetString("SettingsVacCountDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Virtual Audio Cables.
+        /// </summary>
+        public static string SettingsVacCountName {
+            get {
+                return ResourceManager.GetString("SettingsVacCountName", resourceCulture);
             }
         }
         

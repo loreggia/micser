@@ -1,7 +1,7 @@
 ﻿using CSCore;
 using Micser.Common.Audio;
+using Micser.Common.Extensions;
 using Micser.Engine.Infrastructure.Audio;
-using Micser.Engine.Infrastructure.Extensions;
 using Micser.Plugins.Main.Modules;
 using System;
 

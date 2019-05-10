@@ -32,7 +32,6 @@
             public const string ToolsSettings = Tools + "Settings";
             public const string ToolsStart = Tools + "Start";
             public const string ToolsStop = Tools + "Stop";
-            public const string ToolsVac = Tools + "Vac";
         }
 
         /// <summary>
@@ -75,6 +74,7 @@
             public const string ShellState = "ShellState";
             public const string Startup = "Startup";
             public const string StartupMinimized = "StartupMinimized";
+            public const string VacCount = "VacCount";
         }
 
         /// <summary>

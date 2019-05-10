@@ -16,15 +16,20 @@ namespace Micser.DriverUtility
 
         public int SetDeviceSettingsAndReload(int deviceCount)
         {
-            if (deviceCount > DriverGlobals.MaxDeviceCount)
+            if (deviceCount < 1)
             {
-                deviceCount = DriverGlobals.MaxDeviceCount;
+                deviceCount = 1;
+            }
+
+            if (deviceCount > Globals.MaxVacCount)
+            {
+                deviceCount = Globals.MaxVacCount;
             }
 
             try
             {
                 var registryKey = Registry.CurrentUser.CreateSubKey(Globals.UserRegistryRoot, true);
-                registryKey.SetValue(DriverGlobals.RegistryValues.DeviceCount, (uint)deviceCount, RegistryValueKind.DWord);
+                registryKey.SetValue(Globals.RegistryValues.VacCount, (uint)deviceCount, RegistryValueKind.DWord);
             }
             catch (Exception ex)
             {
