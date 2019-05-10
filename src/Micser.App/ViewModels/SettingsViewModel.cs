@@ -58,7 +58,7 @@ namespace Micser.App.ViewModels
             await LoadAsync();
         }
 
-        private async Task ExportAsync()
+        private Task ExportAsync()
         {
             var confirmation = new FileDialogConfirmation { Title = Resources.ExportSettingsDialogTitle, DefaultExtension = ".json" };
             confirmation.AddFilter(Resources.JsonFiles, "*.json");
@@ -71,8 +71,13 @@ namespace Micser.App.ViewModels
 
                 var fileName = c.Content as string;
                 var result = _settingsExporter.Export(fileName);
+
                 // todo show notification
+                if (result)
+                {
+                }
             });
+            return Task.CompletedTask;
         }
 
         private Task ImportAsync()

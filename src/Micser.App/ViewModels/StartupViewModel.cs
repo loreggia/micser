@@ -45,7 +45,7 @@ namespace Micser.App.ViewModels
             await Task.Delay(2000);
 
             var shellState = _settingsService.GetSetting<ShellState>(AppGlobals.SettingKeys.ShellState);
-            var shell = Application.Current.MainWindow;
+            var shell = System.Windows.Application.Current.MainWindow;
 
             if (shellState != null && shell != null)
             {
