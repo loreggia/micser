@@ -12,6 +12,9 @@ using System.Windows.Input;
 
 namespace Micser.App.Infrastructure.Widgets
 {
+    /// <summary>
+    /// A customized <see cref="Canvas"/> control managing widgets and their connections.
+    /// </summary>
     public class WidgetPanel : Canvas
     {
         public static readonly DependencyProperty ConnectionsSourceProperty = DependencyProperty.Register(
@@ -37,8 +40,6 @@ namespace Micser.App.Infrastructure.Widgets
         private readonly SemaphoreSlim _loadSemaphore;
         private readonly ObservableCollection<Widget> _widgets;
         private bool _isLoaded;
-
-        // start point of the rubber band drag operation
         private Point? _rubberbandSelectionStartPoint;
 
         public WidgetPanel()
@@ -84,6 +85,9 @@ namespace Micser.App.Infrastructure.Widgets
             set => SetValue(WidgetsSourceProperty, value);
         }
 
+        /// <summary>
+        /// Deselects all widgets.
+        /// </summary>
         public void ClearSelection()
         {
             foreach (ISelectable selectable in Children)
@@ -92,6 +96,9 @@ namespace Micser.App.Infrastructure.Widgets
             }
         }
 
+        /// <summary>
+        /// Create a connection between an output and an input connector.
+        /// </summary>
         public void CreateConnection(Connector sourceConnector, Connector targetConnector)
         {
             if (sourceConnector.DataContext is ConnectorViewModel sourceVm &&
@@ -120,6 +127,9 @@ namespace Micser.App.Infrastructure.Widgets
             }
         }
 
+        /// <summary>
+        /// Removes the specified connection.
+        /// </summary>
         public void RemoveConnection(Connection connection)
         {
             if (connection == null || !(connection.DataContext is ConnectionViewModel vm))
@@ -138,6 +148,9 @@ namespace Micser.App.Infrastructure.Widgets
             }
         }
 
+        /// <summary>
+        /// Removes the specified widget.
+        /// </summary>
         public void RemoveWidget(Widget widget)
         {
             if (widget == null || !(widget.DataContext is WidgetViewModel vm))
@@ -203,6 +216,7 @@ namespace Micser.App.Infrastructure.Widgets
         {
             base.OnDrop(e);
 
+            // Handle drag & drop from the widget tool box
             if (e.Data.GetData(typeof(WidgetDescription)) is WidgetDescription description)
             {
                 if (WidgetFactory == null)
@@ -235,6 +249,7 @@ namespace Micser.App.Infrastructure.Widgets
         {
             base.OnKeyDown(e);
 
+            // Delete widgets on key press
             if (e.Key == Key.Delete || e.Key == Key.Back)
             {
                 var selected = _widgets.Where(w => w.IsSelected).ToArray();
@@ -257,6 +272,7 @@ namespace Micser.App.Infrastructure.Widgets
         {
             base.OnMouseDown(e);
 
+            // Handle rubberband selection
             if (Equals(e.Source, this))
             {
                 // in case that this click is the start for a

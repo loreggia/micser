@@ -7,6 +7,9 @@ using System.Windows.Controls.Primitives;
 
 namespace Micser.App.Infrastructure.Widgets
 {
+    /// <summary>
+    /// A <see cref="Thumb"/> control handling widget resizing.
+    /// </summary>
     public class ResizeThumb : Thumb
     {
         public ResizeThumb()

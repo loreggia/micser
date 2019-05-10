@@ -6,6 +6,9 @@ using System.Windows.Media;
 
 namespace Micser.App.Infrastructure.Widgets
 {
+    /// <summary>
+    /// Adorner used to display a drag selection.
+    /// </summary>
     public class RubberbandAdorner : Adorner
     {
         private readonly Pen _rubberbandPen;

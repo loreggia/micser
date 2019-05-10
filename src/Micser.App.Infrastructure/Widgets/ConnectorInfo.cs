@@ -12,7 +12,7 @@ namespace Micser.App.Infrastructure.Widgets
     }
 
     /// <summary>
-    ///     Provides compact info about a connector; used for the routing algorithm, instead of hand over a full fledged Connector.
+    /// Provides compact info about a connector; used for the routing algorithm, instead of hand over a full fledged Connector.
     /// </summary>
     public struct ConnectorInfo
     {

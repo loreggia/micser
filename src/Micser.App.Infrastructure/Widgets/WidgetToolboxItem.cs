@@ -5,7 +5,7 @@ using System.Windows.Input;
 namespace Micser.App.Infrastructure.Widgets
 {
     /// <summary>
-    ///     Represents a selectable item in the Toolbox.
+    /// Represents a selectable item in the Toolbox.
     /// </summary>
     public class WidgetToolboxItem : ContentControl
     {
