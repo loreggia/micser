@@ -15,6 +15,12 @@ namespace Micser.App.Infrastructure
         private bool _canExecuteState;
         private Timer _timer;
 
+        /// <summary>
+        /// Creates an instance of the <see cref="AsyncDelegateCommand"/> class.
+        /// </summary>
+        /// <param name="executeMethod">The method to call when executing the command.</param>
+        /// <param name="canExecuteMethod">The method to call when checking if the command can be executed.</param>
+        /// <param name="checkInterval">The interval in milliseconds to periodically check if the command can be executed.</param>
         public AsyncDelegateCommand(Func<Task> executeMethod, Func<Task<bool>> canExecuteMethod, int checkInterval = 500)
         {
             CheckInterval = checkInterval;
@@ -24,19 +30,27 @@ namespace Micser.App.Infrastructure
             _timer = new Timer(TimerCallback, null, TimeSpan.Zero, TimeSpan.FromMilliseconds(checkInterval));
         }
 
+        /// <summary>
+        /// Gets the number of milliseconds that this command periodically checks its <see cref="CanExecute"/> method.
+        /// </summary>
         public int CheckInterval { get; }
 
+        /// <inheritdoc />
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
+        /// <inheritdoc />
         protected override bool CanExecute(object parameter)
         {
             return _canExecuteState;
         }
 
+        /// <summary>
+        /// Releases resources.
+        /// </summary>
         protected virtual void Dispose(bool disposing)
         {
             if (disposing)
@@ -46,6 +60,7 @@ namespace Micser.App.Infrastructure
             }
         }
 
+        /// <inheritdoc />
         protected override async void Execute(object parameter)
         {
             await _executeMethod();

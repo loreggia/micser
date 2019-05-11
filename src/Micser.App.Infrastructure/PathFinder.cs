@@ -5,14 +5,15 @@ using System.Windows;
 
 namespace Micser.App.Infrastructure
 {
-    // Note: I couldn't find a useful open source library that does
-    // orthogonal routing so started to write something on my own.
-    // Categorize this as a quick and dirty short term solution.
-    // I will keep on searching.
-
-    // Helper class to provide an orthogonal connection path
+    /// <summary>
+    /// Helper class to provide orthogonal connection paths.
+    /// </summary>
+    /// <remarks>
+    /// https://www.codeproject.com/Articles/24681/WPF-Diagram-Designer-Part-4
+    /// </remarks>
     public static class PathFinder
     {
+#pragma warning disable 1591
         private const double Epsilon = 0.001d;
         private const int Margin = 20;
 
@@ -663,5 +664,7 @@ namespace Micser.App.Infrastructure
             rect.Inflate(-1, -1);
             return rect.IntersectsWith(new Rect(startPoint, endPoint));
         }
+
+#pragma warning restore 1591
     }
 }

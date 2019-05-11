@@ -6,10 +6,24 @@ using System.Windows.Input;
 
 namespace Micser.App.Infrastructure.Behaviors
 {
+    /// <summary>
+    /// The type of masking to apply to the text box input.
+    /// </summary>
     public enum MaskType
     {
+        /// <summary>
+        /// A custom mask.
+        /// </summary>
         Any,
+
+        /// <summary>
+        /// Only allows integer numbers.
+        /// </summary>
         Integer,
+
+        /// <summary>
+        /// Allows integer and decimal numbers.
+        /// </summary>
         Decimal
     }
 
@@ -31,6 +45,9 @@ namespace Micser.App.Infrastructure.Behaviors
     {
         #region MinimumValue Property
 
+        /// <summary>
+        /// The minimum allowed value for <see cref="MaskType.Integer"/> and <see cref="MaskType.Decimal"/> masks.
+        /// </summary>
         public static readonly DependencyProperty MinimumValueProperty =
             DependencyProperty.RegisterAttached(
                 "MinimumValue",
@@ -39,11 +56,17 @@ namespace Micser.App.Infrastructure.Behaviors
                 new FrameworkPropertyMetadata(double.NaN, MinimumValueChangedCallback)
             );
 
+        /// <summary>
+        /// Gets the minimum allowed value for <see cref="MaskType.Integer"/> and <see cref="MaskType.Decimal"/> masks.
+        /// </summary>
         public static double GetMinimumValue(DependencyObject obj)
         {
             return (double)obj.GetValue(MinimumValueProperty);
         }
 
+        /// <summary>
+        /// Sets the minimum allowed value for <see cref="MaskType.Integer"/> and <see cref="MaskType.Decimal"/> masks.
+        /// </summary>
         public static void SetMinimumValue(DependencyObject obj, double value)
         {
             obj.SetValue(MinimumValueProperty, value);
@@ -59,6 +82,9 @@ namespace Micser.App.Infrastructure.Behaviors
 
         #region MaximumValue Property
 
+        /// <summary>
+        /// The maximum allowed value for <see cref="MaskType.Integer"/> and <see cref="MaskType.Decimal"/> masks.
+        /// </summary>
         public static readonly DependencyProperty MaximumValueProperty =
             DependencyProperty.RegisterAttached(
                 "MaximumValue",
@@ -67,11 +93,17 @@ namespace Micser.App.Infrastructure.Behaviors
                 new FrameworkPropertyMetadata(double.NaN, MaximumValueChangedCallback)
             );
 
+        /// <summary>
+        /// Gets the maximum allowed value for <see cref="MaskType.Integer"/> and <see cref="MaskType.Decimal"/> masks.
+        /// </summary>
         public static double GetMaximumValue(DependencyObject obj)
         {
             return (double)obj.GetValue(MaximumValueProperty);
         }
 
+        /// <summary>
+        /// Sets the maximum allowed value for <see cref="MaskType.Integer"/> and <see cref="MaskType.Decimal"/> masks.
+        /// </summary>
         public static void SetMaximumValue(DependencyObject obj, double value)
         {
             obj.SetValue(MaximumValueProperty, value);
@@ -87,6 +119,9 @@ namespace Micser.App.Infrastructure.Behaviors
 
         #region Mask Property
 
+        /// <summary>
+        /// The input mask type.
+        /// </summary>
         public static readonly DependencyProperty MaskProperty =
             DependencyProperty.RegisterAttached(
                 "Mask",
@@ -95,11 +130,17 @@ namespace Micser.App.Infrastructure.Behaviors
                 new FrameworkPropertyMetadata(MaskChangedCallback)
             );
 
+        /// <summary>
+        /// Gets the input mask type attached property.
+        /// </summary>
         public static MaskType GetMask(DependencyObject obj)
         {
             return (MaskType)obj.GetValue(MaskProperty);
         }
 
+        /// <summary>
+        /// Sets the input mask type attached property.
+        /// </summary>
         public static void SetMask(DependencyObject obj, MaskType value)
         {
             obj.SetValue(MaskProperty, value);
@@ -133,14 +174,23 @@ namespace Micser.App.Infrastructure.Behaviors
 
         #region Decimals Property
 
+        /// <summary>
+        /// The number of decimals for <see cref="MaskType.Decimal"/> masks.
+        /// </summary>
         public static readonly DependencyProperty DecimalsProperty = DependencyProperty.RegisterAttached(
             "Decimals", typeof(int), typeof(TextBoxMaskBehavior), new PropertyMetadata(2));
 
+        /// <summary>
+        /// Gets the number of decimals for <see cref="MaskType.Decimal"/> masks.
+        /// </summary>
         public static int GetDecimals(DependencyObject element)
         {
             return (int)element.GetValue(DecimalsProperty);
         }
 
+        /// <summary>
+        /// Sets the number of decimals for <see cref="MaskType.Decimal"/> masks.
+        /// </summary>
         public static void SetDecimals(DependencyObject element, int value)
         {
             element.SetValue(DecimalsProperty, value);
@@ -409,27 +459,26 @@ namespace Micser.App.Infrastructure.Behaviors
                 case MaskType.Integer:
                     try
                     {
+                        // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
                         Convert.ToInt64(value);
                         return value;
                     }
                     catch
                     {
+                        return string.Empty;
                     }
-
-                    return string.Empty;
 
                 case MaskType.Decimal:
                     try
                     {
+                        // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
                         Convert.ToDouble(value);
-
                         return value;
                     }
                     catch
                     {
+                        return string.Empty;
                     }
-
-                    return string.Empty;
             }
 
             return value;

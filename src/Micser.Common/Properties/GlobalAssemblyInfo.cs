@@ -1,5 +1,7 @@
 ﻿namespace Micser.Common.Properties
 {
+#pragma warning disable 1591
+
     public static class GlobalAssemblyInfo
     {
         public const string Company = "Lucas Loreggia";
@@ -17,4 +19,6 @@
         [assembly: AssemblyFileVersion(GlobalAssemblyInfo.Version)]
          */
     }
+
+#pragma warning restore 1591
 }

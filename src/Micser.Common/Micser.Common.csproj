@@ -77,12 +77,9 @@
     <Compile Include="DataAccess\UnitOfWork.cs" />
     <Compile Include="DataAccess\UnitOfWorkFactory.cs" />
     <Compile Include="Devices\DeviceService.cs" />
-    <Compile Include="Extensions\ComparableExtensions.cs" />
     <Compile Include="Extensions\MathExtensions.cs" />
     <Compile Include="Extensions\PropertyExtensions.cs" />
-    <Compile Include="Extensions\SerializationExtensions.cs" />
     <Compile Include="Extensions\SocketExtensions.cs" />
-    <Compile Include="Extensions\StringBuilderExtensions.cs" />
     <Compile Include="Extensions\UnityContainerExtensions.cs" />
     <Compile Include="Extensions\WaveFormatExtensions.cs" />
     <Compile Include="Globals.cs" />
@@ -97,11 +94,9 @@
     <Compile Include="OrderedParameterOverride.cs" />
     <Compile Include="Properties\GlobalAssemblyInfo.cs" />
     <Compile Include="SemaphoreQueue.cs" />
-    <Compile Include="ServiceStatus.cs" />
     <Compile Include="StateDictionary.cs" />
     <Compile Include="Modules\ModuleDto.cs" />
     <Compile Include="Modules\ModuleConnectionDto.cs" />
-    <Compile Include="Extensions\EnumerableExtensions.cs" />
     <Compile Include="IItemRegistry.cs" />
     <Compile Include="ItemRegistry.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

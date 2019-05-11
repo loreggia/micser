@@ -3,6 +3,9 @@ using System.Globalization;
 
 namespace Micser.App.Infrastructure.Converter
 {
+    /// <summary>
+    /// Value converter that divides a <see cref="double"/> value by a divisor.
+    /// </summary>
     public class DoubleDivisionConverter : ConverterExtension
     {
         /// <summary>
@@ -10,6 +13,7 @@ namespace Micser.App.Infrastructure.Converter
         /// </summary>
         public double Divisor { get; set; }
 
+        /// <inheritdoc />
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is double d)
@@ -22,6 +26,7 @@ namespace Micser.App.Infrastructure.Converter
             return value;
         }
 
+        /// <inheritdoc />
         public override object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is double d)

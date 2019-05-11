@@ -8,6 +8,9 @@ namespace Micser.App.Infrastructure
     /// </summary>
     public abstract class Bindable : INotifyPropertyChanged
     {
+        /// <summary>
+        /// Raised when a bindable property value changed.
+        /// </summary>
         public event PropertyChangedEventHandler PropertyChanged;
 
         /// <summary>

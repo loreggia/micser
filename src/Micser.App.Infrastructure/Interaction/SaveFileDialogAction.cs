@@ -14,6 +14,7 @@ namespace Micser.App.Infrastructure.Interaction
     /// </example>
     public class SaveFileDialogAction : FileDialogAction
     {
+        /// <inheritdoc />
         protected override FileDialog CreateDialog()
         {
             return new SaveFileDialog();

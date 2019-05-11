@@ -7,17 +7,23 @@ namespace Micser.App.Infrastructure.Themes
     /// <summary>
     /// Base class for strongly typed dynamic resource keys.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
+    /// <typeparam name="T">An enumeration type.</typeparam>
     public class ThemeKeyExtension<T> : ResourceKey
     {
         private readonly T _key;
 
+        /// <summary>
+        /// Creates an instance of the <see cref="ThemeKeyExtension{T}"/> class.
+        /// </summary>
         public ThemeKeyExtension(T key)
         {
             _key = key;
         }
 
+        /// <inheritdoc />
         public override Assembly Assembly => GetType().Assembly;
+
+#pragma warning disable 1591
 
         public static bool operator !=(ThemeKeyExtension<T> extension1, ThemeKeyExtension<T> extension2)
         {
@@ -29,6 +35,9 @@ namespace Micser.App.Infrastructure.Themes
             return EqualityComparer<ThemeKeyExtension<T>>.Default.Equals(extension1, extension2);
         }
 
+#pragma warning restore 1591
+
+        /// <inheritdoc />
         public override bool Equals(object obj)
         {
             var extension = obj as ThemeKeyExtension<T>;
@@ -37,6 +46,7 @@ namespace Micser.App.Infrastructure.Themes
                    EqualityComparer<Assembly>.Default.Equals(Assembly, extension.Assembly);
         }
 
+        /// <inheritdoc />
         public override int GetHashCode()
         {
             var hashCode = -401752094;

@@ -80,8 +80,6 @@
     <Compile Include="Converter\DoubleToRectConverter.cs" />
     <Compile Include="Converter\EmptyStringToVisibilityConverter.cs" />
     <Compile Include="Converter\EnumToBooleanConverter.cs" />
-    <Compile Include="Converter\NullToBooleanConverter.cs" />
-    <Compile Include="Converter\NullToVisibilityConverter.cs" />
     <Compile Include="Converter\RelativeCenterPlacementConverter.cs" />
     <Compile Include="CustomApplicationCommands.cs" />
     <Compile Include="DataAccess\AppDbContext.cs" />
@@ -99,10 +97,9 @@
     <Compile Include="IAppModule.cs" />
     <Compile Include="IniFile.cs" />
     <Compile Include="ISelectable.cs" />
-    <Compile Include="MicserRegionNavigationJournal.cs" />
     <Compile Include="Interaction\OpenFileDialogAction.cs" />
     <Compile Include="Interaction\FileDialogConfirmation.cs" />
-    <Compile Include="ModulesExporter.cs" />
+    <Compile Include="ModulesSerializer.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -116,7 +113,7 @@
     <Compile Include="SetPropertyAction.cs" />
     <Compile Include="Settings\SettingChangedEventHandler.cs" />
     <Compile Include="Settings\SettingDefinition.cs" />
-    <Compile Include="Settings\SettingsExporter.cs" />
+    <Compile Include="Settings\SettingsSerializer.cs" />
     <Compile Include="Settings\SettingsPanel.cs" />
     <Compile Include="Settings\SettingsRegistry.cs" />
     <Compile Include="Themes\BrushThemeKeyExtension.cs" />

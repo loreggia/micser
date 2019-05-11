@@ -13,6 +13,9 @@ namespace Micser.App.Infrastructure.Api
         private const string ResourceName = "moduleconnections";
         private readonly IApiEndPoint _apiEndPoint;
 
+        /// <summary>
+        /// Creates an instance of the <see cref="ModuleConnectionsApiClient"/> class.
+        /// </summary>
         public ModuleConnectionsApiClient(IApiEndPoint apiEndPoint)
         {
             _apiEndPoint = apiEndPoint;

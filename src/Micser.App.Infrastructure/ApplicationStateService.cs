@@ -9,13 +9,18 @@ namespace Micser.App.Infrastructure
 
         private bool _isInitialized;
 
+        /// <summary>
+        /// Creates an instance of the <see cref="ApplicationStateService"/> class.
+        /// </summary>
         public ApplicationStateService(IEventAggregator eventAggregator)
         {
             _eventAggregator = eventAggregator;
         }
 
+        /// <inheritdoc />
         public bool ModulesLoaded { get; private set; }
 
+        /// <inheritdoc />
         public void Initialize()
         {
             if (_isInitialized)

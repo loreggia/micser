@@ -14,6 +14,10 @@ namespace Micser.Common
     {
         private readonly Queue<InjectionParameterValue> _parameterValues;
 
+        /// <summary>
+        /// Creates an instance of the <see cref="OrderedParametersOverride"/> class.
+        /// </summary>
+        /// <param name="parameterValues">The values to pass to the resolved object's constructor in the passed order.</param>
         public OrderedParametersOverride(params object[] parameterValues)
         {
             _parameterValues = new Queue<InjectionParameterValue>();
@@ -24,6 +28,7 @@ namespace Micser.Common
             }
         }
 
+        /// <inheritdoc />
         public override IResolverPolicy GetResolver(IBuilderContext context, Type dependencyType)
         {
             if (_parameterValues.Count < 1)

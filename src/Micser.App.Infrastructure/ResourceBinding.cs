@@ -15,16 +15,24 @@ namespace Micser.App.Infrastructure
     /// </remarks>
     public class ResourceBinding : MarkupExtension
     {
+#pragma warning disable 1591
+
         public static readonly DependencyProperty ResourceBindingKeyHelperProperty =
             DependencyProperty.RegisterAttached("ResourceBindingKeyHelper", typeof(object), typeof(ResourceBinding), new PropertyMetadata(null, ResourceKeyChanged));
 
         private readonly Binding _binding;
 
+        /// <summary>
+        /// Creates an instance of the <see cref="ResourceBinding"/> class.
+        /// </summary>
         public ResourceBinding()
         {
             _binding = new Binding();
         }
 
+        /// <summary>
+        /// Creates an instance of the <see cref="ResourceBinding"/> class using the specified binding path.
+        /// </summary>
         public ResourceBinding(string path)
             : this()
         {
@@ -235,5 +243,7 @@ namespace Micser.App.Infrastructure
                 throw new NotImplementedException();
             }
         }
+
+#pragma warning restore 1591
     }
 }

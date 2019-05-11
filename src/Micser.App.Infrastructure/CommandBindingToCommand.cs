@@ -7,6 +7,9 @@ namespace Micser.App.Infrastructure
     /// </summary>
     public class CommandBindingToCommand : CommandBinding
     {
+        /// <summary>
+        /// Creates an instance of the <see cref="CommandBindingToCommand"/> class.
+        /// </summary>
         public CommandBindingToCommand(RoutedUICommand applicationCommand, ICommand boundCommand)
             : base(applicationCommand)
         {
@@ -16,6 +19,9 @@ namespace Micser.App.Infrastructure
             CanExecute += OnCanExecute;
         }
 
+        /// <summary>
+        /// Gets the view model command.
+        /// </summary>
         public ICommand BoundCommand { get; }
 
         private void OnCanExecute(object sender, CanExecuteRoutedEventArgs e)

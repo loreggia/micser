@@ -10,11 +10,17 @@ namespace Micser.App.Infrastructure.Api
     {
         private readonly IEventAggregator _eventAggregator;
 
+        /// <summary>
+        /// Creates an instance of the <see cref="ApiEventRequestProcessor"/> class.
+        /// </summary>
         public ApiEventRequestProcessor(IEventAggregator eventAggregator)
         {
             _eventAggregator = eventAggregator;
         }
 
+        /// <summary>
+        /// Publishes an <see cref="ApiEvent"/> via <see cref="IEventAggregator"/> for incoming requests.
+        /// </summary>
         public JsonResponse Process(string action, object content)
         {
             var apiEvent = _eventAggregator.GetEvent<ApiEvent>();

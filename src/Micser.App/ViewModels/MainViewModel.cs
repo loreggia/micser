@@ -26,7 +26,7 @@ namespace Micser.App.ViewModels
         private readonly IEventAggregator _eventAggregator;
         private readonly ILogger _logger;
         private readonly ModulesApiClient _modulesApiClient;
-        private readonly ModulesExporter _modulesExporter;
+        private readonly ModulesSerializer _modulesSerializer;
         private readonly INavigationManager _navigationManager;
         private readonly ICollection<WidgetViewModel> _savingBuffer;
         private readonly IWidgetRegistry _widgetRegistry;
@@ -46,7 +46,7 @@ namespace Micser.App.ViewModels
             IEventAggregator eventAggregator,
             ModulesApiClient modulesApiClient,
             ModuleConnectionsApiClient connectionsApiClient,
-            ModulesExporter modulesExporter)
+            ModulesSerializer modulesSerializer)
         {
             _widgetRegistry = widgetRegistry;
             _logger = logger;
@@ -54,7 +54,7 @@ namespace Micser.App.ViewModels
             _eventAggregator = eventAggregator;
             _modulesApiClient = modulesApiClient;
             _connectionsApiClient = connectionsApiClient;
-            _modulesExporter = modulesExporter;
+            _modulesSerializer = modulesSerializer;
 
             _widgets = new ObservableCollection<WidgetViewModel>();
             _widgets.CollectionChanged += OnWidgetsCollectionChanged;
@@ -235,7 +235,7 @@ namespace Micser.App.ViewModels
                         Connections = _connectionDtos.ToArray()
                     };
 
-                    _modulesExporter.Export(fileName, data);
+                    _modulesSerializer.Export(fileName, data);
                 }
             });
         }
@@ -253,7 +253,7 @@ namespace Micser.App.ViewModels
 
                 if (c.Content is string fileName)
                 {
-                    var dto = _modulesExporter.Import(fileName);
+                    var dto = _modulesSerializer.Import(fileName);
 
                     if (dto == null)
                     {

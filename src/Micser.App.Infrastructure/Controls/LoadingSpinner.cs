@@ -12,14 +12,27 @@ namespace Micser.App.Infrastructure.Controls
     [TemplatePart(Name = PartRotationTransform, Type = typeof(RotateTransform))]
     public class LoadingSpinner : Control
     {
+        /// <summary>
+        /// The name of the canvas control.
+        /// </summary>
         public const string PartCanvas = "PART_Canvas";
+
+        /// <summary>
+        /// The name of the rotation transform to rotate the spinner with.
+        /// </summary>
         public const string PartRotationTransform = "PART_RotationTransform";
 
+        /// <summary>
+        /// The number of circles to generate for the spinner.
+        /// </summary>
         public static readonly DependencyProperty CircleCountProperty = DependencyProperty.Register(
             nameof(CircleCount), typeof(int), typeof(LoadingSpinner), new PropertyMetadata(9));
 
+        /// <summary>
+        /// The <see cref="DataTemplate"/> to use for displaying the spinning circles.
+        /// </summary>
         public static readonly DependencyProperty CircleTemplateProperty = DependencyProperty.Register(
-                    nameof(CircleTemplate), typeof(DataTemplate), typeof(LoadingSpinner), new PropertyMetadata(default(DataTemplate)));
+            nameof(CircleTemplate), typeof(DataTemplate), typeof(LoadingSpinner), new PropertyMetadata(default(DataTemplate)));
 
         private Canvas _canvas;
         private RotateTransform _rotateTransform;
@@ -29,18 +42,27 @@ namespace Micser.App.Infrastructure.Controls
             DefaultStyleKeyProperty.OverrideMetadata(typeof(LoadingSpinner), new FrameworkPropertyMetadata(typeof(LoadingSpinner)));
         }
 
+        /// <summary>
+        /// Gets or sets the number of circles to generate for the spinner.
+        /// Wraps the <see cref="CircleCountProperty"/> dependency property.
+        /// </summary>
         public int CircleCount
         {
             get => (int)GetValue(CircleCountProperty);
             set => SetValue(CircleCountProperty, value);
         }
 
+        /// <summary>
+        /// Gets or sets the <see cref="DataTemplate"/> to use for displaying the spinning circles.
+        /// Wraps the <see cref="CircleTemplateProperty"/> dependency property.
+        /// </summary>
         public DataTemplate CircleTemplate
         {
             get => (DataTemplate)GetValue(CircleTemplateProperty);
             set => SetValue(CircleTemplateProperty, value);
         }
 
+        /// <inheritdoc />
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
