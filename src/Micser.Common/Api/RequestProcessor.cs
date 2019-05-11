@@ -10,9 +10,7 @@ namespace Micser.Common.Api
     {
         private readonly IDictionary<string, Func<dynamic, object>> _actions;
 
-        /// <summary>
-        /// Creates an instance of the <see cref="RequestProcessor"/> class.
-        /// </summary>
+        /// <inheritdoc />
         protected RequestProcessor()
         {
             _actions = new Dictionary<string, Func<dynamic, object>>();

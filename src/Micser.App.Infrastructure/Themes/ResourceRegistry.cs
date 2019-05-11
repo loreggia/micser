@@ -10,9 +10,7 @@ namespace Micser.App.Infrastructure.Themes
     {
         private static IEnumerable<ResourceDictionary> _infrastructureResources;
 
-        /// <summary>
-        /// Creates an instance of the <see cref="ResourceRegistry"/> class.
-        /// </summary>
+        /// <inheritdoc />
         public ResourceRegistry()
         {
             foreach (var infrastructureResource in InfrastructureResources)

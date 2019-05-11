@@ -8,9 +8,7 @@ namespace Micser.Common.Api
     [JsonConverter(typeof(JsonMessageConverter))]
     public abstract class JsonMessage
     {
-        /// <summary>
-        /// Creates an instance of the <see cref="JsonMessage"/> class.
-        /// </summary>
+        /// <inheritdoc />
         protected JsonMessage()
         {
         }
@@ -40,9 +38,7 @@ namespace Micser.Common.Api
     /// </summary>
     public class JsonRequest : JsonMessage
     {
-        /// <summary>
-        /// Creates an instance of the <see cref="JsonRequest"/> class.
-        /// </summary>
+        /// <inheritdoc />
         public JsonRequest()
         {
         }
@@ -73,16 +69,12 @@ namespace Micser.Common.Api
     /// </summary>
     public class JsonResponse : JsonMessage
     {
-        /// <summary>
-        /// Creates an instance of the <see cref="JsonResponse"/> class.
-        /// </summary>
+        /// <inheritdoc />
         public JsonResponse()
         {
         }
 
-        /// <summary>
-        /// Creates an instance of the <see cref="JsonResponse"/> class.
-        /// </summary>
+        /// <inheritdoc />
         public JsonResponse(bool isSuccess, object content = null, string message = null)
             : base(content)
         {

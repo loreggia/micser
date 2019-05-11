@@ -11,12 +11,23 @@ namespace Micser.App.Infrastructure
     /// </summary>
     public class SetPropertyAction : TriggerAction<FrameworkElement>
     {
+        /// <summary>
+        /// The name of the property to set.
+        /// </summary>
         public static readonly DependencyProperty PropertyNameProperty = DependencyProperty.Register(nameof(PropertyName), typeof(string), typeof(SetPropertyAction));
+
+        /// <summary>
+        /// The value of the property to set.
+        /// </summary>
         public static readonly DependencyProperty PropertyValueProperty = DependencyProperty.Register(nameof(PropertyValue), typeof(object), typeof(SetPropertyAction));
+
+        /// <summary>
+        /// The object to set the value to.
+        /// </summary>
         public static readonly DependencyProperty TargetObjectProperty = DependencyProperty.Register(nameof(TargetObject), typeof(object), typeof(SetPropertyAction));
 
         /// <summary>
-        ///     The property to be executed in response to the trigger.
+        /// The property to be executed in response to the trigger.
         /// </summary>
         public string PropertyName
         {
@@ -42,6 +53,7 @@ namespace Micser.App.Infrastructure
             set => SetValue(TargetObjectProperty, value);
         }
 
+        /// <inheritdoc />
         protected override void Invoke(object parameter)
         {
             var value = PropertyValue;

@@ -7,9 +7,7 @@ namespace Micser.App.Infrastructure.ToolBars
     {
         private readonly Dictionary<string, ToolBarDescription> _toolBars;
 
-        /// <summary>
-        /// Creates an instance of the <see cref="ToolBarRegistry"/> class.
-        /// </summary>
+        /// <inheritdoc />
         public ToolBarRegistry()
         {
             _toolBars = new Dictionary<string, ToolBarDescription>();

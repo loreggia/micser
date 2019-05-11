@@ -8,9 +8,7 @@ namespace Micser.App.Infrastructure.DataAccess.Repositories
     /// <inheritdoc cref="ISettingValueRepository" />
     public class SettingValueRepository : Repository<SettingValue>, ISettingValueRepository
     {
-        /// <summary>
-        /// Creates an instance of the <see cref="SettingValueRepository"/> class.
-        /// </summary>
+        /// <inheritdoc />
         public SettingValueRepository(DbContext context)
             : base(context)
         {

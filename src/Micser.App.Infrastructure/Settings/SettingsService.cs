@@ -24,9 +24,7 @@ namespace Micser.App.Infrastructure.Settings
         private readonly IDictionary<string, object> _settings;
         private bool _isLoaded;
 
-        /// <summary>
-        /// Creates an instance of the <see cref="SettingsService"/> class.
-        /// </summary>
+        /// <inheritdoc />
         public SettingsService(IUnitOfWorkFactory database, ISettingsRegistry registry, ILogger logger)
         {
             _settings = new ConcurrentDictionary<string, object>();

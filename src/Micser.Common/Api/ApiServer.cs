@@ -18,9 +18,7 @@ namespace Micser.Common.Api
         private readonly ILogger _logger;
         private readonly SemaphoreSlim _startSemaphore;
 
-        /// <summary>
-        /// Creates an instance of the <see cref="ApiServer"/> class.
-        /// </summary>
+        /// <inheritdoc />
         public ApiServer(IRequestProcessorFactory requestProcessorFactory, ILogger logger)
             : base(requestProcessorFactory)
         {

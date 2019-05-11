@@ -10,6 +10,7 @@ namespace Micser.App.Infrastructure
     {
         private bool _isBusy;
 
+        /// <inheritdoc />
         protected ViewModel()
         {
             CommandBindings = new CommandBindingCollection();
@@ -34,6 +35,7 @@ namespace Micser.App.Infrastructure
         /// </summary>
         public bool IsDisposed { get; private set; }
 
+        /// <inheritdoc />
         public void Dispose()
         {
             Dispose(true);
@@ -49,6 +51,9 @@ namespace Micser.App.Infrastructure
             CommandBindings.Add(new CommandBindingToCommand(applicationCommand, vmCommand));
         }
 
+        /// <summary>
+        /// Releases resources.
+        /// </summary>
         protected virtual void Dispose(bool disposing)
         {
             if (disposing)

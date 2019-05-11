@@ -13,6 +13,10 @@ namespace Micser.App.Infrastructure
         /// </summary>
         public bool DisposeOnNavigatedFrom { get; protected set; }
 
+        /// <summary>
+        /// Checks whether this instance qualifies as a navigation target and will be reused instead of creating a new instance upon navigation.
+        /// Returns true unless the view model has been disposed.
+        /// </summary>
         public virtual bool IsNavigationTarget(NavigationContext navigationContext)
         {
             return !IsDisposed;

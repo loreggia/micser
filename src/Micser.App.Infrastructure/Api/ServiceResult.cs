@@ -8,9 +8,7 @@ namespace Micser.App.Infrastructure.Api
     /// <typeparam name="TData"></typeparam>
     public class ServiceResult<TData>
     {
-        /// <summary>
-        /// Creates an instance of the <see cref="ServiceResult{TData}"/> class.
-        /// </summary>
+        /// <inheritdoc />
         public ServiceResult(JsonResponse message)
         {
             IsSuccess = message.IsSuccess;

@@ -8,9 +8,7 @@ namespace Micser.App.Infrastructure.Converter
     /// </summary>
     public class BooleanConverter<T> : ConverterExtension
     {
-        /// <summary>
-        /// Creates an instance of the <see cref="BooleanConverter{T}"/> class.
-        /// </summary>
+        /// <inheritdoc />
         public BooleanConverter()
         {
         }
