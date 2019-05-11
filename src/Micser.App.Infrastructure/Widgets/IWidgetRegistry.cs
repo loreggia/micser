@@ -7,6 +7,9 @@ namespace Micser.App.Infrastructure.Widgets
     /// </summary>
     public interface IWidgetRegistry
     {
+        /// <summary>
+        /// Gets the descriptions for all available widgets.
+        /// </summary>
         IEnumerable<WidgetDescription> Widgets { get; }
     }
 }

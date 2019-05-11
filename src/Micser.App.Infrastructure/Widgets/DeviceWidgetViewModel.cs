@@ -1,4 +1,5 @@
 ﻿using CSCore.CoreAudioAPI;
+using Micser.Common;
 using Micser.Common.Devices;
 using Micser.Common.Modules;
 using System.Collections.Generic;
@@ -11,11 +12,11 @@ namespace Micser.App.Infrastructure.Widgets
     /// </summary>
     public abstract class DeviceWidgetViewModel : AudioWidgetViewModel
     {
-        public const string StateKeyDeviceId = "DeviceId";
         private readonly MMDeviceEnumerator _deviceEnumerator;
         private IEnumerable<DeviceDescription> _deviceDescriptions;
         private DeviceDescription _selectedDeviceDescription;
 
+        /// <inheritdoc />
         protected DeviceWidgetViewModel()
         {
             _deviceEnumerator = new MMDeviceEnumerator();
@@ -54,27 +55,31 @@ namespace Micser.App.Infrastructure.Widgets
         /// </summary>
         protected abstract DeviceType DeviceType { get; }
 
+        /// <inheritdoc />
         public override ModuleState GetState()
         {
             var state = base.GetState();
-            state.Data[StateKeyDeviceId] = SelectedDeviceDescription?.Id;
+            state.Data[Globals.StateKeys.DeviceId] = SelectedDeviceDescription?.Id;
             return state;
         }
 
+        /// <inheritdoc />
         public override void Initialize()
         {
             UpdateDeviceDescriptions();
             base.Initialize();
         }
 
+        /// <inheritdoc />
         public override void SetState(ModuleState state)
         {
             base.SetState(state);
 
-            var deviceId = state?.Data.GetObject<string>(StateKeyDeviceId);
+            var deviceId = state?.Data.GetObject<string>(Globals.StateKeys.DeviceId);
             SelectedDeviceDescription = deviceId != null ? DeviceDescriptions?.FirstOrDefault(d => d.Id == deviceId) : null;
         }
 
+        /// <inheritdoc />
         protected override void Dispose(bool disposing)
         {
             base.Dispose(disposing);

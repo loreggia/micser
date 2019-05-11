@@ -10,6 +10,7 @@ namespace Micser.App.Infrastructure.Widgets
     /// </summary>
     public class DragThumb : Thumb
     {
+        /// <inheritdoc />
         public DragThumb()
         {
             DragDelta += DragThumb_DragDelta;

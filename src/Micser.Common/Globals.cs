@@ -95,5 +95,16 @@ namespace Micser.Common
             /// </summary>
             public const string VacCount = "DeviceCount";
         }
+
+        /// <summary>
+        /// Contains module/widget state keys.
+        /// </summary>
+        public static class StateKeys
+        {
+            /// <summary>
+            /// Hardware device ID.
+            /// </summary>
+            public const string DeviceId = "DeviceId";
+        }
     }
 }

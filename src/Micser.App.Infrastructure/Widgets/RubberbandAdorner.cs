@@ -16,6 +16,7 @@ namespace Micser.App.Infrastructure.Widgets
         private readonly WidgetPanel _widgetPanel;
         private Point? _endPoint;
 
+        /// <inheritdoc />
         public RubberbandAdorner(WidgetPanel widgetPanel, Point? dragStartPoint)
             : base(widgetPanel)
         {
@@ -27,6 +28,7 @@ namespace Micser.App.Infrastructure.Widgets
             };
         }
 
+        /// <inheritdoc />
         protected override void OnMouseMove(MouseEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed)
@@ -51,6 +53,7 @@ namespace Micser.App.Infrastructure.Widgets
             //e.Handled = true;
         }
 
+        /// <inheritdoc />
         protected override void OnMouseUp(MouseButtonEventArgs e)
         {
             // release mouse capture
@@ -66,6 +69,7 @@ namespace Micser.App.Infrastructure.Widgets
             //e.Handled = true;
         }
 
+        /// <inheritdoc />
         protected override void OnRender(DrawingContext dc)
         {
             base.OnRender(dc);
