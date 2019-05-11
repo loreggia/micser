@@ -8,9 +8,7 @@ namespace Micser.Common.DataAccess
         private readonly DbContext _context;
         private readonly IRepositoryFactory _repositoryFactory;
 
-        /// <summary>
-        /// Creates an instance of the <see cref="UnitOfWork"/> class.
-        /// </summary>
+        /// <inheritdoc />
         public UnitOfWork(DbContext context, IRepositoryFactory repositoryFactory)
         {
             _context = context;

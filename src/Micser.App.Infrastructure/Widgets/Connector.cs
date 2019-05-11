@@ -7,6 +7,9 @@ using System.Windows.Input;
 
 namespace Micser.App.Infrastructure.Widgets
 {
+    /// <summary>
+    /// Represents a connector (input/output) on a widget.
+    /// </summary>
     public class Connector : Control
     {
         public static readonly DependencyProperty ConnectionProperty = DependencyProperty.Register(

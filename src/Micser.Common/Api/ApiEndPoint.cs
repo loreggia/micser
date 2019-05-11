@@ -50,9 +50,7 @@ namespace Micser.Common.Api
         private readonly IRequestProcessorFactory _requestProcessorFactory;
         private readonly SemaphoreQueue _sendMessageSemaphore;
 
-        /// <summary>
-        /// Creates an instance of the <see cref="ApiEndPoint"/> class.
-        /// </summary>
+        /// <inheritdoc />
         protected ApiEndPoint(IRequestProcessorFactory requestProcessorFactory)
         {
             _requestProcessorFactory = requestProcessorFactory;

@@ -2,6 +2,9 @@
 
 namespace Micser.App.Infrastructure.Widgets
 {
+    /// <summary>
+    /// The orientation of a connector that is used for displaying a connection line from the correct starting point.
+    /// </summary>
     public enum ConnectorOrientation
     {
         None,

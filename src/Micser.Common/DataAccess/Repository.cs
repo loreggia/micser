@@ -18,10 +18,7 @@ namespace Micser.Common.DataAccess
         /// </summary>
         protected readonly DbContext Context;
 
-        /// <summary>
-        /// Creates an instance of the <see cref="Repository{TEntity}"/> class.
-        /// </summary>
-        /// <param name="context"></param>
+        /// <inheritdoc />
         protected Repository(DbContext context)
         {
             Context = context;

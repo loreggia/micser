@@ -8,9 +8,7 @@ namespace Micser.Common
     {
         private readonly IList<T> _items;
 
-        /// <summary>
-        /// Creates an instance of the <see cref="ItemRegistry{T}"/> class.
-        /// </summary>
+        /// <inheritdoc />
         public ItemRegistry()
         {
             _items = new List<T>();

@@ -8,6 +8,7 @@ namespace Micser.App.Infrastructure
     /// </summary>
     public class TypeTemplateSelector : DataTemplateSelector
     {
+        /// <inheritdoc />
         public override DataTemplate SelectTemplate(object item, DependencyObject container)
         {
             if (item != null && container is FrameworkElement element)

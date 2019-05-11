@@ -7,9 +7,7 @@ namespace Micser.App.Infrastructure
     /// </summary>
     public class CommandBindingToCommand : CommandBinding
     {
-        /// <summary>
-        /// Creates an instance of the <see cref="CommandBindingToCommand"/> class.
-        /// </summary>
+        /// <inheritdoc />
         public CommandBindingToCommand(RoutedUICommand applicationCommand, ICommand boundCommand)
             : base(applicationCommand)
         {

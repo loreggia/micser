@@ -12,9 +12,7 @@ namespace Micser.App.Infrastructure.Themes
     {
         private readonly T _key;
 
-        /// <summary>
-        /// Creates an instance of the <see cref="ThemeKeyExtension{T}"/> class.
-        /// </summary>
+        /// <inheritdoc />
         public ThemeKeyExtension(T key)
         {
             _key = key;

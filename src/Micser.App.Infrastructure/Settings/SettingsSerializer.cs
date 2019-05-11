@@ -14,9 +14,7 @@ namespace Micser.App.Infrastructure.Settings
         private readonly ILogger _logger;
         private readonly ISettingsService _settingsService;
 
-        /// <summary>
-        /// Creates an instance of the <see cref="SettingsSerializer"/> class.
-        /// </summary>
+        /// <inheritdoc />
         public SettingsSerializer(ILogger logger, ISettingsService settingsService)
         {
             _logger = logger;

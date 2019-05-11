@@ -9,9 +9,7 @@ namespace Micser.Common
     /// </summary>
     public class StateDictionary : Dictionary<string, object>
     {
-        /// <summary>
-        /// Creates an instance of the <see cref="StateDictionary"/> class.
-        /// </summary>
+        /// <inheritdoc />
         public StateDictionary()
         {
         }

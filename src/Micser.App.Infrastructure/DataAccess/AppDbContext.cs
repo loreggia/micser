@@ -17,9 +17,7 @@ namespace Micser.App.Infrastructure.DataAccess
             AppDomain.CurrentDomain.SetData("DataDirectory", Globals.AppDataFolder);
         }
 
-        /// <summary>
-        /// Creates an instance of the <see cref="AppDbContext"/> class.
-        /// </summary>
+        /// <inheritdoc />
         public AppDbContext()
             : base("DefaultConnection")
         {

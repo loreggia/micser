@@ -5,9 +5,7 @@
     /// </summary>
     public class BooleanInvertConverter : BooleanConverter<bool>
     {
-        /// <summary>
-        /// Creates an instance of the <see cref="BooleanInvertConverter"/> class.
-        /// </summary>
+        /// <inheritdoc />
         public BooleanInvertConverter()
             : base(false, true)
         {

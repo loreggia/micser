@@ -60,9 +60,7 @@ namespace Micser.App.Infrastructure.Settings
     /// </summary>
     public class SettingDefinition
     {
-        /// <summary>
-        /// Creates an instance of the <see cref="SettingDefinition"/> class.
-        /// </summary>
+        /// <inheritdoc />
         public SettingDefinition()
         {
             Type = SettingType.String;

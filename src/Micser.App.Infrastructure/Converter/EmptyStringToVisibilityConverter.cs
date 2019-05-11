@@ -10,6 +10,7 @@ namespace Micser.App.Infrastructure.Converter
     /// </summary>
     public class EmptyStringToVisibilityConverter : ConverterExtension
     {
+        /// <inheritdoc />
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (!string.IsNullOrEmpty(value as string))
@@ -20,6 +21,10 @@ namespace Micser.App.Infrastructure.Converter
             return Visibility.Collapsed;
         }
 
+        /// <summary>
+        /// Not implemented.
+        /// </summary>
+        /// <exception cref="NotImplementedException"></exception>
         public override object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();

@@ -22,9 +22,7 @@ namespace Micser.App.Infrastructure
 
         private readonly Binding _binding;
 
-        /// <summary>
-        /// Creates an instance of the <see cref="ResourceBinding"/> class.
-        /// </summary>
+        /// <inheritdoc />
         public ResourceBinding()
         {
             _binding = new Binding();

@@ -44,9 +44,7 @@
     // ReSharper disable once UnusedMember.Global
     public class ColorThemeKeyExtension : ThemeKeyExtension<ColorThemeKey>
     {
-        /// <summary>
-        /// Creates an instance of the <see cref="ColorThemeKeyExtension"/> class.
-        /// </summary>
+        /// <inheritdoc />
         public ColorThemeKeyExtension(ColorThemeKey key)
             : base(key)
         {

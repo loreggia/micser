@@ -13,11 +13,17 @@ namespace Micser.App.Infrastructure
     {
         private readonly ILogger _logger;
 
+        /// <inheritdoc />
         public ModulesSerializer(ILogger logger)
         {
             _logger = logger;
         }
 
+        /// <summary>
+        /// Serializes the <paramref name="data"/> to a file.
+        /// </summary>
+        /// <param name="fileName">The full file name to serialize the data to.</param>
+        /// <param name="data">The data to serialize.</param>
         public bool Export(string fileName, ModulesExportDto data)
         {
             try
@@ -38,6 +44,10 @@ namespace Micser.App.Infrastructure
             }
         }
 
+        /// <summary>
+        /// Deserializes module data from a file.
+        /// </summary>
+        /// <param name="fileName">The file name of the file containing the serialized module data.</param>
         public ModulesExportDto Import(string fileName)
         {
             try

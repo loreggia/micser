@@ -8,9 +8,7 @@ namespace Micser.Common.Modules
     [JsonObject]
     public sealed class ModuleState
     {
-        /// <summary>
-        /// Creates an instance of the <see cref="ModuleState"/> class.
-        /// </summary>
+        /// <inheritdoc />
         public ModuleState()
         {
             Data = new StateDictionary();

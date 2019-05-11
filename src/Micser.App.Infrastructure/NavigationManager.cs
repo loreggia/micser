@@ -10,9 +10,7 @@ namespace Micser.App.Infrastructure
         private readonly IEventAggregator _eventAggregator;
         private readonly IRegionManager _regionManager;
 
-        /// <summary>
-        /// Creates an instance of the <see cref="NavigationManager"/> class.
-        /// </summary>
+        /// <inheritdoc />
         public NavigationManager(IRegionManager regionManager, IEventAggregator eventAggregator)
         {
             _regionManager = regionManager;

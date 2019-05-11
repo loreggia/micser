@@ -13,9 +13,7 @@ namespace Micser.App.Infrastructure.Api
         /// </summary>
         public class ApiData
         {
-            /// <summary>
-            /// Creates an instance of the <see cref="ApiData"/> class.
-            /// </summary>
+            /// <inheritdoc />
             public ApiData(string action, object content)
             {
                 Action = action;

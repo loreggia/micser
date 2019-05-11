@@ -5,6 +5,7 @@
     /// </summary>
     public partial class AudioWidgetControls
     {
+        /// <inheritdoc />
         public AudioWidgetControls()
         {
             InitializeComponent();

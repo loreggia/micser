@@ -28,9 +28,7 @@ namespace Micser.App.Infrastructure.ToolBars
     /// </summary>
     public abstract class ToolBarItem
     {
-        /// <summary>
-        /// Creates an instance of the <see cref="ToolBarItem"/> class.
-        /// </summary>
+        /// <inheritdoc />
         protected ToolBarItem()
         {
             Placement = ToolBarItemPlacement.ToolBar;

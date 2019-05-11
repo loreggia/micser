@@ -10,9 +10,7 @@ namespace Micser.App.Infrastructure.Api
     {
         private readonly IEventAggregator _eventAggregator;
 
-        /// <summary>
-        /// Creates an instance of the <see cref="ApiEventRequestProcessor"/> class.
-        /// </summary>
+        /// <inheritdoc />
         public ApiEventRequestProcessor(IEventAggregator eventAggregator)
         {
             _eventAggregator = eventAggregator;

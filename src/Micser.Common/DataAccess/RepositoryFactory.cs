@@ -8,10 +8,7 @@ namespace Micser.Common.DataAccess
     {
         private readonly Func<Type, DbContext, IRepository> _factory;
 
-        /// <summary>
-        /// Creates an instance of the <see cref="RepositoryFactory"/> class.
-        /// </summary>
-        /// <param name="factory"></param>
+        /// <inheritdoc />
         public RepositoryFactory(Func<Type, DbContext, IRepository> factory)
         {
             _factory = factory;
