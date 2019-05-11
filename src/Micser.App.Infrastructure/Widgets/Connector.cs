@@ -43,12 +43,12 @@ namespace Micser.App.Infrastructure.Widgets
         public ConnectorOrientation Orientation { get; set; }
 
         /// <summary>
-        ///     The Widget this Connector belongs to.
+        /// The Widget this Connector belongs to.
         /// </summary>
         public Widget ParentWidget => this.GetParentOfType<Widget>();
 
         /// <summary>
-        ///     Center position of this Connector relative to the WidgetPanel.
+        /// Center position of this Connector relative to the WidgetPanel.
         /// </summary>
         public Point Position
         {

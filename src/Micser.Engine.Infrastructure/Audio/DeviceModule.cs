@@ -1,4 +1,5 @@
 ﻿using CSCore.CoreAudioAPI;
+using Micser.Common;
 using Micser.Common.Devices;
 using Micser.Common.Modules;
 
@@ -9,8 +10,6 @@ namespace Micser.Engine.Infrastructure.Audio
     /// </summary>
     public abstract class DeviceModule : AudioModule
     {
-        public const string DeviceIdKey = "DeviceId";
-
         private DeviceDescription _deviceDescription;
 
         protected DeviceModule(long id)
@@ -42,7 +41,7 @@ namespace Micser.Engine.Infrastructure.Audio
         public override ModuleState GetState()
         {
             var state = base.GetState();
-            state.Data[DeviceIdKey] = DeviceDescription?.Id;
+            state.Data[Globals.StateKeys.DeviceId] = DeviceDescription?.Id;
             return state;
         }
 
@@ -50,7 +49,7 @@ namespace Micser.Engine.Infrastructure.Audio
         {
             base.SetState(state);
 
-            var deviceId = state?.Data.GetObject<string>(DeviceIdKey);
+            var deviceId = state?.Data.GetObject<string>(Globals.StateKeys.DeviceId);
             if (deviceId != null)
             {
                 var deviceService = new DeviceService();

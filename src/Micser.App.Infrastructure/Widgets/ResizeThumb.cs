@@ -12,6 +12,7 @@ namespace Micser.App.Infrastructure.Widgets
     /// </summary>
     public class ResizeThumb : Thumb
     {
+        /// <inheritdoc />
         public ResizeThumb()
         {
             DragDelta += ResizeThumb_DragDelta;

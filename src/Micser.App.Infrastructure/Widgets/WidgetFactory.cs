@@ -9,16 +9,19 @@ namespace Micser.App.Infrastructure.Widgets
     {
         private readonly IUnityContainer _container;
 
+        /// <inheritdoc />
         public WidgetFactory(IUnityContainer container)
         {
             _container = container;
         }
 
+        /// <inheritdoc />
         public virtual WidgetViewModel CreateViewModel(Type widgetVmType)
         {
             return (WidgetViewModel)_container.Resolve(widgetVmType);
         }
 
+        /// <inheritdoc />
         public virtual Widget CreateWidget(WidgetViewModel viewModel)
         {
             var result = _container.Resolve<Widget>(viewModel.GetType().AssemblyQualifiedName);
@@ -27,6 +30,9 @@ namespace Micser.App.Infrastructure.Widgets
             return result;
         }
 
+        /// <summary>
+        /// Handles a widget's <see cref="FrameworkElement.Loaded"/> event.
+        /// </summary>
         protected virtual void OnWidgetLoaded(object sender, RoutedEventArgs e)
         {
             var widget = (Widget)sender;
