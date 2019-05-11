@@ -10,24 +10,30 @@ namespace Micser.App.Infrastructure
         private readonly IEventAggregator _eventAggregator;
         private readonly IRegionManager _regionManager;
 
+        /// <summary>
+        /// Creates an instance of the <see cref="NavigationManager"/> class.
+        /// </summary>
         public NavigationManager(IRegionManager regionManager, IEventAggregator eventAggregator)
         {
             _regionManager = regionManager;
             _eventAggregator = eventAggregator;
         }
 
+        /// <inheritdoc />
         public bool CanGoBack(string regionName)
         {
             var journal = _regionManager.Regions[regionName].NavigationService.Journal;
             return journal.CanGoBack;
         }
 
+        /// <inheritdoc />
         public bool CanGoForward(string regionName)
         {
             var journal = _regionManager.Regions[regionName].NavigationService.Journal;
             return journal.CanGoForward;
         }
 
+        /// <inheritdoc />
         public void ClearJournal(string regionName)
         {
             var journal = GetJournal(regionName);
@@ -36,24 +42,28 @@ namespace Micser.App.Infrastructure
             journal.RecordNavigation(currentEntry, true);
         }
 
+        /// <inheritdoc />
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
+        /// <inheritdoc />
         public void GoBack(string regionName)
         {
             var journal = GetJournal(regionName);
             journal.GoBack();
         }
 
+        /// <inheritdoc />
         public void GoForward(string regionName)
         {
             var journal = GetJournal(regionName);
             journal.GoForward();
         }
 
+        /// <inheritdoc />
         public void Navigate<TView>(string regionName, object parameter = null)
         {
             var viewName = typeof(TView).Name;
@@ -71,6 +81,9 @@ namespace Micser.App.Infrastructure
             _regionManager.RequestNavigate(regionName, new Uri(viewName, UriKind.Relative), new NavigationParameters { { AppGlobals.NavigationParameterKey, parameter } });
         }
 
+        /// <summary>
+        /// Releases resources.
+        /// </summary>
         protected virtual void Dispose(bool disposing)
         {
             if (disposing)

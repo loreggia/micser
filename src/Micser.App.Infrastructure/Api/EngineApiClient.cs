@@ -11,6 +11,9 @@ namespace Micser.App.Infrastructure.Api
         private const string ResourceName = "engine";
         private readonly IApiEndPoint _apiEndPoint;
 
+        /// <summary>
+        /// Creates an instance of the <see cref="EngineApiClient"/> class.
+        /// </summary>
         public EngineApiClient(IApiEndPoint apiEndPoint)
         {
             _apiEndPoint = apiEndPoint;

@@ -10,10 +10,15 @@ namespace Micser.App.Infrastructure.Converter
     /// </summary>
     public abstract class ConverterExtension : MarkupExtension, IValueConverter
     {
+        /// <inheritdoc />
         public abstract object Convert(object value, Type targetType, object parameter, CultureInfo culture);
 
+        /// <inheritdoc />
         public abstract object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture);
 
+        /// <summary>
+        /// Returns this instance.
+        /// </summary>
         public override object ProvideValue(IServiceProvider serviceProvider)
         {
             return this;

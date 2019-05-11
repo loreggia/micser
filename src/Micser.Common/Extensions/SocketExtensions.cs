@@ -4,8 +4,18 @@ using System.Runtime.InteropServices;
 
 namespace Micser.Common.Extensions
 {
+    /// <summary>
+    /// Provides helper extension methods for <see cref="Socket"/> objects.
+    /// </summary>
     public static class SocketExtensions
     {
+        /// <summary>
+        /// Sets the keep-alive time for a socket.
+        /// </summary>
+        /// <param name="socket"></param>
+        /// <param name="enabled"></param>
+        /// <param name="keepAliveTime"></param>
+        /// <param name="keepAliveInterval"></param>
         public static void SetKeepAlive(this Socket socket, bool enabled = true, uint keepAliveTime = 100, uint keepAliveInterval = 100)
         {
             var size = Marshal.SizeOf(new uint());

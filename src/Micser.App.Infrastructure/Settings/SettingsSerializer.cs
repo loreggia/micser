@@ -9,17 +9,23 @@ namespace Micser.App.Infrastructure.Settings
     /// <summary>
     /// Exports/imports all application settings to or from a JSON file.
     /// </summary>
-    public class SettingsExporter
+    public class SettingsSerializer
     {
         private readonly ILogger _logger;
         private readonly ISettingsService _settingsService;
 
-        public SettingsExporter(ILogger logger, ISettingsService settingsService)
+        /// <summary>
+        /// Creates an instance of the <see cref="SettingsSerializer"/> class.
+        /// </summary>
+        public SettingsSerializer(ILogger logger, ISettingsService settingsService)
         {
             _logger = logger;
             _settingsService = settingsService;
         }
 
+        /// <summary>
+        /// Exports the settings to the specified JSON file.
+        /// </summary>
         public bool Export(string fileName)
         {
             try
@@ -42,6 +48,9 @@ namespace Micser.App.Infrastructure.Settings
             }
         }
 
+        /// <summary>
+        /// Imports the settings from the specified JSON file.
+        /// </summary>
         public bool Import(string fileName)
         {
             try

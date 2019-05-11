@@ -11,11 +11,11 @@ using Xunit.Abstractions;
 
 namespace Micser.App.Infrastructure.Test.Settings
 {
-    public class SettingsExporterTest : IDisposable
+    public class SettingsSerializerTest : IDisposable
     {
         private readonly TestFileManager _testFileManager;
 
-        public SettingsExporterTest(ITestOutputHelper testOutputHelper)
+        public SettingsSerializerTest(ITestOutputHelper testOutputHelper)
         {
             _testFileManager = new TestFileManager(testOutputHelper);
             TestOutputHelperTarget.ConfigureLogger(testOutputHelper);
@@ -39,7 +39,7 @@ namespace Micser.App.Infrastructure.Test.Settings
                 .Setup(s => s.SetSetting(It.IsAny<string>(), It.IsAny<object>()))
                 .Callback<string, object>((key, value) => settings.Add(key, value));
 
-            var importer = new SettingsExporter(LogManager.GetCurrentClassLogger(), settingsServiceMock.Object);
+            var importer = new SettingsSerializer(LogManager.GetCurrentClassLogger(), settingsServiceMock.Object);
             var result = importer.Import(fileName);
 
             Assert.True(result);
@@ -67,7 +67,7 @@ namespace Micser.App.Infrastructure.Test.Settings
                 {"StringKey", "Value"}
             });
 
-            var exporter = new SettingsExporter(LogManager.GetCurrentClassLogger(), settingsServiceMock.Object);
+            var exporter = new SettingsSerializer(LogManager.GetCurrentClassLogger(), settingsServiceMock.Object);
 
             var result = exporter.Export(fileName);
 

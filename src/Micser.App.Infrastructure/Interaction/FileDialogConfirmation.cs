@@ -11,6 +11,9 @@ namespace Micser.App.Infrastructure.Interaction
     {
         private readonly Dictionary<string, string[]> _filters;
 
+        /// <summary>
+        /// Creates an instance of the <see cref="FileDialogConfirmation"/> class.
+        /// </summary>
         public FileDialogConfirmation()
         {
             _filters = new Dictionary<string, string[]>();

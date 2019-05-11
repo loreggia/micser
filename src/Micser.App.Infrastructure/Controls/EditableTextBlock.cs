@@ -12,23 +12,41 @@ namespace Micser.App.Infrastructure.Controls
     [TemplatePart(Name = PartNameToggleButton, Type = typeof(ButtonBase))]
     public class EditableTextBlock : Control
     {
+        /// <summary>
+        /// The name of the text box control.
+        /// </summary>
         public const string PartNameTextBox = "PART_TextBox";
+
+        /// <summary>
+        /// The name of the toggle button control.
+        /// </summary>
         public const string PartNameToggleButton = "PART_ToggleButton";
 
+        /// <summary>
+        /// Indicates whether the control is in editing mode.
+        /// </summary>
         public static readonly DependencyProperty IsEditingProperty = DependencyProperty.Register(
             nameof(IsEditing), typeof(bool), typeof(EditableTextBlock), new PropertyMetadata(false));
 
+        /// <summary>
+        /// The maximum number of characters that can be entered when editing the text.
+        /// </summary>
         public static readonly DependencyProperty MaxLengthProperty = DependencyProperty.Register(
             nameof(MaxLength), typeof(int), typeof(EditableTextBlock), new PropertyMetadata(0));
 
+        /// <summary>
+        /// Indicates whether the edit button is visible.
+        /// </summary>
         public static readonly DependencyProperty ShowButtonProperty = DependencyProperty.Register(
             nameof(ShowButton), typeof(bool), typeof(EditableTextBlock), new PropertyMetadata(true));
 
+        /// <summary>
+        /// The editable text shown in the control.
+        /// </summary>
         public static readonly DependencyProperty TextProperty = DependencyProperty.Register(
             nameof(Text), typeof(string), typeof(EditableTextBlock), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.BindsTwoWayByDefault));
 
         private TextBox _textBox;
-
         private ButtonBase _toggleButton;
 
         static EditableTextBlock()
@@ -36,30 +54,50 @@ namespace Micser.App.Infrastructure.Controls
             DefaultStyleKeyProperty.OverrideMetadata(typeof(EditableTextBlock), new FrameworkPropertyMetadata(typeof(EditableTextBlock)));
         }
 
+        /// <summary>
+        /// Gets or sets a value that indicates whether the control is in editing mode.
+        /// Wraps the <see cref="IsEditingProperty"/> dependency property.
+        /// </summary>
         public bool IsEditing
         {
             get => (bool)GetValue(IsEditingProperty);
             set => SetValue(IsEditingProperty, value);
         }
 
+        /// <summary>
+        /// Gets or sets the maximum number of characters that can be entered when editing the text.
+        /// Wraps the <see cref="MaxLengthProperty"/> dependency property.
+        /// </summary>
         public int MaxLength
         {
             get => (int)GetValue(MaxLengthProperty);
             set => SetValue(MaxLengthProperty, value);
         }
 
+        /// <summary>
+        /// Gets or sets a value that indicates whether the edit button is visible.
+        /// Wraps the <see cref="ShowButtonProperty"/> dependency property.
+        /// </summary>
         public bool ShowButton
         {
             get => (bool)GetValue(ShowButtonProperty);
             set => SetValue(ShowButtonProperty, value);
         }
 
+        /// <summary>
+        /// Gets or sets the editable text shown in the control.
+        /// Wraps the <see cref="TextProperty"/> dependency property.
+        /// </summary>
         public string Text
         {
             get => (string)GetValue(TextProperty);
             set => SetValue(TextProperty, value);
         }
 
+        /// <summary>
+        /// Sets the focus into the text box.
+        /// </summary>
+        /// <returns>True if the focus was set successfully, otherwise false.</returns>
         public bool FocusTextBox()
         {
             if (_textBox != null && IsEditing)
@@ -70,6 +108,7 @@ namespace Micser.App.Infrastructure.Controls
             return false;
         }
 
+        /// <inheritdoc />
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();

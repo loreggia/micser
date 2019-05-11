@@ -1,7 +1,6 @@
 ﻿using Micser.Common;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Windows;
 
 namespace Micser.App.Infrastructure.Themes
@@ -11,6 +10,9 @@ namespace Micser.App.Infrastructure.Themes
     {
         private static IEnumerable<ResourceDictionary> _infrastructureResources;
 
+        /// <summary>
+        /// Creates an instance of the <see cref="ResourceRegistry"/> class.
+        /// </summary>
         public ResourceRegistry()
         {
             foreach (var infrastructureResource in InfrastructureResources)
@@ -19,15 +21,13 @@ namespace Micser.App.Infrastructure.Themes
             }
         }
 
+        /// <summary>
+        /// Gets all resources required by the infrastructure module.
+        /// </summary>
         public static IEnumerable<ResourceDictionary> InfrastructureResources =>
             _infrastructureResources ?? (_infrastructureResources = new[]
             {
                 new ResourceDictionary {Source = new Uri("Micser.App.Infrastructure;component/Themes/Generic.xaml", UriKind.Relative)}
             });
-
-        public static void RegisterResourcesFor(FrameworkElement element)
-        {
-            element.Resources.MergedDictionaries.AddRange(InfrastructureResources);
-        }
     }
 }

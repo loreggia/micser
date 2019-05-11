@@ -13,16 +13,16 @@ namespace Micser.App.ViewModels
 {
     public class SettingsViewModel : ViewModelNavigationAware
     {
-        private readonly SettingsExporter _settingsExporter;
         private readonly ISettingsRegistry _settingsRegistry;
+        private readonly SettingsSerializer _settingsSerializer;
         private readonly ISettingsService _settingsService;
         private IEnumerable<SettingViewModel> _settings;
 
-        public SettingsViewModel(ISettingsRegistry settingsRegistry, ISettingsService settingsService, SettingsExporter settingsExporter)
+        public SettingsViewModel(ISettingsRegistry settingsRegistry, ISettingsService settingsService, SettingsSerializer settingsSerializer)
         {
             _settingsRegistry = settingsRegistry;
             _settingsService = settingsService;
-            _settingsExporter = settingsExporter;
+            _settingsSerializer = settingsSerializer;
 
             RefreshCommand = new DelegateCommand(async () => await LoadAsync(), () => !IsBusy);
             ImportCommand = new DelegateCommand(async () => await ImportAsync(), () => !IsBusy);
@@ -70,7 +70,7 @@ namespace Micser.App.ViewModels
                 }
 
                 var fileName = c.Content as string;
-                var result = _settingsExporter.Export(fileName);
+                var result = _settingsSerializer.Export(fileName);
 
                 // todo show notification
                 if (result)
@@ -92,7 +92,7 @@ namespace Micser.App.ViewModels
                 }
 
                 var fileName = c.Content as string;
-                var result = _settingsExporter.Import(fileName);
+                var result = _settingsSerializer.Import(fileName);
                 if (result)
                 {
                     await LoadAsync();

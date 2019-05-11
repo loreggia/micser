@@ -11,6 +11,9 @@ namespace Micser.App.Infrastructure.Api
         private const string ResourceName = "status";
         private readonly IApiEndPoint _apiEndPoint;
 
+        /// <summary>
+        /// Creates an instance of the <see cref="StatusApiClient"/> class.
+        /// </summary>
         public StatusApiClient(IApiEndPoint apiEndPoint)
         {
             _apiEndPoint = apiEndPoint;

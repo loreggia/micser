@@ -8,6 +8,9 @@ namespace Micser.App.Infrastructure.Api
     /// <typeparam name="TData"></typeparam>
     public class ServiceResult<TData>
     {
+        /// <summary>
+        /// Creates an instance of the <see cref="ServiceResult{TData}"/> class.
+        /// </summary>
         public ServiceResult(JsonResponse message)
         {
             IsSuccess = message.IsSuccess;
@@ -30,6 +33,7 @@ namespace Micser.App.Infrastructure.Api
         /// </summary>
         public string Message { get; }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return $"Success: {IsSuccess}, Data: {Data}, Message: {Message}";

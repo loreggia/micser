@@ -8,6 +8,7 @@ namespace Micser.App.Infrastructure.Converter
     /// </summary>
     public class RelativeCenterPlacementConverter : ConverterExtension
     {
+        /// <inheritdoc />
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is double d)
@@ -18,6 +19,7 @@ namespace Micser.App.Infrastructure.Converter
             return value;
         }
 
+        /// <inheritdoc />
         public override object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             throw new NotImplementedException();

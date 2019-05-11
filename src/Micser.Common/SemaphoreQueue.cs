@@ -13,6 +13,11 @@ namespace Micser.Common
         private readonly Queue<TaskCompletionSource<bool>> _waiters = new Queue<TaskCompletionSource<bool>>();
         private int _currentCount;
 
+        /// <summary>
+        /// Creates an instance of the <see cref="SemaphoreQueue"/> class using a maximum initial count.
+        /// </summary>
+        /// <param name="initialCount">The initial number of requests for the semaphore that can be granted concurrently.</param>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="initialCount"/> must be greater than or equal to 0.</exception>
         public SemaphoreQueue(int initialCount)
         {
             if (initialCount < 0)
@@ -23,6 +28,9 @@ namespace Micser.Common
             _currentCount = initialCount;
         }
 
+        /// <summary>
+        /// Releases a request (increases the number of available requests by 1).
+        /// </summary>
         public void Release()
         {
             TaskCompletionSource<bool> toRelease = null;
@@ -42,6 +50,10 @@ namespace Micser.Common
             toRelease?.SetResult(true);
         }
 
+        /// <summary>
+        /// Waits until there is an available request slot (decreases the number of available requests by 1).
+        /// </summary>
+        /// <returns></returns>
         public Task WaitAsync()
         {
             lock (_waiters)

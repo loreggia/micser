@@ -1,5 +1,7 @@
 ﻿namespace Micser.App.Infrastructure.Themes
 {
+#pragma warning disable 1591
+
     public enum BrushThemeKey
     {
         DefaultBackground,
@@ -33,11 +35,17 @@
         SliderLeftBackground
     }
 
+#pragma warning restore 1591
+
     /// <summary>
     /// Strongly typed resource keys for dynamic brush resources.
     /// </summary>
+    // ReSharper disable once UnusedMember.Global
     public class BrushThemeKeyExtension : ThemeKeyExtension<BrushThemeKey>
     {
+        /// <summary>
+        /// Creates an instance of the <see cref="BrushThemeKeyExtension"/> class with the specified key.
+        /// </summary>
         public BrushThemeKeyExtension(BrushThemeKey key)
             : base(key)
         {

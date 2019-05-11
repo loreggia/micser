@@ -12,7 +12,7 @@ namespace Micser.App.Infrastructure
         private static readonly Regex RxSection;
         private static readonly Regex RxValue;
         private readonly string _fileName;
-        private Dictionary<string, Dictionary<string, string>> _values;
+        private readonly Dictionary<string, Dictionary<string, string>> _values;
 
         static IniFile()
         {
@@ -20,6 +20,10 @@ namespace Micser.App.Infrastructure
             RxValue = new Regex(@"^(?<key>\w+)\W*=\W*('|"")?(?<value>[^'""]+)('|"")?", RegexOptions.Compiled);
         }
 
+        /// <summary>
+        /// Creates an instance of the <see cref="IniFile"/> class.
+        /// </summary>
+        /// <exception cref="FileNotFoundException"></exception>
         public IniFile(string fileName)
         {
             if (!File.Exists(fileName))
@@ -32,6 +36,9 @@ namespace Micser.App.Infrastructure
             Load();
         }
 
+        /// <summary>
+        /// Gets a value from the ini file. Returns null if the value was not found.
+        /// </summary>
         public string GetValue(string section, string key)
         {
             if (_values.TryGetValue(section.ToLower(), out var sectionDict) && sectionDict.TryGetValue(key.ToLower(), out var value))

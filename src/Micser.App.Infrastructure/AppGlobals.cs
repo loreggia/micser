@@ -5,6 +5,8 @@
     /// </summary>
     public static class AppGlobals
     {
+#pragma warning disable 1591
+
         /// <summary>
         /// The internal key identifying the parameter during prism navigation.
         /// </summary>
@@ -101,5 +103,7 @@
         {
             public const string LabelsSharedSizeGroup = "Labels";
         }
+
+#pragma warning restore 1591
     }
 }

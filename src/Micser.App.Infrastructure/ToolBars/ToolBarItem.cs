@@ -2,6 +2,9 @@
 
 namespace Micser.App.Infrastructure.ToolBars
 {
+    /// <summary>
+    /// Specifies a tool bar item's placement mode.
+    /// </summary>
     public enum ToolBarItemPlacement
     {
         /// <summary>
@@ -25,6 +28,9 @@ namespace Micser.App.Infrastructure.ToolBars
     /// </summary>
     public abstract class ToolBarItem
     {
+        /// <summary>
+        /// Creates an instance of the <see cref="ToolBarItem"/> class.
+        /// </summary>
         protected ToolBarItem()
         {
             Placement = ToolBarItemPlacement.ToolBar;

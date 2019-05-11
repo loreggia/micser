@@ -19,10 +19,24 @@ namespace Micser.App.Infrastructure
         /// </summary>
         public class Navigated : PubSubEvent<Navigated.NavigationInfo>
         {
+            /// <summary>
+            /// The data passed in the <see cref="Navigated"/> event.
+            /// </summary>
             public class NavigationInfo
             {
+                /// <summary>
+                /// Gets or sets the navigation parameter object.
+                /// </summary>
                 public object Parameter { get; set; }
+
+                /// <summary>
+                /// Gets or sets the name of the region where the navigation happened.
+                /// </summary>
                 public string RegionName { get; set; }
+
+                /// <summary>
+                /// Gets or sets the name of the view that was navigated to.
+                /// </summary>
                 public string ViewName { get; set; }
             }
         }

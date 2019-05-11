@@ -7,6 +7,9 @@ using Unity.Injection;
 
 namespace Micser.App.Infrastructure.Extensions
 {
+    /// <summary>
+    /// Provides helper extension methods for the <see cref="IContainerRegistry"/> class.
+    /// </summary>
     public static class PrismContainerExtensions
     {
         /// <summary>

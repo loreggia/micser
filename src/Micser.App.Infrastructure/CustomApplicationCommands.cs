@@ -5,6 +5,9 @@ using System.Windows.Input;
 
 namespace Micser.App.Infrastructure
 {
+    /// <summary>
+    /// Contains custom <see cref="RoutedUICommand"/>s.
+    /// </summary>
     public static class CustomApplicationCommands
     {
         /// <summary>

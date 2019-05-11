@@ -8,8 +8,14 @@ namespace Micser.App.Infrastructure.Api
     /// </summary>
     public class ApiEvent : PubSubEvent<ApiEvent.ApiData>
     {
+        /// <summary>
+        /// The data object passed in an <see cref="ApiEvent"/>.
+        /// </summary>
         public class ApiData
         {
+            /// <summary>
+            /// Creates an instance of the <see cref="ApiData"/> class.
+            /// </summary>
             public ApiData(string action, object content)
             {
                 Action = action;

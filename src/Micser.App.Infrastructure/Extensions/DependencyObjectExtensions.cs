@@ -4,8 +4,14 @@ using System.Windows.Media;
 
 namespace Micser.App.Infrastructure.Extensions
 {
+    /// <summary>
+    /// Provides helper extension methods for the <see cref="DependencyObject"/> class.
+    /// </summary>
     public static class DependencyObjectExtensions
     {
+        /// <summary>
+        /// Gets this objects children of type <typeparamref name="T"/> in the visual tree.
+        /// </summary>
         public static IEnumerable<T> GetChildrenOfType<T>(this DependencyObject element)
             where T : UIElement
         {
@@ -33,6 +39,9 @@ namespace Micser.App.Infrastructure.Extensions
             return result.ToArray();
         }
 
+        /// <summary>
+        /// Gets this object's first parent of type <typeparamref name="T"/> in the visual tree.
+        /// </summary>
         public static T GetParentOfType<T>(this DependencyObject element)
             where T : UIElement
         {

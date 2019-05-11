@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Micser.Common
 {
@@ -8,10 +9,16 @@ namespace Micser.Common
     /// </summary>
     public class StateDictionary : Dictionary<string, object>
     {
+        /// <summary>
+        /// Creates an instance of the <see cref="StateDictionary"/> class.
+        /// </summary>
         public StateDictionary()
         {
         }
 
+        /// <summary>
+        /// Creates an instance of the <see cref="StateDictionary"/> class and shallow copies the <paramref name="other"/> dictionary's values.
+        /// </summary>
         public StateDictionary(StateDictionary other)
         {
             foreach (var key in other.Keys)
@@ -20,12 +27,45 @@ namespace Micser.Common
             }
         }
 
+        /// <summary>
+        /// Gets an object from the dictionary.
+        /// If key is not present or the type is not convertible to the type <typeparamref name="T"/>,
+        /// the value passed in <paramref name="defaultValue"/> is returned.
+        /// </summary>
+        /// <param name="key">The key of the value to get.</param>
+        /// <param name="defaultValue">The default value that is returned if the key is not found
+        /// or the stored type is not convertible to the return type <typeparamref name="T"/>.</param>
+        /// <typeparam name="T">The type of the value to get.</typeparam>
         public T GetObject<T>(string key, T defaultValue = default(T))
         {
             if (ContainsKey(key))
             {
                 var obj = this[key];
-                return obj is T result ? result : defaultValue;
+
+                if (obj is T result)
+                {
+                    return result;
+                }
+
+                if (obj != null)
+                {
+                    var tType = typeof(T);
+                    var objType = obj.GetType();
+
+                    var objConverter = TypeDescriptor.GetConverter(objType);
+
+                    if (objConverter.CanConvertTo(tType))
+                    {
+                        return (T)objConverter.ConvertTo(obj, tType);
+                    }
+
+                    var tConverter = TypeDescriptor.GetConverter(tType);
+
+                    if (tConverter.CanConvertFrom(objType))
+                    {
+                        return (T)tConverter.ConvertFrom(objType);
+                    }
+                }
             }
 
             return defaultValue;

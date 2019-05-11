@@ -24,11 +24,34 @@ namespace Micser.App.Infrastructure.Settings
     /// </summary>
     public enum SettingType
     {
+        /// <summary>
+        /// A <see cref="bool"/> value.
+        /// </summary>
         Boolean,
+
+        /// <summary>
+        /// A <see cref="string"/> value.
+        /// </summary>
         String,
+
+        /// <summary>
+        /// An integer value (<see cref="short"/>, <see cref="int"/>, <see cref="long"/>).
+        /// </summary>
         Integer,
+
+        /// <summary>
+        /// A decimal value (<see cref="decimal"/>, <see cref="float"/>, <see cref="double"/>).
+        /// </summary>
         Decimal,
+
+        /// <summary>
+        /// A list of values to choose from. Requires <see cref="SettingDefinition.List"/> to be set.
+        /// </summary>
         List,
+
+        /// <summary>
+        /// A custom object.
+        /// </summary>
         Object
     }
 
@@ -37,6 +60,9 @@ namespace Micser.App.Infrastructure.Settings
     /// </summary>
     public class SettingDefinition
     {
+        /// <summary>
+        /// Creates an instance of the <see cref="SettingDefinition"/> class.
+        /// </summary>
         public SettingDefinition()
         {
             Type = SettingType.String;

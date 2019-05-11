@@ -4,8 +4,14 @@ using System.Linq;
 
 namespace Micser.Common.Devices
 {
+    /// <summary>
+    /// Provides helper methods for enumerating or getting hardware audio device information.
+    /// </summary>
     public class DeviceService
     {
+        /// <summary>
+        /// Gets an internal <see cref="DeviceDescription"/> from a WASAPI <see cref="MMDevice"/> instance.
+        /// </summary>
         public DeviceDescription GetDescription(MMDevice device)
         {
             if (device == null)
@@ -17,12 +23,15 @@ namespace Micser.Common.Devices
             {
                 Id = device.DeviceID,
                 Name = device.FriendlyName,
-                //IconPath = audioEndPoint.IconPath,
+                //IconPath = device.IconPath,
                 IsActive = device.DeviceState == DeviceState.Active,
                 Type = device.DataFlow == DataFlow.Capture ? DeviceType.Input : DeviceType.Output
             };
         }
 
+        /// <summary>
+        /// Gets a <see cref="DeviceDescription"/> for the specified hardware device ID.
+        /// </summary>
         public DeviceDescription GetDescription(string id)
         {
             using (var deviceEnumerator = new MMDeviceEnumerator())
@@ -32,6 +41,9 @@ namespace Micser.Common.Devices
             }
         }
 
+        /// <summary>
+        /// Enumerates active or unplugged devices of the specified type.
+        /// </summary>
         public IEnumerable<DeviceDescription> GetDevices(DeviceType type)
         {
             using (var deviceEnumerator = new MMDeviceEnumerator())

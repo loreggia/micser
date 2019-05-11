@@ -24,6 +24,9 @@ namespace Micser.App.Infrastructure.Settings
         private readonly IDictionary<string, object> _settings;
         private bool _isLoaded;
 
+        /// <summary>
+        /// Creates an instance of the <see cref="SettingsService"/> class.
+        /// </summary>
         public SettingsService(IUnitOfWorkFactory database, ISettingsRegistry registry, ILogger logger)
         {
             _settings = new ConcurrentDictionary<string, object>();
@@ -33,8 +36,10 @@ namespace Micser.App.Infrastructure.Settings
             _logger = logger;
         }
 
+        /// <inheritdoc />
         public event SettingChangedEventHandler SettingChanged;
 
+        /// <inheritdoc />
         public T GetSetting<T>(string key)
         {
             if (!_settings.TryGetValue(key, out var value))
@@ -71,6 +76,7 @@ namespace Micser.App.Infrastructure.Settings
             return default(T);
         }
 
+        /// <inheritdoc />
         public IReadOnlyDictionary<string, object> GetSettings()
         {
             return new ReadOnlyDictionary<string, object>(_settings);
@@ -81,6 +87,7 @@ namespace Micser.App.Infrastructure.Settings
             return EnsureLoadedAsync();
         }
 
+        /// <inheritdoc />
         public async void SetSetting(string key, object value)
         {
             await EnsureLoadedAsync();
@@ -134,6 +141,9 @@ namespace Micser.App.Infrastructure.Settings
             }
         }
 
+        /// <summary>
+        /// Raises the <see cref="SettingChanged"/> event.
+        /// </summary>
         protected virtual void OnSettingChanged(SettingChangedEventArgs e)
         {
             SettingChanged?.Invoke(this, e);

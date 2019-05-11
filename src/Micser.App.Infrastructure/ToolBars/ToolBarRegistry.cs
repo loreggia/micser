@@ -7,13 +7,18 @@ namespace Micser.App.Infrastructure.ToolBars
     {
         private readonly Dictionary<string, ToolBarDescription> _toolBars;
 
+        /// <summary>
+        /// Creates an instance of the <see cref="ToolBarRegistry"/> class.
+        /// </summary>
         public ToolBarRegistry()
         {
             _toolBars = new Dictionary<string, ToolBarDescription>();
         }
 
+        /// <inheritdoc />
         public IEnumerable<ToolBarDescription> Items => _toolBars.Values;
 
+        /// <inheritdoc />
         public void Add(ToolBarDescription toolBar)
         {
             if (_toolBars.ContainsKey(toolBar.Name))
@@ -29,6 +34,7 @@ namespace Micser.App.Infrastructure.ToolBars
             }
         }
 
+        /// <inheritdoc />
         public void AddItem(string toolBarName, ToolBarItem item)
         {
             if (!_toolBars.ContainsKey(toolBarName))
@@ -39,6 +45,7 @@ namespace Micser.App.Infrastructure.ToolBars
             _toolBars[toolBarName].Add(item);
         }
 
+        /// <inheritdoc />
         public ToolBarDescription GetToolBar(string toolBarName)
         {
             return _toolBars.ContainsKey(toolBarName) ? _toolBars[toolBarName] : null;

@@ -10,6 +10,7 @@ namespace Micser.App.Infrastructure.ToolBars
     /// </summary>
     public class ToolBarPlacementToOverflowModeConverter : ConverterExtension
     {
+        /// <inheritdoc />
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is ToolBarItemPlacement placement)
@@ -30,6 +31,7 @@ namespace Micser.App.Infrastructure.ToolBars
             return value;
         }
 
+        /// <inheritdoc />
         public override object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is OverflowMode mode)

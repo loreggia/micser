@@ -8,13 +8,22 @@ namespace Micser.Common
     {
         private readonly IList<T> _items;
 
+        /// <summary>
+        /// Creates an instance of the <see cref="ItemRegistry{T}"/> class.
+        /// </summary>
         public ItemRegistry()
         {
             _items = new List<T>();
         }
 
+        /// <summary>
+        /// Gets all items currently registered in this registry.
+        /// </summary>
         public IEnumerable<T> Items => _items.AsEnumerable();
 
+        /// <summary>
+        /// Adds an item to this registry.
+        /// </summary>
         public virtual void Add(T item)
         {
             if (item != null)

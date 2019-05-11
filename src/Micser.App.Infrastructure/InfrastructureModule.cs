@@ -17,6 +17,9 @@ namespace Micser.App.Infrastructure
     {
         private static bool _isRegistered;
 
+        /// <summary>
+        /// Registers all types required by the infrastructure module.
+        /// </summary>
         public static void RegisterInfrastructureTypes(IContainerRegistry containerRegistry)
         {
             containerRegistry.RegisterSingleton<INavigationManager, NavigationManager>();
@@ -40,10 +43,12 @@ namespace Micser.App.Infrastructure
             _isRegistered = true;
         }
 
+        /// <inheritdoc />
         public void OnInitialized(IContainerProvider containerProvider)
         {
         }
 
+        /// <inheritdoc />
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
             if (_isRegistered)

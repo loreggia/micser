@@ -8,10 +8,18 @@ namespace Micser.App.Infrastructure.Converter
     /// </summary>
     public class BooleanConverter<T> : ConverterExtension
     {
+        /// <summary>
+        /// Creates an instance of the <see cref="BooleanConverter{T}"/> class.
+        /// </summary>
         public BooleanConverter()
         {
         }
 
+        /// <summary>
+        /// Creates an instance of the <see cref="BooleanConverter{T}"/> class.
+        /// </summary>
+        /// <param name="trueValue">The value to return when the source value is true.</param>
+        /// <param name="falseValue">The value to return when the source value is false.</param>
         public BooleanConverter(T trueValue, T falseValue)
         {
             TrueValue = trueValue;
@@ -28,6 +36,7 @@ namespace Micser.App.Infrastructure.Converter
         /// </summary>
         public T TrueValue { get; set; }
 
+        /// <inheritdoc />
         public override object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is bool b)
@@ -38,6 +47,7 @@ namespace Micser.App.Infrastructure.Converter
             return FalseValue;
         }
 
+        /// <inheritdoc />
         public override object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
             if (value is T t)

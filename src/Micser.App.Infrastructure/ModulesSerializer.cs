@@ -9,11 +9,11 @@ namespace Micser.App.Infrastructure
     /// <summary>
     /// Exports/imports (audio) module data to and from JSON files.
     /// </summary>
-    public class ModulesExporter
+    public class ModulesSerializer
     {
         private readonly ILogger _logger;
 
-        public ModulesExporter(ILogger logger)
+        public ModulesSerializer(ILogger logger)
         {
             _logger = logger;
         }

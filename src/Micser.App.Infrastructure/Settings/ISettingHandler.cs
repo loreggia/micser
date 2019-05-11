@@ -18,8 +18,18 @@ namespace Micser.App.Infrastructure.Settings
     /// </summary>
     public interface ISettingHandler
     {
+        /// <summary>
+        /// Handler that is executed when a setting is loaded.
+        /// </summary>
+        /// <param name="value">The internally stored setting value (if the corresponding <see cref="SettingDefinition.StorageType"/> is set to <see cref="SettingStorageType.Internal"/>).</param>
+        /// <returns>The loaded setting value.</returns>
         object OnLoadSetting(object value);
 
+        /// <summary>
+        /// Handler that is executed when a setting is saved.
+        /// </summary>
+        /// <param name="value">The value to save.</param>
+        /// <returns>The actually saved value.</returns>
         object OnSaveSetting(object value);
     }
 }
