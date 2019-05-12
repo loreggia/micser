@@ -9,53 +9,79 @@ using System.Windows.Media;
 
 namespace Micser.App.Infrastructure.Widgets
 {
-    public enum ArrowSymbol
-    {
-        None,
-        Arrow,
-        Diamond
-    }
-
+    /// <summary>
+    /// A connection line between two <see cref="Connector"/> controls.
+    /// </summary>
     public class Connection : Control, ISelectable
     {
+        /// <summary>
+        /// Indicates whether the connection is currently selected.
+        /// </summary>
         public static readonly DependencyProperty IsSelectedProperty = DependencyProperty.Register(
             nameof(IsSelected), typeof(bool), typeof(Connection), new PropertyMetadata(false, OnIsSelectedPropertyChanged));
 
+        /// <summary>
+        /// The position of the text label.
+        /// </summary>
         public static readonly DependencyProperty LabelPositionProperty;
 
+        /// <summary>
+        /// Property key for the <see cref="LabelPositionProperty"/> dependency property.
+        /// </summary>
         public static readonly DependencyPropertyKey LabelPositionPropertyKey = DependencyProperty.RegisterReadOnly(
             nameof(LabelPosition), typeof(Point), typeof(Connection), new PropertyMetadata(default(Point)));
 
+        /// <summary>
+        /// The label text.
+        /// </summary>
         public static readonly DependencyProperty LabelProperty = DependencyProperty.Register(
             nameof(Label), typeof(string), typeof(Connection), new PropertyMetadata(null));
 
+        /// <summary>
+        /// The <see cref="System.Windows.Media.PathGeometry"/> making up the connection line.
+        /// </summary>
         public static readonly DependencyProperty PathGeometryProperty = DependencyProperty.Register(
             nameof(PathGeometry), typeof(PathGeometry), typeof(Connection), new PropertyMetadata(null, OnPathGeometryPropertyChanged));
 
+        /// <summary>
+        /// The angle at which the connection starts from the source connector used for rotating the source anchor.
+        /// </summary>
         public static readonly DependencyProperty SourceAnchorAngleProperty = DependencyProperty.Register(
             nameof(SourceAnchorAngle), typeof(double), typeof(Connection), new PropertyMetadata(0d));
 
+        /// <summary>
+        /// The position offset relative to the source connector where the source anchor is displayed.
+        /// </summary>
         public static readonly DependencyProperty SourceAnchorPositionProperty = DependencyProperty.Register(
             nameof(SourceAnchorPosition), typeof(Point), typeof(Connection), new PropertyMetadata(default(Point)));
 
-        public static readonly DependencyProperty SourceArrowSymbolProperty = DependencyProperty.Register(
-            nameof(SourceArrowSymbol), typeof(ArrowSymbol), typeof(Connection), new PropertyMetadata(ArrowSymbol.None));
-
+        /// <summary>
+        /// The source <see cref="Connector"/>.
+        /// </summary>
         public static readonly DependencyProperty SourceProperty = DependencyProperty.Register(
             nameof(Source), typeof(Connector), typeof(Connection), new PropertyMetadata(null, OnConnectorPropertyChanged));
 
+        /// <summary>
+        /// A collection of <see cref="double"/> values that describe the stroke dash distances.
+        /// </summary>
         public static readonly DependencyProperty StrokeDashArrayProperty = DependencyProperty.Register(
             nameof(StrokeDashArray), typeof(DoubleCollection), typeof(Connection), new PropertyMetadata(null));
 
+        /// <summary>
+        /// The anchor at which the connection comes into the target connector used for rotating the target anchor.
+        /// </summary>
         public static readonly DependencyProperty TargetAnchorAngleProperty = DependencyProperty.Register(
             nameof(TargetAnchorAngle), typeof(double), typeof(Connection), new PropertyMetadata(0d));
 
+        /// <summary>
+        /// The position offset relative to the target connector where the target anchor is displayed.
+        /// </summary>
         public static readonly DependencyProperty TargetAnchorPositionProperty = DependencyProperty.Register(
             nameof(TargetAnchorPosition), typeof(Point), typeof(Connection), new PropertyMetadata(default(Point)));
 
-        public static readonly DependencyProperty TargetArrowSymbolProperty = DependencyProperty.Register(
-            nameof(TargetArrowSymbol), typeof(ArrowSymbol), typeof(Connection), new PropertyMetadata(ArrowSymbol.Arrow));
-
+        /// <summary>
+        /// The target connector.
+        /// </summary>
         public static readonly DependencyProperty TargetProperty = DependencyProperty.Register(
             nameof(Target), typeof(Connector), typeof(Connection), new PropertyMetadata(null, OnConnectorPropertyChanged));
 
@@ -68,88 +94,118 @@ namespace Micser.App.Infrastructure.Widgets
             LabelPositionProperty = LabelPositionPropertyKey.DependencyProperty;
         }
 
+        /// <inheritdoc />
         public Connection(Connector source, Connector target)
         {
             Source = source;
             Target = target;
         }
 
+        /// <inheritdoc />
         public bool IsSelected
         {
             get => (bool)GetValue(IsSelectedProperty);
             set => SetValue(IsSelectedProperty, value);
         }
 
+        /// <summary>
+        /// Gets or sets the label text.
+        /// Wraps the <see cref="LabelProperty"/> dependency property.
+        /// </summary>
         public string Label
         {
             get => (string)GetValue(LabelProperty);
             set => SetValue(LabelProperty, value);
         }
 
+        /// <summary>
+        /// Gets the position of the text label (read-only).
+        /// Wraps the <see cref="LabelPositionProperty"/> dependency property.
+        /// </summary>
         public Point LabelPosition
         {
             get => (Point)GetValue(LabelPositionProperty);
             private set => SetValue(LabelPositionPropertyKey, value);
         }
 
+        /// <summary>
+        /// Gets or sets the <see cref="System.Windows.Media.PathGeometry"/> making up the connection line.
+        /// Wraps the <see cref="PathGeometryProperty"/> dependency property.
+        /// </summary>
         public PathGeometry PathGeometry
         {
             get => (PathGeometry)GetValue(PathGeometryProperty);
             set => SetValue(PathGeometryProperty, value);
         }
 
+        /// <summary>
+        /// Gets or sets the source <see cref="Connector"/>.
+        /// Wraps the <see cref="SourceProperty"/> dependency property.
+        /// </summary>
         public Connector Source
         {
             get => (Connector)GetValue(SourceProperty);
             set => SetValue(SourceProperty, value);
         }
 
+        /// <summary>
+        /// Gets or sets the angle at which the connection starts from the source connector used for rotating the source anchor.
+        /// Wraps the <see cref="SourceAnchorAngleProperty"/> dependency property.
+        /// </summary>
         public double SourceAnchorAngle
         {
             get => (double)GetValue(SourceAnchorAngleProperty);
             set => SetValue(SourceAnchorAngleProperty, value);
         }
 
+        /// <summary>
+        /// Gets or sets the position offset relative to the source connector where the source anchor is displayed.
+        /// Wraps the <see cref="SourceAnchorPositionProperty"/> dependency property.
+        /// </summary>
         public Point SourceAnchorPosition
         {
             get => (Point)GetValue(SourceAnchorPositionProperty);
             set => SetValue(SourceAnchorPositionProperty, value);
         }
 
-        public ArrowSymbol SourceArrowSymbol
-        {
-            get => (ArrowSymbol)GetValue(SourceArrowSymbolProperty);
-            set => SetValue(SourceArrowSymbolProperty, value);
-        }
-
+        /// <summary>
+        /// A collection of <see cref="double"/> values that describe the stroke dash distances.
+        /// Wraps the <see cref="StrokeDashArrayProperty"/> dependency property.
+        /// </summary>
         public DoubleCollection StrokeDashArray
         {
             get => (DoubleCollection)GetValue(StrokeDashArrayProperty);
             set => SetValue(StrokeDashArrayProperty, value);
         }
 
+        /// <summary>
+        /// Gets or sets the target connector.
+        /// Wraps the <see cref="TargetProperty"/> dependency property.
+        /// </summary>
         public Connector Target
         {
             get => (Connector)GetValue(TargetProperty);
             set => SetValue(TargetProperty, value);
         }
 
+        /// <summary>
+        /// Gets or sets the anchor at which the connection comes into the target connector used for rotating the target anchor.
+        /// Wraps the <see cref="TargetAnchorAngleProperty"/> dependency property.
+        /// </summary>
         public double TargetAnchorAngle
         {
             get => (double)GetValue(TargetAnchorAngleProperty);
             set => SetValue(TargetAnchorAngleProperty, value);
         }
 
+        /// <summary>
+        /// Gets or sets the position offset relative to the target connector where the target anchor is displayed.
+        /// Wraps the <see cref="TargetAnchorPositionProperty"/> dependency property.
+        /// </summary>
         public Point TargetAnchorPosition
         {
             get => (Point)GetValue(TargetAnchorPositionProperty);
             set => SetValue(TargetAnchorPositionProperty, value);
-        }
-
-        public ArrowSymbol TargetArrowSymbol
-        {
-            get => (ArrowSymbol)GetValue(TargetArrowSymbolProperty);
-            set => SetValue(TargetArrowSymbolProperty, value);
         }
 
         private WidgetPanel ParentPanel => _parentPanel ?? (_parentPanel = this.GetParentOfType<WidgetPanel>());
@@ -162,6 +218,9 @@ namespace Micser.App.Infrastructure.Widgets
             }
         }
 
+        /// <summary>
+        /// Handles selection.
+        /// </summary>
         protected override void OnMouseDown(MouseButtonEventArgs e)
         {
             base.OnMouseDown(e);

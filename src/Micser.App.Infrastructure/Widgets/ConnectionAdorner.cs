@@ -9,6 +9,9 @@ using System.Windows.Media;
 
 namespace Micser.App.Infrastructure.Widgets
 {
+    /// <summary>
+    /// An adorner that shows a connection to be created while dragging from a connector.
+    /// </summary>
     public class ConnectionAdorner : Adorner
     {
         private readonly Canvas _adornerCanvas;
@@ -21,6 +24,7 @@ namespace Micser.App.Infrastructure.Widgets
         private PathGeometry _pathGeometry;
         private Thumb _sourceDragThumb, _targetDragThumb;
 
+        /// <inheritdoc />
         public ConnectionAdorner(WidgetPanel panel, Connection connection)
             : base(panel)
         {
@@ -47,6 +51,7 @@ namespace Micser.App.Infrastructure.Widgets
             };
         }
 
+        /// <inheritdoc />
         protected override int VisualChildrenCount => _visualChildren.Count;
 
         private Connector HitConnector { get; set; }
@@ -70,17 +75,20 @@ namespace Micser.App.Infrastructure.Widgets
             }
         }
 
+        /// <inheritdoc />
         protected override Size ArrangeOverride(Size finalSize)
         {
             _adornerCanvas.Arrange(new Rect(0, 0, _widgetPanel.ActualWidth, _widgetPanel.ActualHeight));
             return finalSize;
         }
 
+        /// <inheritdoc />
         protected override Visual GetVisualChild(int index)
         {
             return _visualChildren[index];
         }
 
+        /// <inheritdoc />
         protected override void OnRender(DrawingContext dc)
         {
             base.OnRender(dc);
