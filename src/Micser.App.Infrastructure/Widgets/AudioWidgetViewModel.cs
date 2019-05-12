@@ -13,29 +13,40 @@ namespace Micser.App.Infrastructure.Widgets
 
         private float _volume;
 
+        /// <inheritdoc />
         protected AudioWidgetViewModel()
         {
             Volume = 1f;
         }
 
+        /// <summary>
+        /// Gets or sets a value that indicates whether the module is muted.
+        /// </summary>
         public bool IsMuted
         {
             get => _isMuted;
             set => SetProperty(ref _isMuted, value);
         }
 
+        /// <summary>
+        /// Gets or sets a value that indicates whether to use the current system volume.
+        /// </summary>
         public bool UseSystemVolume
         {
             get => _useSystemVolume;
             set => SetProperty(ref _useSystemVolume, value);
         }
 
+        /// <summary>
+        /// Gets or sets the audio volume.
+        /// </summary>
         public float Volume
         {
             get => _volume;
             set => SetProperty(ref _volume, value);
         }
 
+        /// <inheritdoc />
         public override ModuleState GetState()
         {
             var state = base.GetState();
@@ -45,6 +56,7 @@ namespace Micser.App.Infrastructure.Widgets
             return state;
         }
 
+        /// <inheritdoc />
         public override void SetState(ModuleState state)
         {
             base.SetState(state);

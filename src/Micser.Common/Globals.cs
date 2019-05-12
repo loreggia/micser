@@ -8,6 +8,8 @@ namespace Micser.Common
     /// </summary>
     public static class Globals
     {
+#pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
+
         /// <summary>
         /// The TCP port over which the API is talking.
         /// </summary>
@@ -106,5 +108,7 @@ namespace Micser.Common
             /// </summary>
             public const string DeviceId = "DeviceId";
         }
+
+#pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
     }
 }

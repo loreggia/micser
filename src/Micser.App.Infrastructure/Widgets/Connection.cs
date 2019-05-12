@@ -54,10 +54,10 @@ namespace Micser.App.Infrastructure.Widgets
             nameof(TargetAnchorPosition), typeof(Point), typeof(Connection), new PropertyMetadata(default(Point)));
 
         public static readonly DependencyProperty TargetArrowSymbolProperty = DependencyProperty.Register(
-                                                                    nameof(TargetArrowSymbol), typeof(ArrowSymbol), typeof(Connection), new PropertyMetadata(ArrowSymbol.Arrow));
+            nameof(TargetArrowSymbol), typeof(ArrowSymbol), typeof(Connection), new PropertyMetadata(ArrowSymbol.Arrow));
 
         public static readonly DependencyProperty TargetProperty = DependencyProperty.Register(
-                                                                    nameof(Target), typeof(Connector), typeof(Connection), new PropertyMetadata(null, OnConnectorPropertyChanged));
+            nameof(Target), typeof(Connector), typeof(Connection), new PropertyMetadata(null, OnConnectorPropertyChanged));
 
         private Adorner _connectionAdorner;
 

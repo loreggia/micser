@@ -9,6 +9,9 @@ namespace Micser.App.Infrastructure
     /// </summary>
     public class View : ContentControl
     {
+        /// <summary>
+        /// Defines whether the view shows a busy indicator.
+        /// </summary>
         public static readonly DependencyProperty IsBusyProperty = DependencyProperty.Register(
             nameof(IsBusy), typeof(bool), typeof(View), new PropertyMetadata(false));
 
@@ -17,6 +20,7 @@ namespace Micser.App.Infrastructure
             DefaultStyleKeyProperty.OverrideMetadata(typeof(View), new FrameworkPropertyMetadata(typeof(View)));
         }
 
+        /// <inheritdoc />
         public View()
         {
             SetResourceReference(StyleProperty, typeof(View));
@@ -35,7 +39,7 @@ namespace Micser.App.Infrastructure
         }
 
         /// <summary>
-        /// Gets the current <see cref="ContentControl.DataContext"/> as a <see cref="Infrastructure.ViewModel"/>.
+        /// Gets the current <see cref="FrameworkElement.DataContext"/> as a <see cref="Infrastructure.ViewModel"/>.
         /// </summary>
         public ViewModel ViewModel => DataContext as ViewModel;
 

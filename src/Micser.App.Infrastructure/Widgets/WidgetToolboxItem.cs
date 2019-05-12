@@ -11,6 +11,10 @@ namespace Micser.App.Infrastructure.Widgets
     {
         private Point? _dragStartPoint;
 
+        /// <summary>
+        /// Handles drag &amp; drop.
+        /// </summary>
+        /// <param name="e"></param>
         protected override void OnMouseMove(MouseEventArgs e)
         {
             base.OnMouseMove(e);
@@ -27,6 +31,9 @@ namespace Micser.App.Infrastructure.Widgets
             }
         }
 
+        /// <summary>
+        /// Starts drag &amp; drop.
+        /// </summary>
         protected override void OnPreviewMouseDown(MouseButtonEventArgs e)
         {
             base.OnPreviewMouseDown(e);
