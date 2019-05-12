@@ -21,6 +21,7 @@ namespace Micser.App.Infrastructure.Widgets
         private Point _position;
         private Size _size;
 
+        /// <inheritdoc />
         protected WidgetViewModel()
         {
             _inputConnectors = new ObservableCollection<ConnectorViewModel>();

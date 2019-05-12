@@ -1,7 +1,6 @@
 ﻿using CSCore;
 using Micser.Common.Extensions;
 using Micser.Common.Modules;
-using Micser.Engine.Infrastructure.Extensions;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -14,15 +13,23 @@ namespace Micser.Engine.Infrastructure.Audio
     /// </summary>
     public abstract class AudioModule : IAudioModule
     {
+        /// <summary>
+        /// A small epsilon value for float equality comparison.
+        /// </summary>
         public static readonly float Epsilon = float.Epsilon;
 
+        /// <summary>
+        /// The logger for the current class.
+        /// </summary>
         protected static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
+
         private readonly IList<IAudioModule> _outputs;
 
         private readonly IList<ISampleProcessor> _sampleProcessors;
         private float _volume = 1f;
         private IWaveBuffer _waveBuffer;
 
+        /// <inheritdoc />
         protected AudioModule(long id)
         {
             Id = id;
@@ -33,17 +40,22 @@ namespace Micser.Engine.Infrastructure.Audio
             };
         }
 
+        /// <inheritdoc />
         ~AudioModule()
         {
             Dispose(false);
         }
 
+        /// <inheritdoc />
         public virtual long Id { get; }
 
+        /// <inheritdoc />
         public virtual bool IsMuted { get; set; }
 
+        /// <inheritdoc />
         public virtual bool UseSystemVolume { get; set; }
 
+        /// <inheritdoc />
         public virtual float Volume
         {
             get => _volume;

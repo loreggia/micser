@@ -8,11 +8,13 @@ namespace Micser.App.Infrastructure.Widgets
     {
         private readonly IUnityContainer _container;
 
+        /// <inheritdoc />
         public WidgetRegistry(IUnityContainer container)
         {
             _container = container;
         }
 
+        /// <inheritdoc />
         public IEnumerable<WidgetDescription> Widgets => _container.Resolve<IEnumerable<WidgetDescription>>();
     }
 }
