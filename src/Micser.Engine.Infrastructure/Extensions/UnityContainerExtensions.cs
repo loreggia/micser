@@ -5,6 +5,9 @@ using Unity;
 
 namespace Micser.Engine.Infrastructure.Extensions
 {
+    /// <summary>
+    /// Contains helper extension methods for the <see cref="IUnityContainer"/> class.
+    /// </summary>
     public static class UnityContainerExtensions
     {
         /// <summary>

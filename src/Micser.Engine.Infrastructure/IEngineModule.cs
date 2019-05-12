@@ -7,6 +7,9 @@ namespace Micser.Engine.Infrastructure
     /// </summary>
     public interface IEngineModule
     {
+        /// <summary>
+        /// Lets the module register its types in the DI container.
+        /// </summary>
         void RegisterTypes(IUnityContainer container);
     }
 }

@@ -12,11 +12,13 @@ namespace Micser.Engine.Infrastructure.Services
     {
         private readonly IUnitOfWorkFactory _uowFactory;
 
+        /// <inheritdoc />
         public ModuleConnectionService(IUnitOfWorkFactory uowFactory)
         {
             _uowFactory = uowFactory;
         }
 
+        /// <inheritdoc />
         public ModuleConnectionDto Delete(long id)
         {
             using (var uow = _uowFactory.Create())
@@ -36,6 +38,7 @@ namespace Micser.Engine.Infrastructure.Services
             }
         }
 
+        /// <inheritdoc />
         public IEnumerable<ModuleConnectionDto> GetAll()
         {
             using (var uow = _uowFactory.Create())
@@ -44,6 +47,7 @@ namespace Micser.Engine.Infrastructure.Services
             }
         }
 
+        /// <inheritdoc />
         public ModuleConnectionDto GetById(long id)
         {
             using (var uow = _uowFactory.Create())
@@ -53,6 +57,7 @@ namespace Micser.Engine.Infrastructure.Services
             }
         }
 
+        /// <inheritdoc />
         public bool Insert(ModuleConnectionDto dto)
         {
             using (var uow = _uowFactory.Create())
@@ -78,6 +83,7 @@ namespace Micser.Engine.Infrastructure.Services
             return false;
         }
 
+        /// <inheritdoc />
         public bool Truncate()
         {
             using (var uow = _uowFactory.Create())
@@ -89,6 +95,7 @@ namespace Micser.Engine.Infrastructure.Services
             }
         }
 
+        /// <inheritdoc />
         public bool Update(ModuleConnectionDto dto)
         {
             using (var uow = _uowFactory.Create())

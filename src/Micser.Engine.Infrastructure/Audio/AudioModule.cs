@@ -119,9 +119,13 @@ namespace Micser.Engine.Infrastructure.Audio
 
         /// <inheritdoc />
         public void RemoveSampleProcessor<T>()
+            where T : ISampleProcessor
         {
-            var processor = _sampleProcessors.FirstOrDefault(p => p is T);
-            RemoveSampleProcessor(processor);
+            var processors = _sampleProcessors.Where(p => p is T).ToArray();
+            foreach (var processor in processors)
+            {
+                RemoveSampleProcessor(processor);
+            }
         }
 
         /// <inheritdoc />
