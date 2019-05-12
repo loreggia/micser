@@ -66,6 +66,7 @@ namespace Micser.Engine.Infrastructure.Audio
             }
         }
 
+        /// <inheritdoc />
         public virtual void AddOutput(IAudioModule module)
         {
             if (_outputs.Contains(module))
@@ -76,12 +77,23 @@ namespace Micser.Engine.Infrastructure.Audio
             _outputs.Add(module);
         }
 
+        /// <inheritdoc />
+        public void AddSampleProcessor(ISampleProcessor sampleProcessor)
+        {
+            if (!_sampleProcessors.Contains(sampleProcessor))
+            {
+                _sampleProcessors.Add(sampleProcessor);
+            }
+        }
+
+        /// <inheritdoc />
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
+        /// <inheritdoc />
         public virtual ModuleState GetState()
         {
             var state = new ModuleState
@@ -96,6 +108,7 @@ namespace Micser.Engine.Infrastructure.Audio
             return state;
         }
 
+        /// <inheritdoc />
         public virtual void RemoveOutput(IAudioModule module)
         {
             if (_outputs.Contains(module))
@@ -104,6 +117,23 @@ namespace Micser.Engine.Infrastructure.Audio
             }
         }
 
+        /// <inheritdoc />
+        public void RemoveSampleProcessor<T>()
+        {
+            var processor = _sampleProcessors.FirstOrDefault(p => p is T);
+            RemoveSampleProcessor(processor);
+        }
+
+        /// <inheritdoc />
+        public void RemoveSampleProcessor(ISampleProcessor sampleProcessor)
+        {
+            if (_sampleProcessors.Contains(sampleProcessor))
+            {
+                _sampleProcessors.Remove(sampleProcessor);
+            }
+        }
+
+        /// <inheritdoc />
         public virtual void SetState(ModuleState state)
         {
             if (state == null)
@@ -118,6 +148,7 @@ namespace Micser.Engine.Infrastructure.Audio
             this.SetStateProperties(state);
         }
 
+        /// <inheritdoc />
         public virtual void Write(IAudioModule source, WaveFormat waveFormat, byte[] buffer, int offset, int count)
         {
             if (IsMuted || Math.Abs(Volume) < Epsilon)
@@ -250,33 +281,14 @@ namespace Micser.Engine.Infrastructure.Audio
             }
         }
 
-        protected void AddSampleProcessor(ISampleProcessor sampleProcessor)
-        {
-            if (!_sampleProcessors.Contains(sampleProcessor))
-            {
-                _sampleProcessors.Add(sampleProcessor);
-            }
-        }
-
+        /// <summary>
+        /// Releases resources.
+        /// </summary>
         protected virtual void Dispose(bool disposing)
         {
             if (disposing)
             {
                 _outputs.Clear();
-            }
-        }
-
-        protected void RemoveSampleProcessor<T>()
-        {
-            var processor = _sampleProcessors.FirstOrDefault(p => p is T);
-            RemoveSampleProcessor(processor);
-        }
-
-        protected void RemoveSampleProcessor(ISampleProcessor sampleProcessor)
-        {
-            if (_sampleProcessors.Contains(sampleProcessor))
-            {
-                _sampleProcessors.Remove(sampleProcessor);
             }
         }
     }

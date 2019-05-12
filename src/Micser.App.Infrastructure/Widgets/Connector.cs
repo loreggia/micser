@@ -81,6 +81,7 @@ namespace Micser.App.Infrastructure.Widgets
             return info;
         }
 
+        /// <inheritdoc />
         protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
         {
             base.OnMouseLeftButtonDown(e);
@@ -99,6 +100,7 @@ namespace Micser.App.Infrastructure.Widgets
             }
         }
 
+        /// <inheritdoc />
         protected override void OnMouseMove(MouseEventArgs e)
         {
             base.OnMouseMove(e);

@@ -5,6 +5,9 @@ using System.Windows.Media;
 
 namespace Micser.App.Infrastructure.Widgets
 {
+    /// <summary>
+    /// An adorner that
+    /// </summary>
     public class ConnectorAdorner : Adorner
     {
         private readonly Pen _drawingPen;
@@ -13,6 +16,7 @@ namespace Micser.App.Infrastructure.Widgets
         private Widget _hitWidget;
         private PathGeometry _pathGeometry;
 
+        /// <inheritdoc />
         public ConnectorAdorner(WidgetPanel panel, Connector sourceConnector)
             : base(panel)
         {
@@ -46,6 +50,7 @@ namespace Micser.App.Infrastructure.Widgets
             }
         }
 
+        /// <inheritdoc />
         protected override void OnMouseMove(MouseEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed)
@@ -68,6 +73,7 @@ namespace Micser.App.Infrastructure.Widgets
             }
         }
 
+        /// <inheritdoc />
         protected override void OnMouseUp(MouseButtonEventArgs e)
         {
             if (HitConnector != null)
@@ -92,6 +98,7 @@ namespace Micser.App.Infrastructure.Widgets
             adornerLayer?.Remove(this);
         }
 
+        /// <inheritdoc />
         protected override void OnRender(DrawingContext dc)
         {
             base.OnRender(dc);

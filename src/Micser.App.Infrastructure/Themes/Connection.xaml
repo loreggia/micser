@@ -33,19 +33,6 @@
                     </Setter.Value>
                 </Setter>
             </Style>
-            <!-- base style for all arrow shapes -->
-            <Style x:Key="ArrowSymbolBaseStyle" TargetType="Path">
-                <Setter Property="Fill" Value="{DynamicResource {themes:BrushThemeKey ConnectionEnd}}" />
-                <Setter Property="Stretch" Value="Fill" />
-            </Style>
-            <!-- Arrow -->
-            <Style x:Key="Arrow" TargetType="Path" BasedOn="{StaticResource ArrowSymbolBaseStyle}">
-                <Setter Property="Data" Value="M0,0 8,4 0,8 Z" />
-            </Style>
-            <!-- Diamond  -->
-            <Style x:Key="Diamond" TargetType="Path" BasedOn="{StaticResource ArrowSymbolBaseStyle}">
-                <Setter Property="Data" Value="M-5,0 0,-5 5,0 0,5 Z" />
-            </Style>
         </Style.Resources>
         <Setter Property="Template">
             <Setter.Value>
@@ -66,7 +53,7 @@
                         <Grid Style="{StaticResource ArrowGridStyle}"
                               Canvas.Left="{Binding SourceAnchorPosition.X}"
                               Canvas.Top="{Binding SourceAnchorPosition.Y}">
-                            <Path Name="PART_SourceAnchorPath" />
+                            <Path Data="" Stretch="Fill" Fill="{DynamicResource {themes:BrushThemeKey ConnectionEnd}}" />
                             <Grid.LayoutTransform>
                                 <RotateTransform Angle="{Binding SourceAnchorAngle}" />
                             </Grid.LayoutTransform>
@@ -74,7 +61,7 @@
                         <Grid Style="{StaticResource ArrowGridStyle}"
                               Canvas.Left="{Binding TargetAnchorPosition.X}"
                               Canvas.Top="{Binding TargetAnchorPosition.Y}">
-                            <Path Name="PART_TargetAnchorPath" />
+                            <Path Data="M0,0 8,4 0,8 Z" Stretch="Fill" Fill="{DynamicResource {themes:BrushThemeKey ConnectionEnd}}" />
                             <Grid.LayoutTransform>
                                 <RotateTransform Angle="{Binding TargetAnchorAngle}" />
                             </Grid.LayoutTransform>
@@ -90,20 +77,6 @@
                             </TextBlock.RenderTransform>
                         </TextBlock>
                     </Canvas>
-                    <ControlTemplate.Triggers>
-                        <DataTrigger Value="Arrow" Binding="{Binding RelativeSource={RelativeSource Self},Path=SourceArrowSymbol}">
-                            <Setter TargetName="PART_SourceAnchorPath" Property="Style" Value="{StaticResource Arrow}" />
-                        </DataTrigger>
-                        <DataTrigger Value="Diamond" Binding="{Binding RelativeSource={RelativeSource Self},Path=SourceArrowSymbol}">
-                            <Setter TargetName="PART_SourceAnchorPath" Property="Style" Value="{StaticResource Diamond}" />
-                        </DataTrigger>
-                        <DataTrigger Value="Arrow" Binding="{Binding RelativeSource={RelativeSource Self},Path=TargetArrowSymbol}">
-                            <Setter TargetName="PART_TargetAnchorPath" Property="Style" Value="{StaticResource Arrow}" />
-                        </DataTrigger>
-                        <DataTrigger Value="Diamond" Binding="{Binding RelativeSource={RelativeSource Self},Path=TargetArrowSymbol}">
-                            <Setter TargetName="PART_TargetAnchorPath" Property="Style" Value="{StaticResource Diamond}" />
-                        </DataTrigger>
-                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

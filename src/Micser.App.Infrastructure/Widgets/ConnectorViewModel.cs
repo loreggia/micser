@@ -7,6 +7,7 @@
     {
         private ConnectionViewModel _connection;
 
+        /// <inheritdoc />
         public ConnectorViewModel(string name, WidgetViewModel widget, object data)
         {
             Name = name;
@@ -14,6 +15,9 @@
             Data = data;
         }
 
+        /// <summary>
+        /// Raised when the a new connection is made to or from this connector.
+        /// </summary>
         public event ConnectionChangedEventHandler ConnectionChanged;
 
         public ConnectionViewModel Connection
