@@ -16,7 +16,7 @@ namespace Micser.App.Infrastructure.Widgets
         /// <inheritdoc />
         protected AudioWidgetViewModel()
         {
-            Volume = 1f;
+            _volume = 1f;
         }
 
         /// <summary>

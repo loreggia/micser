@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace Micser.Common
@@ -7,6 +8,7 @@ namespace Micser.Common
     /// A string/object dictionary that provides typed access to the values.
     /// Used for generic state serialization.
     /// </summary>
+    [Serializable]
     public class StateDictionary : Dictionary<string, object>
     {
         /// <inheritdoc />
