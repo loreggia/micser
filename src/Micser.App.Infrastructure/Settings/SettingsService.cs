@@ -15,7 +15,7 @@ using System.Threading.Tasks;
 namespace Micser.App.Infrastructure.Settings
 {
     /// <inheritdoc cref="ISettingsService"/>
-    public class SettingsService : ISettingsService
+    public class SettingsService : ISettingsService, IDisposable
     {
         private readonly IUnitOfWorkFactory _database;
         private readonly SemaphoreSlim _loadSemaphore;
@@ -36,6 +36,13 @@ namespace Micser.App.Infrastructure.Settings
 
         /// <inheritdoc />
         public event SettingChangedEventHandler SettingChanged;
+
+        /// <inheritdoc />
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
 
         /// <inheritdoc />
         public T GetSetting<T>(string key)
@@ -136,6 +143,17 @@ namespace Micser.App.Infrastructure.Settings
                 }
 
                 uow.Complete();
+            }
+        }
+
+        /// <summary>
+        /// Releases resources.
+        /// </summary>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _loadSemaphore?.Dispose();
             }
         }
 

@@ -39,8 +39,8 @@ namespace Micser.App.Infrastructure
         public void Dispose()
         {
             Dispose(true);
-            IsDisposed = true;
             GC.SuppressFinalize(this);
+            IsDisposed = true;
         }
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace Micser.App.Infrastructure
         {
             if (disposing)
             {
-                CommandBindings.Clear();
+                CommandBindings?.Clear();
             }
         }
     }

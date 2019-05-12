@@ -1,4 +1,5 @@
-﻿using System.Data.Entity;
+﻿using System;
+using System.Data.Entity;
 
 namespace Micser.Common.DataAccess
 {
@@ -24,13 +25,22 @@ namespace Micser.Common.DataAccess
         /// <inheritdoc />
         public void Dispose()
         {
-            _context.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         /// <inheritdoc />
         public T GetRepository<T>() where T : class, IRepository
         {
             return _repositoryFactory.Create<T>(_context);
+        }
+
+        /// <summary>
+        /// Disposes the context.
+        /// </summary>
+        protected virtual void Dispose(bool disposing)
+        {
+            _context?.Dispose();
         }
     }
 }
