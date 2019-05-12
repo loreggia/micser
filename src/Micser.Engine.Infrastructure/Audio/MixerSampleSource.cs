@@ -13,6 +13,7 @@ namespace Micser.Engine.Infrastructure.Audio
         private readonly List<ISampleSource> _sampleSources = new List<ISampleSource>();
         private float[] _mixerBuffer;
 
+        /// <inheritdoc />
         public MixerSampleSource(int channelCount, int sampleRate)
         {
             if (channelCount < 1)
@@ -70,13 +71,13 @@ namespace Micser.Engine.Infrastructure.Audio
         {
             if (source == null)
             {
-                throw new ArgumentNullException("source");
+                throw new ArgumentNullException(nameof(source));
             }
 
             if (source.WaveFormat.Channels != WaveFormat.Channels ||
                source.WaveFormat.SampleRate != WaveFormat.SampleRate)
             {
-                throw new ArgumentException("Invalid format.", "source");
+                throw new ArgumentException("Invalid format.", nameof(source));
             }
 
             lock (_lockObj)
@@ -88,16 +89,15 @@ namespace Micser.Engine.Infrastructure.Audio
             }
         }
 
+        /// <summary>
+        /// Checks if the mixer contains the specified <see cref="ISampleSource"/> instance.
+        /// </summary>
         public bool Contains(ISampleSource source)
         {
-            if (source == null)
-            {
-                return false;
-            }
-
-            return _sampleSources.Contains(source);
+            return source != null && _sampleSources.Contains(source);
         }
 
+        /// <inheritdoc />
         public void Dispose()
         {
             lock (_lockObj)
@@ -106,6 +106,7 @@ namespace Micser.Engine.Infrastructure.Audio
             }
         }
 
+        /// <inheritdoc />
         public int Read(float[] buffer, int offset, int count)
         {
             var numberOfStoredSamples = 0;
@@ -185,6 +186,10 @@ namespace Micser.Engine.Infrastructure.Audio
             return numberOfStoredSamples;
         }
 
+        /// <summary>
+        /// Removes an <see cref="ISampleSource"/> instance from the mixer's inputs.
+        /// </summary>
+        /// <param name="source"></param>
         public void RemoveSource(ISampleSource source)
         {
             //don't throw null ex here

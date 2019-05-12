@@ -12,6 +12,7 @@ namespace Micser.Engine.Infrastructure.Audio
     {
         private DeviceDescription _deviceDescription;
 
+        /// <inheritdoc />
         protected DeviceModule(long id)
             : base(id)
         {
@@ -19,6 +20,9 @@ namespace Micser.Engine.Infrastructure.Audio
             DeviceEnumerator.DeviceStateChanged += DeviceStateChanged;
         }
 
+        /// <summary>
+        /// Gets or sets the currently selected device. Changing the device will call <see cref="InitializeDevice"/>.
+        /// </summary>
         public virtual DeviceDescription DeviceDescription
         {
             get => _deviceDescription;
@@ -34,10 +38,17 @@ namespace Micser.Engine.Infrastructure.Audio
             }
         }
 
+        /// <summary>
+        /// Gets the CoreAudio device instance.
+        /// </summary>
         protected MMDevice Device { get; private set; }
 
+        /// <summary>
+        /// Gets the CoreAudio device enumerator.
+        /// </summary>
         protected MMDeviceEnumerator DeviceEnumerator { get; }
 
+        /// <inheritdoc />
         public override ModuleState GetState()
         {
             var state = base.GetState();
@@ -45,6 +56,7 @@ namespace Micser.Engine.Infrastructure.Audio
             return state;
         }
 
+        /// <inheritdoc />
         public override void SetState(ModuleState state)
         {
             base.SetState(state);
@@ -61,6 +73,7 @@ namespace Micser.Engine.Infrastructure.Audio
             }
         }
 
+        /// <inheritdoc />
         protected override void Dispose(bool disposing)
         {
             if (disposing)
@@ -72,11 +85,17 @@ namespace Micser.Engine.Infrastructure.Audio
             base.Dispose(disposing);
         }
 
+        /// <summary>
+        /// Disposes the <see cref="Device"/>.
+        /// </summary>
         protected virtual void DisposeDevice()
         {
             Device?.Dispose();
         }
 
+        /// <summary>
+        /// Initializes the <see cref="Device"/>.
+        /// </summary>
         protected void InitializeDevice()
         {
             DisposeDevice();
@@ -92,6 +111,10 @@ namespace Micser.Engine.Infrastructure.Audio
             }
         }
 
+        /// <summary>
+        /// Callback when the state of the active device changes. Calls <see cref="OnInitializeDevice"/> if it is active or <see cref="DisposeDevice"/> otherwise.
+        /// </summary>
+        /// <param name="deviceState">The new device state.</param>
         protected virtual void OnDeviceStateChanged(DeviceState deviceState)
         {
             if (deviceState == DeviceState.Active)
