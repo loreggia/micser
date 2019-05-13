@@ -55,7 +55,7 @@ namespace Micser.App.Infrastructure
         {
             if (disposing)
             {
-                _timer.Dispose();
+                _timer?.Dispose();
                 _timer = null;
             }
         }

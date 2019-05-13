@@ -102,7 +102,7 @@ namespace Micser.Engine.Infrastructure.Audio
         {
             lock (_lockObj)
             {
-                _sampleSources.Clear();
+                _sampleSources?.Clear();
             }
         }
 

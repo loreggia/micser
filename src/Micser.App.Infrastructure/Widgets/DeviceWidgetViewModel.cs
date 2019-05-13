@@ -84,7 +84,7 @@ namespace Micser.App.Infrastructure.Widgets
         {
             base.Dispose(disposing);
 
-            if (disposing)
+            if (disposing && _deviceEnumerator != null)
             {
                 _deviceEnumerator.DeviceAdded -= OnDeviceAdded;
                 _deviceEnumerator.DeviceRemoved -= OnDeviceRemoved;

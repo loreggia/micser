@@ -292,7 +292,7 @@ namespace Micser.Engine.Infrastructure.Audio
         {
             if (disposing)
             {
-                _outputs.Clear();
+                _outputs?.Clear();
             }
         }
     }

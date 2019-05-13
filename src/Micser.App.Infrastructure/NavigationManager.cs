@@ -86,9 +86,12 @@ namespace Micser.App.Infrastructure
         {
             if (disposing)
             {
-                foreach (var region in _regionManager.Regions)
+                if (_regionManager != null)
                 {
-                    region.NavigationService.Navigated -= OnNavigated;
+                    foreach (var region in _regionManager.Regions)
+                    {
+                        region.NavigationService.Navigated -= OnNavigated;
+                    }
                 }
             }
         }

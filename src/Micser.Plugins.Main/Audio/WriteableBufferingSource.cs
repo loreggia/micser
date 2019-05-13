@@ -166,7 +166,7 @@ namespace Micser.Plugins.Main.Audio
                 return;
             }
 
-            _buffer.Dispose();
+            _buffer?.Dispose();
             _buffer = null;
         }
     }
