@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Runtime.Serialization;
 
 namespace Micser.Common
 {
@@ -25,6 +26,12 @@ namespace Micser.Common
             {
                 this[key] = other[key];
             }
+        }
+
+        /// <inheritdoc />
+        protected StateDictionary(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
         }
 
         /// <summary>
