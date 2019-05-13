@@ -88,7 +88,10 @@ namespace Micser.Engine.Audio
 
         public void Dispose()
         {
-            _endpointVolumeCallback.NotifyRecived -= VolumeNotifyReceived;
+            if (_endpointVolumeCallback != null)
+            {
+                _endpointVolumeCallback.NotifyRecived -= VolumeNotifyReceived;
+            }
 
             Stop();
         }
@@ -155,7 +158,7 @@ namespace Micser.Engine.Audio
             _endpointVolume?.UnregisterControlChangeNotify(_endpointVolumeCallback);
             _endpointVolume?.Dispose();
 
-            if (_modules.Count == 0)
+            if (_modules == null || _modules.Count == 0)
             {
                 return;
             }

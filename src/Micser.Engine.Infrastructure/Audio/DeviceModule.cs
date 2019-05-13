@@ -78,7 +78,7 @@ namespace Micser.Engine.Infrastructure.Audio
         {
             if (disposing)
             {
-                DeviceEnumerator.Dispose();
+                DeviceEnumerator?.Dispose();
                 DisposeDevice();
             }
 

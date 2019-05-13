@@ -27,7 +27,7 @@ namespace Micser.DriverUtility
 
         public void Dispose()
         {
-            _deviceEnumerator.Dispose();
+            _deviceEnumerator?.Dispose();
         }
 
         public async Task<bool> RenameDevices(int expectedCount)

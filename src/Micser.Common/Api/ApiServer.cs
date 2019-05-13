@@ -87,8 +87,8 @@ namespace Micser.Common.Api
         {
             if (disposing)
             {
-                _listener.Stop();
-                _startSemaphore.Dispose();
+                _listener?.Stop();
+                _startSemaphore?.Dispose();
                 Stop();
             }
 

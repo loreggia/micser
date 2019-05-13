@@ -107,8 +107,8 @@ namespace Micser.Plugins.Main.Modules
             {
                 _volumeSource?.Dispose();
                 _outputMixer?.Dispose();
-                _inputBuffers.Clear();
-                _inputSources.Clear();
+                _inputBuffers?.Clear();
+                _inputSources?.Clear();
             }
 
             base.Dispose(disposing);
