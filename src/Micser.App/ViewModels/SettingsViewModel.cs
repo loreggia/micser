@@ -164,7 +164,7 @@ namespace Micser.App.ViewModels
         {
             _settingsService = settingsService;
             settingsService.SettingChanged += OnSettingChanged;
-            Value = settingsService.GetSetting<T>(setting.Key);
+            _value = settingsService.GetSetting<T>(setting.Key);
         }
 
         public T Value
@@ -216,7 +216,7 @@ namespace Micser.App.ViewModels
         public ListSettingViewModel(SettingDefinition setting, ISettingsService settingsService)
             : base(setting, settingsService)
         {
-            List = setting.List;
+            _list = setting.List;
         }
 
         public IDictionary<object, string> List

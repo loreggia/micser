@@ -161,13 +161,11 @@ namespace Micser.Plugins.Main.Audio
         /// <param name="disposing">True to release both managed and unmanaged resources; false to release only unmanaged resources.</param>
         protected virtual void Dispose(bool disposing)
         {
-            if (!disposing)
+            if (disposing && _buffer != null)
             {
-                return;
+                _buffer.Dispose();
+                _buffer = null;
             }
-
-            _buffer?.Dispose();
-            _buffer = null;
         }
     }
 }

@@ -372,9 +372,9 @@ NTSTATUS IrpMjCreateHandler(IN PDEVICE_OBJECT DeviceObject, IN PIRP Irp)
 {
     UNREFERENCED_PARAMETER(DeviceObject);
 
+    PAGED_CODE();
+
     NTSTATUS status = STATUS_SUCCESS;
-    PIO_STACK_LOCATION pIoStackLocation;
-    ULONG IoControlCode;
 
     DPF_ENTER(("[IrpMjCreateHandler]"));
 
@@ -393,9 +393,9 @@ NTSTATUS IrpMjCloseHandler(IN PDEVICE_OBJECT DeviceObject, IN PIRP Irp)
 {
     UNREFERENCED_PARAMETER(DeviceObject);
 
+    PAGED_CODE();
+
     NTSTATUS status = STATUS_SUCCESS;
-    PIO_STACK_LOCATION pIoStackLocation;
-    ULONG IoControlCode;
 
     DPF_ENTER(("[IrpMjCloseHandler]"));
 
@@ -427,10 +427,6 @@ NTSTATUS IrpMjDeviceControlHandler(IN PDEVICE_OBJECT DeviceObject, IN PIRP Irp)
     // check if we need to handle the IRP
     if (DeviceObject == g_IoDevice)
     {
-        ioControlCode = IOCTL_RELOAD;
-
-        DPF(D_TERSE, ("Expected control code: %i", ioControlCode));
-
         pIoStackLocation = IoGetCurrentIrpStackLocation(Irp);
         ioControlCode = pIoStackLocation->Parameters.DeviceIoControl.IoControlCode;
 

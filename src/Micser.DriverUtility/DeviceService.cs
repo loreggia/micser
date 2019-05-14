@@ -27,7 +27,8 @@ namespace Micser.DriverUtility
 
         public void Dispose()
         {
-            _deviceEnumerator?.Dispose();
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         public async Task<bool> RenameDevices(int expectedCount)
@@ -62,6 +63,14 @@ namespace Micser.DriverUtility
             } while (retries < numRetries);
 
             return false;
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                _deviceEnumerator?.Dispose();
+            }
         }
 
         private List<MMDevice> GetDevices(DataFlow dataFlow)

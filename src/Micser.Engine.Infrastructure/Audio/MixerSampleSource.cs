@@ -100,10 +100,8 @@ namespace Micser.Engine.Infrastructure.Audio
         /// <inheritdoc />
         public void Dispose()
         {
-            lock (_lockObj)
-            {
-                _sampleSources?.Clear();
-            }
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         /// <inheritdoc />
@@ -198,6 +196,20 @@ namespace Micser.Engine.Infrastructure.Audio
                 if (Contains(source))
                 {
                     _sampleSources.Remove(source);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Releases resources.
+        /// </summary>
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing && _sampleSources != null && _lockObj != null)
+            {
+                lock (_lockObj)
+                {
+                    _sampleSources?.Clear();
                 }
             }
         }

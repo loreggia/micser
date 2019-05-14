@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using NLog;
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
@@ -10,6 +11,7 @@ namespace Micser.DriverUtility
     {
         private const string UacRegistryKey = "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System";
         private const string UacRegistryValue = "EnableLUA";
+        private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
         private static readonly uint STANDARD_RIGHTS_READ = 0x00020000;
         private static readonly uint TOKEN_QUERY = 0x0008;
@@ -61,9 +63,10 @@ namespace Micser.DriverUtility
             {
                 if (IsUacEnabled)
                 {
-                    if (!OpenProcessToken(Process.GetCurrentProcess().Handle, TOKEN_READ, out var tokenHandle))
+                    if (!NativeMethods.OpenProcessToken(Process.GetCurrentProcess().Handle, TOKEN_READ, out var tokenHandle))
                     {
-                        throw new ApplicationException("Could not get process token.  Win32 Error Code: " + Marshal.GetLastWin32Error());
+                        Logger.Error("Could not get process token. Win32 Error Code: " + Marshal.GetLastWin32Error());
+                        return false;
                     }
 
                     try
@@ -73,7 +76,7 @@ namespace Micser.DriverUtility
                         var elevationTypePtr = Marshal.AllocHGlobal(elevationResultSize);
                         try
                         {
-                            var success = GetTokenInformation(tokenHandle, TOKEN_INFORMATION_CLASS.TokenElevationType, elevationTypePtr, (uint)elevationResultSize, out _);
+                            var success = NativeMethods.GetTokenInformation(tokenHandle, TOKEN_INFORMATION_CLASS.TokenElevationType, elevationTypePtr, (uint)elevationResultSize, out _);
                             if (success)
                             {
                                 var elevationResult = (TOKEN_ELEVATION_TYPE)Marshal.ReadInt32(elevationTypePtr);
@@ -81,7 +84,8 @@ namespace Micser.DriverUtility
                             }
                             else
                             {
-                                throw new ApplicationException("Unable to determine the current elevation.");
+                                Logger.Error($"GetTokenInformation returned false. Win32 Error Code: " + Marshal.GetLastWin32Error());
+                                return false;
                             }
                         }
                         finally
@@ -96,7 +100,7 @@ namespace Micser.DriverUtility
                     {
                         if (tokenHandle != IntPtr.Zero)
                         {
-                            CloseHandle(tokenHandle);
+                            NativeMethods.CloseHandle(tokenHandle);
                         }
                     }
                 }
@@ -121,15 +125,18 @@ namespace Micser.DriverUtility
             }
         }
 
-        [DllImport("kernel32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool CloseHandle(IntPtr hObject);
+        private class NativeMethods
+        {
+            [DllImport("kernel32.dll", SetLastError = true)]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            internal static extern bool CloseHandle(IntPtr hObject);
 
-        [DllImport("advapi32.dll", SetLastError = true)]
-        private static extern bool GetTokenInformation(IntPtr TokenHandle, TOKEN_INFORMATION_CLASS TokenInformationClass, IntPtr TokenInformation, uint TokenInformationLength, out uint ReturnLength);
+            [DllImport("advapi32.dll", SetLastError = true)]
+            internal static extern bool GetTokenInformation(IntPtr TokenHandle, TOKEN_INFORMATION_CLASS TokenInformationClass, IntPtr TokenInformation, uint TokenInformationLength, out uint ReturnLength);
 
-        [DllImport("advapi32.dll", SetLastError = true)]
-        [return: MarshalAs(UnmanagedType.Bool)]
-        private static extern bool OpenProcessToken(IntPtr ProcessHandle, uint DesiredAccess, out IntPtr TokenHandle);
+            [DllImport("advapi32.dll", SetLastError = true)]
+            [return: MarshalAs(UnmanagedType.Bool)]
+            internal static extern bool OpenProcessToken(IntPtr ProcessHandle, uint DesiredAccess, out IntPtr TokenHandle);
+        }
     }
 }

@@ -41,7 +41,7 @@ namespace Micser.DriverUtility
             {
                 var result = Globals.DriverUtility.ReturnCodes.Success;
 
-                var hFileHandle = DriverInterop.CreateFile(
+                var hFileHandle = SafeNativeMethods.CreateFile(
                     DriverGlobals.DeviceSymLink,
                     FileAccess.ReadWrite,
                     FileShare.ReadWrite,
@@ -57,10 +57,10 @@ namespace Micser.DriverUtility
                     return Globals.DriverUtility.ReturnCodes.SendControlSignalFailed;
                 }
 
-                var ioCtlReload = DriverInterop.CtlCode(
-                    DriverInterop.EFileDevice.Unknown,
+                var ioCtlReload = SafeNativeMethods.CtlCode(
+                    SafeNativeMethods.EFileDevice.Unknown,
                     DriverGlobals.IoControlCodes.Reload,
-                    DriverInterop.EMethod.Buffered,
+                    SafeNativeMethods.EMethod.Buffered,
                     FileAccess.ReadWrite);
 
                 try
@@ -69,7 +69,7 @@ namespace Micser.DriverUtility
 
                     uint bytesReturned = 0;
                     var overlapped = new NativeOverlapped();
-                    var success = DriverInterop.DeviceIoControl(hFileHandle, ioCtlReload, null, 0, null, 0, ref bytesReturned, ref overlapped);
+                    var success = SafeNativeMethods.DeviceIoControl(hFileHandle, ioCtlReload, null, 0, null, 0, ref bytesReturned, ref overlapped);
 
                     if (!success)
                     {
@@ -79,8 +79,11 @@ namespace Micser.DriverUtility
                 }
                 finally
                 {
-                    hFileHandle.Close();
-                    hFileHandle.Dispose();
+                    if (!hFileHandle.IsClosed && !hFileHandle.IsInvalid)
+                    {
+                        hFileHandle.Close();
+                        hFileHandle.Dispose();
+                    }
                 }
 
                 return result;
@@ -94,7 +97,7 @@ namespace Micser.DriverUtility
 
         [ComVisible(false)]
         [SuppressUnmanagedCodeSecurity]
-        private class DriverInterop
+        private class SafeNativeMethods
         {
             #region Enums
 
