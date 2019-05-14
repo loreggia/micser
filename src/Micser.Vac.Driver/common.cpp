@@ -401,7 +401,11 @@ public:
     STDMETHODIMP_(void) MixerReset(void);
     STDMETHODIMP_(LONG) MixerVolumeRead(IN ULONG Index, IN LONG Channel);
     STDMETHODIMP_(void) MixerVolumeWrite(IN ULONG Index, IN LONG Channel, IN LONG Value);
-    STDMETHODIMP_(BOOL) IsInstantiated() { return m_bInstantiated; };
+    STDMETHODIMP_(BOOL) IsInstantiated()
+    {
+        PAGED_CODE();
+        return m_bInstantiated;
+    };
 
     //=====================================================================
     // friends

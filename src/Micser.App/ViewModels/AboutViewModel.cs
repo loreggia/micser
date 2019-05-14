@@ -11,9 +11,9 @@ namespace Micser.App.ViewModels
 
         public AboutViewModel()
         {
-            AboutText = Resources.AboutText;
+            _aboutText = Resources.AboutText;
             var version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            VersionText = $"{Resources.AboutVersionText} {version}";
+            _versionText = $"{Resources.AboutVersionText} {version}";
         }
 
         public string AboutText

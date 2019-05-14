@@ -94,6 +94,8 @@ namespace Micser.Engine.Audio
             }
 
             Stop();
+
+            _deviceEnumerator?.Dispose();
         }
 
         public void RemoveConnection(long id)

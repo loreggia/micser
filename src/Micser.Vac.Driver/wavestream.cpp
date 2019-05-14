@@ -710,6 +710,8 @@ Return Value:
   void
 */
 {
+    PAGED_CODE();
+
     DBGPRINT("[CMiniportWaveCyclicStream::FreeBuffer]");
 
     //if ( m_pvDmaBuffer ) {
