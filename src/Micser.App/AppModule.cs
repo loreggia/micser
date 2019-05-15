@@ -72,11 +72,11 @@ namespace Micser.App
                 Type = SettingType.Integer,
                 StorageType = SettingStorageType.Custom,
                 DefaultValue = 1,
-                Handler = containerProvider.Resolve<VacCountSettingHandler>()
+                Handler = containerProvider.Resolve<VacCountSettingHandler>(),
+                IsAppliedInstantly = false
             });
 
             var navigationManager = containerProvider.Resolve<INavigationManager>();
-
             var menuItemRegistry = containerProvider.Resolve<IMenuItemRegistry>();
 
             // File

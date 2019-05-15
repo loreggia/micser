@@ -11,12 +11,18 @@ using System.Windows.Input;
 
 namespace Micser.App.ViewModels
 {
+    public interface ISettingViewModel
+    {
+        SettingDefinition Definition { get; }
+        bool IsEnabled { get; set; }
+    }
+
     public class SettingsViewModel : ViewModelNavigationAware
     {
         private readonly ISettingsRegistry _settingsRegistry;
         private readonly SettingsSerializer _settingsSerializer;
         private readonly ISettingsService _settingsService;
-        private IEnumerable<SettingViewModel> _settings;
+        private IEnumerable<ISettingViewModel> _settings;
 
         public SettingsViewModel(ISettingsRegistry settingsRegistry, ISettingsService settingsService, SettingsSerializer settingsSerializer)
         {
@@ -45,7 +51,7 @@ namespace Micser.App.ViewModels
 
         public ICommand RefreshCommand { get; }
 
-        public IEnumerable<SettingViewModel> Settings
+        public IEnumerable<ISettingViewModel> Settings
         {
             get => _settings;
             set => SetProperty(ref _settings, value);
@@ -109,7 +115,7 @@ namespace Micser.App.ViewModels
                 var settings = _settingsRegistry
                     .Items
                     .Where(s => !s.IsHidden)
-                    .Select<SettingDefinition, SettingViewModel>(s =>
+                    .Select<SettingDefinition, ISettingViewModel>(s =>
                     {
                         switch (s.Type)
                         {
@@ -136,35 +142,40 @@ namespace Micser.App.ViewModels
         }
     }
 
-    public abstract class SettingViewModel : ViewModel
+    public abstract class SettingViewModel<T> : ViewModel, ISettingViewModel
     {
+        private readonly ISettingsService _settingsService;
+        private bool _isChanged;
         private bool _isEnabled;
+        private T _value;
 
-        protected SettingViewModel(SettingDefinition definition)
+        protected SettingViewModel(SettingDefinition definition, ISettingsService settingsService)
         {
             Definition = definition;
+            _settingsService = settingsService;
+
+            ApplyCommand = new DelegateCommand(Apply, () => IsChanged);
+
+            settingsService.SettingChanged += OnSettingChanged;
+            _value = settingsService.GetSetting<T>(definition.Key);
+
+            UpdateIsEnabled();
         }
 
+        public ICommand ApplyCommand { get; set; }
+
         public SettingDefinition Definition { get; }
+
+        public bool IsChanged
+        {
+            get => _isChanged;
+            set => SetProperty(ref _isChanged, value);
+        }
 
         public bool IsEnabled
         {
             get => _isEnabled;
             set => SetProperty(ref _isEnabled, value);
-        }
-    }
-
-    public abstract class SettingViewModel<T> : SettingViewModel
-    {
-        private readonly ISettingsService _settingsService;
-        private T _value;
-
-        protected SettingViewModel(SettingDefinition setting, ISettingsService settingsService)
-            : base(setting)
-        {
-            _settingsService = settingsService;
-            settingsService.SettingChanged += OnSettingChanged;
-            _value = settingsService.GetSetting<T>(setting.Key);
         }
 
         public T Value
@@ -174,14 +185,28 @@ namespace Micser.App.ViewModels
             {
                 if (SetProperty(ref _value, value))
                 {
-                    _settingsService.SetSetting(Definition.Key, Value);
+                    if (Definition.IsAppliedInstantly)
+                    {
+                        Apply();
+                    }
+                    IsChanged = true;
                 }
             }
         }
 
-        private void OnSettingChanged(object sender, SettingChangedEventArgs e)
+        protected void UpdateIsEnabled()
         {
             IsEnabled = Definition.IsEnabled?.Invoke(_settingsService) != false;
+        }
+
+        private void Apply()
+        {
+            _settingsService.SetSetting(Definition.Key, Value);
+        }
+
+        private void OnSettingChanged(object sender, SettingChangedEventArgs e)
+        {
+            UpdateIsEnabled();
         }
     }
 
