@@ -63,6 +63,7 @@ namespace Micser.App.Infrastructure.Settings
         /// <inheritdoc />
         public SettingDefinition()
         {
+            IsAppliedInstantly = true;
             Type = SettingType.String;
             StorageType = SettingStorageType.Internal;
         }
@@ -82,6 +83,11 @@ namespace Micser.App.Infrastructure.Settings
         /// This should be set if the <see cref="StorageType"/> is set to <see cref="SettingStorageType.Custom"/>.
         /// </summary>
         public ISettingHandler Handler { get; set; }
+
+        /// <summary>
+        /// Gets or sets whether the setting will be applied and saved instantly when changing it in the UI or the user has to click an Apply button first. Default is true.
+        /// </summary>
+        public bool IsAppliedInstantly { get; set; }
 
         /// <summary>
         /// Gets or sets a function that is used to determine if this setting can be changed by the user.

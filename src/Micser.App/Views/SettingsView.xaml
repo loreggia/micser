@@ -44,7 +44,7 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Label Content="{Binding Definition.Name}" ToolTip="{Binding Definition.Description}" Target="{Binding ElementName=TextBox}" VerticalAlignment="Center" Margin="5" />
-                <TextBox x:Name="TextBox" Grid.Column="1" Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" behaviors:TextBoxMaskBehavior.Mask="Integer" />
+                <TextBox x:Name="TextBox" Grid.Column="1" Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" behaviors:TextBoxMaskBehavior.Mask="Integer" VerticalAlignment="Center" />
                 <controls:InfoButton Grid.Column="2" Content="{Binding Definition.Description}" Margin="10,5,5,5" />
             </Grid>
         </DataTemplate>
@@ -57,7 +57,7 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Label Content="{Binding Definition.Name}" ToolTip="{Binding Definition.Description}" Target="{Binding ElementName=TextBox}" VerticalAlignment="Center" Margin="5" />
-                <TextBox x:Name="TextBox" Grid.Column="1" Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" behaviors:TextBoxMaskBehavior.Mask="Decimal" />
+                <TextBox x:Name="TextBox" Grid.Column="1" Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" behaviors:TextBoxMaskBehavior.Mask="Decimal" VerticalAlignment="Center" />
                 <controls:InfoButton Grid.Column="2" Content="{Binding Definition.Description}" Margin="10,5,5,5" />
             </Grid>
         </DataTemplate>
@@ -70,7 +70,7 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Label Content="{Binding Definition.Name}" ToolTip="{Binding Definition.Description}" Target="{Binding ElementName=TextBox}" VerticalAlignment="Center" Margin="5" />
-                <TextBox x:Name="TextBox" Grid.Column="1" Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                <TextBox x:Name="TextBox" Grid.Column="1" Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" />
                 <controls:InfoButton Grid.Column="2" Content="{Binding Definition.Description}" Margin="10,5,5,5" />
             </Grid>
         </DataTemplate>

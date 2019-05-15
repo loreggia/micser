@@ -112,6 +112,7 @@
     <Compile Include="ResourceBinding.cs" />
     <Compile Include="SetPropertyAction.cs" />
     <Compile Include="Settings\SettingChangedEventHandler.cs" />
+    <Compile Include="Settings\SettingContainer.cs" />
     <Compile Include="Settings\SettingDefinition.cs" />
     <Compile Include="Settings\SettingsSerializer.cs" />
     <Compile Include="Settings\SettingsPanel.cs" />
