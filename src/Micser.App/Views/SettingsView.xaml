@@ -17,81 +17,36 @@
         d:DataContext="{d:DesignInstance vm:SettingsViewModel}">
 
     <i:View.Resources>
+        <i:TypeTemplateSelector x:Key="TemplateSelector" />
+
         <Style TargetType="{x:Type TextBox}">
             <Setter Property="VerticalContentAlignment" Value="Center" />
         </Style>
 
-        <i:TypeTemplateSelector x:Key="TemplateSelector" />
-
         <DataTemplate x:Key="{x:Type vm:BooleanSettingViewModel}" DataType="{x:Type vm:BooleanSettingViewModel}">
-            <Grid IsEnabled="{Binding IsEnabled}">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition SharedSizeGroup="Label" Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <Label Content="{Binding Definition.Name}" ToolTip="{Binding Definition.Description}" Target="{Binding ElementName=CheckBox}" behaviors:CheckBoxLabelBehavior.IsEnabled="True" VerticalAlignment="Center" Margin="5" />
-                <CheckBox x:Name="CheckBox" Grid.Column="1" IsChecked="{Binding Value, Mode=TwoWay}" VerticalAlignment="Center" />
-                <controls:InfoButton Grid.Column="2" Content="{Binding Definition.Description}" Margin="10,5,5,5" />
-            </Grid>
+            <CheckBox IsChecked="{Binding Value, Mode=TwoWay}" VerticalAlignment="Center" />
         </DataTemplate>
 
         <DataTemplate x:Key="{x:Type vm:IntegerSettingViewModel}" DataType="{x:Type vm:IntegerSettingViewModel}">
-            <Grid IsEnabled="{Binding IsEnabled}">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition SharedSizeGroup="Label" Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <Label Content="{Binding Definition.Name}" ToolTip="{Binding Definition.Description}" Target="{Binding ElementName=TextBox}" VerticalAlignment="Center" Margin="5" />
-                <TextBox x:Name="TextBox" Grid.Column="1" Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" behaviors:TextBoxMaskBehavior.Mask="Integer" VerticalAlignment="Center" />
-                <controls:InfoButton Grid.Column="2" Content="{Binding Definition.Description}" Margin="10,5,5,5" />
-            </Grid>
+            <TextBox Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" behaviors:TextBoxMaskBehavior.Mask="Integer" VerticalAlignment="Center" />
         </DataTemplate>
 
         <DataTemplate x:Key="{x:Type vm:DecimalSettingViewModel}" DataType="{x:Type vm:DecimalSettingViewModel}">
-            <Grid IsEnabled="{Binding IsEnabled}">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition SharedSizeGroup="Label" Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <Label Content="{Binding Definition.Name}" ToolTip="{Binding Definition.Description}" Target="{Binding ElementName=TextBox}" VerticalAlignment="Center" Margin="5" />
-                <TextBox x:Name="TextBox" Grid.Column="1" Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" behaviors:TextBoxMaskBehavior.Mask="Decimal" VerticalAlignment="Center" />
-                <controls:InfoButton Grid.Column="2" Content="{Binding Definition.Description}" Margin="10,5,5,5" />
-            </Grid>
+            <TextBox Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" behaviors:TextBoxMaskBehavior.Mask="Decimal" VerticalAlignment="Center" />
         </DataTemplate>
 
         <DataTemplate x:Key="{x:Type vm:StringSettingViewModel}" DataType="{x:Type vm:StringSettingViewModel}">
-            <Grid IsEnabled="{Binding IsEnabled}">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition SharedSizeGroup="Label" Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <Label Content="{Binding Definition.Name}" ToolTip="{Binding Definition.Description}" Target="{Binding ElementName=TextBox}" VerticalAlignment="Center" Margin="5" />
-                <TextBox x:Name="TextBox" Grid.Column="1" Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" />
-                <controls:InfoButton Grid.Column="2" Content="{Binding Definition.Description}" Margin="10,5,5,5" />
-            </Grid>
+            <TextBox Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" VerticalAlignment="Center" />
         </DataTemplate>
 
         <DataTemplate x:Key="{x:Type vm:ListSettingViewModel}" DataType="{x:Type vm:ListSettingViewModel}">
-            <Grid IsEnabled="{Binding IsEnabled}">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition SharedSizeGroup="Label" Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <Label Content="{Binding Definition.Name}" ToolTip="{Binding Definition.Description}" Target="{Binding ElementName=ComboBox}" VerticalAlignment="Center" Margin="5" />
-                <ComboBox x:Name="ComboBox" Grid.Column="1" SelectedValue="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Key" DisplayMemberPath="Value"
-                          ItemsSource="{Binding List}" VerticalAlignment="Center" />
-                <controls:InfoButton Grid.Column="2" Content="{Binding Definition.Description}" Margin="10,5,5,5" />
-            </Grid>
+            <ComboBox SelectedValue="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Key" DisplayMemberPath="Value" ItemsSource="{Binding List}" VerticalAlignment="Center" />
         </DataTemplate>
     </i:View.Resources>
 
     <ScrollViewer HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
-        <settings:SettingsPanel ItemsSource="{Binding Settings}" ItemTemplateSelector="{StaticResource TemplateSelector}" Grid.IsSharedSizeScope="True" MaxWidth="800" />
+        <settings:SettingsPanel ItemsSource="{Binding Settings}" ItemTemplateSelector="{StaticResource TemplateSelector}" MaxWidth="800" />
+        <!--<ListView ItemsSource="{Binding Settings}" DisplayMemberPath="Definition.Name" />-->
     </ScrollViewer>
 
     <int:Interaction.Triggers>
