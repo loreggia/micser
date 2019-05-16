@@ -9,8 +9,11 @@ namespace Micser.App.Infrastructure.Settings
     /// </summary>
     public class SettingContainer : ContentControl
     {
+        /// <summary>
+        /// The command to execute when the "Apply" button is pressed.
+        /// </summary>
         public static readonly DependencyProperty ApplyCommandProperty = DependencyProperty.Register(
-            "ApplyCommand", typeof(ICommand), typeof(SettingContainer), new PropertyMetadata(default(ICommand)));
+            nameof(ApplyCommand), typeof(ICommand), typeof(SettingContainer), new PropertyMetadata(default(ICommand)));
 
         /// <summary>
         /// The description that is shown as a tooltip and in the info popup.
@@ -24,13 +27,20 @@ namespace Micser.App.Infrastructure.Settings
         public static readonly DependencyProperty LabelProperty = DependencyProperty.Register(
             nameof(Label), typeof(string), typeof(SettingContainer), new PropertyMetadata(default(string)));
 
+        /// <summary>
+        /// A value indicating whether the "Apply" button is visible.
+        /// </summary>
         public static readonly DependencyProperty ShowApplyButtonProperty = DependencyProperty.Register(
-                                    "ShowApplyButton", typeof(bool), typeof(SettingContainer), new PropertyMetadata(default(bool)));
+            nameof(ShowApplyButton), typeof(bool), typeof(SettingContainer), new PropertyMetadata(default(bool)));
 
+        /// <summary>
+        /// Gets or sets the command to execute when the "Apply" button is pressed.
+        /// Wraps the <see cref="ApplyCommandProperty"/> dependency property.
+        /// </summary>
         public ICommand ApplyCommand
         {
-            get { return (ICommand)GetValue(ApplyCommandProperty); }
-            set { SetValue(ApplyCommandProperty, value); }
+            get => (ICommand)GetValue(ApplyCommandProperty);
+            set => SetValue(ApplyCommandProperty, value);
         }
 
         /// <summary>
@@ -54,14 +64,13 @@ namespace Micser.App.Infrastructure.Settings
         }
 
         /// <summary>
-        /// Gets the <see cref="SettingsPanel"/> parent control that this container is a child of.
+        /// Gets or sets whether to show the "Apply" button.
+        /// Wraps the <see cref="ShowApplyButtonProperty"/> dependency property.
         /// </summary>
-        public SettingsPanel ParentPanel => ItemsControl.ItemsControlFromItemContainer(this) as SettingsPanel;
-
         public bool ShowApplyButton
         {
-            get { return (bool)GetValue(ShowApplyButtonProperty); }
-            set { SetValue(ShowApplyButtonProperty, value); }
+            get => (bool)GetValue(ShowApplyButtonProperty);
+            set => SetValue(ShowApplyButtonProperty, value);
         }
     }
 }
