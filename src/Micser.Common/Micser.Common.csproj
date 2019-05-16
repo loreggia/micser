@@ -80,6 +80,7 @@
     <Compile Include="Extensions\MathExtensions.cs" />
     <Compile Include="Extensions\PropertyExtensions.cs" />
     <Compile Include="Extensions\SocketExtensions.cs" />
+    <Compile Include="Extensions\ObjectExtensions.cs" />
     <Compile Include="Extensions\UnityContainerExtensions.cs" />
     <Compile Include="Extensions\WaveFormatExtensions.cs" />
     <Compile Include="Globals.cs" />

@@ -16,7 +16,7 @@ namespace Micser.App.Infrastructure.Settings
         /// <summary>
         /// Gets the value for the specified setting.
         /// </summary>
-        T GetSetting<T>(string key);
+        object GetSetting(string key);
 
         /// <summary>
         /// Gets a dictionary of all setting keys/values.
@@ -31,6 +31,7 @@ namespace Micser.App.Infrastructure.Settings
         /// <summary>
         /// Sets a setting value and saves it in the database.
         /// </summary>
-        void SetSetting(string key, object value);
+        /// <returns>True if the setting was changed, otherwise false.</returns>
+        bool SetSetting(string key, object value);
     }
 }

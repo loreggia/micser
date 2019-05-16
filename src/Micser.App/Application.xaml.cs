@@ -1,6 +1,7 @@
 ﻿using CommonServiceLocator;
 using Micser.App.Infrastructure;
 using Micser.App.Infrastructure.DataAccess;
+using Micser.App.Infrastructure.Extensions;
 using Micser.App.Infrastructure.Settings;
 using Micser.App.Infrastructure.Themes;
 using Micser.App.Settings;
