@@ -8,9 +8,12 @@ using Micser.App.Properties;
 using Micser.App.Settings;
 using Micser.App.ViewModels;
 using Micser.App.Views;
+using Micser.Common;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Ioc;
+using System.Globalization;
+using System.Linq;
 
 namespace Micser.App
 {
@@ -69,9 +72,10 @@ namespace Micser.App
                 Key = AppGlobals.SettingKeys.VacCount,
                 Name = Resources.SettingsVacCountName,
                 Description = Resources.SettingsVacCountDescription,
-                Type = SettingType.Integer,
+                Type = SettingType.List,
                 StorageType = SettingStorageType.Custom,
                 DefaultValue = 1,
+                List = Enumerable.Range(1, Globals.MaxVacCount).ToDictionary(x => (object)x, x => x.ToString(CultureInfo.InvariantCulture)),
                 Handler = containerProvider.Resolve<VacCountSettingHandler>(),
                 IsAppliedInstantly = false
             });

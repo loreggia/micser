@@ -1,4 +1,5 @@
 ﻿using Micser.App.Infrastructure;
+using Micser.App.Infrastructure.Extensions;
 using Micser.App.Infrastructure.Settings;
 using Prism.Regions;
 using System.ComponentModel;

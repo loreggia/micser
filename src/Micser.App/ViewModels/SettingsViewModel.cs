@@ -11,12 +11,6 @@ using System.Windows.Input;
 
 namespace Micser.App.ViewModels
 {
-    public interface ISettingViewModel
-    {
-        SettingDefinition Definition { get; }
-        bool IsEnabled { get; set; }
-    }
-
     public class SettingsViewModel : ViewModelNavigationAware
     {
         private readonly ISettingsRegistry _settingsRegistry;
@@ -110,6 +104,8 @@ namespace Micser.App.ViewModels
         private async Task LoadAsync()
         {
             IsBusy = true;
+            await _settingsService.LoadAsync();
+
             await Task.Run(() =>
             {
                 var settings = _settingsRegistry
@@ -139,123 +135,6 @@ namespace Micser.App.ViewModels
                 Settings = settings.ToArray();
             });
             IsBusy = false;
-        }
-    }
-
-    public abstract class SettingViewModel<T> : ViewModel, ISettingViewModel
-    {
-        private readonly ISettingsService _settingsService;
-        private bool _isChanged;
-        private bool _isEnabled;
-        private T _value;
-
-        protected SettingViewModel(SettingDefinition definition, ISettingsService settingsService)
-        {
-            Definition = definition;
-            _settingsService = settingsService;
-
-            ApplyCommand = new DelegateCommand(Apply, () => IsChanged);
-
-            settingsService.SettingChanged += OnSettingChanged;
-            _value = settingsService.GetSetting<T>(definition.Key);
-
-            UpdateIsEnabled();
-        }
-
-        public ICommand ApplyCommand { get; set; }
-
-        public SettingDefinition Definition { get; }
-
-        public bool IsChanged
-        {
-            get => _isChanged;
-            set => SetProperty(ref _isChanged, value);
-        }
-
-        public bool IsEnabled
-        {
-            get => _isEnabled;
-            set => SetProperty(ref _isEnabled, value);
-        }
-
-        public T Value
-        {
-            get => _value;
-            set
-            {
-                if (SetProperty(ref _value, value))
-                {
-                    if (Definition.IsAppliedInstantly)
-                    {
-                        Apply();
-                    }
-                    IsChanged = true;
-                }
-            }
-        }
-
-        protected void UpdateIsEnabled()
-        {
-            IsEnabled = Definition.IsEnabled?.Invoke(_settingsService) != false;
-        }
-
-        private void Apply()
-        {
-            _settingsService.SetSetting(Definition.Key, Value);
-        }
-
-        private void OnSettingChanged(object sender, SettingChangedEventArgs e)
-        {
-            UpdateIsEnabled();
-        }
-    }
-
-    internal class BooleanSettingViewModel : SettingViewModel<bool>
-    {
-        public BooleanSettingViewModel(SettingDefinition setting, ISettingsService settingsService)
-            : base(setting, settingsService)
-        {
-        }
-    }
-
-    internal class DecimalSettingViewModel : SettingViewModel<double>
-    {
-        public DecimalSettingViewModel(SettingDefinition setting, ISettingsService settingsService)
-            : base(setting, settingsService)
-        {
-        }
-    }
-
-    internal class IntegerSettingViewModel : SettingViewModel<long>
-    {
-        public IntegerSettingViewModel(SettingDefinition setting, ISettingsService settingsService)
-            : base(setting, settingsService)
-        {
-        }
-    }
-
-    internal class ListSettingViewModel : SettingViewModel<object>
-    {
-        private IDictionary<object, string> _list;
-
-        public ListSettingViewModel(SettingDefinition setting, ISettingsService settingsService)
-            : base(setting, settingsService)
-        {
-            _list = setting.List;
-        }
-
-        public IDictionary<object, string> List
-        {
-            get => _list;
-            set => SetProperty(ref _list, value);
-        }
-    }
-
-    internal class StringSettingViewModel : SettingViewModel<string>
-    {
-        public StringSettingViewModel(SettingDefinition setting, ISettingsService settingsService)
-            : base(setting, settingsService)
-        {
         }
     }
 }

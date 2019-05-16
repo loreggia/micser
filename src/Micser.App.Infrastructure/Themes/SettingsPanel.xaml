@@ -2,12 +2,51 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:settings="clr-namespace:Micser.App.Infrastructure.Settings"
                     xmlns:themes="clr-namespace:Micser.App.Infrastructure.Themes"
-                    xmlns:controls="clr-namespace:Micser.App.Infrastructure.Controls">
+                    xmlns:controls="clr-namespace:Micser.App.Infrastructure.Controls"
+                    xmlns:properties="clr-namespace:Micser.App.Infrastructure.Properties"
+                    xmlns:converter="clr-namespace:Micser.App.Infrastructure.Converter"
+                    xmlns:behaviors="clr-namespace:Micser.App.Infrastructure.Behaviors"
+                    xmlns:infrastructure="clr-namespace:Micser.App.Infrastructure">
+
+    <Style x:Key="DefaultEditorStyle" TargetType="{x:Type Control}">
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
+        <Setter Property="HorizontalContentAlignment" Value="Left" />
+        <Setter Property="MinHeight" Value="22" />
+    </Style>
+
+    <Style TargetType="{x:Type TextBox}">
+        <Setter Property="VerticalContentAlignment" Value="Center" />
+    </Style>
+
+    <DataTemplate x:Key="{x:Type settings:BooleanSettingViewModel}" DataType="{x:Type settings:BooleanSettingViewModel}">
+        <CheckBox IsChecked="{Binding Value, Mode=TwoWay}" Style="{StaticResource DefaultEditorStyle}" />
+    </DataTemplate>
+
+    <DataTemplate x:Key="{x:Type settings:IntegerSettingViewModel}" DataType="{x:Type settings:IntegerSettingViewModel}">
+        <TextBox Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" behaviors:TextBoxMaskBehavior.Mask="Integer" Style="{StaticResource DefaultEditorStyle}" />
+    </DataTemplate>
+
+    <DataTemplate x:Key="{x:Type settings:DecimalSettingViewModel}" DataType="{x:Type settings:DecimalSettingViewModel}">
+        <TextBox Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" behaviors:TextBoxMaskBehavior.Mask="Decimal" Style="{StaticResource DefaultEditorStyle}" />
+    </DataTemplate>
+
+    <DataTemplate x:Key="{x:Type settings:StringSettingViewModel}" DataType="{x:Type settings:StringSettingViewModel}">
+        <TextBox Text="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"  Style="{StaticResource DefaultEditorStyle}" />
+    </DataTemplate>
+
+    <DataTemplate x:Key="{x:Type settings:ListSettingViewModel}" DataType="{x:Type settings:ListSettingViewModel}">
+        <ComboBox SelectedValue="{Binding Value, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectedValuePath="Key" DisplayMemberPath="Value" ItemsSource="{Binding List}"
+                  Style="{StaticResource DefaultEditorStyle}" />
+    </DataTemplate>
 
     <Style TargetType="{x:Type settings:SettingContainer}">
         <Setter Property="IsEnabled" Value="{Binding IsEnabled}" />
         <Setter Property="Label" Value="{Binding Definition.Name}" />
         <Setter Property="Description" Value="{Binding Definition.Description}" />
+        <Setter Property="ApplyCommand" Value="{Binding ApplyCommand}" />
+        <Setter Property="ShowApplyButton" Value="{Binding Definition.IsAppliedInstantly, Converter={converter:BooleanInvertConverter}}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type settings:SettingContainer}">
@@ -18,10 +57,13 @@
                                 <ColumnDefinition SharedSizeGroup="Label" Width="Auto" />
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <Label Content="{TemplateBinding Label}" ToolTip="{TemplateBinding Description}" VerticalAlignment="Center" Margin="5" />
                             <ContentPresenter Grid.Column="1" />
-                            <controls:InfoButton Grid.Column="2" Content="{TemplateBinding Description}" Margin="10,5,5,5" />
+                            <Button Grid.Column="2" Command="{TemplateBinding ApplyCommand}" Content="{x:Static properties:Resources.Apply}" Margin="10,5,5,5"
+                                    Visibility="{TemplateBinding ShowApplyButton, Converter={converter:BooleanToVisibilityConverter}}" VerticalAlignment="Center" />
+                            <controls:InfoButton Grid.Column="3" Content="{TemplateBinding Description}" Margin="10,5,5,5" />
                         </Grid>
                     </Border>
                 </ControlTemplate>
@@ -41,6 +83,11 @@
                 <ItemsPanelTemplate>
                     <StackPanel Orientation="Vertical" />
                 </ItemsPanelTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="ItemTemplateSelector">
+            <Setter.Value>
+                <infrastructure:TypeTemplateSelector />
             </Setter.Value>
         </Setter>
         <Setter Property="Template">

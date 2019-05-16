@@ -7,7 +7,6 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -45,40 +44,15 @@ namespace Micser.App.Infrastructure.Settings
         }
 
         /// <inheritdoc />
-        public T GetSetting<T>(string key)
+        public object GetSetting(string key)
         {
             if (!_settings.TryGetValue(key, out var value))
             {
                 _logger.Warn($"Requested unregistered setting '{key}'.");
-                return default(T);
+                return null;
             }
 
-            if (value == null)
-            {
-                return default(T);
-            }
-
-            var valueType = value.GetType();
-            var resultType = typeof(T);
-
-            if (valueType == resultType || resultType.IsAssignableFrom(valueType))
-            {
-                return (T)value;
-            }
-
-            var valueConverter = TypeDescriptor.GetConverter(valueType);
-            if (valueConverter.CanConvertTo(resultType))
-            {
-                return (T)valueConverter.ConvertTo(value, resultType);
-            }
-
-            var resultConverter = TypeDescriptor.GetConverter(resultType);
-            if (resultConverter.CanConvertFrom(valueType))
-            {
-                return (T)resultConverter.ConvertFrom(value);
-            }
-
-            return default(T);
+            return value;
         }
 
         /// <inheritdoc />
@@ -89,13 +63,13 @@ namespace Micser.App.Infrastructure.Settings
 
         Task ISettingsService.LoadAsync()
         {
-            return EnsureLoadedAsync();
+            return Task.Run(() => EnsureLoaded(true));
         }
 
         /// <inheritdoc />
-        public async void SetSetting(string key, object value)
+        public bool SetSetting(string key, object value)
         {
-            await EnsureLoadedAsync();
+            EnsureLoaded();
 
             var setting = _registry.Items.FirstOrDefault(i => string.Equals(i.Key, key, StringComparison.InvariantCultureIgnoreCase));
 
@@ -115,35 +89,35 @@ namespace Micser.App.Infrastructure.Settings
 
             OnSettingChanged(new SettingChangedEventArgs(setting, oldValue, value));
 
-            if (setting?.StorageType == SettingStorageType.Custom)
+            if (setting == null || setting.StorageType == SettingStorageType.Internal)
             {
-                return;
+                using (var uow = _database.Create())
+                {
+                    var settingRepo = uow.GetRepository<ISettingValueRepository>();
+                    var settingValue = settingRepo.GetByKey(key) ?? new SettingValue { Key = key };
+
+                    var type = value?.GetType();
+
+                    if (type == null)
+                    {
+                        settingValue.ValueJson = null;
+                    }
+                    else
+                    {
+                        settingValue.ValueType = type.AssemblyQualifiedName;
+                        settingValue.ValueJson = JsonConvert.SerializeObject(value);
+                    }
+
+                    if (settingValue.Id <= 0)
+                    {
+                        settingRepo.Add(settingValue);
+                    }
+
+                    uow.Complete();
+                }
             }
 
-            using (var uow = _database.Create())
-            {
-                var settingRepo = uow.GetRepository<ISettingValueRepository>();
-                var settingValue = settingRepo.GetByKey(key) ?? new SettingValue { Key = key };
-
-                var type = value?.GetType();
-
-                if (type == null)
-                {
-                    settingValue.ValueJson = null;
-                }
-                else
-                {
-                    settingValue.ValueType = type.AssemblyQualifiedName;
-                    settingValue.ValueJson = JsonConvert.SerializeObject(value);
-                }
-
-                if (settingValue.Id <= 0)
-                {
-                    settingRepo.Add(settingValue);
-                }
-
-                uow.Complete();
-            }
+            return !Equals(oldValue, value);
         }
 
         /// <summary>
@@ -165,24 +139,24 @@ namespace Micser.App.Infrastructure.Settings
             SettingChanged?.Invoke(this, e);
         }
 
-        private async Task EnsureLoadedAsync()
+        private void EnsureLoaded(bool forceReload = false)
         {
-            if (_isLoaded)
+            if (_isLoaded && !forceReload)
             {
                 return;
             }
-            await _loadSemaphore.WaitAsync();
-            if (_isLoaded)
+            _loadSemaphore.Wait();
+            if (_isLoaded && !forceReload)
             {
                 _loadSemaphore.Release();
                 return;
             }
 
-            await LoadAsync();
+            Load();
             _loadSemaphore.Release();
         }
 
-        private async Task LoadAsync()
+        private void Load()
         {
             try
             {
@@ -220,7 +194,7 @@ namespace Micser.App.Infrastructure.Settings
                                 setting.List = listHandler.CreateList();
                             }
 
-                            value = await Task.Run(() => setting.Handler.OnLoadSetting(value ?? setting.DefaultValue));
+                            value = setting.Handler.OnLoadSetting(value ?? setting.DefaultValue);
                         }
 
                         _settings[setting.Key] = value;

@@ -90,6 +90,7 @@
     <Compile Include="Extensions\DependencyObjectExtensions.cs" />
     <Compile Include="Extensions\ItemsControlExtensions.cs" />
     <Compile Include="Extensions\PrismContainerExtensions.cs" />
+    <Compile Include="Extensions\ServiceExtensions.cs" />
     <Compile Include="Interaction\FileDialogAction.cs" />
     <Compile Include="IApplicationStateService.cs" />
     <Compile Include="INavigationManager.cs" />
@@ -111,12 +112,14 @@
     <Compile Include="Settings\ISettingsService.cs" />
     <Compile Include="ResourceBinding.cs" />
     <Compile Include="SetPropertyAction.cs" />
+    <Compile Include="Settings\ISettingViewModel.cs" />
     <Compile Include="Settings\SettingChangedEventHandler.cs" />
     <Compile Include="Settings\SettingContainer.cs" />
     <Compile Include="Settings\SettingDefinition.cs" />
     <Compile Include="Settings\SettingsSerializer.cs" />
     <Compile Include="Settings\SettingsPanel.cs" />
     <Compile Include="Settings\SettingsRegistry.cs" />
+    <Compile Include="Settings\SettingViewModel.cs" />
     <Compile Include="Themes\BrushThemeKeyExtension.cs" />
     <Compile Include="Themes\ColorThemeKeyExtension.cs" />
     <Compile Include="ToolBars\IToolBarRegistry.cs" />
