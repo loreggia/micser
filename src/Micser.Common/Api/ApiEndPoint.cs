@@ -89,9 +89,10 @@ namespace Micser.Common.Api
             }
             catch
             {
+                _sendMessageSemaphore.Release();
+
                 if (numRetries > 0)
                 {
-                    _sendMessageSemaphore.Release();
                     await Task.Delay(10);
                     return await SendMessageAsync(message, --numRetries);
                 }
