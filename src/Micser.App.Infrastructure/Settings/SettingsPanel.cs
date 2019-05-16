@@ -11,7 +11,7 @@ namespace Micser.App.Infrastructure.Settings
         /// <inheritdoc />
         protected override DependencyObject GetContainerForItemOverride()
         {
-            return new ContentControl();
+            return new SettingContainer();
         }
 
         /// <summary>
