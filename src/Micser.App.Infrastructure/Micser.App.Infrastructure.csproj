@@ -112,7 +112,6 @@
     <Compile Include="Settings\ISettingsService.cs" />
     <Compile Include="ResourceBinding.cs" />
     <Compile Include="SetPropertyAction.cs" />
-    <Compile Include="Settings\ISettingViewModel.cs" />
     <Compile Include="Settings\SettingChangedEventHandler.cs" />
     <Compile Include="Settings\SettingContainer.cs" />
     <Compile Include="Settings\SettingDefinition.cs" />
