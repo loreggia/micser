@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace Micser.Common.Api
@@ -22,31 +23,14 @@ namespace Micser.Common.Api
         /// </summary>
         protected TcpClient InClient;
 
-        /// <summary>
-        /// Reader that reads incoming messages.
-        /// </summary>
-        protected StreamReader InReader;
-
-        /// <summary>
-        /// Writer that responds to incoming messages.
-        /// </summary>
-        protected StreamWriter InWriter;
+        protected Stream InStream;
 
         /// <summary>
         /// Handles outgoing messages.
         /// </summary>
         protected TcpClient OutClient;
 
-        /// <summary>
-        /// Handles the response after sending a message.
-        /// </summary>
-        protected StreamReader OutReader;
-
-        /// <summary>
-        /// Writes outgoing messages.
-        /// </summary>
-        protected StreamWriter OutWriter;
-
+        protected Stream OutStream;
         private readonly IRequestProcessorFactory _requestProcessorFactory;
         private readonly SemaphoreQueue _sendMessageSemaphore;
 
@@ -82,10 +66,11 @@ namespace Micser.Common.Api
             try
             {
                 var json = JsonConvert.SerializeObject(message);
-                await OutWriter.WriteLineAsync(json);
-                json = await OutReader.ReadLineAsync();
+
+                await ApiProtocol.WriteMessage(OutStream, json);
+                var response = await ApiProtocol.ReceiveMessage(OutStream);
                 _sendMessageSemaphore.Release();
-                return JsonConvert.DeserializeObject<JsonResponse>(json);
+                return JsonConvert.DeserializeObject<JsonResponse>(response);
             }
             catch
             {
@@ -110,11 +95,7 @@ namespace Micser.Common.Api
             {
                 try
                 {
-                    InReader?.Dispose();
-                    InWriter?.Dispose();
                     InClient?.Dispose();
-                    OutReader?.Dispose();
-                    OutWriter?.Dispose();
                     OutClient?.Dispose();
                 }
                 catch
@@ -133,12 +114,9 @@ namespace Micser.Common.Api
             {
                 try
                 {
-                    var message = await InReader.ReadLineAsync();
-                    if (message != null)
-                    {
-                        var response = ProcessMessage(message);
-                        await InWriter.WriteLineAsync(response);
-                    }
+                    var message = await ApiProtocol.ReceiveMessage(InStream);
+                    var response = ProcessMessage(message);
+                    await ApiProtocol.WriteMessage(InStream, response);
                 }
                 catch
                 {
@@ -161,6 +139,27 @@ namespace Micser.Common.Api
             catch (Exception ex)
             {
                 return JsonConvert.SerializeObject(new JsonResponse(false, ex.ToString(), ex.Message));
+            }
+        }
+
+        private class ApiProtocol
+        {
+            public static async Task<string> ReceiveMessage(Stream tcpStream)
+            {
+                var reqCountBytes = new byte[sizeof(int)];
+                await tcpStream.ReadAsync(reqCountBytes, 0, reqCountBytes.Length);
+                var reqCount = BitConverter.ToInt32(reqCountBytes, 0);
+                var reqBytes = new byte[reqCount];
+                await tcpStream.ReadAsync(reqBytes, 0, reqCount);
+                return Encoding.UTF8.GetString(reqBytes);
+            }
+
+            public static async Task WriteMessage(Stream tcpStream, string content)
+            {
+                var contentBytes = Encoding.UTF8.GetBytes(content);
+                var countBytes = BitConverter.GetBytes(contentBytes.Length);
+                await tcpStream.WriteAsync(countBytes, 0, countBytes.Length);
+                await tcpStream.WriteAsync(contentBytes, 0, contentBytes.Length);
             }
         }
     }
