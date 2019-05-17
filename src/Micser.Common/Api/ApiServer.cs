@@ -1,7 +1,6 @@
 ﻿using Micser.Common.Extensions;
 using NLog;
 using System;
-using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -43,15 +42,11 @@ namespace Micser.Common.Api
 
                 InClient = await _listener.AcceptTcpClientAsync();
                 InClient.Client.SetKeepAlive();
-                var inStream = InClient.GetStream();
-                InReader = new StreamReader(inStream);
-                InWriter = new StreamWriter(inStream) { AutoFlush = true };
+                InStream = InClient.GetStream();
 
                 OutClient = await _listener.AcceptTcpClientAsync();
                 OutClient.Client.SetKeepAlive();
-                var outStream = OutClient.GetStream();
-                OutReader = new StreamReader(outStream);
-                OutWriter = new StreamWriter(outStream) { AutoFlush = true };
+                OutStream = OutClient.GetStream();
 
                 IsRunning = true;
 
