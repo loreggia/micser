@@ -5,6 +5,7 @@ using Micser.App.Infrastructure.Settings;
 using Micser.App.Infrastructure.Themes;
 using Micser.App.Infrastructure.ToolBars;
 using Micser.App.Infrastructure.Widgets;
+using Micser.Common;
 using Micser.Common.Api;
 using Prism.Ioc;
 
@@ -35,6 +36,11 @@ namespace Micser.App.Infrastructure
             containerRegistry.RegisterSingleton<ISettingsService, SettingsService>();
             containerRegistry.RegisterSingleton<IRequestProcessorFactory, RequestProcessorFactory>();
             containerRegistry.RegisterSingleton<IApiEndPoint, ApiClient>();
+
+            containerRegistry.RegisterInstance<IApiConfiguration>(new ApiConfiguration
+            {
+                Port = Globals.ApiPort
+            });
 
             containerRegistry.Register<IRequestProcessor, ApiEventRequestProcessor>();
 
