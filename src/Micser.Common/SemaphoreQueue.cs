@@ -7,7 +7,7 @@ namespace Micser.Common
     /// <summary>
     /// An async semaphore that also retains the order in which the lock requests were made.
     /// </summary>
-    public class SemaphoreQueue
+    public class SemaphoreQueue : IDisposable
     {
         private static readonly Task Completed = Task.FromResult(true);
         private readonly Queue<TaskCompletionSource<bool>> _waiters = new Queue<TaskCompletionSource<bool>>();
@@ -26,6 +26,12 @@ namespace Micser.Common
             }
 
             _currentCount = initialCount;
+        }
+
+        public void Dispose()
+        {
+            Dispose(true);
+            GC.SuppressFinalize(this);
         }
 
         /// <summary>
@@ -67,6 +73,17 @@ namespace Micser.Common
                 var waiter = new TaskCompletionSource<bool>();
                 _waiters.Enqueue(waiter);
                 return waiter.Task;
+            }
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                while (_waiters.Count > 0)
+                {
+                    Release();
+                }
             }
         }
     }

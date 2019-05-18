@@ -18,11 +18,11 @@ namespace Micser.Common.Api
         private readonly SemaphoreSlim _startSemaphore;
 
         /// <inheritdoc />
-        public ApiServer(IRequestProcessorFactory requestProcessorFactory, ILogger logger)
-            : base(requestProcessorFactory)
+        public ApiServer(IApiConfiguration configuration, IRequestProcessorFactory requestProcessorFactory, ILogger logger)
+            : base(configuration, requestProcessorFactory)
         {
             _logger = logger;
-            var endPoint = new IPEndPoint(IPAddress.Loopback, Globals.ApiPort);
+            var endPoint = new IPEndPoint(IPAddress.Loopback, Configuration.Port);
             _listener = new TcpListener(endPoint);
             _startSemaphore = new SemaphoreSlim(1, 1);
         }
@@ -33,6 +33,11 @@ namespace Micser.Common.Api
         /// <inheritdoc />
         public override async Task ConnectAsync()
         {
+            if (IsDisposed)
+            {
+                return;
+            }
+
             try
             {
                 await _startSemaphore.WaitAsync();
@@ -58,13 +63,26 @@ namespace Micser.Common.Api
             }
             finally
             {
-                _startSemaphore.Release();
+                try
+                {
+                    _startSemaphore?.Release();
+                }
+                catch
+                {
+                    // ignored
+                }
             }
         }
 
         /// <inheritdoc />
+        /// <exception cref="ObjectDisposedException" />
         public void Start()
         {
+            if (IsDisposed)
+            {
+                throw new ObjectDisposedException(nameof(ApiServer));
+            }
+
             _listener.Start();
             ConnectTask = ConnectAsync();
         }

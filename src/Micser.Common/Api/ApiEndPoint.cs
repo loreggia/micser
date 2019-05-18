@@ -13,6 +13,8 @@ namespace Micser.Common.Api
     /// <inheritdoc cref="IApiEndPoint"/>
     public abstract class ApiEndPoint : IApiEndPoint, IDisposable
     {
+        protected readonly IApiConfiguration Configuration;
+
         /// <summary>
         /// The task that is created by the <see cref="ConnectAsync"/> method.
         /// </summary>
@@ -25,6 +27,8 @@ namespace Micser.Common.Api
 
         protected Stream InStream;
 
+        protected bool IsDisposed;
+
         /// <summary>
         /// Handles outgoing messages.
         /// </summary>
@@ -35,8 +39,9 @@ namespace Micser.Common.Api
         private readonly SemaphoreQueue _sendMessageSemaphore;
 
         /// <inheritdoc />
-        protected ApiEndPoint(IRequestProcessorFactory requestProcessorFactory)
+        protected ApiEndPoint(IApiConfiguration configuration, IRequestProcessorFactory requestProcessorFactory)
         {
+            Configuration = configuration;
             _requestProcessorFactory = requestProcessorFactory;
             _sendMessageSemaphore = new SemaphoreQueue(1);
         }
@@ -103,6 +108,8 @@ namespace Micser.Common.Api
                     // ignored
                 }
             }
+
+            IsDisposed = true;
         }
 
         /// <summary>
@@ -110,7 +117,7 @@ namespace Micser.Common.Api
         /// </summary>
         protected async void ReaderThread()
         {
-            while (InClient?.Connected == true)
+            while (InClient?.Connected == true && !IsDisposed)
             {
                 try
                 {

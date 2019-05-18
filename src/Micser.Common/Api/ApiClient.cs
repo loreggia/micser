@@ -21,8 +21,8 @@ namespace Micser.Common.Api
         /// <summary>
         /// Creates a new instance of the <see cref="ApiClient"/> class.
         /// </summary>
-        public ApiClient(IRequestProcessorFactory requestProcessorFactory, ILogger logger)
-            : base(requestProcessorFactory)
+        public ApiClient(IApiConfiguration configuration, IRequestProcessorFactory requestProcessorFactory, ILogger logger)
+            : base(configuration, requestProcessorFactory)
         {
             _logger = logger;
             _connectSemaphore = new SemaphoreSlim(1, 1);
@@ -33,6 +33,11 @@ namespace Micser.Common.Api
         /// </summary>
         public override async Task ConnectAsync()
         {
+            if (IsDisposed)
+            {
+                return;
+            }
+
             try
             {
                 await _connectSemaphore.WaitAsync();
@@ -41,12 +46,22 @@ namespace Micser.Common.Api
                 OutClient?.Dispose();
 
                 OutClient = new TcpClient();
-                await OutClient.ConnectAsync(IPAddress.Loopback, Globals.ApiPort);
+                await OutClient.ConnectAsync(IPAddress.Loopback, Configuration.Port);
+                if (OutClient.Client == null)
+                {
+                    return;
+                }
+
                 OutClient.Client.SetKeepAlive();
                 OutStream = OutClient.GetStream();
 
                 InClient = new TcpClient();
-                await InClient.ConnectAsync(IPAddress.Loopback, Globals.ApiPort);
+                await InClient.ConnectAsync(IPAddress.Loopback, Configuration.Port);
+                if (InClient.Client == null)
+                {
+                    return;
+                }
+
                 InClient.Client.SetKeepAlive();
                 InStream = InClient.GetStream();
 
