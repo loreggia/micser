@@ -10,6 +10,14 @@ using System.Threading.Tasks;
 
 namespace Micser.Common.Api
 {
+    public enum ClientState
+    {
+        Disconnected,
+        Disconnecting,
+        Connected,
+        Connecting
+    }
+
     /// <summary>
     /// An API endpoint that acts as the client upon connection. Communication is otherwise bidirectional.
     /// </summary>

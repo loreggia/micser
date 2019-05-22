@@ -6,11 +6,6 @@
     public interface IApiServer : IApiEndPoint
     {
         /// <summary>
-        /// Gets a value that indicates whether the server is currently listening for connections.
-        /// </summary>
-        bool IsRunning { get; }
-
-        /// <summary>
         /// Starts listening for connections.
         /// </summary>
         void Start();
