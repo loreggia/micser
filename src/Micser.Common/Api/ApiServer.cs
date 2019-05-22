@@ -10,12 +10,26 @@ using System.Threading.Tasks;
 
 namespace Micser.Common.Api
 {
+    public enum ServerState
+    {
+        Stopped,
+        Stopping,
+        Started,
+        Starting,
+        Disconnected,
+        Disconnecting,
+        Connected,
+        Connecting
+    }
+
     /// <inheritdoc cref="IApiServer" />
     public class ApiServer : ApiEndPoint, IApiServer
     {
+        private static readonly object StateLock = new object();
         private readonly TcpListener _listener;
         private readonly ILogger _logger;
-        private readonly SemaphoreSlim _startSemaphore;
+        private CancellationTokenSource _cancellationTokenSource;
+        private ServerState _state;
 
         /// <inheritdoc />
         public ApiServer(IApiConfiguration configuration, IRequestProcessorFactory requestProcessorFactory, ILogger logger)
@@ -24,11 +38,7 @@ namespace Micser.Common.Api
             _logger = logger;
             var endPoint = new IPEndPoint(IPAddress.Loopback, Configuration.Port);
             _listener = new TcpListener(endPoint);
-            _startSemaphore = new SemaphoreSlim(1, 1);
         }
-
-        /// <inheritdoc />
-        public bool IsRunning { get; private set; }
 
         /// <inheritdoc />
         public override async Task ConnectAsync()
@@ -76,12 +86,27 @@ namespace Micser.Common.Api
 
         /// <inheritdoc />
         /// <exception cref="ObjectDisposedException" />
-        public void Start()
+        public async void Start()
         {
             if (IsDisposed)
             {
                 throw new ObjectDisposedException(nameof(ApiServer));
             }
+
+            if (IsRunning)
+            {
+                return;
+            }
+
+            lock (StateLock)
+            {
+                if (IsRunning)
+                {
+                    return;
+                }
+            }
+
+            _cancellationTokenSource = new CancellationTokenSource();
 
             _listener.Start();
             ConnectTask = ConnectAsync();
@@ -90,7 +115,7 @@ namespace Micser.Common.Api
         /// <inheritdoc />
         public void Stop()
         {
-            IsRunning = false;
+            _listener?.Stop();
             InClient?.Close();
             OutClient?.Close();
         }
@@ -100,8 +125,6 @@ namespace Micser.Common.Api
         {
             if (disposing)
             {
-                _listener?.Stop();
-                _startSemaphore?.Dispose();
                 Stop();
             }
 
