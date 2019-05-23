@@ -29,9 +29,16 @@ namespace Micser.Common.Test.Api
             using (var server = new ApiServer(configuration, factory, LogManager.GetCurrentClassLogger()))
             using (var client = new ApiClient(configuration, factory, LogManager.GetCurrentClassLogger()))
             {
-                server.Start();
+                var startResult = server.Start();
 
-                await client.ConnectAsync();
+                Assert.True(startResult);
+
+                var serverTask = server.ConnectAsync();
+                var clientTask = client.ConnectAsync();
+
+                await Task.WhenAll(serverTask, clientTask);
+
+                Assert.True(serverTask.Result);
 
                 server.Stop();
 
@@ -55,9 +62,15 @@ namespace Micser.Common.Test.Api
             using (var server = new ApiServer(configuration, factory, LogManager.GetCurrentClassLogger()))
             using (var client = new ApiClient(configuration, factory, LogManager.GetCurrentClassLogger()))
             {
-                server.Start();
+                var startResult = server.Start();
 
-                await client.ConnectAsync();
+                Assert.True(startResult);
+
+                var serverTask = server.ConnectAsync();
+                var clientTask = client.ConnectAsync();
+                await Task.WhenAll(serverTask, clientTask);
+
+                Assert.True(serverTask.Result);
 
                 var result = await client.SendMessageAsync(new JsonRequest());
 
@@ -77,9 +90,15 @@ namespace Micser.Common.Test.Api
             using (var server = new ApiServer(configuration, factory, LogManager.GetCurrentClassLogger()))
             using (var client = new ApiClient(configuration, factory, LogManager.GetCurrentClassLogger()))
             {
-                server.Start();
+                var startResult = server.Start();
 
-                await client.ConnectAsync();
+                Assert.True(startResult);
+
+                var serverTask = server.ConnectAsync();
+                var clientTask = client.ConnectAsync();
+                await Task.WhenAll(serverTask, clientTask);
+
+                Assert.True(serverTask.Result);
 
                 var result = await server.SendMessageAsync(new JsonRequest());
 

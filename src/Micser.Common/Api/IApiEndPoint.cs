@@ -7,11 +7,12 @@ namespace Micser.Common.Api
     /// </summary>
     public interface IApiEndPoint
     {
+        Task<bool> ConnectAsync();
+
         /// <summary>
         /// Sends a message to the connected endpoint.
         /// </summary>
         /// <param name="message">The message.</param>
-        /// <param name="numRetries">The number of retries to try sending the message if sending it failed.</param>
-        Task<JsonResponse> SendMessageAsync(JsonRequest message, int numRetries = 5);
+        Task<JsonResponse> SendMessageAsync(JsonRequest message);
     }
 }

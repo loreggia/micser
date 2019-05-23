@@ -78,7 +78,7 @@ namespace Micser.Common.Api
         }
 
         /// <inheritdoc />
-        public async Task<JsonResponse> SendMessageAsync(JsonRequest message, int numRetries = 5)
+        public async Task<JsonResponse> SendMessageAsync(JsonRequest message)
         {
             await _sendMessageSemaphore.WaitAsync();
 
@@ -96,17 +96,14 @@ namespace Micser.Common.Api
                 _sendMessageSemaphore.Release();
                 return JsonConvert.DeserializeObject<JsonResponse>(response);
             }
-            catch
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+                return new JsonResponse(false, ex, ex.Message);
+            }
+            finally
             {
                 _sendMessageSemaphore.Release();
-
-                if (numRetries > 0)
-                {
-                    await Task.Delay(10);
-                    return await SendMessageAsync(message, --numRetries);
-                }
-
-                throw;
             }
         }
 
@@ -151,6 +148,22 @@ namespace Micser.Common.Api
                     var response = ProcessMessage(message);
                     await ApiProtocol.WriteMessage(InStream, response);
                 }
+                catch (IOException ioEx)
+                {
+                    Logger.Error(ioEx);
+
+                    lock (StateLock)
+                    {
+                        _state = EndpointState.Disconnecting;
+
+                        InClient?.Dispose();
+                        InClient = null;
+                        OutClient?.Dispose();
+                        OutClient = null;
+
+                        _state = EndpointState.Disconnected;
+                    }
+                }
                 catch (Exception ex)
                 {
                     Logger.Error(ex);
@@ -163,6 +176,10 @@ namespace Micser.Common.Api
             try
             {
                 var message = JsonConvert.DeserializeObject<JsonRequest>(content);
+                if (message == null)
+                {
+                    return null;
+                }
                 var processor = _requestProcessorFactory.Create(message.Resource);
                 var response = processor.Process(message.Action, message.Content);
                 return JsonConvert.SerializeObject(response);
@@ -177,7 +194,7 @@ namespace Micser.Common.Api
         {
             public static async Task<string> ReceiveMessage(Stream tcpStream)
             {
-                var reqCountBytes = new byte[sizeof(int)];
+                var reqCountBytes = new byte[4];
                 await tcpStream.ReadAsync(reqCountBytes, 0, reqCountBytes.Length);
                 var reqCount = BitConverter.ToInt32(reqCountBytes, 0);
                 var reqBytes = new byte[reqCount];
