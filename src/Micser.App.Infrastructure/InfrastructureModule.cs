@@ -37,10 +37,7 @@ namespace Micser.App.Infrastructure
             containerRegistry.RegisterSingleton<IRequestProcessorFactory, RequestProcessorFactory>();
             containerRegistry.RegisterSingleton<IApiEndPoint, ApiClient>();
 
-            containerRegistry.RegisterInstance<IApiConfiguration>(new ApiConfiguration
-            {
-                Port = Globals.ApiPort
-            });
+            containerRegistry.RegisterInstance<IApiConfiguration>(new ApiConfiguration { Port = Globals.ApiPort });
 
             containerRegistry.Register<IRequestProcessor, ApiEventRequestProcessor>();
 

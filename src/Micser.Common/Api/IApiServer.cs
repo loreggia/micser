@@ -8,7 +8,7 @@
         /// <summary>
         /// Starts listening for connections.
         /// </summary>
-        void Start();
+        bool Start();
 
         /// <summary>
         /// Stops listening for connections.

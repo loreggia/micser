@@ -3,7 +3,6 @@ using NLog;
 using System;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading;
 using System.Threading.Tasks;
 
 #pragma warning disable 4014
@@ -15,45 +14,43 @@ namespace Micser.Common.Api
         Stopped,
         Stopping,
         Started,
-        Starting,
-        Disconnected,
-        Disconnecting,
-        Connected,
-        Connecting
+        Starting
     }
 
     /// <inheritdoc cref="IApiServer" />
     public class ApiServer : ApiEndPoint, IApiServer
     {
-        private static readonly object StateLock = new object();
         private readonly TcpListener _listener;
-        private readonly ILogger _logger;
-        private CancellationTokenSource _cancellationTokenSource;
-        private ServerState _state;
+        private ServerState _serverState;
 
         /// <inheritdoc />
         public ApiServer(IApiConfiguration configuration, IRequestProcessorFactory requestProcessorFactory, ILogger logger)
-            : base(configuration, requestProcessorFactory)
+            : base(configuration, requestProcessorFactory, logger)
         {
-            _logger = logger;
+            _serverState = ServerState.Stopped;
             var endPoint = new IPEndPoint(IPAddress.Loopback, Configuration.Port);
             _listener = new TcpListener(endPoint);
         }
 
         /// <inheritdoc />
-        public override async Task ConnectAsync()
+        public override async Task<bool> ConnectAsync()
         {
-            if (IsDisposed)
+            if (IsDisposed || _state != EndpointState.Disconnected || _serverState != ServerState.Started)
             {
-                return;
+                return false;
             }
 
             try
             {
-                await _startSemaphore.WaitAsync();
+                lock (StateLock)
+                {
+                    if (_state != EndpointState.Disconnected || _serverState != ServerState.Started)
+                    {
+                        return false;
+                    }
 
-                InClient = null;
-                OutClient = null;
+                    _state = EndpointState.Connecting;
+                }
 
                 InClient = await _listener.AcceptTcpClientAsync();
                 InClient.Client.SetKeepAlive();
@@ -63,61 +60,99 @@ namespace Micser.Common.Api
                 OutClient.Client.SetKeepAlive();
                 OutStream = OutClient.GetStream();
 
-                IsRunning = true;
+                lock (StateLock)
+                {
+                    _state = EndpointState.Connected;
+                }
 
                 Task.Run(ReaderThread);
+
+                return true;
             }
             catch (Exception ex)
             {
-                _logger.Error(ex);
-            }
-            finally
-            {
-                try
-                {
-                    _startSemaphore?.Release();
-                }
-                catch
-                {
-                    // ignored
-                }
+                Logger.Error(ex);
+                return false;
             }
         }
 
         /// <inheritdoc />
         /// <exception cref="ObjectDisposedException" />
-        public async void Start()
+        public bool Start()
         {
             if (IsDisposed)
             {
                 throw new ObjectDisposedException(nameof(ApiServer));
             }
 
-            if (IsRunning)
+            if (_serverState != ServerState.Stopped)
+            {
+                return _serverState == ServerState.Started;
+            }
+
+            lock (StateLock)
+            {
+                if (_serverState != ServerState.Stopped)
+                {
+                    return _serverState == ServerState.Started;
+                }
+
+                _serverState = ServerState.Starting;
+            }
+
+            try
+            {
+                _listener.Start();
+
+                lock (StateLock)
+                {
+                    _serverState = ServerState.Started;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+                return false;
+            }
+        }
+
+        /// <inheritdoc />
+        public void Stop()
+        {
+            if (_serverState != ServerState.Started)
             {
                 return;
             }
 
             lock (StateLock)
             {
-                if (IsRunning)
+                if (_serverState != ServerState.Started)
                 {
                     return;
                 }
+
+                _serverState = ServerState.Stopping;
             }
 
-            _cancellationTokenSource = new CancellationTokenSource();
-
-            _listener.Start();
-            ConnectTask = ConnectAsync();
-        }
-
-        /// <inheritdoc />
-        public void Stop()
-        {
-            _listener?.Stop();
-            InClient?.Close();
-            OutClient?.Close();
+            try
+            {
+                _listener?.Stop();
+                InClient?.Close();
+                OutClient?.Close();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+            }
+            finally
+            {
+                lock (StateLock)
+                {
+                    _serverState = ServerState.Stopped;
+                }
+            }
         }
 
         /// <inheritdoc />
