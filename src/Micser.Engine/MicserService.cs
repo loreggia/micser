@@ -79,6 +79,8 @@ namespace Micser.Engine
             _server.Start();
             _engine.Start();
 
+            _server.ConnectAsync();
+
             Logger.Info("Service started");
         }
 
