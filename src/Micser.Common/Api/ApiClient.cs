@@ -3,61 +3,54 @@ using NLog;
 using System;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading;
 using System.Threading.Tasks;
 
 #pragma warning disable 4014
 
 namespace Micser.Common.Api
 {
-    public enum ClientState
-    {
-        Disconnected,
-        Disconnecting,
-        Connected,
-        Connecting
-    }
-
     /// <summary>
     /// An API endpoint that acts as the client upon connection. Communication is otherwise bidirectional.
     /// </summary>
     public class ApiClient : ApiEndPoint
     {
-        private readonly SemaphoreSlim _connectSemaphore;
-        private readonly ILogger _logger;
-
         /// <summary>
         /// Creates a new instance of the <see cref="ApiClient"/> class.
         /// </summary>
         public ApiClient(IApiConfiguration configuration, IRequestProcessorFactory requestProcessorFactory, ILogger logger)
-            : base(configuration, requestProcessorFactory)
+            : base(configuration, requestProcessorFactory, logger)
         {
-            _logger = logger;
-            _connectSemaphore = new SemaphoreSlim(1, 1);
         }
 
         /// <summary>
         /// Tries to connect to an <see cref="ApiServer"/>. Waits until a connection is established.
         /// </summary>
-        public override async Task ConnectAsync()
+        public override async Task<bool> ConnectAsync()
         {
-            if (IsDisposed)
+            if (IsDisposed || _state != EndpointState.Disconnected)
             {
-                return;
+                return false;
             }
 
             try
             {
-                await _connectSemaphore.WaitAsync();
+                lock (StateLock)
+                {
+                    if (_state != EndpointState.Disconnected)
+                    {
+                        return false;
+                    }
 
-                InClient?.Dispose();
-                OutClient?.Dispose();
+                    _state = EndpointState.Connecting;
+                }
 
                 OutClient = new TcpClient();
                 await OutClient.ConnectAsync(IPAddress.Loopback, Configuration.Port);
                 if (OutClient.Client == null)
                 {
-                    return;
+                    OutClient?.Dispose();
+                    OutClient = null;
+                    return false;
                 }
 
                 OutClient.Client.SetKeepAlive();
@@ -67,21 +60,40 @@ namespace Micser.Common.Api
                 await InClient.ConnectAsync(IPAddress.Loopback, Configuration.Port);
                 if (InClient.Client == null)
                 {
-                    return;
+                    OutClient?.Dispose();
+                    OutClient = null;
+                    InClient?.Dispose();
+                    InClient = null;
+                    return false;
                 }
 
                 InClient.Client.SetKeepAlive();
                 InStream = InClient.GetStream();
 
+                lock (StateLock)
+                {
+                    _state = EndpointState.Connected;
+                }
+
                 Task.Run(ReaderThread);
+
+                return true;
             }
             catch (Exception ex)
             {
-                _logger.Error(ex);
-            }
-            finally
-            {
-                _connectSemaphore.Release();
+                Logger.Error(ex);
+
+                lock (StateLock)
+                {
+                    OutClient?.Dispose();
+                    OutClient = null;
+                    InClient?.Dispose();
+                    InClient = null;
+
+                    _state = EndpointState.Disconnected;
+                }
+
+                return false;
             }
         }
     }

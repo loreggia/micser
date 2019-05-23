@@ -67,6 +67,7 @@ namespace Micser.Engine
 
             container.RegisterSingleton<IAudioEngine, AudioEngine>();
             container.RegisterSingleton<IApiServer, ApiServer>();
+            container.RegisterInstance<IApiConfiguration>(new ApiConfiguration { Port = Globals.ApiPort });
 
             container.RegisterSingleton<IRequestProcessorFactory, RequestProcessorFactory>();
 

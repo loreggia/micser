@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using NLog;
 using System;
 using System.IO;
 using System.Net.Sockets;
@@ -7,13 +8,27 @@ using System.Threading.Tasks;
 
 namespace Micser.Common.Api
 {
+    public enum EndpointState
+    {
+        Disconnected,
+        Disconnecting,
+        Connected,
+        Connecting
+    }
+
     /// <summary>
     /// Base API endpoint implementation. Contains functionality shared between <see cref="ApiServer"/> and <see cref="ApiClient"/>.
     /// </summary>
     /// <inheritdoc cref="IApiEndPoint"/>
     public abstract class ApiEndPoint : IApiEndPoint, IDisposable
     {
+        protected static readonly object StateLock = new object();
+
         protected readonly IApiConfiguration Configuration;
+
+        protected readonly ILogger Logger;
+
+        protected EndpointState _state;
 
         /// <summary>
         /// The task that is created by the <see cref="ConnectAsync"/> method.
@@ -35,21 +50,25 @@ namespace Micser.Common.Api
         protected TcpClient OutClient;
 
         protected Stream OutStream;
+
         private readonly IRequestProcessorFactory _requestProcessorFactory;
         private readonly SemaphoreQueue _sendMessageSemaphore;
 
         /// <inheritdoc />
-        protected ApiEndPoint(IApiConfiguration configuration, IRequestProcessorFactory requestProcessorFactory)
+        protected ApiEndPoint(IApiConfiguration configuration, IRequestProcessorFactory requestProcessorFactory, ILogger logger)
         {
             Configuration = configuration;
             _requestProcessorFactory = requestProcessorFactory;
+            Logger = logger;
+
+            _state = EndpointState.Disconnected;
             _sendMessageSemaphore = new SemaphoreQueue(1);
         }
 
         /// <summary>
         /// Tries to connect to the API counterpart.
         /// </summary>
-        public abstract Task ConnectAsync();
+        public abstract Task<bool> ConnectAsync();
 
         /// <inheritdoc />
         public void Dispose()
@@ -100,8 +119,15 @@ namespace Micser.Common.Api
             {
                 try
                 {
-                    InClient?.Dispose();
-                    OutClient?.Dispose();
+                    lock (StateLock)
+                    {
+                        InClient?.Dispose();
+                        InClient = null;
+                        OutClient?.Dispose();
+                        OutClient = null;
+
+                        _state = EndpointState.Disconnected;
+                    }
                 }
                 catch
                 {
@@ -117,7 +143,7 @@ namespace Micser.Common.Api
         /// </summary>
         protected async void ReaderThread()
         {
-            while (InClient?.Connected == true && !IsDisposed)
+            while (_state == EndpointState.Connected)
             {
                 try
                 {
@@ -125,11 +151,9 @@ namespace Micser.Common.Api
                     var response = ProcessMessage(message);
                     await ApiProtocol.WriteMessage(InStream, response);
                 }
-                catch
+                catch (Exception ex)
                 {
-                    ConnectTask = ConnectAsync();
-                    await ConnectTask;
-                    return;
+                    Logger.Error(ex);
                 }
             }
         }
