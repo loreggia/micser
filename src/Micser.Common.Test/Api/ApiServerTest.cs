@@ -1,6 +1,7 @@
 ﻿using Micser.Common.Api;
 using Moq;
 using NLog;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
@@ -19,6 +20,55 @@ namespace Micser.Common.Test.Api
         }
 
         [Fact]
+        public async Task BiDirectionalMessaging()
+        {
+            var configuration = GetConfiguration();
+            var factory = GetFactory();
+
+            _testOutputHelper.WriteLine($"{nameof(ClientReconnect)}: using port {configuration.Port}");
+
+            using (var server = new ApiServer(configuration, factory, LogManager.GetCurrentClassLogger()))
+            using (var client = new ApiClient(configuration, factory, LogManager.GetCurrentClassLogger()))
+            {
+                var startResult = server.Start();
+
+                Assert.True(startResult);
+
+                var serverTask = server.ConnectAsync();
+                var clientTask = client.ConnectAsync();
+
+                await Task.WhenAll(serverTask, clientTask);
+
+                Assert.True(serverTask.Result);
+
+                var clientResponseTasks = new List<Task<JsonResponse>>();
+                var serverResponseTasks = new List<Task<JsonResponse>>();
+
+                for (int i = 0; i < 100; i++)
+                {
+                    var clientResponseTask = server.SendMessageAsync(new JsonRequest { Content = new { Property = "server-to-client" } });
+                    clientResponseTasks.Add(clientResponseTask);
+                    var serverResponseTask = client.SendMessageAsync(new JsonRequest { Content = new { Property = "client-to-server" } });
+                    serverResponseTasks.Add(serverResponseTask);
+                }
+
+                await Task.WhenAll(clientResponseTasks);
+                await Task.WhenAll(serverResponseTasks);
+
+                Assert.All(clientResponseTasks, task =>
+                {
+                    Assert.NotNull(task.Result);
+                    Assert.True(task.Result.IsSuccess, task.Result.Message);
+                });
+                Assert.All(serverResponseTasks, task =>
+                {
+                    Assert.NotNull(task.Result);
+                    Assert.True(task.Result.IsSuccess, task.Result.Message);
+                });
+            }
+        }
+
+        //[Fact]
         public async Task ClientReconnect()
         {
             var configuration = GetConfiguration();
@@ -43,6 +93,9 @@ namespace Micser.Common.Test.Api
                 server.Stop();
 
                 server.Start();
+
+                await server.ConnectAsync();
+                await client.ConnectAsync();
 
                 var result = await client.SendMessageAsync(new JsonRequest());
 
@@ -120,7 +173,10 @@ namespace Micser.Common.Test.Api
             {
                 server.Start();
 
-                await client.ConnectAsync();
+                var clientTask = client.ConnectAsync();
+                var serverTask = server.ConnectAsync();
+
+                await Task.WhenAll(clientTask, serverTask);
 
                 var result = await client.SendMessageAsync(new JsonRequest());
 
@@ -131,7 +187,10 @@ namespace Micser.Common.Test.Api
 
                 using (var client2 = new ApiClient(configuration, factory, LogManager.GetCurrentClassLogger()))
                 {
-                    await client2.ConnectAsync();
+                    clientTask = client2.ConnectAsync();
+                    serverTask = server.ConnectAsync();
+
+                    await Task.WhenAll(clientTask, serverTask);
 
                     result = await client2.SendMessageAsync(new JsonRequest());
 

@@ -82,18 +82,19 @@ namespace Micser.Common.Api
         {
             await _sendMessageSemaphore.WaitAsync();
 
-            if (OutClient == null || !OutClient.Connected)
-            {
-                await ConnectAsync();
-            }
-
             try
             {
                 var json = JsonConvert.SerializeObject(message);
 
                 await ApiProtocol.WriteMessage(OutStream, json);
                 var response = await ApiProtocol.ReceiveMessage(OutStream);
-                _sendMessageSemaphore.Release();
+
+                if (response == null)
+                {
+                    Disconnect();
+                    return new JsonResponse { IsSuccess = false };
+                }
+
                 return JsonConvert.DeserializeObject<JsonResponse>(response);
             }
             catch (Exception ex)
@@ -107,6 +108,21 @@ namespace Micser.Common.Api
             }
         }
 
+        protected virtual void Disconnect()
+        {
+            lock (StateLock)
+            {
+                _state = EndpointState.Disconnecting;
+
+                InClient?.Dispose();
+                InClient = null;
+                OutClient?.Dispose();
+                OutClient = null;
+
+                _state = EndpointState.Disconnected;
+            }
+        }
+
         /// <summary>
         /// Disposes resources.
         /// </summary>
@@ -116,15 +132,7 @@ namespace Micser.Common.Api
             {
                 try
                 {
-                    lock (StateLock)
-                    {
-                        InClient?.Dispose();
-                        InClient = null;
-                        OutClient?.Dispose();
-                        OutClient = null;
-
-                        _state = EndpointState.Disconnected;
-                    }
+                    Disconnect();
                 }
                 catch
                 {
@@ -145,28 +153,17 @@ namespace Micser.Common.Api
                 try
                 {
                     var message = await ApiProtocol.ReceiveMessage(InStream);
+                    if (message == null)
+                    {
+                        Disconnect();
+                    }
                     var response = ProcessMessage(message);
                     await ApiProtocol.WriteMessage(InStream, response);
-                }
-                catch (IOException ioEx)
-                {
-                    Logger.Error(ioEx);
-
-                    lock (StateLock)
-                    {
-                        _state = EndpointState.Disconnecting;
-
-                        InClient?.Dispose();
-                        InClient = null;
-                        OutClient?.Dispose();
-                        OutClient = null;
-
-                        _state = EndpointState.Disconnected;
-                    }
                 }
                 catch (Exception ex)
                 {
                     Logger.Error(ex);
+                    Disconnect();
                 }
             }
         }
@@ -194,11 +191,24 @@ namespace Micser.Common.Api
         {
             public static async Task<string> ReceiveMessage(Stream tcpStream)
             {
-                var reqCountBytes = new byte[4];
-                await tcpStream.ReadAsync(reqCountBytes, 0, reqCountBytes.Length);
+                var reqCountBytes = new byte[sizeof(int)];
+
+                var readCount = await tcpStream.ReadAsync(reqCountBytes, 0, reqCountBytes.Length);
+
+                if (readCount != reqCountBytes.Length)
+                {
+                    return null;
+                }
+
                 var reqCount = BitConverter.ToInt32(reqCountBytes, 0);
                 var reqBytes = new byte[reqCount];
-                await tcpStream.ReadAsync(reqBytes, 0, reqCount);
+                readCount = await tcpStream.ReadAsync(reqBytes, 0, reqCount);
+
+                if (readCount != reqCount)
+                {
+                    return null;
+                }
+
                 return Encoding.UTF8.GetString(reqBytes);
             }
 
@@ -206,8 +216,11 @@ namespace Micser.Common.Api
             {
                 var contentBytes = Encoding.UTF8.GetBytes(content);
                 var countBytes = BitConverter.GetBytes(contentBytes.Length);
+
                 await tcpStream.WriteAsync(countBytes, 0, countBytes.Length);
+                await tcpStream.FlushAsync();
                 await tcpStream.WriteAsync(contentBytes, 0, contentBytes.Length);
+                await tcpStream.FlushAsync();
             }
         }
     }
