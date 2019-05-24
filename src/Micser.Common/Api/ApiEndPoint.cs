@@ -8,14 +8,6 @@ using System.Threading.Tasks;
 
 namespace Micser.Common.Api
 {
-    public enum EndpointState
-    {
-        Disconnected,
-        Disconnecting,
-        Connected,
-        Connecting
-    }
-
     /// <summary>
     /// Base API endpoint implementation. Contains functionality shared between <see cref="ApiServer"/> and <see cref="ApiClient"/>.
     /// </summary>
@@ -28,7 +20,7 @@ namespace Micser.Common.Api
 
         protected readonly ILogger Logger;
 
-        protected EndpointState _state;
+        protected EndPointState _state;
 
         /// <summary>
         /// The task that is created by the <see cref="ConnectAsync"/> method.
@@ -61,9 +53,11 @@ namespace Micser.Common.Api
             _requestProcessorFactory = requestProcessorFactory;
             Logger = logger;
 
-            _state = EndpointState.Disconnected;
+            _state = EndPointState.Disconnected;
             _sendMessageSemaphore = new SemaphoreQueue(1);
         }
+
+        public EndPointState State => _state;
 
         /// <summary>
         /// Tries to connect to the API counterpart.
@@ -80,6 +74,11 @@ namespace Micser.Common.Api
         /// <inheritdoc />
         public async Task<JsonResponse> SendMessageAsync(JsonRequest message)
         {
+            if (_state != EndPointState.Connected)
+            {
+                return new JsonResponse { IsSuccess = false };
+            }
+
             await _sendMessageSemaphore.WaitAsync();
 
             try
@@ -112,14 +111,14 @@ namespace Micser.Common.Api
         {
             lock (StateLock)
             {
-                _state = EndpointState.Disconnecting;
+                _state = EndPointState.Disconnecting;
 
                 InClient?.Dispose();
                 InClient = null;
                 OutClient?.Dispose();
                 OutClient = null;
 
-                _state = EndpointState.Disconnected;
+                _state = EndPointState.Disconnected;
             }
         }
 
@@ -148,7 +147,7 @@ namespace Micser.Common.Api
         /// </summary>
         protected async void ReaderThread()
         {
-            while (_state == EndpointState.Connected)
+            while (_state == EndPointState.Connected)
             {
                 try
                 {

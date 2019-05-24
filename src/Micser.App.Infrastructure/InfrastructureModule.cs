@@ -49,9 +49,6 @@ namespace Micser.App.Infrastructure
         /// <inheritdoc />
         public async void OnInitialized(IContainerProvider containerProvider)
         {
-            // todo move to startup view?
-            var apiEndPoint = containerProvider.Resolve<IApiEndPoint>();
-            await apiEndPoint.ConnectAsync();
         }
 
         /// <inheritdoc />
