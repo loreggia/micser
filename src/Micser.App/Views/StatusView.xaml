@@ -5,7 +5,8 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:i="clr-namespace:Micser.App.Infrastructure;assembly=Micser.App.Infrastructure"
       xmlns:vm="clr-namespace:Micser.App.ViewModels"
-      mc:Ignorable="d"
+        xmlns:themes="clr-namespace:Micser.App.Infrastructure.Themes;assembly=Micser.App.Infrastructure"
+        mc:Ignorable="d"
       d:DesignHeight="450"
         d:DesignWidth="800"
         d:DataContext="{d:DesignInstance vm:StatusViewModel}">
@@ -23,8 +24,8 @@
         </Grid.ColumnDefinitions>
 
         <StackPanel Grid.Row="1" Grid.Column="1">
-            <TextBlock Text="{Binding StatusText}" />
-            <Button Command="{Binding ActionCommand}" Content="{Binding ActionText}" />
+            <TextBlock Text="{Binding StatusText}" FontSize="25" Foreground="{DynamicResource {themes:BrushThemeKey DefaultForeground}}" Margin="10" />
+            <Button Command="{Binding ActionCommand}" Content="{Binding ActionText}" Margin="10" Padding="20,10" />
         </StackPanel>
     </Grid>
 </i:View>

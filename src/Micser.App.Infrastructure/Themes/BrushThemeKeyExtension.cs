@@ -32,7 +32,11 @@
         ToolBarButtonBackgroundHover,
         ToolBarButtonBackgroundActive,
         SliderThumbBackground,
-        SliderLeftBackground
+        SliderLeftBackground,
+        ButtonBackground,
+        ButtonBackgroundHover,
+        ButtonBackgroundPressed,
+        ButtonBorder
     }
 
 #pragma warning restore 1591
