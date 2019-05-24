@@ -1,9 +1,9 @@
 ﻿using Micser.App.Infrastructure;
-using Micser.App.Infrastructure.Api;
 using Micser.App.Infrastructure.Extensions;
 using Micser.App.Infrastructure.Settings;
 using Micser.App.Settings;
 using Micser.App.Views;
+using Micser.Common.Api;
 using Prism.Events;
 using System.Threading.Tasks;
 
@@ -11,20 +11,20 @@ namespace Micser.App.ViewModels
 {
     public class StartupViewModel : ViewModelNavigationAware
     {
+        private readonly IApiEndPoint _apiEndPoint;
         private readonly INavigationManager _navigationManager;
         private readonly ISettingsService _settingsService;
-        private readonly StatusApiClient _statusApiClient;
 
         public StartupViewModel(
             IApplicationStateService applicationStateService,
             IEventAggregator eventAggregator,
             INavigationManager navigationManager,
             ISettingsService settingsService,
-            StatusApiClient statusApiClient)
+            IApiEndPoint apiEndPoint)
         {
             _navigationManager = navigationManager;
             _settingsService = settingsService;
-            _statusApiClient = statusApiClient;
+            _apiEndPoint = apiEndPoint;
 
             IsBusy = true;
 
@@ -56,9 +56,9 @@ namespace Micser.App.ViewModels
                 shell.Left = shellState.Left;
             }
 
-            var statusResult = await _statusApiClient.GetStatus();
+            var isConnected = await _apiEndPoint.ConnectAsync();
 
-            if (statusResult.IsSuccess)
+            if (isConnected)
             {
                 _navigationManager.Navigate<MainStatusBarView>(AppGlobals.PrismRegions.Status);
                 _navigationManager.Navigate<MainMenuView>(AppGlobals.PrismRegions.Menu);

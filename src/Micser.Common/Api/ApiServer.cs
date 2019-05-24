@@ -9,14 +9,6 @@ using System.Threading.Tasks;
 
 namespace Micser.Common.Api
 {
-    public enum ServerState
-    {
-        Stopped,
-        Stopping,
-        Started,
-        Starting
-    }
-
     /// <inheritdoc cref="IApiServer" />
     public class ApiServer : ApiEndPoint, IApiServer
     {
@@ -32,10 +24,12 @@ namespace Micser.Common.Api
             _listener = new TcpListener(endPoint);
         }
 
+        public ServerState ServerState => _serverState;
+
         /// <inheritdoc />
         public override async Task<bool> ConnectAsync()
         {
-            if (IsDisposed || _state != EndpointState.Disconnected || _serverState != ServerState.Started)
+            if (IsDisposed || _state != EndPointState.Disconnected || _serverState != ServerState.Started)
             {
                 return false;
             }
@@ -44,12 +38,12 @@ namespace Micser.Common.Api
             {
                 lock (StateLock)
                 {
-                    if (_state != EndpointState.Disconnected || _serverState != ServerState.Started)
+                    if (_state != EndPointState.Disconnected || _serverState != ServerState.Started)
                     {
                         return false;
                     }
 
-                    _state = EndpointState.Connecting;
+                    _state = EndPointState.Connecting;
                 }
 
                 InClient = await _listener.AcceptTcpClientAsync();
@@ -62,7 +56,7 @@ namespace Micser.Common.Api
 
                 lock (StateLock)
                 {
-                    _state = EndpointState.Connected;
+                    _state = EndPointState.Connected;
                 }
 
                 Task.Run(ReaderThread);

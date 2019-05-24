@@ -16,6 +16,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.ServiceProcess;
+using System.Timers;
 using Unity;
 using Unity.Injection;
 using Unity.Resolution;
@@ -26,6 +27,7 @@ namespace Micser.Engine
     {
         private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
         private readonly ICollection<IEngineModule> _plugins;
+        private readonly Timer _reconnectTimer;
         private IAudioEngine _engine;
         private IApiServer _server;
 
@@ -39,6 +41,8 @@ namespace Micser.Engine
             InitializeComponent();
 
             _plugins = new List<IEngineModule>();
+            _reconnectTimer = new Timer(1000) { AutoReset = true };
+            _reconnectTimer.Elapsed += OnReconnectTimerElapsed;
         }
 
         public void ManualStart()
@@ -79,7 +83,7 @@ namespace Micser.Engine
             _server.Start();
             _engine.Start();
 
-            _server.ConnectAsync();
+            _reconnectTimer.Start();
 
             Logger.Info("Service started");
         }
@@ -115,8 +119,8 @@ namespace Micser.Engine
             _plugins.Add(new InfrastructureModule());
 
             var executingFile = new FileInfo(Assembly.GetExecutingAssembly().Location);
-            var moduleFiles = executingFile.Directory.GetFiles(Globals.PluginSearchPattern);
-            foreach (var moduleFile in moduleFiles)
+
+            foreach (var moduleFile in executingFile.Directory.GetFiles(Globals.PluginSearchPattern))
             {
                 try
                 {
@@ -142,6 +146,14 @@ namespace Micser.Engine
             }
 
             Logger.Info("Plugins loaded");
+        }
+
+        private async void OnReconnectTimerElapsed(object sender, ElapsedEventArgs e)
+        {
+            if (_server.State == EndPointState.Disconnected)
+            {
+                await _server.ConnectAsync();
+            }
         }
     }
 }

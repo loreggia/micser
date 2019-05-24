@@ -1,6 +1,7 @@
 ﻿using Micser.App.Infrastructure;
 using Micser.App.Infrastructure.Api;
 using Micser.App.Views;
+using Micser.Common.Api;
 using Prism.Commands;
 using System;
 
@@ -14,6 +15,7 @@ namespace Micser.App.ViewModels
 
     public class StatusViewModel : ViewModelNavigationAware
     {
+        private readonly IApiEndPoint _apiEndPoint;
         private readonly INavigationManager _navigationManager;
         private readonly StatusApiClient _statusApiClient;
         private string _actionText;
@@ -21,12 +23,13 @@ namespace Micser.App.ViewModels
         private StatusType _currentStatus;
         private string _statusText;
 
-        public StatusViewModel(INavigationManager navigationManager, StatusApiClient statusApiClient)
+        public StatusViewModel(INavigationManager navigationManager, IApiEndPoint apiEndPoint, StatusApiClient statusApiClient)
         {
             _navigationManager = navigationManager;
             _statusApiClient = statusApiClient;
 
             ActionCommand = new DelegateCommand(OnActionCommand, () => CanExecuteAction).ObservesProperty(() => CanExecuteAction);
+            _apiEndPoint = apiEndPoint;
         }
 
         public DelegateCommand ActionCommand { get; set; }
@@ -94,15 +97,23 @@ namespace Micser.App.ViewModels
                         break;
 
                     case StatusType.ConnectionFailed:
-                        var result = await _statusApiClient.GetStatus();
-                        if (result.IsSuccess)
+                        var result = await _apiEndPoint.ConnectAsync();
+
+                        if (result)
                         {
-                            _navigationManager.Navigate<MainView>(AppGlobals.PrismRegions.Main);
+                            var statusResult = await _statusApiClient.GetStatus();
+
+                            if (statusResult.IsSuccess)
+                            {
+                                _navigationManager.Navigate<MainStatusBarView>(AppGlobals.PrismRegions.Status);
+                                _navigationManager.Navigate<MainMenuView>(AppGlobals.PrismRegions.Menu);
+                                _navigationManager.Navigate<ToolBarView>(AppGlobals.PrismRegions.TopToolBar, AppGlobals.ToolBarIds.Main);
+                                _navigationManager.Navigate<MainView>(AppGlobals.PrismRegions.Main);
+                                return;
+                            }
                         }
-                        else
-                        {
-                            CanExecuteAction = true;
-                        }
+
+                        CanExecuteAction = true;
 
                         break;
 

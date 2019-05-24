@@ -27,7 +27,7 @@ namespace Micser.Common.Api
         /// </summary>
         public override async Task<bool> ConnectAsync()
         {
-            if (IsDisposed || _state != EndpointState.Disconnected)
+            if (IsDisposed || _state != EndPointState.Disconnected)
             {
                 return false;
             }
@@ -36,12 +36,12 @@ namespace Micser.Common.Api
             {
                 lock (StateLock)
                 {
-                    if (_state != EndpointState.Disconnected)
+                    if (_state != EndPointState.Disconnected)
                     {
                         return false;
                     }
 
-                    _state = EndpointState.Connecting;
+                    _state = EndPointState.Connecting;
                 }
 
                 OutClient = new TcpClient();
@@ -72,7 +72,7 @@ namespace Micser.Common.Api
 
                 lock (StateLock)
                 {
-                    _state = EndpointState.Connected;
+                    _state = EndPointState.Connected;
                 }
 
                 Task.Run(ReaderThread);
@@ -90,7 +90,7 @@ namespace Micser.Common.Api
                     InClient?.Dispose();
                     InClient = null;
 
-                    _state = EndpointState.Disconnected;
+                    _state = EndPointState.Disconnected;
                 }
 
                 return false;
