@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Micser.Setup.CustomActions;
+using System;
 using System.Linq;
 using WixSharp;
 using WixSharp.Forms;
@@ -27,7 +28,10 @@ namespace Micser.Setup
             var project = new ManagedProject("Micser")
             {
                 GUID = new Guid("6fe30b47-2577-43ad-9095-1861ba25889b"),
-                ManagedUI = new ManagedUI()
+                ManagedUI = new ManagedUI(),
+                Version = new Version(1, 0, 0, 0),
+                MajorUpgrade = MajorUpgrade.Default,
+                MajorUpgradeStrategy = MajorUpgradeStrategy.Default
             };
 
 #if DEBUG
@@ -82,21 +86,24 @@ namespace Micser.Setup
 
             project.Actions = new Action[]
             {
-                new BinaryFileAction("DevconExe", @"install ""[INSTALLDIR]Micser.Vac.Driver.inf"" Root\Micser.Vac.Driver", Return.check, When.After, Step.InstallServices, Condition.NOT_Installed)
-                {
-                    Execute = Execute.deferred,
-                    Impersonate = false
-                },
-                new BinaryFileAction("DevconExe", @"remove Root\Micser.Vac.Driver", Return.check, When.Before, Step.RemoveFiles, Condition.BeingUninstalled)
-                {
-                    Execute = Execute.deferred,
-                    Impersonate = false
-                },
-                new InstalledFileAction("MicserDriverUtilityExe", @"/c 1 /s", Return.check, When.After, Step.InstallServices, Condition.NOT_Installed)
-                {
-                    Execute = Execute.deferred,
-                    Impersonate = false
-                },
+                new ManagedAction(DriverActions.Install, typeof(DriverActions).Assembly.Location, Return.check, When.After, Step.InstallServices, Condition.NOT_Installed) { Rollback = nameof(DriverActions.Uninstall) },
+                new ManagedAction(DriverActions.Uninstall, typeof(DriverActions).Assembly.Location, Return.check, When.Before, Step.RemoveFiles, Condition.BeingUninstalled) { Rollback = nameof(DriverActions.Install) },
+                new ManagedAction(DriverActions.Configure, typeof(DriverActions).Assembly.Location, Return.check, When.After, Step.InstallServices, Condition.NOT_Installed),
+                //new BinaryFileAction("DevconExe", @"install ""[INSTALLDIR]Micser.Vac.Driver.inf"" Root\Micser.Vac.Driver", Return.check, When.After, Step.InstallServices, Condition.NOT_Installed)
+                //{
+                //    Execute = Execute.deferred,
+                //    Impersonate = false
+                //},
+                //new BinaryFileAction("DevconExe", @"remove Root\Micser.Vac.Driver", Return.check, When.Before, Step.RemoveFiles, Condition.BeingUninstalled)
+                //{
+                //    Execute = Execute.deferred,
+                //    Impersonate = false
+                //},
+                //new InstalledFileAction("MicserDriverUtilityExe", @"/c 1 /s", Return.check, When.After, Step.InstallServices, Condition.NOT_Installed)
+                //{
+                //    Execute = Execute.deferred,
+                //    Impersonate = false
+                //},
             };
 
             project.ManagedUI.InstallDialogs
