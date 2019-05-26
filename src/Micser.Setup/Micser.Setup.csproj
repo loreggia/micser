@@ -115,7 +115,12 @@
       <Version>1.9.6</Version>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Micser.Setup.CustomActions\Micser.Setup.CustomActions.csproj">
+      <Project>{1e05c6e2-f8da-495c-988d-2566b52e05a6}</Project>
+      <Name>Micser.Setup.CustomActions</Name>
+    </ProjectReference>
+  </ItemGroup>
   <ItemGroup>
     <Content Include="Resources\x64\devcon.exe" />
     <Content Include="Resources\x86\devcon.exe" />
