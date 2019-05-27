@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Micser.Setup.CustomActions;
+using System;
 using System.Linq;
 using WixSharp;
 using WixSharp.Forms;
