@@ -1,5 +1,4 @@
-﻿using Micser.Setup.CustomActions;
-using System;
+﻿using System;
 using System.Linq;
 using WixSharp;
 using WixSharp.Forms;
@@ -30,8 +29,7 @@ namespace Micser.Setup
                 GUID = new Guid("6fe30b47-2577-43ad-9095-1861ba25889b"),
                 ManagedUI = new ManagedUI(),
                 Version = new Version(1, 0, 0, 0),
-                MajorUpgrade = MajorUpgrade.Default,
-                MajorUpgradeStrategy = MajorUpgradeStrategy.Default
+                MajorUpgrade = MajorUpgrade.Default
             };
 
 #if DEBUG
