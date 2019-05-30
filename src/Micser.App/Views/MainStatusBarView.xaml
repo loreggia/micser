@@ -5,14 +5,13 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:i="clr-namespace:Micser.App.Infrastructure;assembly=Micser.App.Infrastructure"
         xmlns:vm="clr-namespace:Micser.App.ViewModels"
-        xmlns:themes="clr-namespace:Micser.App.Infrastructure.Themes;assembly=Micser.App.Infrastructure"
         mc:Ignorable="d"
         d:DesignWidth="300"
         d:DataContext="{d:DesignInstance vm:MainStatusBarViewModel}">
     <Grid>
-        <StatusBar Background="{DynamicResource {themes:BrushThemeKey StatusBarBackground}}">
+        <StatusBar>
             <StatusBarItem>
-                <TextBlock Text="{Binding StatusText}" Foreground="{DynamicResource {themes:BrushThemeKey DefaultForeground}}" />
+                <TextBlock Text="{Binding StatusText}" />
             </StatusBarItem>
         </StatusBar>
     </Grid>

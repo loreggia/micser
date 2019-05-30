@@ -5,7 +5,6 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:i="clr-namespace:Micser.App.Infrastructure;assembly=Micser.App.Infrastructure"
         xmlns:vm="clr-namespace:Micser.App.ViewModels"
-        xmlns:themes="clr-namespace:Micser.App.Infrastructure.Themes;assembly=Micser.App.Infrastructure"
         mc:Ignorable="d"
         d:DesignHeight="450"
         d:DesignWidth="800"
@@ -13,8 +12,8 @@
     <ScrollViewer HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto" MaxWidth="800">
         <StackPanel Orientation="Vertical">
             <ContentControl ContentTemplate="{DynamicResource Logo}" Margin="50" MinWidth="64" MaxWidth="512" />
-            <TextBlock Text="{Binding VersionText}" HorizontalAlignment="Center" Foreground="{DynamicResource {themes:BrushThemeKey DefaultForeground}}" />
-            <TextBlock Text="{Binding AboutText}" HorizontalAlignment="Center" Foreground="{DynamicResource {themes:BrushThemeKey DefaultForeground}}" />
+            <TextBlock Text="{Binding VersionText}" HorizontalAlignment="Center" />
+            <TextBlock Text="{Binding AboutText}" HorizontalAlignment="Center" />
         </StackPanel>
     </ScrollViewer>
 </i:View>

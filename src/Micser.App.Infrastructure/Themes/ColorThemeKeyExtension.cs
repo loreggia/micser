@@ -33,7 +33,8 @@
         Neutral040,
         Neutral030,
         Neutral020,
-        Neutral010
+        Neutral010,
+        Neutral000
     }
 
 #pragma warning restore 1591

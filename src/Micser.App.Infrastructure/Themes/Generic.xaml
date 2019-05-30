@@ -38,6 +38,27 @@
         <Setter Property="Background" Value="{DynamicResource {themes:BrushThemeKey DefaultBorder}}" />
     </Style>
 
+    <Style TargetType="{x:Type TextBlock}">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Control}}" />
+    </Style>
+
+    <Style TargetType="{x:Type Label}">
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Control}}" />
+    </Style>
+
+    <Style TargetType="{x:Type TextBox}">
+        <Setter Property="Background" Value="{DynamicResource {themes:BrushThemeKey TextBoxBackground}}" />
+        <Setter Property="Foreground" Value="{DynamicResource {themes:BrushThemeKey DefaultForeground}}" />
+        <Setter Property="BorderBrush" Value="{DynamicResource {themes:BrushThemeKey DefaultBorder}}" />
+        <Setter Property="BorderThickness" Value="1" />
+    </Style>
+
+    <Style TargetType="{x:Type StatusBar}">
+        <Setter Property="Background" Value="{DynamicResource {themes:BrushThemeKey StatusBarBackground}}" />
+    </Style>
+
     <Style TargetType="{x:Type Button}">
         <Setter Property="Background" Value="{DynamicResource {themes:BrushThemeKey ButtonBackground}}" />
         <Setter Property="Foreground" Value="{DynamicResource {themes:BrushThemeKey DefaultForeground}}" />
