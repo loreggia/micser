@@ -35,6 +35,7 @@
     <Color x:Key="{themes:ColorThemeKey Neutral030}">#FFB2B2B2</Color>
     <Color x:Key="{themes:ColorThemeKey Neutral020}">#FFCCCCCC</Color>
     <Color x:Key="{themes:ColorThemeKey Neutral010}">#FFE6E6E6</Color>
+    <Color x:Key="{themes:ColorThemeKey Neutral000}">#FFFFFFFF</Color>
     <!-- /Colors -->
 
     <!-- Brushes -->
@@ -52,6 +53,7 @@
     <SolidColorBrush x:Key="{themes:BrushThemeKey WidgetBorder}" Color="{DynamicResource {themes:ColorThemeKey Neutral100}}" />
     <SolidColorBrush x:Key="{themes:BrushThemeKey WidgetBorderSelected}" Color="{DynamicResource {themes:ColorThemeKey Secondary100}}" />
     <SolidColorBrush x:Key="{themes:BrushThemeKey WidgetHeaderBackground}" Color="{DynamicResource {themes:ColorThemeKey Primary100}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey WidgetEditBackground}" Color="{DynamicResource {themes:ColorThemeKey Neutral000}}" />
 
     <SolidColorBrush x:Key="{themes:BrushThemeKey WidgetPanelBackground}" Color="{DynamicResource {themes:ColorThemeKey Neutral080}}" />
     <SolidColorBrush x:Key="{themes:BrushThemeKey WidgetPanelGridLine}" Color="{DynamicResource {themes:ColorThemeKey Neutral060}}" />
@@ -81,6 +83,9 @@
     <SolidColorBrush x:Key="{themes:BrushThemeKey ButtonBackgroundHover}" Color="{DynamicResource {themes:ColorThemeKey Neutral050}}" />
     <SolidColorBrush x:Key="{themes:BrushThemeKey ButtonBackgroundPressed}" Color="{DynamicResource {themes:ColorThemeKey Neutral070}}" />
     <SolidColorBrush x:Key="{themes:BrushThemeKey ButtonBorder}" Color="{DynamicResource {themes:ColorThemeKey Neutral030}}" />
+
+    <SolidColorBrush x:Key="{themes:BrushThemeKey TextBoxBackground}" Color="{DynamicResource {themes:ColorThemeKey Neutral050}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey CheckBoxBackground}" Color="{DynamicResource {themes:ColorThemeKey Neutral050}}" />
 
     <!-- /Brushes -->
 </ResourceDictionary>

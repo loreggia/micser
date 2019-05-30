@@ -119,6 +119,9 @@
     <Compile Include="Settings\SettingsPanel.cs" />
     <Compile Include="Settings\SettingsRegistry.cs" />
     <Compile Include="Settings\SettingViewModel.cs" />
+    <Compile Include="TestView.xaml.cs">
+      <DependentUpon>TestView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Themes\BrushThemeKeyExtension.cs" />
     <Compile Include="Themes\ColorThemeKeyExtension.cs" />
     <Compile Include="ToolBars\IToolBarRegistry.cs" />
@@ -180,6 +183,10 @@
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Page Include="TestView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Themes\EditableSlider.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

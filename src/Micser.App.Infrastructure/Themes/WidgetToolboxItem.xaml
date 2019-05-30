@@ -6,7 +6,7 @@
 
     <DataTemplate x:Key="WidgetToolboxItemContentTemplate" DataType="{x:Type widgets:WidgetDescription}">
         <StackPanel Orientation="Horizontal">
-            <TextBlock Text="{Binding Name}" Foreground="{DynamicResource {themes:BrushThemeKey WidgetForeground}}" ToolTip="{Binding Description}" VerticalAlignment="Center" />
+            <TextBlock Text="{Binding Name}" ToolTip="{Binding Description}" VerticalAlignment="Center" />
             <controls:InfoButton Content="{Binding Description}" Margin="10,0,0,0" VerticalAlignment="Center" />
         </StackPanel>
     </DataTemplate>

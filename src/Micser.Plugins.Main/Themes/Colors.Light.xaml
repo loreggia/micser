@@ -82,5 +82,8 @@
     <SolidColorBrush x:Key="{themes:BrushThemeKey ButtonBackgroundPressed}" Color="{DynamicResource {themes:ColorThemeKey Neutral070}}" />
     <SolidColorBrush x:Key="{themes:BrushThemeKey ButtonBorder}" Color="{DynamicResource {themes:ColorThemeKey Neutral030}}" />
 
+    <SolidColorBrush x:Key="{themes:BrushThemeKey TextBoxBackground}" Color="{DynamicResource {themes:ColorThemeKey Neutral050}}" />
+    <SolidColorBrush x:Key="{themes:BrushThemeKey CheckBoxBackground}" Color="{DynamicResource {themes:ColorThemeKey Neutral050}}" />
+
     <!-- /Brushes -->
 </ResourceDictionary>

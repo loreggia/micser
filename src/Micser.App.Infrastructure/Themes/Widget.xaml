@@ -58,6 +58,17 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type widgets:Widget}">
+                    <ControlTemplate.Resources>
+                        <Style TargetType="{x:Type TextBox}">
+                            <Setter Property="Background" Value="{DynamicResource {themes:BrushThemeKey WidgetEditBackground}}" />
+                            <Setter Property="Foreground" Value="{DynamicResource {themes:BrushThemeKey WidgetForeground}}" />
+                        </Style>
+                        <Style TargetType="{x:Type CheckBox}">
+                            <Setter Property="Background" Value="{DynamicResource {themes:BrushThemeKey WidgetEditBackground}}" />
+                            <Setter Property="Foreground" Value="{DynamicResource {themes:BrushThemeKey WidgetForeground}}" />
+                        </Style>
+                    </ControlTemplate.Resources>
+
                     <Border Background="{TemplateBinding Background}"
                                 BorderBrush="{TemplateBinding BorderBrush}"
                                 BorderThickness="{TemplateBinding BorderThickness}">
