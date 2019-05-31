@@ -17,9 +17,10 @@ namespace Micser.Setup
                 {
                     ".test.dll",
                     ".pdb",
-                    "Micser.App.exe",
-                    "Micser.DriverUtility.exe",
-                    "Micser.Engine.exe"
+                    "Micser.Engine.exe",
+                    "CodeAnalysisLog.xml",
+                    "lastcodeanalysissucceeded",
+                    "ManualStart.ps1"
                 };
 
                 return !excludedFiles.Any(x => file.EndsWith(x, StringComparison.InvariantCultureIgnoreCase));
@@ -47,14 +48,14 @@ namespace Micser.Setup
             };
 #endif
 
+            var coreFeature = new Feature("Micser", "Installs Micser core components.", true, false) { Id = new Id("CoreFeature") };
+            var vacFeature = new Feature("Virtual Audio Cable", "Installs the Micser Virtual Audio Cable driver.", true, true) { Id = new Id("VacFeature") };
+
             project.Dirs = new[]
             {
-                new Dir(@"%ProgramFiles%\Micser",
-                    new Files(@"App\*.*", FileFilter),
-                    new Files(@"Driver\Micser.Vac.Package\*.*"),
-                    new File(new Id("MicserAppExe"), @"App\Micser.App.exe"),
-                    new File(new Id("MicserDriverUtilityExe"), @"App\Micser.DriverUtility.exe"),
-                    new File(new Id("MicserEngineExe"), @"App\Micser.Engine.exe")
+                new Dir(coreFeature, @"%ProgramFiles%\Micser",
+                    new Files(coreFeature, @"App\*.*", FileFilter),
+                    new File(new Id("MicserEngineExe"), coreFeature, @"App\Micser.Engine.exe")
                     {
                         ServiceInstaller = new ServiceInstaller("Micser.Engine")
                         {
@@ -68,57 +69,67 @@ namespace Micser.Setup
                             Start = SvcStartType.auto,
                             DelayedAutoStart = false,
                             Vital = true,
-                            Interactive = false
+                            Interactive = false,
+                            FirstFailureActionType = FailureActionType.restart,
+                            SecondFailureActionType = FailureActionType.restart,
+                            ThirdFailureActionType = FailureActionType.restart
                         }
-                    }
+                    },
+                    new Dir(vacFeature, @"Driver",
+                        new Files(vacFeature, @"Driver\Micser.Vac.Package\*.*")
+                    )
                 ),
-                new Dir(@"%ProgramMenu%\Micser",
+                new Dir(coreFeature, @"%ProgramMenu%\Micser",
                     new ExeFileShortcut("Micser", @"[INSTALLDIR]\Micser.App.exe", ""),
                     new ExeFileShortcut("Uninstall Micser", "[SystemFolder]msiexec.exe", "/x [ProductCode]")
                 )
             };
 
-            project.Binaries = new[]
-            {
-                new Binary(new Id("DevconExe"), @"Driver\devcon.exe")
-            };
+            var vacFeatureCondition = Condition.Create("&VacFeature=3");
 
             project.Actions = new Action[]
             {
-                new ManagedAction(DriverActions.Install, typeof(DriverActions).Assembly.Location, Return.check, When.After, Step.InstallServices, Condition.NOT_Installed) { Rollback = nameof(DriverActions.Uninstall) },
-                new ManagedAction(DriverActions.Uninstall, typeof(DriverActions).Assembly.Location, Return.check, When.Before, Step.RemoveFiles, Condition.BeingUninstalled) { Rollback = nameof(DriverActions.Install) },
-                new ManagedAction(DriverActions.Configure, typeof(DriverActions).Assembly.Location, Return.check, When.After, Step.InstallServices, Condition.NOT_Installed),
-                //new BinaryFileAction("DevconExe", @"install ""[INSTALLDIR]Micser.Vac.Driver.inf"" Root\Micser.Vac.Driver", Return.check, When.After, Step.InstallServices, Condition.NOT_Installed)
-                //{
-                //    Execute = Execute.deferred,
-                //    Impersonate = false
-                //},
-                //new BinaryFileAction("DevconExe", @"remove Root\Micser.Vac.Driver", Return.check, When.Before, Step.RemoveFiles, Condition.BeingUninstalled)
-                //{
-                //    Execute = Execute.deferred,
-                //    Impersonate = false
-                //},
-                //new InstalledFileAction("MicserDriverUtilityExe", @"/c 1 /s", Return.check, When.After, Step.InstallServices, Condition.NOT_Installed)
-                //{
-                //    Execute = Execute.deferred,
-                //    Impersonate = false
-                //},
+                new ManagedAction(
+                    DriverActions.Install,
+                    typeof(DriverActions).Assembly.Location,
+                    Return.check,
+                    When.After,
+                    Step.InstallFinalize,
+                    Condition.NOT_BeingRemoved & vacFeatureCondition)
+                {
+                    Rollback = nameof(DriverActions.Uninstall)
+                },
+
+                new ManagedAction(
+                    DriverActions.Uninstall,
+                    typeof(DriverActions).Assembly.Location,
+                    Return.check,
+                    When.Before,
+                    Step.InstallInitialize,
+                    Condition.BeingUninstalled & vacFeatureCondition | Condition.Create("&VacFeature=2"))
+                {
+                    Rollback = nameof(DriverActions.Install)
+                }
             };
 
             project.ManagedUI.InstallDialogs
                 .Add(Dialogs.Welcome)
                 .Add(Dialogs.Licence)
                 //.Add(Dialogs.SetupType)
-                //.Add(Dialogs.Features)
+                .Add(Dialogs.Features)
                 .Add(Dialogs.InstallDir)
                 .Add(Dialogs.Progress)
                 .Add(Dialogs.Exit);
 
             project.ManagedUI.ModifyDialogs
                 .Add(Dialogs.MaintenanceType)
-                //.Add(Dialogs.Features)
+                .Add(Dialogs.Features)
                 .Add(Dialogs.Progress)
                 .Add(Dialogs.Exit);
+
+            project.DefaultFeature.Display = FeatureDisplay.expand;
+            project.DefaultFeature.Children.Add(coreFeature);
+            project.DefaultFeature.Children.Add(vacFeature);
 
             project.BuildMsi();
         }
