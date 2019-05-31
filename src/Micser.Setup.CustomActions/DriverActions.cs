@@ -12,15 +12,11 @@ namespace Micser.Setup.CustomActions
         private const string HardwareId = @"Root\Micser.Vac.Driver";
 
         [CustomAction]
-        public static ActionResult Configure(Session session)
-        {
-            return ActionResult.Success;
-        }
-
-        [CustomAction]
         public static ActionResult Install(Session session)
         {
             var infPath = GetInfPath(session);
+            //MessageBox.Show($"Install {infPath} {File.Exists(infPath)}");
+            //return ActionResult.Success;
             var result = InstallInternal(infPath, HardwareId);
             return result ? ActionResult.Success : ActionResult.Failure;
         }
@@ -29,6 +25,8 @@ namespace Micser.Setup.CustomActions
         public static ActionResult Uninstall(Session session)
         {
             var infPath = GetInfPath(session);
+            //MessageBox.Show($"Uninstall {infPath} {File.Exists(infPath)}");
+            //return ActionResult.Success;
             var result = UninstallInternal(infPath, HardwareId);
             return result ? ActionResult.Success : ActionResult.Failure;
         }
@@ -98,7 +96,7 @@ namespace Micser.Setup.CustomActions
         private static string GetInfPath(Session session)
         {
             var installDir = session["INSTALLDIR"];
-            return Path.Combine(installDir, "Micser.Vac.Driver.inf");
+            return Path.Combine(installDir, @"Driver\Micser.Vac.Driver.inf");
         }
 
         [HandleProcessCorruptedStateExceptions]
