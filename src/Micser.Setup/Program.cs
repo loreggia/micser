@@ -87,28 +87,40 @@ namespace Micser.Setup
 
             var vacFeatureCondition = Condition.Create("&VacFeature=3");
 
+#if X64
+            project.Platform = Platform.x64;
+#else
+            project.Platform = Platform.x86;
+#endif
+
             project.Actions = new Action[]
             {
                 new ManagedAction(
                     DriverActions.Install,
                     typeof(DriverActions).Assembly.Location,
                     Return.check,
-                    When.After,
+                    When.Before,
                     Step.InstallFinalize,
                     Condition.NOT_BeingRemoved & vacFeatureCondition)
                 {
-                    Rollback = nameof(DriverActions.Uninstall)
+                    Rollback = nameof(DriverActions.Uninstall),
+                    Impersonate = false,
+                    Execute = Execute.deferred,
+                    UsesProperties = ""
                 },
 
                 new ManagedAction(
                     DriverActions.Uninstall,
                     typeof(DriverActions).Assembly.Location,
                     Return.check,
-                    When.Before,
+                    When.After,
                     Step.InstallInitialize,
                     Condition.BeingUninstalled & vacFeatureCondition | Condition.Create("&VacFeature=2"))
                 {
-                    Rollback = nameof(DriverActions.Install)
+                    Rollback = nameof(DriverActions.Install),
+                    Impersonate = false,
+                    Execute = Execute.deferred,
+                    UsesProperties = ""
                 }
             };
 
