@@ -59,7 +59,7 @@ namespace Micser.Setup
                     {
                         ServiceInstaller = new ServiceInstaller("Micser.Engine")
                         {
-                            StartOn = SvcEvent.Install,
+                            StartOn = SvcEvent.Install_Wait,
                             StopOn = SvcEvent.InstallUninstall_Wait,
                             RemoveOn = SvcEvent.Uninstall_Wait,
                             Type = SvcType.ownProcess,

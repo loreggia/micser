@@ -212,9 +212,16 @@ namespace Micser.Engine.Audio
                 _endpointVolume.Dispose();
             }
 
-            var defaultDevice = _deviceEnumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console);
-            _endpointVolume = AudioEndpointVolume.FromDevice(defaultDevice);
-            _endpointVolume.RegisterControlChangeNotify(_endpointVolumeCallback);
+            try
+            {
+                var defaultDevice = _deviceEnumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Console);
+                _endpointVolume = AudioEndpointVolume.FromDevice(defaultDevice);
+                _endpointVolume.RegisterControlChangeNotify(_endpointVolumeCallback);
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex);
+            }
         }
 
         private void VolumeNotifyReceived(object sender, AudioEndpointVolumeCallbackEventArgs e)
