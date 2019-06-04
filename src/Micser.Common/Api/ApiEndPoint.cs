@@ -76,7 +76,7 @@ namespace Micser.Common.Api
         {
             if (_state != EndPointState.Connected)
             {
-                return new JsonResponse { IsSuccess = false };
+                return new JsonResponse(false, null, null, false);
             }
 
             await _sendMessageSemaphore.WaitAsync();

@@ -23,7 +23,7 @@ namespace Micser.Setup.CustomActions
                 return ActionResult.Failure;
             }
 
-            var result = SetupApi.InstallInfDriver(infPath, HardwareId);
+            var result = SetupApi.InstallDevice(infPath, HardwareId);
             return result ? ActionResult.Success : ActionResult.Failure;
         }
 

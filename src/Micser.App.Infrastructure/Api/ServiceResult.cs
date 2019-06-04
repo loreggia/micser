@@ -13,13 +13,19 @@ namespace Micser.App.Infrastructure.Api
         {
             IsSuccess = message.IsSuccess;
             Message = message.Message;
-            Data = message.Content is TData data ? data : default(TData);
+            Data = message.Content is TData data ? data : default;
+            IsConnected = message.IsConnected;
         }
 
         /// <summary>
         /// Gets the data returned from the service.
         /// </summary>
         public TData Data { get; }
+
+        /// <summary>
+        /// Gets a value indicating whether a connection to the server is established.
+        /// </summary>
+        public bool IsConnected { get; }
 
         /// <summary>
         /// Gets a value whether the call was successful.

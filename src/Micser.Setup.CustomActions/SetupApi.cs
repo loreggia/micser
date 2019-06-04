@@ -59,18 +59,70 @@ namespace Micser.Setup.CustomActions
 
         #endregion Imports
 
-        public static bool InstallInfDriver(string filePath, string hardwareID, string description = "")
+        public static bool GetDevice(string hardwareId, out IntPtr deviceInfoList, out SP_DEVINFO_DATA? deviceInfoData)
         {
-            filePath = Path.GetFullPath(filePath);
+            deviceInfoData = null;
+
+            deviceInfoList = SetupDiGetClassDevsEx(IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, DIGCF_ALLCLASSES, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero);
+
+            if (deviceInfoList == INVALID_HANDLE_VALUE)
+            {
+                LogWin32Error(nameof(SetupDiGetClassDevsEx));
+                return false;
+            }
+
+            var currentDeviceInfoData = new SP_DEVINFO_DATA();
+            currentDeviceInfoData.cbSize = (uint)Marshal.SizeOf(currentDeviceInfoData);
+
+            for (uint i = 0; SetupDiEnumDeviceInfo(deviceInfoList, i, ref currentDeviceInfoData); i++)
+            {
+                uint requiredSize = 0;
+                SetupDiGetDeviceRegistryProperty(deviceInfoList, ref currentDeviceInfoData, SPDRP_HARDWAREID, IntPtr.Zero, IntPtr.Zero, 0, ref requiredSize);
+
+                if (requiredSize == 0)
+                {
+                    continue;
+                }
+
+                var pPropertyBuffer = Marshal.AllocHGlobal((int)requiredSize);
+
+                if (!SetupDiGetDeviceRegistryProperty(deviceInfoList, ref currentDeviceInfoData, SPDRP_HARDWAREID, IntPtr.Zero, pPropertyBuffer, requiredSize, IntPtr.Zero))
+                {
+                    continue;
+                }
+
+                var currentHardwareId = Marshal.PtrToStringAuto(pPropertyBuffer);
+                Marshal.FreeHGlobal(pPropertyBuffer);
+
+                if (currentHardwareId == hardwareId)
+                {
+                    deviceInfoData = currentDeviceInfoData;
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        public static bool InstallDevice(string infFilePath, string hardwareId)
+        {
+            infFilePath = Path.GetFullPath(infFilePath);
 
             var classGuid = Guid.Empty;
             var className = new char[MAX_CLASS_NAME_LEN];
+            var description = "";
             uint requiredSize = 0;
             var deviceInfoData = new SP_DEVINFO_DATA();
             deviceInfoData.cbSize = (uint)Marshal.SizeOf(deviceInfoData);
 
+            if (IsInstalled(hardwareId))
+            {
+                LogMessage($"Device with hardware ID '{hardwareId}' is already installed.");
+                return true;
+            }
+
             // Use the INF File to extract the Class GUID
-            if (!SetupDiGetINFClass(filePath, ref classGuid, className, MAX_CLASS_NAME_LEN, ref requiredSize))
+            if (!SetupDiGetINFClass(infFilePath, ref classGuid, className, MAX_CLASS_NAME_LEN, ref requiredSize))
             {
                 LogWin32Error(nameof(SetupDiGetINFClass));
                 return false;
@@ -93,7 +145,7 @@ namespace Micser.Setup.CustomActions
             }
 
             // Add the HardwareID to the Device's HardwareID property
-            if (!SetupDiSetDeviceRegistryProperty(deviceInfoSet, ref deviceInfoData, SPDRP_HARDWAREID, Encoding.Unicode.GetBytes(hardwareID), (uint)Encoding.Unicode.GetByteCount(hardwareID)))
+            if (!SetupDiSetDeviceRegistryProperty(deviceInfoSet, ref deviceInfoData, SPDRP_HARDWAREID, Encoding.Unicode.GetBytes(hardwareId), (uint)Encoding.Unicode.GetByteCount(hardwareId)))
             {
                 LogWin32Error(nameof(SetupDiSetDeviceRegistryProperty));
                 return false;
@@ -109,7 +161,7 @@ namespace Micser.Setup.CustomActions
             SetupDiDestroyDeviceInfoList(deviceInfoSet);
 
             // Update the driver for the device we just created
-            if (!UpdateDriverForPlugAndPlayDevices(IntPtr.Zero, hardwareID, filePath, INSTALLFLAG_FORCE, IntPtr.Zero))
+            if (!UpdateDriverForPlugAndPlayDevices(IntPtr.Zero, hardwareId, infFilePath, INSTALLFLAG_FORCE, IntPtr.Zero))
             {
                 LogWin32Error(nameof(UpdateDriverForPlugAndPlayDevices));
                 return false;
@@ -118,65 +170,56 @@ namespace Micser.Setup.CustomActions
             return true;
         }
 
-        public static bool UninstallDevice(string hardwareID)
+        public static bool IsInstalled(string hardwareId)
         {
-            var deviceInfoSet = SetupDiGetClassDevsEx(IntPtr.Zero, IntPtr.Zero, IntPtr.Zero, DIGCF_ALLCLASSES, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero);
-
-            if (deviceInfoSet == INVALID_HANDLE_VALUE)
+            var result = GetDevice(hardwareId, out var deviceInfoList, out var deviceInfoData) && deviceInfoData.HasValue;
+            if (deviceInfoList != INVALID_HANDLE_VALUE)
             {
-                LogWin32Error(nameof(SetupDiGetClassDevsEx));
-                return false;
+                SetupDiDestroyDeviceInfoList(deviceInfoList);
             }
+            return result;
+        }
 
-            uint index = 0;
-            var deviceInfoData = new SP_DEVINFO_DATA();
-            deviceInfoData.cbSize = (uint)Marshal.SizeOf(deviceInfoData);
+        public static bool UninstallDevice(string hardwareId)
+        {
+            var result = true;
 
-            while (SetupDiEnumDeviceInfo(deviceInfoSet, index, ref deviceInfoData))
+            if (!GetDevice(hardwareId, out var deviceInfoList, out var deviceInfoData) || deviceInfoData == null)
             {
-                index++;
-                uint requiredSize = 0;
-                SetupDiGetDeviceRegistryProperty(deviceInfoSet, ref deviceInfoData, SPDRP_HARDWAREID, IntPtr.Zero, IntPtr.Zero, 0, ref requiredSize);
+                LogMessage($"No device for hardware ID '{hardwareId}' found.");
+            }
+            else
+            {
+                var deviceInfoDataValue = deviceInfoData.Value;
 
-                if (requiredSize == 0)
+                var removeParams = new SP_REMOVEDEVICE_PARAMS();
+                removeParams.ClassInstallHeader.cbSize = (uint)Marshal.SizeOf(removeParams.ClassInstallHeader);
+                removeParams.ClassInstallHeader.InstallFunction = DIF_REMOVE;
+                removeParams.Scope = DI_REMOVEDEVICE_GLOBAL;
+
+                if (!SetupDiSetClassInstallParams(deviceInfoList, ref deviceInfoDataValue, ref removeParams, (uint)Marshal.SizeOf(removeParams)))
                 {
-                    continue;
+                    LogWin32Error(nameof(SetupDiSetClassInstallParams));
+                    result = false;
                 }
-
-                var pPropertyBuffer = Marshal.AllocHGlobal((int)requiredSize);
-
-                if (!SetupDiGetDeviceRegistryProperty(deviceInfoSet, ref deviceInfoData, SPDRP_HARDWAREID, IntPtr.Zero, pPropertyBuffer, requiredSize, IntPtr.Zero))
+                else if (!SetupDiCallClassInstaller(DIF_REMOVE, deviceInfoList, ref deviceInfoDataValue))
                 {
-                    continue;
-                }
-
-                var currHardwareID = Marshal.PtrToStringAuto(pPropertyBuffer);
-                Marshal.FreeHGlobal(pPropertyBuffer);
-
-                if (currHardwareID == hardwareID)
-                {
-                    var classInstallParams = new SP_REMOVEDEVICE_PARAMS();
-                    classInstallParams.ClassInstallHeader.cbSize = (uint)Marshal.SizeOf(classInstallParams.ClassInstallHeader);
-                    classInstallParams.ClassInstallHeader.InstallFunction = DIF_REMOVE;
-                    classInstallParams.Scope = DI_REMOVEDEVICE_GLOBAL;
-
-                    if (!SetupDiSetClassInstallParams(deviceInfoSet, ref deviceInfoData, ref classInstallParams, (uint)Marshal.SizeOf(classInstallParams)))
-                    {
-                        LogWin32Error(nameof(SetupDiSetClassInstallParams));
-                        return false;
-                    }
-
-                    if (!SetupDiCallClassInstaller(DIF_REMOVE, deviceInfoSet, ref deviceInfoData))
-                    {
-                        LogWin32Error(nameof(SetupDiCallClassInstaller));
-                        return false;
-                    }
+                    LogWin32Error(nameof(SetupDiCallClassInstaller));
+                    result = false;
                 }
             }
 
-            SetupDiDestroyDeviceInfoList(deviceInfoSet);
+            if (deviceInfoList != INVALID_HANDLE_VALUE)
+            {
+                SetupDiDestroyDeviceInfoList(deviceInfoList);
+            }
 
-            return true;
+            return result;
+        }
+
+        private static void LogMessage(string msg)
+        {
+            Log?.Invoke(msg);
         }
 
         private static void LogWin32Error(string method)
@@ -188,14 +231,24 @@ namespace Micser.Setup.CustomActions
             }
         }
 
-        [StructLayout(LayoutKind.Sequential)]
+#if X64
+
+        [StructLayout(LayoutKind.Sequential, Pack = 8)]
+#else
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+#endif
         public struct SP_CLASSINSTALL_HEADER
         {
             public uint cbSize;
             public uint InstallFunction;
         }
 
-        [StructLayout(LayoutKind.Sequential)]
+#if X64
+
+        [StructLayout(LayoutKind.Sequential, Pack = 8)]
+#else
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+#endif
         public struct SP_DEVINFO_DATA
         {
             public uint cbSize;
@@ -207,12 +260,17 @@ namespace Micser.Setup.CustomActions
             public IntPtr Reserved;
         }
 
-        [StructLayout(LayoutKind.Sequential)]
+#if X64
+
+        [StructLayout(LayoutKind.Sequential, Pack = 8)]
+#else
+        [StructLayout(LayoutKind.Sequential, Pack = 1)]
+#endif
         public struct SP_REMOVEDEVICE_PARAMS
         {
             public SP_CLASSINSTALL_HEADER ClassInstallHeader;
-            public uint HwProfile;
             public uint Scope;
+            public uint HwProfile;
         }
     }
 }

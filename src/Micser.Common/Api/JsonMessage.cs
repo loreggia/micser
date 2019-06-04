@@ -75,12 +75,18 @@ namespace Micser.Common.Api
         }
 
         /// <inheritdoc />
-        public JsonResponse(bool isSuccess, object content = null, string message = null)
+        public JsonResponse(bool isSuccess, object content = null, string message = null, bool isConnected = true)
             : base(content)
         {
             IsSuccess = isSuccess;
             Message = message;
+            IsConnected = isConnected;
         }
+
+        /// <summary>
+        /// Indicates whether the client has an active connection.
+        /// </summary>
+        public bool IsConnected { get; set; }
 
         /// <summary>
         /// Indicates whether the call was successful.

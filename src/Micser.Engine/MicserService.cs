@@ -102,12 +102,26 @@ namespace Micser.Engine
 
         protected override void OnStart(string[] args)
         {
-            ManualStart();
+            try
+            {
+                ManualStart();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Error while starting the service.");
+            }
         }
 
         protected override void OnStop()
         {
-            ManualStop();
+            try
+            {
+                ManualStop();
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Error while stopping the service.");
+            }
         }
 
         private void LoadPlugins(IUnityContainer container)
