@@ -67,7 +67,8 @@ namespace Micser.App.Infrastructure.Settings
 
                     foreach (var setting in settings)
                     {
-                        _settingsService.SetSetting(setting.Key, setting.Value);
+                        // TODO await
+                        _settingsService.SetSettingAsync(setting.Key, setting.Value);
                     }
                 }
 

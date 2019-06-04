@@ -108,6 +108,7 @@
     </Compile>
     <Compile Include="Interaction\SaveFileDialogAction.cs" />
     <Compile Include="Settings\ISettingHandler.cs" />
+    <Compile Include="Settings\ISettingHandlerFactory.cs" />
     <Compile Include="Settings\ISettingsRegistry.cs" />
     <Compile Include="Settings\ISettingsService.cs" />
     <Compile Include="ResourceBinding.cs" />
@@ -115,6 +116,7 @@
     <Compile Include="Settings\SettingChangedEventHandler.cs" />
     <Compile Include="Settings\SettingContainer.cs" />
     <Compile Include="Settings\SettingDefinition.cs" />
+    <Compile Include="Settings\SettingHandlerFactory.cs" />
     <Compile Include="Settings\SettingsSerializer.cs" />
     <Compile Include="Settings\SettingsPanel.cs" />
     <Compile Include="Settings\SettingsRegistry.cs" />

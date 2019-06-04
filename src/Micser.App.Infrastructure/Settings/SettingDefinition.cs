@@ -79,10 +79,10 @@ namespace Micser.App.Infrastructure.Settings
         public string Description { get; set; }
 
         /// <summary>
-        /// Gets or sets an <see cref="ISettingHandler"/> instance that is used to process loading/saving of the setting.
+        /// Gets or sets the type of a setting handler that is used to process loading/saving of the setting.
         /// This should be set if the <see cref="StorageType"/> is set to <see cref="SettingStorageType.Custom"/>.
         /// </summary>
-        public ISettingHandler Handler { get; set; }
+        public Type HandlerType { get; set; }
 
         /// <summary>
         /// Gets or sets whether the setting will be applied and saved instantly when changing it in the UI or the user has to click an Apply button first. Default is true.

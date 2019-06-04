@@ -22,6 +22,12 @@ namespace Micser.App.Infrastructure.Settings
             nameof(Description), typeof(string), typeof(SettingContainer), new PropertyMetadata(default(string)));
 
         /// <summary>
+        /// Indicates whether the control is busy (i.e. while saving).
+        /// </summary>
+        public static readonly DependencyProperty IsBusyProperty = DependencyProperty.Register(
+            nameof(IsBusy), typeof(bool), typeof(SettingContainer), new PropertyMetadata(false));
+
+        /// <summary>
         /// The main label text (setting name).
         /// </summary>
         public static readonly DependencyProperty LabelProperty = DependencyProperty.Register(
@@ -51,6 +57,16 @@ namespace Micser.App.Infrastructure.Settings
         {
             get => (string)GetValue(DescriptionProperty);
             set => SetValue(DescriptionProperty, value);
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the control is busy (i.e. while saving).
+        /// Wraps the <see cref="IsBusyProperty"/> dependency property.
+        /// </summary>
+        public bool IsBusy
+        {
+            get => (bool)GetValue(IsBusyProperty);
+            set => SetValue(IsBusyProperty, value);
         }
 
         /// <summary>

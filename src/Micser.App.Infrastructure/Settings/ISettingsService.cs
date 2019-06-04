@@ -26,12 +26,12 @@ namespace Micser.App.Infrastructure.Settings
         /// <summary>
         /// Loads the settings from the database.
         /// </summary>
-        Task LoadAsync();
+        Task LoadAsync(bool forceReload = false);
 
         /// <summary>
         /// Sets a setting value and saves it in the database.
         /// </summary>
         /// <returns>True if the setting was changed, otherwise false.</returns>
-        bool SetSetting(string key, object value);
+        Task<bool> SetSettingAsync(string key, object value);
     }
 }

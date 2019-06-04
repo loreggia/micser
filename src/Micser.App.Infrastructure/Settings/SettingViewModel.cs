@@ -135,11 +135,12 @@ namespace Micser.App.Infrastructure.Settings
             {
                 if (SetProperty(ref _value, value))
                 {
+                    IsChanged = true;
+
                     if (Definition.IsAppliedInstantly)
                     {
                         Apply();
                     }
-                    IsChanged = true;
                 }
             }
         }
@@ -147,11 +148,20 @@ namespace Micser.App.Infrastructure.Settings
         /// <summary>
         /// Saves the setting.
         /// </summary>
-        protected void Apply()
+        protected async void Apply()
         {
-            if (_settingsService.SetSetting(Definition.Key, Value))
+            try
             {
-                IsChanged = false;
+                IsBusy = true;
+                if (await _settingsService.SetSettingAsync(Definition.Key, Value))
+                {
+                    IsChanged = false;
+                }
+            }
+            finally
+            {
+                Value = _settingsService.GetSetting<T>(Definition.Key);
+                IsBusy = false;
             }
         }
 

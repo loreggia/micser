@@ -93,7 +93,7 @@ namespace Micser.App
                 };
 
                 var settingsService = GetService<ISettingsService>();
-                settingsService.SetSetting(AppGlobals.SettingKeys.ShellState, state);
+                settingsService.SetSettingAsync(AppGlobals.SettingKeys.ShellState, state).GetAwaiter().GetResult();
 
                 _shell = null;
             }

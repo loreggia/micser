@@ -8,6 +8,8 @@ using Micser.App.Infrastructure.Widgets;
 using Micser.Common;
 using Micser.Common.Api;
 using Prism.Ioc;
+using Prism.Unity;
+using Unity;
 
 namespace Micser.App.Infrastructure
 {
@@ -42,6 +44,9 @@ namespace Micser.App.Infrastructure
             containerRegistry.Register<IRequestProcessor, ApiEventRequestProcessor>();
 
             containerRegistry.Register<ISettingValueRepository, SettingValueRepository>();
+
+            var container = containerRegistry.GetContainer();
+            container.RegisterInstance<ISettingHandlerFactory>(new SettingHandlerFactory(t => (ISettingHandler)container.Resolve(t)));
 
             _isRegistered = true;
         }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.Win32;
+using Micser.App.Infrastructure.Api;
 using Micser.App.Infrastructure.Settings;
 using Micser.Common;
 using Micser.Common.Extensions;
@@ -7,24 +8,27 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Threading.Tasks;
 
 namespace Micser.App.Settings
 {
     public class VacCountSettingHandler : ISettingHandler
     {
         protected readonly ILogger _logger;
+        private readonly EngineApiClient _engineApiClient;
 
-        public VacCountSettingHandler(ILogger logger)
+        public VacCountSettingHandler(EngineApiClient engineApiClient, ILogger logger)
         {
             _logger = logger;
+            _engineApiClient = engineApiClient;
         }
 
-        public object OnLoadSetting(object value)
+        public async Task<object> LoadSettingAsync(object value)
         {
             return GetRegistryValue();
         }
 
-        public object OnSaveSetting(object value)
+        public async Task<object> SaveSettingAsync(object value)
         {
             var iValue = Convert.ToInt32(value);
             MathExtensions.Clamp(ref iValue, 1, Globals.MaxVacCount);
@@ -40,6 +44,8 @@ namespace Micser.App.Settings
 
             try
             {
+                await _engineApiClient.StopAsync();
+
                 var process = new Process
                 {
                     StartInfo = new ProcessStartInfo
@@ -80,6 +86,10 @@ namespace Micser.App.Settings
             {
                 _logger.Error(ex);
                 return currentValue;
+            }
+            finally
+            {
+                await _engineApiClient.StartAsync();
             }
         }
 

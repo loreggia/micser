@@ -6,6 +6,7 @@ using NLog;
 using System;
 using System.IO;
 using System.Reflection;
+using System.Threading.Tasks;
 using File = System.IO.File;
 
 namespace Micser.App.Settings
@@ -21,7 +22,7 @@ namespace Micser.App.Settings
             _logger = logger;
         }
 
-        public object OnLoadSetting(object value)
+        public async Task<object> LoadSettingAsync(object value)
         {
             try
             {
@@ -35,7 +36,7 @@ namespace Micser.App.Settings
             }
         }
 
-        public object OnSaveSetting(object value)
+        public async Task<object> SaveSettingAsync(object value)
         {
             value = value ?? false;
 
