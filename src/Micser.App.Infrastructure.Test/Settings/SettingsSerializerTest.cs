@@ -36,7 +36,7 @@ namespace Micser.App.Infrastructure.Test.Settings
             IDictionary<string, object> settings = new Dictionary<string, object>();
             var settingsServiceMock = new Mock<ISettingsService>();
             settingsServiceMock
-                .Setup(s => s.SetSetting(It.IsAny<string>(), It.IsAny<object>()))
+                .Setup(s => s.SetSettingAsync(It.IsAny<string>(), It.IsAny<object>()))
                 .Callback<string, object>((key, value) => settings.Add(key, value));
 
             var importer = new SettingsSerializer(LogManager.GetCurrentClassLogger(), settingsServiceMock.Object);

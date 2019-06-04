@@ -47,6 +47,7 @@
         <Setter Property="Description" Value="{Binding Definition.Description}" />
         <Setter Property="ApplyCommand" Value="{Binding ApplyCommand}" />
         <Setter Property="ShowApplyButton" Value="{Binding Definition.IsAppliedInstantly, Converter={converter:BooleanInvertConverter}}" />
+        <Setter Property="IsBusy" Value="{Binding IsBusy}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type settings:SettingContainer}">
@@ -64,6 +65,7 @@
                             <Button Grid.Column="2" Command="{TemplateBinding ApplyCommand}" Content="{x:Static properties:Resources.Apply}" Margin="10,5,0,5"
                                     Visibility="{TemplateBinding ShowApplyButton, Converter={converter:BooleanToVisibilityConverter}}" VerticalAlignment="Center" />
                             <controls:InfoButton Grid.Column="3" Content="{TemplateBinding Description}" Margin="10,5,5,5" />
+                            <controls:BusyPanel Grid.ColumnSpan="4" ShowText="False" SpinnerSize="25" Visibility="{TemplateBinding IsBusy, Converter={converter:BooleanToVisibilityConverter}}" />
                         </Grid>
                     </Border>
                 </ControlTemplate>

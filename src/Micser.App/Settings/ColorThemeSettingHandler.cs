@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Markup;
 
@@ -64,7 +65,7 @@ namespace Micser.App.Settings
             return _themeList;
         }
 
-        public object OnLoadSetting(object value)
+        public async Task<object> LoadSettingAsync(object value)
         {
             if (value is string name && _themeFiles.TryGetValue(name, out var fileName))
             {
@@ -74,7 +75,7 @@ namespace Micser.App.Settings
             return value;
         }
 
-        public object OnSaveSetting(object value)
+        public async Task<object> SaveSettingAsync(object value)
         {
             if (value is string name && _themeFiles.TryGetValue(name, out var fileName))
             {

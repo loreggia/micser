@@ -38,7 +38,7 @@ namespace Micser.App
                 DefaultValue = true,
                 Type = SettingType.Boolean,
                 StorageType = SettingStorageType.Custom,
-                Handler = containerProvider.Resolve<StartupSettingHandler>()
+                HandlerType = typeof(StartupSettingHandler)
             });
             settingsRegistry.Add(new SettingDefinition
             {
@@ -58,7 +58,7 @@ namespace Micser.App
                 DefaultValue = "Default",
                 Type = SettingType.List,
                 StorageType = SettingStorageType.Internal,
-                Handler = containerProvider.Resolve<ColorThemeSettingHandler>()
+                HandlerType = typeof(ColorThemeSettingHandler)
             });
             settingsRegistry.Add(new SettingDefinition
             {
@@ -76,7 +76,7 @@ namespace Micser.App
                 StorageType = SettingStorageType.Custom,
                 DefaultValue = 1,
                 List = Enumerable.Range(1, Globals.MaxVacCount).ToDictionary(x => (object)x, x => x.ToString(CultureInfo.InvariantCulture)),
-                Handler = containerProvider.Resolve<VacCountSettingHandler>(),
+                HandlerType = typeof(VacCountSettingHandler),
                 IsAppliedInstantly = false
             });
 

@@ -20,15 +20,18 @@ namespace Micser.App.Infrastructure.Settings
         private readonly SemaphoreSlim _loadSemaphore;
         private readonly ILogger _logger;
         private readonly ISettingsRegistry _registry;
+        private readonly ISettingHandlerFactory _settingHandlerFactory;
         private readonly IDictionary<string, object> _settings;
         private bool _isLoaded;
 
         /// <inheritdoc />
-        public SettingsService(IUnitOfWorkFactory database, ISettingsRegistry registry, ILogger logger)
+        public SettingsService(IUnitOfWorkFactory database, ISettingHandlerFactory settingHandlerFactory, ISettingsRegistry registry, ILogger logger)
         {
             _settings = new ConcurrentDictionary<string, object>();
             _loadSemaphore = new SemaphoreSlim(1, 1);
+
             _database = database;
+            _settingHandlerFactory = settingHandlerFactory;
             _registry = registry;
             _logger = logger;
         }
@@ -61,15 +64,85 @@ namespace Micser.App.Infrastructure.Settings
             return new ReadOnlyDictionary<string, object>(_settings);
         }
 
-        Task ISettingsService.LoadAsync()
+        /// <inheritdoc />
+        public async Task LoadAsync(bool forceReload = false)
         {
-            return Task.Run(() => EnsureLoaded(true));
+            if (_isLoaded && !forceReload)
+            {
+                return;
+            }
+
+            _loadSemaphore.Wait();
+
+            if (_isLoaded && !forceReload)
+            {
+                _loadSemaphore.Release();
+                return;
+            }
+
+            try
+            {
+                using (var uow = _database.Create())
+                {
+                    var settingRepo = uow.GetRepository<ISettingValueRepository>();
+
+                    foreach (var setting in _registry.Items)
+                    {
+                        object value = null;
+
+                        if (setting.StorageType == SettingStorageType.Internal)
+                        {
+                            var settingValue = settingRepo.GetByKey(setting.Key);
+
+                            if (settingValue?.ValueType != null)
+                            {
+                                var type = Type.GetType(settingValue.ValueType);
+
+                                if (type != null)
+                                {
+                                    value = JsonConvert.DeserializeObject(settingValue.ValueJson, type);
+                                }
+                            }
+                            else
+                            {
+                                value = setting.DefaultValue;
+                            }
+                        }
+
+                        if (setting.HandlerType != null)
+                        {
+                            var handler = _settingHandlerFactory.Create(setting.HandlerType);
+
+                            if (handler is IListSettingHandler listHandler)
+                            {
+                                setting.List = listHandler.CreateList();
+                            }
+
+                            if (handler != null)
+                            {
+                                value = await handler.LoadSettingAsync(value ?? setting.DefaultValue);
+                            }
+                        }
+
+                        _settings[setting.Key] = value;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex);
+            }
+            finally
+            {
+                _isLoaded = true;
+                _loadSemaphore.Release();
+            }
         }
 
         /// <inheritdoc />
-        public bool SetSetting(string key, object value)
+        public async Task<bool> SetSettingAsync(string key, object value)
         {
-            EnsureLoaded();
+            await LoadAsync(false);
 
             var setting = _registry.Items.FirstOrDefault(i => string.Equals(i.Key, key, StringComparison.InvariantCultureIgnoreCase));
 
@@ -78,9 +151,10 @@ namespace Micser.App.Infrastructure.Settings
                 _logger.Warn($"Saving unregistered setting '{key}'.");
             }
 
-            if (setting?.Handler != null)
+            if (setting?.HandlerType != null)
             {
-                value = setting.Handler.OnSaveSetting(value);
+                var handler = _settingHandlerFactory.Create(setting.HandlerType);
+                value = await handler.SaveSettingAsync(value);
             }
 
             var oldValue = _settings.ContainsKey(key) ? _settings[key] : null;
@@ -137,78 +211,6 @@ namespace Micser.App.Infrastructure.Settings
         protected virtual void OnSettingChanged(SettingChangedEventArgs e)
         {
             SettingChanged?.Invoke(this, e);
-        }
-
-        private void EnsureLoaded(bool forceReload = false)
-        {
-            if (_isLoaded && !forceReload)
-            {
-                return;
-            }
-            _loadSemaphore.Wait();
-            if (_isLoaded && !forceReload)
-            {
-                _loadSemaphore.Release();
-                return;
-            }
-
-            Load();
-            _loadSemaphore.Release();
-        }
-
-        private void Load()
-        {
-            try
-            {
-                using (var uow = _database.Create())
-                {
-                    var settingRepo = uow.GetRepository<ISettingValueRepository>();
-
-                    foreach (var setting in _registry.Items)
-                    {
-                        object value = null;
-
-                        if (setting.StorageType == SettingStorageType.Internal)
-                        {
-                            var settingValue = settingRepo.GetByKey(setting.Key);
-
-                            if (settingValue?.ValueType != null)
-                            {
-                                var type = Type.GetType(settingValue.ValueType);
-
-                                if (type != null)
-                                {
-                                    value = JsonConvert.DeserializeObject(settingValue.ValueJson, type);
-                                }
-                            }
-                            else
-                            {
-                                value = setting.DefaultValue;
-                            }
-                        }
-
-                        if (setting.Handler != null)
-                        {
-                            if (setting.Handler is IListSettingHandler listHandler)
-                            {
-                                setting.List = listHandler.CreateList();
-                            }
-
-                            value = setting.Handler.OnLoadSetting(value ?? setting.DefaultValue);
-                        }
-
-                        _settings[setting.Key] = value;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(ex);
-            }
-            finally
-            {
-                _isLoaded = true;
-            }
         }
     }
 }

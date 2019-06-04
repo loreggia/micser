@@ -26,14 +26,10 @@ namespace Micser.DriverUtility
                 deviceCount = Globals.MaxVacCount;
             }
 
-            try
+            var currentCount = GetRegistryValue();
+
+            if (!SetRegistryValue(deviceCount))
             {
-                var registryKey = Registry.CurrentUser.CreateSubKey(Globals.UserRegistryRoot, true);
-                registryKey.SetValue(Globals.RegistryValues.VacCount, (uint)deviceCount, RegistryValueKind.DWord);
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex, "Could not save the settings to the registry.");
                 return Globals.DriverUtility.ReturnCodes.RegistryAccessFailed;
             }
 
@@ -91,7 +87,37 @@ namespace Micser.DriverUtility
             catch (Exception ex)
             {
                 Logger.Error(ex, "Error while sending the reload control signal to the driver.");
+                SetRegistryValue(currentCount);
                 return Globals.DriverUtility.ReturnCodes.SendControlSignalFailed;
+            }
+        }
+
+        private int GetRegistryValue()
+        {
+            try
+            {
+                var registryKey = Registry.CurrentUser.CreateSubKey(Globals.UserRegistryRoot, false);
+                return (int)registryKey.GetValue(Globals.RegistryValues.VacCount, 1);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Error while getting the current device count.");
+                return 1;
+            }
+        }
+
+        private bool SetRegistryValue(int deviceCount)
+        {
+            try
+            {
+                var registryKey = Registry.CurrentUser.CreateSubKey(Globals.UserRegistryRoot, true);
+                registryKey.SetValue(Globals.RegistryValues.VacCount, (uint)deviceCount, RegistryValueKind.DWord);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex, "Could not save the settings to the registry.");
+                return false;
             }
         }
 
