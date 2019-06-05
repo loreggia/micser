@@ -50,36 +50,43 @@ namespace Micser.DriverUtility
                 {
                     Logger.Error("Could not open a driver handle.");
                     hFileHandle.Dispose();
-                    return Globals.DriverUtility.ReturnCodes.SendControlSignalFailed;
+                    result = Globals.DriverUtility.ReturnCodes.SendControlSignalFailed;
                 }
-
-                var ioCtlReload = SafeNativeMethods.CtlCode(
-                    SafeNativeMethods.FILE_DEVICE_UNKNOWN,
-                    DriverGlobals.IoControlCodes.Reload,
-                    SafeNativeMethods.METHOD_BUFFERED,
-                    SafeNativeMethods.GENERIC_READ | SafeNativeMethods.GENERIC_WRITE);
-
-                try
+                else
                 {
-                    Logger.Info($"Sending control code [{DriverGlobals.IoControlCodes.Reload}], encoded: [{ioCtlReload:X}]");
+                    var ioCtlReload = SafeNativeMethods.CtlCode(
+                        SafeNativeMethods.FILE_DEVICE_UNKNOWN,
+                        DriverGlobals.IoControlCodes.Reload,
+                        SafeNativeMethods.METHOD_BUFFERED,
+                        SafeNativeMethods.GENERIC_READ | SafeNativeMethods.GENERIC_WRITE);
 
-                    uint bytesReturned = 0;
-                    var overlapped = new NativeOverlapped();
-                    var success = SafeNativeMethods.DeviceIoControl(hFileHandle, ioCtlReload, null, 0, null, 0, ref bytesReturned, ref overlapped);
-
-                    if (!success)
+                    try
                     {
-                        Logger.Error("DeviceIoControl failed.");
-                        result = Globals.DriverUtility.ReturnCodes.SendControlSignalFailed;
+                        Logger.Info($"Sending control code [{DriverGlobals.IoControlCodes.Reload}], encoded: [{ioCtlReload:X}]");
+
+                        uint bytesReturned = 0;
+                        var overlapped = new NativeOverlapped();
+                        var success = SafeNativeMethods.DeviceIoControl(hFileHandle, ioCtlReload, null, 0, null, 0, ref bytesReturned, ref overlapped);
+
+                        if (!success)
+                        {
+                            Logger.Error("DeviceIoControl failed.");
+                            result = Globals.DriverUtility.ReturnCodes.SendControlSignalFailed;
+                        }
+                    }
+                    finally
+                    {
+                        if (!hFileHandle.IsClosed && !hFileHandle.IsInvalid)
+                        {
+                            hFileHandle.Close();
+                            hFileHandle.Dispose();
+                        }
                     }
                 }
-                finally
+
+                if (result != Globals.DriverUtility.ReturnCodes.Success)
                 {
-                    if (!hFileHandle.IsClosed && !hFileHandle.IsInvalid)
-                    {
-                        hFileHandle.Close();
-                        hFileHandle.Dispose();
-                    }
+                    SetRegistryValue(currentCount);
                 }
 
                 return result;
