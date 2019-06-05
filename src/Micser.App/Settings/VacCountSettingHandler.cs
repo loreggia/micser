@@ -33,13 +33,6 @@ namespace Micser.App.Settings
             var iValue = Convert.ToInt32(value);
             MathExtensions.Clamp(ref iValue, 1, Globals.MaxVacCount);
 
-            var currentValue = GetRegistryValue();
-
-            if (iValue == currentValue)
-            {
-                return iValue;
-            }
-
             var a = Globals.DriverUtility.ArgumentNameChars[0];
 
             try
@@ -62,35 +55,28 @@ namespace Micser.App.Settings
                 if (!process.Start())
                 {
                     _logger.Error("Could not start the driver utility.");
-                    return currentValue;
                 }
-
-                if (!process.WaitForExit(30000))
+                else if (!process.WaitForExit(30000))
                 {
                     _logger.Error("The driver utility did not finish within 30 seconds. Aborting...");
                     process.Kill();
-                    return currentValue;
                 }
 
-                var exitCode = process.ExitCode;
-
-                if (exitCode != Globals.DriverUtility.ReturnCodes.Success)
+                if (process.ExitCode != Globals.DriverUtility.ReturnCodes.Success)
                 {
-                    _logger.Error($"Driver utility returned with exit code {exitCode}");
-                    return currentValue;
+                    _logger.Error($"Driver utility returned with exit code {process.ExitCode}");
                 }
-
-                return iValue;
             }
             catch (Exception ex)
             {
                 _logger.Error(ex);
-                return currentValue;
             }
             finally
             {
                 await _engineApiClient.StartAsync();
             }
+
+            return GetRegistryValue();
         }
 
         private int GetRegistryValue()
