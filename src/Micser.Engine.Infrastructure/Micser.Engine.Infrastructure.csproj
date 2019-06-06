@@ -48,6 +48,7 @@
     <Compile Include="Audio\ISampleProcessor.cs" />
     <Compile Include="Audio\IWaveBuffer.cs" />
     <Compile Include="Audio\MixerSampleSource.cs" />
+    <Compile Include="Audio\SampleProcessor.cs" />
     <Compile Include="Audio\VolumeSampleProcessor.cs" />
     <Compile Include="Audio\WaveBuffer.cs" />
     <Compile Include="DataAccess\EngineDbContext.cs" />
