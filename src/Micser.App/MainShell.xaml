@@ -16,7 +16,8 @@
         MinWidth="350"
         MinHeight="250"
         Icon="logo.ico"
-        UseLayoutRounding="True">
+        UseLayoutRounding="True"
+        WindowStartupLocation="CenterScreen">
 
     <Window.Resources>
         <Style x:Key="RegionStyle" TargetType="ContentControl">
