@@ -48,6 +48,8 @@
   <ItemGroup>
     <Compile Include="Audio\CompressorSampleProcessor.cs" />
     <Compile Include="Audio\CompressorType.cs" />
+    <Compile Include="Audio\EqualizerSampleProcessor.cs" />
+    <Compile Include="Audio\FilterDescription.cs" />
     <Compile Include="Audio\GainSampleProcessor.cs" />
     <Compile Include="Audio\WriteableBufferingSource.cs" />
     <Compile Include="MainAppModule.cs" />
@@ -55,6 +57,7 @@
     <Compile Include="Modules\CompressorModule.cs" />
     <Compile Include="Modules\DeviceInputModule.cs" />
     <Compile Include="Modules\DeviceOutputModule.cs" />
+    <Compile Include="Modules\EqualizerModule.cs" />
     <Compile Include="Modules\GainModule.cs" />
     <Compile Include="Modules\LoopbackDeviceInputModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

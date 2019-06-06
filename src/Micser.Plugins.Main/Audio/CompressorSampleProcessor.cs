@@ -8,7 +8,7 @@ using System;
 namespace Micser.Plugins.Main.Audio
 {
     // https://code.soundsoftware.ac.uk/projects/audio_effects_textbook_code/repository
-    public class CompressorSampleProcessor : ISampleProcessor
+    public class CompressorSampleProcessor : SampleProcessor
     {
         private const int ChunkSize = 32;
 
@@ -33,16 +33,10 @@ namespace Micser.Plugins.Main.Audio
         public CompressorSampleProcessor(CompressorModule module)
         {
             _module = module;
-
-            IsEnabled = true;
             Priority = 50;
         }
 
-        public bool IsEnabled { get; set; }
-
-        public int Priority { get; set; }
-
-        public void Process(WaveFormat waveFormat, ref float value)
+        public override void Process(WaveFormat waveFormat, ref float value)
         {
             var typeChanged = _type != _module.Type;
             if (waveFormat.SampleRate != _sampleRate ||
