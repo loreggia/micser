@@ -10,7 +10,7 @@ namespace Micser.Common.Api
         /// <summary>
         /// The name of the default request processor that is used when a request did not specify a resource name.
         /// </summary>
-        public const string DefaultName = "<default>";
+        public const string DefaultName = Globals.ApiResources.Default;
 
         /// <summary>
         /// Creates an instance of the <see cref="RequestProcessorNameAttribute"/> class with the specified name.

@@ -78,6 +78,8 @@ namespace Micser.Engine
             _engine = container.Resolve<IAudioEngine>();
             _server = container.Resolve<IApiServer>();
 
+            container.RegisterInstance<IApiEndPoint>(_server);
+
             LoadPlugins(container);
 
             _server.Start();

@@ -6,8 +6,7 @@ namespace Micser.Plugins.Main.Modules
 {
     public class EqualizerModule : AudioModule
     {
-        protected EqualizerModule(long id)
-            : base(id)
+        protected EqualizerModule()
         {
             Filters = new List<FilterDescription>();
 

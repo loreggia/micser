@@ -183,4 +183,10 @@
   <data name="Name" xml:space="preserve">
     <value>Name</value>
   </data>
+  <data name="SpectrumWidgetDescription" xml:space="preserve">
+    <value>Visualizes the audio spectrum.</value>
+  </data>
+  <data name="SpectrumWidgetName" xml:space="preserve">
+    <value>Spectrum</value>
+  </data>
 </root>

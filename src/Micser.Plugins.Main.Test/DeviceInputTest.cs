@@ -14,7 +14,7 @@ namespace Micser.Plugins.Main.Test
         [Fact]
         public async Task TestActualInput()
         {
-            var module = new DeviceInputModule(1);
+            var module = new DeviceInputModule();
 
             using (var deviceEnumerator = new MMDeviceEnumerator())
             {
@@ -55,7 +55,6 @@ namespace Micser.Plugins.Main.Test
             private readonly Action<IAudioModule, WaveFormat, byte[], int, int> _writeCallback;
 
             public TestOutputModule(Action<IAudioModule, WaveFormat, byte[], int, int> writeCallback)
-                : base(-1)
             {
                 _writeCallback = writeCallback;
             }

@@ -6,8 +6,8 @@
     public interface IIdentifiable
     {
         /// <summary>
-        /// Gets the object's ID.
+        /// Gets or sets the object's ID.
         /// </summary>
-        long Id { get; }
+        long Id { get; set; }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Micser.Common.Api;
+﻿using Micser.Common;
+using Micser.Common.Api;
 using Micser.Common.Modules;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -10,7 +11,7 @@ namespace Micser.App.Infrastructure.Api
     /// </summary>
     public class ModulesApiClient
     {
-        private const string ResourceName = "modules";
+        private const string ResourceName = Globals.ApiResources.Modules;
         private readonly IApiEndPoint _apiEndPoint;
 
         /// <inheritdoc />

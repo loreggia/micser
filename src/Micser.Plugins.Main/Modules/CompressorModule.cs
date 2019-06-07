@@ -6,8 +6,7 @@ namespace Micser.Plugins.Main.Modules
 {
     public class CompressorModule : AudioModule
     {
-        public CompressorModule(long id)
-            : base(id)
+        public CompressorModule()
         {
             AddSampleProcessor(new CompressorSampleProcessor(this));
         }

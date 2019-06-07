@@ -1,4 +1,5 @@
-﻿using Micser.Common.Api;
+﻿using Micser.Common;
+using Micser.Common.Api;
 using System.Threading.Tasks;
 
 namespace Micser.App.Infrastructure.Api
@@ -8,7 +9,7 @@ namespace Micser.App.Infrastructure.Api
     /// </summary>
     public class StatusApiClient
     {
-        private const string ResourceName = "status";
+        private const string ResourceName = Globals.ApiResources.Status;
         private readonly IApiEndPoint _apiEndPoint;
 
         /// <inheritdoc />

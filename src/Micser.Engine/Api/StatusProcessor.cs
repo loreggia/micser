@@ -1,8 +1,9 @@
-﻿using Micser.Common.Api;
+﻿using Micser.Common;
+using Micser.Common.Api;
 
 namespace Micser.Engine.Api
 {
-    [RequestProcessorName("status")]
+    [RequestProcessorName(Globals.ApiResources.Status)]
     public class StatusProcessor : RequestProcessor
     {
         public StatusProcessor()
