@@ -1,4 +1,5 @@
-﻿using Micser.Common.Api;
+﻿using Micser.Common;
+using Micser.Common.Api;
 using Micser.Common.Modules;
 using Micser.Engine.Audio;
 using Micser.Engine.Infrastructure.Services;
@@ -8,7 +9,7 @@ using System.Linq;
 
 namespace Micser.Engine.Api
 {
-    [RequestProcessorName("modules")]
+    [RequestProcessorName(Globals.ApiResources.Modules)]
     public class ModulesProcessor : RequestProcessor
     {
         private readonly IAudioEngine _audioEngine;

@@ -6,8 +6,7 @@ namespace Micser.Plugins.Main.Modules
 {
     public class GainModule : AudioModule
     {
-        public GainModule(long id)
-            : base(id)
+        public GainModule()
         {
             AddSampleProcessor(new GainSampleProcessor(this));
         }

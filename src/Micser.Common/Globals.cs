@@ -42,6 +42,15 @@ namespace Micser.Common
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData, Environment.SpecialFolderOption.Create),
             "Micser");
 
+        public static class ApiResources
+        {
+            public const string Default = "<default>";
+            public const string Engine = "Engine";
+            public const string ModuleConnections = "moduleconnections";
+            public const string Modules = "modules";
+            public const string Status = "status";
+        }
+
         /// <summary>
         /// Constants for managing the virtual audio cable driver using the Micser.DriverUtility application
         /// </summary>

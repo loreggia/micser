@@ -30,9 +30,8 @@ namespace Micser.Engine.Infrastructure.Audio
         private IWaveBuffer _waveBuffer;
 
         /// <inheritdoc />
-        protected AudioModule(long id)
+        protected AudioModule()
         {
-            Id = id;
             _outputs = new List<IAudioModule>(2);
             _sampleProcessors = new List<ISampleProcessor>
             {
@@ -47,7 +46,7 @@ namespace Micser.Engine.Infrastructure.Audio
         }
 
         /// <inheritdoc />
-        public virtual long Id { get; }
+        public virtual long Id { get; set; }
 
         /// <inheritdoc />
         public virtual bool IsMuted { get; set; }

@@ -1,5 +1,4 @@
 ﻿using CSCore.CoreAudioAPI;
-using Micser.Common;
 using Micser.Common.Api;
 using Micser.Engine.Infrastructure.Audio;
 using Micser.Engine.Infrastructure.Services;
@@ -58,8 +57,9 @@ namespace Micser.Engine.Audio
             var type = Type.GetType(moduleDto.ModuleType);
             if (type != null)
             {
-                if (_container.Resolve(type, new OrderedParametersOverride(id)) is IAudioModule audioModule)
+                if (_container.Resolve(type) is IAudioModule audioModule)
                 {
+                    audioModule.Id = id;
                     audioModule.SetState(moduleDto.State);
                     _modules.Add(audioModule);
                 }

@@ -1,0 +1,12 @@
+﻿<widgets:Widget x:Class="Micser.Plugins.Main.Widgets.SpectrumWidget"
+                xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                xmlns:local="clr-namespace:Micser.Plugins.Main.Widgets"
+                xmlns:widgets="clr-namespace:Micser.App.Infrastructure.Widgets;assembly=Micser.App.Infrastructure"
+                mc:Ignorable="d"
+                d:DataContext="{d:DesignInstance local:SpectrumViewModel}">
+    <Grid>
+    </Grid>
+</widgets:Widget>

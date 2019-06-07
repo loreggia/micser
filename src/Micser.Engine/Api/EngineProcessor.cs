@@ -1,9 +1,10 @@
-﻿using Micser.Common.Api;
+﻿using Micser.Common;
+using Micser.Common.Api;
 using Micser.Engine.Audio;
 
 namespace Micser.Engine.Api
 {
-    [RequestProcessorName("engine")]
+    [RequestProcessorName(Globals.ApiResources.Engine)]
     public class EngineProcessor : RequestProcessor
     {
         private readonly IAudioEngine _audioEngine;

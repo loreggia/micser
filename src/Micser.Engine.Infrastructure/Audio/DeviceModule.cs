@@ -13,8 +13,7 @@ namespace Micser.Engine.Infrastructure.Audio
         private DeviceDescription _deviceDescription;
 
         /// <inheritdoc />
-        protected DeviceModule(long id)
-            : base(id)
+        protected DeviceModule()
         {
             DeviceEnumerator = new MMDeviceEnumerator();
             DeviceEnumerator.DeviceStateChanged += DeviceStateChanged;

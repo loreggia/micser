@@ -8,11 +8,6 @@ namespace Micser.Plugins.Main.Modules
     {
         private WasapiCapture _capture;
 
-        public DeviceInputModule(long id)
-            : base(id)
-        {
-        }
-
         protected virtual WasapiCapture CreateCapture()
         {
             return new WasapiCapture(true, AudioClientShareMode.Shared) { Device = Device };

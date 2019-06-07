@@ -14,7 +14,8 @@ namespace Micser.Plugins.Main
                 typeof(LoopbackDeviceInputModule),
                 typeof(DeviceOutputModule),
                 typeof(CompressorModule),
-                typeof(GainModule));
+                typeof(GainModule),
+                typeof(SpectrumModule));
         }
     }
 }

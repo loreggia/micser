@@ -1,4 +1,5 @@
-﻿using Micser.Common.Api;
+﻿using Micser.Common;
+using Micser.Common.Api;
 using System.Threading.Tasks;
 
 namespace Micser.App.Infrastructure.Api
@@ -8,7 +9,7 @@ namespace Micser.App.Infrastructure.Api
     /// </summary>
     public class EngineApiClient
     {
-        private const string ResourceName = "engine";
+        private const string ResourceName = Globals.ApiResources.Engine;
         private readonly IApiEndPoint _apiEndPoint;
 
         /// <inheritdoc />

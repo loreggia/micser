@@ -23,8 +23,7 @@ namespace Micser.Plugins.Main.Modules
         private float _volume;
         private VolumeSource _volumeSource;
 
-        public DeviceOutputModule(long id)
-            : base(id)
+        public DeviceOutputModule()
         {
             _inputBuffers = new ConcurrentDictionary<long, WriteableBufferingSource>();
             _inputSources = new ConcurrentDictionary<long, ISampleSource>();
