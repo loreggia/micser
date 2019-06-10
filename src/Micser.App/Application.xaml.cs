@@ -6,6 +6,7 @@ using Micser.App.Infrastructure.Settings;
 using Micser.App.Infrastructure.Themes;
 using Micser.App.Settings;
 using Micser.Common;
+using Micser.Common.Api;
 using Micser.Common.DataAccess;
 using NLog;
 using NLog.Config;
@@ -20,6 +21,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows;
 using System.Windows.Threading;
 using Unity;
@@ -34,12 +36,17 @@ namespace Micser.App
     public partial class Application
     {
         private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
+        private readonly Timer _reconnectTimer;
+        private IApiEndPoint _apiEndPoint;
         private bool _isStartup;
         private MainShell _shell;
 
         public Application()
         {
             DispatcherUnhandledException += OnDispatcherUnhandledException;
+
+            _reconnectTimer = new Timer(1000) { AutoReset = true };
+            _reconnectTimer.Elapsed += OnReconnectTimerElapsed;
         }
 
         public static T GetService<T>()
@@ -82,6 +89,9 @@ namespace Micser.App
 
         protected override void OnExit(ExitEventArgs e)
         {
+            _reconnectTimer.Stop();
+            _reconnectTimer.Dispose();
+
             if (_shell != null)
             {
                 var state = new ShellState
@@ -108,6 +118,9 @@ namespace Micser.App
             var settingsService = GetService<ISettingsService>();
 
             await Task.Run(() => settingsService.LoadAsync());
+
+            _apiEndPoint = GetService<IApiEndPoint>();
+            _reconnectTimer.Start();
 
             var showWindow = true;
 
@@ -216,6 +229,15 @@ namespace Micser.App
         {
             Logger.Error(e.Exception, "Unhandled application exception.");
             e.Handled = true;
+        }
+
+        private async void OnReconnectTimerElapsed(object sender, ElapsedEventArgs e)
+        {
+            if (_apiEndPoint != null &&
+                _apiEndPoint.State == EndPointState.Disconnected)
+            {
+                await _apiEndPoint.ConnectAsync();
+            }
         }
     }
 }

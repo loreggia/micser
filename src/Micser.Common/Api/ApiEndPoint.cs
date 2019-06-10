@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json;
 using NLog;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
@@ -79,6 +80,11 @@ namespace Micser.Common.Api
                 return new JsonResponse(false, null, null, false);
             }
 
+            if (_sendMessageSemaphore.Count > 0)
+            {
+                Debug.WriteLine(_sendMessageSemaphore.Count);
+            }
+
             await _sendMessageSemaphore.WaitAsync();
 
             try
@@ -155,6 +161,7 @@ namespace Micser.Common.Api
                     if (message == null)
                     {
                         Disconnect();
+                        return;
                     }
                     var response = ProcessMessage(message);
                     await ApiProtocol.WriteMessage(InStream, response);

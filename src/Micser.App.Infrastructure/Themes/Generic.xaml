@@ -13,6 +13,7 @@
         <ResourceDictionary Source="Expander.xaml" />
         <ResourceDictionary Source="Icons.xaml" />
         <ResourceDictionary Source="InfoButton.xaml" />
+        <ResourceDictionary Source="LinePanel.xaml" />
         <ResourceDictionary Source="Menu.xaml" />
         <ResourceDictionary Source="Slider.xaml" />
         <ResourceDictionary Source="SettingsPanel.xaml" />

@@ -1,6 +1,5 @@
 ﻿using CSCore;
 using CSCore.DSP;
-using Micser.Common.Api;
 using Micser.Engine.Infrastructure.Audio;
 using Micser.Plugins.Main.Api;
 using Micser.Plugins.Main.Modules;
@@ -9,36 +8,39 @@ namespace Micser.Plugins.Main.Audio
 {
     public class SpectrumSampleProcessor : SampleProcessor
     {
-        protected readonly IApiEndPoint _apiEndPoint;
         protected readonly SpectrumModule _module;
         protected int _currentSampleIndex;
         protected float[] _fftBuffer;
         protected SpectrumFftProvider _fftProvider;
         protected float[] _sampleBuffer;
+        protected int _sampleBufferSize;
+        protected SpectrumData.SpectrumValue[] _spectrumValueBuffer;
 
-        public SpectrumSampleProcessor(SpectrumModule module, IApiEndPoint apiEndPoint)
+        public SpectrumSampleProcessor(SpectrumModule module)
         {
-            _apiEndPoint = apiEndPoint;
             _module = module;
 
             FftSize = FftSize.Fft4096;
-            ChannelBufferSize = 512;
+            _sampleBufferSize = 4096;
         }
 
-        public int ChannelBufferSize { get; set; }
+        public SpectrumData Data { get; protected set; }
         public FftSize FftSize { get; set; }
 
         public override void Process(WaveFormat waveFormat, ref float value)
         {
+            _sampleBufferSize = waveFormat.SampleRate / 10 * waveFormat.Channels;
+
             if (_fftProvider == null
                 || _fftProvider.Channels != waveFormat.Channels
                 || _fftProvider.SampleRate != waveFormat.SampleRate
                 || _fftProvider.FftSize != FftSize
                 || _sampleBuffer == null
-                || _sampleBuffer.Length != (ChannelBufferSize * waveFormat.Channels))
+                || _sampleBuffer.Length != _sampleBufferSize)
             {
-                _sampleBuffer = new float[ChannelBufferSize * waveFormat.Channels];
+                _sampleBuffer = new float[_sampleBufferSize];
                 _fftBuffer = new float[(int)FftSize];
+                _spectrumValueBuffer = new SpectrumData.SpectrumValue[(int)FftSize / 2];
                 _fftProvider = new SpectrumFftProvider(waveFormat.SampleRate, waveFormat.Channels, FftSize);
             }
 
@@ -56,7 +58,16 @@ namespace Micser.Plugins.Main.Audio
             if (_fftProvider.IsNewDataAvailable)
             {
                 _fftProvider.GetFftData(_fftBuffer);
-                _apiEndPoint.SendMessageAsync(new JsonRequest("spectrum", null, new SpectrumData()));
+                for (int i = 0; i < _spectrumValueBuffer.Length; i++)
+                {
+                    _spectrumValueBuffer[i].Frequency = _fftProvider.GetFftFrequency(i);
+                    _spectrumValueBuffer[i].Value = _fftBuffer[i];
+                }
+
+                Data = new SpectrumData
+                {
+                    Values = _spectrumValueBuffer
+                };
             }
         }
     }

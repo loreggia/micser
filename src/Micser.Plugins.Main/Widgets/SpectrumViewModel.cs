@@ -4,7 +4,6 @@ using Micser.Plugins.Main.Api;
 using Micser.Plugins.Main.Modules;
 using Prism.Events;
 using System;
-using System.Diagnostics;
 
 namespace Micser.Plugins.Main.Widgets
 {
@@ -13,6 +12,7 @@ namespace Micser.Plugins.Main.Widgets
         public const string InputConnectorName = "Input1";
         public const string OutputConnectorName = "Output1";
         private readonly IEventAggregator _eventAggregator;
+        private SpectrumData _spectrumData;
         private SubscriptionToken _subToken;
 
         public SpectrumViewModel(IEventAggregator eventAggregator)
@@ -24,6 +24,13 @@ namespace Micser.Plugins.Main.Widgets
         }
 
         public override Type ModuleType => typeof(SpectrumModule);
+
+        [Unsaved]
+        public SpectrumData SpectrumData
+        {
+            get => _spectrumData;
+            set => SetProperty(ref _spectrumData, value);
+        }
 
         public override void Initialize()
         {
@@ -46,7 +53,7 @@ namespace Micser.Plugins.Main.Widgets
 
         private void OnSpectrumDataEvent(SpectrumData data)
         {
-            Debug.WriteLine(data);
+            SpectrumData = data;
         }
     }
 }
