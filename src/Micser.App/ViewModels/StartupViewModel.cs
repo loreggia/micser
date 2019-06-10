@@ -56,7 +56,7 @@ namespace Micser.App.ViewModels
                 shell.Left = shellState.Left;
             }
 
-            var isConnected = await _apiEndPoint.ConnectAsync();
+            var isConnected = _apiEndPoint.State == EndPointState.Connected;
 
             if (isConnected)
             {

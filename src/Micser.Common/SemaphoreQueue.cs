@@ -28,6 +28,8 @@ namespace Micser.Common
             _currentCount = initialCount;
         }
 
+        public int Count => _currentCount;
+
         public void Dispose()
         {
             Dispose(true);

@@ -69,6 +69,7 @@
     <Compile Include="Controls\EditableSlider.cs" />
     <Compile Include="Controls\EditableTextBlock.cs" />
     <Compile Include="Controls\InfoButton.cs" />
+    <Compile Include="Controls\LinePanel.cs" />
     <Compile Include="Controls\LoadingSpinner.cs" />
     <Compile Include="Converter\BooleanConverter.cs" />
     <Compile Include="Converter\BooleanInvertConverter.cs" />
@@ -170,6 +171,7 @@
     <Compile Include="Widgets\IWidgetRegistry.cs" />
     <Compile Include="Widgets\ResizeThumb.cs" />
     <Compile Include="Widgets\RubberbandAdorner.cs" />
+    <Compile Include="Widgets\UnsavedAttribute.cs" />
     <Compile Include="Widgets\Widget.cs" />
     <Compile Include="Widgets\WidgetDescription.cs" />
     <Compile Include="Widgets\WidgetFactory.cs" />
@@ -188,6 +190,10 @@
     <Page Include="TestView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Themes\LinePanel.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Themes\EditableSlider.xaml">
       <Generator>MSBuild:Compile</Generator>

@@ -73,6 +73,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Widgets\CompressorViewModel.cs" />
+    <Compile Include="Widgets\PeakSpectrum.cs" />
     <Compile Include="Widgets\SpectrumWidget.xaml.cs">
       <DependentUpon>SpectrumWidget.xaml</DependentUpon>
     </Compile>
@@ -128,6 +129,9 @@
   <ItemGroup>
     <PackageReference Include="CSCore">
       <Version>1.2.1.2</Version>
+    </PackageReference>
+    <PackageReference Include="CSCore.Visualization">
+      <Version>0.8.9</Version>
     </PackageReference>
     <PackageReference Include="NLog">
       <Version>4.6.3</Version>
