@@ -18,7 +18,7 @@ namespace Micser.Plugins.Main.Modules
             _sampleProcessor = new SpectrumSampleProcessor(this);
             AddSampleProcessor(_sampleProcessor);
 
-            _timer = new Timer(100) { AutoReset = false };
+            _timer = new Timer(50) { AutoReset = false };
             _timer.Elapsed += OnTimerElapsed;
             _timer.Start();
         }

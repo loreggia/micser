@@ -197,36 +197,50 @@ namespace Micser.Common.Api
         {
             public static async Task<string> ReceiveMessage(Stream tcpStream)
             {
-                var reqCountBytes = new byte[sizeof(int)];
+                var headerBuffer = new byte[sizeof(int)];
+                var headerRead = 0;
+                int bytesRead;
 
-                var readCount = await tcpStream.ReadAsync(reqCountBytes, 0, reqCountBytes.Length);
+                do
+                {
+                    bytesRead = await tcpStream.ReadAsync(headerBuffer, headerRead, headerBuffer.Length - headerRead).ConfigureAwait(false);
+                    headerRead += bytesRead;
+                }
+                while (headerRead < headerBuffer.Length && bytesRead > 0);
 
-                if (readCount != reqCountBytes.Length)
+                if (headerRead != headerBuffer.Length)
                 {
                     return null;
                 }
 
-                var reqCount = BitConverter.ToInt32(reqCountBytes, 0);
-                var reqBytes = new byte[reqCount];
-                readCount = await tcpStream.ReadAsync(reqBytes, 0, reqCount);
+                var contentLength = BitConverter.ToInt32(headerBuffer, 0);
+                var contentBuffer = new byte[contentLength];
+                var contentRead = 0;
 
-                if (readCount != reqCount)
+                do
+                {
+                    bytesRead = await tcpStream.ReadAsync(contentBuffer, contentRead, contentLength - contentRead).ConfigureAwait(false);
+                    contentRead += bytesRead;
+                }
+                while (contentRead < contentLength && bytesRead > 0);
+
+                if (contentRead != contentLength)
                 {
                     return null;
                 }
 
-                return Encoding.UTF8.GetString(reqBytes);
+                return Encoding.UTF8.GetString(contentBuffer);
             }
 
             public static async Task WriteMessage(Stream tcpStream, string content)
             {
                 var contentBytes = Encoding.UTF8.GetBytes(content);
-                var countBytes = BitConverter.GetBytes(contentBytes.Length);
+                var headerBytes = BitConverter.GetBytes(contentBytes.Length);
 
-                await tcpStream.WriteAsync(countBytes, 0, countBytes.Length);
-                await tcpStream.FlushAsync();
-                await tcpStream.WriteAsync(contentBytes, 0, contentBytes.Length);
-                await tcpStream.FlushAsync();
+                await tcpStream.WriteAsync(headerBytes, 0, headerBytes.Length).ConfigureAwait(false);
+                await tcpStream.FlushAsync().ConfigureAwait(false);
+                await tcpStream.WriteAsync(contentBytes, 0, contentBytes.Length).ConfigureAwait(false);
+                await tcpStream.FlushAsync().ConfigureAwait(false);
             }
         }
     }

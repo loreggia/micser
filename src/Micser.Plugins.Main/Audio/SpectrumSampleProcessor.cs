@@ -53,21 +53,22 @@ namespace Micser.Plugins.Main.Audio
                 _currentSampleIndex = 0;
 
                 _fftProvider.Add(_sampleBuffer, _sampleBuffer.Length);
-            }
 
-            if (_fftProvider.IsNewDataAvailable)
-            {
-                _fftProvider.GetFftData(_fftBuffer);
-                for (int i = 0; i < _spectrumValueBuffer.Length; i++)
+                if (_fftProvider.IsNewDataAvailable)
                 {
-                    _spectrumValueBuffer[i].Frequency = _fftProvider.GetFftFrequency(i);
-                    _spectrumValueBuffer[i].Value = _fftBuffer[i];
+                    _fftProvider.GetFftData(_fftBuffer);
+                    for (int i = 0; i < _spectrumValueBuffer.Length; i++)
+                    {
+                        _spectrumValueBuffer[i].Frequency = _fftProvider.GetFftFrequency(i);
+                        _spectrumValueBuffer[i].Value += _fftBuffer[i];
+                        _spectrumValueBuffer[i].Value /= 2f;
+                    }
+
+                    Data = new SpectrumData
+                    {
+                        Values = _spectrumValueBuffer
+                    };
                 }
-
-                Data = new SpectrumData
-                {
-                    Values = _spectrumValueBuffer
-                };
             }
         }
     }

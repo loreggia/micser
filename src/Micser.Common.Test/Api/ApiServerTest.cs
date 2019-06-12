@@ -2,6 +2,7 @@
 using Moq;
 using NLog;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
@@ -133,6 +134,48 @@ namespace Micser.Common.Test.Api
         }
 
         [Fact]
+        public async Task SendLargeObject()
+        {
+            var configuration = GetConfiguration();
+            var factory = GetFactory();
+
+            _testOutputHelper.WriteLine($"{nameof(SendLargeObject)}: using port {configuration.Port}");
+
+            using (var server = new ApiServer(configuration, factory, LogManager.GetCurrentClassLogger()))
+            using (var client = new ApiClient(configuration, factory, LogManager.GetCurrentClassLogger()))
+            {
+                var startResult = server.Start();
+
+                Assert.True(startResult);
+
+                var serverTask = server.ConnectAsync();
+                var clientTask = client.ConnectAsync();
+                await Task.WhenAll(serverTask, clientTask);
+
+                Assert.True(serverTask.Result);
+
+                var valueCount = 100000;
+                var content = new TestObject
+                {
+                    Values = new double[valueCount]
+                };
+                for (int i = 0; i < valueCount; i++)
+                {
+                    content.Values[i] = i;
+                }
+
+                var stopwatch = Stopwatch.StartNew();
+                var result = await client.SendMessageAsync(new JsonRequest("test", null, content));
+                stopwatch.Stop();
+
+                _testOutputHelper.WriteLine($"Sending {valueCount} values took {stopwatch.Elapsed}");
+
+                Assert.NotNull(result);
+                Assert.True(result.IsSuccess, result.Message);
+            }
+        }
+
+        [Fact]
         public async Task SendServerToClient()
         {
             var configuration = GetConfiguration();
@@ -215,6 +258,11 @@ namespace Micser.Common.Test.Api
             var factoryMock = new Mock<IRequestProcessorFactory>();
             factoryMock.Setup(f => f.Create(It.IsAny<string>())).Returns(processorMock.Object);
             return factoryMock.Object;
+        }
+
+        private class TestObject
+        {
+            public double[] Values { get; set; }
         }
     }
 }
