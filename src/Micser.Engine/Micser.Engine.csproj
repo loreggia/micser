@@ -95,10 +95,10 @@
       <Version>1.2.1.2</Version>
     </PackageReference>
     <PackageReference Include="NLog">
-      <Version>4.6.3</Version>
+      <Version>4.6.4</Version>
     </PackageReference>
     <PackageReference Include="System.Data.SQLite.Core">
-      <Version>1.0.110</Version>
+      <Version>1.0.111</Version>
     </PackageReference>
     <PackageReference Include="Unity">
       <Version>5.8.13</Version>
