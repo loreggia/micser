@@ -17,7 +17,7 @@ namespace Micser.Plugins.Main.Audio
             _module = module;
         }
 
-        public override void Process(WaveFormat waveFormat, ref float value)
+        public override void Process(WaveFormat waveFormat, float[] channelSamples)
         {
             if (_sampleRate != waveFormat.SampleRate ||
                 _filters.Count != _module.Filters.Count)
@@ -31,7 +31,7 @@ namespace Micser.Plugins.Main.Audio
 
             foreach (var filter in _filters)
             {
-                value = filter.Process(value);
+                filter.Process(channelSamples);
             }
         }
 

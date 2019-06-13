@@ -21,7 +21,7 @@ namespace Micser.Engine.Infrastructure.Audio
         /// Processes a sample value.
         /// </summary>
         /// <param name="waveFormat">The format of the samples.</param>
-        /// <param name="value">The current sample value that can be modified to apply effects.</param>
-        void Process(WaveFormat waveFormat, ref float value);
+        /// <param name="channelSamples">The current sample block (one sample value per channel).</param>
+        void Process(WaveFormat waveFormat, float[] channelSamples);
     }
 }

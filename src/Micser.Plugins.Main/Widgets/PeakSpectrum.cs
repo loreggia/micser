@@ -47,8 +47,8 @@ namespace Micser.Plugins.Main.Widgets
             var x = width / maxFreqLog * log;
 
             var valueDb = AudioHelper.LinearToDb(data.Values[i].Value);
-            MathExtensions.Clamp(ref valueDb, -60f, 12f);
-            var y = height - height / 72d * (valueDb + 60d);
+            MathExtensions.Clamp(ref valueDb, -90f, 12f);
+            var y = height - height / 72d * (valueDb + 90d);
 
             return new Point(x, y);
         }

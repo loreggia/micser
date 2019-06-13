@@ -13,6 +13,6 @@ namespace Micser.Engine.Infrastructure.Audio
         public bool IsEnabled { get; set; }
         public int Priority { get; set; }
 
-        public abstract void Process(WaveFormat waveFormat, ref float value);
+        public abstract void Process(WaveFormat waveFormat, float[] channelSamples);
     }
 }
