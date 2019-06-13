@@ -26,6 +26,7 @@ namespace Micser.Engine.Infrastructure.Audio
         private readonly IList<IAudioModule> _outputs;
 
         private readonly IList<ISampleProcessor> _sampleProcessors;
+        private float[] _channelSamplesBuffer;
         private float _volume = 1f;
         private IWaveBuffer _waveBuffer;
 
@@ -180,66 +181,56 @@ namespace Micser.Engine.Infrastructure.Audio
                 }
                 Array.Copy(buffer, offset, _waveBuffer.ByteBuffer, 0, count);
 
+                if (_channelSamplesBuffer == null || _channelSamplesBuffer.Length != waveFormat.Channels)
+                {
+                    _channelSamplesBuffer = new float[waveFormat.Channels];
+                }
+
                 if (waveFormat.IsPCM())
                 {
                     switch (waveFormat.BytesPerSample)
                     {
                         case 1:
-                            for (var i8 = 0; i8 < _waveBuffer.ByteBufferCount; i8++)
-                            {
-                                var fSample8 = _waveBuffer.ByteBuffer[i8] / 256f;
-                                foreach (var sampleProcessor in sampleProcessors)
-                                {
-                                    sampleProcessor.Process(waveFormat, ref fSample8);
-                                }
-                                _waveBuffer.ByteBuffer[i8] = (byte)(fSample8 * 255f);
-                            }
-
+                            ProcessPcm8(waveFormat, sampleProcessors);
                             nextBuffer = _waveBuffer.ByteBuffer;
                             break;
 
                         case 2:
-                            for (var i16 = 0; i16 < _waveBuffer.ShortBufferCount; i16++)
-                            {
-                                var fSample16 = _waveBuffer.ShortBuffer[i16] / 32767f;
-                                foreach (var sampleProcessor in sampleProcessors)
-                                {
-                                    sampleProcessor.Process(waveFormat, ref fSample16);
-                                }
-                                _waveBuffer.ShortBuffer[i16] = (short)(fSample16 * 32768f);
-                            }
-
+                            ProcessPcm16(waveFormat, sampleProcessors);
                             nextBuffer = _waveBuffer.ByteBuffer;
                             break;
 
                         case 3:
                             nextBuffer = new byte[count];
-                            for (var i24 = 0; i24 < count / 3; i24 += 3)
+                            for (var i = 0; i < count / 3; i += 3 * waveFormat.Channels)
                             {
-                                var fSample24 = (((sbyte)buffer[offset + i24 + 2] << 16) | (buffer[offset + i24 + 1] << 8) | buffer[offset + i24]) / 8388608f;
+                                for (int c = 0; c < waveFormat.Channels; c++)
+                                {
+                                    var cOffset = i + (3 * c);
+                                    var fSample24 = (((sbyte)buffer[offset + cOffset + 2] << 16) | (buffer[offset + cOffset + 1] << 8) | buffer[offset + cOffset]) / 8388608f;
+                                    _channelSamplesBuffer[c] = fSample24;
+                                }
+
                                 foreach (var sampleProcessor in sampleProcessors)
                                 {
-                                    sampleProcessor.Process(waveFormat, ref fSample24);
+                                    sampleProcessor.Process(waveFormat, _channelSamplesBuffer);
                                 }
-                                var sample24 = (int)(fSample24 * 8388607f);
-                                nextBuffer[i24] = (byte)(sample24);
-                                nextBuffer[i24 + 1] = (byte)(sample24 >> 8);
-                                nextBuffer[i24 + 2] = (byte)(sample24 >> 16);
+
+                                for (int c = 0; c < waveFormat.Channels; c++)
+                                {
+                                    var cOffset = i + (3 * c);
+                                    var fSample24 = _channelSamplesBuffer[c];
+                                    var sample24 = (int)(fSample24 * 8388607f);
+                                    nextBuffer[cOffset] = (byte)(sample24);
+                                    nextBuffer[cOffset + 1] = (byte)(sample24 >> 8);
+                                    nextBuffer[cOffset + 2] = (byte)(sample24 >> 16);
+                                }
                             }
 
                             break;
 
                         case 4:
-                            for (var i32 = 0; i32 < _waveBuffer.IntBufferCount; i32++)
-                            {
-                                var fSample32 = _waveBuffer.IntBuffer[i32] / 2147483648f;
-                                foreach (var sampleProcessor in sampleProcessors)
-                                {
-                                    sampleProcessor.Process(waveFormat, ref fSample32);
-                                }
-                                _waveBuffer.IntBuffer[i32] = (int)(fSample32 * 2147483647f);
-                            }
-
+                            ProcessPcm32(waveFormat, sampleProcessors);
                             nextBuffer = _waveBuffer.ByteBuffer;
                             break;
 
@@ -253,16 +244,7 @@ namespace Micser.Engine.Infrastructure.Audio
                     switch (waveFormat.BytesPerSample)
                     {
                         case 4:
-                            for (var iF = 0; iF < _waveBuffer.FloatBufferCount; iF++)
-                            {
-                                var fSample = _waveBuffer.FloatBuffer[iF];
-                                foreach (var sampleProcessor in sampleProcessors)
-                                {
-                                    sampleProcessor.Process(waveFormat, ref fSample);
-                                }
-                                _waveBuffer.FloatBuffer[iF] = fSample;
-                            }
-
+                            ProcessIeeeFloat(waveFormat, sampleProcessors);
                             nextBuffer = _waveBuffer.ByteBuffer;
                             break;
 
@@ -292,6 +274,90 @@ namespace Micser.Engine.Infrastructure.Audio
             if (disposing)
             {
                 _outputs?.Clear();
+            }
+        }
+
+        private void ProcessIeeeFloat(WaveFormat waveFormat, ISampleProcessor[] sampleProcessors)
+        {
+            for (var i = 0; i < _waveBuffer.FloatBufferCount; i += waveFormat.Channels)
+            {
+                for (int c = 0; c < waveFormat.Channels; c++)
+                {
+                    _channelSamplesBuffer[c] = _waveBuffer.FloatBuffer[i + c];
+                }
+
+                foreach (var sampleProcessor in sampleProcessors)
+                {
+                    sampleProcessor.Process(waveFormat, _channelSamplesBuffer);
+                }
+
+                for (int c = 0; c < waveFormat.Channels; c++)
+                {
+                    _waveBuffer.FloatBuffer[i + c] = _channelSamplesBuffer[c];
+                }
+            }
+        }
+
+        private void ProcessPcm16(WaveFormat waveFormat, ISampleProcessor[] sampleProcessors)
+        {
+            for (var i = 0; i < _waveBuffer.ShortBufferCount; i += waveFormat.Channels)
+            {
+                for (int c = 0; c < waveFormat.Channels; c++)
+                {
+                    _channelSamplesBuffer[c] = _waveBuffer.ShortBuffer[i + c] / 32767f;
+                }
+
+                foreach (var sampleProcessor in sampleProcessors)
+                {
+                    sampleProcessor.Process(waveFormat, _channelSamplesBuffer);
+                }
+
+                for (int c = 0; c < waveFormat.Channels; c++)
+                {
+                    _waveBuffer.ShortBuffer[i + c] = (short)(_channelSamplesBuffer[c] * 32768f);
+                }
+            }
+        }
+
+        private void ProcessPcm32(WaveFormat waveFormat, ISampleProcessor[] sampleProcessors)
+        {
+            for (var i = 0; i < _waveBuffer.IntBufferCount; i += waveFormat.Channels)
+            {
+                for (int c = 0; c < waveFormat.Channels; c++)
+                {
+                    _channelSamplesBuffer[c] = _waveBuffer.IntBuffer[i + c] / 2147483648f;
+                }
+
+                foreach (var sampleProcessor in sampleProcessors)
+                {
+                    sampleProcessor.Process(waveFormat, _channelSamplesBuffer);
+                }
+
+                for (int c = 0; c < waveFormat.Channels; c++)
+                {
+                    _waveBuffer.IntBuffer[i + c] = (int)(_channelSamplesBuffer[c] * 2147483647f);
+                }
+            }
+        }
+
+        private void ProcessPcm8(WaveFormat waveFormat, ISampleProcessor[] sampleProcessors)
+        {
+            for (var i = 0; i < _waveBuffer.ByteBufferCount; i += waveFormat.Channels)
+            {
+                for (int c = 0; c < waveFormat.Channels; c++)
+                {
+                    _channelSamplesBuffer[c] = _waveBuffer.ByteBuffer[i + c] / 256f;
+                }
+
+                foreach (var sampleProcessor in sampleProcessors)
+                {
+                    sampleProcessor.Process(waveFormat, _channelSamplesBuffer);
+                }
+
+                for (int c = 0; c < waveFormat.Channels; c++)
+                {
+                    _waveBuffer.ByteBuffer[i + c] = (byte)(_channelSamplesBuffer[c] * 255f);
+                }
             }
         }
     }

@@ -33,7 +33,7 @@ namespace Micser.Plugins.Main.Modules
 
         private async void OnTimerElapsed(object sender, ElapsedEventArgs e)
         {
-            var data = _sampleProcessor.Data;
+            var data = _sampleProcessor.GetFftData();
             if (data != null)
             {
                 await _apiEndPoint.SendMessageAsync(new JsonRequest("spectrum", null, data));

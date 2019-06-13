@@ -36,7 +36,7 @@ namespace Micser.Plugins.Main.Audio
             Priority = 50;
         }
 
-        public override void Process(WaveFormat waveFormat, ref float value)
+        public override void Process(WaveFormat waveFormat, float[] channelSamples)
         {
             var typeChanged = _type != _module.Type;
             if (waveFormat.SampleRate != _sampleRate ||
@@ -57,12 +57,13 @@ namespace Micser.Plugins.Main.Audio
                 }
             }
 
+            // TODO multi channel
             if (Math.Abs(_slope) < 1f)
             {
-                ProcessCompressor(ref value);
+                ProcessCompressor(ref channelSamples[0]);
             }
 
-            MathExtensions.Clamp(ref value, -1f, 1f);
+            MathExtensions.Clamp(ref channelSamples[0], -1f, 1f);
         }
 
         private void Initialize(WaveFormat waveFormat)

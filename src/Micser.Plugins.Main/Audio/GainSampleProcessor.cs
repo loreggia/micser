@@ -15,11 +15,15 @@ namespace Micser.Plugins.Main.Audio
             _module = module;
         }
 
-        public override void Process(WaveFormat waveFormat, ref float value)
+        public override void Process(WaveFormat waveFormat, float[] channelSamples)
         {
             var gain = _module.Gain;
-            var dbValue = AudioHelper.LinearToDb(Math.Abs(value));
-            value = Math.Sign(value) * AudioHelper.DbToLinear(dbValue + gain);
+
+            for (int c = 0; c < waveFormat.Channels; c++)
+            {
+                var dbValue = AudioHelper.LinearToDb(Math.Abs(channelSamples[c]));
+                channelSamples[c] = Math.Sign(channelSamples[c]) * AudioHelper.DbToLinear(dbValue + gain);
+            }
         }
     }
 }

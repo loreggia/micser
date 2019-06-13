@@ -30,10 +30,13 @@ namespace Micser.Engine.Infrastructure.Audio
         public int Priority { get; set; }
 
         /// <inheritdoc />
-        public void Process(WaveFormat waveFormat, ref float value)
+        public void Process(WaveFormat waveFormat, float[] channelSamples)
         {
-            value *= _module.Volume;
-            MathExtensions.Clamp(ref value, -1f, 1f);
+            for (int c = 0; c < waveFormat.Channels; c++)
+            {
+                channelSamples[c] *= _module.Volume;
+                MathExtensions.Clamp(ref channelSamples[c], -1f, 1f);
+            }
         }
     }
 }
