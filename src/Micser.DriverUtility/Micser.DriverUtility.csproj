@@ -58,7 +58,7 @@
       <Version>1.2.1.2</Version>
     </PackageReference>
     <PackageReference Include="NLog">
-      <Version>4.6.3</Version>
+      <Version>4.6.4</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
