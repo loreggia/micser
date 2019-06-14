@@ -28,7 +28,7 @@ namespace Micser.Common
             _currentCount = initialCount;
         }
 
-        public int Count => _currentCount;
+        public int WaiterCount => _waiters.Count;
 
         public void Dispose()
         {

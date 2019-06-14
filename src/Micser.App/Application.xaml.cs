@@ -164,8 +164,11 @@ namespace Micser.App
                 FileName = Path.Combine(Globals.AppDataFolder, "Micser.App.log"),
                 FileNameKind = FilePathKind.Absolute
             });
+            config.AddTarget(new DebuggerTarget("DebuggerTarget"));
+
             config.AddRuleForAllLevels("ConsoleTarget");
             config.AddRuleForAllLevels("FileTarget");
+            config.AddRuleForAllLevels("DebuggerTarget");
 
             LogManager.Configuration = config;
             Logger.Info("Starting...");

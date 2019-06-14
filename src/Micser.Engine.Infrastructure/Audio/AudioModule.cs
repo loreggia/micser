@@ -160,7 +160,7 @@ namespace Micser.Engine.Infrastructure.Audio
                 return;
             }
 
-            byte[] nextBuffer;
+            byte[] nextBuffer = null;
             int nextOffset;
 
             if (Math.Abs(Volume - 1f) < Epsilon && _sampleProcessors.All(p => p is VolumeSampleProcessor))
@@ -186,18 +186,21 @@ namespace Micser.Engine.Infrastructure.Audio
                     _channelSamplesBuffer = new float[waveFormat.Channels];
                 }
 
+                if (_waveBuffer != null)
+                {
+                    nextBuffer = _waveBuffer.ByteBuffer;
+                }
+
                 if (waveFormat.IsPCM())
                 {
                     switch (waveFormat.BytesPerSample)
                     {
                         case 1:
-                            ProcessPcm8(waveFormat, sampleProcessors);
-                            nextBuffer = _waveBuffer.ByteBuffer;
+                            ProcessPcm8(waveFormat, sampleProcessors, count);
                             break;
 
                         case 2:
-                            ProcessPcm16(waveFormat, sampleProcessors);
-                            nextBuffer = _waveBuffer.ByteBuffer;
+                            ProcessPcm16(waveFormat, sampleProcessors, count);
                             break;
 
                         case 3:
@@ -230,8 +233,7 @@ namespace Micser.Engine.Infrastructure.Audio
                             break;
 
                         case 4:
-                            ProcessPcm32(waveFormat, sampleProcessors);
-                            nextBuffer = _waveBuffer.ByteBuffer;
+                            ProcessPcm32(waveFormat, sampleProcessors, count);
                             break;
 
                         default:
@@ -244,7 +246,7 @@ namespace Micser.Engine.Infrastructure.Audio
                     switch (waveFormat.BytesPerSample)
                     {
                         case 4:
-                            ProcessIeeeFloat(waveFormat, sampleProcessors);
+                            ProcessIeeeFloat(waveFormat, sampleProcessors, count);
                             nextBuffer = _waveBuffer.ByteBuffer;
                             break;
 
@@ -258,6 +260,12 @@ namespace Micser.Engine.Infrastructure.Audio
                     Logger.Error($"Unsupported audio format '{waveFormat}'. Only PCM or IEEE audio is supported.");
                     return;
                 }
+            }
+
+            if (nextBuffer == null)
+            {
+                Logger.Error("No buffer set to pass to output modules.");
+                return;
             }
 
             foreach (var module in _outputs.ToArray())
@@ -277,9 +285,9 @@ namespace Micser.Engine.Infrastructure.Audio
             }
         }
 
-        private void ProcessIeeeFloat(WaveFormat waveFormat, ISampleProcessor[] sampleProcessors)
+        private void ProcessIeeeFloat(WaveFormat waveFormat, ISampleProcessor[] sampleProcessors, int byteCount)
         {
-            for (var i = 0; i < _waveBuffer.FloatBufferCount; i += waveFormat.Channels)
+            for (var i = 0; i < byteCount / 4; i += waveFormat.Channels)
             {
                 for (int c = 0; c < waveFormat.Channels; c++)
                 {
@@ -298,9 +306,9 @@ namespace Micser.Engine.Infrastructure.Audio
             }
         }
 
-        private void ProcessPcm16(WaveFormat waveFormat, ISampleProcessor[] sampleProcessors)
+        private void ProcessPcm16(WaveFormat waveFormat, ISampleProcessor[] sampleProcessors, int byteCount)
         {
-            for (var i = 0; i < _waveBuffer.ShortBufferCount; i += waveFormat.Channels)
+            for (var i = 0; i < byteCount / 2; i += waveFormat.Channels)
             {
                 for (int c = 0; c < waveFormat.Channels; c++)
                 {
@@ -319,9 +327,9 @@ namespace Micser.Engine.Infrastructure.Audio
             }
         }
 
-        private void ProcessPcm32(WaveFormat waveFormat, ISampleProcessor[] sampleProcessors)
+        private void ProcessPcm32(WaveFormat waveFormat, ISampleProcessor[] sampleProcessors, int byteCount)
         {
-            for (var i = 0; i < _waveBuffer.IntBufferCount; i += waveFormat.Channels)
+            for (var i = 0; i < byteCount / 4; i += waveFormat.Channels)
             {
                 for (int c = 0; c < waveFormat.Channels; c++)
                 {
@@ -340,9 +348,9 @@ namespace Micser.Engine.Infrastructure.Audio
             }
         }
 
-        private void ProcessPcm8(WaveFormat waveFormat, ISampleProcessor[] sampleProcessors)
+        private void ProcessPcm8(WaveFormat waveFormat, ISampleProcessor[] sampleProcessors, int byteCount)
         {
-            for (var i = 0; i < _waveBuffer.ByteBufferCount; i += waveFormat.Channels)
+            for (var i = 0; i < byteCount; i += waveFormat.Channels)
             {
                 for (int c = 0; c < waveFormat.Channels; c++)
                 {

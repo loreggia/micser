@@ -1,7 +1,6 @@
 ﻿using Newtonsoft.Json;
 using NLog;
 using System;
-using System.Diagnostics;
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
@@ -80,9 +79,9 @@ namespace Micser.Common.Api
                 return new JsonResponse(false, null, null, false);
             }
 
-            if (_sendMessageSemaphore.Count > 0)
+            if (_sendMessageSemaphore.WaiterCount > 5)
             {
-                Debug.WriteLine(_sendMessageSemaphore.Count);
+                Logger.Warn($"{nameof(SendMessageAsync)} waiters: {_sendMessageSemaphore.WaiterCount}");
             }
 
             await _sendMessageSemaphore.WaitAsync();
