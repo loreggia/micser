@@ -25,6 +25,11 @@ namespace Micser.Plugins.Main.Audio
 
         public SpectrumData GetFftData()
         {
+            if (_fftBuffer == null)
+            {
+                return null;
+            }
+
             _fftProvider.GetFftData(_fftBuffer);
 
             for (int i = 0; i < _spectrumValueBuffer.Length; i++)

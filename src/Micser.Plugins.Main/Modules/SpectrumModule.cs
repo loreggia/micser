@@ -10,6 +10,7 @@ namespace Micser.Plugins.Main.Modules
         private readonly IApiEndPoint _apiEndPoint;
         private readonly SpectrumSampleProcessor _sampleProcessor;
         private readonly Timer _timer;
+        private bool _isDisposed;
 
         public SpectrumModule(IApiEndPoint apiEndPoint)
         {
@@ -29,16 +30,27 @@ namespace Micser.Plugins.Main.Modules
 
             _timer.Stop();
             _timer.Dispose();
+
+            _isDisposed = true;
         }
 
         private async void OnTimerElapsed(object sender, ElapsedEventArgs e)
         {
+            if (_isDisposed)
+            {
+                return;
+            }
+
             var data = _sampleProcessor.GetFftData();
             if (data != null)
             {
                 await _apiEndPoint.SendMessageAsync(new JsonRequest("spectrum", null, data));
             }
-            _timer.Start();
+
+            if (!_isDisposed)
+            {
+                _timer.Start();
+            }
         }
     }
 }
