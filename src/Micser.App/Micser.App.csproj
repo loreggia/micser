@@ -202,7 +202,7 @@
       <Version>1.0.8</Version>
     </PackageReference>
     <PackageReference Include="NLog">
-      <Version>4.6.4</Version>
+      <Version>4.6.5</Version>
     </PackageReference>
     <PackageReference Include="Prism.Core">
       <Version>7.1.0.431</Version>

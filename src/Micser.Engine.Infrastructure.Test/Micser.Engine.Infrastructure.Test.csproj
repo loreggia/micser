@@ -1,14 +1,14 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="16.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="15.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{32A852E1-D13D-4589-9963-3F9D32AF243E}</ProjectGuid>
+    <ProjectGuid>{0616E45A-EA01-4ADB-A52C-817AE85245FE}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Micser.Plugins.Main.Test</RootNamespace>
-    <AssemblyName>Micser.Plugins.Main.Test</AssemblyName>
+    <RootNamespace>Micser.Engine.Infrastructure.Test</RootNamespace>
+    <AssemblyName>Micser.Engine.Infrastructure.Test</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{3AC096D0-A1C2-E12C-1390-A8335801FDAB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
@@ -19,6 +19,7 @@
     <TestProjectType>UnitTest</TestProjectType>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -42,13 +43,12 @@
     <Reference Include="System.Core" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CompressorTest.cs" />
-    <Compile Include="DeviceInputTest.cs" />
+    <Compile Include="Updates\UpdateServiceTest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CSCore">
-      <Version>1.2.1.2</Version>
+    <PackageReference Include="NLog">
+      <Version>4.6.5</Version>
     </PackageReference>
     <PackageReference Include="xunit">
       <Version>2.4.1</Version>
@@ -60,6 +60,10 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Micser.Common.Test\Micser.Common.Test.csproj">
+      <Project>{5CB07365-3143-4B65-9118-7B255AACAC6F}</Project>
+      <Name>Micser.Common.Test</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Micser.Common\Micser.Common.csproj">
       <Project>{E14431B4-F54A-4D36-B505-1D3407252430}</Project>
       <Name>Micser.Common</Name>
@@ -67,10 +71,6 @@
     <ProjectReference Include="..\Micser.Engine.Infrastructure\Micser.Engine.Infrastructure.csproj">
       <Project>{C5D0038C-8258-4BB4-9723-F3855F583E95}</Project>
       <Name>Micser.Engine.Infrastructure</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Micser.Plugins.Main\Micser.Plugins.Main.csproj">
-      <Project>{6824c944-0750-41d6-898e-f05cdf0fb90a}</Project>
-      <Name>Micser.Plugins.Main</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />

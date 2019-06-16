@@ -1,13 +1,13 @@
-﻿using Micser.Common.Properties;
+using Micser.Common.Properties;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyTitle("Micser.DriverUtility")]
+[assembly: AssemblyTitle("Micser.Engine.Infrastructure.Test")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyTrademark("")]
 [assembly: ComVisible(false)]
-[assembly: Guid("b63ffc5b-c668-4a79-9e01-e01659c63c44")]
+[assembly: Guid("0616e45a-ea01-4adb-a52c-817ae85245fe")]
 [assembly: AssemblyProduct(GlobalAssemblyInfo.Product)]
 [assembly: AssemblyCompany(GlobalAssemblyInfo.Company)]
 [assembly: AssemblyCopyright(GlobalAssemblyInfo.Copyright)]

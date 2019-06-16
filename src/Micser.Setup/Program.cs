@@ -2,6 +2,7 @@
 using System;
 using System.Linq;
 using WixSharp;
+using WixSharp.CommonTasks;
 using WixSharp.Forms;
 using Action = WixSharp.Action;
 
@@ -30,8 +31,9 @@ namespace Micser.Setup
             {
                 GUID = new Guid("6fe30b47-2577-43ad-9095-1861ba25889b"),
                 ManagedUI = new ManagedUI(),
-                Version = new Version(1, 0, 0, 0),
-                MajorUpgrade = MajorUpgrade.Default
+                //Version = new Version(),
+                MajorUpgrade = MajorUpgrade.Default,
+                UpgradeCode = new Guid("10C43476-AAF1-46E2-9EC8-E87DD16F9119")
             };
 
 #if DEBUG
@@ -47,6 +49,10 @@ namespace Micser.Setup
                 TimeUrl = new Uri("http://timestamp.verisign.com/scripts/timstamp.dll")
             };
 #endif
+
+            var appFile = System.IO.Path.GetFullPath(System.IO.Path.Combine(project.SourceBaseDir, "App", "Micser.App.exe"));
+            var appAssembly = System.Reflection.Assembly.LoadFrom(appFile);
+            project.Version = appAssembly.GetName().Version;
 
             var coreFeature = new Feature("Micser", "Installs Micser core components.", true, false) { Id = new Id("CoreFeature") };
             var vacFeature = new Feature("Virtual Audio Cable", "Installs the Micser Virtual Audio Cable driver.", true, true) { Id = new Id("VacFeature") };
@@ -143,6 +149,9 @@ namespace Micser.Setup
             project.DefaultFeature.Children.Add(coreFeature);
             project.DefaultFeature.Children.Add(vacFeature);
 
+            project.SetNetFxPrerequisite("WIXNETFX4RELEASEINSTALLED >= '#461808'");
+
+            project.Include(WixExtension.NetFx);
             project.BuildMsi();
         }
     }
