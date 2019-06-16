@@ -116,6 +116,10 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Micser.Common\Micser.Common.csproj">
+      <Project>{e14431b4-f54a-4d36-b505-1d3407252430}</Project>
+      <Name>Micser.Common</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Micser.Setup.CustomActions\Micser.Setup.CustomActions.csproj">
       <Project>{1e05c6e2-f8da-495c-988d-2566b52e05a6}</Project>
       <Name>Micser.Setup.CustomActions</Name>
