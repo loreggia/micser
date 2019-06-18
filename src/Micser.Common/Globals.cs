@@ -13,7 +13,13 @@ namespace Micser.Common
         /// <summary>
         /// The TCP port over which the API is talking.
         /// </summary>
-        public const int ApiPort = 60666;
+        public const int ApiPort =
+#if DEBUG
+            60667
+#else
+            60666
+#endif
+        ;
 
         /// <summary>
         /// The name of the virtual audio cable device. This has to be equal to the "DeviceName" string in Micser.Vac.Driver.inf
