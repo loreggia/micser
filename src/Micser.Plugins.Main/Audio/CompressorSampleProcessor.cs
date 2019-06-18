@@ -10,7 +10,7 @@ namespace Micser.Plugins.Main.Audio
     // https://code.soundsoftware.ac.uk/projects/audio_effects_textbook_code/repository
     public class CompressorSampleProcessor : SampleProcessor
     {
-        private const int ChunkSize = 32;
+        private const int ChannelChunkSize = 32;
 
         private readonly CompressorModule _module;
         private float _alphaAttack;
@@ -19,6 +19,7 @@ namespace Micser.Plugins.Main.Audio
         private float _attack;
         private int _channelCount;
         private float _chunkMaxDbDiff;
+        private int _chunkSize;
         private float _envelope;
         private float _knee;
         private float _makeUpGain;
@@ -57,13 +58,22 @@ namespace Micser.Plugins.Main.Audio
                 }
             }
 
-            // TODO multi channel
             if (Math.Abs(_slope) < 1f)
             {
-                ProcessCompressor(ref channelSamples[0]);
-            }
+                var average = 0f;
+                for (int c = 0; c < _channelCount; c++)
+                {
+                    average += channelSamples[c];
+                }
+                average /= _channelCount;
+                var lGain = ProcessCompressor(average);
 
-            MathExtensions.Clamp(ref channelSamples[0], -1f, 1f);
+                for (int c = 0; c < _channelCount; c++)
+                {
+                    channelSamples[c] *= lGain;
+                    MathExtensions.Clamp(ref channelSamples[c], -1f, 1f);
+                }
+            }
         }
 
         private void Initialize(WaveFormat waveFormat)
@@ -71,6 +81,8 @@ namespace Micser.Plugins.Main.Audio
             _channelCount = waveFormat.Channels;
             _sampleRate = waveFormat.SampleRate;
             _samplePosition = 0;
+
+            _chunkSize = _channelCount * ChannelChunkSize;
 
             _slope = 1.0f / _module.Ratio;
 
@@ -90,7 +102,7 @@ namespace Micser.Plugins.Main.Audio
             _makeUpGain = _module.MakeUpGain;
         }
 
-        private void ProcessCompressor(ref float lInput)
+        private float ProcessCompressor(float lInput)
         {
             // Level detection - estimate level using peak detector
             var lInputAbs = Math.Abs(lInput);
@@ -104,7 +116,7 @@ namespace Micser.Plugins.Main.Audio
             var dbDiff = dbInput - dbCompressed;
             dbDiff *= _amount;
 
-            if ((_samplePosition %= ChunkSize) == 0)
+            if ((_samplePosition %= _chunkSize) == 0)
             {
                 _chunkMaxDbDiff = dbDiff;
             }
@@ -126,13 +138,10 @@ namespace Micser.Plugins.Main.Audio
             }
             _envelope = dbEnv;
 
-            // find control
-            var dbGain = _makeUpGain * _amount - dbEnv;
-
-            var lGain = AudioHelper.DbToLinear(dbGain);
-            lInput *= lGain;
-
             _samplePosition++;
+
+            var dbGain = _makeUpGain * _amount - dbEnv;
+            return AudioHelper.DbToLinear(dbGain);
         }
     }
 }
