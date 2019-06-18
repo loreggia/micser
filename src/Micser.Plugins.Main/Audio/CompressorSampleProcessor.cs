@@ -1,6 +1,5 @@
 ﻿using CSCore;
 using Micser.Common.Audio;
-using Micser.Common.Extensions;
 using Micser.Engine.Infrastructure.Audio;
 using Micser.Plugins.Main.Modules;
 using System;
@@ -71,7 +70,6 @@ namespace Micser.Plugins.Main.Audio
                 for (int c = 0; c < _channelCount; c++)
                 {
                     channelSamples[c] *= lGain;
-                    MathExtensions.Clamp(ref channelSamples[c], -1f, 1f);
                 }
             }
         }
