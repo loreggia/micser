@@ -28,27 +28,7 @@ namespace Micser.Engine.Api
             this["insert"] = dto => InsertModule(dto);
             this["update"] = dto => UpdateModule(dto);
             this["delete"] = id => DeleteModule(id);
-            this["changestatedata"] = dto => ChangeStateData(dto);
             this["import"] = dto => ImportConfiguration(dto);
-        }
-
-        private dynamic ChangeStateData(ModuleStateChangeDto dto)
-        {
-            var moduleDto = _moduleService.GetById(dto.ModuleId);
-
-            if (moduleDto == null)
-            {
-                return false;
-            }
-
-            if (string.IsNullOrEmpty(dto.Key))
-            {
-                return false;
-            }
-
-            moduleDto.State.Data[dto.Key] = dto.Value;
-            //todo _audioEngine.
-            return null;
         }
 
         private dynamic DeleteModule(long id)
