@@ -1,8 +1,9 @@
 ﻿using CSCore.CoreAudioAPI;
 using Micser.Common;
 using Micser.Common.Devices;
+using Micser.Common.Extensions;
 using Micser.Common.Modules;
-using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 
 namespace Micser.App.Infrastructure.Widgets
@@ -13,12 +14,13 @@ namespace Micser.App.Infrastructure.Widgets
     public abstract class DeviceWidgetViewModel : AudioWidgetViewModel
     {
         private readonly MMDeviceEnumerator _deviceEnumerator;
-        private IEnumerable<DeviceDescription> _deviceDescriptions;
         private DeviceDescription _selectedDeviceDescription;
 
         /// <inheritdoc />
         protected DeviceWidgetViewModel()
         {
+            DeviceDescriptions = new ObservableCollection<DeviceDescription>();
+
             _deviceEnumerator = new MMDeviceEnumerator();
             _deviceEnumerator.DeviceAdded += OnDeviceAdded;
             _deviceEnumerator.DeviceRemoved += OnDeviceRemoved;
@@ -28,18 +30,7 @@ namespace Micser.App.Infrastructure.Widgets
         /// <summary>
         /// Gets or sets the available devices. This is set automatically in <see cref="UpdateDeviceDescriptions"/>.
         /// </summary>
-        public IEnumerable<DeviceDescription> DeviceDescriptions
-        {
-            get => _deviceDescriptions;
-            set
-            {
-                var selectedId = SelectedDeviceDescription?.Id;
-                if (SetProperty(ref _deviceDescriptions, value) && !string.IsNullOrEmpty(selectedId))
-                {
-                    SelectedDeviceDescription = value.FirstOrDefault(d => d.Id == selectedId);
-                }
-            }
-        }
+        public ObservableCollection<DeviceDescription> DeviceDescriptions { get; }
 
         /// <summary>
         /// Gets or sets the currently selected device.
@@ -123,7 +114,8 @@ namespace Micser.App.Infrastructure.Widgets
         protected virtual void UpdateDeviceDescriptions()
         {
             var deviceService = new DeviceService();
-            DeviceDescriptions = deviceService.GetDevices(DeviceType).ToArray();
+            var deviceDescriptions = deviceService.GetDevices(DeviceType).ToArray();
+            DeviceDescriptions.Update(deviceDescriptions, (a, b) => a.Id == b.Id);
         }
     }
 }
