@@ -80,6 +80,7 @@
     <Compile Include="DataAccess\UnitOfWorkFactory.cs" />
     <Compile Include="Devices\DeviceService.cs" />
     <Compile Include="Extensions\MathExtensions.cs" />
+    <Compile Include="Extensions\ObservableCollectionExtensions.cs" />
     <Compile Include="Extensions\PropertyExtensions.cs" />
     <Compile Include="Extensions\SocketExtensions.cs" />
     <Compile Include="Extensions\ObjectExtensions.cs" />
