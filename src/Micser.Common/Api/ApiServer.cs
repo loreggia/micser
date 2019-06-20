@@ -36,6 +36,8 @@ namespace Micser.Common.Api
 
             try
             {
+                Logger.Info("API server connecting");
+
                 lock (StateLock)
                 {
                     if (_state != EndPointState.Disconnected || _serverState != ServerState.Started)
@@ -59,6 +61,8 @@ namespace Micser.Common.Api
                     _state = EndPointState.Connected;
                 }
 
+                Logger.Info("API server connected");
+
                 Task.Run(ReaderThread);
 
                 return true;
@@ -78,6 +82,8 @@ namespace Micser.Common.Api
             {
                 throw new ObjectDisposedException(nameof(ApiServer));
             }
+
+            Logger.Info($"Starting API server. Current state: {_serverState}");
 
             if (_serverState != ServerState.Stopped)
             {
@@ -103,6 +109,8 @@ namespace Micser.Common.Api
                     _serverState = ServerState.Started;
                 }
 
+                Logger.Info("API server started");
+
                 return true;
             }
             catch (Exception ex)
@@ -115,6 +123,8 @@ namespace Micser.Common.Api
         /// <inheritdoc />
         public void Stop()
         {
+            Logger.Info("Stopping server");
+
             if (_serverState != ServerState.Started)
             {
                 return;
@@ -146,6 +156,8 @@ namespace Micser.Common.Api
                 {
                     _serverState = ServerState.Stopped;
                 }
+
+                Logger.Info("Server stopped");
             }
         }
 

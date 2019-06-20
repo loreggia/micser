@@ -2,6 +2,7 @@
 using Micser.Common;
 using Micser.Common.Devices;
 using Micser.Common.Modules;
+using System.Threading.Tasks;
 
 namespace Micser.Engine.Infrastructure.Audio
 {
@@ -133,11 +134,11 @@ namespace Micser.Engine.Infrastructure.Audio
         {
         }
 
-        private void DeviceStateChanged(object sender, DeviceStateChangedEventArgs e)
+        private async void DeviceStateChanged(object sender, DeviceStateChangedEventArgs e)
         {
             if (e.DeviceId == DeviceDescription?.Id)
             {
-                OnDeviceStateChanged(e.DeviceState);
+                await Task.Run(() => OnDeviceStateChanged(e.DeviceState));
             }
         }
     }
