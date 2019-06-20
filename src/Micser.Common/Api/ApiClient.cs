@@ -34,6 +34,8 @@ namespace Micser.Common.Api
 
             try
             {
+                Logger.Info("API client connecting");
+
                 lock (StateLock)
                 {
                     if (_state != EndPointState.Disconnected)
@@ -74,6 +76,8 @@ namespace Micser.Common.Api
                 {
                     _state = EndPointState.Connected;
                 }
+
+                Logger.Info("API client connected");
 
                 Task.Run(ReaderThread);
 

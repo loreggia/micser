@@ -5,6 +5,7 @@ using Micser.Common.Extensions;
 using Micser.Common.Modules;
 using System.Collections.ObjectModel;
 using System.Linq;
+using System.Windows.Data;
 
 namespace Micser.App.Infrastructure.Widgets
 {
@@ -13,6 +14,8 @@ namespace Micser.App.Infrastructure.Widgets
     /// </summary>
     public abstract class DeviceWidgetViewModel : AudioWidgetViewModel
     {
+        private readonly object _deviceDescriptionsLock;
+
         private readonly MMDeviceEnumerator _deviceEnumerator;
         private DeviceDescription _selectedDeviceDescription;
 
@@ -20,6 +23,8 @@ namespace Micser.App.Infrastructure.Widgets
         protected DeviceWidgetViewModel()
         {
             DeviceDescriptions = new ObservableCollection<DeviceDescription>();
+            _deviceDescriptionsLock = new object();
+            BindingOperations.EnableCollectionSynchronization(DeviceDescriptions, _deviceDescriptionsLock);
 
             _deviceEnumerator = new MMDeviceEnumerator();
             _deviceEnumerator.DeviceAdded += OnDeviceAdded;

@@ -114,17 +114,30 @@ namespace Micser.Common.Api
 
         protected virtual void Disconnect()
         {
+            Logger.Info("Disconnecting");
+
+            if (_state == EndPointState.Disconnected)
+            {
+                return;
+            }
+
             lock (StateLock)
             {
                 _state = EndPointState.Disconnecting;
 
+                InStream?.Dispose();
+                InStream = null;
                 InClient?.Dispose();
                 InClient = null;
+                OutStream?.Dispose();
+                OutStream = null;
                 OutClient?.Dispose();
                 OutClient = null;
 
                 _state = EndPointState.Disconnected;
             }
+
+            Logger.Info("Disconnected");
         }
 
         /// <summary>
@@ -156,14 +169,14 @@ namespace Micser.Common.Api
             {
                 try
                 {
-                    var message = await ApiProtocol.ReceiveMessage(InStream);
+                    var message = await ApiProtocol.ReceiveMessage(InStream).ConfigureAwait(false);
                     if (message == null)
                     {
                         Disconnect();
                         return;
                     }
                     var response = ProcessMessage(message);
-                    await ApiProtocol.WriteMessage(InStream, response);
+                    await ApiProtocol.WriteMessage(InStream, response).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {

@@ -6,6 +6,7 @@ using NLog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Unity;
 
 namespace Micser.Engine.Audio
@@ -157,22 +158,23 @@ namespace Micser.Engine.Audio
 
         public void Stop()
         {
+            _logger.Info("Stopping audio engine");
+
             _endpointVolume?.UnregisterControlChangeNotify(_endpointVolumeCallback);
             _endpointVolume?.Dispose();
 
-            if (_modules == null || _modules.Count == 0)
+            _logger.Info($"Disposing modules ({_modules?.Count ?? 0})");
+
+            if (_modules?.Count > 0)
             {
-                return;
+                foreach (var audioModule in _modules)
+                {
+                    _logger.Info($"Disposing module {audioModule.Id} ({audioModule.GetType()})");
+                    audioModule.Dispose();
+                }
+
+                _modules.Clear();
             }
-
-            _logger.Info("Stopping audio engine");
-
-            foreach (var audioModule in _modules)
-            {
-                audioModule.Dispose();
-            }
-
-            _modules.Clear();
 
             _logger.Info("Audio engine stopped");
 
@@ -199,9 +201,9 @@ namespace Micser.Engine.Audio
             }
         }
 
-        private void DefaultDeviceChanged(object sender, DefaultDeviceChangedEventArgs e)
+        private async void DefaultDeviceChanged(object sender, DefaultDeviceChangedEventArgs e)
         {
-            SetupDefaultEndpoint();
+            await Task.Run(SetupDefaultEndpoint).ConfigureAwait(false);
         }
 
         private void SetupDefaultEndpoint()
@@ -224,29 +226,32 @@ namespace Micser.Engine.Audio
             }
         }
 
-        private void VolumeNotifyReceived(object sender, AudioEndpointVolumeCallbackEventArgs e)
+        private async void VolumeNotifyReceived(object sender, AudioEndpointVolumeCallbackEventArgs e)
         {
-            var modules = _modules.OfType<AudioModule>().Where(m => m.UseSystemVolume).ToArray();
-            foreach (var module in modules)
+            await Task.Run(() =>
             {
-                module.Volume = e.MasterVolume;
-                module.IsMuted = e.IsMuted;
-
-                var moduleDto = _moduleService.GetById(module.Id);
-
-                if (moduleDto.State == null)
+                var modules = _modules.OfType<AudioModule>().Where(m => m.UseSystemVolume).ToArray();
+                foreach (var module in modules)
                 {
-                    moduleDto.State = module.GetState();
+                    module.Volume = e.MasterVolume;
+                    module.IsMuted = e.IsMuted;
+
+                    var moduleDto = _moduleService.GetById(module.Id);
+
+                    if (moduleDto.State == null)
+                    {
+                        moduleDto.State = module.GetState();
+                    }
+
+                    moduleDto.State.UseSystemVolume = true;
+                    moduleDto.State.IsMuted = e.IsMuted;
+                    moduleDto.State.Volume = e.MasterVolume;
+
+                    _moduleService.Update(moduleDto);
+
+                    _apiServer.SendMessageAsync(new JsonRequest("modules", "updatevolume", moduleDto));
                 }
-
-                moduleDto.State.UseSystemVolume = true;
-                moduleDto.State.IsMuted = e.IsMuted;
-                moduleDto.State.Volume = e.MasterVolume;
-
-                _moduleService.Update(moduleDto);
-
-                _apiServer.SendMessageAsync(new JsonRequest("modules", "updatevolume", moduleDto));
-            }
+            }).ConfigureAwait(false);
         }
     }
 }
