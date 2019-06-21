@@ -3,7 +3,7 @@ using System;
 using System.Linq;
 using WixSharp;
 using WixSharp.CommonTasks;
-using WixSharp.Forms;
+using WixSharp.Controls;
 using Action = WixSharp.Action;
 
 namespace Micser.Setup
@@ -18,6 +18,7 @@ namespace Micser.Setup
                 {
                     ".test.dll",
                     ".pdb",
+                    "Micser.App.exe",
                     "Micser.Engine.exe",
                     "CodeAnalysisLog.xml",
                     "lastcodeanalysissucceeded",
@@ -27,13 +28,11 @@ namespace Micser.Setup
                 return !excludedFiles.Any(x => file.EndsWith(x, StringComparison.InvariantCultureIgnoreCase));
             }
 
-            var project = new ManagedProject("Micser")
+            var project = new Project("Micser")
             {
                 GUID = new Guid("6fe30b47-2577-43ad-9095-1861ba25889b"),
-                ManagedUI = new ManagedUI(),
-                //Version = new Version(),
                 MajorUpgrade = MajorUpgrade.Default,
-                UpgradeCode = new Guid("10C43476-AAF1-46E2-9EC8-E87DD16F9119")
+                UpgradeCode = new Guid("10C43476-AAF1-46E2-9EC8-E87DD16F9119"),
             };
 
 #if DEBUG
@@ -50,6 +49,9 @@ namespace Micser.Setup
             };
 #endif
 
+            project.Package.Attributes.Add("Manufacturer", "Lucas Loreggia");
+            project.Package.Attributes.Add("Description", "Micser Installer");
+
             var appFile = System.IO.Path.GetFullPath(System.IO.Path.Combine(project.SourceBaseDir, "App", "Micser.App.exe"));
             var appAssembly = System.Reflection.Assembly.LoadFrom(appFile);
             project.Version = appAssembly.GetName().Version;
@@ -57,10 +59,13 @@ namespace Micser.Setup
             var coreFeature = new Feature("Micser", "Installs Micser core components.", true, false) { Id = new Id("CoreFeature") };
             var vacFeature = new Feature("Virtual Audio Cable", "Installs the Micser Virtual Audio Cable driver.", true, true) { Id = new Id("VacFeature") };
 
+            var appId = new Id("MicserAppExe");
+
             project.Dirs = new[]
             {
                 new Dir(coreFeature, @"%ProgramFiles%\Micser",
                     new Files(coreFeature, @"App\*.*", FileFilter),
+                    new File(appId, coreFeature, @"App\Micser.App.exe"),
                     new File(new Id("MicserEngineExe"), coreFeature, @"App\Micser.Engine.exe")
                     {
                         ServiceInstaller = new ServiceInstaller("Micser.Engine")
@@ -86,18 +91,20 @@ namespace Micser.Setup
                     )
                 ),
                 new Dir(coreFeature, @"%ProgramMenu%\Micser",
-                    new ExeFileShortcut("Micser", @"[INSTALLDIR]\Micser.App.exe", ""),
-                    new ExeFileShortcut("Uninstall Micser", "[SystemFolder]msiexec.exe", "/x [ProductCode]")
+                    new ExeFileShortcut(coreFeature, "Micser", @"[INSTALLDIR]\Micser.App.exe", ""),
+                    new ExeFileShortcut(coreFeature, "Uninstall Micser", "[SystemFolder]msiexec.exe", "/x [ProductCode]")
                 )
             };
 
-            var vacFeatureCondition = Condition.Create("&VacFeature=3");
+            var vacFeatureCondition = Condition.Create("&VacFeature = 3");
 
 #if X64
             project.Platform = Platform.x64;
 #else
             project.Platform = Platform.x86;
 #endif
+
+            var launchAppAction = new Id("LaunchApp");
 
             project.Actions = new Action[]
             {
@@ -127,23 +134,24 @@ namespace Micser.Setup
                     Impersonate = false,
                     Execute = Execute.deferred,
                     UsesProperties = ""
+                },
+
+                new InstalledFileAction(launchAppAction, appId, "")
+                {
+                    Impersonate = true,
+                    Sequence = Sequence.NotInSequence
                 }
             };
 
-            project.ManagedUI.InstallDialogs
-                .Add(Dialogs.Welcome)
-                .Add(Dialogs.Licence)
-                //.Add(Dialogs.SetupType)
-                .Add(Dialogs.Features)
-                .Add(Dialogs.InstallDir)
-                .Add(Dialogs.Progress)
-                .Add(Dialogs.Exit);
-
-            project.ManagedUI.ModifyDialogs
-                .Add(Dialogs.MaintenanceType)
-                .Add(Dialogs.Features)
-                .Add(Dialogs.Progress)
-                .Add(Dialogs.Exit);
+            project.UI = WUI.WixUI_Common;
+            project.CustomUI = new CommomDialogsUI()
+                .On(NativeDialogs.WelcomeDlg, Buttons.Next, new ShowDialog(NativeDialogs.InstallDirDlg))
+                .On(NativeDialogs.InstallDirDlg, Buttons.Back, new ShowDialog(NativeDialogs.WelcomeDlg))
+                .On(NativeDialogs.MaintenanceTypeDlg, "ChangeButton", new ShowDialog(NativeDialogs.CustomizeDlg))
+                .On(NativeDialogs.CustomizeDlg, Buttons.Back, new ShowDialog(NativeDialogs.MaintenanceTypeDlg, Condition.Installed))
+                .On(NativeDialogs.ExitDialog, Buttons.Finish, new ExecuteCustomAction(launchAppAction, new Condition("WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1")))
+                ;
+            project.CustomUI.Properties.Remove("ARPNOMODIFY");
 
             project.DefaultFeature.Display = FeatureDisplay.expand;
             project.DefaultFeature.Children.Add(coreFeature);
@@ -151,7 +159,12 @@ namespace Micser.Setup
 
             project.SetNetFxPrerequisite("WIXNETFX4RELEASEINSTALLED >= '#461808'");
 
+            project.AddProperty(new Property("WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT", "Launch Micser"));
+            project.AddProperty(new Property("WIXUI_EXITDIALOGOPTIONALCHECKBOX", "1"));
+
+            project.Include(WixExtension.UI);
             project.Include(WixExtension.NetFx);
+
             project.BuildMsi();
         }
     }
