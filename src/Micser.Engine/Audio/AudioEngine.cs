@@ -1,4 +1,5 @@
 ﻿using CSCore.CoreAudioAPI;
+using Microsoft.Win32;
 using Micser.Common.Api;
 using Micser.Engine.Infrastructure.Audio;
 using Micser.Engine.Infrastructure.Services;
@@ -32,9 +33,7 @@ namespace Micser.Engine.Audio
             _apiServer = apiServer;
             _modules = new List<IAudioModule>();
             _deviceEnumerator = new MMDeviceEnumerator();
-            _deviceEnumerator.DefaultDeviceChanged += DefaultDeviceChanged;
             _endpointVolumeCallback = new AudioEndpointVolumeCallback();
-            _endpointVolumeCallback.NotifyRecived += VolumeNotifyReceived;
         }
 
         public bool IsRunning { get; private set; }
@@ -117,6 +116,10 @@ namespace Micser.Engine.Audio
 
             Stop();
 
+            _deviceEnumerator.DefaultDeviceChanged += DefaultDeviceChanged;
+            _endpointVolumeCallback.NotifyRecived += VolumeNotifyReceived;
+            SystemEvents.PowerModeChanged += PowerModeChanged;
+
             SetupDefaultEndpoint();
 
             foreach (var module in _moduleService.GetAll())
@@ -158,7 +161,16 @@ namespace Micser.Engine.Audio
 
         public void Stop()
         {
+            if (!IsRunning)
+            {
+                return;
+            }
+
             _logger.Info("Stopping audio engine");
+
+            _deviceEnumerator.DefaultDeviceChanged -= DefaultDeviceChanged;
+            _endpointVolumeCallback.NotifyRecived -= VolumeNotifyReceived;
+            SystemEvents.PowerModeChanged -= PowerModeChanged;
 
             _endpointVolume?.UnregisterControlChangeNotify(_endpointVolumeCallback);
             _endpointVolume?.Dispose();
@@ -203,7 +215,31 @@ namespace Micser.Engine.Audio
 
         private async void DefaultDeviceChanged(object sender, DefaultDeviceChangedEventArgs e)
         {
+            if (!IsRunning)
+            {
+                return;
+            }
+
             await Task.Run(SetupDefaultEndpoint).ConfigureAwait(false);
+        }
+
+        private async void PowerModeChanged(object sender, PowerModeChangedEventArgs e)
+        {
+            // restart on resume
+            if (e.Mode != PowerModes.Resume)
+            {
+                return;
+            }
+
+            await Task.Run(async () =>
+            {
+                Stop();
+                while (IsRunning)
+                {
+                    await Task.Delay(100);
+                }
+                Start();
+            });
         }
 
         private void SetupDefaultEndpoint()
