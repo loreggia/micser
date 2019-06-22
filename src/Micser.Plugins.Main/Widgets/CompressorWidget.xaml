@@ -53,7 +53,7 @@
         <Label Grid.Row="3" Grid.Column="0" Content="{x:Static p:Resources.CompressorEnableAdvancedControls}" Target="{Binding ElementName=CkbEnableAdvancedControls}" behaviors:CheckBoxLabelBehavior.IsEnabled="True" />
         <CheckBox Grid.Row="3" Grid.Column="1" x:Name="CkbEnableAdvancedControls" HorizontalAlignment="Stretch" VerticalAlignment="Center" IsChecked="{Binding EnableAdvancedControls, Mode=TwoWay}" />
 
-        <Grid Grid.Row="4" Grid.ColumnSpan="2" Visibility="{Binding EnableAdvancedControls, Converter={converter:BooleanToVisibilityConverter}}">
+        <Grid Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Visibility="{Binding EnableAdvancedControls, Converter={converter:BooleanToVisibilityConverter}}">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />

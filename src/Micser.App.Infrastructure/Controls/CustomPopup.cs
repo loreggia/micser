@@ -153,6 +153,12 @@ namespace Micser.App.Infrastructure.Controls
         {
             var popupLocation = visual.PointToScreen(new Point(0, 0));
             var source = PresentationSource.FromVisual(visual);
+
+            if (source?.CompositionTarget == null)
+            {
+                return new Point();
+            }
+
             return source.CompositionTarget.TransformFromDevice.Transform(popupLocation);
         }
     }

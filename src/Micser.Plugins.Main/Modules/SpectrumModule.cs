@@ -16,7 +16,7 @@ namespace Micser.Plugins.Main.Modules
         {
             _apiEndPoint = apiEndPoint;
 
-            _sampleProcessor = new SpectrumSampleProcessor(this);
+            _sampleProcessor = new SpectrumSampleProcessor();
             AddSampleProcessor(_sampleProcessor);
 
             _timer = new Timer(50) { AutoReset = false };

@@ -2,26 +2,21 @@
 using CSCore.DSP;
 using Micser.Engine.Infrastructure.Audio;
 using Micser.Plugins.Main.Api;
-using Micser.Plugins.Main.Modules;
 
 namespace Micser.Plugins.Main.Audio
 {
     public class SpectrumSampleProcessor : SampleProcessor
     {
-        protected readonly SpectrumModule _module;
-        protected int _currentSampleIndex;
-        protected float[] _fftBuffer;
-        protected SpectrumFftProvider _fftProvider;
-        protected SpectrumData.SpectrumValue[] _spectrumValueBuffer;
+        private float[] _fftBuffer;
+        private SpectrumFftProvider _fftProvider;
+        private SpectrumData.SpectrumValue[] _spectrumValueBuffer;
 
-        public SpectrumSampleProcessor(SpectrumModule module)
+        public SpectrumSampleProcessor()
         {
-            _module = module;
-
             FftSize = FftSize.Fft4096;
         }
 
-        public FftSize FftSize { get; set; }
+        public FftSize FftSize { get; }
 
         public SpectrumData GetFftData()
         {

@@ -52,7 +52,7 @@ namespace Micser.App.Infrastructure
         }
 
         /// <inheritdoc />
-        public async void OnInitialized(IContainerProvider containerProvider)
+        public void OnInitialized(IContainerProvider containerProvider)
         {
         }
 

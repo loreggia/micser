@@ -47,7 +47,7 @@ namespace Micser.App
         {
             _isExiting = true;
             _regionManager.RequestNavigate(AppGlobals.PrismRegions.Main, "");
-            System.Windows.Application.Current.Shutdown();
+            Application.Current.Shutdown();
         }
 
         private void MainShell_Loaded(object sender, RoutedEventArgs e)

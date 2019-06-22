@@ -455,7 +455,7 @@ namespace Micser.App.ViewModels
                     return;
                 }
 
-                if (vm.GetType().GetProperty(e.PropertyName).GetCustomAttributes(true).OfType<UnsavedAttribute>().Any())
+                if (vm.GetType().GetProperty(e.PropertyName)?.GetCustomAttributes(true).OfType<UnsavedAttribute>().Any() == true)
                 {
                     return;
                 }

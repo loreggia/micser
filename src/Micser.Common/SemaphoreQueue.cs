@@ -28,8 +28,12 @@ namespace Micser.Common
             _currentCount = initialCount;
         }
 
+        /// <summary>
+        /// Gets the current number of waiters in the queue.
+        /// </summary>
         public int WaiterCount => _waiters.Count;
 
+        /// <inheritdoc />
         public void Dispose()
         {
             Dispose(true);
@@ -78,6 +82,9 @@ namespace Micser.Common
             }
         }
 
+        /// <summary>
+        /// Releases all wait handles.
+        /// </summary>
         protected virtual void Dispose(bool disposing)
         {
             if (disposing)

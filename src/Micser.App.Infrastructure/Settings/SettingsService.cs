@@ -142,7 +142,7 @@ namespace Micser.App.Infrastructure.Settings
         /// <inheritdoc />
         public async Task<bool> SetSettingAsync(string key, object value)
         {
-            await LoadAsync(false);
+            await LoadAsync();
 
             var setting = _registry.Items.FirstOrDefault(i => string.Equals(i.Key, key, StringComparison.InvariantCultureIgnoreCase));
 
