@@ -35,7 +35,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup>
-    <StartupObject>Micser.App.Application</StartupObject>
+    <StartupObject>Micser.App.MicserApplication</StartupObject>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationIcon>..\..\gfx\logo.ico</ApplicationIcon>
@@ -62,7 +62,7 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <ApplicationDefinition Include="Application.xaml">
+    <ApplicationDefinition Include="MicserApplication.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
@@ -113,8 +113,8 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Compile Include="Application.xaml.cs">
-      <DependentUpon>Application.xaml</DependentUpon>
+    <Compile Include="MicserApplication.xaml.cs">
+      <DependentUpon>MicserApplication.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
     <Page Include="Views\AboutView.xaml">
