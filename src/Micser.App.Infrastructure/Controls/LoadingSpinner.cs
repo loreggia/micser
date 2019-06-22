@@ -75,9 +75,7 @@ namespace Micser.App.Infrastructure.Controls
 
             for (var i = 0; i < CircleCount; i++)
             {
-                var circle = CircleTemplate.LoadContent() as UIElement;
-
-                if (circle == null)
+                if (!(CircleTemplate.LoadContent() is UIElement circle))
                 {
                     throw new InvalidOperationException(nameof(CircleTemplate));
                 }
