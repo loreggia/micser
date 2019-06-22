@@ -8,7 +8,7 @@ namespace Micser.Setup.CustomActions
         private const string HardwareId = @"Root\Micser.Vac.Driver";
 
         [CustomAction]
-        public static ActionResult Install(Session session)
+        public static ActionResult InstallDriver(Session session)
         {
             SetupApi.Log = msg => session.Log(msg);
 
@@ -28,7 +28,7 @@ namespace Micser.Setup.CustomActions
         }
 
         [CustomAction]
-        public static ActionResult Uninstall(Session session)
+        public static ActionResult UninstallDriver(Session session)
         {
             SetupApi.Log = msg => session.Log(msg);
 

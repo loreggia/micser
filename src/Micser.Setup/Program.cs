@@ -104,33 +104,36 @@ namespace Micser.Setup
             project.Platform = Platform.x86;
 #endif
 
+            project.AddProperty(new Property("WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT", "Launch Micser"));
+            project.AddProperty(new Property("WIXUI_EXITDIALOGOPTIONALCHECKBOX", "0"));
+
             var launchAppAction = new Id("LaunchApp");
 
             project.Actions = new Action[]
             {
                 new ManagedAction(
-                    DriverActions.Install,
+                    DriverActions.InstallDriver,
                     typeof(DriverActions).Assembly.Location,
                     Return.check,
                     When.Before,
                     Step.InstallFinalize,
                     Condition.NOT_BeingRemoved & vacFeatureCondition)
                 {
-                    Rollback = nameof(DriverActions.Uninstall),
+                    Rollback = nameof(DriverActions.UninstallDriver),
                     Impersonate = false,
                     Execute = Execute.deferred,
                     UsesProperties = ""
                 },
 
                 new ManagedAction(
-                    DriverActions.Uninstall,
+                    DriverActions.UninstallDriver,
                     typeof(DriverActions).Assembly.Location,
                     Return.check,
                     When.After,
                     Step.InstallInitialize,
                     Condition.BeingUninstalled & vacFeatureCondition | Condition.Create("&VacFeature=2"))
                 {
-                    Rollback = nameof(DriverActions.Install),
+                    Rollback = nameof(DriverActions.InstallDriver),
                     Impersonate = false,
                     Execute = Execute.deferred,
                     UsesProperties = ""
@@ -140,7 +143,17 @@ namespace Micser.Setup
                 {
                     Impersonate = true,
                     Sequence = Sequence.NotInSequence
-                }
+                },
+
+                new SetPropertyAction(
+                    new Id("SetWIXUI_EXITDIALOGOPTIONALCHECKBOX"),
+                    "WIXUI_EXITDIALOGOPTIONALCHECKBOX",
+                    "1")
+                {
+                    Condition = Condition.NOT_Installed,
+                    Step = Step.InstallFiles,
+                    When = When.Before
+                },
             };
 
             project.UI = WUI.WixUI_Common;
@@ -158,9 +171,6 @@ namespace Micser.Setup
             project.DefaultFeature.Children.Add(vacFeature);
 
             project.SetNetFxPrerequisite("WIXNETFX4RELEASEINSTALLED >= '#461808'");
-
-            project.AddProperty(new Property("WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT", "Launch Micser"));
-            project.AddProperty(new Property("WIXUI_EXITDIALOGOPTIONALCHECKBOX", "1"));
 
             project.Include(WixExtension.UI);
             project.Include(WixExtension.NetFx);

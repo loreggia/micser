@@ -11,8 +11,14 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Driver", "Driver", "{C212CC42-E145-4A81-A3FC-47AB12168AE3}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Micser.Vac.Package", "Micser.Vac.Package\Micser.Vac.Package.vcxproj", "{353EAF8B-CDFD-4216-BE5A-1D44CA2583EC}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E14431B4-F54A-4D36-B505-1D3407252430} = {E14431B4-F54A-4D36-B505-1D3407252430}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Micser.Vac.Driver", "Micser.Vac.Driver\Micser.Vac.Driver.vcxproj", "{6EEBBC22-F44C-400D-8FBB-2E42960D287B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E14431B4-F54A-4D36-B505-1D3407252430} = {E14431B4-F54A-4D36-B505-1D3407252430}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Micser.Common", "Micser.Common\Micser.Common.csproj", "{E14431B4-F54A-4D36-B505-1D3407252430}"
 EndProject
@@ -65,6 +71,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Micser.DriverUtility", "Micser.DriverUtility\Micser.DriverUtility.csproj", "{B63FFC5B-C668-4A79-9E01-E01659C63C44}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Micser.Setup.CustomActions", "Micser.Setup.CustomActions\Micser.Setup.CustomActions.csproj", "{1E05C6E2-F8DA-495C-988D-2566B52E05A6}"
+	ProjectSection(ProjectDependencies) = postProject
+		{E14431B4-F54A-4D36-B505-1D3407252430} = {E14431B4-F54A-4D36-B505-1D3407252430}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Micser.Engine.Infrastructure.Test", "Micser.Engine.Infrastructure.Test\Micser.Engine.Infrastructure.Test.csproj", "{0616E45A-EA01-4ADB-A52C-817AE85245FE}"
 EndProject

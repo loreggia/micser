@@ -47,6 +47,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="..\Micser.Common\Properties\GlobalAssemblyInfo.cs">
+      <Link>Properties\GlobalAssemblyInfo.cs</Link>
+    </Compile>
     <Compile Include="Api\EngineProcessor.cs" />
     <Compile Include="Api\ModuleConnectionsProcessor.cs" />
     <Compile Include="Api\ModulesProcessor.cs" />
