@@ -19,10 +19,27 @@ namespace Micser.Common.Devices
                 return null;
             }
 
+            string deviceName = null;
+            string deviceDescription = null;
+
+            try
+            {
+                var deviceNameProperty = device.PropertyStore.GetValue(Globals.PropertyKeys.DeviceName);
+                deviceName = deviceNameProperty.GetValue()?.ToString();
+                var deviceDescriptionProperty = device.PropertyStore.GetValue(Globals.PropertyKeys.DeviceDescription);
+                deviceDescription = deviceDescriptionProperty.GetValue()?.ToString();
+            }
+            catch
+            {
+                // ignored
+            }
+
             return new DeviceDescription
             {
                 Id = device.DeviceID,
-                Name = device.FriendlyName,
+                FriendlyName = device.FriendlyName,
+                Description = deviceDescription,
+                AdapterName = deviceName,
                 //IconPath = device.IconPath,
                 IsActive = device.DeviceState == DeviceState.Active,
                 Type = device.DataFlow == DataFlow.Capture ? DeviceType.Input : DeviceType.Output
