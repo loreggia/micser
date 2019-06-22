@@ -25,7 +25,7 @@ namespace Micser.Common.Test
             Assert.True(devicesArray.Length > 0);
             foreach (var deviceDescription in devicesArray)
             {
-                _testOutputHelper.WriteLine($"{deviceDescription.Name}: {deviceDescription.Id}");
+                _testOutputHelper.WriteLine($"{deviceDescription.FriendlyName}: {deviceDescription.Id}");
             }
         }
 
@@ -40,7 +40,7 @@ namespace Micser.Common.Test
             Assert.True(devicesArray.Length > 0);
             foreach (var deviceDescription in devicesArray)
             {
-                _testOutputHelper.WriteLine($"{deviceDescription.Name}: {deviceDescription.Id}");
+                _testOutputHelper.WriteLine($"{deviceDescription.FriendlyName}: {deviceDescription.Id}");
             }
         }
     }

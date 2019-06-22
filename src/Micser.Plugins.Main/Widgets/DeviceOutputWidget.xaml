@@ -7,6 +7,8 @@
                  xmlns:local="clr-namespace:Micser.Plugins.Main.Widgets"
                  xmlns:widgets="clr-namespace:Micser.App.Infrastructure.Widgets;assembly=Micser.App.Infrastructure"
                  xmlns:i="clr-namespace:Micser.App.Infrastructure;assembly=Micser.App.Infrastructure"
+                 xmlns:extensions="clr-namespace:Micser.App.Infrastructure.Extensions;assembly=Micser.App.Infrastructure"
+                 xmlns:devices="clr-namespace:Micser.Common.Devices;assembly=Micser.Common"
                  mc:Ignorable="d"
                  d:DataContext="{d:DesignInstance local:DeviceOutputViewModel}"
                  MinWidth="250"
@@ -25,7 +27,7 @@
 
         <Label Grid.Row="1" Grid.Column="0" Target="{Binding ElementName=CbxDevice}" Content="{x:Static p:Resources.Device}"
                VerticalAlignment="Center" />
-        <ComboBox Grid.Row="1" Grid.Column="1" x:Name="CbxDevice" MinWidth="100" ItemsSource="{Binding DeviceDescriptions}" DisplayMemberPath="Name"
+        <ComboBox Grid.Row="1" Grid.Column="1" x:Name="CbxDevice" MinWidth="100" ItemsSource="{Binding DeviceDescriptions}" DisplayMemberPath="{extensions:NameOf Member=FriendlyName, Type=devices:DeviceDescription}"
                   SelectedItem="{Binding SelectedDeviceDescription, Mode=TwoWay}" HorizontalAlignment="Stretch" />
     </Grid>
 </widgets:Widget>

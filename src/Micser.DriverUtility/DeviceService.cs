@@ -81,7 +81,7 @@ namespace Micser.DriverUtility
 
             foreach (var device in devices)
             {
-                var deviceNameProperty = device.PropertyStore.GetValue(DriverGlobals.PropertyKeys.DeviceName);
+                var deviceNameProperty = device.PropertyStore.GetValue(Globals.PropertyKeys.DeviceName);
                 var deviceName = deviceNameProperty.GetValue()?.ToString();
 
                 if (deviceName == Globals.DeviceInterfaceName)
@@ -100,8 +100,8 @@ namespace Micser.DriverUtility
             devices.Sort((d1, d2) =>
             {
                 // HACK - this property is not documented my microsoft
-                var topologyInfo1 = d1.PropertyStore.GetValue(DriverGlobals.PropertyKeys.TopologyInfo).GetValue()?.ToString();
-                var topologyInfo2 = d2.PropertyStore.GetValue(DriverGlobals.PropertyKeys.TopologyInfo).GetValue()?.ToString();
+                var topologyInfo1 = d1.PropertyStore.GetValue(Globals.PropertyKeys.TopologyInfo).GetValue()?.ToString();
+                var topologyInfo2 = d2.PropertyStore.GetValue(Globals.PropertyKeys.TopologyInfo).GetValue()?.ToString();
 
                 if (!string.IsNullOrEmpty(topologyInfo1) &&
                     !string.IsNullOrEmpty(topologyInfo2))
@@ -128,7 +128,7 @@ namespace Micser.DriverUtility
                 var pName = Marshal.StringToHGlobalUni(deviceName);
                 var propertyStore = device.OpenPropertyStore(StorageAccess.ReadWrite);
                 propertyStore.SetValue(
-                    DriverGlobals.PropertyKeys.DeviceDescription,
+                    Globals.PropertyKeys.DeviceDescription,
                     new PropertyVariant { DataType = VarEnum.VT_LPWSTR, PointerValue = pName });
                 propertyStore.Commit();
             }
