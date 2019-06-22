@@ -56,8 +56,30 @@ namespace Micser.Setup
             var appAssembly = System.Reflection.Assembly.LoadFrom(appFile);
             project.Version = appAssembly.GetName().Version;
 
-            var coreFeature = new Feature("Micser", "Installs Micser core components.", true, false) { Id = new Id("CoreFeature") };
-            var vacFeature = new Feature("Virtual Audio Cable", "Installs the Micser Virtual Audio Cable driver.", true, true) { Id = new Id("VacFeature") };
+            var coreFeature = new Feature("Micser", "Installs Micser core components.", true, false)
+            {
+                Id = new Id("CoreFeature"),
+                Attributes =
+                {
+                    { "AllowAdvertise","no" },
+                    { "InstallDefault", "followParent" }
+                }
+            };
+            var vacFeature = new Feature("Virtual Audio Cable", "Installs the Micser Virtual Audio Cable driver.", true, true)
+            {
+                Id = new Id("VacFeature"),
+                Attributes =
+                {
+                    { "AllowAdvertise", "no" },
+                    { "InstallDefault", "followParent" }
+                }
+            };
+            project.DefaultFeature.AllowChange = false;
+            project.DefaultFeature.Attributes.Add("AllowAdvertise", "no");
+            project.DefaultFeature.Attributes.Add("InstallDefault", "local");
+            project.DefaultFeature.Display = FeatureDisplay.expand;
+            project.DefaultFeature.Children.Add(coreFeature);
+            project.DefaultFeature.Children.Add(vacFeature);
 
             var appId = new Id("MicserAppExe");
 
@@ -104,9 +126,6 @@ namespace Micser.Setup
             project.Platform = Platform.x86;
 #endif
 
-            project.AddProperty(new Property("WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT", "Launch Micser"));
-            project.AddProperty(new Property("WIXUI_EXITDIALOGOPTIONALCHECKBOX", "0"));
-
             var launchAppAction = new Id("LaunchApp");
 
             project.Actions = new Action[]
@@ -143,17 +162,7 @@ namespace Micser.Setup
                 {
                     Impersonate = true,
                     Sequence = Sequence.NotInSequence
-                },
-
-                new SetPropertyAction(
-                    new Id("SetWIXUI_EXITDIALOGOPTIONALCHECKBOX"),
-                    "WIXUI_EXITDIALOGOPTIONALCHECKBOX",
-                    "1")
-                {
-                    Condition = Condition.NOT_Installed,
-                    Step = Step.InstallFiles,
-                    When = When.Before
-                },
+                }
             };
 
             project.UI = WUI.WixUI_Common;
@@ -162,13 +171,12 @@ namespace Micser.Setup
                 .On(NativeDialogs.InstallDirDlg, Buttons.Back, new ShowDialog(NativeDialogs.WelcomeDlg))
                 .On(NativeDialogs.MaintenanceTypeDlg, "ChangeButton", new ShowDialog(NativeDialogs.CustomizeDlg))
                 .On(NativeDialogs.CustomizeDlg, Buttons.Back, new ShowDialog(NativeDialogs.MaintenanceTypeDlg, Condition.Installed))
-                .On(NativeDialogs.ExitDialog, Buttons.Finish, new ExecuteCustomAction(launchAppAction, new Condition("WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1")))
+                .On(NativeDialogs.ExitDialog, Buttons.Finish, new ExecuteCustomAction(launchAppAction, new Condition("WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1") & Condition.NOT_Installed))
                 ;
             project.CustomUI.Properties.Remove("ARPNOMODIFY");
 
-            project.DefaultFeature.Display = FeatureDisplay.expand;
-            project.DefaultFeature.Children.Add(coreFeature);
-            project.DefaultFeature.Children.Add(vacFeature);
+            project.AddProperty(new Property("WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT", "Launch Micser"));
+            project.AddProperty(new Property("WIXUI_EXITDIALOGOPTIONALCHECKBOX", "1"));
 
             project.SetNetFxPrerequisite("WIXNETFX4RELEASEINSTALLED >= '#461808'");
 
