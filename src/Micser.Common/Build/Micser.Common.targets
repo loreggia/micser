@@ -29,13 +29,13 @@
     <VersionFile Condition="'$(VersionFile)'==''">Properties/Version.txt</VersionFile>
   </PropertyGroup>
   <Target Name="MSBuildVersionTarget" BeforeTargets="BeforeBuild">
-    <Version Condition="'$(Configuration)' != 'Release'" VersionFile="$(VersionFile)" BuildType="Increment">
+    <Version Condition="'$(Configuration)' == 'Release'" VersionFile="$(VersionFile)" BuildType="Increment">
       <Output TaskParameter="Major" PropertyName="Major" />
       <Output TaskParameter="Minor" PropertyName="Minor" />
       <Output TaskParameter="Build" PropertyName="Build" />
       <Output TaskParameter="Revision" PropertyName="Revision" />
     </Version>
-    <Version Condition="'$(Configuration)' == 'Release'" VersionFile="$(VersionFile)">
+    <Version Condition="'$(Configuration)' != 'Release'" VersionFile="$(VersionFile)">
       <Output TaskParameter="Major" PropertyName="Major" />
       <Output TaskParameter="Minor" PropertyName="Minor" />
       <Output TaskParameter="Build" PropertyName="Build" />
