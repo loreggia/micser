@@ -33,7 +33,7 @@ namespace Micser.App
     /// <summary>
     /// Interaction logic for App.xaml
     /// </summary>
-    public partial class Application
+    public partial class MicserApplication
     {
         private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
         private readonly Timer _reconnectTimer;
@@ -41,7 +41,7 @@ namespace Micser.App
         private bool _isStartup;
         private MainShell _shell;
 
-        public Application()
+        public MicserApplication()
         {
             DispatcherUnhandledException += OnDispatcherUnhandledException;
 

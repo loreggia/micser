@@ -27,7 +27,7 @@ namespace Micser.App
 
         protected override void OnClosing(CancelEventArgs e)
         {
-            var settingsService = Application.GetService<ISettingsService>();
+            var settingsService = MicserApplication.GetService<ISettingsService>();
             _isExiting = !settingsService.GetSetting<bool>(AppGlobals.SettingKeys.MinimizeToTray);
 
             e.Cancel = !_isExiting;
