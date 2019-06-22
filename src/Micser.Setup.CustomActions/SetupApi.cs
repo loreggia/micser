@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Micser.Setup.CustomActions
 {
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     public static class SetupApi
     {
         public const uint DI_REMOVEDEVICE_GLOBAL = 1;

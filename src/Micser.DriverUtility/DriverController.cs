@@ -3,6 +3,7 @@ using Microsoft.Win32.SafeHandles;
 using Micser.Common;
 using NLog;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Security;
@@ -130,6 +131,7 @@ namespace Micser.DriverUtility
 
         [ComVisible(false)]
         [SuppressUnmanagedCodeSecurity]
+        [SuppressMessage("ReSharper", "InconsistentNaming")]
         private class SafeNativeMethods
         {
             public const uint FILE_DEVICE_UNKNOWN = 0x00000022;

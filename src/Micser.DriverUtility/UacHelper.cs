@@ -2,11 +2,13 @@
 using NLog;
 using System;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 
 namespace Micser.DriverUtility
 {
+    [SuppressMessage("ReSharper", "InconsistentNaming")]
     public static class UacHelper
     {
         private const string UacRegistryKey = "Software\\Microsoft\\Windows\\CurrentVersion\\Policies\\System";
@@ -119,13 +121,12 @@ namespace Micser.DriverUtility
             {
                 using (var uacKey = Registry.LocalMachine.OpenSubKey(UacRegistryKey, false))
                 {
-                    var result = uacKey.GetValue(UacRegistryValue).Equals(1);
-                    return result;
+                    return uacKey != null && uacKey.GetValue(UacRegistryValue).Equals(1);
                 }
             }
         }
 
-        private class NativeMethods
+        private static class NativeMethods
         {
             [DllImport("kernel32.dll", SetLastError = true)]
             [return: MarshalAs(UnmanagedType.Bool)]

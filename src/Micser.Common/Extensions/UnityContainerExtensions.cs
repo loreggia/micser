@@ -100,7 +100,7 @@ namespace Micser.Common.Extensions
             }
             catch (ResolutionFailedException)
             {
-                return default(T);
+                return default;
             }
         }
     }

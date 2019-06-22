@@ -243,21 +243,21 @@ namespace Micser.App.Infrastructure.Behaviors
 
         private static void TextBox_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
-            var _this = sender as TextBox;
-            var isValid = IsSymbolValid(GetMask(_this), e.Text);
+            var textBox = (TextBox)sender;
+            var isValid = IsSymbolValid(GetMask(textBox), e.Text);
             e.Handled = !isValid;
             if (isValid)
             {
-                var caret = _this.CaretIndex;
-                var text = _this.Text;
+                var caret = textBox.CaretIndex;
+                var text = textBox.Text;
                 var textInserted = false;
                 var selectionLength = 0;
 
-                if (_this.SelectionLength > 0)
+                if (textBox.SelectionLength > 0)
                 {
-                    text = text.Substring(0, _this.SelectionStart) +
-                           text.Substring(_this.SelectionStart + _this.SelectionLength);
-                    caret = _this.SelectionStart;
+                    text = text.Substring(0, textBox.SelectionStart) +
+                           text.Substring(textBox.SelectionStart + textBox.SelectionLength);
+                    caret = textBox.SelectionStart;
                 }
 
                 if (e.Text == NumberFormatInfo.CurrentInfo.NumberDecimalSeparator)
@@ -302,7 +302,7 @@ namespace Micser.App.Infrastructure.Behaviors
                 else if (e.Text == NumberFormatInfo.CurrentInfo.NegativeSign)
                 {
                     textInserted = true;
-                    if (_this.Text.Contains(NumberFormatInfo.CurrentInfo.NegativeSign))
+                    if (textBox.Text.Contains(NumberFormatInfo.CurrentInfo.NegativeSign))
                     {
                         text = text.Replace(NumberFormatInfo.CurrentInfo.NegativeSign, string.Empty);
                         if (caret != 0)
@@ -312,7 +312,7 @@ namespace Micser.App.Infrastructure.Behaviors
                     }
                     else
                     {
-                        text = NumberFormatInfo.CurrentInfo.NegativeSign + _this.Text;
+                        text = NumberFormatInfo.CurrentInfo.NegativeSign + textBox.Text;
                         caret++;
                     }
                 }
@@ -320,7 +320,7 @@ namespace Micser.App.Infrastructure.Behaviors
                 if (!textInserted)
                 {
                     text = text.Substring(0, caret) + e.Text +
-                           (caret < _this.Text.Length ? text.Substring(caret) : string.Empty);
+                           (caret < textBox.Text.Length ? text.Substring(caret) : string.Empty);
 
                     caret++;
                 }
@@ -328,7 +328,7 @@ namespace Micser.App.Infrastructure.Behaviors
                 try
                 {
                     var val = Convert.ToDouble(text);
-                    var newVal = ValidateLimits(GetMinimumValue(_this), GetMaximumValue(_this), val);
+                    var newVal = ValidateLimits(GetMinimumValue(textBox), GetMaximumValue(textBox), val);
                     if (val != newVal)
                     {
                         text = newVal.ToString();
@@ -370,10 +370,10 @@ namespace Micser.App.Infrastructure.Behaviors
                     caret = text.Length;
                 }
 
-                _this.Text = text;
-                _this.CaretIndex = caret;
-                _this.SelectionStart = caret;
-                _this.SelectionLength = selectionLength;
+                textBox.Text = text;
+                textBox.CaretIndex = caret;
+                textBox.SelectionStart = caret;
+                textBox.SelectionLength = selectionLength;
                 e.Handled = true;
             }
         }
@@ -405,12 +405,12 @@ namespace Micser.App.Infrastructure.Behaviors
 
         private static void TextBoxPastingEventHandler(object sender, DataObjectPastingEventArgs e)
         {
-            var _this = sender as TextBox;
+            var textBox = (TextBox)sender;
             var clipboard = e.DataObject.GetData(typeof(string)) as string;
-            clipboard = ValidateValue(GetMask(_this), clipboard, GetMinimumValue(_this), GetMaximumValue(_this));
+            clipboard = ValidateValue(GetMask(textBox), clipboard);
             if (!string.IsNullOrEmpty(clipboard))
             {
-                _this.Text = clipboard;
+                textBox.Text = clipboard;
             }
 
             e.CancelCommand();
@@ -442,11 +442,11 @@ namespace Micser.App.Infrastructure.Behaviors
         {
             if (GetMask(_this) != MaskType.Any)
             {
-                _this.Text = ValidateValue(GetMask(_this), _this.Text, GetMinimumValue(_this), GetMaximumValue(_this));
+                _this.Text = ValidateValue(GetMask(_this), _this.Text);
             }
         }
 
-        private static string ValidateValue(MaskType mask, string value, double min, double max)
+        private static string ValidateValue(MaskType mask, string value)
         {
             if (string.IsNullOrEmpty(value))
             {
