@@ -65,24 +65,24 @@ namespace Micser.App.Settings
             return _themeList;
         }
 
-        public async Task<object> LoadSettingAsync(object value)
+        public Task<object> LoadSettingAsync(object value)
         {
             if (value is string name && _themeFiles.TryGetValue(name, out var fileName))
             {
                 ApplyTheme(fileName);
             }
 
-            return value;
+            return Task.FromResult(value);
         }
 
-        public async Task<object> SaveSettingAsync(object value)
+        public Task<object> SaveSettingAsync(object value)
         {
             if (value is string name && _themeFiles.TryGetValue(name, out var fileName))
             {
                 ApplyTheme(fileName);
             }
 
-            return value;
+            return Task.FromResult(value);
         }
 
         private static void ApplyTheme(string fileName)
