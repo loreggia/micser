@@ -22,18 +22,20 @@ namespace Micser.App.Settings
             _logger = logger;
         }
 
-        public async Task<object> LoadSettingAsync(object value)
+        public Task<object> LoadSettingAsync(object value)
         {
+            object result = false;
             try
             {
                 var fileName = Path.Combine(StartupFolder, StartupShortcutFileName);
-                return File.Exists(fileName);
+                result = File.Exists(fileName);
             }
             catch (Exception ex)
             {
                 _logger.Error(ex);
-                return false;
             }
+
+            return Task.FromResult(result);
         }
 
         public async Task<object> SaveSettingAsync(object value)
@@ -42,38 +44,7 @@ namespace Micser.App.Settings
 
             if (value is bool isEnabled)
             {
-                var fileName = Path.Combine(StartupFolder, StartupShortcutFileName);
-                var fileExists = File.Exists(fileName);
-
-                if (isEnabled && !fileExists)
-                {
-                    // create shortcut
-                    try
-                    {
-                        var shell = new WshShell();
-                        var shortcut = (IWshShortcut)shell.CreateShortcut(fileName);
-                        shortcut.TargetPath = Assembly.GetExecutingAssembly().Location;
-                        shortcut.WorkingDirectory = Path.GetDirectoryName(shortcut.TargetPath);
-                        shortcut.Arguments = "-" + AppGlobals.ProgramArguments.Startup;
-                        shortcut.Save();
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.Error(ex, "Could not create the startup shortcut.");
-                    }
-                }
-                else if (!isEnabled && fileExists)
-                {
-                    // delete shortcut
-                    try
-                    {
-                        File.Delete(fileName);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.Error(ex, "Could not delete the startup shortcut.");
-                    }
-                }
+                await Task.Run(() => SaveSetting(isEnabled));
             }
             else
             {
@@ -81,6 +52,42 @@ namespace Micser.App.Settings
             }
 
             return value;
+        }
+
+        private void SaveSetting(bool isEnabled)
+        {
+            var fileName = Path.Combine(StartupFolder, StartupShortcutFileName);
+            var fileExists = File.Exists(fileName);
+
+            if (isEnabled && !fileExists)
+            {
+                // create shortcut
+                try
+                {
+                    var shell = new WshShell();
+                    var shortcut = (IWshShortcut)shell.CreateShortcut(fileName);
+                    shortcut.TargetPath = Assembly.GetExecutingAssembly().Location;
+                    shortcut.WorkingDirectory = Path.GetDirectoryName(shortcut.TargetPath);
+                    shortcut.Arguments = "-" + AppGlobals.ProgramArguments.Startup;
+                    shortcut.Save();
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex, "Could not create the startup shortcut.");
+                }
+            }
+            else if (!isEnabled && fileExists)
+            {
+                // delete shortcut
+                try
+                {
+                    File.Delete(fileName);
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex, "Could not delete the startup shortcut.");
+                }
+            }
         }
     }
 }

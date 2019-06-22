@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media;
 
 namespace Micser.App.Infrastructure.Controls
 {
@@ -9,18 +8,12 @@ namespace Micser.App.Infrastructure.Controls
     /// A loading spinner consisting of a number of rotating circles.
     /// </summary>
     [TemplatePart(Name = PartCanvas, Type = typeof(Canvas))]
-    [TemplatePart(Name = PartRotationTransform, Type = typeof(RotateTransform))]
     public class LoadingSpinner : Control
     {
         /// <summary>
         /// The name of the canvas control.
         /// </summary>
         public const string PartCanvas = "PART_Canvas";
-
-        /// <summary>
-        /// The name of the rotation transform to rotate the spinner with.
-        /// </summary>
-        public const string PartRotationTransform = "PART_RotationTransform";
 
         /// <summary>
         /// The number of circles to generate for the spinner.
@@ -35,7 +28,6 @@ namespace Micser.App.Infrastructure.Controls
             nameof(CircleTemplate), typeof(DataTemplate), typeof(LoadingSpinner), new PropertyMetadata(default(DataTemplate)));
 
         private Canvas _canvas;
-        private RotateTransform _rotateTransform;
 
         static LoadingSpinner()
         {
@@ -72,12 +64,6 @@ namespace Micser.App.Infrastructure.Controls
                 throw new InvalidOperationException(PartCanvas);
             }
             _canvas = canvas;
-
-            if (!(GetTemplateChild(PartRotationTransform) is RotateTransform transform))
-            {
-                throw new InvalidOperationException(PartRotationTransform);
-            }
-            _rotateTransform = transform;
 
             if (CircleTemplate == null)
             {

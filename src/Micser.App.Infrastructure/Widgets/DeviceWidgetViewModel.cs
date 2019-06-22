@@ -14,8 +14,6 @@ namespace Micser.App.Infrastructure.Widgets
     /// </summary>
     public abstract class DeviceWidgetViewModel : AudioWidgetViewModel
     {
-        private readonly object _deviceDescriptionsLock;
-
         private readonly MMDeviceEnumerator _deviceEnumerator;
         private DeviceDescription _selectedDeviceDescription;
 
@@ -23,8 +21,7 @@ namespace Micser.App.Infrastructure.Widgets
         protected DeviceWidgetViewModel()
         {
             DeviceDescriptions = new ObservableCollection<DeviceDescription>();
-            _deviceDescriptionsLock = new object();
-            BindingOperations.EnableCollectionSynchronization(DeviceDescriptions, _deviceDescriptionsLock);
+            BindingOperations.EnableCollectionSynchronization(DeviceDescriptions, new object());
 
             _deviceEnumerator = new MMDeviceEnumerator();
             _deviceEnumerator.DeviceAdded += OnDeviceAdded;

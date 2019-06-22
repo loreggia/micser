@@ -14,8 +14,8 @@ namespace Micser.App.Settings
 {
     public class VacCountSettingHandler : ISettingHandler
     {
-        protected readonly ILogger _logger;
         private readonly EngineApiClient _engineApiClient;
+        private readonly ILogger _logger;
 
         public VacCountSettingHandler(EngineApiClient engineApiClient, ILogger logger)
         {
@@ -25,7 +25,7 @@ namespace Micser.App.Settings
 
         public async Task<object> LoadSettingAsync(object value)
         {
-            return GetRegistryValue();
+            return await Task.Run(GetRegistryValue);
         }
 
         public async Task<object> SaveSettingAsync(object value)
