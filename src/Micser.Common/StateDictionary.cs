@@ -43,7 +43,7 @@ namespace Micser.Common
         /// <param name="defaultValue">The default value that is returned if the key is not found
         /// or the stored type is not convertible to the return type <typeparamref name="T"/>.</param>
         /// <typeparam name="T">The type of the value to get.</typeparam>
-        public T GetObject<T>(string key, T defaultValue = default(T))
+        public T GetObject<T>(string key, T defaultValue = default)
         {
             if (ContainsKey(key))
             {
