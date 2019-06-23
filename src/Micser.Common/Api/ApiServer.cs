@@ -138,23 +138,27 @@ namespace Micser.Common.Api
                 }
 
                 _serverState = ServerState.Stopping;
+                _state = EndPointState.Disconnecting;
             }
 
             try
             {
                 _listener?.Stop();
                 InClient?.Close();
+                InClient = null;
                 OutClient?.Close();
+                OutClient = null;
             }
-            catch (Exception ex)
+            catch
             {
-                Logger.Error(ex);
+                // Ignored
             }
             finally
             {
                 lock (StateLock)
                 {
                     _serverState = ServerState.Stopped;
+                    _state = EndPointState.Disconnected;
                 }
 
                 Logger.Info("Server stopped");
