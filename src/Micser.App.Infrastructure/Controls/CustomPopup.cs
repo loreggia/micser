@@ -11,7 +11,7 @@ namespace Micser.App.Infrastructure.Controls
     public class CustomPopup : Popup
     {
         /// <summary>
-        /// The actual horizontal offset taking opposite placement when close to a screen edge into account.
+        /// <see cref="DependencyProperty"/> for the <see cref="ActualHorizontalOffset"/> property.
         /// </summary>
         public static readonly DependencyProperty ActualHorizontalOffsetProperty;
 
@@ -21,7 +21,7 @@ namespace Micser.App.Infrastructure.Controls
         public static readonly DependencyPropertyKey ActualHorizontalOffsetPropertyKey;
 
         /// <summary>
-        /// The actual vertical offset taking opposite placement when close to a screen edge into account.
+        /// <see cref="DependencyProperty"/> for the <see cref="ActualVerticalOffset"/> property.
         /// </summary>
         public static readonly DependencyProperty ActualVerticalOffsetProperty;
 
@@ -31,7 +31,7 @@ namespace Micser.App.Infrastructure.Controls
         public static readonly DependencyPropertyKey ActualVerticalOffsetPropertyKey;
 
         /// <summary>
-        /// Indicates whether the popup is currently placed on the opposite side due to being close to a screen edge.
+        /// <see cref="DependencyProperty"/> for the <see cref="IsOppositePlacement"/> property.
         /// </summary>
         public static readonly DependencyProperty IsOppositePlacementProperty;
 

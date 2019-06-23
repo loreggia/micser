@@ -71,7 +71,6 @@ namespace Micser.App.Infrastructure.Controls
 
         /// <summary>
         /// Gets or sets a value indicating whether the line is closed.
-        /// Wraps the <see cref="IsClosedCurveProperty"/> dependency property.
         /// </summary>
         public bool IsClosedCurve
         {
@@ -81,7 +80,6 @@ namespace Micser.App.Infrastructure.Controls
 
         /// <summary>
         /// Defines the <see cref="Brush"/> to use for drawing the line path.
-        /// Wraps the <see cref="PathColorProperty"/> dependency property.
         /// </summary>
         public Brush PathColor
         {
@@ -91,7 +89,6 @@ namespace Micser.App.Infrastructure.Controls
 
         /// <summary>
         /// Defines the thickness of the line path.
-        /// Wraps the <see cref="PathThicknessProperty"/> dependency property.
         /// </summary>
         public double PathThickness
         {
@@ -101,7 +98,6 @@ namespace Micser.App.Infrastructure.Controls
 
         /// <summary>
         /// Defines the list of points that produce the line path.
-        /// Wraps the <see cref="PointsProperty"/> dependency property.
         /// </summary>
         public IEnumerable<Point> Points
         {
@@ -111,7 +107,6 @@ namespace Micser.App.Infrastructure.Controls
 
         /// <summary>
         /// Defines a smooth factor that specifies how smooth the curve is around a point.
-        /// Wraps the <see cref="SmoothFactorProperty"/> dependency property.
         /// </summary>
         public double SmoothFactor
         {
@@ -272,16 +267,16 @@ namespace Micser.App.Infrastructure.Controls
 
                 // Resulting control points. Here smooth_value is mentioned
                 // above coefficient K whose value should be in range [0...1].
-                var ctrl1_x = xm1 + (xc2 - xm1) * smoothFactor + x1 - xm1;
-                var ctrl1_y = ym1 + (yc2 - ym1) * smoothFactor + y1 - ym1;
+                var ctrl1X = xm1 + (xc2 - xm1) * smoothFactor + x1 - xm1;
+                var ctrl1Y = ym1 + (yc2 - ym1) * smoothFactor + y1 - ym1;
 
-                var ctrl2_x = xm2 + (xc2 - xm2) * smoothFactor + x2 - xm2;
-                var ctrl2_y = ym2 + (yc2 - ym2) * smoothFactor + y2 - ym2;
+                var ctrl2X = xm2 + (xc2 - xm2) * smoothFactor + x2 - xm2;
+                var ctrl2Y = ym2 + (yc2 - ym2) * smoothFactor + y2 - ym2;
 
                 result.Add(new BezierSegment
                 {
-                    Point1 = i == 0 && !isClosedCurve ? new Point(x1, y1) : new Point(ctrl1_x, ctrl1_y),
-                    Point2 = i == points.Count - 2 && !isClosedCurve ? new Point(x2, y2) : new Point(ctrl2_x, ctrl2_y),
+                    Point1 = i == 0 && !isClosedCurve ? new Point(x1, y1) : new Point(ctrl1X, ctrl1Y),
+                    Point2 = i == points.Count - 2 && !isClosedCurve ? new Point(x2, y2) : new Point(ctrl2X, ctrl2Y),
                     Point3 = new Point(x2, y2)
                 });
             }

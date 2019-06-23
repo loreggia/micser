@@ -16,18 +16,18 @@ namespace Micser.App.Infrastructure.Controls
         public const string PartCanvas = "PART_Canvas";
 
         /// <summary>
-        /// The number of circles to generate for the spinner.
+        /// <see cref="DependencyProperty"/> for the <see cref="CircleCount"/> property.
         /// </summary>
         public static readonly DependencyProperty CircleCountProperty = DependencyProperty.Register(
             nameof(CircleCount), typeof(int), typeof(LoadingSpinner), new PropertyMetadata(9));
 
         /// <summary>
-        /// The <see cref="DataTemplate"/> to use for displaying the spinning circles.
+        /// <see cref="DependencyProperty"/> for the <see cref="CircleTemplate"/> property.
         /// </summary>
         public static readonly DependencyProperty CircleTemplateProperty = DependencyProperty.Register(
             nameof(CircleTemplate), typeof(DataTemplate), typeof(LoadingSpinner), new PropertyMetadata(default(DataTemplate)));
 
-        private Canvas _canvas;
+        protected Canvas Canvas;
 
         static LoadingSpinner()
         {
@@ -63,7 +63,7 @@ namespace Micser.App.Infrastructure.Controls
             {
                 throw new InvalidOperationException(PartCanvas);
             }
-            _canvas = canvas;
+            Canvas = canvas;
 
             if (CircleTemplate == null)
             {
@@ -84,7 +84,7 @@ namespace Micser.App.Infrastructure.Controls
                 circle.SetValue(Canvas.TopProperty, 50 + Math.Cos(offset + i * step) * 50);
                 circle.Opacity = 1.0 - 1.0 / CircleCount * i;
 
-                _canvas.Children.Add(circle);
+                Canvas.Children.Add(circle);
             }
         }
     }

@@ -15,47 +15,87 @@ namespace Micser.App.Infrastructure.Widgets
     [TemplatePart(Name = PartNameOutputConnectors, Type = typeof(ItemsControl))]
     public class Widget : ContentControl, ISelectable
     {
+        /// <summary>
+        /// The name of the input connectors template part.
+        /// </summary>
+        public const string PartNameInputConnectors = "PART_InputConnectors";
+
+        /// <summary>
+        /// The name of the output connectors template part.
+        /// </summary>
+        public const string PartNameOutputConnectors = "PART_OutputConnectors";
+
+        /// <summary>
+        /// <see cref="DependencyProperty"/> for the <see cref="DeleteCommand"/> property.
+        /// </summary>
         public static readonly DependencyProperty DeleteCommandProperty = DependencyProperty.Register(
             nameof(DeleteCommand), typeof(ICommand), typeof(Widget), new PropertyMetadata(null));
 
+        /// <summary>
+        /// <see cref="DependencyProperty"/> for the <see cref="Header"/> property.
+        /// </summary>
         public static readonly DependencyProperty HeaderProperty = DependencyProperty.Register(
             nameof(Header), typeof(object), typeof(Widget), new PropertyMetadata(null));
 
+        /// <summary>
+        /// <see cref="DependencyProperty"/> for the <see cref="HeaderTemplate"/> property.
+        /// </summary>
         public static readonly DependencyProperty HeaderTemplateProperty = DependencyProperty.Register(
             nameof(HeaderTemplate), typeof(DataTemplate), typeof(Widget), new PropertyMetadata(null));
 
+        /// <summary>
+        /// <see cref="DependencyProperty"/> for the <see cref="InputConnectorsSource"/> property.
+        /// </summary>
         public static readonly DependencyProperty InputConnectorsSourceProperty = DependencyProperty.Register(
             nameof(InputConnectorsSource), typeof(IEnumerable<ConnectorViewModel>), typeof(Widget), new PropertyMetadata(null));
 
+        /// <summary>
+        /// <see cref="DependencyProperty"/> for the <see cref="InputConnectorTemplate"/> property.
+        /// </summary>
         public static readonly DependencyProperty InputConnectorTemplateProperty = DependencyProperty.Register(
             nameof(InputConnectorTemplate), typeof(DataTemplate), typeof(Widget), new PropertyMetadata(null));
 
+        /// <summary>
+        /// <see cref="DependencyProperty"/> for the <see cref="IsDragConnectionOver"/> property.
+        /// </summary>
         public static readonly DependencyProperty IsDragConnectionOverProperty = DependencyProperty.Register(
             nameof(IsDragConnectionOver), typeof(bool), typeof(Widget), new FrameworkPropertyMetadata(false));
 
+        /// <summary>
+        /// <see cref="DependencyProperty"/> for the <see cref="IsSelected"/> property.
+        /// </summary>
         public static readonly DependencyProperty IsSelectedProperty = DependencyProperty.Register(
             nameof(IsSelected), typeof(bool), typeof(Widget), new FrameworkPropertyMetadata(false));
 
+        /// <summary>
+        /// <see cref="DependencyProperty"/> for the <see cref="OutputConnectorsSource"/> property.
+        /// </summary>
         public static readonly DependencyProperty OutputConnectorsSourceProperty = DependencyProperty.Register(
             nameof(OutputConnectorsSource), typeof(IEnumerable<ConnectorViewModel>), typeof(Widget), new PropertyMetadata(null));
 
+        /// <summary>
+        /// <see cref="DependencyProperty"/> for the <see cref="OutputConnectorTemplate"/> property.
+        /// </summary>
         public static readonly DependencyProperty OutputConnectorTemplateProperty = DependencyProperty.Register(
             nameof(OutputConnectorTemplate), typeof(DataTemplate), typeof(Widget), new PropertyMetadata(null));
 
+        /// <summary>
+        /// <see cref="DependencyProperty"/> for the <see cref="Position"/> property.
+        /// </summary>
         public static readonly DependencyProperty PositionProperty = DependencyProperty.Register(
             nameof(Position), typeof(Point), typeof(Widget), new PropertyMetadata(default(Point), OnPositionPropertyChanged));
 
+        /// <summary>
+        /// <see cref="DependencyProperty"/> for the <see cref="Size"/> property.
+        /// </summary>
         public static readonly DependencyProperty SizeProperty = DependencyProperty.Register(
             nameof(Size), typeof(Size), typeof(Widget), new PropertyMetadata(default(Size), OnSizePropertyChanged));
-
-        internal const string PartNameInputConnectors = "PART_InputConnectors";
-
-        internal const string PartNameOutputConnectors = "PART_OutputConnectors";
 
         private ItemsControl _inputConnectorsControl;
 
         private ItemsControl _outputConnectorsControl;
 
+        /// <inheritdoc />
         public Widget()
         {
             SetResourceReference(StyleProperty, typeof(Widget));
@@ -64,6 +104,9 @@ namespace Micser.App.Infrastructure.Widgets
             Dispatcher.ShutdownStarted += OnDispatcherShutdownStarted;
         }
 
+        /// <summary>
+        /// Gets or sets a command to execute when the delete context action is called.
+        /// </summary>
         public ICommand DeleteCommand
         {
             get => (ICommand)GetValue(DeleteCommandProperty);
@@ -171,6 +214,7 @@ namespace Micser.App.Infrastructure.Widgets
             set => SetValue(SizeProperty, value);
         }
 
+        /// <inheritdoc />
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
@@ -179,6 +223,7 @@ namespace Micser.App.Infrastructure.Widgets
             _outputConnectorsControl = (ItemsControl)GetTemplateChild(PartNameOutputConnectors);
         }
 
+        /// <inheritdoc />
         protected override void OnPreviewMouseDown(MouseButtonEventArgs e)
         {
             base.OnPreviewMouseDown(e);

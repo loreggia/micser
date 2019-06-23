@@ -159,7 +159,6 @@
     <Compile Include="Widgets\AudioWidgetViewModel.cs" />
     <Compile Include="Widgets\Connection.cs" />
     <Compile Include="Widgets\ConnectionAdorner.cs" />
-    <Compile Include="Widgets\ConnectionChangedEventHandler.cs" />
     <Compile Include="Widgets\ConnectionViewModel.cs" />
     <Compile Include="Widgets\Connector.cs" />
     <Compile Include="Widgets\ConnectorAdorner.cs" />
