@@ -13,23 +13,23 @@ namespace Micser.Common.Api
     public class ApiServer : ApiEndPoint, IApiServer
     {
         private readonly TcpListener _listener;
-        private ServerState _serverState;
 
         /// <inheritdoc />
         public ApiServer(IApiConfiguration configuration, IRequestProcessorFactory requestProcessorFactory, ILogger logger)
             : base(configuration, requestProcessorFactory, logger)
         {
-            _serverState = ServerState.Stopped;
+            ServerState = ServerState.Stopped;
             var endPoint = new IPEndPoint(IPAddress.Loopback, Configuration.Port);
             _listener = new TcpListener(endPoint);
         }
 
-        public ServerState ServerState => _serverState;
+        /// <inheritdoc />
+        public ServerState ServerState { get; protected set; }
 
         /// <inheritdoc />
         public override async Task<bool> ConnectAsync()
         {
-            if (IsDisposed || _state != EndPointState.Disconnected || _serverState != ServerState.Started)
+            if (IsDisposed || State != EndPointState.Disconnected || ServerState != ServerState.Started)
             {
                 return false;
             }
@@ -40,12 +40,12 @@ namespace Micser.Common.Api
 
                 lock (StateLock)
                 {
-                    if (_state != EndPointState.Disconnected || _serverState != ServerState.Started)
+                    if (State != EndPointState.Disconnected || ServerState != ServerState.Started)
                     {
                         return false;
                     }
 
-                    _state = EndPointState.Connecting;
+                    State = EndPointState.Connecting;
                 }
 
                 InClient = await _listener.AcceptTcpClientAsync();
@@ -58,7 +58,7 @@ namespace Micser.Common.Api
 
                 lock (StateLock)
                 {
-                    _state = EndPointState.Connected;
+                    State = EndPointState.Connected;
                 }
 
                 Logger.Info("API server connected");
@@ -83,21 +83,21 @@ namespace Micser.Common.Api
                 throw new ObjectDisposedException(nameof(ApiServer));
             }
 
-            Logger.Info($"Starting API server. Current state: {_serverState}");
+            Logger.Info($"Starting API server. Current state: {ServerState}");
 
-            if (_serverState != ServerState.Stopped)
+            if (ServerState != ServerState.Stopped)
             {
-                return _serverState == ServerState.Started;
+                return ServerState == ServerState.Started;
             }
 
             lock (StateLock)
             {
-                if (_serverState != ServerState.Stopped)
+                if (ServerState != ServerState.Stopped)
                 {
-                    return _serverState == ServerState.Started;
+                    return ServerState == ServerState.Started;
                 }
 
-                _serverState = ServerState.Starting;
+                ServerState = ServerState.Starting;
             }
 
             try
@@ -106,7 +106,7 @@ namespace Micser.Common.Api
 
                 lock (StateLock)
                 {
-                    _serverState = ServerState.Started;
+                    ServerState = ServerState.Started;
                 }
 
                 Logger.Info("API server started");
@@ -125,20 +125,20 @@ namespace Micser.Common.Api
         {
             Logger.Info("Stopping server");
 
-            if (_serverState != ServerState.Started)
+            if (ServerState != ServerState.Started)
             {
                 return;
             }
 
             lock (StateLock)
             {
-                if (_serverState != ServerState.Started)
+                if (ServerState != ServerState.Started)
                 {
                     return;
                 }
 
-                _serverState = ServerState.Stopping;
-                _state = EndPointState.Disconnecting;
+                ServerState = ServerState.Stopping;
+                State = EndPointState.Disconnecting;
             }
 
             try
@@ -157,8 +157,8 @@ namespace Micser.Common.Api
             {
                 lock (StateLock)
                 {
-                    _serverState = ServerState.Stopped;
-                    _state = EndPointState.Disconnected;
+                    ServerState = ServerState.Stopped;
+                    State = EndPointState.Disconnected;
                 }
 
                 Logger.Info("Server stopped");
