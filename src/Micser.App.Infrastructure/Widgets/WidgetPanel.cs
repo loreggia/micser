@@ -17,20 +17,35 @@ namespace Micser.App.Infrastructure.Widgets
     /// </summary>
     public class WidgetPanel : Canvas
     {
+        /// <summary>
+        /// <see cref="DependencyProperty"/> for the <see cref="ConnectionsSource"/> property.
+        /// </summary>
         public static readonly DependencyProperty ConnectionsSourceProperty = DependencyProperty.Register(
             nameof(ConnectionsSource), typeof(IEnumerable<ConnectionViewModel>), typeof(WidgetPanel),
             new PropertyMetadata(null, OnConnectionsSourcePropertyChanged));
 
+        /// <summary>
+        /// <see cref="DependencyProperty"/> for the <see cref="GridSize"/> property.
+        /// </summary>
         public static readonly DependencyProperty GridSizeProperty = DependencyProperty.Register(
             nameof(GridSize), typeof(double), typeof(WidgetPanel), new PropertyMetadata(10d));
 
+        /// <summary>
+        /// <see cref="DependencyProperty"/> for the <see cref="IsGridVisible"/> property.
+        /// </summary>
         public static readonly DependencyProperty IsGridVisibleProperty = DependencyProperty.Register(
             nameof(IsGridVisible), typeof(bool), typeof(WidgetPanel), new PropertyMetadata(false, OnIsGridVisiblePropertyChanged));
 
+        /// <summary>
+        /// <see cref="DependencyProperty"/> for the <see cref="WidgetFactory"/> property.
+        /// </summary>
         public static readonly DependencyProperty WidgetFactoryProperty = DependencyProperty.Register(
             nameof(WidgetFactory), typeof(IWidgetFactory), typeof(WidgetPanel),
             new PropertyMetadata(null, OnWidgetFactoryPropertyChanged));
 
+        /// <summary>
+        /// <see cref="DependencyProperty"/> for the <see cref="WidgetsSource"/> property.
+        /// </summary>
         public static readonly DependencyProperty WidgetsSourceProperty = DependencyProperty.Register(
             nameof(WidgetsSource), typeof(IEnumerable<WidgetViewModel>), typeof(WidgetPanel),
             new PropertyMetadata(null, OnWidgetsSourcePropertyChanged));
@@ -42,6 +57,7 @@ namespace Micser.App.Infrastructure.Widgets
         private bool _isLoaded;
         private Point? _rubberbandSelectionStartPoint;
 
+        /// <inheritdoc />
         public WidgetPanel()
         {
             _loadSemaphore = new SemaphoreSlim(1, 1);
@@ -53,32 +69,50 @@ namespace Micser.App.Infrastructure.Widgets
             Loaded += OnLoaded;
         }
 
+        /// <summary>
+        /// Gets or sets the connections between the widgets.
+        /// </summary>
         public IEnumerable<ConnectionViewModel> ConnectionsSource
         {
             get => (IEnumerable<ConnectionViewModel>)GetValue(ConnectionsSourceProperty);
             set => SetValue(ConnectionsSourceProperty, value);
         }
 
+        /// <summary>
+        /// Gets or sets the grid size of the snapping grid that is shown while moving a widget.
+        /// </summary>
         public double GridSize
         {
             get => (double)GetValue(GridSizeProperty);
             set => SetValue(GridSizeProperty, value);
         }
 
+        /// <summary>
+        /// Gets or sets whether the background grid is visible.
+        /// </summary>
         public bool IsGridVisible
         {
             get => (bool)GetValue(IsGridVisibleProperty);
             set => SetValue(IsGridVisibleProperty, value);
         }
 
+        /// <summary>
+        /// Gets or sets the <see cref="IWidgetFactory"/> instance that is used to create widgets based on the <see cref="WidgetsSource"/> collection.
+        /// </summary>
         public IWidgetFactory WidgetFactory
         {
             get => (IWidgetFactory)GetValue(WidgetFactoryProperty);
             set => SetValue(WidgetFactoryProperty, value);
         }
 
+        /// <summary>
+        /// Gets the currently loaded widgets.
+        /// </summary>
         public IEnumerable<Widget> Widgets => _widgets;
 
+        /// <summary>
+        /// Gets or sets a collection of <see cref="WidgetViewModel"/>s from which to create widgets using the <see cref="WidgetFactory"/>.
+        /// </summary>
         public IEnumerable<WidgetViewModel> WidgetsSource
         {
             get => (IEnumerable<WidgetViewModel>)GetValue(WidgetsSourceProperty);
@@ -166,6 +200,7 @@ namespace Micser.App.Infrastructure.Widgets
             }
         }
 
+        /// <inheritdoc />
         protected override Size MeasureOverride(Size constraint)
         {
             var size = new Size();
@@ -209,6 +244,7 @@ namespace Micser.App.Infrastructure.Widgets
             return size;
         }
 
+        /// <inheritdoc />
         protected override void OnDrop(DragEventArgs e)
         {
             base.OnDrop(e);
@@ -242,6 +278,7 @@ namespace Micser.App.Infrastructure.Widgets
             }
         }
 
+        /// <inheritdoc />
         protected override void OnKeyDown(KeyEventArgs e)
         {
             base.OnKeyDown(e);
@@ -265,6 +302,7 @@ namespace Micser.App.Infrastructure.Widgets
             }
         }
 
+        /// <inheritdoc />
         protected override void OnMouseDown(MouseButtonEventArgs e)
         {
             base.OnMouseDown(e);
@@ -293,6 +331,7 @@ namespace Micser.App.Infrastructure.Widgets
             }
         }
 
+        /// <inheritdoc />
         protected override void OnMouseMove(MouseEventArgs e)
         {
             base.OnMouseMove(e);

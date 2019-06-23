@@ -15,75 +15,75 @@ namespace Micser.App.Infrastructure.Widgets
     public class Connection : Control, ISelectable
     {
         /// <summary>
-        /// Indicates whether the connection is currently selected.
+        /// <see cref="DependencyProperty"/> for the <see cref="IsSelected"/> property.
         /// </summary>
         public static readonly DependencyProperty IsSelectedProperty = DependencyProperty.Register(
             nameof(IsSelected), typeof(bool), typeof(Connection), new PropertyMetadata(false, OnIsSelectedPropertyChanged));
 
         /// <summary>
-        /// The position of the text label.
+        /// <see cref="DependencyProperty"/> for the <see cref="LabelPosition"/> property.
         /// </summary>
         public static readonly DependencyProperty LabelPositionProperty;
 
         /// <summary>
-        /// Property key for the <see cref="LabelPositionProperty"/> dependency property.
-        /// </summary>
-        public static readonly DependencyPropertyKey LabelPositionPropertyKey = DependencyProperty.RegisterReadOnly(
-            nameof(LabelPosition), typeof(Point), typeof(Connection), new PropertyMetadata(default(Point)));
-
-        /// <summary>
-        /// The label text.
+        /// <see cref="DependencyProperty"/> for the <see cref="Label"/> property.
         /// </summary>
         public static readonly DependencyProperty LabelProperty = DependencyProperty.Register(
             nameof(Label), typeof(string), typeof(Connection), new PropertyMetadata(null));
 
         /// <summary>
-        /// The <see cref="System.Windows.Media.PathGeometry"/> making up the connection line.
+        /// <see cref="DependencyProperty"/> for the <see cref="PathGeometry"/> property.
         /// </summary>
         public static readonly DependencyProperty PathGeometryProperty = DependencyProperty.Register(
             nameof(PathGeometry), typeof(PathGeometry), typeof(Connection), new PropertyMetadata(null, OnPathGeometryPropertyChanged));
 
         /// <summary>
-        /// The angle at which the connection starts from the source connector used for rotating the source anchor.
+        /// <see cref="DependencyProperty"/> for the <see cref="SourceAnchorAngle"/> property.
         /// </summary>
         public static readonly DependencyProperty SourceAnchorAngleProperty = DependencyProperty.Register(
             nameof(SourceAnchorAngle), typeof(double), typeof(Connection), new PropertyMetadata(0d));
 
         /// <summary>
-        /// The position offset relative to the source connector where the source anchor is displayed.
+        /// <see cref="DependencyProperty"/> for the <see cref="SourceAnchorPosition"/> property.
         /// </summary>
         public static readonly DependencyProperty SourceAnchorPositionProperty = DependencyProperty.Register(
             nameof(SourceAnchorPosition), typeof(Point), typeof(Connection), new PropertyMetadata(default(Point)));
 
         /// <summary>
-        /// The source <see cref="Connector"/>.
+        /// <see cref="DependencyProperty"/> for the <see cref="Source"/> property.
         /// </summary>
         public static readonly DependencyProperty SourceProperty = DependencyProperty.Register(
             nameof(Source), typeof(Connector), typeof(Connection), new PropertyMetadata(null, OnConnectorPropertyChanged));
 
         /// <summary>
-        /// A collection of <see cref="double"/> values that describe the stroke dash distances.
+        /// <see cref="DependencyProperty"/> for the <see cref="StrokeDashArray"/> property.
         /// </summary>
         public static readonly DependencyProperty StrokeDashArrayProperty = DependencyProperty.Register(
             nameof(StrokeDashArray), typeof(DoubleCollection), typeof(Connection), new PropertyMetadata(null));
 
         /// <summary>
-        /// The anchor at which the connection comes into the target connector used for rotating the target anchor.
+        /// <see cref="DependencyProperty"/> for the <see cref="TargetAnchorAngle"/> property.
         /// </summary>
         public static readonly DependencyProperty TargetAnchorAngleProperty = DependencyProperty.Register(
             nameof(TargetAnchorAngle), typeof(double), typeof(Connection), new PropertyMetadata(0d));
 
         /// <summary>
-        /// The position offset relative to the target connector where the target anchor is displayed.
+        /// <see cref="DependencyProperty"/> for the <see cref="TargetAnchorPosition"/> property.
         /// </summary>
         public static readonly DependencyProperty TargetAnchorPositionProperty = DependencyProperty.Register(
             nameof(TargetAnchorPosition), typeof(Point), typeof(Connection), new PropertyMetadata(default(Point)));
 
         /// <summary>
-        /// The target connector.
+        /// <see cref="DependencyProperty"/> for the <see cref="Target"/> property.
         /// </summary>
         public static readonly DependencyProperty TargetProperty = DependencyProperty.Register(
             nameof(Target), typeof(Connector), typeof(Connection), new PropertyMetadata(null, OnConnectorPropertyChanged));
+
+        /// <summary>
+        /// Property key for the <see cref="LabelPositionProperty"/> dependency property.
+        /// </summary>
+        protected internal static readonly DependencyPropertyKey LabelPositionPropertyKey = DependencyProperty.RegisterReadOnly(
+            nameof(LabelPosition), typeof(Point), typeof(Connection), new PropertyMetadata(default(Point)));
 
         private Adorner _connectionAdorner;
 

@@ -9,13 +9,13 @@ namespace Micser.App.Infrastructure.Controls
     public class BusyPanel : Control
     {
         /// <summary>
-        /// Indicates whether the "Loading..." text is shown.
+        /// <see cref="DependencyProperty"/> for the <see cref="ShowText"/> property.
         /// </summary>
         public static readonly DependencyProperty ShowTextProperty =
             DependencyProperty.Register(nameof(ShowText), typeof(bool), typeof(BusyPanel), new PropertyMetadata(true));
 
         /// <summary>
-        /// The width and height of the loading spinner.
+        /// <see cref="DependencyProperty"/> for the <see cref="SpinnerSize"/> property.
         /// </summary>
         public static readonly DependencyProperty SpinnerSizeProperty =
             DependencyProperty.Register(nameof(SpinnerSize), typeof(double), typeof(BusyPanel), new PropertyMetadata(50d));
@@ -27,7 +27,6 @@ namespace Micser.App.Infrastructure.Controls
 
         /// <summary>
         /// Gets or sets a value that indicates whether the "Loading..." text is shown.
-        /// Wraps the <see cref="ShowTextProperty"/> dependency property.
         /// </summary>
         public bool ShowText
         {
@@ -37,7 +36,6 @@ namespace Micser.App.Infrastructure.Controls
 
         /// <summary>
         /// Gets or sets the size of the loading spinner.
-        /// Wraps the <see cref="SpinnerSizeProperty"/> dependency property.
         /// </summary>
         public double SpinnerSize
         {

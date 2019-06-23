@@ -13,24 +13,24 @@ namespace Micser.App.Infrastructure.Widgets
     public class Connector : Control
     {
         /// <summary>
-        /// Specifies whether the connector allows being the source of a connection.
+        /// <see cref="DependencyProperty"/> for the <see cref="IsConnectionSource"/> property.
         /// </summary>
         public static readonly DependencyProperty IsConnectionSourceProperty = DependencyProperty.Register(
             nameof(IsConnectionSource), typeof(bool), typeof(Connector), new PropertyMetadata(true));
 
         /// <summary>
-        /// Defines the connector's orientation relative to the widget.
+        /// <see cref="DependencyProperty"/> for the <see cref="Orientation"/> property.
         /// </summary>
         public static readonly DependencyProperty OrientationProperty = DependencyProperty.Register(
             nameof(Orientation), typeof(ConnectorOrientation), typeof(Connector), new PropertyMetadata(default(ConnectorOrientation)));
 
         /// <summary>
-        /// Gets the connector's center position.
+        /// <see cref="DependencyProperty"/> for the <see cref="Position"/> property.
         /// </summary>
         public static readonly DependencyProperty PositionProperty;
 
         /// <summary>
-        /// The key for setting the <see cref="PositionProperty"/> dependency property.
+        /// Property key for setting the <see cref="PositionProperty"/> dependency property.
         /// </summary>
         protected internal static readonly DependencyPropertyKey PositionPropertyKey = DependencyProperty.RegisterReadOnly(
             nameof(Position), typeof(Point), typeof(Connector), new PropertyMetadata(default(Point)));

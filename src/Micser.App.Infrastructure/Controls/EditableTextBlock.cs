@@ -56,7 +56,6 @@ namespace Micser.App.Infrastructure.Controls
 
         /// <summary>
         /// Gets or sets a value that indicates whether the control is in editing mode.
-        /// Wraps the <see cref="IsEditingProperty"/> dependency property.
         /// </summary>
         public bool IsEditing
         {
@@ -66,7 +65,6 @@ namespace Micser.App.Infrastructure.Controls
 
         /// <summary>
         /// Gets or sets the maximum number of characters that can be entered when editing the text.
-        /// Wraps the <see cref="MaxLengthProperty"/> dependency property.
         /// </summary>
         public int MaxLength
         {
@@ -76,7 +74,6 @@ namespace Micser.App.Infrastructure.Controls
 
         /// <summary>
         /// Gets or sets a value that indicates whether the edit button is visible.
-        /// Wraps the <see cref="ShowButtonProperty"/> dependency property.
         /// </summary>
         public bool ShowButton
         {
@@ -86,7 +83,6 @@ namespace Micser.App.Infrastructure.Controls
 
         /// <summary>
         /// Gets or sets the editable text shown in the control.
-        /// Wraps the <see cref="TextProperty"/> dependency property.
         /// </summary>
         public string Text
         {
