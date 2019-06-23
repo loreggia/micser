@@ -27,6 +27,9 @@ namespace Micser.App.Infrastructure.Controls
         public static readonly DependencyProperty CircleTemplateProperty = DependencyProperty.Register(
             nameof(CircleTemplate), typeof(DataTemplate), typeof(LoadingSpinner), new PropertyMetadata(default(DataTemplate)));
 
+        /// <summary>
+        /// The <see cref="Canvas"/> template part.
+        /// </summary>
         protected Canvas Canvas;
 
         static LoadingSpinner()
