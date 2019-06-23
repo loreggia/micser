@@ -1,10 +1,11 @@
 ﻿using Micser.Common.Test;
 using Micser.Engine.Infrastructure.Updates;
+using NLog;
 using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace Micser.Engine.Infrastructure.Test
+namespace Micser.Engine.Infrastructure.Test.Updates
 {
     public class UpdateServiceTest
     {
@@ -17,9 +18,9 @@ namespace Micser.Engine.Infrastructure.Test
         public async Task GetUpdateManifest()
         {
             //var service = new AzureUpdateService(LogManager.GetCurrentClassLogger());
-            var service = new LocalUpdateService();
+            var service = new LocalUpdateService(LogManager.GetLogger("LocalUpdateService"));
 
-            var manifest = await service.GetUpdateManifest();
+            var manifest = await service.GetUpdateManifestAsync();
 
             Assert.NotNull(manifest);
         }

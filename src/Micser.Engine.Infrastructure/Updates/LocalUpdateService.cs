@@ -1,16 +1,25 @@
-﻿using System.IO;
+﻿using NLog;
+using System.IO;
 using System.Threading.Tasks;
 
 namespace Micser.Engine.Infrastructure.Updates
 {
-    public class LocalUpdateService : IUpdateService
+    public class LocalUpdateService : UpdateService
     {
-        public async Task<string> DownloadInstaller(UpdateManifest manifest)
+        /// <inheritdoc />
+        public LocalUpdateService(ILogger logger)
+            : base(logger)
+        {
+        }
+
+        /// <inheritdoc />
+        public override async Task<string> DownloadInstallerAsync(UpdateManifest manifest)
         {
             return Path.GetFullPath("Micser.msi");
         }
 
-        public async Task<UpdateManifest> GetUpdateManifest()
+        /// <inheritdoc />
+        public override async Task<UpdateManifest> GetUpdateManifestAsync()
         {
             return new UpdateManifest
             {

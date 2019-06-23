@@ -71,10 +71,11 @@
     <Compile Include="Services\IModuleService.cs" />
     <Compile Include="Services\ModuleConnectionService.cs" />
     <Compile Include="Services\ModuleService.cs" />
+    <Compile Include="Updates\HttpUpdateService.cs" />
     <Compile Include="Updates\IUpdateService.cs" />
     <Compile Include="Updates\LocalUpdateService.cs" />
     <Compile Include="Updates\UpdateManifest.cs" />
-    <Compile Include="Updates\AzureUpdateService.cs" />
+    <Compile Include="Updates\UpdateService.cs" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CSCore">
