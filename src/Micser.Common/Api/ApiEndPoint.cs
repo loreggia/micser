@@ -14,13 +14,20 @@ namespace Micser.Common.Api
     /// <inheritdoc cref="IApiEndPoint"/>
     public abstract class ApiEndPoint : IApiEndPoint, IDisposable
     {
+        /// <summary>
+        /// The lock object to use when accessing the <see cref="State"/> field.
+        /// </summary>
         protected static readonly object StateLock = new object();
 
+        /// <summary>
+        /// The currently used API configuration.
+        /// </summary>
         protected readonly IApiConfiguration Configuration;
 
+        /// <summary>
+        /// The logger.
+        /// </summary>
         protected readonly ILogger Logger;
-
-        protected EndPointState _state;
 
         /// <summary>
         /// The task that is created by the <see cref="ConnectAsync"/> method.
@@ -32,8 +39,14 @@ namespace Micser.Common.Api
         /// </summary>
         protected TcpClient InClient;
 
+        /// <summary>
+        /// The TCP stream for receiving data.
+        /// </summary>
         protected Stream InStream;
 
+        /// <summary>
+        /// Indicates whether the instance has been disposed of.
+        /// </summary>
         protected bool IsDisposed;
 
         /// <summary>
@@ -41,6 +54,9 @@ namespace Micser.Common.Api
         /// </summary>
         protected TcpClient OutClient;
 
+        /// <summary>
+        /// The TCP stream for sending data.
+        /// </summary>
         protected Stream OutStream;
 
         private readonly IRequestProcessorFactory _requestProcessorFactory;
@@ -53,11 +69,14 @@ namespace Micser.Common.Api
             _requestProcessorFactory = requestProcessorFactory;
             Logger = logger;
 
-            _state = EndPointState.Disconnected;
+            State = EndPointState.Disconnected;
             _sendMessageSemaphore = new SemaphoreQueue(1);
         }
 
-        public EndPointState State => _state;
+        /// <summary>
+        /// Gets the current <see cref="EndPointState"/>.
+        /// </summary>
+        public EndPointState State { get; protected set; }
 
         /// <summary>
         /// Tries to connect to the API counterpart.
@@ -74,7 +93,7 @@ namespace Micser.Common.Api
         /// <inheritdoc />
         public async Task<JsonResponse> SendMessageAsync(JsonRequest message)
         {
-            if (_state != EndPointState.Connected)
+            if (State != EndPointState.Connected)
             {
                 return new JsonResponse(false, null, null, false);
             }
@@ -112,10 +131,13 @@ namespace Micser.Common.Api
             }
         }
 
+        /// <summary>
+        /// Disposes the current streams and TCP clients and sets the <see cref="State"/> to <see cref="EndPointState.Disconnected"/>.
+        /// </summary>
         protected virtual void Disconnect()
         {
-            if (_state == EndPointState.Disconnected ||
-                _state == EndPointState.Disconnecting)
+            if (State == EndPointState.Disconnected ||
+                State == EndPointState.Disconnecting)
             {
                 return;
             }
@@ -124,7 +146,7 @@ namespace Micser.Common.Api
 
             lock (StateLock)
             {
-                _state = EndPointState.Disconnecting;
+                State = EndPointState.Disconnecting;
 
                 InStream?.Dispose();
                 InStream = null;
@@ -135,7 +157,7 @@ namespace Micser.Common.Api
                 OutClient?.Dispose();
                 OutClient = null;
 
-                _state = EndPointState.Disconnected;
+                State = EndPointState.Disconnected;
             }
 
             Logger.Info("Disconnected");
@@ -166,7 +188,7 @@ namespace Micser.Common.Api
         /// </summary>
         protected async void ReaderThread()
         {
-            while (_state == EndPointState.Connected)
+            while (State == EndPointState.Connected)
             {
                 try
                 {
@@ -206,7 +228,7 @@ namespace Micser.Common.Api
             }
         }
 
-        private class ApiProtocol
+        private static class ApiProtocol
         {
             public static async Task<string> ReceiveMessage(Stream tcpStream)
             {
