@@ -112,9 +112,6 @@ namespace Micser.App.Infrastructure.Widgets
                     Target = targetVm
                 };
 
-                sourceVm.Connection = vm;
-                targetVm.Connection = vm;
-
                 if (ConnectionsSource is ICollection<ConnectionViewModel> collection)
                 {
                     collection.Add(vm);

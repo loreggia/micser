@@ -12,42 +12,80 @@ namespace Micser.App.Infrastructure.Widgets
     /// </summary>
     public class Connector : Control
     {
+        /// <summary>
+        /// Specifies whether the connector allows being the source of a connection.
+        /// </summary>
         public static readonly DependencyProperty IsConnectionSourceProperty = DependencyProperty.Register(
             nameof(IsConnectionSource), typeof(bool), typeof(Connector), new PropertyMetadata(true));
 
-        public static readonly DependencyProperty PositionProperty = DependencyProperty.Register(
+        /// <summary>
+        /// Defines the connector's orientation relative to the widget.
+        /// </summary>
+        public static readonly DependencyProperty OrientationProperty = DependencyProperty.Register(
+            nameof(Orientation), typeof(ConnectorOrientation), typeof(Connector), new PropertyMetadata(default(ConnectorOrientation)));
+
+        /// <summary>
+        /// Gets the connector's center position.
+        /// </summary>
+        public static readonly DependencyProperty PositionProperty;
+
+        /// <summary>
+        /// The key for setting the <see cref="PositionProperty"/> dependency property.
+        /// </summary>
+        protected internal static readonly DependencyPropertyKey PositionPropertyKey = DependencyProperty.RegisterReadOnly(
             nameof(Position), typeof(Point), typeof(Connector), new PropertyMetadata(default(Point)));
 
         private Point? _dragStartPoint;
 
+        static Connector()
+        {
+            PositionProperty = PositionPropertyKey.DependencyProperty;
+        }
+
+        /// <inheritdoc />
         public Connector()
         {
             LayoutUpdated += Connector_LayoutUpdated;
         }
 
+        /// <summary>
+        /// Gets or sets whether the connector allows being the source of a connection.
+        /// Wraps the <see cref="IsConnectionSourceProperty"/> dependency property.
+        /// </summary>
         public bool IsConnectionSource
         {
             get => (bool)GetValue(IsConnectionSourceProperty);
             set => SetValue(IsConnectionSourceProperty, value);
         }
 
-        public ConnectorOrientation Orientation { get; set; }
+        /// <summary>
+        /// Gets or sets the connector's orientation relative to the widget.
+        /// Wraps the <see cref="OrientationProperty"/> dependency property.
+        /// </summary>
+        public ConnectorOrientation Orientation
+        {
+            get => (ConnectorOrientation)GetValue(OrientationProperty);
+            set => SetValue(OrientationProperty, value);
+        }
 
         /// <summary>
-        /// The Widget this Connector belongs to.
+        /// Gets the Widget this Connector belongs to.
         /// </summary>
         public Widget ParentWidget => this.GetParentOfType<Widget>();
 
         /// <summary>
-        /// Center position of this Connector relative to the WidgetPanel.
+        /// Gets the center position of this Connector relative to the WidgetPanel.
         /// </summary>
         public Point Position
         {
             get => (Point)GetValue(PositionProperty);
-            set => SetValue(PositionProperty, value);
+            protected set => SetValue(PositionPropertyKey, value);
         }
 
-        private WidgetPanel ParentPanel => this.GetParentOfType<WidgetPanel>();
+        /// <summary>
+        /// Gets the parent <see cref="WidgetPanel"/>.
+        /// </summary>
+        protected WidgetPanel ParentPanel => this.GetParentOfType<WidgetPanel>();
 
         internal ConnectorInfo GetInfo()
         {
@@ -120,9 +158,9 @@ namespace Micser.App.Infrastructure.Widgets
             }
         }
 
-        // when the layout changes we update the position property
         private void Connector_LayoutUpdated(object sender, EventArgs e)
         {
+            // update the position when the layout changes
             var panel = ParentPanel;
             if (panel != null)
             {
