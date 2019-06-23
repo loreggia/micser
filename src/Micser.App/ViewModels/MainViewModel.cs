@@ -300,8 +300,6 @@ namespace Micser.App.ViewModels
                                     Target = target
                                 };
                                 _connections.Add(cvm);
-                                source.Connection = cvm;
-                                target.Connection = cvm;
                                 cvm.SourceChanged += OnConnectionSourceChanged;
                                 cvm.TargetChanged += OnConnectionTargetChanged;
                             }

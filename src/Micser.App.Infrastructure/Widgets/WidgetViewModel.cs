@@ -164,8 +164,7 @@ namespace Micser.App.Infrastructure.Widgets
         /// </summary>
         protected ConnectorViewModel AddInput(string name)
         {
-            var input = new ConnectorViewModel(name, this, null);
-            input.ConnectionChanged += OnInputConnectionChanged;
+            var input = new ConnectorViewModel(name, this);
             AddInput(input);
             return input;
         }
@@ -183,8 +182,7 @@ namespace Micser.App.Infrastructure.Widgets
         /// </summary>
         protected ConnectorViewModel AddOutput(string name)
         {
-            var output = new ConnectorViewModel(name, this, null);
-            output.ConnectionChanged += OnOutputConnectionChanged;
+            var output = new ConnectorViewModel(name, this);
             AddOutput(output);
             return output;
         }
@@ -195,20 +193,6 @@ namespace Micser.App.Infrastructure.Widgets
         protected virtual void AddOutput(ConnectorViewModel output)
         {
             _outputConnectors.Add(output);
-        }
-
-        /// <summary>
-        /// Event handler that is called when the connection of an input connector has changed.
-        /// </summary>
-        protected virtual void OnInputConnectionChanged(object sender, ConnectionChangedEventArgs e)
-        {
-        }
-
-        /// <summary>
-        /// Event handler that is called when the connection of an output connector has changed.
-        /// </summary>
-        protected virtual void OnOutputConnectionChanged(object sender, ConnectionChangedEventArgs e)
-        {
         }
     }
 }

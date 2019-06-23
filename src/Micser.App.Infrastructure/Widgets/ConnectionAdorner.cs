@@ -112,8 +112,6 @@ namespace Micser.App.Infrastructure.Widgets
                     _connection.Source = HitConnector;
                     connectionVm.Source = connectorVm;
                 }
-
-                connectorVm.Connection = connectionVm;
             }
             else
             {
