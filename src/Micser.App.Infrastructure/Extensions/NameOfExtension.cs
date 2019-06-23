@@ -5,12 +5,23 @@ using System.Windows.Markup;
 
 namespace Micser.App.Infrastructure.Extensions
 {
+    /// <summary>
+    /// A XAML markup extension similar to the <c>nameof</c> operator.
+    /// </summary>
     [ContentProperty(nameof(Member))]
     public class NameOfExtension : MarkupExtension
     {
+        /// <summary>
+        /// The member whose name is returned.
+        /// </summary>
         public string Member { get; set; }
+
+        /// <summary>
+        /// The type containing the <see cref="Member"/>.
+        /// </summary>
         public Type Type { get; set; }
 
+        /// <inheritdoc />
         public override object ProvideValue(IServiceProvider serviceProvider)
         {
             if (serviceProvider == null)

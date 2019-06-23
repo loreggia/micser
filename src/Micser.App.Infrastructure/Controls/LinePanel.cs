@@ -19,66 +19,161 @@ namespace Micser.App.Infrastructure.Controls
     [TemplatePart(Name = PartNamePath, Type = typeof(Path))]
     public class LinePanel : Control
     {
+        /// <summary>
+        /// The name of the <see cref="System.Windows.Controls.Canvas"/> template part.
+        /// </summary>
         public const string PartNameCanvas = "PART_Canvas";
+
+        /// <summary>
+        /// The name of the line <see cref="System.Windows.Shapes.Path"/> template part.
+        /// </summary>
         public const string PartNamePath = "PART_Path";
 
+        /// <summary>
+        /// Specifies whether the line is closed.
+        /// </summary>
         public static readonly DependencyProperty IsClosedCurveProperty = DependencyProperty.Register(
             nameof(IsClosedCurve), typeof(bool), typeof(LinePanel), new PropertyMetadata(false, OnIsClosedCurveChanged));
 
+        /// <summary>
+        /// Defines the <see cref="Brush"/> to use for drawing the line path.
+        /// </summary>
         public static readonly DependencyProperty PathColorProperty = DependencyProperty.Register(
             nameof(PathColor), typeof(Brush), typeof(LinePanel), new PropertyMetadata(Brushes.Black));
 
+        /// <summary>
+        /// Defines the thickness of the line path.
+        /// </summary>
         public static readonly DependencyProperty PathThicknessProperty = DependencyProperty.Register(
             nameof(PathThickness), typeof(double), typeof(LinePanel), new PropertyMetadata(1d));
 
+        /// <summary>
+        /// Defines the list of points that produce the line path.
+        /// </summary>
         public static readonly DependencyProperty PointsProperty = DependencyProperty.Register(
             nameof(Points), typeof(IEnumerable<Point>), typeof(LinePanel), new PropertyMetadata(null, OnPointsPropertyChanged));
 
+        /// <summary>
+        /// Defines a smooth factor that specifies how smooth the curve is around a point.
+        /// </summary>
         public static readonly DependencyProperty SmoothFactorProperty = DependencyProperty.Register(
             nameof(SmoothFactor), typeof(double), typeof(LinePanel), new PropertyMetadata(0.6d, OnSmoothFactorPropertyChanged));
 
-        protected Canvas _canvas;
+        /// <summary>
+        /// The canvas containing the <see cref="Path"/>.
+        /// </summary>
+        protected Canvas Canvas;
 
-        protected Path _path;
+        /// <summary>
+        /// The path defining the line.
+        /// </summary>
+        protected Path Path;
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the line is closed.
+        /// Wraps the <see cref="IsClosedCurveProperty"/> dependency property.
+        /// </summary>
         public bool IsClosedCurve
         {
             get => (bool)GetValue(IsClosedCurveProperty);
             set => SetValue(IsClosedCurveProperty, value);
         }
 
+        /// <summary>
+        /// Defines the <see cref="Brush"/> to use for drawing the line path.
+        /// Wraps the <see cref="PathColorProperty"/> dependency property.
+        /// </summary>
         public Brush PathColor
         {
             get => (Brush)GetValue(PathColorProperty);
             set => SetValue(PathColorProperty, value);
         }
 
+        /// <summary>
+        /// Defines the thickness of the line path.
+        /// Wraps the <see cref="PathThicknessProperty"/> dependency property.
+        /// </summary>
         public double PathThickness
         {
             get => (double)GetValue(PathThicknessProperty);
             set => SetValue(PathThicknessProperty, value);
         }
 
+        /// <summary>
+        /// Defines the list of points that produce the line path.
+        /// Wraps the <see cref="PointsProperty"/> dependency property.
+        /// </summary>
         public IEnumerable<Point> Points
         {
             get => (IEnumerable<Point>)GetValue(PointsProperty);
             set => SetValue(PointsProperty, value);
         }
 
+        /// <summary>
+        /// Defines a smooth factor that specifies how smooth the curve is around a point.
+        /// Wraps the <see cref="SmoothFactorProperty"/> dependency property.
+        /// </summary>
         public double SmoothFactor
         {
             get => (double)GetValue(SmoothFactorProperty);
             set => SetValue(SmoothFactorProperty, value);
         }
 
+        /// <inheritdoc />
         public override void OnApplyTemplate()
         {
             base.OnApplyTemplate();
 
-            _canvas = (Canvas)GetTemplateChild("PART_Canvas");
-            _path = (Path)GetTemplateChild("PART_Path");
+            Canvas = (Canvas)GetTemplateChild("PART_Canvas");
+            Path = (Path)GetTemplateChild("PART_Path");
 
             UpdatePathData();
+        }
+
+        /// <summary>
+        /// Populates the <see cref="Path"/>'s <see cref="System.Windows.Shapes.Path.Data"/> property based on the current <see cref="Points"/> collection.
+        /// </summary>
+        protected void UpdatePathData()
+        {
+            if (Points == null || Path == null)
+            {
+                return;
+            }
+
+            var points = Points.ToList();
+
+            if (points.Count <= 1)
+            {
+                return;
+            }
+
+            var pathFigure = new PathFigure { StartPoint = points[0] };
+
+            var pathSegments = new PathSegmentCollection();
+
+            var bezierSegments = InterpolatePointWithBezierCurves(points, SmoothFactor, IsClosedCurve);
+
+            if (bezierSegments == null || bezierSegments.Count < 1)
+            {
+                foreach (var point in points.GetRange(1, points.Count - 1))
+                {
+                    var myLineSegment = new LineSegment { Point = point };
+                    pathSegments.Add(myLineSegment);
+                }
+            }
+            else
+            {
+                foreach (var bezierSegment in bezierSegments)
+                {
+                    pathSegments.Add(bezierSegment);
+                }
+            }
+
+            pathFigure.Segments = pathSegments;
+
+            var myPathFigureCollection = new PathFigureCollection { pathFigure };
+
+            Path.Data = new PathGeometry { Figures = myPathFigureCollection };
         }
 
         private static List<BezierSegment> InterpolatePointWithBezierCurves(IList<Point> points, double smoothFactor, bool isClosedCurve)
@@ -230,49 +325,6 @@ namespace Micser.App.Infrastructure.Controls
         private void OnPointCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             UpdatePathData();
-        }
-
-        private void UpdatePathData()
-        {
-            if (Points == null || _path == null)
-            {
-                return;
-            }
-
-            var points = Points.ToList();
-
-            if (points.Count <= 1)
-            {
-                return;
-            }
-
-            var pathFigure = new PathFigure { StartPoint = points[0] };
-
-            var pathSegments = new PathSegmentCollection();
-
-            var bezierSegments = InterpolatePointWithBezierCurves(points, SmoothFactor, IsClosedCurve);
-
-            if (bezierSegments == null || bezierSegments.Count < 1)
-            {
-                foreach (var point in points.GetRange(1, points.Count - 1))
-                {
-                    var myLineSegment = new LineSegment { Point = point };
-                    pathSegments.Add(myLineSegment);
-                }
-            }
-            else
-            {
-                foreach (var bezierSegment in bezierSegments)
-                {
-                    pathSegments.Add(bezierSegment);
-                }
-            }
-
-            pathFigure.Segments = pathSegments;
-
-            var myPathFigureCollection = new PathFigureCollection { pathFigure };
-
-            _path.Data = new PathGeometry { Figures = myPathFigureCollection };
         }
     }
 }

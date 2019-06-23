@@ -258,13 +258,11 @@ namespace Micser.App.Infrastructure.Widgets
             if (e.OldValue is Connector oldConnector)
             {
                 positionPropertyDescriptor.RemoveValueChanged(oldConnector, connection.OnConnectorPositionChanged);
-                oldConnector.Connection = null;
             }
 
             if (e.NewValue is Connector newConnector)
             {
                 positionPropertyDescriptor.AddValueChanged(newConnector, connection.OnConnectorPositionChanged);
-                newConnector.Connection = connection;
             }
 
             connection.UpdatePathGeometry();

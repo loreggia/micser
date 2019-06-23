@@ -402,8 +402,6 @@ namespace Micser.App.Infrastructure.Widgets
             if (source != null && target != null && !_connections.Any(c => ReferenceEquals(c.Source, source) && ReferenceEquals(c.Target, target)))
             {
                 var connection = new Connection(source, target) { DataContext = vm };
-                source.Connection = connection;
-                target.Connection = connection;
                 _connections.Add(connection);
             }
             else

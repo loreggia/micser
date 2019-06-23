@@ -118,8 +118,6 @@ namespace Micser.App.Infrastructure.Widgets
             else
             {
                 // remove connection
-                _connection.Target.Connection = null;
-                _connection.Source.Connection = null;
                 _connection.Target = null;
                 _connection.Source = null;
                 _widgetPanel.RemoveConnection(_connection);
