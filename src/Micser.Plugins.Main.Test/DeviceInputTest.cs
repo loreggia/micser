@@ -12,6 +12,7 @@ namespace Micser.Plugins.Main.Test
     public class DeviceInputTest
     {
         [Fact]
+        [Trait("Category", "Sound")]
         public async Task TestActualInput()
         {
             var module = new DeviceInputModule();

@@ -15,7 +15,7 @@ namespace Micser.Common.Test
         }
 
         [Fact]
-        //[Category("Sound")]
+        [Trait("Category", "Sound")]
         public void GetInputDevicesTest()
         {
             var service = new DeviceService();
@@ -30,7 +30,7 @@ namespace Micser.Common.Test
         }
 
         [Fact]
-        //[TestCategory("Sound")]
+        [Trait("Category", "Sound")]
         public void GetOutputDevicesTest()
         {
             var service = new DeviceService();
