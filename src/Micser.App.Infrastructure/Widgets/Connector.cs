@@ -12,9 +12,6 @@ namespace Micser.App.Infrastructure.Widgets
     /// </summary>
     public class Connector : Control
     {
-        public static readonly DependencyProperty ConnectionProperty = DependencyProperty.Register(
-            nameof(Connection), typeof(Connection), typeof(Connector), new PropertyMetadata(null));
-
         public static readonly DependencyProperty IsConnectionSourceProperty = DependencyProperty.Register(
             nameof(IsConnectionSource), typeof(bool), typeof(Connector), new PropertyMetadata(true));
 
@@ -26,12 +23,6 @@ namespace Micser.App.Infrastructure.Widgets
         public Connector()
         {
             LayoutUpdated += Connector_LayoutUpdated;
-        }
-
-        public Connection Connection
-        {
-            get => (Connection)GetValue(ConnectionProperty);
-            set => SetValue(ConnectionProperty, value);
         }
 
         public bool IsConnectionSource
