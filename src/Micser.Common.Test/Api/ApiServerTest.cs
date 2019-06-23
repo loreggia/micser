@@ -21,6 +21,7 @@ namespace Micser.Common.Test.Api
         }
 
         [Fact]
+        [Trait("Category", "Network")]
         public async Task BiDirectionalMessaging()
         {
             var configuration = GetConfiguration();
@@ -28,8 +29,8 @@ namespace Micser.Common.Test.Api
 
             _testOutputHelper.WriteLine($"{nameof(ClientReconnect)}: using port {configuration.Port}");
 
-            using (var server = new ApiServer(configuration, factory, LogManager.GetCurrentClassLogger()))
-            using (var client = new ApiClient(configuration, factory, LogManager.GetCurrentClassLogger()))
+            using (var server = new ApiServer(configuration, factory, LogManager.GetLogger("Server")))
+            using (var client = new ApiClient(configuration, factory, LogManager.GetLogger("Client")))
             {
                 var startResult = server.Start();
 
@@ -69,7 +70,8 @@ namespace Micser.Common.Test.Api
             }
         }
 
-        //[Fact]
+        [Fact]
+        [Trait("Category", "Network")]
         public async Task ClientReconnect()
         {
             var configuration = GetConfiguration();
@@ -77,8 +79,8 @@ namespace Micser.Common.Test.Api
 
             _testOutputHelper.WriteLine($"{nameof(ClientReconnect)}: using port {configuration.Port}");
 
-            using (var server = new ApiServer(configuration, factory, LogManager.GetCurrentClassLogger()))
-            using (var client = new ApiClient(configuration, factory, LogManager.GetCurrentClassLogger()))
+            using (var server = new ApiServer(configuration, factory, LogManager.GetLogger("Server")))
+            using (var client = new ApiClient(configuration, factory, LogManager.GetLogger("Client")))
             {
                 var startResult = server.Start();
 
@@ -90,15 +92,31 @@ namespace Micser.Common.Test.Api
                 await Task.WhenAll(serverTask, clientTask);
 
                 Assert.True(serverTask.Result);
+                Assert.True(clientTask.Result);
 
                 server.Stop();
 
+                var result = await client.SendMessageAsync(new JsonRequest());
+                Assert.False(result.IsSuccess, result.Message);
+                Assert.False(result.IsConnected, result.Message);
+
+                while (server.State != EndPointState.Disconnected &&
+                       client.State != EndPointState.Disconnected)
+                {
+                    await Task.Delay(10);
+                }
+
                 server.Start();
 
-                await server.ConnectAsync();
-                await client.ConnectAsync();
+                serverTask = server.ConnectAsync();
+                clientTask = client.ConnectAsync();
 
-                var result = await client.SendMessageAsync(new JsonRequest());
+                await Task.WhenAll(serverTask, clientTask);
+
+                Assert.True(serverTask.Result);
+                Assert.True(clientTask.Result);
+
+                result = await client.SendMessageAsync(new JsonRequest());
 
                 Assert.NotNull(result);
                 Assert.True(result.IsSuccess, result.Message);
@@ -106,6 +124,7 @@ namespace Micser.Common.Test.Api
         }
 
         [Fact]
+        [Trait("Category", "Network")]
         public async Task SendClientToServer()
         {
             var configuration = GetConfiguration();
@@ -113,8 +132,8 @@ namespace Micser.Common.Test.Api
 
             _testOutputHelper.WriteLine($"{nameof(SendClientToServer)}: using port {configuration.Port}");
 
-            using (var server = new ApiServer(configuration, factory, LogManager.GetCurrentClassLogger()))
-            using (var client = new ApiClient(configuration, factory, LogManager.GetCurrentClassLogger()))
+            using (var server = new ApiServer(configuration, factory, LogManager.GetLogger("Server")))
+            using (var client = new ApiClient(configuration, factory, LogManager.GetLogger("Client")))
             {
                 var startResult = server.Start();
 
@@ -134,6 +153,7 @@ namespace Micser.Common.Test.Api
         }
 
         [Fact]
+        [Trait("Category", "Network")]
         public async Task SendLargeObject()
         {
             var configuration = GetConfiguration();
@@ -141,8 +161,8 @@ namespace Micser.Common.Test.Api
 
             _testOutputHelper.WriteLine($"{nameof(SendLargeObject)}: using port {configuration.Port}");
 
-            using (var server = new ApiServer(configuration, factory, LogManager.GetCurrentClassLogger()))
-            using (var client = new ApiClient(configuration, factory, LogManager.GetCurrentClassLogger()))
+            using (var server = new ApiServer(configuration, factory, LogManager.GetLogger("Server")))
+            using (var client = new ApiClient(configuration, factory, LogManager.GetLogger("Client")))
             {
                 var startResult = server.Start();
 
@@ -176,6 +196,7 @@ namespace Micser.Common.Test.Api
         }
 
         [Fact]
+        [Trait("Category", "Network")]
         public async Task SendServerToClient()
         {
             var configuration = GetConfiguration();
@@ -183,8 +204,8 @@ namespace Micser.Common.Test.Api
 
             _testOutputHelper.WriteLine($"{nameof(SendServerToClient)}: using port {configuration.Port}");
 
-            using (var server = new ApiServer(configuration, factory, LogManager.GetCurrentClassLogger()))
-            using (var client = new ApiClient(configuration, factory, LogManager.GetCurrentClassLogger()))
+            using (var server = new ApiServer(configuration, factory, LogManager.GetLogger("Server")))
+            using (var client = new ApiClient(configuration, factory, LogManager.GetLogger("Client")))
             {
                 var startResult = server.Start();
 
@@ -204,6 +225,7 @@ namespace Micser.Common.Test.Api
         }
 
         [Fact]
+        [Trait("Category", "Network")]
         public async Task ServerReconnect()
         {
             var configuration = GetConfiguration();
@@ -211,8 +233,8 @@ namespace Micser.Common.Test.Api
 
             _testOutputHelper.WriteLine($"{nameof(ServerReconnect)}: using port {configuration.Port}");
 
-            using (var server = new ApiServer(configuration, factory, LogManager.GetCurrentClassLogger()))
-            using (var client = new ApiClient(configuration, factory, LogManager.GetCurrentClassLogger()))
+            using (var server = new ApiServer(configuration, factory, LogManager.GetLogger("Server")))
+            using (var client = new ApiClient(configuration, factory, LogManager.GetLogger("Client1")))
             {
                 server.Start();
 
@@ -228,7 +250,12 @@ namespace Micser.Common.Test.Api
 
                 client.Dispose();
 
-                using (var client2 = new ApiClient(configuration, factory, LogManager.GetCurrentClassLogger()))
+                while (server.State != EndPointState.Disconnected)
+                {
+                    await Task.Delay(10);
+                }
+
+                using (var client2 = new ApiClient(configuration, factory, LogManager.GetLogger("Client2")))
                 {
                     clientTask = client2.ConnectAsync();
                     serverTask = server.ConnectAsync();

@@ -114,12 +114,13 @@ namespace Micser.Common.Api
 
         protected virtual void Disconnect()
         {
-            Logger.Info("Disconnecting");
-
-            if (_state == EndPointState.Disconnected)
+            if (_state == EndPointState.Disconnected ||
+                _state == EndPointState.Disconnecting)
             {
                 return;
             }
+
+            Logger.Info("Disconnecting");
 
             lock (StateLock)
             {
@@ -209,6 +210,11 @@ namespace Micser.Common.Api
         {
             public static async Task<string> ReceiveMessage(Stream tcpStream)
             {
+                if (tcpStream == null)
+                {
+                    return null;
+                }
+
                 var headerBuffer = new byte[sizeof(int)];
                 var headerRead = 0;
                 int bytesRead;
@@ -246,6 +252,11 @@ namespace Micser.Common.Api
 
             public static async Task WriteMessage(Stream tcpStream, string content)
             {
+                if (tcpStream == null)
+                {
+                    return;
+                }
+
                 var contentBytes = Encoding.UTF8.GetBytes(content);
                 var headerBytes = BitConverter.GetBytes(contentBytes.Length);
 
