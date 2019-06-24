@@ -14,19 +14,69 @@ namespace Micser.App.Settings
     public class ColorThemeSettingHandler : IListSettingHandler
     {
         private readonly ILogger _logger;
-        private Dictionary<string, string> _themeFiles;
-        private Dictionary<object, string> _themeList;
+        private readonly Dictionary<string, string> _themeFiles;
+        private readonly Dictionary<object, string> _themeList;
 
         public ColorThemeSettingHandler(ILogger logger)
         {
             _logger = logger;
+            _themeList = new Dictionary<object, string>();
+            _themeFiles = new Dictionary<string, string>();
         }
 
         public IDictionary<object, string> CreateList()
         {
-            _themeList = new Dictionary<object, string>();
-            _themeFiles = new Dictionary<string, string>();
+            LoadThemeFiles();
+            return _themeList;
+        }
 
+        public async Task<object> LoadSettingAsync(object value)
+        {
+            await LoadThemeFilesAsync();
+
+            if (value is string name && _themeFiles.TryGetValue(name, out var fileName))
+            {
+                ApplyTheme(fileName);
+            }
+
+            return value;
+        }
+
+        public async Task<object> SaveSettingAsync(object value)
+        {
+            await LoadThemeFilesAsync();
+
+            if (value is string name && _themeFiles.TryGetValue(name, out var fileName))
+            {
+                ApplyTheme(fileName);
+            }
+
+            return value;
+        }
+
+        private static void ApplyTheme(string fileName)
+        {
+            if (!Application.Current.Dispatcher.CheckAccess())
+            {
+                Application.Current.Dispatcher.Invoke(() => ApplyThemeInternal(fileName));
+            }
+            else
+            {
+                ApplyThemeInternal(fileName);
+            }
+        }
+
+        private static void ApplyThemeInternal(string fileName)
+        {
+            using (var fs = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+            {
+                var dic = (ResourceDictionary)XamlReader.Load(fs);
+                Application.Current.Resources.MergedDictionaries.Add(dic);
+            }
+        }
+
+        private void LoadThemeFiles()
+        {
             var themePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), AppGlobals.ThemesDirectoryName);
             if (Directory.Exists(themePath))
             {
@@ -61,49 +111,11 @@ namespace Micser.App.Settings
                     }
                 }
             }
-
-            return _themeList;
         }
 
-        public Task<object> LoadSettingAsync(object value)
+        private Task LoadThemeFilesAsync()
         {
-            if (value is string name && _themeFiles.TryGetValue(name, out var fileName))
-            {
-                ApplyTheme(fileName);
-            }
-
-            return Task.FromResult(value);
-        }
-
-        public Task<object> SaveSettingAsync(object value)
-        {
-            if (value is string name && _themeFiles.TryGetValue(name, out var fileName))
-            {
-                ApplyTheme(fileName);
-            }
-
-            return Task.FromResult(value);
-        }
-
-        private static void ApplyTheme(string fileName)
-        {
-            if (!Application.Current.Dispatcher.CheckAccess())
-            {
-                Application.Current.Dispatcher.Invoke(() => ApplyThemeInternal(fileName));
-            }
-            else
-            {
-                ApplyThemeInternal(fileName);
-            }
-        }
-
-        private static void ApplyThemeInternal(string fileName)
-        {
-            using (var fs = new FileStream(fileName, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
-            {
-                var dic = (ResourceDictionary)XamlReader.Load(fs);
-                Application.Current.Resources.MergedDictionaries.Add(dic);
-            }
+            return Task.Run(LoadThemeFiles);
         }
     }
 }

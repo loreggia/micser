@@ -19,7 +19,7 @@ namespace Micser.App.Properties {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "15.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     public class Resources {
@@ -57,6 +57,15 @@ namespace Micser.App.Properties {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Libraries and tools used:.
+        /// </summary>
+        public static string AboutLibrariesTitle {
+            get {
+                return ResourceManager.GetString("AboutLibrariesTitle", resourceCulture);
             }
         }
         
@@ -129,6 +138,25 @@ namespace Micser.App.Properties {
         public static string JsonFiles {
             get {
                 return ResourceManager.GetString("JsonFiles", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.Byte[].
+        /// </summary>
+        public static byte[] libraries {
+            get {
+                object obj = ResourceManager.GetObject("libraries", resourceCulture);
+                return ((byte[])(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to License.
+        /// </summary>
+        public static string License {
+            get {
+                return ResourceManager.GetString("License", resourceCulture);
             }
         }
         
@@ -399,6 +427,15 @@ namespace Micser.App.Properties {
         public static string ToolBarSettingsDescription {
             get {
                 return ResourceManager.GetString("ToolBarSettingsDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to View License.
+        /// </summary>
+        public static string ViewLicense {
+            get {
+                return ResourceManager.GetString("ViewLicense", resourceCulture);
             }
         }
     }

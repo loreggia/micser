@@ -1,0 +1,82 @@
+[
+  {
+    "Name": "CommonServiceLocator",
+    "Url": "https://github.com/unitycontainer/commonservicelocator",
+    "LicenseUrl": "https://raw.githubusercontent.com/unitycontainer/commonservicelocator/master/LICENSE"
+  },
+  {
+    "Name": "CSCore",
+    "Url": "https://github.com/filoe/cscore",
+    "LicenseUrl": "https://raw.githubusercontent.com/filoe/cscore/master/license.md"
+  },
+  {
+    "Name": "Hardcodet.NotifyIcon.Wpf",
+    "Url": "http://www.hardcodet.net/wpf-notifyicon",
+    "LicenseUrl": ""
+  },
+  {
+    "Name": "Moq",
+    "Url": "https://github.com/moq/moq4",
+    "LicenseUrl": "https://raw.githubusercontent.com/moq/moq4/master/License.txt"
+  },
+  {
+    "Name": "MSBuild Community Tasks",
+    "Url": "https://github.com/loresoft/msbuildtasks",
+    "LicenseUrl": "https://raw.githubusercontent.com/loresoft/msbuildtasks/master/LICENSE"
+  },
+  {
+    "Name": "MSBuild.Version.Target",
+    "Url": "https://github.com/guibranco/MSBuild.Version.Target",
+    "LicenseUrl": "https://raw.githubusercontent.com/guibranco/MSBuild.Version.Target/master/LICENSE"
+  },
+  {
+    "Name": "Newtonsoft.Json",
+    "Url": "https://www.newtonsoft.com/json",
+    "LicenseUrl": "https://raw.githubusercontent.com/JamesNK/Newtonsoft.Json/master/LICENSE.md"
+  },
+  {
+    "Name": "NLog",
+    "Url": "https://nlog-project.org/",
+    "LicenseUrl": "https://raw.githubusercontent.com/NLog/NLog/master/LICENSE.txt"
+  },
+  {
+    "Name": "Prism",
+    "Url": "https://github.com/PrismLibrary/Prism",
+    "LicenseUrl": "https://raw.githubusercontent.com/PrismLibrary/Prism/master/LICENSE"
+  },
+  {
+    "Name": "SQLite.CodeFirst",
+    "Url": "https://github.com/msallin/SQLiteCodeFirst",
+    "LicenseUrl": "https://raw.githubusercontent.com/msallin/SQLiteCodeFirst/master/LICENSE"
+  },
+  {
+    "Name": "System.Data.SQLite",
+    "Url": "https://system.data.sqlite.org/index.html/doc/trunk/www/index.wiki",
+    "LicenseUrl": "https://system.data.sqlite.org/index.html/doc/trunk/www/copyright.wiki"
+  },
+  {
+    "Name": "System.Data.SQLite.EF6.Migrations",
+    "Url": "https://github.com/bubibubi/db2ef6migrations",
+    "LicenseUrl": ""
+  },
+  {
+    "Name": "Unity",
+    "Url": "https://github.com/unitycontainer/unity",
+    "LicenseUrl": "https://raw.githubusercontent.com/unitycontainer/unity/master/LICENSE"
+  },
+  {
+    "Name": "WixSharp",
+    "Url": "https://github.com/oleg-shilo/wixsharp",
+    "LicenseUrl": "https://raw.githubusercontent.com/oleg-shilo/wixsharp/master/LICENSE"
+  },
+  {
+    "Name": "Windows Driver Samples",
+    "Url": "https://github.com/Microsoft/Windows-driver-samples",
+    "LicenseUrl": "https://raw.githubusercontent.com/microsoft/Windows-driver-samples/master/LICENSE"
+  },
+  {
+    "Name": "xUnit.net",
+    "Url": "https://github.com/xunit/xunit",
+    "LicenseUrl": "https://raw.githubusercontent.com/xunit/xunit/master/license.txt"
+  }
+]
