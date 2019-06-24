@@ -115,7 +115,7 @@ namespace Micser.Common.Api
                 if (response == null)
                 {
                     Disconnect();
-                    return new JsonResponse { IsSuccess = false };
+                    return new JsonResponse { IsSuccess = false, IsConnected = false };
                 }
 
                 return JsonConvert.DeserializeObject<JsonResponse>(response);
@@ -193,7 +193,7 @@ namespace Micser.Common.Api
                 try
                 {
                     var message = await ApiProtocol.ReceiveMessage(InStream).ConfigureAwait(false);
-                    if (message == null)
+                    if (message == null && State == EndPointState.Connected)
                     {
                         Disconnect();
                         return;

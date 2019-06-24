@@ -54,14 +54,21 @@ namespace Micser.Common.Api
                     OutClient = null;
                     return false;
                 }
-
-                OutClient.Client.SetKeepAlive();
+                
                 OutStream = OutClient.GetStream();
+                if (OutStream == null)
+                {
+                    OutClient?.Dispose();
+                    OutClient = null;
+                    return false;
+                }
+                OutClient.Client.SetKeepAlive();
 
                 InClient = new TcpClient();
                 await InClient.ConnectAsync(IPAddress.Loopback, Configuration.Port);
                 if (InClient.Client == null)
                 {
+                    OutStream?.Dispose();
                     OutClient?.Dispose();
                     OutClient = null;
                     InClient?.Dispose();
@@ -69,8 +76,17 @@ namespace Micser.Common.Api
                     return false;
                 }
 
-                InClient.Client.SetKeepAlive();
                 InStream = InClient.GetStream();
+                if (InStream == null)
+                {
+                    OutStream?.Dispose();
+                    OutClient?.Dispose();
+                    OutClient = null;
+                    InClient?.Dispose();
+                    InClient = null;
+                    return false;
+                }
+                InClient.Client.SetKeepAlive();
 
                 lock (StateLock)
                 {
