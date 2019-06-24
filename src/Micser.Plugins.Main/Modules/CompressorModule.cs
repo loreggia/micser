@@ -42,7 +42,7 @@ namespace Micser.Plugins.Main.Modules
             public const float Knee = 5f;
             public const float MakeUpGain = 0f;
             public const float Ratio = 2f;
-            public const float Release = 0.1f;
+            public const float Release = 0.01f;
             public const float Threshold = -10f;
             public const CompressorType Type = CompressorType.Upward;
         }

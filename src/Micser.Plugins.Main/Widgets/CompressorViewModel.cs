@@ -112,12 +112,24 @@ namespace Micser.Plugins.Main.Widgets
         {
             var amount = Amount;
 
-            Attack = Type == CompressorType.Upward ? 0.1f : 0.05f;
-            Knee = 5f;
-            Release = 0.1f;
-            MakeUpGain = Type == CompressorType.Upward ? 0f : MathExtensions.Lerp(0f, 25f, amount);
-            Ratio = MathExtensions.Lerp(1.5f, 2.5f, amount);
-            Threshold = Type == CompressorType.Upward ? MathExtensions.Lerp(-60f, -5f, amount) : MathExtensions.Lerp(0f, -40f, amount);
+            if (Type == CompressorType.Upward)
+            {
+                Attack = 0.05f;
+                Knee = 5f;
+                Release = 0.01f;
+                MakeUpGain = 0f;
+                Ratio = MathExtensions.Lerp(1.5f, 5.0f, amount);
+                Threshold = MathExtensions.Lerp(-60f, -5f, amount);
+            }
+            else
+            {
+                Attack = 0.05f;
+                Knee = 5f;
+                Release = 0.05f;
+                MakeUpGain = MathExtensions.Lerp(0f, 25f, amount);
+                Ratio = MathExtensions.Lerp(1.5f, 2.5f, amount);
+                Threshold = MathExtensions.Lerp(0f, -40f, amount);
+            }
         }
     }
 }
