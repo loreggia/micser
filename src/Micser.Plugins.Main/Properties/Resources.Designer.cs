@@ -61,7 +61,7 @@ namespace Micser.Plugins.Main.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Amount.
+        ///   Looks up a localized string similar to Amount (%).
         /// </summary>
         public static string CompressorAmount {
             get {
@@ -70,7 +70,7 @@ namespace Micser.Plugins.Main.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Attack.
+        ///   Looks up a localized string similar to Attack (ms).
         /// </summary>
         public static string CompressorAttack {
             get {
@@ -88,7 +88,7 @@ namespace Micser.Plugins.Main.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Knee.
+        ///   Looks up a localized string similar to Knee (dB).
         /// </summary>
         public static string CompressorKnee {
             get {
@@ -97,7 +97,7 @@ namespace Micser.Plugins.Main.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Make up gain.
+        ///   Looks up a localized string similar to Make up gain (dB).
         /// </summary>
         public static string CompressorMakeUpGain {
             get {
@@ -115,7 +115,7 @@ namespace Micser.Plugins.Main.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Release.
+        ///   Looks up a localized string similar to Release (ms).
         /// </summary>
         public static string CompressorRelease {
             get {
@@ -124,7 +124,7 @@ namespace Micser.Plugins.Main.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Threshold.
+        ///   Looks up a localized string similar to Threshold (dB).
         /// </summary>
         public static string CompressorThreshold {
             get {
@@ -205,7 +205,7 @@ namespace Micser.Plugins.Main.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Gain.
+        ///   Looks up a localized string similar to Gain (dB).
         /// </summary>
         public static string Gain {
             get {

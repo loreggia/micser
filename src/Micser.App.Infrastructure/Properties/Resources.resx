@@ -127,6 +127,6 @@
     <value>Use system volume</value>
   </data>
   <data name="Volume" xml:space="preserve">
-    <value>Volume</value>
+    <value>Volume (%)</value>
   </data>
 </root>

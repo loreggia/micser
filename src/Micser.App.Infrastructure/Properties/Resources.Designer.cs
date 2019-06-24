@@ -88,7 +88,7 @@ namespace Micser.App.Infrastructure.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Volume.
+        ///   Looks up a localized string similar to Volume (%).
         /// </summary>
         public static string Volume {
             get {

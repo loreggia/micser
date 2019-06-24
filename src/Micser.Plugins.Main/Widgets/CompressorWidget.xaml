@@ -36,7 +36,7 @@
         <widgets:AudioWidgetControls Grid.Row="0" Grid.ColumnSpan="2" />
 
         <Label Grid.Row="1" Grid.Column="0" Content="{x:Static p:Resources.CompressorAmount}" />
-        <controls:EditableSlider Grid.Row="1" Grid.Column="1" Value="{Binding Amount, Mode=TwoWay}" Minimum="0" Maximum="1" />
+        <controls:EditableSlider Grid.Row="1" Grid.Column="1" Value="{Binding Amount, Mode=TwoWay, Converter={converter:DoubleMultiplicationConverter Factor=100}}" Minimum="0" Maximum="100" />
 
         <Label Grid.Row="2" Grid.Column="0" Content="{x:Static p:Resources.CompressorType}" />
         <Grid Grid.Row="2" Grid.Column="1">
@@ -81,10 +81,10 @@
             <controls:EditableSlider Grid.Row="3" Grid.Column="1" Value="{Binding MakeUpGain, Mode=TwoWay}" Minimum="0" Maximum="60" />
 
             <Label Grid.Row="4" Grid.Column="0" Content="{x:Static p:Resources.CompressorAttack}" />
-            <controls:EditableSlider Grid.Row="4" Grid.Column="1" Value="{Binding Attack, Mode=TwoWay}" Minimum="0" Maximum="1" />
+            <controls:EditableSlider Grid.Row="4" Grid.Column="1" Value="{Binding Attack, Mode=TwoWay, Converter={converter:DoubleMultiplicationConverter Factor=1000}}" Minimum="0" Maximum="100" />
 
             <Label Grid.Row="5" Grid.Column="0" Content="{x:Static p:Resources.CompressorRelease}" />
-            <controls:EditableSlider Grid.Row="5" Grid.Column="1" Value="{Binding Release, Mode=TwoWay}" Minimum="0" Maximum="1" />
+            <controls:EditableSlider Grid.Row="5" Grid.Column="1" Value="{Binding Release, Mode=TwoWay, Converter={converter:DoubleMultiplicationConverter Factor=1000}}" Minimum="0" Maximum="100" />
         </Grid>
     </Grid>
 </widgets:Widget>

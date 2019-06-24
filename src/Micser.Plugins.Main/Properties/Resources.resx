@@ -118,28 +118,28 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="CompressorAmount" xml:space="preserve">
-    <value>Amount</value>
+    <value>Amount (%)</value>
   </data>
   <data name="CompressorAttack" xml:space="preserve">
-    <value>Attack</value>
+    <value>Attack (ms)</value>
   </data>
   <data name="CompressorEnableAdvancedControls" xml:space="preserve">
     <value>Advanced controls</value>
   </data>
   <data name="CompressorKnee" xml:space="preserve">
-    <value>Knee</value>
+    <value>Knee (dB)</value>
   </data>
   <data name="CompressorMakeUpGain" xml:space="preserve">
-    <value>Make up gain</value>
+    <value>Make up gain (dB)</value>
   </data>
   <data name="CompressorRatio" xml:space="preserve">
     <value>Ratio</value>
   </data>
   <data name="CompressorRelease" xml:space="preserve">
-    <value>Release</value>
+    <value>Release (ms)</value>
   </data>
   <data name="CompressorThreshold" xml:space="preserve">
-    <value>Threshold</value>
+    <value>Threshold (dB)</value>
   </data>
   <data name="CompressorType" xml:space="preserve">
     <value>Type</value>
@@ -166,7 +166,7 @@
     <value>Device Output</value>
   </data>
   <data name="Gain" xml:space="preserve">
-    <value>Gain</value>
+    <value>Gain (dB)</value>
   </data>
   <data name="GainWidgetDescription" xml:space="preserve">
     <value>Changes the gain (in dB) of the audio that is routed through this widget, which allows amplifying the input volume. This can cause the audio to clip if it gets too loud.</value>
