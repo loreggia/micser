@@ -116,10 +116,10 @@ namespace Micser.Common.Test.Api
                 Assert.True(serverTask.Result);
                 Assert.True(clientTask.Result);
 
-                result = await client.SendMessageAsync(new JsonRequest());
+                result = await client.SendMessageAsync(new JsonRequest("Resource", "Action", "Content"));
 
                 Assert.NotNull(result);
-                Assert.True(result.IsSuccess, result.Message);
+                Assert.True(result.IsSuccess, $"Message: '{result.Message}', IsConnected: {result.IsConnected}, Content: {result.Content}");
             }
         }
 
