@@ -7,8 +7,8 @@
                 xmlns:widgets="clr-namespace:Micser.App.Infrastructure.Widgets;assembly=Micser.App.Infrastructure"
                 mc:Ignorable="d"
                 d:DataContext="{d:DesignInstance local:SpectrumViewModel}"
-                MinWidth="100"
-                MinHeight="50">
+                MinWidth="200"
+                MinHeight="150">
     <Grid>
         <local:PeakSpectrum SpectrumData="{Binding SpectrumData}" />
     </Grid>
