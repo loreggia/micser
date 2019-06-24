@@ -78,6 +78,7 @@
     <Compile Include="Settings\StartupSettingHandler.cs" />
     <Compile Include="Settings\VacCountSettingHandler.cs" />
     <Compile Include="ViewModels\AboutViewModel.cs" />
+    <Compile Include="ViewModels\LibraryInfo.cs" />
     <Compile Include="ViewModels\SettingsViewModel.cs" />
     <Compile Include="ViewModels\StatusViewModel.cs" />
     <Compile Include="ViewModels\MainMenuViewModel.cs" />
@@ -177,6 +178,7 @@
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
+    <None Include="Resources\libraries.json" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config">
