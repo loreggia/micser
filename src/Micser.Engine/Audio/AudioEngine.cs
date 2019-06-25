@@ -233,6 +233,14 @@ namespace Micser.Engine.Audio
 
             await Task.Run(async () =>
             {
+                // TODO make delay configurable
+                await Task.Delay(5000);
+
+                if (!IsRunning)
+                {
+                    return;
+                }
+
                 Stop();
                 while (IsRunning)
                 {
