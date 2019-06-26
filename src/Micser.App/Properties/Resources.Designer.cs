@@ -296,7 +296,7 @@ namespace Micser.App.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to If enabled, the program will minimize to the system tray instead of exiting when the window is closed..
+        ///   Looks up a localized string similar to If enabled, the program will minimize to the system tray instead of minimizing to the task bar..
         /// </summary>
         public static string SettingMinimizeToTrayDescription {
             get {

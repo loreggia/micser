@@ -77,6 +77,9 @@ namespace Micser.App.Settings
 
         private void LoadThemeFiles()
         {
+            _themeList.Clear();
+            _themeFiles.Clear();
+
             var themePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), AppGlobals.ThemesDirectoryName);
             if (Directory.Exists(themePath))
             {

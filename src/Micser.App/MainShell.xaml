@@ -26,7 +26,6 @@
     </Window.Resources>
 
     <Window.CommandBindings>
-        <CommandBinding Command="ai:CustomApplicationCommands.Close" Executed="CloseCommand_Executed" />
         <CommandBinding Command="ai:CustomApplicationCommands.Exit" Executed="ExitCommand_Executed" />
         <CommandBinding Command="ai:CustomApplicationCommands.Restore" Executed="RestoreCommand_Executed" />
     </Window.CommandBindings>

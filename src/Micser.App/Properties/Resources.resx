@@ -191,7 +191,7 @@
     <value>Color theme</value>
   </data>
   <data name="SettingMinimizeToTrayDescription" xml:space="preserve">
-    <value>If enabled, the program will minimize to the system tray instead of exiting when the window is closed.</value>
+    <value>If enabled, the program will minimize to the system tray instead of minimizing to the task bar.</value>
   </data>
   <data name="SettingMinimizeToTrayName" xml:space="preserve">
     <value>Minimize to tray</value>
