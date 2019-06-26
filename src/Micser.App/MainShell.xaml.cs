@@ -2,6 +2,7 @@
 using Micser.App.Infrastructure.Extensions;
 using Micser.App.Infrastructure.Settings;
 using Prism.Regions;
+using System;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
@@ -14,7 +15,6 @@ namespace Micser.App
     public partial class MainShell
     {
         private readonly IRegionManager _regionManager;
-        private bool _isExiting;
 
         public MainShell(IRegionManager regionManager)
         {
@@ -27,27 +27,28 @@ namespace Micser.App
 
         protected override void OnClosing(CancelEventArgs e)
         {
-            var settingsService = MicserApplication.GetService<ISettingsService>();
-            _isExiting = !settingsService.GetSetting<bool>(AppGlobals.SettingKeys.MinimizeToTray);
-
-            e.Cancel = !_isExiting;
+            e.Cancel = true;
             base.OnClosing(e);
-            if (!_isExiting)
-            {
-                Hide();
-            }
+            Shutdown();
         }
 
-        private void CloseCommand_Executed(object sender, ExecutedRoutedEventArgs e)
+        protected override void OnStateChanged(EventArgs e)
         {
-            Close();
+            if (WindowState == WindowState.Minimized)
+            {
+                // ISettingsService is not yet available when the shell is created, so we can't use constructor injection
+                var settingsService = MicserApplication.GetService<ISettingsService>();
+                if (settingsService.GetSetting<bool>(AppGlobals.SettingKeys.MinimizeToTray))
+                {
+                    Hide();
+                }
+            }
+            base.OnStateChanged(e);
         }
 
         private void ExitCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            _isExiting = true;
-            _regionManager.RequestNavigate(AppGlobals.PrismRegions.Main, "");
-            Application.Current.Shutdown();
+            Shutdown();
         }
 
         private void MainShell_Loaded(object sender, RoutedEventArgs e)
@@ -63,6 +64,17 @@ namespace Micser.App
         private void RestoreCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             Show();
+
+            if (WindowState == WindowState.Minimized)
+            {
+                WindowState = WindowState.Normal;
+            }
+        }
+
+        private void Shutdown()
+        {
+            _regionManager.RequestNavigate(AppGlobals.PrismRegions.Main, "");
+            Application.Current.Shutdown();
         }
 
         private void TaskbarIconExitClick(object sender, RoutedEventArgs e)

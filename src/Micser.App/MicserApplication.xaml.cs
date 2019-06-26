@@ -96,10 +96,11 @@ namespace Micser.App
             {
                 var state = new ShellState
                 {
-                    Width = _shell.ActualWidth,
-                    Height = _shell.ActualHeight,
+                    Width = _shell.Width,
+                    Height = _shell.Height,
                     Top = _shell.Top,
-                    Left = _shell.Left
+                    Left = _shell.Left,
+                    State = _shell.WindowState
                 };
 
                 var settingsService = GetService<ISettingsService>();

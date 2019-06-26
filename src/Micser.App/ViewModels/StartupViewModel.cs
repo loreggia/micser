@@ -6,6 +6,7 @@ using Micser.App.Views;
 using Micser.Common.Api;
 using Prism.Events;
 using System.Threading.Tasks;
+using System.Windows;
 
 namespace Micser.App.ViewModels
 {
@@ -44,9 +45,8 @@ namespace Micser.App.ViewModels
             await _settingsService.LoadAsync();
 
             await Task.Delay(2000);
-
             var shellState = _settingsService.GetSetting<ShellState>(AppGlobals.SettingKeys.ShellState);
-            var shell = System.Windows.Application.Current.MainWindow;
+            var shell = Application.Current.MainWindow;
 
             if (shellState != null && shell != null)
             {
@@ -54,6 +54,11 @@ namespace Micser.App.ViewModels
                 shell.Height = shellState.Height;
                 shell.Top = shellState.Top;
                 shell.Left = shellState.Left;
+
+                if (shellState.State != WindowState.Minimized)
+                {
+                    shell.WindowState = shellState.State;
+                }
             }
 
             var isConnected = _apiEndPoint.State == EndPointState.Connected;

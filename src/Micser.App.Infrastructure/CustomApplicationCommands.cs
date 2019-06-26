@@ -11,11 +11,6 @@ namespace Micser.App.Infrastructure
     public static class CustomApplicationCommands
     {
         /// <summary>
-        /// Closes the window or exits depending on settings.
-        /// </summary>
-        public static readonly RoutedUICommand Close;
-
-        /// <summary>
         /// Performs a delete action in the current context.
         /// </summary>
         public static readonly RoutedUICommand Delete;
@@ -47,7 +42,6 @@ namespace Micser.App.Infrastructure
 
         static CustomApplicationCommands()
         {
-            Close = CreateCommand(() => Close);
             Exit = CreateCommand(() => Exit);
             Import = CreateCommand(() => Import);
             Export = CreateCommand(() => Export);

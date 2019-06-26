@@ -97,9 +97,14 @@ namespace Micser.App.ViewModels
                         break;
 
                     case StatusType.ConnectionFailed:
-                        var result = await _apiEndPoint.ConnectAsync();
+                        var isConnected = _apiEndPoint.State == EndPointState.Connected;
 
-                        if (result)
+                        if (!isConnected)
+                        {
+                            isConnected = await _apiEndPoint.ConnectAsync();
+                        }
+
+                        if (isConnected)
                         {
                             var statusResult = await _statusApiClient.GetStatus();
 
