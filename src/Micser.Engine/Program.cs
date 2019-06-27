@@ -3,6 +3,7 @@ using NLog;
 using NLog.Config;
 using NLog.Targets;
 using System;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.ServiceProcess;
@@ -13,10 +14,23 @@ namespace Micser.Engine
     internal static class Program
     {
         /// <summary>
-        ///     The main entry point for the application.
+        /// The main entry point for the application.
         /// </summary>
         internal static void Main(params string[] arguments)
         {
+            try
+            {
+                // try setting process priority to high
+                using (var process = Process.GetCurrentProcess())
+                {
+                    process.PriorityClass = ProcessPriorityClass.High;
+                }
+            }
+            catch
+            {
+                // ignore
+            }
+
             var config = new LoggingConfiguration();
             config.AddTarget(new ColoredConsoleTarget("ConsoleTarget")
             {
