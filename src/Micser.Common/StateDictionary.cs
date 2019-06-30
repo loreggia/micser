@@ -1,6 +1,6 @@
-﻿using System;
+﻿using Micser.Common.Extensions;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Runtime.Serialization;
 
 namespace Micser.Common
@@ -56,22 +56,7 @@ namespace Micser.Common
 
                 if (obj != null)
                 {
-                    var tType = typeof(T);
-                    var objType = obj.GetType();
-
-                    var objConverter = TypeDescriptor.GetConverter(objType);
-
-                    if (objConverter.CanConvertTo(tType))
-                    {
-                        return (T)objConverter.ConvertTo(obj, tType);
-                    }
-
-                    var tConverter = TypeDescriptor.GetConverter(tType);
-
-                    if (tConverter.CanConvertFrom(objType))
-                    {
-                        return (T)tConverter.ConvertFrom(objType);
-                    }
+                    return obj.ToType<T>();
                 }
             }
 
