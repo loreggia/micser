@@ -82,6 +82,7 @@
     <Compile Include="Extensions\MathExtensions.cs" />
     <Compile Include="Extensions\ObservableCollectionExtensions.cs" />
     <Compile Include="Extensions\PropertyExtensions.cs" />
+    <Compile Include="Extensions\RegexExtensions.cs" />
     <Compile Include="Extensions\SocketExtensions.cs" />
     <Compile Include="Extensions\ObjectExtensions.cs" />
     <Compile Include="Extensions\UnityContainerExtensions.cs" />
@@ -110,11 +111,6 @@
     </PackageReference>
     <PackageReference Include="CSCore">
       <Version>1.2.1.2</Version>
-    </PackageReference>
-    <PackageReference Include="MSBuildTasks" GeneratePathProperty="true">
-      <Version>1.5.0.235</Version>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>12.0.2</Version>

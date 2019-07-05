@@ -1,4 +1,7 @@
-﻿using Microsoft.Build.Utilities;
+﻿using Microsoft.Build.Framework;
+using Microsoft.Build.Utilities;
+using Micser.Common.Extensions;
+using System;
 using System.IO;
 using System.Text.RegularExpressions;
 
@@ -6,16 +9,21 @@ namespace Micser.BuildTasks
 {
     public class UpdateAssemblyVersion : Task
     {
-        private readonly Regex _rxVersion;
-        private readonly Regex _rxVersionFile;
+        private const string VersionGroupName = "version";
+        private readonly Regex _rxAssemblyVersion;
 
         public UpdateAssemblyVersion()
         {
-            _rxVersion = new Regex(@"(\d+)\.(\d+)\.(\d+)\.(\d+)", RegexOptions.Compiled);
+            _rxAssemblyVersion = new Regex($@"Assembly(File)?Version\s*\(\s*""(?<{VersionGroupName}>[^""]+)""\s*\)", RegexOptions.Compiled);
         }
 
+        [Required]
         public string InputFileName { get; set; }
+
+        [Required]
         public string OutputFileName { get; set; }
+
+        [Required]
         public string VersionFileName { get; set; }
 
         public override bool Execute()
@@ -47,9 +55,19 @@ namespace Micser.BuildTasks
                 return false;
             }
 
-            var templateContent = File.ReadAllText(InputFileName);
+            try
+            {
+                var inputContent = File.ReadAllText(InputFileName);
+                var output = _rxAssemblyVersion.ReplaceGroup(inputContent, VersionGroupName, versionContent);
+                File.WriteAllText(OutputFileName, output);
 
-            File.WriteAllText(OutputFileName, templateContent);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Log.LogErrorFromException(ex);
+                return false;
+            }
         }
     }
 }
