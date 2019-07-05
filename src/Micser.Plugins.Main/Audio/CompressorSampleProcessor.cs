@@ -102,8 +102,15 @@ namespace Micser.Plugins.Main.Audio
 
         private float ProcessCompressor(float lInput)
         {
-            // Level detection - estimate level using peak detector
             var lInputAbs = Math.Abs(lInput);
+
+            // don't process zero values, otherwise a loud crack is heard when audio starts after being silent
+            if (lInputAbs < float.Epsilon)
+            {
+                return 1f;
+            }
+
+            // Level detection - estimate level using peak detector
             var dbInput = lInputAbs < 0.000001 ? -120f : AudioHelper.LinearToDb(lInputAbs);
 
             // Gain computer - static apply input/output curve
