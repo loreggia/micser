@@ -8,7 +8,7 @@ namespace Micser.Plugins.Main.Audio
     /// Buffered WaveSource which overrides the allocated memory after the internal buffer got full.
     /// </summary>
     /// <remarks>
-    /// Copied from CSCore source to allow clearing of the internal buffer.
+    /// Copied from CSCore & adjusted.
     /// </remarks>
     public class WriteableBufferingSource : IWaveSource
     {
@@ -17,35 +17,12 @@ namespace Micser.Plugins.Main.Audio
         private bool _disposed;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="T:CSCore.Streams.WriteableBufferingSource" /> class with a default buffersize of 5 seconds.
-        /// </summary>
-        /// <param name="waveFormat">The WaveFormat of the source.</param>
-        public WriteableBufferingSource(WaveFormat waveFormat)
-            : this(waveFormat, waveFormat.BytesPerSecond * 5)
-        {
-        }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="T:CSCore.Streams.WriteableBufferingSource" /> class.
         /// </summary>
         /// <param name="waveFormat">The WaveFormat of the source.</param>
-        /// <param name="bufferSize">Buffersize in bytes.</param>
-        public WriteableBufferingSource(WaveFormat waveFormat, int bufferSize)
+        public WriteableBufferingSource(WaveFormat waveFormat)
         {
-            if (waveFormat == null)
-            {
-                throw new ArgumentNullException(nameof(waveFormat));
-            }
-
-            if (bufferSize <= 0 || bufferSize % waveFormat.BlockAlign != 0)
-            {
-                throw new ArgumentException("Invalid bufferSize.");
-            }
-
-            MaxBufferSize = bufferSize;
-            WaveFormat = waveFormat;
-            _buffer = new FixedSizeBuffer<byte>(bufferSize);
-            FillWithZeros = true;
+            WaveFormat = waveFormat ?? throw new ArgumentNullException(nameof(waveFormat));
         }
 
         /// <summary>
@@ -62,18 +39,9 @@ namespace Micser.Plugins.Main.Audio
         public bool CanSeek => false;
 
         /// <summary>
-        /// Gets or sets a value which specifies whether the <see cref="M:CSCore.Streams.WriteableBufferingSource.Read(System.Byte[],System.Int32,System.Int32)" /> method should clear the specified buffer with zeros before reading any data.
+        /// Gets the number of stored bytes inside of the internal buffer.
         /// </summary>
-        public bool FillWithZeros { get; set; }
-
-        /// <summary>
-        ///     Gets the number of stored bytes inside of the internal buffer.
-        /// </summary>
-        public long Length => _buffer.Buffered;
-
-        /// <summary>Gets the maximum size of the buffer in bytes.</summary>
-        /// <value>The maximum size of the buffer in bytes.</value>
-        public int MaxBufferSize { get; }
+        public long Length => _buffer?.Buffered ?? 0;
 
         /// <summary>Not supported.</summary>
         public long Position
@@ -83,13 +51,16 @@ namespace Micser.Plugins.Main.Audio
         }
 
         /// <summary>
-        ///     Gets the <see cref="P:CSCore.IAudioSource.WaveFormat" /> of the waveform-audio data.
+        /// Gets the <see cref="P:CSCore.IAudioSource.WaveFormat" /> of the waveform-audio data.
         /// </summary>
         public WaveFormat WaveFormat { get; }
 
         public void Clear()
         {
-            _buffer.Clear();
+            lock (_bufferlock)
+            {
+                _buffer.Clear();
+            }
         }
 
         /// <summary>
@@ -108,8 +79,7 @@ namespace Micser.Plugins.Main.Audio
         }
 
         /// <summary>
-        ///     Reads a sequence of bytes from the internal buffer of the <see cref="T:CSCore.Streams.WriteableBufferingSource" /> and advances the position within the internal buffer by the
-        ///     number of bytes read.
+        /// Reads a sequence of bytes from the internal buffer of the <see cref="T:CSCore.Streams.WriteableBufferingSource" /> and advances the position within the internal buffer by the number of bytes read.
         /// </summary>
         /// <param name="buffer">
         ///     An array of bytes. When this method returns, the <paramref name="buffer" /> contains the specified
@@ -126,12 +96,9 @@ namespace Micser.Plugins.Main.Audio
         {
             lock (_bufferlock)
             {
-                var num = _buffer.Read(buffer, offset, count);
+                EnsureBuffer(count);
 
-                if (!FillWithZeros)
-                {
-                    return num;
-                }
+                var num = _buffer.Read(buffer, offset, count);
 
                 if (num < count)
                 {
@@ -151,6 +118,8 @@ namespace Micser.Plugins.Main.Audio
         {
             lock (_bufferlock)
             {
+                EnsureBuffer(count);
+
                 return _buffer.Write(buffer, offset, count);
             }
         }
@@ -163,8 +132,22 @@ namespace Micser.Plugins.Main.Audio
         {
             if (disposing && _buffer != null)
             {
-                _buffer.Dispose();
-                _buffer = null;
+                lock (_bufferlock)
+                {
+                    _buffer.Dispose();
+                    _buffer = null;
+                }
+            }
+        }
+
+        private void EnsureBuffer(int count)
+        {
+            count *= 2;
+            count += count % WaveFormat.BlockAlign;
+
+            if (_buffer == null || _buffer.Length < count)
+            {
+                _buffer = new FixedSizeBuffer<byte>(count);
             }
         }
     }
