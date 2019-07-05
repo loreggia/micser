@@ -21,6 +21,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Micser.Vac.Driver", "Micser
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Micser.Common", "Micser.Common\Micser.Common.csproj", "{E14431B4-F54A-4D36-B505-1D3407252430}"
+	ProjectSection(ProjectDependencies) = postProject
+		{9B270774-3850-4C23-ABCF-587BCFFF4844} = {9B270774-3850-4C23-ABCF-587BCFFF4844}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Micser.Common.Test", "Micser.Common.Test\Micser.Common.Test.csproj", "{5CB07365-3143-4B65-9118-7B255AACAC6F}"
 EndProject

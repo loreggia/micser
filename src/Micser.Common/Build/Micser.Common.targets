@@ -1,48 +1,23 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <!--
-  Copied/adjusted from the MSBuild.Version.Target project.
-
-    MIT License
-
-    Copyright (c) 2018 Guilherme Branco Stracini
-
-    Permission is hereby granted, free of charge, to any person obtaining a copy
-    of this software and associated documentation files (the "Software"), to deal
-    in the Software without restriction, including without limitation the rights
-    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-    copies of the Software, and to permit persons to whom the Software is
-    furnished to do so, subject to the following conditions:
-
-    The above copyright notice and this permission notice shall be included in all
-    copies or substantial portions of the Software.
-
-    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-    SOFTWARE.
-  -->
   <PropertyGroup>
-    <VersionFile Condition="'$(VersionFile)'==''">Properties/Version.txt</VersionFile>
+    <RunBuildTasks Condition="'$(RunBuildTasks)' == ''">false</RunBuildTasks>
+    <VersionFile Condition="'$(VersionFile)' == ''">Properties/Version.txt</VersionFile>
+    <InputFile Condition="'$(InputFile)' == ''">Properties/GlobalAssemblyInfo.cs</InputFile>
+    <OutputFile Condition="'$(OutputFile)' == ''">$(InputFile)</OutputFile>
   </PropertyGroup>
-  <Target Name="MSBuildVersionTarget" BeforeTargets="BeforeBuild">
-    <Version Condition="'$(Configuration)' == 'Release'" VersionFile="$(VersionFile)" BuildType="Increment">
-      <Output TaskParameter="Major" PropertyName="Major" />
-      <Output TaskParameter="Minor" PropertyName="Minor" />
-      <Output TaskParameter="Build" PropertyName="Build" />
-      <Output TaskParameter="Revision" PropertyName="Revision" />
-    </Version>
-    <Version Condition="'$(Configuration)' != 'Release'" VersionFile="$(VersionFile)">
-      <Output TaskParameter="Major" PropertyName="Major" />
-      <Output TaskParameter="Minor" PropertyName="Minor" />
-      <Output TaskParameter="Build" PropertyName="Build" />
-      <Output TaskParameter="Revision" PropertyName="Revision" />
-    </Version>
-    <Message Text="Current version: $(Major).$(Minor).$(Build).$(Revision)" Importance="High" />
-    <FileUpdate Condition="'$(Configuration)' != 'Release'" Files="Properties\GlobalAssemblyInfo.cs" Regex="(\d+)\.(\d+)\.(\d+).(\d+)" ReplacementText="$(Major).$(Minor).$(Build).$(Revision)" />
-    <FileUpdate Condition="'$(Configuration)' != 'Release'" Files="Properties\Version.txt" Regex="(\d+)\.(\d+)\.(\d+).(\d+)" ReplacementText="$(Major).$(Minor).$(Build).$(Revision)" />
+
+  <Target Name="ExecRunBuildTasks" BeforeTargets="BeforeBuild">
+    <Exec Command="&quot;$(MSBuildBinPath)\MSBuild.exe&quot; /t:RunBuildTasks /p:RunBuildTasks=true /p:Configuration=$(Configuration) &quot;$(ProjectDir)$(ProjectFileName)&quot;" />
+  </Target>
+
+  <Target Name="RunBuildTasks" Condition="$(RunBuildTasks)">
+    <CallTarget Targets="UpdateVersion" />
+  </Target>
+
+  <UsingTask TaskName="UpdateAssemblyVersion" AssemblyFile="$(ProjectDir)..\Micser.BuildTasks\bin\$(Configuration)\Micser.BuildTasks.dll" />
+
+  <Target Name="UpdateVersion">
+    <UpdateAssemblyVersion InputFileName="$(InputFile)" OutputFileName="$(OutputFile)" VersionFileName="$(VersionFile)" />
   </Target>
 </Project>
