@@ -1,4 +1,5 @@
-﻿using Micser.Engine.Infrastructure.DataAccess.Models;
+﻿using Micser.Common.DataAccess.Models;
+using Micser.Engine.Infrastructure.DataAccess.Models;
 using System.Data.Entity;
 using System.Data.Entity.Migrations;
 using System.Data.SQLite.EF6.Migrations;
@@ -46,6 +47,12 @@ namespace Micser.Engine.Infrastructure.DataAccess
         /// The modules store.
         /// </summary>
         public IDbSet<Module> Modules { get; set; }
+
+        // ReSharper disable once UnusedMember.Global
+        /// <summary>
+        /// The application setting store.
+        /// </summary>
+        public IDbSet<SettingValue> Settings { get; set; }
 
         /// <inheritdoc />
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
