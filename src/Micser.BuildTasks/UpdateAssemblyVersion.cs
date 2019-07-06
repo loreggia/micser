@@ -33,12 +33,6 @@ namespace Micser.BuildTasks
                 return false;
             }
 
-            if (!File.Exists(OutputFileName))
-            {
-                Log.LogError($"Output file '{OutputFileName}' not found.");
-                return false;
-            }
-
             if (!File.Exists(VersionFileName))
             {
                 Log.LogError($"Version file '{VersionFileName}' not found.");
@@ -87,9 +81,11 @@ namespace Micser.BuildTasks
                     iValue = 0;
                 }
 
-                if (iValue > ushort.MaxValue)
+                var maxValue = i < 2 ? 255 : 65535;
+
+                if (iValue > maxValue)
                 {
-                    throw new InvalidOperationException($"The value {iValue} is too big to use as a version number (max = {ushort.MaxValue}).");
+                    throw new InvalidOperationException($"The value {iValue} is too big to use as a version number (index: {i}, max: {maxValue}).");
                 }
 
                 result[i] = (ushort)iValue;
