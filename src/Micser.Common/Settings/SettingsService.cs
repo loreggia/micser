@@ -1,6 +1,7 @@
-﻿using Micser.App.Infrastructure.DataAccess.Models;
-using Micser.App.Infrastructure.DataAccess.Repositories;
-using Micser.Common.DataAccess;
+﻿using Micser.Common.DataAccess;
+using Micser.Common.DataAccess.Models;
+using Micser.Common.DataAccess.Repositories;
+using Micser.Common.Extensions;
 using Newtonsoft.Json;
 using NLog;
 using System;
@@ -11,7 +12,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Micser.App.Infrastructure.Settings
+namespace Micser.Common.Settings
 {
     /// <inheritdoc cref="ISettingsService"/>
     public class SettingsService : ISettingsService, IDisposable
@@ -47,15 +48,15 @@ namespace Micser.App.Infrastructure.Settings
         }
 
         /// <inheritdoc />
-        public object GetSetting(string key)
+        public T GetSetting<T>(string key)
         {
             if (!_settings.TryGetValue(key, out var value))
             {
                 _logger.Warn($"Requested unregistered setting '{key}'.");
-                return null;
+                return default;
             }
 
-            return value;
+            return value.ToType<T>();
         }
 
         /// <inheritdoc />

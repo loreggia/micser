@@ -74,6 +74,9 @@
     <Compile Include="DataAccess\IUnitOfWorkFactory.cs" />
     <Compile Include="DataAccess\IRepository.cs" />
     <Compile Include="DataAccess\IUnitOfWork.cs" />
+    <Compile Include="DataAccess\Models\SettingValue.cs" />
+    <Compile Include="DataAccess\Repositories\ISettingValueRepository.cs" />
+    <Compile Include="DataAccess\Repositories\SettingValueRepository.cs" />
     <Compile Include="DataAccess\Repository.cs" />
     <Compile Include="DataAccess\RepositoryFactory.cs" />
     <Compile Include="DataAccess\UnitOfWork.cs" />
@@ -99,6 +102,16 @@
     <Compile Include="Properties\GlobalAssemblyInfo.cs" />
     <None Include="Properties\GlobalAssemblyInfoTemplate.cs" />
     <Compile Include="SemaphoreQueue.cs" />
+    <Compile Include="Settings\ISettingHandler.cs" />
+    <Compile Include="Settings\ISettingHandlerFactory.cs" />
+    <Compile Include="Settings\ISettingsRegistry.cs" />
+    <Compile Include="Settings\ISettingsService.cs" />
+    <Compile Include="Settings\SettingChangedEventHandler.cs" />
+    <Compile Include="Settings\SettingDefinition.cs" />
+    <Compile Include="Settings\SettingHandlerFactory.cs" />
+    <Compile Include="Settings\SettingsRegistry.cs" />
+    <Compile Include="Settings\SettingsSerializer.cs" />
+    <Compile Include="Settings\SettingsService.cs" />
     <Compile Include="StateDictionary.cs" />
     <Compile Include="Modules\ModuleDto.cs" />
     <Compile Include="Modules\ModuleConnectionDto.cs" />
@@ -148,6 +161,7 @@
   <ItemGroup>
     <Resource Include="Properties\Version.txt" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(ProjectDir)Build\Micser.Common.targets" />
 </Project>

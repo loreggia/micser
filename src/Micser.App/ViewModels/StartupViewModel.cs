@@ -1,9 +1,8 @@
 ﻿using Micser.App.Infrastructure;
-using Micser.App.Infrastructure.Extensions;
-using Micser.App.Infrastructure.Settings;
 using Micser.App.Settings;
 using Micser.App.Views;
 using Micser.Common.Api;
+using Micser.Common.Settings;
 using Prism.Events;
 using System.Threading.Tasks;
 using System.Windows;

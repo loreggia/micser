@@ -1,9 +1,8 @@
-﻿using Micser.App.Infrastructure.DataAccess.Models;
-using Micser.Common.DataAccess;
+﻿using Micser.Common.DataAccess.Models;
 using System.Data.Entity;
 using System.Linq;
 
-namespace Micser.App.Infrastructure.DataAccess.Repositories
+namespace Micser.Common.DataAccess.Repositories
 {
     /// <inheritdoc cref="ISettingValueRepository" />
     public class SettingValueRepository : Repository<SettingValue>, ISettingValueRepository

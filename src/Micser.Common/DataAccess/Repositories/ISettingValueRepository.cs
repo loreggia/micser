@@ -1,7 +1,6 @@
-﻿using Micser.App.Infrastructure.DataAccess.Models;
-using Micser.Common.DataAccess;
+﻿using Micser.Common.DataAccess.Models;
 
-namespace Micser.App.Infrastructure.DataAccess.Repositories
+namespace Micser.Common.DataAccess.Repositories
 {
     /// <summary>
     /// Provides database access to the settings store.

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Micser.App.Infrastructure.Settings
+namespace Micser.Common.Settings
 {
     /// <summary>
     /// Specifies the type/location where the setting is stored.

@@ -2,13 +2,13 @@
 using Micser.App.Infrastructure.Api;
 using Micser.App.Infrastructure.Extensions;
 using Micser.App.Infrastructure.Menu;
-using Micser.App.Infrastructure.Settings;
 using Micser.App.Infrastructure.ToolBars;
 using Micser.App.Properties;
 using Micser.App.Settings;
 using Micser.App.ViewModels;
 using Micser.App.Views;
 using Micser.Common;
+using Micser.Common.Settings;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Ioc;

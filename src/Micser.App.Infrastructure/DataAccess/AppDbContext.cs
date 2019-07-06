@@ -1,5 +1,5 @@
-﻿using Micser.App.Infrastructure.DataAccess.Models;
-using Micser.Common;
+﻿using Micser.Common;
+using Micser.Common.DataAccess.Models;
 using System;
 using System.Data.Entity;
 using System.Data.Entity.Migrations;

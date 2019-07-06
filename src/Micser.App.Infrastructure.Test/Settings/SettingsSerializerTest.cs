@@ -1,4 +1,4 @@
-﻿using Micser.App.Infrastructure.Settings;
+﻿using Micser.Common.Settings;
 using Micser.Common.Test;
 using Moq;
 using Newtonsoft.Json.Linq;

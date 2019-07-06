@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Micser.App.Infrastructure.Settings
+namespace Micser.Common.Settings
 {
     /// <summary>
     /// A factory for creating <see cref="ISettingHandler"/> instances.

@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Micser.App.Infrastructure.Settings
+namespace Micser.Common.Settings
 {
     /// <summary>
     /// Exports/imports all application settings to or from a JSON file.

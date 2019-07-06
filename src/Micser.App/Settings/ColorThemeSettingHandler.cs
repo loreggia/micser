@@ -1,5 +1,5 @@
 ﻿using Micser.App.Infrastructure;
-using Micser.App.Infrastructure.Settings;
+using Micser.Common.Settings;
 using NLog;
 using System;
 using System.Collections.Generic;

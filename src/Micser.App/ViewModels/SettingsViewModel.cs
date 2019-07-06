@@ -2,6 +2,7 @@
 using Micser.App.Infrastructure.Interaction;
 using Micser.App.Infrastructure.Settings;
 using Micser.App.Properties;
+using Micser.Common.Settings;
 using Prism.Commands;
 using Prism.Interactivity.InteractionRequest;
 using System.Collections.Generic;
