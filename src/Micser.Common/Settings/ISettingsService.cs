@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Micser.App.Infrastructure.Settings
+namespace Micser.Common.Settings
 {
     /// <summary>
     /// Provides access to the currently stored setting values.
@@ -16,7 +16,7 @@ namespace Micser.App.Infrastructure.Settings
         /// <summary>
         /// Gets the value for the specified setting.
         /// </summary>
-        object GetSetting(string key);
+        T GetSetting<T>(string key);
 
         /// <summary>
         /// Gets a dictionary of all setting keys/values.

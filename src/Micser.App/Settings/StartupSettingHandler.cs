@@ -1,7 +1,7 @@
 ﻿using IWshRuntimeLibrary;
 using Micser.App.Infrastructure;
-using Micser.App.Infrastructure.Settings;
 using Micser.App.Properties;
+using Micser.Common.Settings;
 using NLog;
 using System;
 using System.IO;

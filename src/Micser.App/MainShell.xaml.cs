@@ -1,6 +1,5 @@
 ﻿using Micser.App.Infrastructure;
-using Micser.App.Infrastructure.Extensions;
-using Micser.App.Infrastructure.Settings;
+using Micser.Common.Settings;
 using Prism.Regions;
 using System;
 using System.ComponentModel;

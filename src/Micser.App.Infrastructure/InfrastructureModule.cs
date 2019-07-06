@@ -1,12 +1,12 @@
 ﻿using Micser.App.Infrastructure.Api;
-using Micser.App.Infrastructure.DataAccess.Repositories;
 using Micser.App.Infrastructure.Menu;
-using Micser.App.Infrastructure.Settings;
 using Micser.App.Infrastructure.Themes;
 using Micser.App.Infrastructure.ToolBars;
 using Micser.App.Infrastructure.Widgets;
 using Micser.Common;
 using Micser.Common.Api;
+using Micser.Common.DataAccess.Repositories;
+using Micser.Common.Settings;
 using Prism.Ioc;
 using Prism.Unity;
 using Unity;

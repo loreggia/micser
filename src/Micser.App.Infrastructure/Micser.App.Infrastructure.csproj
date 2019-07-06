@@ -87,15 +87,11 @@
     <Compile Include="Converter\RelativeCenterPlacementConverter.cs" />
     <Compile Include="CustomApplicationCommands.cs" />
     <Compile Include="DataAccess\AppDbContext.cs" />
-    <Compile Include="DataAccess\Models\SettingValue.cs" />
-    <Compile Include="DataAccess\Repositories\ISettingValueRepository.cs" />
-    <Compile Include="DataAccess\Repositories\SettingValueRepository.cs" />
     <Compile Include="Extensions\ColorExtensions.cs" />
     <Compile Include="Extensions\DependencyObjectExtensions.cs" />
     <Compile Include="Extensions\ItemsControlExtensions.cs" />
     <Compile Include="Extensions\NameOfExtension.cs" />
     <Compile Include="Extensions\PrismContainerExtensions.cs" />
-    <Compile Include="Extensions\ServiceExtensions.cs" />
     <Compile Include="Interaction\FileDialogAction.cs" />
     <Compile Include="IApplicationStateService.cs" />
     <Compile Include="INavigationManager.cs" />
@@ -112,19 +108,10 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Interaction\SaveFileDialogAction.cs" />
-    <Compile Include="Settings\ISettingHandler.cs" />
-    <Compile Include="Settings\ISettingHandlerFactory.cs" />
-    <Compile Include="Settings\ISettingsRegistry.cs" />
-    <Compile Include="Settings\ISettingsService.cs" />
     <Compile Include="ResourceBinding.cs" />
     <Compile Include="SetPropertyAction.cs" />
-    <Compile Include="Settings\SettingChangedEventHandler.cs" />
     <Compile Include="Settings\SettingContainer.cs" />
-    <Compile Include="Settings\SettingDefinition.cs" />
-    <Compile Include="Settings\SettingHandlerFactory.cs" />
-    <Compile Include="Settings\SettingsSerializer.cs" />
     <Compile Include="Settings\SettingsPanel.cs" />
-    <Compile Include="Settings\SettingsRegistry.cs" />
     <Compile Include="Settings\SettingViewModel.cs" />
     <Compile Include="Themes\BrushThemeKeyExtension.cs" />
     <Compile Include="Themes\ColorThemeKeyExtension.cs" />
@@ -137,7 +124,6 @@
     <Compile Include="NavigationManager.cs" />
     <Compile Include="PathFinder.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Settings\SettingsService.cs" />
     <Compile Include="Themes\IResourceRegistry.cs" />
     <Compile Include="Themes\ResourceRegistry.cs" />
     <Compile Include="Themes\ThemeKeyExtension.cs" />

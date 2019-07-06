@@ -1,6 +1,6 @@
 ﻿using Micser.App.Infrastructure.DataAccess;
-using Micser.App.Infrastructure.DataAccess.Repositories;
 using Micser.Common.DataAccess;
+using Micser.Common.DataAccess.Repositories;
 using System.Data.Entity;
 using Unity;
 using Unity.Resolution;

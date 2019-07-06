@@ -1,6 +1,4 @@
-﻿using Micser.Common;
-
-namespace Micser.App.Infrastructure.Settings
+﻿namespace Micser.Common.Settings
 {
     /// <summary>
     /// Registry containing settings definitions.

@@ -1,7 +1,6 @@
-﻿using Micser.Common.DataAccess;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace Micser.App.Infrastructure.DataAccess.Models
+namespace Micser.Common.DataAccess.Models
 {
     /// <summary>
     /// Contains a JSON-serialized setting value.

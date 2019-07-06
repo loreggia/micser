@@ -1,8 +1,8 @@
 ﻿using Microsoft.Win32;
 using Micser.App.Infrastructure.Api;
-using Micser.App.Infrastructure.Settings;
 using Micser.Common;
 using Micser.Common.Extensions;
+using Micser.Common.Settings;
 using NLog;
 using System;
 using System.Diagnostics;

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Micser.App.Infrastructure.Settings
+namespace Micser.Common.Settings
 {
     /// <summary>
     /// Delegate for a setting changed event.

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Micser.App.Infrastructure.Settings
+namespace Micser.Common.Settings
 {
     /// <inheritdoc cref="ISettingHandlerFactory" />
     public class SettingHandlerFactory : ISettingHandlerFactory
