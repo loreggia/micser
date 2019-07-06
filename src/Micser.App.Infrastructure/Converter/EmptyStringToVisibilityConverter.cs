@@ -10,13 +10,21 @@ namespace Micser.App.Infrastructure.Converter
     /// </summary>
     public class EmptyStringToVisibilityConverter : ConverterExtension
     {
+        /// <inheritdoc />
         public EmptyStringToVisibilityConverter()
         {
             EmptyValue = Visibility.Collapsed;
             NonEmptyValue = Visibility.Visible;
         }
 
+        /// <summary>
+        /// Gets or sets the visibility that is returned when the value is null or empty.
+        /// </summary>
         public Visibility EmptyValue { get; set; }
+
+        /// <summary>
+        /// Gets or sets the visibility that is returned when the value is not null or empty.
+        /// </summary>
         public Visibility NonEmptyValue { get; set; }
 
         /// <inheritdoc />
