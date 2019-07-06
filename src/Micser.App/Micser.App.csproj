@@ -45,6 +45,7 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Data" />
     <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Runtime.Remoting" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.Transactions" />
@@ -62,10 +63,10 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <ApplicationDefinition Include="MicserApplication.xaml">
+    <Page Include="MicserApplication.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </ApplicationDefinition>
+    </Page>
     <Compile Include="..\Micser.Common\Properties\GlobalAssemblyInfo.cs">
       <Link>Properties\GlobalAssemblyInfo.cs</Link>
     </Compile>
@@ -77,6 +78,7 @@
     <Compile Include="Settings\ShellState.cs" />
     <Compile Include="Settings\StartupSettingHandler.cs" />
     <Compile Include="Settings\VacCountSettingHandler.cs" />
+    <Compile Include="SingleInstance.cs" />
     <Compile Include="ViewModels\AboutViewModel.cs" />
     <Compile Include="ViewModels\LibraryInfo.cs" />
     <Compile Include="ViewModels\SettingsViewModel.cs" />
