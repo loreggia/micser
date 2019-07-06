@@ -1,7 +1,9 @@
 ﻿using Micser.Common;
 using Micser.Common.Api;
 using Micser.Common.DataAccess;
+using Micser.Common.DataAccess.Repositories;
 using Micser.Common.Extensions;
+using Micser.Common.Settings;
 using Micser.Engine.Api;
 using Micser.Engine.Audio;
 using Micser.Engine.Infrastructure;
@@ -61,6 +63,7 @@ namespace Micser.Engine
 
             container.RegisterType<IModuleRepository, ModuleRepository>();
             container.RegisterType<IModuleConnectionRepository, ModuleConnectionRepository>();
+            container.RegisterType<ISettingValueRepository, SettingValueRepository>();
 
             container.RegisterType<IModuleService, ModuleService>();
             container.RegisterType<IModuleConnectionService, ModuleConnectionService>();
@@ -69,6 +72,10 @@ namespace Micser.Engine
             container.RegisterRequestProcessor<StatusProcessor>();
             container.RegisterRequestProcessor<ModulesProcessor>();
             container.RegisterRequestProcessor<ModuleConnectionsProcessor>();
+
+            container.RegisterSingleton<ISettingsRegistry, SettingsRegistry>();
+            container.RegisterSingleton<ISettingsService, SettingsService>();
+            container.RegisterInstance<ISettingHandlerFactory>(new SettingHandlerFactory(t => (ISettingHandler)container.Resolve(t)));
 
             container.RegisterSingleton<IAudioEngine, AudioEngine>();
             container.RegisterSingleton<IApiServer, ApiServer>();
@@ -88,6 +95,9 @@ namespace Micser.Engine
             container.RegisterInstance<IApiEndPoint>(_server);
 
             LoadPlugins(container);
+
+            var settingsService = container.Resolve<ISettingsService>();
+            settingsService.LoadAsync().ConfigureAwait(false).GetAwaiter().GetResult();
 
             _server.Start();
             _engine.Start();
