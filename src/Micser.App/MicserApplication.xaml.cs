@@ -1,4 +1,5 @@
 ﻿using CommonServiceLocator;
+using Microsoft.Shell;
 using Micser.App.Infrastructure;
 using Micser.App.Infrastructure.DataAccess;
 using Micser.App.Infrastructure.Extensions;
@@ -16,6 +17,7 @@ using Prism.Ioc;
 using Prism.Modularity;
 using Prism.Unity;
 using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.IO;
 using System.Linq;
@@ -30,11 +32,10 @@ using Unity.Resolution;
 
 namespace Micser.App
 {
-    /// <summary>
-    /// Interaction logic for App.xaml
-    /// </summary>
-    public partial class MicserApplication
+    public partial class MicserApplication : ISingleInstanceApp
     {
+        private const string Unique = "{50CD2933-87A9-4411-9577-56401F034A60}";
+
         private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
         private readonly Timer _reconnectTimer;
         private IApiEndPoint _apiEndPoint;
@@ -52,6 +53,38 @@ namespace Micser.App
         public static T GetService<T>()
         {
             return ServiceLocator.Current.GetInstance<T>();
+        }
+
+        [STAThread]
+        public static void Main()
+        {
+            if (SingleInstance<MicserApplication>.InitializeAsFirstInstance(Unique))
+            {
+                var application = new MicserApplication();
+                application.InitializeComponent();
+                application.Run();
+
+                // Allow single instance code to perform cleanup operations
+                SingleInstance<MicserApplication>.Cleanup();
+            }
+        }
+
+        public bool SignalExternalCommandLineArgs(IList<string> args)
+        {
+            if (MainWindow != null)
+            {
+                MainWindow.Show();
+
+                // Bring window to foreground
+                if (MainWindow.WindowState == WindowState.Minimized)
+                {
+                    MainWindow.WindowState = WindowState.Normal;
+                }
+
+                MainWindow.Activate();
+            }
+
+            return true;
         }
 
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)
