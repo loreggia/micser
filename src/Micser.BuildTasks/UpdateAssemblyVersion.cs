@@ -9,12 +9,11 @@ namespace Micser.BuildTasks
 {
     public class UpdateAssemblyVersion : Task
     {
-        private const string VersionGroupName = "version";
         private readonly Regex _rxAssemblyVersion;
 
         public UpdateAssemblyVersion()
         {
-            _rxAssemblyVersion = new Regex($@"Assembly(File)?Version\s*\(\s*""(?<{VersionGroupName}>[^""]+)""\s*\)", RegexOptions.Compiled);
+            _rxAssemblyVersion = new Regex(@"Assembly(File)?Version\s*\(\s*""(?<version>[^""]+)""\s*\)", RegexOptions.Compiled);
         }
 
         [Required]
@@ -57,8 +56,10 @@ namespace Micser.BuildTasks
 
             try
             {
+                var version = ProcessVersion(versionContent);
+
                 var inputContent = File.ReadAllText(InputFileName);
-                var output = _rxAssemblyVersion.ReplaceGroup(inputContent, VersionGroupName, versionContent);
+                var output = _rxAssemblyVersion.ReplaceGroup(inputContent, "version", version);
                 File.WriteAllText(OutputFileName, output);
 
                 return true;
@@ -68,6 +69,33 @@ namespace Micser.BuildTasks
                 Log.LogErrorFromException(ex);
                 return false;
             }
+        }
+
+        private static string ProcessVersion(string versionContent)
+        {
+            var result = new ushort[4];
+
+            var parts = versionContent.Split('.');
+
+            for (int i = 0; i < parts.Length; i++)
+            {
+                var part = parts[i];
+
+                if (!int.TryParse(part, out var iValue) &&
+                    !int.TryParse(DateTime.Now.ToString(part), out iValue))
+                {
+                    iValue = 0;
+                }
+
+                if (iValue > ushort.MaxValue)
+                {
+                    throw new InvalidOperationException($"The value {iValue} is too big to use as a version number (max = {ushort.MaxValue}).");
+                }
+
+                result[i] = (ushort)iValue;
+            }
+
+            return string.Join(".", result);
         }
     }
 }

@@ -264,3 +264,4 @@ __pycache__/
 # Micser specific
 /crt/
 /src/Micser.Setup/wix/Micser.Setup.g.wxs
+/src/Micser.Common/Properties/GlobalAssemblyInfo.cs
