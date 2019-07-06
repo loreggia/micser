@@ -6,17 +6,29 @@ using System.Threading.Tasks;
 
 namespace Micser.Engine.Infrastructure.Updates
 {
+    /// <summary>
+    /// Base implementation of <see cref="IUpdateService"/> that provides functionality for executing an installer.
+    /// </summary>
     public abstract class UpdateService : IUpdateService
     {
+        /// <summary>
+        /// The logger.
+        /// </summary>
         protected readonly ILogger Logger;
 
+        /// <inheritdoc />
         protected UpdateService(ILogger logger)
         {
             Logger = logger;
         }
 
+        /// <inheritdoc />
         public abstract Task<string> DownloadInstallerAsync(UpdateManifest manifest);
 
+        /// <summary>
+        /// Executes a MSI installer.
+        /// </summary>
+        /// <param name="path">The path of the MSI installer.</param>
         public virtual bool ExecuteInstaller(string path)
         {
             if (path == null)
@@ -51,6 +63,7 @@ namespace Micser.Engine.Infrastructure.Updates
             }
         }
 
+        /// <inheritdoc />
         public abstract Task<UpdateManifest> GetUpdateManifestAsync();
     }
 }

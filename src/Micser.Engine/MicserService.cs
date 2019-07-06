@@ -8,6 +8,7 @@ using Micser.Engine.Infrastructure;
 using Micser.Engine.Infrastructure.DataAccess;
 using Micser.Engine.Infrastructure.DataAccess.Repositories;
 using Micser.Engine.Infrastructure.Services;
+using Micser.Engine.Infrastructure.Updates;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -74,6 +75,12 @@ namespace Micser.Engine
             container.RegisterInstance<IApiConfiguration>(new ApiConfiguration { Port = Globals.ApiPort });
 
             container.RegisterSingleton<IRequestProcessorFactory, RequestProcessorFactory>();
+
+            container.RegisterInstance(new HttpUpdateSettings
+            {
+                ManifestUrl = "https://micser.lloreggia.ch/update/manifest.json"
+            });
+            container.RegisterSingleton<IUpdateService, HttpUpdateService>();
 
             _engine = container.Resolve<IAudioEngine>();
             _server = container.Resolve<IApiServer>();
