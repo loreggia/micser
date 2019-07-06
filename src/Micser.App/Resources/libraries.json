@@ -75,6 +75,11 @@
     "LicenseUrl": "https://raw.githubusercontent.com/microsoft/Windows-driver-samples/master/LICENSE"
   },
   {
+    "Name": "WPF Diagram Designer",
+    "Url": "https://www.codeproject.com/Articles/22952/WPF-Diagram-Designer-Part-1",
+    "LicenseUrl": "https://www.codeproject.com/info/cpol10.aspx"
+  },
+  {
     "Name": "xUnit.net",
     "Url": "https://github.com/xunit/xunit",
     "LicenseUrl": "https://raw.githubusercontent.com/xunit/xunit/master/license.txt"
