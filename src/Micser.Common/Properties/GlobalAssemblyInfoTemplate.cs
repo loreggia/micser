@@ -1,4 +1,4 @@
-using System.Reflection;
+﻿using System.Reflection;
 
 [assembly: AssemblyProduct("Micser")]
 [assembly: AssemblyCompany("Lucas Loreggia")]

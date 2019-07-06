@@ -97,6 +97,7 @@
     <Compile Include="Modules\SaveStateAttribute.cs" />
     <Compile Include="OrderedParameterOverride.cs" />
     <Compile Include="Properties\GlobalAssemblyInfo.cs" />
+    <None Include="Properties\GlobalAssemblyInfoTemplate.cs" />
     <Compile Include="SemaphoreQueue.cs" />
     <Compile Include="StateDictionary.cs" />
     <Compile Include="Modules\ModuleDto.cs" />

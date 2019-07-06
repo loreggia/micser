@@ -3,10 +3,11 @@
   <PropertyGroup>
     <RunBuildTasks Condition="'$(RunBuildTasks)' == ''">false</RunBuildTasks>
     <VersionFile Condition="'$(VersionFile)' == ''">Properties/Version.txt</VersionFile>
-    <InputFile Condition="'$(InputFile)' == ''">Properties/GlobalAssemblyInfo.cs</InputFile>
-    <OutputFile Condition="'$(OutputFile)' == ''">$(InputFile)</OutputFile>
+    <InputFile Condition="'$(InputFile)' == ''">Properties/GlobalAssemblyInfoTemplate.cs</InputFile>
+    <OutputFile Condition="'$(OutputFile)' == ''">Properties/GlobalAssemblyInfo.cs</OutputFile>
   </PropertyGroup>
 
+  <!-- https://stackoverflow.com/a/3405932/1511066 -->
   <Target Name="ExecRunBuildTasks" BeforeTargets="BeforeBuild">
     <Exec Command="&quot;$(MSBuildBinPath)\MSBuild.exe&quot; /t:RunBuildTasks /p:RunBuildTasks=true /p:Configuration=$(Configuration) &quot;$(ProjectDir)$(ProjectFileName)&quot;" />
   </Target>
