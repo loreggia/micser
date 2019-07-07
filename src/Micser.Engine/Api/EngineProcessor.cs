@@ -13,10 +13,10 @@ namespace Micser.Engine.Api
         {
             _audioEngine = audioEngine;
 
-            this["start"] = _ => Start();
-            this["stop"] = _ => Stop();
-            this["restart"] = _ => Restart();
-            this["getstatus"] = _ => GetStatus();
+            AddAction("start", _ => Start());
+            AddAction("stop", _ => Stop());
+            AddAction("restart", _ => Restart());
+            AddAction("getstatus", _ => GetStatus());
         }
 
         private bool GetStatus()

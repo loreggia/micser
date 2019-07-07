@@ -1,4 +1,5 @@
-﻿using Micser.Common.Settings;
+﻿using Micser.Common.Extensions;
+using Micser.Common.Settings;
 using Prism.Commands;
 using System.Collections.Generic;
 using System.Windows.Input;

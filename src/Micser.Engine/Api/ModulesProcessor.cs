@@ -24,11 +24,11 @@ namespace Micser.Engine.Api
             _connectionService = connectionService;
             _logger = logger;
 
-            this["getall"] = _ => GetAll();
-            this["insert"] = dto => InsertModule(dto);
-            this["update"] = dto => UpdateModule(dto);
-            this["delete"] = id => DeleteModule(id);
-            this["import"] = dto => ImportConfiguration(dto);
+            AddAction("getall", _ => GetAll());
+            AddAction("insert", dto => InsertModule(dto));
+            AddAction("update", dto => UpdateModule(dto));
+            AddAction("delete", id => DeleteModule(id));
+            AddAction("import", dto => ImportConfiguration(dto));
         }
 
         private dynamic DeleteModule(long id)

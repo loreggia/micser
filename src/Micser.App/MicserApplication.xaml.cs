@@ -7,6 +7,7 @@ using Micser.App.Settings;
 using Micser.Common;
 using Micser.Common.Api;
 using Micser.Common.DataAccess;
+using Micser.Common.Extensions;
 using Micser.Common.Settings;
 using NLog;
 using NLog.Config;

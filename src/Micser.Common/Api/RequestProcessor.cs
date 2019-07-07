@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Micser.Common.Api
 {
@@ -8,44 +9,42 @@ namespace Micser.Common.Api
     /// </summary>
     public abstract class RequestProcessor : IRequestProcessor
     {
-        private readonly IDictionary<string, Func<dynamic, object>> _actions;
+        private readonly IDictionary<string, Func<dynamic, Task<object>>> _actions;
 
         /// <inheritdoc />
         protected RequestProcessor()
         {
-            _actions = new Dictionary<string, Func<dynamic, object>>();
+            _actions = new Dictionary<string, Func<dynamic, Task<object>>>();
         }
 
         /// <summary>
         /// Gets or sets a handler function that is executed when a request with the specified action name is received.
         /// </summary>
-        /// <param name="action">The name of the action (case insensitive).</param>
+        /// <param name="name">The name of the action (case insensitive).</param>
+        /// <param name="action">An action function.</param>
         /// <exception cref="ArgumentNullException"><paramref name="action"/> cannot be null.</exception>
-        public Func<dynamic, object> this[string action]
+        public void AddAction(string name, Func<dynamic, object> action)
         {
-            get
+            if (action == null)
             {
-                if (action == null)
-                {
-                    throw new ArgumentNullException(nameof(action));
-                }
-
-                if (_actions.TryGetValue(action.ToLower(), out var function))
-                {
-                    return function;
-                }
-
-                return null;
+                throw new ArgumentNullException(nameof(action));
             }
-            set
-            {
-                if (action == null)
-                {
-                    throw new ArgumentNullException(nameof(action));
-                }
 
-                _actions[action.ToLower()] = value;
-            }
+            name = name ?? "";
+
+            _actions[name.ToLower()] = async x => await Task.FromResult(action(x));
+        }
+
+        /// <summary>
+        /// Gets or sets a handler function that is executed when a request with the specified action name is received.
+        /// </summary>
+        /// <param name="name">The name of the action (case insensitive).</param>
+        /// <param name="action">An async action function.</param>
+        /// <exception cref="ArgumentNullException"><paramref name="action"/> cannot be null.</exception>
+        public void AddAction(string name, Func<dynamic, Task<object>> action)
+        {
+            name = name ?? "";
+            _actions[name.ToLower()] = action ?? throw new ArgumentNullException(nameof(action));
         }
 
         /// <summary>
@@ -54,14 +53,14 @@ namespace Micser.Common.Api
         /// <param name="action">The name of the action function to execute.</param>
         /// <param name="param">The deserialized message content.</param>
         /// <returns>A <see cref="JsonResponse"/>; if no action with the specified action name is found, an empty response with <see cref="JsonResponse.IsSuccess"/>=false is returned.</returns>
-        public virtual JsonResponse Process(string action, object param)
+        public virtual async Task<JsonResponse> ProcessAsync(string action, object param)
         {
             if (_actions.TryGetValue(action ?? "", out var actionFunction) ||
                 _actions.TryGetValue("", out actionFunction))
             {
                 try
                 {
-                    var result = actionFunction(param);
+                    var result = await actionFunction.Invoke(param).ConfigureAwait(false);
 
                     if (result is bool b)
                     {

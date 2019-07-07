@@ -1,5 +1,6 @@
 ﻿using Micser.Common.Api;
 using Prism.Events;
+using System.Threading.Tasks;
 
 namespace Micser.App.Infrastructure.Api
 {
@@ -19,7 +20,7 @@ namespace Micser.App.Infrastructure.Api
         /// <summary>
         /// Publishes an <see cref="ApiEvent"/> via <see cref="IEventAggregator"/> for incoming requests.
         /// </summary>
-        public JsonResponse Process(string action, object content)
+        public async Task<JsonResponse> ProcessAsync(string action, object content)
         {
             var apiEvent = _eventAggregator.GetEvent<ApiEvent>();
             var data = new ApiEvent.ApiData(action, content);

@@ -16,7 +16,7 @@ namespace Micser.Common.Settings
         /// <summary>
         /// Gets the value for the specified setting.
         /// </summary>
-        T GetSetting<T>(string key);
+        object GetSetting(string key);
 
         /// <summary>
         /// Gets a dictionary of all setting keys/values.

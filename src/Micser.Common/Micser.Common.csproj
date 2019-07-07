@@ -86,6 +86,7 @@
     <Compile Include="Extensions\ObservableCollectionExtensions.cs" />
     <Compile Include="Extensions\PropertyExtensions.cs" />
     <Compile Include="Extensions\RegexExtensions.cs" />
+    <Compile Include="Extensions\ServiceExtensions.cs" />
     <Compile Include="Extensions\SocketExtensions.cs" />
     <Compile Include="Extensions\ObjectExtensions.cs" />
     <Compile Include="Extensions\UnityContainerExtensions.cs" />
@@ -112,6 +113,7 @@
     <Compile Include="Settings\SettingsRegistry.cs" />
     <Compile Include="Settings\SettingsSerializer.cs" />
     <Compile Include="Settings\SettingsService.cs" />
+    <Compile Include="Settings\SettingValueDto.cs" />
     <Compile Include="StateDictionary.cs" />
     <Compile Include="Modules\ModuleDto.cs" />
     <Compile Include="Modules\ModuleConnectionDto.cs" />

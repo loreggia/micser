@@ -18,10 +18,10 @@ namespace Micser.Engine.Api
             _audioEngine = audioEngine;
             _moduleConnectionService = moduleConnectionService;
 
-            this["getall"] = _ => GetAll();
-            this["delete"] = id => DeleteConnection(id);
-            this["insert"] = dto => InsertConnection(dto);
-            this["update"] = dto => UpdateConnection(dto);
+            AddAction("getall", _ => GetAll());
+            AddAction("delete", id => DeleteConnection(id));
+            AddAction("insert", dto => InsertConnection(dto));
+            AddAction("update", dto => UpdateConnection(dto));
         }
 
         private object DeleteConnection(long id)

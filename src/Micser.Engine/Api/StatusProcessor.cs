@@ -8,7 +8,7 @@ namespace Micser.Engine.Api
     {
         public StatusProcessor()
         {
-            this[""] = _ => true;
+            AddAction(null, _ => true);
         }
     }
 }

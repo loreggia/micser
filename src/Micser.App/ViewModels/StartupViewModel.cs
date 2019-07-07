@@ -2,6 +2,7 @@
 using Micser.App.Settings;
 using Micser.App.Views;
 using Micser.Common.Api;
+using Micser.Common.Extensions;
 using Micser.Common.Settings;
 using Prism.Events;
 using System.Threading.Tasks;

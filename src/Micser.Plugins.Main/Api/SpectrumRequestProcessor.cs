@@ -10,11 +10,11 @@ namespace Micser.Plugins.Main.Api
 
         public SpectrumRequestProcessor(IEventAggregator eventAggregator)
         {
-            this[""] = data => Process(data);
+            AddAction(null, data => Process(data));
             _eventAggregator = eventAggregator;
         }
 
-        public object Process(SpectrumData data)
+        private object Process(SpectrumData data)
         {
             if (data == null)
             {

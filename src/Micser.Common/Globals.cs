@@ -55,6 +55,7 @@ namespace Micser.Common
             public const string Engine = "Engine";
             public const string ModuleConnections = "moduleconnections";
             public const string Modules = "modules";
+            public const string Settings = "settings";
             public const string Status = "status";
         }
 
