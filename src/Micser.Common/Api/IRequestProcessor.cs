@@ -1,4 +1,6 @@
-﻿namespace Micser.Common.Api
+﻿using System.Threading.Tasks;
+
+namespace Micser.Common.Api
 {
     /// <summary>
     /// Classes implementing this interface can receive incoming API requests for processing.
@@ -11,6 +13,6 @@
         /// <param name="action">The action name that was sent in <see cref="JsonRequest.Action"/>.</param>
         /// <param name="content">The deserialized message content.</param>
         /// <returns>A <see cref="JsonResponse"/> that will be sent back.</returns>
-        JsonResponse Process(string action, object content);
+        Task<JsonResponse> ProcessAsync(string action, object content);
     }
 }

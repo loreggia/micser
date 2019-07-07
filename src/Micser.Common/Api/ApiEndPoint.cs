@@ -198,7 +198,7 @@ namespace Micser.Common.Api
                         Disconnect();
                         return;
                     }
-                    var response = ProcessMessage(message);
+                    var response = await ProcessMessage(message);
                     await ApiProtocol.WriteMessage(InStream, response).ConfigureAwait(false);
                 }
                 catch (Exception ex)
@@ -209,7 +209,7 @@ namespace Micser.Common.Api
             }
         }
 
-        private string ProcessMessage(string content)
+        private async Task<string> ProcessMessage(string content)
         {
             try
             {
@@ -219,7 +219,7 @@ namespace Micser.Common.Api
                     return null;
                 }
                 var processor = _requestProcessorFactory.Create(message.Resource);
-                var response = processor.Process(message.Action, message.Content);
+                var response = await processor.ProcessAsync(message.Action, message.Content);
                 return JsonConvert.SerializeObject(response);
             }
             catch (Exception ex)

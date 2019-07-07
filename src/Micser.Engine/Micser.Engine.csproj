@@ -54,6 +54,7 @@
     <Compile Include="Api\EngineProcessor.cs" />
     <Compile Include="Api\ModuleConnectionsProcessor.cs" />
     <Compile Include="Api\ModulesProcessor.cs" />
+    <Compile Include="Api\SettingsProcessor.cs" />
     <Compile Include="Api\StatusProcessor.cs" />
     <Compile Include="Audio\AudioEngine.cs" />
     <Compile Include="Audio\IAudioEngine.cs" />

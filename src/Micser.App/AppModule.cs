@@ -8,6 +8,7 @@ using Micser.App.Settings;
 using Micser.App.ViewModels;
 using Micser.App.Views;
 using Micser.Common;
+using Micser.Common.Extensions;
 using Micser.Common.Settings;
 using Prism.Commands;
 using Prism.Events;

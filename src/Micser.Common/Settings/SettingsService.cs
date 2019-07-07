@@ -1,7 +1,6 @@
 ﻿using Micser.Common.DataAccess;
 using Micser.Common.DataAccess.Models;
 using Micser.Common.DataAccess.Repositories;
-using Micser.Common.Extensions;
 using Newtonsoft.Json;
 using NLog;
 using System;
@@ -48,15 +47,15 @@ namespace Micser.Common.Settings
         }
 
         /// <inheritdoc />
-        public T GetSetting<T>(string key)
+        public object GetSetting(string key)
         {
             if (!_settings.TryGetValue(key, out var value))
             {
                 _logger.Warn($"Requested unregistered setting '{key}'.");
-                return default;
+                return null;
             }
 
-            return value.ToType<T>();
+            return value;
         }
 
         /// <inheritdoc />
