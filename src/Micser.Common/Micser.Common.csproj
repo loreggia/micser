@@ -68,6 +68,8 @@
     <Compile Include="Api\RequestProcessor.cs" />
     <Compile Include="Api\RequestProcessorFactory.cs" />
     <Compile Include="Api\RequestProcessorNameAttribute.cs" />
+    <Compile Include="Api\ServiceResult.cs" />
+    <Compile Include="Api\SettingsApiClient.cs" />
     <Compile Include="ArgumentDictionary.cs" />
     <Compile Include="Audio\AudioHelper.cs" />
     <Compile Include="DataAccess\IRepositoryFactory.cs" />

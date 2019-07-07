@@ -81,9 +81,6 @@
     <PackageReference Include="CSCore">
       <Version>1.2.1.2</Version>
     </PackageReference>
-    <PackageReference Include="Microsoft.Azure.Storage.File">
-      <Version>10.0.3</Version>
-    </PackageReference>
     <PackageReference Include="Unity">
       <Version>5.8.13</Version>
     </PackageReference>

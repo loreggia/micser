@@ -15,6 +15,11 @@ namespace Micser.Common.Extensions
         /// <returns>An instance of type <typeparamref name="T"/> if the conversion was successful or <c>default(T)</c>.</returns>
         public static T ToType<T>(this object value)
         {
+            if (value == null)
+            {
+                return default;
+            }
+
             var valueType = value.GetType();
             var resultType = typeof(T);
 

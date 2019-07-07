@@ -13,8 +13,8 @@ namespace Micser.Engine.Api
         public SettingsProcessor(ISettingsService settingsService)
         {
             _settingsService = settingsService;
-            AddAction("getvalue", key => GetValue(key));
-            AddAction("setvalue", async dto => await SetValueAsync(dto));
+            AddAction("getsetting", key => GetValue(key));
+            AddAction("setsetting", async dto => await SetValueAsync(dto));
         }
 
         private object GetValue(string key)

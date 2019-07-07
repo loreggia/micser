@@ -1,4 +1,5 @@
-﻿using Micser.Common.DataAccess;
+﻿using Micser.Common.Api;
+using Micser.Common.DataAccess;
 using Micser.Common.DataAccess.Models;
 using Micser.Common.DataAccess.Repositories;
 using Newtonsoft.Json;
@@ -16,6 +17,7 @@ namespace Micser.Common.Settings
     /// <inheritdoc cref="ISettingsService"/>
     public class SettingsService : ISettingsService, IDisposable
     {
+        private readonly SettingsApiClient _apiClient;
         private readonly IUnitOfWorkFactory _database;
         private readonly SemaphoreSlim _loadSemaphore;
         private readonly ILogger _logger;
@@ -25,7 +27,12 @@ namespace Micser.Common.Settings
         private bool _isLoaded;
 
         /// <inheritdoc />
-        public SettingsService(IUnitOfWorkFactory database, ISettingHandlerFactory settingHandlerFactory, ISettingsRegistry registry, ILogger logger)
+        public SettingsService(
+            IUnitOfWorkFactory database,
+            ISettingHandlerFactory settingHandlerFactory,
+            ISettingsRegistry registry,
+            SettingsApiClient apiClient,
+            ILogger logger)
         {
             _settings = new ConcurrentDictionary<string, object>();
             _loadSemaphore = new SemaphoreSlim(1, 1);
@@ -33,6 +40,7 @@ namespace Micser.Common.Settings
             _database = database;
             _settingHandlerFactory = settingHandlerFactory;
             _registry = registry;
+            _apiClient = apiClient;
             _logger = logger;
         }
 
@@ -106,6 +114,19 @@ namespace Micser.Common.Settings
                             else
                             {
                                 value = setting.DefaultValue;
+                            }
+                        }
+                        else if (setting.StorageType == SettingStorageType.Api)
+                        {
+                            var settingValueResult = await _apiClient.GetSetting(setting.Key);
+
+                            if (settingValueResult.IsSuccess)
+                            {
+                                value = settingValueResult.Data != null ? settingValueResult.Data.Value : setting.DefaultValue;
+                            }
+                            else
+                            {
+                                _logger.Warn($"Failed to get a setting from the setting API. Key: {setting.Key}, Result: {settingValueResult.Message}");
                             }
                         }
 
@@ -188,6 +209,22 @@ namespace Micser.Common.Settings
                     }
 
                     uow.Complete();
+                }
+            }
+            else if (setting.StorageType == SettingStorageType.Api)
+            {
+                var setSettingResult = await _apiClient.SetSetting(setting.Key, value);
+
+                if (setSettingResult.IsSuccess)
+                {
+                    if (setSettingResult.Data != null)
+                    {
+                        value = setSettingResult.Data.Value;
+                    }
+                }
+                else
+                {
+                    _logger.Warn($"Could not save API setting. Key: {setting.Key}, Value: {value}, Result: {setSettingResult.Message}");
                 }
             }
 

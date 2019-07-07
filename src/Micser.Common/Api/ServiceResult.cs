@@ -1,6 +1,4 @@
-﻿using Micser.Common.Api;
-
-namespace Micser.App.Infrastructure.Api
+﻿namespace Micser.Common.Api
 {
     /// <summary>
     /// Contains the result of an API service call.
