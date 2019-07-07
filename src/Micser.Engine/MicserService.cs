@@ -1,28 +1,18 @@
 ﻿using Micser.Common;
 using Micser.Common.Api;
-using Micser.Common.DataAccess;
-using Micser.Common.DataAccess.Repositories;
 using Micser.Common.Extensions;
 using Micser.Common.Settings;
-using Micser.Engine.Api;
 using Micser.Engine.Audio;
 using Micser.Engine.Infrastructure;
-using Micser.Engine.Infrastructure.DataAccess;
-using Micser.Engine.Infrastructure.DataAccess.Repositories;
-using Micser.Engine.Infrastructure.Services;
-using Micser.Engine.Infrastructure.Updates;
 using NLog;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.ServiceProcess;
 using System.Timers;
 using Unity;
-using Unity.Injection;
-using Unity.Resolution;
 
 namespace Micser.Engine
 {
@@ -54,53 +44,16 @@ namespace Micser.Engine
 
             var container = new UnityContainer();
 
-            container.RegisterType<ILogger>(new InjectionFactory(c => LogManager.GetCurrentClassLogger()));
-
-            container.RegisterType<DbContext, EngineDbContext>();
-            container.RegisterInstance<IRepositoryFactory>(new RepositoryFactory((t, c) => (IRepository)container.Resolve(t, new ParameterOverride("context", c))));
-            container.RegisterInstance<IUnitOfWorkFactory>(new UnitOfWorkFactory(() => container.Resolve<IUnitOfWork>()));
-            container.RegisterType<IUnitOfWork, UnitOfWork>();
-
-            container.RegisterType<IModuleRepository, ModuleRepository>();
-            container.RegisterType<IModuleConnectionRepository, ModuleConnectionRepository>();
-            container.RegisterType<ISettingValueRepository, SettingValueRepository>();
-
-            container.RegisterType<IModuleService, ModuleService>();
-            container.RegisterType<IModuleConnectionService, ModuleConnectionService>();
-
-            container.RegisterRequestProcessor<EngineProcessor>();
-            container.RegisterRequestProcessor<StatusProcessor>();
-            container.RegisterRequestProcessor<ModulesProcessor>();
-            container.RegisterRequestProcessor<ModuleConnectionsProcessor>();
-
-            container.RegisterSingleton<ISettingsRegistry, SettingsRegistry>();
-            container.RegisterSingleton<ISettingsService, SettingsService>();
-            container.RegisterInstance<ISettingHandlerFactory>(new SettingHandlerFactory(t => (ISettingHandler)container.Resolve(t)));
-
-            container.RegisterSingleton<IAudioEngine, AudioEngine>();
-            container.RegisterSingleton<IApiServer, ApiServer>();
-            container.RegisterInstance<IApiConfiguration>(new ApiConfiguration { Port = Globals.ApiPort });
-
-            container.RegisterSingleton<IRequestProcessorFactory, RequestProcessorFactory>();
-
-            container.RegisterInstance(new HttpUpdateSettings
-            {
-                ManifestUrl = "https://micser.lloreggia.ch/update/manifest.json"
-            });
-            container.RegisterSingleton<IUpdateService, HttpUpdateService>();
-
-            _engine = container.Resolve<IAudioEngine>();
-            _server = container.Resolve<IApiServer>();
-
-            container.RegisterInstance<IApiEndPoint>(_server);
-
             LoadPlugins(container);
 
-            var settingsService = container.Resolve<ISettingsService>();
-            settingsService.LoadAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+            _server = container.Resolve<IApiServer>();
+            _engine = container.Resolve<IAudioEngine>();
 
             _server.Start();
             _engine.Start();
+
+            var settingsService = container.Resolve<ISettingsService>();
+            settingsService.LoadAsync().ConfigureAwait(false).GetAwaiter().GetResult();
 
             _reconnectTimer.Start();
 
@@ -149,6 +102,7 @@ namespace Micser.Engine
 
             _plugins.Clear();
 
+            _plugins.Add(new EngineModule());
             _plugins.Add(new InfrastructureModule());
 
             var executingFile = new FileInfo(Assembly.GetExecutingAssembly().Location);
@@ -176,6 +130,11 @@ namespace Micser.Engine
             foreach (var engineModule in _plugins)
             {
                 engineModule.RegisterTypes(container);
+            }
+
+            foreach (var engineModule in _plugins)
+            {
+                engineModule.OnInitialized(container);
             }
 
             Logger.Info("Plugins loaded");

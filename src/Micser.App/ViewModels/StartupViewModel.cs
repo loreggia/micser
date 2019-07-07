@@ -42,9 +42,22 @@ namespace Micser.App.ViewModels
 
         private async void OnModulesLoaded()
         {
-            await _settingsService.LoadAsync();
+            bool isConnected = false;
 
-            await Task.Delay(2000);
+            for (int i = 0; i < 5; i++)
+            {
+                isConnected = _apiEndPoint.State == EndPointState.Connected;
+
+                if (isConnected)
+                {
+                    break;
+                }
+
+                await Task.Delay(1000);
+            }
+
+            await _settingsService.LoadAsync(true);
+
             var shellState = _settingsService.GetSetting<ShellState>(AppGlobals.SettingKeys.ShellState);
             var shell = Application.Current.MainWindow;
 
@@ -60,8 +73,6 @@ namespace Micser.App.ViewModels
                     shell.WindowState = shellState.State;
                 }
             }
-
-            var isConnected = _apiEndPoint.State == EndPointState.Connected;
 
             if (isConnected)
             {

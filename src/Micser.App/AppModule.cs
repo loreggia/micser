@@ -80,6 +80,15 @@ namespace Micser.App
                 HandlerType = typeof(VacCountSettingHandler),
                 IsAppliedInstantly = false
             });
+            settingsRegistry.Add(new SettingDefinition
+            {
+                Key = Globals.SettingKeys.UpdateCheck,
+                Name = Resources.SettingsUpdateCheckName,
+                Description = Resources.SettingsUpdateCheckDescription,
+                Type = SettingType.Boolean,
+                StorageType = SettingStorageType.Api,
+                DefaultValue = true
+            });
 
             var navigationManager = containerProvider.Resolve<INavigationManager>();
             var menuItemRegistry = containerProvider.Resolve<IMenuItemRegistry>();

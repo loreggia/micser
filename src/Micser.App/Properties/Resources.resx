@@ -244,4 +244,10 @@
   <data name="ViewLicense" xml:space="preserve">
     <value>View License</value>
   </data>
+  <data name="SettingsUpdateCheckDescription" xml:space="preserve">
+    <value>Automatically check for updates and notify when an update is ready to install.</value>
+  </data>
+  <data name="SettingsUpdateCheckName" xml:space="preserve">
+    <value>Check for updates</value>
+  </data>
 </root>

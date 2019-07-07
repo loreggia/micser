@@ -137,6 +137,17 @@ namespace Micser.Common
         }
 
         /// <summary>
+        /// Contains global setting keys.
+        /// </summary>
+        public static class SettingKeys
+        {
+            /// <summary>
+            /// Enable/disable automatic update check.
+            /// </summary>
+            public const string UpdateCheck = "UpdateCheck";
+        }
+
+        /// <summary>
         /// Contains module/widget state keys.
         /// </summary>
         public static class StateKeys

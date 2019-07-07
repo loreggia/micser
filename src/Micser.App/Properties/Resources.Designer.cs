@@ -350,6 +350,24 @@ namespace Micser.App.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Automatically check for updates and notify when an update is ready to install..
+        /// </summary>
+        public static string SettingsUpdateCheckDescription {
+            get {
+                return ResourceManager.GetString("SettingsUpdateCheckDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Check for updates.
+        /// </summary>
+        public static string SettingsUpdateCheckName {
+            get {
+                return ResourceManager.GetString("SettingsUpdateCheckName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Configures the number of virtual audio cables. Changing this requires administrative privileges..
         /// </summary>
         public static string SettingsVacCountDescription {

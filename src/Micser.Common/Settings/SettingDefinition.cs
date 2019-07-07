@@ -16,7 +16,12 @@ namespace Micser.Common.Settings
         /// <summary>
         /// Doesn't store the setting; expects the setting to be stored a custom <see cref="ISettingHandler"/>.
         /// </summary>
-        Custom
+        Custom,
+
+        /// <summary>
+        /// The setting is stored via API.
+        /// </summary>
+        Api
     }
 
     /// <summary>

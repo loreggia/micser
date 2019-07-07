@@ -7,6 +7,10 @@ namespace Micser.Plugins.Main
 {
     public class MainEngineModule : IEngineModule
     {
+        public void OnInitialized(IUnityContainer container)
+        {
+        }
+
         public void RegisterTypes(IUnityContainer container)
         {
             container.RegisterAudioModules(
