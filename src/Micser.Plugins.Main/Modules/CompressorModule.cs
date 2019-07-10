@@ -38,7 +38,7 @@ namespace Micser.Plugins.Main.Modules
         public class Defaults
         {
             public const float Amount = 0f;
-            public const float Attack = 0.05f;
+            public const float Attack = 0.01f;
             public const float Knee = 5f;
             public const float MakeUpGain = 0f;
             public const float Ratio = 2f;
