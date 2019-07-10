@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Micser.Common.Updates;
+using Newtonsoft.Json;
 using NLog;
 using System;
 using System.IO;

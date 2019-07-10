@@ -23,13 +23,6 @@ namespace Micser.Engine.Infrastructure
         /// <inheritdoc />
         public void OnInitialized(IUnityContainer container)
         {
-            var settingsRegistry = container.Resolve<ISettingsRegistry>();
-
-            settingsRegistry.Add(new SettingDefinition
-            {
-                Key = Globals.SettingKeys.UpdateCheck,
-                DefaultValue = true
-            });
         }
 
         /// <inheritdoc />
@@ -58,10 +51,7 @@ namespace Micser.Engine.Infrastructure
 
             container.RegisterSingleton<IRequestProcessorFactory, RequestProcessorFactory>();
 
-            container.RegisterInstance(new HttpUpdateSettings
-            {
-                ManifestUrl = "https://micser.lloreggia.ch/update/manifest.json"
-            });
+            container.RegisterInstance(new HttpUpdateSettings { ManifestUrl = Globals.Updates.ManifestUrl });
             container.RegisterSingleton<IUpdateService, HttpUpdateService>();
 
             var server = container.Resolve<IApiServer>();

@@ -1,4 +1,6 @@
-﻿using Micser.Common.Extensions;
+﻿using Micser.Common;
+using Micser.Common.Extensions;
+using Micser.Common.Settings;
 using Micser.Engine.Api;
 using Micser.Engine.Audio;
 using Micser.Engine.Infrastructure;
@@ -10,6 +12,13 @@ namespace Micser.Engine
     {
         public void OnInitialized(IUnityContainer container)
         {
+            var settingsRegistry = container.Resolve<ISettingsRegistry>();
+
+            settingsRegistry.Add(new SettingDefinition
+            {
+                Key = Globals.SettingKeys.UpdateCheck,
+                DefaultValue = true
+            });
         }
 
         public void RegisterTypes(IUnityContainer container)
