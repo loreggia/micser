@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Micser.Engine.Infrastructure.Updates
+namespace Micser.Common.Updates
 {
     /// <summary>
     /// Contains information about an application update package.

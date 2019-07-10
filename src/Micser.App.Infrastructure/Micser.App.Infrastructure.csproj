@@ -58,6 +58,7 @@
     <Compile Include="Api\ModuleConnectionsApiClient.cs" />
     <Compile Include="Api\ModulesApiClient.cs" />
     <Compile Include="Api\StatusApiClient.cs" />
+    <Compile Include="Api\UpdatesRequestProcessor.cs" />
     <Compile Include="AppGlobals.cs" />
     <Compile Include="ApplicationEvents.cs" />
     <Compile Include="ApplicationStateService.cs" />

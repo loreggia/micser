@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using Micser.Common.Updates;
+using System.Threading.Tasks;
 
 namespace Micser.Engine.Infrastructure.Updates
 {

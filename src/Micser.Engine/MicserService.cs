@@ -4,6 +4,7 @@ using Micser.Common.Extensions;
 using Micser.Common.Settings;
 using Micser.Engine.Audio;
 using Micser.Engine.Infrastructure;
+using Micser.Engine.Infrastructure.Updates;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -21,8 +22,11 @@ namespace Micser.Engine
         private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
         private readonly ICollection<IEngineModule> _plugins;
         private readonly Timer _reconnectTimer;
+        private readonly Timer _updateTimer;
         private IAudioEngine _engine;
         private IApiServer _server;
+        private ISettingsService _settingsService;
+        private IUpdateService _updateService;
 
         static MicserService()
         {
@@ -34,8 +38,10 @@ namespace Micser.Engine
             InitializeComponent();
 
             _plugins = new List<IEngineModule>();
-            _reconnectTimer = new Timer(1000) { AutoReset = true };
+            _reconnectTimer = new Timer(1000) { AutoReset = false };
             _reconnectTimer.Elapsed += OnReconnectTimerElapsed;
+            _updateTimer = new Timer(1000) { AutoReset = false };
+            _updateTimer.Elapsed += OnUpdateTimerElapsed;
         }
 
         public void ManualStart()
@@ -48,14 +54,16 @@ namespace Micser.Engine
 
             _server = container.Resolve<IApiServer>();
             _engine = container.Resolve<IAudioEngine>();
+            _updateService = container.Resolve<IUpdateService>();
 
             _server.Start();
             _engine.Start();
 
-            var settingsService = container.Resolve<ISettingsService>();
-            settingsService.LoadAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+            _settingsService = container.Resolve<ISettingsService>();
+            _settingsService.LoadAsync().ConfigureAwait(false).GetAwaiter().GetResult();
 
             _reconnectTimer.Start();
+            _updateTimer.Start();
 
             Logger.Info("Service started");
         }
@@ -63,6 +71,9 @@ namespace Micser.Engine
         public void ManualStop()
         {
             Logger.Info("Stopping service");
+
+            _reconnectTimer.Stop();
+            _updateTimer.Stop();
 
             _server.Stop();
             _engine.Stop();
@@ -144,8 +155,37 @@ namespace Micser.Engine
         {
             if (_server.State == EndPointState.Disconnected)
             {
-                await _server.ConnectAsync();
+                if (!await _server.ConnectAsync())
+                {
+                    _reconnectTimer.Start();
+                }
             }
+        }
+
+        private async void OnUpdateTimerElapsed(object sender, ElapsedEventArgs e)
+        {
+            var interval = TimeSpan.FromHours(24).TotalMilliseconds;
+            _updateTimer.Interval = interval;
+
+            var updatesEnabled = _settingsService.GetSetting<bool>(Globals.SettingKeys.UpdateCheck);
+
+            if (updatesEnabled)
+            {
+                var updateManifest = await _updateService.GetUpdateManifestAsync();
+
+                if (updateManifest != null)
+                {
+                    var updateVersion = new Version(updateManifest.Version);
+                    var currentVersion = Assembly.GetEntryAssembly().GetName().Version;
+
+                    if (updateVersion > currentVersion)
+                    {
+                        await _server.SendMessageAsync(new JsonRequest(Globals.ApiResources.Updates, "updateavailable", updateManifest));
+                    }
+                }
+            }
+
+            _updateTimer.Start();
         }
     }
 }

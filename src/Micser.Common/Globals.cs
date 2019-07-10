@@ -57,6 +57,7 @@ namespace Micser.Common
             public const string Modules = "modules";
             public const string Settings = "settings";
             public const string Status = "status";
+            public const string Updates = "updates";
         }
 
         /// <summary>
@@ -156,6 +157,14 @@ namespace Micser.Common
             /// Hardware device ID.
             /// </summary>
             public const string DeviceId = "DeviceId";
+        }
+
+        /// <summary>
+        /// Contains settings concerning application updates.
+        /// </summary>
+        public static class Updates
+        {
+            public const string ManifestUrl = "https://micser.lloreggia.ch/update/manifest.json";
         }
 
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
