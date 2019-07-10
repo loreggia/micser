@@ -20,16 +20,6 @@
     "LicenseUrl": "https://raw.githubusercontent.com/moq/moq4/master/License.txt"
   },
   {
-    "Name": "MSBuild Community Tasks",
-    "Url": "https://github.com/loresoft/msbuildtasks",
-    "LicenseUrl": "https://raw.githubusercontent.com/loresoft/msbuildtasks/master/LICENSE"
-  },
-  {
-    "Name": "MSBuild.Version.Target",
-    "Url": "https://github.com/guibranco/MSBuild.Version.Target",
-    "LicenseUrl": "https://raw.githubusercontent.com/guibranco/MSBuild.Version.Target/master/LICENSE"
-  },
-  {
     "Name": "Newtonsoft.Json",
     "Url": "https://www.newtonsoft.com/json",
     "LicenseUrl": "https://raw.githubusercontent.com/JamesNK/Newtonsoft.Json/master/LICENSE.md"
