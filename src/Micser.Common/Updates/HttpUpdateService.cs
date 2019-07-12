@@ -1,12 +1,11 @@
-﻿using Micser.Common.Updates;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using NLog;
 using System;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 
-namespace Micser.Engine.Infrastructure.Updates
+namespace Micser.Common.Updates
 {
     /// <summary>
     /// An update service that downloads manifest/installer data from a HTTP resource.

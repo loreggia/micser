@@ -1,11 +1,11 @@
-﻿using Micser.Common.Updates;
-using NLog;
+﻿using NLog;
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Reflection;
 using System.Threading.Tasks;
 
-namespace Micser.Engine.Infrastructure.Updates
+namespace Micser.Common.Updates
 {
     /// <summary>
     /// Base implementation of <see cref="IUpdateService"/> that provides functionality for executing an installer.
@@ -66,5 +66,19 @@ namespace Micser.Engine.Infrastructure.Updates
 
         /// <inheritdoc />
         public abstract Task<UpdateManifest> GetUpdateManifestAsync();
+
+        /// <inheritdoc />
+        public virtual bool IsUpdateAvailable(UpdateManifest manifest)
+        {
+            if (manifest == null)
+            {
+                return false;
+            }
+
+            var updateVersion = new Version(manifest.Version);
+            var currentVersion = Assembly.GetEntryAssembly()?.GetName().Version;
+
+            return updateVersion > currentVersion;
+        }
     }
 }

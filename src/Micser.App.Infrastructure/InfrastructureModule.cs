@@ -8,6 +8,7 @@ using Micser.Common.Api;
 using Micser.Common.DataAccess.Repositories;
 using Micser.Common.Extensions;
 using Micser.Common.Settings;
+using Micser.Common.Updates;
 using Prism.Ioc;
 using Prism.Unity;
 using Unity;
@@ -50,6 +51,8 @@ namespace Micser.App.Infrastructure
             container.RegisterInstance<ISettingHandlerFactory>(new SettingHandlerFactory(t => (ISettingHandler)container.Resolve(t)));
 
             container.RegisterRequestProcessor<UpdatesRequestProcessor>();
+            containerRegistry.RegisterInstance(new HttpUpdateSettings { ManifestUrl = Globals.Updates.ManifestUrl });
+            containerRegistry.RegisterSingleton<IUpdateService, HttpUpdateService>();
 
             _isRegistered = true;
         }

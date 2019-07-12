@@ -45,6 +45,8 @@ namespace Micser.App
 
         public MicserApplication()
         {
+            InitializeComponent();
+
             DispatcherUnhandledException += OnDispatcherUnhandledException;
 
             _reconnectTimer = new Timer(1000) { AutoReset = true };
@@ -57,17 +59,25 @@ namespace Micser.App
         }
 
         [STAThread]
-        public static void Main()
+        public static int Main()
         {
-            if (SingleInstance<MicserApplication>.InitializeAsFirstInstance(Unique))
-            {
-                var application = new MicserApplication();
-                application.InitializeComponent();
-                application.Run();
+            var enableSingleInstance = !Debugger.IsAttached;
 
+            if (enableSingleInstance && !SingleInstance<MicserApplication>.InitializeAsFirstInstance(Unique))
+            {
+                return 0;
+            }
+
+            var application = new MicserApplication();
+            var result = application.Run();
+
+            if (enableSingleInstance)
+            {
                 // Allow single instance code to perform cleanup operations
                 SingleInstance<MicserApplication>.Cleanup();
             }
+
+            return result;
         }
 
         public bool SignalExternalCommandLineArgs(IList<string> args)

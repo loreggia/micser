@@ -2,9 +2,9 @@
 using Micser.Common.Api;
 using Micser.Common.Extensions;
 using Micser.Common.Settings;
+using Micser.Common.Updates;
 using Micser.Engine.Audio;
 using Micser.Engine.Infrastructure;
-using Micser.Engine.Infrastructure.Updates;
 using NLog;
 using System;
 using System.Collections.Generic;
@@ -174,25 +174,19 @@ namespace Micser.Engine
             {
                 var updateManifest = await _updateService.GetUpdateManifestAsync();
 
-                if (updateManifest != null)
+                if (_updateService.IsUpdateAvailable(updateManifest))
                 {
-                    var updateVersion = new Version(updateManifest.Version);
-                    var currentVersion = Assembly.GetEntryAssembly().GetName().Version;
+                    JsonResponse result;
 
-                    if (updateVersion > currentVersion)
+                    do
                     {
-                        JsonResponse result;
+                        result = await _server.SendMessageAsync(new JsonRequest(Globals.ApiResources.Updates, "updateavailable", updateManifest));
 
-                        do
+                        if (!result.IsConnected)
                         {
-                            result = await _server.SendMessageAsync(new JsonRequest(Globals.ApiResources.Updates, "updateavailable", updateManifest));
-
-                            if (!result.IsConnected)
-                            {
-                                await Task.Delay(1000);
-                            }
-                        } while (!result.IsConnected);
-                    }
+                            await Task.Delay(1000);
+                        }
+                    } while (!result.IsConnected);
                 }
             }
 
