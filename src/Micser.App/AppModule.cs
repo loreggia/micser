@@ -176,6 +176,16 @@ namespace Micser.App
 
             // Help
             menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemHelpHeader, Id = AppGlobals.MenuItemIds.Help });
+            menuItemRegistry.Add(new MenuItemDescription
+            {
+                Header = Resources.MenuItemCheckUpdateHeader,
+                Id = AppGlobals.MenuItemIds.HelpCheckUpdate,
+                ParentId = AppGlobals.MenuItemIds.Help,
+                //todo
+                Command = new DelegateCommand(() => { }),
+                IconTemplateName = "Icon_"
+            });
+            menuItemRegistry.Add(new MenuItemDescription { IsSeparator = true, ParentId = AppGlobals.MenuItemIds.Help });
             // Help->About
             menuItemRegistry.Add(new MenuItemDescription
             {

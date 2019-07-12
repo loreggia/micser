@@ -250,4 +250,7 @@
   <data name="SettingsUpdateCheckName" xml:space="preserve">
     <value>Check for updates</value>
   </data>
+  <data name="MenuItemCheckUpdateHeader" xml:space="preserve">
+    <value>Check for updates</value>
+  </data>
 </root>

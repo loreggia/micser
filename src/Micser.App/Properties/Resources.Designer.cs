@@ -170,6 +170,15 @@ namespace Micser.App.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Check for updates.
+        /// </summary>
+        public static string MenuItemCheckUpdateHeader {
+            get {
+                return ResourceManager.GetString("MenuItemCheckUpdateHeader", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to E_xit.
         /// </summary>
         public static string MenuItemExitHeader {
