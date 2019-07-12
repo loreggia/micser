@@ -160,14 +160,9 @@
 
                             <ToggleButton x:Name="OverflowButton" DockPanel.Dock="Right" ClickMode="Press"
                                           IsChecked="{Binding IsOverflowOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" Style="{StaticResource ToolBarOverflowButtonStyle}">
-                                <Popup x:Name="OverflowPopup" AllowsTransparency="True" Placement="Bottom" StaysOpen="False" Focusable="False" PopupAnimation="Slide"
+                                <Popup x:Name="OverflowPopup" Placement="Bottom" StaysOpen="False" Focusable="False" PopupAnimation="Slide"
                                        IsOpen="{Binding IsOverflowOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}">
-                                    <Border x:Name="OverflowBorder" BorderThickness="1" BorderBrush="{DynamicResource {themes:BrushThemeKey DefaultBorder}}"
-                                            Background="{DynamicResource {themes:BrushThemeKey DefaultBackground}}" Margin="5">
-                                        <Border.Effect>
-                                            <DropShadowEffect BlurRadius="5" Opacity="0.8" ShadowDepth="5" Direction="-45" RenderingBias="Quality" />
-                                        </Border.Effect>
-
+                                    <Border x:Name="OverflowBorder" Style="{DynamicResource PopupBorder}">
                                         <ToolBarOverflowPanel x:Name="PART_ToolBarOverflowPanel" WrapWidth="200" Focusable="True" FocusVisualStyle="{x:Null}" KeyboardNavigation.TabNavigation="Cycle"
                                                               KeyboardNavigation.DirectionalNavigation="Cycle" Margin="6,3" />
                                     </Border>

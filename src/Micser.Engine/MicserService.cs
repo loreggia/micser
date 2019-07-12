@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.ServiceProcess;
+using System.Threading.Tasks;
 using System.Timers;
 using Unity;
 
@@ -180,7 +181,17 @@ namespace Micser.Engine
 
                     if (updateVersion > currentVersion)
                     {
-                        await _server.SendMessageAsync(new JsonRequest(Globals.ApiResources.Updates, "updateavailable", updateManifest));
+                        JsonResponse result;
+
+                        do
+                        {
+                            result = await _server.SendMessageAsync(new JsonRequest(Globals.ApiResources.Updates, "updateavailable", updateManifest));
+
+                            if (!result.IsConnected)
+                            {
+                                await Task.Delay(1000);
+                            }
+                        } while (!result.IsConnected);
                     }
                 }
             }

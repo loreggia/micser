@@ -6,6 +6,7 @@ using Micser.App.Infrastructure.Widgets;
 using Micser.Common;
 using Micser.Common.Api;
 using Micser.Common.DataAccess.Repositories;
+using Micser.Common.Extensions;
 using Micser.Common.Settings;
 using Prism.Ioc;
 using Prism.Unity;
@@ -47,6 +48,8 @@ namespace Micser.App.Infrastructure
 
             var container = containerRegistry.GetContainer();
             container.RegisterInstance<ISettingHandlerFactory>(new SettingHandlerFactory(t => (ISettingHandler)container.Resolve(t)));
+
+            container.RegisterRequestProcessor<UpdatesRequestProcessor>();
 
             _isRegistered = true;
         }

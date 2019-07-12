@@ -17,19 +17,19 @@
                     <Viewbox HorizontalAlignment="Center" VerticalAlignment="Center">
                         <Canvas x:Name="PART_Canvas" RenderTransformOrigin="0.5,0.5" HorizontalAlignment="Center" VerticalAlignment="Center" Width="120" Height="120">
                             <Canvas.RenderTransform>
-                                <RotateTransform x:Name="PART_RotationTransform" />
+                                <RotateTransform x:Name="PART_RotationTransform" Angle="0" />
                             </Canvas.RenderTransform>
+                            <Canvas.Triggers>
+                                <EventTrigger RoutedEvent="Loaded">
+                                    <BeginStoryboard>
+                                        <Storyboard>
+                                            <DoubleAnimation Storyboard.TargetName="PART_RotationTransform" Storyboard.TargetProperty="Angle" RepeatBehavior="Forever" From="0" To="360" Duration="0:0:2" AccelerationRatio="0.5" DecelerationRatio="0.5" />
+                                        </Storyboard>
+                                    </BeginStoryboard>
+                                </EventTrigger>
+                            </Canvas.Triggers>
                         </Canvas>
                     </Viewbox>
-                    <ControlTemplate.Triggers>
-                        <EventTrigger RoutedEvent="Loaded">
-                            <BeginStoryboard>
-                                <Storyboard>
-                                    <DoubleAnimation Storyboard.TargetName="PART_RotationTransform" Storyboard.TargetProperty="Angle" RepeatBehavior="Forever" From="0" To="360" Duration="0:0:2" AccelerationRatio="0.5" DecelerationRatio="0.5" />
-                                </Storyboard>
-                            </BeginStoryboard>
-                        </EventTrigger>
-                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
