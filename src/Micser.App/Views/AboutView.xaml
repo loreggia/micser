@@ -17,14 +17,14 @@
     <ScrollViewer HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
         <StackPanel Orientation="Vertical" MaxWidth="800">
             <ContentControl ContentTemplate="{DynamicResource Logo}" Margin="50" MinWidth="64" MaxWidth="512" />
-            <TextBlock Text="{Binding AboutText}" Foreground="{DynamicResource {themes:BrushThemeKey DefaultForeground}}" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,10,0,0" />
-            <TextBlock Text="{Binding VersionText}" Foreground="{DynamicResource {themes:BrushThemeKey DefaultForeground}}" FontSize="14" HorizontalAlignment="Center" Margin="0,10,0,0" />
-            <TextBlock Text="{x:Static p:Resources.AboutLibrariesTitle}" Foreground="{DynamicResource {themes:BrushThemeKey DefaultForeground}}" FontSize="14" HorizontalAlignment="Center" Margin="0,10,0,0" />
+            <TextBlock Text="{Binding AboutText}" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,10,0,0" />
+            <TextBlock Text="{Binding VersionText}" FontSize="14" HorizontalAlignment="Center" Margin="0,10,0,0" />
+            <TextBlock Text="{x:Static p:Resources.AboutLibrariesTitle}" FontSize="14" HorizontalAlignment="Center" Margin="0,10,0,0" />
             <ItemsControl ItemsSource="{Binding Libraries}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="{x:Type vm:LibraryInfo}">
                         <Grid>
-                            <TextBlock TextAlignment="Center">
+                            <TextBlock TextAlignment="Center" x:Name="TextBlock">
                                 <Hyperlink Command="{Binding DataContext.OpenLibraryUrlCommand, ElementName=AboutViewElement}" CommandParameter="{Binding}" Foreground="{DynamicResource {themes:BrushThemeKey DefaultForeground}}">
                                     <Hyperlink.Inlines>
                                         <Run Text="{Binding Name}" FontWeight="Bold" />
@@ -36,32 +36,34 @@
                                     </Hyperlink.Inlines>
                                 </Hyperlink>
                             </TextBlock>
-                            <Popup IsOpen="{Binding IsLicenseOpen, Mode=TwoWay}" PlacementTarget="{Binding ElementName=LicenseLink}" StaysOpen="False" Placement="Center">
-                                <Grid Background="White">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition />
-                                    </Grid.RowDefinitions>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition />
-                                        <ColumnDefinition Width="Auto" />
-                                    </Grid.ColumnDefinitions>
+                            <Popup IsOpen="{Binding IsLicenseOpen, Mode=TwoWay}" PlacementTarget="{Binding ElementName=TextBlock}" StaysOpen="False" Placement="Center">
+                                <Border x:Name="PopupBorder" Style="{DynamicResource PopupBorder}">
+                                    <Grid>
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition />
+                                        </Grid.RowDefinitions>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
 
-                                    <TextBlock Grid.Row="0" Grid.Column="0" Padding="10" FontWeight="Bold">
-                                        <Run Text="{Binding Name}" />
-                                        <Run Text="{x:Static p:Resources.License}" />
-                                    </TextBlock>
-                                    <Button Grid.Row="0" Grid.Column="1" BorderThickness="0" Content="X" Width="20" Height="20" HorizontalAlignment="Right" VerticalAlignment="Top"
-                                            Command="{Binding DataContext.ClosePopupCommand, ElementName=AboutViewElement}" CommandParameter="{Binding}" />
+                                        <TextBlock Grid.Row="0" Grid.Column="0" Padding="10" FontWeight="Bold">
+                                            <Run Text="{Binding Name}" />
+                                            <Run Text="{x:Static p:Resources.License}" />
+                                        </TextBlock>
+                                        <Button Grid.Row="0" Grid.Column="1" BorderThickness="0" Content="X" Width="20" Height="20" HorizontalAlignment="Right" VerticalAlignment="Top"
+                                                Command="{Binding DataContext.ClosePopupCommand, ElementName=AboutViewElement}" CommandParameter="{Binding}" />
 
-                                    <ScrollViewer Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" MaxWidth="500" MaxHeight="500" VerticalScrollBarVisibility="Auto">
-                                        <Grid MaxWidth="500" Margin="10">
-                                            <TextBlock MaxWidth="500" Text="{Binding LicenseText}" TextWrapping="Wrap" />
-                                            <controls:LoadingSpinner MaxWidth="50" MaxHeight="50" HorizontalAlignment="Center" VerticalAlignment="Center"
-                                                Visibility="{Binding LicenseText, Converter={converter:EmptyStringToVisibilityConverter EmptyValue=Visible, NonEmptyValue=Collapsed}}" />
-                                        </Grid>
-                                    </ScrollViewer>
-                                </Grid>
+                                        <ScrollViewer Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" MaxWidth="500" MaxHeight="500" VerticalScrollBarVisibility="Auto">
+                                            <Grid MaxWidth="500" Margin="10">
+                                                <TextBlock MaxWidth="500" Text="{Binding LicenseText}" TextWrapping="Wrap" />
+                                                <controls:LoadingSpinner MaxWidth="50" MaxHeight="50" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                                                         Visibility="{Binding LicenseText, Converter={converter:EmptyStringToVisibilityConverter EmptyValue=Visible, NonEmptyValue=Collapsed}}" />
+                                            </Grid>
+                                        </ScrollViewer>
+                                    </Grid>
+                                </Border>
                             </Popup>
                         </Grid>
                     </DataTemplate>

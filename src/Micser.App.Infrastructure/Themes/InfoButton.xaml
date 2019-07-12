@@ -14,13 +14,8 @@
 
                             <Popup x:Name="Popup" MaxWidth="200" IsOpen="{Binding IsChecked, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" StaysOpen="False" Placement="Relative"
                                        PlacementTarget="{Binding ElementName=Border}" VerticalOffset="{Binding ActualHeight, ElementName=Border}"
-                                       HorizontalOffset="{Binding ActualWidth, ElementName=PopupBorder, Converter={converter:RelativeCenterPlacementConverter}}" AllowsTransparency="True">
-                                <Border x:Name="PopupBorder" Background="{DynamicResource {themes:BrushThemeKey DefaultBackground}}" BorderBrush="{DynamicResource {themes:BrushThemeKey DefaultBorder}}"
-                                            BorderThickness="1" Margin="5">
-                                    <Border.Effect>
-                                        <DropShadowEffect BlurRadius="5" Opacity="0.8" ShadowDepth="5" Direction="-45" RenderingBias="Quality" />
-                                    </Border.Effect>
-
+                                       HorizontalOffset="{Binding ActualWidth, ElementName=PopupBorder, Converter={converter:RelativeCenterPlacementConverter}}">
+                                <Border x:Name="PopupBorder" Style="{DynamicResource PopupBorder}">
                                     <TextBlock Text="{TemplateBinding Content}" Foreground="{DynamicResource {themes:BrushThemeKey DefaultForeground}}" TextWrapping="Wrap" Margin="10" />
                                 </Border>
                             </Popup>

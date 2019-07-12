@@ -8,16 +8,21 @@
         xmlns:tb="http://www.hardcodet.net/taskbar"
         xmlns:ai="clr-namespace:Micser.App.Infrastructure;assembly=Micser.App.Infrastructure"
         xmlns:themes="clr-namespace:Micser.App.Infrastructure.Themes;assembly=Micser.App.Infrastructure"
+        xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
+        xmlns:app="clr-namespace:Micser.App"
+        xmlns:interaction="clr-namespace:Micser.App.Infrastructure.Interaction;assembly=Micser.App.Infrastructure"
         mc:Ignorable="d"
         x:Name="Window"
         Title="{x:Static p:Resources.ApplicationTitle}"
+        Style="{DynamicResource DefaultWindowStyle}"
         Height="600"
         Width="800"
         MinWidth="350"
         MinHeight="250"
         Icon="logo.ico"
         UseLayoutRounding="True"
-        WindowStartupLocation="CenterScreen">
+        WindowStartupLocation="CenterScreen"
+        d:DataContext="{d:DesignInstance app:MainShellViewModel}">
 
     <Window.Resources>
         <Style x:Key="RegionStyle" TargetType="ContentControl">
@@ -58,4 +63,12 @@
             </tb:TaskbarIcon.ContextMenu>
         </tb:TaskbarIcon>
     </Grid>
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger EventName="Raised" SourceObject="{Binding MessageBoxInteractionRequest}">
+            <i:EventTrigger.Actions>
+                <interaction:MessageBoxAction />
+            </i:EventTrigger.Actions>
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
 </Window>

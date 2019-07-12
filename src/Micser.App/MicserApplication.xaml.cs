@@ -19,6 +19,7 @@ using Prism.Unity;
 using System;
 using System.Collections.Generic;
 using System.Data.Entity;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -100,6 +101,7 @@ namespace Micser.App
         protected override Window CreateShell()
         {
             _shell = GetService<MainShell>();
+            _shell.DataContext = GetService<MainShellViewModel>();
             return _shell;
         }
 
@@ -264,6 +266,11 @@ namespace Micser.App
 
         private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
+            if (Debugger.IsAttached)
+            {
+                Debugger.Break();
+            }
+
             Logger.Error(e.Exception, "Unhandled application exception.");
             e.Handled = true;
         }

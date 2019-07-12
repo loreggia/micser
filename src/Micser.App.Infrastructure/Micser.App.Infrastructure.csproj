@@ -85,6 +85,7 @@
     <Compile Include="Converter\EmptyStringToVisibilityConverter.cs" />
     <Compile Include="Converter\EnumToBooleanConverter.cs" />
     <Compile Include="Converter\RelativeCenterPlacementConverter.cs" />
+    <Compile Include="Converter\IconToBitmapSourceConverter.cs" />
     <Compile Include="CustomApplicationCommands.cs" />
     <Compile Include="DataAccess\AppDbContext.cs" />
     <Compile Include="Extensions\ColorExtensions.cs" />
@@ -92,12 +93,19 @@
     <Compile Include="Extensions\ItemsControlExtensions.cs" />
     <Compile Include="Extensions\NameOfExtension.cs" />
     <Compile Include="Extensions\PrismContainerExtensions.cs" />
+    <Compile Include="Interaction\MessageBoxAction.cs" />
+    <Compile Include="Interaction\MessageBoxEvent.cs" />
+    <Compile Include="Interaction\MessageBoxViewModel.cs" />
+    <Compile Include="Interaction\MessageBoxWindow.xaml.cs">
+      <DependentUpon>MessageBoxWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Interaction\FileDialogAction.cs" />
     <Compile Include="IApplicationStateService.cs" />
     <Compile Include="INavigationManager.cs" />
     <Compile Include="InfrastructureModule.cs" />
     <Compile Include="IAppModule.cs" />
     <Compile Include="IniFile.cs" />
+    <Compile Include="Interaction\MessageBoxContent.cs" />
     <Compile Include="ISelectable.cs" />
     <Compile Include="Interaction\OpenFileDialogAction.cs" />
     <Compile Include="Interaction\FileDialogConfirmation.cs" />
@@ -173,6 +181,10 @@
       <SubType>Designer</SubType>
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Page Include="Interaction\MessageBoxWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Themes\LinePanel.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

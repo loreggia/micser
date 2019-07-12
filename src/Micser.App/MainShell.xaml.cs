@@ -10,7 +10,7 @@ using System.Windows.Input;
 namespace Micser.App
 {
     /// <summary>
-    ///     Interaction logic for MainWindow.xaml
+    /// Interaction logic for MainWindow.xaml
     /// </summary>
     public partial class MainShell
     {

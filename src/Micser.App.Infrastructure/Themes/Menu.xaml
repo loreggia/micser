@@ -18,14 +18,9 @@
                                       PopupAnimation="Fade"
                                       MinWidth="150">
                     <Grid Margin="5">
-                        <Border x:Name="SubmenuBorder"
+                        <Border x:Name="SubmenuBorder" Style="{DynamicResource PopupBorder}" Margin="0"
                                 Background="{DynamicResource {themes:BrushThemeKey MenuItemBackgroundActive}}"
-                                BorderThickness="1"
                                 BorderBrush="{DynamicResource {themes:BrushThemeKey MenuItemPopupBorder}}">
-                            <Border.Effect>
-                                <DropShadowEffect BlurRadius="5" Opacity="0.8" ShadowDepth="5" Direction="-45" RenderingBias="Quality" />
-                            </Border.Effect>
-
                             <ScrollViewer CanContentScroll="True" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Auto">
                                 <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" Margin="2" />
                             </ScrollViewer>
@@ -139,14 +134,9 @@
                                       PopupAnimation="Fade"
                                       MinWidth="150">
                     <Grid Margin="5">
-                        <Border x:Name="SubmenuBorder"
+                        <Border x:Name="SubmenuBorder" Style="{DynamicResource PopupBorder}" Margin="0"
                                 Background="{DynamicResource {themes:BrushThemeKey MenuItemBackgroundActive}}"
-                                BorderThickness="1"
                                 BorderBrush="{DynamicResource {themes:BrushThemeKey MenuItemPopupBorder}}">
-                            <Border.Effect>
-                                <DropShadowEffect BlurRadius="5" Opacity="0.8" ShadowDepth="5" Direction="-45" RenderingBias="Quality" />
-                            </Border.Effect>
-
                             <ScrollViewer CanContentScroll="True" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Auto">
                                 <StackPanel IsItemsHost="True" KeyboardNavigation.DirectionalNavigation="Cycle" Margin="2" />
                             </ScrollViewer>
