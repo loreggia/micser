@@ -45,13 +45,12 @@ namespace Micser.Plugins.Main.Widgets
             set => SetProperty(ref _attack, value);
         }
 
-        [SaveState(false)]
         public bool EnableAdvancedControls
         {
             get => _enableAdvancedControls;
             set
             {
-                if (SetProperty(ref _enableAdvancedControls, value) && value)
+                if (SetProperty(ref _enableAdvancedControls, value) && !value)
                 {
                     CalculateSimpleValues();
                 }
@@ -106,6 +105,20 @@ namespace Micser.Plugins.Main.Widgets
                     CalculateSimpleValues();
                 }
             }
+        }
+
+        public override ModuleState GetState()
+        {
+            var state = base.GetState();
+            state.Data[nameof(EnableAdvancedControls)] = EnableAdvancedControls;
+            return state;
+        }
+
+        public override void SetState(ModuleState state)
+        {
+            // EnableAdvancedControls has to be set before all other values
+            EnableAdvancedControls = state.Data.GetObject(nameof(EnableAdvancedControls), false);
+            base.SetState(state);
         }
 
         private void CalculateSimpleValues()
