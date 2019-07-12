@@ -103,7 +103,11 @@
     <Compile Include="Modules\SaveStateAttribute.cs" />
     <Compile Include="OrderedParameterOverride.cs" />
     <Compile Include="Properties\GlobalAssemblyInfo.cs" />
+    <Compile Include="Updates\HttpUpdateService.cs" />
+    <Compile Include="Updates\HttpUpdateSettings.cs" />
+    <Compile Include="Updates\IUpdateService.cs" />
     <Compile Include="Updates\UpdateManifest.cs" />
+    <Compile Include="Updates\UpdateService.cs" />
     <None Include="Properties\GlobalAssemblyInfoTemplate.cs" />
     <Compile Include="SemaphoreQueue.cs" />
     <Compile Include="Settings\ISettingHandler.cs" />

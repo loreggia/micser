@@ -1,4 +1,4 @@
-﻿namespace Micser.Engine.Infrastructure.Updates
+﻿namespace Micser.Common.Updates
 {
     /// <summary>
     /// Contains settings for the <see cref="HttpUpdateService"/>.

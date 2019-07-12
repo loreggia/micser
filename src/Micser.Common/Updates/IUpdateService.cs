@@ -1,7 +1,6 @@
-﻿using Micser.Common.Updates;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 
-namespace Micser.Engine.Infrastructure.Updates
+namespace Micser.Common.Updates
 {
     /// <summary>
     /// Defines an interface for a service that can check for, download and execute application updates.
@@ -25,5 +24,11 @@ namespace Micser.Engine.Infrastructure.Updates
         /// Gets an update manifest containing information about the most recent release.
         /// </summary>
         Task<UpdateManifest> GetUpdateManifestAsync();
+
+        /// <summary>
+        /// Checks if the specified manifest describes a newer version than the currently running one.
+        /// </summary>
+        /// <param name="manifest">The update manifest.</param>
+        bool IsUpdateAvailable(UpdateManifest manifest);
     }
 }
