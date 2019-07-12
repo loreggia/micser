@@ -28,6 +28,7 @@
             public const string FileImport = File + "Import";
             public const string Help = "Help";
             public const string HelpAbout = Help + "About";
+            public const string HelpCheckUpdate = Help + "CheckUpdate";
             public const string Tools = "Tools";
             public const string ToolsRefresh = Tools + "Refresh";
             public const string ToolsRestart = Tools + "Restart";
