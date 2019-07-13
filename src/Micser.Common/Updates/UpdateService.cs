@@ -50,7 +50,7 @@ namespace Micser.Common.Updates
                 if (extension == "msi")
                 {
                     var process = new Process();
-                    process.StartInfo = new ProcessStartInfo("msiexec", $"/i \"{Path.GetExtension(path)}\"");
+                    process.StartInfo = new ProcessStartInfo("msiexec", $"/i \"{Path.GetFullPath(path)}\"");
                     return process.Start();
                 }
 

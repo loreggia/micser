@@ -1,6 +1,7 @@
 ﻿using Micser.App.Infrastructure;
 using Micser.App.Infrastructure.Api;
 using Micser.App.Infrastructure.Extensions;
+using Micser.App.Infrastructure.Interaction;
 using Micser.App.Infrastructure.Menu;
 using Micser.App.Infrastructure.ToolBars;
 using Micser.App.Properties;
@@ -10,6 +11,7 @@ using Micser.App.Views;
 using Micser.Common;
 using Micser.Common.Extensions;
 using Micser.Common.Settings;
+using Micser.Common.Updates;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Ioc;
@@ -181,8 +183,7 @@ namespace Micser.App
                 Header = Resources.MenuItemCheckUpdateHeader,
                 Id = AppGlobals.MenuItemIds.HelpCheckUpdate,
                 ParentId = AppGlobals.MenuItemIds.Help,
-                //todo
-                Command = new DelegateCommand(() => { }),
+                Command = new DelegateCommand(() => CheckUpdate(containerProvider)),
                 IconTemplateName = "Icon_WebAPI_16x"
             });
             menuItemRegistry.Add(new MenuItemDescription { IsSeparator = true, ParentId = AppGlobals.MenuItemIds.Help });
@@ -265,6 +266,48 @@ namespace Micser.App
             containerRegistry.RegisterView<MainView, MainViewModel>();
             containerRegistry.RegisterView<SettingsView, SettingsViewModel>();
             containerRegistry.RegisterView<AboutView, AboutViewModel>();
+        }
+
+        private static async void CheckUpdate(IContainerProvider containerProvider)
+        {
+            var updateService = containerProvider.Resolve<IUpdateService>();
+            var manifest = await updateService.GetUpdateManifestAsync();
+
+            if (updateService.IsUpdateAvailable(manifest))
+            {
+                var eventAggregator = containerProvider.Resolve<IEventAggregator>();
+
+                eventAggregator.GetEvent<MessageBoxEvent>().Publish(new MessageBoxEventArgs
+                {
+                    Callback = async result =>
+                    {
+                        if (!result)
+                        {
+                            return;
+                        }
+
+                        var fileName = await updateService.DownloadInstallerAsync(manifest);
+
+                        if (fileName == null)
+                        {
+                            eventAggregator.GetEvent<MessageBoxEvent>().Publish(new MessageBoxEventArgs
+                            {
+                                Title = "Error",
+                                Message = "Could not download the installer. Please try again.",
+                                Type = MessageBoxType.Error,
+                                IsModal = true
+                            });
+                            return;
+                        }
+
+                        updateService.ExecuteInstaller(fileName);
+                    },
+                    IsModal = true,
+                    Message = manifest.Description,
+                    Title = "Update available",
+                    Type = MessageBoxType.Question
+                });
+            }
         }
     }
 }
