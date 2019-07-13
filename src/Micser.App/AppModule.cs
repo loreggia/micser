@@ -183,7 +183,7 @@ namespace Micser.App
                 ParentId = AppGlobals.MenuItemIds.Help,
                 //todo
                 Command = new DelegateCommand(() => { }),
-                IconTemplateName = "Icon_"
+                IconTemplateName = "Icon_WebAPI_16x"
             });
             menuItemRegistry.Add(new MenuItemDescription { IsSeparator = true, ParentId = AppGlobals.MenuItemIds.Help });
             // Help->About
