@@ -2,6 +2,7 @@
 using Micser.App.Infrastructure.Menu;
 using Micser.App.Infrastructure.Themes;
 using Micser.App.Infrastructure.ToolBars;
+using Micser.App.Infrastructure.Updates;
 using Micser.App.Infrastructure.Widgets;
 using Micser.Common;
 using Micser.Common.Api;
@@ -53,6 +54,7 @@ namespace Micser.App.Infrastructure
             container.RegisterRequestProcessor<UpdatesRequestProcessor>();
             containerRegistry.RegisterInstance(new HttpUpdateSettings { ManifestUrl = Globals.Updates.ManifestUrl });
             containerRegistry.RegisterSingleton<IUpdateService, HttpUpdateService>();
+            containerRegistry.RegisterSingleton<UpdateHandler>();
 
             _isRegistered = true;
         }

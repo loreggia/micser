@@ -1,9 +1,7 @@
-﻿using Micser.App.Infrastructure.Interaction;
+﻿using Micser.App.Infrastructure.Updates;
 using Micser.Common;
 using Micser.Common.Api;
 using Micser.Common.Updates;
-using Prism.Events;
-using System;
 
 namespace Micser.App.Infrastructure.Api
 {
@@ -13,32 +11,19 @@ namespace Micser.App.Infrastructure.Api
     [RequestProcessorName(Globals.ApiResources.Updates)]
     public class UpdatesRequestProcessor : RequestProcessor
     {
-        private readonly IEventAggregator _eventAggregator;
+        private readonly UpdateHandler _updateHandler;
 
         /// <inheritdoc />
-        public UpdatesRequestProcessor(IEventAggregator eventAggregator)
+        public UpdatesRequestProcessor(UpdateHandler updateHandler)
         {
-            _eventAggregator = eventAggregator;
+            _updateHandler = updateHandler;
             AddAction("UpdateAvailable", p => UpdateAvailable(p));
         }
 
         private object UpdateAvailable(UpdateManifest updateManifest)
         {
-            _eventAggregator.GetEvent<MessageBoxEvent>().Publish(new MessageBoxEventArgs
-            {
-                Type = MessageBoxType.Question,
-                Title = "Update available",
-                Message = updateManifest.Description,
-                Callback = UpdateConfirmationCallback,
-                IsModal = true
-            });
-
+            _updateHandler.ShowUpdateAvailable(updateManifest);
             return true;
-        }
-
-        private void UpdateConfirmationCallback(bool install)
-        {
-            Console.WriteLine(install);
         }
     }
 }
