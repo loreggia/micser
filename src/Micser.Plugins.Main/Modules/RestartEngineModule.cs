@@ -2,6 +2,7 @@
 using Micser.Common.Audio;
 using Micser.Common.Modules;
 using Micser.Engine.Infrastructure.Audio;
+using NLog;
 using System;
 using System.Threading.Tasks;
 
@@ -10,25 +11,17 @@ namespace Micser.Plugins.Main.Modules
     public class RestartEngineModule : AudioModule
     {
         private readonly IAudioEngine _audioEngine;
+        private readonly ILogger _logger;
 
-        public RestartEngineModule(IAudioEngine audioEngine)
+        public RestartEngineModule(IAudioEngine audioEngine, ILogger logger)
         {
             _audioEngine = audioEngine;
+            _logger = logger;
             SystemEvents.PowerModeChanged += PowerModeChanged;
         }
 
         [SaveState(5f)]
         public float Delay { get; set; }
-
-        public override ModuleState GetState()
-        {
-            return base.GetState();
-        }
-
-        public override void SetState(ModuleState state)
-        {
-            base.SetState(state);
-        }
 
         protected override void Dispose(bool disposing)
         {
@@ -42,6 +35,8 @@ namespace Micser.Plugins.Main.Modules
 
         private async void PowerModeChanged(object sender, PowerModeChangedEventArgs e)
         {
+            _logger.Debug($"Power mode changed to {e.Mode}.");
+
             if (e.Mode != PowerModes.Resume)
             {
                 return;
@@ -51,10 +46,14 @@ namespace Micser.Plugins.Main.Modules
             {
                 await Task.Delay(TimeSpan.FromSeconds(Delay));
 
+                _logger.Debug($"Audio engine state: {_audioEngine.IsRunning}");
+
                 if (!_audioEngine.IsRunning)
                 {
                     return;
                 }
+
+                _logger.Debug("Restarting audio engine");
 
                 _audioEngine.Stop();
                 while (_audioEngine.IsRunning)
@@ -62,6 +61,8 @@ namespace Micser.Plugins.Main.Modules
                     await Task.Delay(100);
                 }
                 _audioEngine.Start();
+
+                _logger.Debug("Restarted audio engine");
             });
         }
     }
