@@ -72,6 +72,7 @@
     <Compile Include="Api\SettingsApiClient.cs" />
     <Compile Include="ArgumentDictionary.cs" />
     <Compile Include="Audio\AudioHelper.cs" />
+    <Compile Include="Audio\IAudioEngine.cs" />
     <Compile Include="DataAccess\IRepositoryFactory.cs" />
     <Compile Include="DataAccess\IUnitOfWorkFactory.cs" />
     <Compile Include="DataAccess\IRepository.cs" />

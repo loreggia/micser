@@ -57,7 +57,6 @@
     <Compile Include="Api\SettingsProcessor.cs" />
     <Compile Include="Api\StatusProcessor.cs" />
     <Compile Include="Audio\AudioEngine.cs" />
-    <Compile Include="Audio\IAudioEngine.cs" />
     <Compile Include="EngineModule.cs" />
     <Compile Include="ProjectInstaller.cs">
       <SubType>Component</SubType>

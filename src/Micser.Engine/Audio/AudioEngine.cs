@@ -1,6 +1,6 @@
 ﻿using CSCore.CoreAudioAPI;
-using Microsoft.Win32;
 using Micser.Common.Api;
+using Micser.Common.Audio;
 using Micser.Engine.Infrastructure.Audio;
 using Micser.Engine.Infrastructure.Services;
 using NLog;
@@ -76,16 +76,6 @@ namespace Micser.Engine.Audio
             }
         }
 
-        public void DeleteModule(long id)
-        {
-            var audioModule = _modules.SingleOrDefault(m => m.Id == id);
-            if (audioModule != null)
-            {
-                _modules.Remove(audioModule);
-                audioModule.Dispose();
-            }
-        }
-
         public void Dispose()
         {
             if (_endpointVolumeCallback != null)
@@ -110,6 +100,16 @@ namespace Micser.Engine.Audio
             }
         }
 
+        public void RemoveModule(long id)
+        {
+            var audioModule = _modules.SingleOrDefault(m => m.Id == id);
+            if (audioModule != null)
+            {
+                _modules.Remove(audioModule);
+                audioModule.Dispose();
+            }
+        }
+
         public void Start()
         {
             _logger.Info("Starting audio engine");
@@ -118,7 +118,6 @@ namespace Micser.Engine.Audio
 
             _deviceEnumerator.DefaultDeviceChanged += DefaultDeviceChanged;
             _endpointVolumeCallback.NotifyRecived += VolumeNotifyReceived;
-            SystemEvents.PowerModeChanged += PowerModeChanged;
 
             SetupDefaultEndpoint();
 
@@ -170,7 +169,6 @@ namespace Micser.Engine.Audio
 
             _deviceEnumerator.DefaultDeviceChanged -= DefaultDeviceChanged;
             _endpointVolumeCallback.NotifyRecived -= VolumeNotifyReceived;
-            SystemEvents.PowerModeChanged -= PowerModeChanged;
 
             _endpointVolume?.UnregisterControlChangeNotify(_endpointVolumeCallback);
             _endpointVolume?.Dispose();
@@ -221,33 +219,6 @@ namespace Micser.Engine.Audio
             }
 
             await Task.Run(SetupDefaultEndpoint).ConfigureAwait(false);
-        }
-
-        private async void PowerModeChanged(object sender, PowerModeChangedEventArgs e)
-        {
-            // restart on resume
-            if (e.Mode != PowerModes.Resume)
-            {
-                return;
-            }
-
-            await Task.Run(async () =>
-            {
-                // TODO make delay configurable
-                await Task.Delay(5000);
-
-                if (!IsRunning)
-                {
-                    return;
-                }
-
-                Stop();
-                while (IsRunning)
-                {
-                    await Task.Delay(100);
-                }
-                Start();
-            });
         }
 
         private void SetupDefaultEndpoint()
