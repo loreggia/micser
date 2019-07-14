@@ -156,11 +156,10 @@ namespace Micser.Engine
         {
             if (_server.State == EndPointState.Disconnected)
             {
-                if (!await _server.ConnectAsync())
-                {
-                    _reconnectTimer.Start();
-                }
+                await _server.ConnectAsync();
             }
+
+            _reconnectTimer.Start();
         }
 
         private async void OnUpdateTimerElapsed(object sender, ElapsedEventArgs e)
