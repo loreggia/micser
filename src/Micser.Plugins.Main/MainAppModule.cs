@@ -28,6 +28,7 @@ namespace Micser.Plugins.Main
             containerRegistry.RegisterWidget<CompressorWidget, CompressorViewModel>(Resources.CompressorWidgetName, Resources.CompressorWidgetDescription);
             containerRegistry.RegisterWidget<GainWidget, GainViewModel>(Resources.GainWidgetName, Resources.GainWidgetDescription);
             containerRegistry.RegisterWidget<SpectrumWidget, SpectrumViewModel>(Resources.SpectrumWidgetName, Resources.SpectrumWidgetDescription);
+            containerRegistry.RegisterWidget<RestartEngineWidget, RestartEngineViewModel>(Resources.RestartEngineWidgetName, Resources.RestartEngineWidgetDescription);
 
             var container = containerRegistry.GetContainer();
             container.RegisterRequestProcessor<SpectrumRequestProcessor>();

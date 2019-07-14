@@ -1,7 +1,7 @@
 ﻿using Micser.Common;
 using Micser.Common.Api;
+using Micser.Common.Audio;
 using Micser.Common.Modules;
-using Micser.Engine.Audio;
 using Micser.Engine.Infrastructure.Services;
 using NLog;
 using System.Collections.Generic;
@@ -40,7 +40,7 @@ namespace Micser.Engine.Api
                 return false;
             }
 
-            _audioEngine.DeleteModule(id);
+            _audioEngine.RemoveModule(id);
 
             return module;
         }
