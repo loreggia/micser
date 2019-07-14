@@ -144,6 +144,7 @@
     <Compile Include="ToolBars\ToolBarLabel.cs" />
     <Compile Include="ToolBars\ToolBarRegistry.cs" />
     <Compile Include="TreeNode.cs" />
+    <Compile Include="Updates\UpdateHandler.cs" />
     <Compile Include="View.cs" />
     <Compile Include="ViewModel.cs" />
     <Compile Include="ViewModelNavigationAware.cs" />

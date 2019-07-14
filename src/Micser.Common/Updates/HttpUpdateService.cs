@@ -29,8 +29,13 @@ namespace Micser.Common.Updates
         {
             try
             {
-                var tempPath = Path.GetTempPath();
-                var fileName = Path.Combine(tempPath, Path.ChangeExtension(Path.GetRandomFileName(), ".msi"));
+                var path = Path.Combine(Globals.AppDataFolder, Globals.Updates.TempFolder);
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
+
+                var fileName = Path.Combine(path, $"Micser-{manifest.Version}.msi");
 
                 using (var webClient = new WebClient())
                 {

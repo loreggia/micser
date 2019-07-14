@@ -165,6 +165,7 @@ namespace Micser.Common
         public static class Updates
         {
             public const string ManifestUrl = "https://micser.lloreggia.ch/update/manifest.json";
+            public static readonly string TempFolder = Path.Combine(AppDataFolder, "Updates");
         }
 
 #pragma warning restore CS1591 // Missing XML comment for publicly visible type or member
