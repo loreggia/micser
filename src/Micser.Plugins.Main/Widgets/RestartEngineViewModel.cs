@@ -17,15 +17,5 @@ namespace Micser.Plugins.Main.Widgets
         }
 
         public override Type ModuleType => typeof(RestartEngineModule);
-
-        public override ModuleState GetState()
-        {
-            return base.GetState();
-        }
-
-        public override void SetState(ModuleState state)
-        {
-            base.SetState(state);
-        }
     }
 }
