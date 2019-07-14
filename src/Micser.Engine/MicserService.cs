@@ -84,8 +84,16 @@ namespace Micser.Engine
             Logger.Info("Service stopped");
         }
 
+        protected override bool OnPowerEvent(PowerBroadcastStatus powerStatus)
+        {
+            PowerEvents.OnPowerStatusChanged(powerStatus);
+            return base.OnPowerEvent(powerStatus);
+        }
+
         protected override void OnStart(string[] args)
         {
+            CanHandlePowerEvent = true;
+
             try
             {
                 ManualStart();
