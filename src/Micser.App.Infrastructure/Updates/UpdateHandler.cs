@@ -1,21 +1,29 @@
 ﻿using Micser.App.Infrastructure.Interaction;
+using Micser.App.Infrastructure.Properties;
 using Micser.Common.Updates;
 using Prism.Events;
 using System.Threading.Tasks;
 
 namespace Micser.App.Infrastructure.Updates
 {
+    /// <summary>
+    /// Handles interaction logic for application updates.
+    /// </summary>
     public class UpdateHandler
     {
         private readonly IEventAggregator _eventAggregator;
         private readonly IUpdateService _updateService;
 
+        /// <inheritdoc />
         public UpdateHandler(IUpdateService updateService, IEventAggregator eventAggregator)
         {
             _updateService = updateService;
             _eventAggregator = eventAggregator;
         }
 
+        /// <summary>
+        /// Checks for updates and shows a confirmation dialog if an update was found or an information dialog when no update is available.
+        /// </summary>
         public async Task CheckForUpdateAsync()
         {
             var manifest = await _updateService.GetUpdateManifestAsync();
@@ -30,14 +38,18 @@ namespace Micser.App.Infrastructure.Updates
                     .GetEvent<MessageBoxEvent>()
                     .Publish(new MessageBoxEventArgs
                     {
-                        Title = "Information",
-                        Message = "There is currently no update available.",
+                        Title = Resources.Information,
+                        Message = Resources.NoUpdateAvailable,
                         Type = MessageBoxType.Information,
                         IsModal = true,
                     });
             }
         }
 
+        /// <summary>
+        /// Installs an update. Shows an error message if the installation failed.
+        /// </summary>
+        /// <param name="manifest">The update manifest for of the update to install.</param>
         public async Task InstallUpdateAsync(UpdateManifest manifest)
         {
             var fileName = await _updateService.DownloadInstallerAsync(manifest);
@@ -45,7 +57,7 @@ namespace Micser.App.Infrastructure.Updates
 
             if (fileName == null)
             {
-                error = "Could not download the installer. Please try again.";
+                error = Resources.ErrorInstallerDownload;
             }
             else
             {
@@ -53,7 +65,7 @@ namespace Micser.App.Infrastructure.Updates
 
                 if (!executeResult)
                 {
-                    error = "Could not execute the installer. Please try again.";
+                    error = Resources.ErrorInstallerExecution;
                 }
             }
 
@@ -61,7 +73,7 @@ namespace Micser.App.Infrastructure.Updates
             {
                 _eventAggregator.GetEvent<MessageBoxEvent>().Publish(new MessageBoxEventArgs
                 {
-                    Title = "Error",
+                    Title = Resources.Error,
                     Message = error,
                     Type = MessageBoxType.Error,
                     IsModal = true
@@ -69,6 +81,10 @@ namespace Micser.App.Infrastructure.Updates
             }
         }
 
+        /// <summary>
+        /// Shows a confirmation to check if the user wants to install an available application update.
+        /// </summary>
+        /// <param name="manifest">The update manifest of the available update.</param>
         public void ShowUpdateAvailable(UpdateManifest manifest)
         {
             _eventAggregator
@@ -84,7 +100,7 @@ namespace Micser.App.Infrastructure.Updates
                     },
                     IsModal = true,
                     Message = manifest.Description,
-                    Title = "Update available",
+                    Title = Resources.UpdateAvailable,
                     Type = MessageBoxType.Question
                 });
         }
