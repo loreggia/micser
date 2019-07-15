@@ -1,6 +1,7 @@
 ﻿using CSCore.CoreAudioAPI;
 using Micser.Common.Api;
 using Micser.Common.Audio;
+using Micser.Common.Settings;
 using Micser.Engine.Infrastructure.Audio;
 using Micser.Engine.Infrastructure.Services;
 using NLog;
@@ -22,15 +23,24 @@ namespace Micser.Engine.Audio
         private readonly IModuleConnectionService _moduleConnectionService;
         private readonly List<IAudioModule> _modules;
         private readonly IModuleService _moduleService;
+        private readonly ISettingsService _settingsService;
         private AudioEndpointVolume _endpointVolume;
 
-        public AudioEngine(IUnityContainer container, ILogger logger, IModuleService moduleService, IModuleConnectionService moduleConnectionService, IApiServer apiServer)
+        public AudioEngine(
+            // todo create audio module factory
+            IUnityContainer container,
+            ILogger logger,
+            IModuleService moduleService,
+            IModuleConnectionService moduleConnectionService,
+            IApiServer apiServer,
+            ISettingsService settingsService)
         {
             _container = container;
             _logger = logger;
             _moduleService = moduleService;
             _moduleConnectionService = moduleConnectionService;
             _apiServer = apiServer;
+            _settingsService = settingsService;
             _modules = new List<IAudioModule>();
             _deviceEnumerator = new MMDeviceEnumerator();
             _endpointVolumeCallback = new AudioEndpointVolumeCallback();

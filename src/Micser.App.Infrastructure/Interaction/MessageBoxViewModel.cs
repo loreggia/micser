@@ -1,10 +1,14 @@
-﻿using Prism.Interactivity.InteractionRequest;
+﻿using Micser.App.Infrastructure.Properties;
+using Prism.Interactivity.InteractionRequest;
 using System;
 using System.Drawing;
 using System.Windows;
 
 namespace Micser.App.Infrastructure.Interaction
 {
+    /// <summary>
+    /// View model for generic message box interaction requests.
+    /// </summary>
     public class MessageBoxViewModel : ViewModel
     {
         private MessageBoxButton _buttons;
@@ -16,6 +20,16 @@ namespace Micser.App.Infrastructure.Interaction
         private string _message;
         private string _title;
 
+        /// <inheritdoc />
+        public MessageBoxViewModel()
+        {
+            SetButtonTexts();
+            SetImageIcon();
+        }
+
+        /// <summary>
+        /// Gets or sets the confirmation/cancel button layout and labeling.
+        /// </summary>
         public MessageBoxButton Buttons
         {
             get => _buttons;
@@ -28,18 +42,27 @@ namespace Micser.App.Infrastructure.Interaction
             }
         }
 
+        /// <summary>
+        /// Gets or sets the text shown on the cancel button.
+        /// </summary>
         public string CancelText
         {
             get => _cancelText;
             set => SetProperty(ref _cancelText, value);
         }
 
+        /// <summary>
+        /// Gets or sets the text shown on the confirmation button.
+        /// </summary>
         public string ConfirmationText
         {
             get => _confirmationText;
             set => SetProperty(ref _confirmationText, value);
         }
 
+        /// <summary>
+        /// Gets or sets the image type of the icon displayed in the message box.
+        /// </summary>
         public MessageBoxImage Image
         {
             get => _image;
@@ -52,24 +75,36 @@ namespace Micser.App.Infrastructure.Interaction
             }
         }
 
+        /// <summary>
+        /// Gets or sets the icon corresponding to the <see cref="Image"/>.
+        /// </summary>
         public Icon ImageIcon
         {
             get => _imageIcon;
             set => SetProperty(ref _imageIcon, value);
         }
 
+        /// <summary>
+        /// Gets or sets the main message text.
+        /// </summary>
         public string Message
         {
             get => _message;
             set => SetProperty(ref _message, value);
         }
 
+        /// <summary>
+        /// Gets or sets the notification/confirmation interaction request.
+        /// </summary>
         public INotification Notification
         {
             get => _confirmation;
             set => SetProperty(ref _confirmation, value);
         }
 
+        /// <summary>
+        /// Gets or sets the message box title text.
+        /// </summary>
         public string Title
         {
             get => _title;
@@ -81,21 +116,21 @@ namespace Micser.App.Infrastructure.Interaction
             switch (Buttons)
             {
                 case MessageBoxButton.OK:
-                    ConfirmationText = "OK";
+                    ConfirmationText = Resources.MessageBoxButtonOk;
                     CancelText = null;
                     break;
 
                 case MessageBoxButton.OKCancel:
-                    ConfirmationText = "OK";
-                    CancelText = "Cancel";
+                    ConfirmationText = Resources.MessageBoxButtonOk;
+                    CancelText = Resources.MessageBoxButtonCancel;
                     break;
 
                 case MessageBoxButton.YesNoCancel:
                     throw new NotSupportedException("MessageBoxButton mode YesNoCancel is not supported.");
 
                 case MessageBoxButton.YesNo:
-                    ConfirmationText = "Yes";
-                    CancelText = "No";
+                    ConfirmationText = Resources.MessageBoxButtonYes;
+                    CancelText = Resources.MessageBoxButtonNo;
                     break;
 
                 default:

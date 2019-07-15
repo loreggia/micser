@@ -1,5 +1,4 @@
-﻿using Microsoft.Win32;
-using Micser.Common.Audio;
+﻿using Micser.Common.Audio;
 using Micser.Common.Modules;
 using Micser.Engine.Infrastructure;
 using Micser.Engine.Infrastructure.Audio;
@@ -18,7 +17,7 @@ namespace Micser.Plugins.Main.Modules
         {
             _audioEngine = audioEngine;
             _logger = logger;
-            PowerEvents.PowerStatusChanged += PowerStatusChanged;
+            PowerEvents.PowerStateChanged += PowerStateChanged;
         }
 
         [SaveState(5f)]
@@ -33,11 +32,9 @@ namespace Micser.Plugins.Main.Modules
             }
         }
 
-        private async void PowerStatusChanged(object sender, Power e)
+        private async void PowerStateChanged(object sender, PowerStateEventArgs e)
         {
-            _logger.Debug($"Power mode changed to {e.Mode}.");
-
-            if (e.Mode != PowerModes.Resume)
+            if (!e.IsResuming)
             {
                 return;
             }

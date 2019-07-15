@@ -1,6 +1,8 @@
 ﻿using Micser.Common;
 using Micser.Common.Api;
 using Micser.Common.Audio;
+using Micser.Common.Settings;
+using System.Threading.Tasks;
 
 namespace Micser.Engine.Api
 {
@@ -8,10 +10,14 @@ namespace Micser.Engine.Api
     public class EngineProcessor : RequestProcessor
     {
         private readonly IAudioEngine _audioEngine;
+        private readonly ISettingsService _settingsService;
 
-        public EngineProcessor(IAudioEngine audioEngine)
+        public EngineProcessor(
+            IAudioEngine audioEngine,
+            ISettingsService settingsService)
         {
             _audioEngine = audioEngine;
+            _settingsService = settingsService;
 
             AddAction("start", _ => Start());
             AddAction("stop", _ => Stop());
@@ -24,22 +30,31 @@ namespace Micser.Engine.Api
             return _audioEngine.IsRunning;
         }
 
-        private bool Restart()
+        private async Task<bool> Restart()
         {
             _audioEngine.Stop();
             _audioEngine.Start();
+
+            await _settingsService.SetSettingAsync(Globals.SettingKeys.IsEngineRunning, true).ConfigureAwait(false);
+
             return true;
         }
 
-        private bool Start()
+        private async Task<bool> Start()
         {
             _audioEngine.Start();
+
+            await _settingsService.SetSettingAsync(Globals.SettingKeys.IsEngineRunning, true).ConfigureAwait(false);
+
             return true;
         }
 
-        private bool Stop()
+        private async Task<bool> Stop()
         {
             _audioEngine.Stop();
+
+            await _settingsService.SetSettingAsync(Globals.SettingKeys.IsEngineRunning, false).ConfigureAwait(false);
+
             return true;
         }
     }
