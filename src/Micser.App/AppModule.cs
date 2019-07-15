@@ -72,8 +72,8 @@ namespace Micser.App
             settingsRegistry.Add(new SettingDefinition
             {
                 Key = AppGlobals.SettingKeys.VacCount,
-                Name = Resources.SettingsVacCountName,
-                Description = Resources.SettingsVacCountDescription,
+                Name = Resources.SettingVacCountName,
+                Description = Resources.SettingVacCountDescription,
                 Type = SettingType.List,
                 StorageType = SettingStorageType.Custom,
                 DefaultValue = 1,
@@ -84,11 +84,20 @@ namespace Micser.App
             settingsRegistry.Add(new SettingDefinition
             {
                 Key = Globals.SettingKeys.UpdateCheck,
-                Name = Resources.SettingsUpdateCheckName,
-                Description = Resources.SettingsUpdateCheckDescription,
+                Name = Resources.SettingUpdateCheckName,
+                Description = Resources.SettingUpdateCheckDescription,
                 Type = SettingType.Boolean,
                 StorageType = SettingStorageType.Api,
                 DefaultValue = true
+            });
+            settingsRegistry.Add(new SettingDefinition
+            {
+                Key = Globals.SettingKeys.ResumeDelay,
+                Name = Resources.SettingResumeDelayName,
+                Description = Resources.SettingResumeDelayDescription,
+                Type = SettingType.Integer,
+                StorageType = SettingStorageType.Api,
+                DefaultValue = 10
             });
 
             var navigationManager = containerProvider.Resolve<INavigationManager>();

@@ -148,6 +148,11 @@ namespace Micser.Common
             public const string IsEngineRunning = "IsEngineRunning";
 
             /// <summary>
+            /// The delay (in seconds) to wait before starting the engine after resuming from a suspended state.
+            /// </summary>
+            public const string ResumeDelay = "ResumeDelay";
+
+            /// <summary>
             /// Enable/disable automatic update check.
             /// </summary>
             public const string UpdateCheck = "UpdateCheck";

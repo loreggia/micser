@@ -208,10 +208,10 @@
   <data name="SettingStartupName" xml:space="preserve">
     <value>Startup</value>
   </data>
-  <data name="SettingsVacCountDescription" xml:space="preserve">
+  <data name="SettingVacCountDescription" xml:space="preserve">
     <value>Configures the number of virtual audio cables. Changing this requires administrative privileges.</value>
   </data>
-  <data name="SettingsVacCountName" xml:space="preserve">
+  <data name="SettingVacCountName" xml:space="preserve">
     <value>Virtual Audio Cables</value>
   </data>
   <data name="ToolBarBackDescription" xml:space="preserve">
@@ -244,13 +244,19 @@
   <data name="ViewLicense" xml:space="preserve">
     <value>View License</value>
   </data>
-  <data name="SettingsUpdateCheckDescription" xml:space="preserve">
+  <data name="SettingUpdateCheckDescription" xml:space="preserve">
     <value>Automatically check for updates and notify when an update is ready to install.</value>
   </data>
-  <data name="SettingsUpdateCheckName" xml:space="preserve">
+  <data name="SettingUpdateCheckName" xml:space="preserve">
     <value>Check for updates</value>
   </data>
   <data name="MenuItemCheckUpdateHeader" xml:space="preserve">
     <value>Check for updates</value>
+  </data>
+  <data name="SettingResumeDelayDescription" xml:space="preserve">
+    <value>The delay to wait before starting the engine after the computer is resuming from a suspended state (sleep, hibernation). Increase this setting if you don't have audio output after the computer was suspended.</value>
+  </data>
+  <data name="SettingResumeDelayName" xml:space="preserve">
+    <value>Resume Delay (s)</value>
   </data>
 </root>
