@@ -167,7 +167,7 @@
     <value>Re_fresh</value>
   </data>
   <data name="MenuItemRestartHeader" xml:space="preserve">
-    <value>_Restart Engine</value>
+    <value>_Restart Audio Engine</value>
   </data>
   <data name="MenuItemSaveHeader" xml:space="preserve">
     <value>_Save</value>
@@ -176,10 +176,10 @@
     <value>_Settings</value>
   </data>
   <data name="MenuItemStartHeader" xml:space="preserve">
-    <value>_Start Engine</value>
+    <value>_Start Audio Engine</value>
   </data>
   <data name="MenuItemStopHeader" xml:space="preserve">
-    <value>Sto_p Engine</value>
+    <value>Sto_p Audio Engine</value>
   </data>
   <data name="MenuItemToolsHeader" xml:space="preserve">
     <value>_Tools</value>

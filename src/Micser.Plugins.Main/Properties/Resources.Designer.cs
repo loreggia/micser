@@ -259,33 +259,6 @@ namespace Micser.Plugins.Main.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Delay (s).
-        /// </summary>
-        public static string RestartEngineDelay {
-            get {
-                return ResourceManager.GetString("RestartEngineDelay", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Automatically restarts the audio engine after a specific delay when the PC resumes from sleep or hibernation. This is needed for some soundcards that take a while to be ready. When you don&apos;t have audio after resuming from sleep, try increasing the delay..
-        /// </summary>
-        public static string RestartEngineWidgetDescription {
-            get {
-                return ResourceManager.GetString("RestartEngineWidgetDescription", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Looks up a localized string similar to Restart Engine.
-        /// </summary>
-        public static string RestartEngineWidgetName {
-            get {
-                return ResourceManager.GetString("RestartEngineWidgetName", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Visualizes the audio spectrum..
         /// </summary>
         public static string SpectrumWidgetDescription {
