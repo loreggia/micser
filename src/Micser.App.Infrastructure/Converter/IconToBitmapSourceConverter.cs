@@ -8,6 +8,9 @@ using System.Windows.Media.Imaging;
 
 namespace Micser.App.Infrastructure.Converter
 {
+    /// <summary>
+    /// Value converter that converts an <see cref="Icon"/> to a <see cref="BitmapSource"/>.
+    /// </summary>
     [ValueConversion(typeof(Icon), typeof(BitmapSource))]
     public class IconToBitmapSourceConverter : ConverterExtension
     {

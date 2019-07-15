@@ -70,6 +70,42 @@ namespace Micser.App.Infrastructure.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Error.
+        /// </summary>
+        public static string Error {
+            get {
+                return ResourceManager.GetString("Error", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not download the installer. Please try again..
+        /// </summary>
+        public static string ErrorInstallerDownload {
+            get {
+                return ResourceManager.GetString("ErrorInstallerDownload", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Could not execute the installer. Please try again..
+        /// </summary>
+        public static string ErrorInstallerExecution {
+            get {
+                return ResourceManager.GetString("ErrorInstallerExecution", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Information.
+        /// </summary>
+        public static string Information {
+            get {
+                return ResourceManager.GetString("Information", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Cancel.
         /// </summary>
         public static string MessageBoxButtonCancel {
@@ -111,6 +147,24 @@ namespace Micser.App.Infrastructure.Properties {
         public static string Mute {
             get {
                 return ResourceManager.GetString("Mute", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to There is currently no update available..
+        /// </summary>
+        public static string NoUpdateAvailable {
+            get {
+                return ResourceManager.GetString("NoUpdateAvailable", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Micser update available.
+        /// </summary>
+        public static string UpdateAvailable {
+            get {
+                return ResourceManager.GetString("UpdateAvailable", resourceCulture);
             }
         }
         

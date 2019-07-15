@@ -120,6 +120,18 @@
   <data name="Apply" xml:space="preserve">
     <value>Apply</value>
   </data>
+  <data name="Error" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="ErrorInstallerDownload" xml:space="preserve">
+    <value>Could not download the installer. Please try again.</value>
+  </data>
+  <data name="ErrorInstallerExecution" xml:space="preserve">
+    <value>Could not execute the installer. Please try again.</value>
+  </data>
+  <data name="Information" xml:space="preserve">
+    <value>Information</value>
+  </data>
   <data name="MessageBoxButtonCancel" xml:space="preserve">
     <value>Cancel</value>
   </data>
@@ -134,6 +146,12 @@
   </data>
   <data name="Mute" xml:space="preserve">
     <value>Mute</value>
+  </data>
+  <data name="NoUpdateAvailable" xml:space="preserve">
+    <value>There is currently no update available.</value>
+  </data>
+  <data name="UpdateAvailable" xml:space="preserve">
+    <value>Micser update available</value>
   </data>
   <data name="UseSystemVolume" xml:space="preserve">
     <value>Use system volume</value>
