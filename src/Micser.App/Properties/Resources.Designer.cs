@@ -233,7 +233,7 @@ namespace Micser.App.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to _Restart Engine.
+        ///   Looks up a localized string similar to _Restart Audio Engine.
         /// </summary>
         public static string MenuItemRestartHeader {
             get {
@@ -260,7 +260,7 @@ namespace Micser.App.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to _Start Engine.
+        ///   Looks up a localized string similar to _Start Audio Engine.
         /// </summary>
         public static string MenuItemStartHeader {
             get {
@@ -269,7 +269,7 @@ namespace Micser.App.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Sto_p Engine.
+        ///   Looks up a localized string similar to Sto_p Audio Engine.
         /// </summary>
         public static string MenuItemStopHeader {
             get {

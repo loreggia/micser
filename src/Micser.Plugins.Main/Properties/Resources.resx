@@ -183,15 +183,6 @@
   <data name="Name" xml:space="preserve">
     <value>Name</value>
   </data>
-  <data name="RestartEngineDelay" xml:space="preserve">
-    <value>Delay (s)</value>
-  </data>
-  <data name="RestartEngineWidgetDescription" xml:space="preserve">
-    <value>Automatically restarts the audio engine after a specific delay when the PC resumes from sleep or hibernation. This is needed for some soundcards that take a while to be ready. When you don't have audio after resuming from sleep, try increasing the delay.</value>
-  </data>
-  <data name="RestartEngineWidgetName" xml:space="preserve">
-    <value>Restart Engine</value>
-  </data>
   <data name="SpectrumWidgetDescription" xml:space="preserve">
     <value>Visualizes the audio spectrum.</value>
   </data>

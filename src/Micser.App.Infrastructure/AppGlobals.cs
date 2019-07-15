@@ -18,6 +18,11 @@
         public const string ThemesDirectoryName = "Themes";
 
         /// <summary>
+        /// An array of culture codes that are available as UI languages.
+        /// </summary>
+        public static readonly string[] AvailableCultures = { "en", "de" };
+
+        /// <summary>
         /// Contains default menu item IDs.
         /// </summary>
         public static class MenuItemIds

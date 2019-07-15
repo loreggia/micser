@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AboutText" xml:space="preserve">
-    <value>Micser - The managed audio routing framework.</value>
+    <value>Micser - Das .NET Audio-Routing-Framework</value>
   </data>
   <data name="AboutVersionText" xml:space="preserve">
     <value>Version:</value>
@@ -127,136 +127,132 @@
     <value>Micser</value>
   </data>
   <data name="ExportConfigurationDialogTitle" xml:space="preserve">
-    <value>Export configuration to file...</value>
+    <value>Konfiguration in Datei exportieren...</value>
   </data>
   <data name="ExportSettingsDialogTitle" xml:space="preserve">
-    <value>Export settings to file...</value>
+    <value>Einstellungen in Datei exportieren...</value>
   </data>
   <data name="ImportConfigurationDialogTitle" xml:space="preserve">
-    <value>Import configuration from file...</value>
+    <value>Konfiguration aus Datei importieren...</value>
   </data>
   <data name="ImportSettingsDialogTitle" xml:space="preserve">
-    <value>Import settings from file...</value>
+    <value>Einstellungen aus Datei importieren...</value>
   </data>
   <data name="JsonFiles" xml:space="preserve">
-    <value>JSON files</value>
-  </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="libraries" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\libraries.json;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+    <value>JSON-Dateien</value>
   </data>
   <data name="MenuItemAboutHeader" xml:space="preserve">
-    <value>_About</value>
+    <value>_Über</value>
   </data>
   <data name="MenuItemExitHeader" xml:space="preserve">
-    <value>E_xit</value>
+    <value>_Schliessen</value>
   </data>
   <data name="MenuItemExportHeader" xml:space="preserve">
-    <value>Export...</value>
+    <value>Exportieren...</value>
   </data>
   <data name="MenuItemFileHeader" xml:space="preserve">
-    <value>_File</value>
+    <value>_Datei</value>
   </data>
   <data name="MenuItemHelpHeader" xml:space="preserve">
-    <value>_Help</value>
+    <value>_Hilfe</value>
   </data>
   <data name="MenuItemImportHeader" xml:space="preserve">
-    <value>_Import...</value>
+    <value>_Importieren...</value>
   </data>
   <data name="MenuItemRefreshHeader" xml:space="preserve">
-    <value>Re_fresh</value>
+    <value>_Aktualisieren</value>
   </data>
   <data name="MenuItemRestartHeader" xml:space="preserve">
-    <value>_Restart Audio Engine</value>
+    <value>Audio-Engine _neu starten</value>
   </data>
   <data name="MenuItemSaveHeader" xml:space="preserve">
-    <value>_Save</value>
+    <value>_Speichern</value>
   </data>
   <data name="MenuItemSettingsHeader" xml:space="preserve">
-    <value>_Settings</value>
+    <value>_Einstellungen</value>
   </data>
   <data name="MenuItemStartHeader" xml:space="preserve">
-    <value>_Start Audio Engine</value>
+    <value>Audio-Engine _starten</value>
   </data>
   <data name="MenuItemStopHeader" xml:space="preserve">
-    <value>Sto_p Audio Engine</value>
+    <value>Audio-Engine sto_ppen</value>
   </data>
   <data name="MenuItemToolsHeader" xml:space="preserve">
-    <value>_Tools</value>
+    <value>E_xtras</value>
   </data>
   <data name="SettingColorThemeDescription" xml:space="preserve">
-    <value>Sets the active color theme of the user interface.</value>
+    <value>Definiert das aktive Farbthema der Benutzeroberfläche</value>
   </data>
   <data name="SettingColorThemeName" xml:space="preserve">
-    <value>Color theme</value>
+    <value>Farbthema</value>
   </data>
   <data name="SettingMinimizeToTrayDescription" xml:space="preserve">
-    <value>If enabled, the program will minimize to the system tray instead of minimizing to the task bar.</value>
+    <value>Wenn aktiviert wird das Programm in den Infobereich anstatt in die Taskleiste minimiert.</value>
   </data>
   <data name="SettingMinimizeToTrayName" xml:space="preserve">
-    <value>Minimize to tray</value>
+    <value>Minimieren in Infobereich</value>
   </data>
   <data name="SettingStartupDescription" xml:space="preserve">
-    <value>If enabled, the program will start when you log in.</value>
+    <value>Wenn aktiviert wird das Programm beim Systemstart gestartet.</value>
   </data>
   <data name="SettingStartupMinimizedDescription" xml:space="preserve">
-    <value>If enabled, the program will start minimized on system startup (when "Startup" is enabled)</value>
+    <value>Wenn aktiviert startet das Programm minimiert beim automatischen Starten.</value>
   </data>
   <data name="SettingStartupMinimizedName" xml:space="preserve">
-    <value>Start minimized</value>
+    <value>Minimiert starten</value>
   </data>
   <data name="SettingStartupName" xml:space="preserve">
-    <value>Startup</value>
+    <value>Autostart</value>
   </data>
   <data name="SettingVacCountDescription" xml:space="preserve">
-    <value>Configures the number of virtual audio cables. Changing this requires administrative privileges.</value>
+    <value>Legt die Anzahl virtueller Audiokabel fest. Eine Änderung erfordert Administratorrechte.</value>
   </data>
   <data name="SettingVacCountName" xml:space="preserve">
-    <value>Virtual Audio Cables</value>
+    <value>Virtuelle Audiokabel</value>
   </data>
   <data name="ToolBarBackDescription" xml:space="preserve">
-    <value>Go back</value>
+    <value>Zurück</value>
   </data>
   <data name="ToolBarDeleteDescription" xml:space="preserve">
-    <value>Delete</value>
+    <value>Löschen</value>
   </data>
   <data name="ToolBarForwardDescription" xml:space="preserve">
-    <value>Forward</value>
+    <value>Vorwärts</value>
   </data>
   <data name="ToolBarHomeDescription" xml:space="preserve">
     <value>Home</value>
   </data>
   <data name="ToolBarLoadDescription" xml:space="preserve">
-    <value>Load</value>
+    <value>Laden</value>
   </data>
   <data name="ToolBarRefreshDescription" xml:space="preserve">
-    <value>Refresh</value>
+    <value>Aktualisieren</value>
   </data>
   <data name="ToolBarSettingsDescription" xml:space="preserve">
-    <value>Settings</value>
+    <value>Einstellungen</value>
   </data>
   <data name="AboutLibrariesTitle" xml:space="preserve">
-    <value>Libraries and tools used:</value>
+    <value>Verwendete Programmbibliotheken und Hilfsprogramme:</value>
   </data>
   <data name="License" xml:space="preserve">
-    <value>License</value>
+    <value>Lizenz</value>
   </data>
   <data name="ViewLicense" xml:space="preserve">
-    <value>View License</value>
+    <value>Lizenz anzeigen</value>
   </data>
   <data name="SettingUpdateCheckDescription" xml:space="preserve">
-    <value>Automatically check for updates and notify when an update is ready to install.</value>
+    <value>Automatisch nach Programm-Updates suchen und benachrichtigen, wenn ein Update verfügbar ist.</value>
   </data>
   <data name="SettingUpdateCheckName" xml:space="preserve">
-    <value>Check for updates</value>
+    <value>Automatische Updates</value>
   </data>
   <data name="MenuItemCheckUpdateHeader" xml:space="preserve">
-    <value>Check for updates</value>
+    <value>Nach Updates suchen</value>
   </data>
   <data name="SettingResumeDelayDescription" xml:space="preserve">
-    <value>The delay to wait before starting the engine after the computer is resuming from a suspended state (sleep, hibernation). Increase this setting if you don't have audio output after the computer was suspended.</value>
+    <value>Eine Verzögerung, die bestimmt, wie lange mit dem Starten der Audio-Engine gewartet wird, nachdem der Computer aus dem Standby-Modus oder Ruhezustand startet.</value>
   </data>
   <data name="SettingResumeDelayName" xml:space="preserve">
-    <value>Resume Delay (s)</value>
+    <value>Standby-Startverzögerung</value>
   </data>
 </root>
