@@ -1,14 +1,21 @@
 ﻿using CommonServiceLocator;
 using Microsoft.Shell;
 using Micser.App.Infrastructure;
+using Micser.App.Infrastructure.Api;
 using Micser.App.Infrastructure.DataAccess;
+using Micser.App.Infrastructure.Menu;
 using Micser.App.Infrastructure.Themes;
+using Micser.App.Infrastructure.ToolBars;
+using Micser.App.Infrastructure.Updates;
+using Micser.App.Infrastructure.Widgets;
 using Micser.App.Settings;
 using Micser.Common;
 using Micser.Common.Api;
 using Micser.Common.DataAccess;
+using Micser.Common.DataAccess.Repositories;
 using Micser.Common.Extensions;
 using Micser.Common.Settings;
+using Micser.Common.Updates;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
@@ -20,10 +27,10 @@ using System;
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Threading.Tasks;
 using System.Timers;
 using System.Windows;
 using System.Windows.Threading;
@@ -110,8 +117,36 @@ namespace Micser.App
 
         protected override Window CreateShell()
         {
+            var settingsRegistry = GetService<ISettingsRegistry>();
+            settingsRegistry.Add(new SettingDefinition
+            {
+                Key = AppGlobals.SettingKeys.Language,
+                Name = "Language",
+                Description = "Sets the display language.",
+                DefaultValue = "en",
+                Type = SettingType.List,
+                StorageType = SettingStorageType.Internal,
+                List = AppGlobals.AvailableCultures.ToDictionary<string, object, string>(c => c, c => new CultureInfo(c).NativeName)
+            });
+
+            var settingsService = GetService<ISettingsService>();
+            settingsService.LoadAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+            var cultureCode = settingsService.GetSetting<string>(AppGlobals.SettingKeys.Language);
+
+            try
+            {
+                var cultureInfo = new CultureInfo(cultureCode);
+                CultureInfo.CurrentUICulture = cultureInfo;
+                CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+            }
+            catch (Exception ex)
+            {
+                Logger.Error(ex);
+            }
+
             _shell = GetService<MainShell>();
             _shell.DataContext = GetService<MainShellViewModel>();
+
             return _shell;
         }
 
@@ -130,6 +165,10 @@ namespace Micser.App
             var eventAggregator = GetService<IEventAggregator>();
             var modulesLoadedEvent = eventAggregator.GetEvent<ApplicationEvents.ModulesLoaded>();
             modulesLoadedEvent.Publish();
+        }
+
+        protected override void InitializeShell(Window shell)
+        {
         }
 
         protected override void OnExit(ExitEventArgs e)
@@ -159,11 +198,9 @@ namespace Micser.App
             Logger.Info("Exiting...");
         }
 
-        protected override async void OnInitialized()
+        protected override void OnInitialized()
         {
             var settingsService = GetService<ISettingsService>();
-
-            await Task.Run(() => settingsService.LoadAsync());
 
             _apiEndPoint = GetService<IApiEndPoint>();
             _reconnectTimer.Start();
@@ -233,8 +270,30 @@ namespace Micser.App
             container.RegisterInstance<IUnitOfWorkFactory>(new UnitOfWorkFactory(() => container.Resolve<IUnitOfWork>()));
             container.RegisterType<IUnitOfWork, UnitOfWork>();
 
-            // DEBUG
-            //container.RegisterType<IRegionNavigationJournal, MicserRegionNavigationJournal>();
+            containerRegistry.RegisterSingleton<INavigationManager, NavigationManager>();
+
+            containerRegistry.RegisterSingleton<IApplicationStateService, ApplicationStateService>();
+
+            containerRegistry.RegisterSingleton<IResourceRegistry, ResourceRegistry>();
+            containerRegistry.RegisterSingleton<IMenuItemRegistry, MenuItemRegistry>();
+            containerRegistry.RegisterSingleton<IToolBarRegistry, ToolBarRegistry>();
+            containerRegistry.RegisterSingleton<IWidgetRegistry, WidgetRegistry>();
+            containerRegistry.RegisterSingleton<IWidgetFactory, WidgetFactory>();
+
+            containerRegistry.RegisterSingleton<IRequestProcessorFactory, RequestProcessorFactory>();
+            containerRegistry.RegisterSingleton<IApiEndPoint, ApiClient>();
+            containerRegistry.RegisterInstance<IApiConfiguration>(new ApiConfiguration { Port = Globals.ApiPort });
+            containerRegistry.Register<IRequestProcessor, ApiEventRequestProcessor>();
+
+            containerRegistry.RegisterSingleton<ISettingsRegistry, SettingsRegistry>();
+            containerRegistry.RegisterSingleton<ISettingsService, SettingsService>();
+            containerRegistry.Register<ISettingValueRepository, SettingValueRepository>();
+            container.RegisterInstance<ISettingHandlerFactory>(new SettingHandlerFactory(t => (ISettingHandler)container.Resolve(t)));
+
+            container.RegisterRequestProcessor<UpdatesRequestProcessor>();
+            containerRegistry.RegisterInstance(new HttpUpdateSettings { ManifestUrl = Globals.Updates.ManifestUrl });
+            containerRegistry.RegisterSingleton<IUpdateService, HttpUpdateService>();
+            containerRegistry.RegisterSingleton<UpdateHandler>();
         }
 
         private static void LoadPlugins(IModuleCatalog moduleCatalog)

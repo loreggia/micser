@@ -24,6 +24,7 @@ namespace Micser.App
         public void OnInitialized(IContainerProvider containerProvider)
         {
             var settingsRegistry = containerProvider.Resolve<ISettingsRegistry>();
+
             settingsRegistry.Add(new SettingDefinition
             {
                 Key = AppGlobals.SettingKeys.MinimizeToTray,
@@ -264,8 +265,6 @@ namespace Micser.App
 
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            InfrastructureModule.RegisterInfrastructureTypes(containerRegistry);
-
             containerRegistry.RegisterView<MainMenuView, MainMenuViewModel>();
             containerRegistry.RegisterView<MainStatusBarView, MainStatusBarViewModel>();
             containerRegistry.RegisterView<ToolBarView, ToolBarViewModel>();
