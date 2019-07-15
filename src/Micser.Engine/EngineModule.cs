@@ -20,6 +20,11 @@ namespace Micser.Engine
                 Key = Globals.SettingKeys.UpdateCheck,
                 DefaultValue = true
             });
+            settingsRegistry.Add(new SettingDefinition
+            {
+                Key = Globals.SettingKeys.IsEngineRunning,
+                DefaultValue = true
+            });
         }
 
         public void RegisterTypes(IUnityContainer container)

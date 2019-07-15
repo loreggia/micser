@@ -58,10 +58,14 @@ namespace Micser.Engine
             _updateService = container.Resolve<IUpdateService>();
 
             _server.Start();
-            _engine.Start();
 
             _settingsService = container.Resolve<ISettingsService>();
             _settingsService.LoadAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+
+            if (_settingsService.GetSetting<bool>(Globals.SettingKeys.IsEngineRunning))
+            {
+                _engine.Start();
+            }
 
             _reconnectTimer.Start();
             _updateTimer.Start();
@@ -86,14 +90,39 @@ namespace Micser.Engine
 
         protected override bool OnPowerEvent(PowerBroadcastStatus powerStatus)
         {
-            PowerEvents.OnPowerStatusChanged(powerStatus);
+            var isSuspending = powerStatus == PowerBroadcastStatus.Suspend;
+            var isResuming = powerStatus == PowerBroadcastStatus.ResumeSuspend;
+
+            Logger.Debug($"Changing power state: {powerStatus}, isSuspending: {isSuspending}, isResuming: {isResuming}");
+
+            if (isSuspending)
+            {
+                _engine.Stop();
+            }
+            else if (isResuming)
+            {
+                var isRunning = _settingsService.GetSetting<bool>(Globals.SettingKeys.IsEngineRunning);
+
+                if (isRunning)
+                {
+                    Task.Run(async () =>
+                    {
+                        await Task.Delay(10000);
+                        _engine.Start();
+                    });
+                }
+            }
+
+            if (isSuspending || isResuming)
+            {
+                PowerEvents.OnPowerStateChanged(new PowerStateEventArgs(isSuspending, isResuming));
+            }
+
             return base.OnPowerEvent(powerStatus);
         }
 
         protected override void OnStart(string[] args)
         {
-            CanHandlePowerEvent = true;
-
             try
             {
                 ManualStart();

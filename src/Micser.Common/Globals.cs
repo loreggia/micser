@@ -143,6 +143,11 @@ namespace Micser.Common
         public static class SettingKeys
         {
             /// <summary>
+            /// The state of the audio engine.
+            /// </summary>
+            public const string IsEngineRunning = "IsEngineRunning";
+
+            /// <summary>
             /// Enable/disable automatic update check.
             /// </summary>
             public const string UpdateCheck = "UpdateCheck";

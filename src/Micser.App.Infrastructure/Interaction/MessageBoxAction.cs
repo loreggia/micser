@@ -5,6 +5,9 @@ using System.Windows.Interactivity;
 
 namespace Micser.App.Infrastructure.Interaction
 {
+    /// <summary>
+    /// An interaction action that handles showing a generic message box.
+    /// </summary>
     public class MessageBoxAction : TriggerAction<FrameworkElement>
     {
         /// <inheritdoc />

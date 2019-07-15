@@ -117,28 +117,7 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
-  <data name="Apply" xml:space="preserve">
-    <value>Apply</value>
-  </data>
-  <data name="MessageBoxButtonCancel" xml:space="preserve">
-    <value>Cancel</value>
-  </data>
-  <data name="MessageBoxButtonNo" xml:space="preserve">
-    <value>No</value>
-  </data>
-  <data name="MessageBoxButtonOk" xml:space="preserve">
-    <value>OK</value>
-  </data>
-  <data name="MessageBoxButtonYes" xml:space="preserve">
-    <value>Yes</value>
-  </data>
-  <data name="Mute" xml:space="preserve">
-    <value>Mute</value>
-  </data>
-  <data name="UseSystemVolume" xml:space="preserve">
-    <value>Use system volume</value>
-  </data>
-  <data name="Volume" xml:space="preserve">
-    <value>Volume (%)</value>
-  </data>
+  <metadata name="$this.TrayLargeIcon" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
+    <value>False</value>
+  </metadata>
 </root>

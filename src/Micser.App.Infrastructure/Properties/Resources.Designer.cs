@@ -70,6 +70,42 @@ namespace Micser.App.Infrastructure.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Cancel.
+        /// </summary>
+        public static string MessageBoxButtonCancel {
+            get {
+                return ResourceManager.GetString("MessageBoxButtonCancel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to No.
+        /// </summary>
+        public static string MessageBoxButtonNo {
+            get {
+                return ResourceManager.GetString("MessageBoxButtonNo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to OK.
+        /// </summary>
+        public static string MessageBoxButtonOk {
+            get {
+                return ResourceManager.GetString("MessageBoxButtonOk", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Yes.
+        /// </summary>
+        public static string MessageBoxButtonYes {
+            get {
+                return ResourceManager.GetString("MessageBoxButtonYes", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Mute.
         /// </summary>
         public static string Mute {
