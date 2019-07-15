@@ -105,9 +105,13 @@ namespace Micser.Engine
 
                 if (isRunning)
                 {
+                    var delay = _settingsService.GetSetting<int>(Globals.SettingKeys.ResumeDelay);
+
+                    Logger.Debug($"Delaying for {delay} seconds before starting the engine.");
+
                     Task.Run(async () =>
                     {
-                        await Task.Delay(10000);
+                        await Task.Delay(delay * 1000);
                         _engine.Start();
                     });
                 }

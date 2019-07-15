@@ -25,6 +25,11 @@ namespace Micser.Engine
                 Key = Globals.SettingKeys.IsEngineRunning,
                 DefaultValue = true
             });
+            settingsRegistry.Add(new SettingDefinition
+            {
+                Key = Globals.SettingKeys.ResumeDelay,
+                DefaultValue = 10
+            });
         }
 
         public void RegisterTypes(IUnityContainer container)

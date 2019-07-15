@@ -62,7 +62,6 @@
     <Compile Include="Audio\WriteableBufferingSource.cs" />
     <Compile Include="MainAppModule.cs" />
     <Compile Include="MainEngineModule.cs" />
-    <Compile Include="Modules\RestartEngineModule.cs" />
     <Compile Include="Modules\CompressorModule.cs" />
     <Compile Include="Modules\DeviceInputModule.cs" />
     <Compile Include="Modules\DeviceOutputModule.cs" />
@@ -78,10 +77,6 @@
     </Compile>
     <Compile Include="Widgets\CompressorViewModel.cs" />
     <Compile Include="Widgets\PeakSpectrum.cs" />
-    <Compile Include="Widgets\RestartEngineViewModel.cs" />
-    <Compile Include="Widgets\RestartEngineWidget.xaml.cs">
-      <DependentUpon>RestartEngineWidget.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Widgets\SpectrumWidget.xaml.cs">
       <DependentUpon>SpectrumWidget.xaml</DependentUpon>
     </Compile>
@@ -112,10 +107,6 @@
     <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="Widgets\RestartEngineWidget.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Widgets\SpectrumWidget.xaml">
       <Generator>MSBuild:Compile</Generator>

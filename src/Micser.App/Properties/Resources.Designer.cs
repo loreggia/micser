@@ -323,6 +323,24 @@ namespace Micser.App.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The delay to wait before starting the engine after the computer is resuming from a suspended state (sleep, hibernation). Increase this setting if you don&apos;t have audio output after the computer was suspended..
+        /// </summary>
+        public static string SettingResumeDelayDescription {
+            get {
+                return ResourceManager.GetString("SettingResumeDelayDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Resume Delay (s).
+        /// </summary>
+        public static string SettingResumeDelayName {
+            get {
+                return ResourceManager.GetString("SettingResumeDelayName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to If enabled, the program will start when you log in..
         /// </summary>
         public static string SettingStartupDescription {
@@ -361,36 +379,36 @@ namespace Micser.App.Properties {
         /// <summary>
         ///   Looks up a localized string similar to Automatically check for updates and notify when an update is ready to install..
         /// </summary>
-        public static string SettingsUpdateCheckDescription {
+        public static string SettingUpdateCheckDescription {
             get {
-                return ResourceManager.GetString("SettingsUpdateCheckDescription", resourceCulture);
+                return ResourceManager.GetString("SettingUpdateCheckDescription", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Check for updates.
         /// </summary>
-        public static string SettingsUpdateCheckName {
+        public static string SettingUpdateCheckName {
             get {
-                return ResourceManager.GetString("SettingsUpdateCheckName", resourceCulture);
+                return ResourceManager.GetString("SettingUpdateCheckName", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Configures the number of virtual audio cables. Changing this requires administrative privileges..
         /// </summary>
-        public static string SettingsVacCountDescription {
+        public static string SettingVacCountDescription {
             get {
-                return ResourceManager.GetString("SettingsVacCountDescription", resourceCulture);
+                return ResourceManager.GetString("SettingVacCountDescription", resourceCulture);
             }
         }
         
         /// <summary>
         ///   Looks up a localized string similar to Virtual Audio Cables.
         /// </summary>
-        public static string SettingsVacCountName {
+        public static string SettingVacCountName {
             get {
-                return ResourceManager.GetString("SettingsVacCountName", resourceCulture);
+                return ResourceManager.GetString("SettingVacCountName", resourceCulture);
             }
         }
         
