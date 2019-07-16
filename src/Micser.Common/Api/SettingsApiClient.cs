@@ -22,7 +22,7 @@ namespace Micser.Common.Api
         /// </summary>
         public async Task<ServiceResult<SettingValueDto>> GetSetting(string key)
         {
-            var response = await _apiEndPoint.SendMessageAsync(new JsonRequest(ResourceName, "getsetting", key));
+            var response = await _apiEndPoint.SendMessageAsync(new JsonRequest(ResourceName, "getsetting", key)).ConfigureAwait(false);
             return new ServiceResult<SettingValueDto>(response);
         }
 
@@ -31,7 +31,7 @@ namespace Micser.Common.Api
         /// </summary>
         public async Task<ServiceResult<SettingValueDto>> SetSetting(string key, object value)
         {
-            var response = await _apiEndPoint.SendMessageAsync(new JsonRequest(ResourceName, "setsetting", new SettingValueDto { Key = key, Value = value }));
+            var response = await _apiEndPoint.SendMessageAsync(new JsonRequest(ResourceName, "setsetting", new SettingValueDto { Key = key, Value = value })).ConfigureAwait(false);
             return new ServiceResult<SettingValueDto>(response);
         }
     }

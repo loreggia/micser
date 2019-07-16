@@ -109,6 +109,9 @@
     <Compile Include="ISelectable.cs" />
     <Compile Include="Interaction\OpenFileDialogAction.cs" />
     <Compile Include="Interaction\FileDialogConfirmation.cs" />
+    <Compile Include="Localization\LocalizationManager.cs" />
+    <Compile Include="Localization\ResourceData.cs" />
+    <Compile Include="Localization\ResxExtension.cs" />
     <Compile Include="ModulesSerializer.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -278,11 +281,6 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Prism.Core">
-      <Version>7.1.0.431</Version>
-    </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Themes\Colors.Default.ini">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -294,5 +292,6 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

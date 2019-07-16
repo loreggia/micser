@@ -1,42 +1,26 @@
 ﻿using CommonServiceLocator;
 using Microsoft.Shell;
 using Micser.App.Infrastructure;
-using Micser.App.Infrastructure.Api;
-using Micser.App.Infrastructure.DataAccess;
-using Micser.App.Infrastructure.Menu;
 using Micser.App.Infrastructure.Themes;
-using Micser.App.Infrastructure.ToolBars;
-using Micser.App.Infrastructure.Updates;
-using Micser.App.Infrastructure.Widgets;
 using Micser.App.Settings;
 using Micser.Common;
 using Micser.Common.Api;
-using Micser.Common.DataAccess;
-using Micser.Common.DataAccess.Repositories;
-using Micser.Common.Extensions;
 using Micser.Common.Settings;
-using Micser.Common.Updates;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
 using Prism.Events;
 using Prism.Ioc;
 using Prism.Modularity;
-using Prism.Unity;
 using System;
 using System.Collections.Generic;
-using System.Data.Entity;
 using System.Diagnostics;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Timers;
 using System.Windows;
 using System.Windows.Threading;
-using Unity;
-using Unity.Injection;
-using Unity.Resolution;
 
 namespace Micser.App
 {
@@ -47,7 +31,7 @@ namespace Micser.App
         private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
         private readonly Timer _reconnectTimer;
         private IApiEndPoint _apiEndPoint;
-        private bool _isStartup;
+        private ArgumentDictionary _argumentDictionary;
         private MainShell _shell;
 
         public MicserApplication()
@@ -56,7 +40,7 @@ namespace Micser.App
 
             DispatcherUnhandledException += OnDispatcherUnhandledException;
 
-            _reconnectTimer = new Timer(1000) { AutoReset = true };
+            _reconnectTimer = new Timer(1000) { AutoReset = false };
             _reconnectTimer.Elapsed += OnReconnectTimerElapsed;
         }
 
@@ -85,6 +69,12 @@ namespace Micser.App
             }
 
             return result;
+        }
+
+        public override void Initialize()
+        {
+            base.Initialize();
+            InitializeModules();
         }
 
         public bool SignalExternalCommandLineArgs(IList<string> args)
@@ -117,37 +107,7 @@ namespace Micser.App
 
         protected override Window CreateShell()
         {
-            var settingsRegistry = GetService<ISettingsRegistry>();
-            settingsRegistry.Add(new SettingDefinition
-            {
-                Key = AppGlobals.SettingKeys.Language,
-                Name = "Language",
-                Description = "Sets the display language.",
-                DefaultValue = "en",
-                Type = SettingType.List,
-                StorageType = SettingStorageType.Internal,
-                List = AppGlobals.AvailableCultures.ToDictionary<string, object, string>(c => c, c => new CultureInfo(c).NativeName)
-            });
-
-            var settingsService = GetService<ISettingsService>();
-            settingsService.LoadAsync().ConfigureAwait(false).GetAwaiter().GetResult();
-            var cultureCode = settingsService.GetSetting<string>(AppGlobals.SettingKeys.Language);
-
-            try
-            {
-                var cultureInfo = new CultureInfo(cultureCode);
-                CultureInfo.CurrentUICulture = cultureInfo;
-                CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex);
-            }
-
-            _shell = GetService<MainShell>();
-            _shell.DataContext = GetService<MainShellViewModel>();
-
-            return _shell;
+            return null;
         }
 
         protected override void InitializeModules()
@@ -200,27 +160,8 @@ namespace Micser.App
 
         protected override void OnInitialized()
         {
-            var settingsService = GetService<ISettingsService>();
-
             _apiEndPoint = GetService<IApiEndPoint>();
             _reconnectTimer.Start();
-
-            var showWindow = true;
-
-            if (_isStartup)
-            {
-                var startMinimized = settingsService.GetSetting<bool>(AppGlobals.SettingKeys.StartupMinimized);
-
-                if (startMinimized)
-                {
-                    showWindow = false;
-                }
-            }
-
-            if (showWindow)
-            {
-                MainWindow?.Show();
-            }
 
             Logger.Info("Ready");
             SetStatus("Ready");
@@ -228,8 +169,7 @@ namespace Micser.App
 
         protected override void OnStartup(StartupEventArgs e)
         {
-            var argumentDictionary = new ArgumentDictionary(e.Args);
-            _isStartup = argumentDictionary.HasFlag(AppGlobals.ProgramArguments.Startup);
+            _argumentDictionary = new ArgumentDictionary(e.Args);
 
             Directory.CreateDirectory(Globals.AppDataFolder);
 
@@ -261,39 +201,7 @@ namespace Micser.App
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            // register types that MainShell depends on here..
-            var container = containerRegistry.GetContainer();
-            container.RegisterType<ILogger>(new InjectionFactory(c => LogManager.GetCurrentClassLogger()));
-
-            container.RegisterType<DbContext, AppDbContext>();
-            container.RegisterInstance<IRepositoryFactory>(new RepositoryFactory((t, c) => (IRepository)container.Resolve(t, new ParameterOverride("context", c))));
-            container.RegisterInstance<IUnitOfWorkFactory>(new UnitOfWorkFactory(() => container.Resolve<IUnitOfWork>()));
-            container.RegisterType<IUnitOfWork, UnitOfWork>();
-
-            containerRegistry.RegisterSingleton<INavigationManager, NavigationManager>();
-
-            containerRegistry.RegisterSingleton<IApplicationStateService, ApplicationStateService>();
-
-            containerRegistry.RegisterSingleton<IResourceRegistry, ResourceRegistry>();
-            containerRegistry.RegisterSingleton<IMenuItemRegistry, MenuItemRegistry>();
-            containerRegistry.RegisterSingleton<IToolBarRegistry, ToolBarRegistry>();
-            containerRegistry.RegisterSingleton<IWidgetRegistry, WidgetRegistry>();
-            containerRegistry.RegisterSingleton<IWidgetFactory, WidgetFactory>();
-
-            containerRegistry.RegisterSingleton<IRequestProcessorFactory, RequestProcessorFactory>();
-            containerRegistry.RegisterSingleton<IApiEndPoint, ApiClient>();
-            containerRegistry.RegisterInstance<IApiConfiguration>(new ApiConfiguration { Port = Globals.ApiPort });
-            containerRegistry.Register<IRequestProcessor, ApiEventRequestProcessor>();
-
-            containerRegistry.RegisterSingleton<ISettingsRegistry, SettingsRegistry>();
-            containerRegistry.RegisterSingleton<ISettingsService, SettingsService>();
-            containerRegistry.Register<ISettingValueRepository, SettingValueRepository>();
-            container.RegisterInstance<ISettingHandlerFactory>(new SettingHandlerFactory(t => (ISettingHandler)container.Resolve(t)));
-
-            container.RegisterRequestProcessor<UpdatesRequestProcessor>();
-            containerRegistry.RegisterInstance(new HttpUpdateSettings { ManifestUrl = Globals.Updates.ManifestUrl });
-            containerRegistry.RegisterSingleton<IUpdateService, HttpUpdateService>();
-            containerRegistry.RegisterSingleton<UpdateHandler>();
+            containerRegistry.RegisterInstance(_argumentDictionary);
         }
 
         private static void LoadPlugins(IModuleCatalog moduleCatalog)
@@ -349,8 +257,10 @@ namespace Micser.App
             if (_apiEndPoint != null &&
                 _apiEndPoint.State == EndPointState.Disconnected)
             {
-                await _apiEndPoint.ConnectAsync();
+                await _apiEndPoint.ConnectAsync().ConfigureAwait(false);
             }
+
+            _reconnectTimer.Start();
         }
     }
 }

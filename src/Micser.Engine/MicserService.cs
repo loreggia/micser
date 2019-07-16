@@ -111,9 +111,9 @@ namespace Micser.Engine
 
                     Task.Run(async () =>
                     {
-                        await Task.Delay(delay * 1000);
+                        await Task.Delay(delay * 1000).ConfigureAwait(false);
                         _engine.Start();
-                    });
+                    }).ConfigureAwait(false);
                 }
             }
 
@@ -197,7 +197,7 @@ namespace Micser.Engine
         {
             if (_server.State == EndPointState.Disconnected)
             {
-                await _server.ConnectAsync();
+                await _server.ConnectAsync().ConfigureAwait(false);
             }
 
             _reconnectTimer.Start();
@@ -212,7 +212,7 @@ namespace Micser.Engine
 
             if (updatesEnabled)
             {
-                var updateManifest = await _updateService.GetUpdateManifestAsync();
+                var updateManifest = await _updateService.GetUpdateManifestAsync().ConfigureAwait(false);
 
                 if (_updateService.IsUpdateAvailable(updateManifest))
                 {
@@ -220,11 +220,11 @@ namespace Micser.Engine
 
                     do
                     {
-                        result = await _server.SendMessageAsync(new JsonRequest(Globals.ApiResources.Updates, "updateavailable", updateManifest));
+                        result = await _server.SendMessageAsync(new JsonRequest(Globals.ApiResources.Updates, "updateavailable", updateManifest)).ConfigureAwait(false);
 
                         if (!result.IsConnected)
                         {
-                            await Task.Delay(1000);
+                            await Task.Delay(1000).ConfigureAwait(false);
                         }
                     } while (!result.IsConnected);
                 }

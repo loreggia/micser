@@ -103,14 +103,14 @@ namespace Micser.Common.Api
                 Logger.Warn($"{nameof(SendMessageAsync)} waiters: {_sendMessageSemaphore.WaiterCount}");
             }
 
-            await _sendMessageSemaphore.WaitAsync();
+            await _sendMessageSemaphore.WaitAsync().ConfigureAwait(false);
 
             try
             {
                 var json = JsonConvert.SerializeObject(message);
 
-                await ApiProtocol.WriteMessage(OutStream, json);
-                var response = await ApiProtocol.ReceiveMessage(OutStream);
+                await ApiProtocol.WriteMessage(OutStream, json).ConfigureAwait(false);
+                var response = await ApiProtocol.ReceiveMessage(OutStream).ConfigureAwait(false);
 
                 if (response == null)
                 {
@@ -198,12 +198,16 @@ namespace Micser.Common.Api
                         Disconnect();
                         return;
                     }
-                    var response = await ProcessMessage(message);
+                    var response = await ProcessMessage(message).ConfigureAwait(false);
                     await ApiProtocol.WriteMessage(InStream, response).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
-                    Logger.Error(ex);
+                    if (!(ex is IOException ioEx) || ioEx.HResult != -2146232800)
+                    {
+                        Logger.Error(ex);
+                    }
+
                     Disconnect();
                 }
             }
@@ -219,7 +223,7 @@ namespace Micser.Common.Api
                     return null;
                 }
                 var processor = _requestProcessorFactory.Create(message.Resource);
-                var response = await processor.ProcessAsync(message.Action, message.Content);
+                var response = await processor.ProcessAsync(message.Action, message.Content).ConfigureAwait(false);
                 return JsonConvert.SerializeObject(response);
             }
             catch (Exception ex)

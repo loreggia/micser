@@ -138,7 +138,7 @@ namespace Micser.Engine.Infrastructure.Audio
         {
             if (e.DeviceId == DeviceDescription?.Id)
             {
-                await Task.Run(() => OnDeviceStateChanged(e.DeviceState));
+                await Task.Run(() => OnDeviceStateChanged(e.DeviceState)).ConfigureAwait(false);
             }
         }
     }

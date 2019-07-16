@@ -204,26 +204,14 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CommonServiceLocator">
-      <Version>2.0.4</Version>
-    </PackageReference>
     <PackageReference Include="Hardcodet.NotifyIcon.Wpf">
       <Version>1.0.8</Version>
     </PackageReference>
     <PackageReference Include="NLog">
-      <Version>4.6.5</Version>
-    </PackageReference>
-    <PackageReference Include="Prism.Core">
-      <Version>7.1.0.431</Version>
+      <Version>4.6.6</Version>
     </PackageReference>
     <PackageReference Include="Prism.Unity">
       <Version>7.1.0.431</Version>
-    </PackageReference>
-    <PackageReference Include="Prism.Wpf">
-      <Version>7.1.0.431</Version>
-    </PackageReference>
-    <PackageReference Include="System.Data.SQLite.Core">
-      <Version>1.0.111</Version>
     </PackageReference>
     <PackageReference Include="Unity">
       <Version>5.8.13</Version>

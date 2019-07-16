@@ -47,14 +47,14 @@ namespace Micser.Common.Api
                 }
 
                 OutClient = new TcpClient();
-                await OutClient.ConnectAsync(IPAddress.Loopback, Configuration.Port);
+                await OutClient.ConnectAsync(IPAddress.Loopback, Configuration.Port).ConfigureAwait(false);
                 if (OutClient.Client == null)
                 {
                     OutClient?.Dispose();
                     OutClient = null;
                     return false;
                 }
-                
+
                 OutStream = OutClient.GetStream();
                 if (OutStream == null)
                 {
@@ -65,7 +65,7 @@ namespace Micser.Common.Api
                 OutClient.Client.SetKeepAlive();
 
                 InClient = new TcpClient();
-                await InClient.ConnectAsync(IPAddress.Loopback, Configuration.Port);
+                await InClient.ConnectAsync(IPAddress.Loopback, Configuration.Port).ConfigureAwait(false);
                 if (InClient.Client == null)
                 {
                     OutStream?.Dispose();

@@ -1,21 +1,38 @@
 ﻿using Micser.App.Infrastructure;
 using Micser.App.Infrastructure.Api;
+using Micser.App.Infrastructure.DataAccess;
 using Micser.App.Infrastructure.Extensions;
 using Micser.App.Infrastructure.Menu;
+using Micser.App.Infrastructure.Themes;
 using Micser.App.Infrastructure.ToolBars;
 using Micser.App.Infrastructure.Updates;
+using Micser.App.Infrastructure.Widgets;
 using Micser.App.Properties;
 using Micser.App.Settings;
 using Micser.App.ViewModels;
 using Micser.App.Views;
 using Micser.Common;
+using Micser.Common.Api;
+using Micser.Common.DataAccess;
+using Micser.Common.DataAccess.Repositories;
 using Micser.Common.Extensions;
 using Micser.Common.Settings;
+using Micser.Common.Updates;
+using NLog;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Ioc;
+using Prism.Regions;
+using Prism.Unity;
+using System;
+using System.Data.Entity;
 using System.Globalization;
 using System.Linq;
+using System.Threading;
+using System.Windows;
+using Unity;
+using Unity.Injection;
+using Unity.Resolution;
 
 namespace Micser.App
 {
@@ -23,85 +40,115 @@ namespace Micser.App
     {
         public void OnInitialized(IContainerProvider containerProvider)
         {
-            var settingsRegistry = containerProvider.Resolve<ISettingsRegistry>();
+            RegisterSettings(containerProvider);
+            RegisterMenuItems(containerProvider);
+            RegisterToolBarItems(containerProvider);
 
-            settingsRegistry.Add(new SettingDefinition
+            InitializeShell(containerProvider);
+
+            containerProvider.Resolve<IApplicationStateService>().Initialize();
+        }
+
+        public void RegisterTypes(IContainerRegistry containerRegistry)
+        {
+            var container = containerRegistry.GetContainer();
+            container.RegisterType<ILogger>(new InjectionFactory(c => LogManager.GetCurrentClassLogger()));
+
+            container.RegisterType<DbContext, AppDbContext>();
+            container.RegisterInstance<IRepositoryFactory>(new RepositoryFactory((t, c) => (IRepository)container.Resolve(t, new ParameterOverride("context", c))));
+            container.RegisterInstance<IUnitOfWorkFactory>(new UnitOfWorkFactory(() => container.Resolve<IUnitOfWork>()));
+            container.RegisterType<IUnitOfWork, UnitOfWork>();
+
+            containerRegistry.RegisterSingleton<INavigationManager, NavigationManager>();
+
+            containerRegistry.RegisterSingleton<IApplicationStateService, ApplicationStateService>();
+
+            containerRegistry.RegisterSingleton<IResourceRegistry, ResourceRegistry>();
+            containerRegistry.RegisterSingleton<IMenuItemRegistry, MenuItemRegistry>();
+            containerRegistry.RegisterSingleton<IToolBarRegistry, ToolBarRegistry>();
+            containerRegistry.RegisterSingleton<IWidgetRegistry, WidgetRegistry>();
+            containerRegistry.RegisterSingleton<IWidgetFactory, WidgetFactory>();
+
+            containerRegistry.RegisterSingleton<IRequestProcessorFactory, RequestProcessorFactory>();
+            containerRegistry.RegisterSingleton<IApiEndPoint, ApiClient>();
+            containerRegistry.RegisterInstance<IApiConfiguration>(new ApiConfiguration { Port = Globals.ApiPort });
+            containerRegistry.Register<IRequestProcessor, ApiEventRequestProcessor>();
+
+            containerRegistry.RegisterSingleton<ISettingsRegistry, SettingsRegistry>();
+            containerRegistry.RegisterSingleton<ISettingsService, SettingsService>();
+            containerRegistry.Register<ISettingValueRepository, SettingValueRepository>();
+            container.RegisterInstance<ISettingHandlerFactory>(new SettingHandlerFactory(t => (ISettingHandler)container.Resolve(t)));
+
+            containerRegistry.RegisterView<MainMenuView, MainMenuViewModel>();
+            containerRegistry.RegisterView<MainStatusBarView, MainStatusBarViewModel>();
+            containerRegistry.RegisterView<ToolBarView, ToolBarViewModel>();
+
+            containerRegistry.RegisterView<StartupView, StartupViewModel>();
+            containerRegistry.RegisterView<StatusView, StatusViewModel>();
+            containerRegistry.RegisterView<MainView, MainViewModel>();
+            containerRegistry.RegisterView<SettingsView, SettingsViewModel>();
+            containerRegistry.RegisterView<AboutView, AboutViewModel>();
+
+            container.RegisterRequestProcessor<UpdatesRequestProcessor>();
+            containerRegistry.RegisterInstance(new HttpUpdateSettings { ManifestUrl = Globals.Updates.ManifestUrl });
+            containerRegistry.RegisterSingleton<IUpdateService, HttpUpdateService>();
+            containerRegistry.RegisterSingleton<UpdateHandler>();
+        }
+
+        private static async void InitializeShell(IContainerProvider containerProvider)
+        {
+            var settingsService = containerProvider.Resolve<ISettingsService>();
+            await settingsService.LoadAsync();
+            var cultureCode = settingsService.GetSetting<string>(AppGlobals.SettingKeys.Language);
+
+            try
             {
-                Key = AppGlobals.SettingKeys.MinimizeToTray,
-                Name = Resources.SettingMinimizeToTrayName,
-                Description = Resources.SettingMinimizeToTrayDescription,
-                DefaultValue = true,
-                Type = SettingType.Boolean
-            });
-            settingsRegistry.Add(new SettingDefinition
+                var cultureInfo = new CultureInfo(cultureCode);
+                Thread.CurrentThread.CurrentUICulture = cultureInfo;
+                Application.Current.Dispatcher.Thread.CurrentUICulture = cultureInfo;
+                CultureInfo.CurrentUICulture = cultureInfo;
+                CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
+            }
+            catch (Exception ex)
             {
-                Key = AppGlobals.SettingKeys.Startup,
-                Name = Resources.SettingStartupName,
-                Description = Resources.SettingStartupDescription,
-                DefaultValue = true,
-                Type = SettingType.Boolean,
-                StorageType = SettingStorageType.Custom,
-                HandlerType = typeof(StartupSettingHandler)
-            });
-            settingsRegistry.Add(new SettingDefinition
+                var logger = containerProvider.Resolve<ILogger>();
+                logger.Error(ex);
+            }
+
+            var shell = containerProvider.Resolve<MainShell>();
+            shell.DataContext = containerProvider.Resolve<MainShellViewModel>();
+
+            RegionManager.SetRegionManager(shell, containerProvider.Resolve<IRegionManager>());
+            RegionManager.UpdateRegions();
+
+            Application.Current.MainWindow = shell;
+
+            var showWindow = true;
+
+            var argumentDictionary = containerProvider.Resolve<ArgumentDictionary>();
+            var isStartup = argumentDictionary.HasFlag(AppGlobals.ProgramArguments.Startup);
+
+            if (isStartup)
             {
-                Key = AppGlobals.SettingKeys.StartupMinimized,
-                Name = Resources.SettingStartupMinimizedName,
-                Description = Resources.SettingStartupMinimizedDescription,
-                DefaultValue = true,
-                Type = SettingType.Boolean,
-                StorageType = SettingStorageType.Internal,
-                IsEnabled = s => s.GetSetting<bool>(AppGlobals.SettingKeys.Startup)
-            });
-            settingsRegistry.Add(new SettingDefinition
+                var startMinimized = settingsService.GetSetting<bool>(AppGlobals.SettingKeys.StartupMinimized);
+
+                if (startMinimized)
+                {
+                    showWindow = false;
+                }
+            }
+
+            if (showWindow)
             {
-                Key = AppGlobals.SettingKeys.ColorTheme,
-                Name = Resources.SettingColorThemeName,
-                Description = Resources.SettingColorThemeDescription,
-                DefaultValue = "Default",
-                Type = SettingType.List,
-                StorageType = SettingStorageType.Internal,
-                HandlerType = typeof(ColorThemeSettingHandler)
-            });
-            settingsRegistry.Add(new SettingDefinition
-            {
-                Key = AppGlobals.SettingKeys.ShellState,
-                Type = SettingType.Object,
-                StorageType = SettingStorageType.Internal,
-                IsHidden = true
-            });
-            settingsRegistry.Add(new SettingDefinition
-            {
-                Key = AppGlobals.SettingKeys.VacCount,
-                Name = Resources.SettingVacCountName,
-                Description = Resources.SettingVacCountDescription,
-                Type = SettingType.List,
-                StorageType = SettingStorageType.Custom,
-                DefaultValue = 1,
-                List = Enumerable.Range(1, Globals.MaxVacCount).ToDictionary(x => (object)x, x => x.ToString(CultureInfo.InvariantCulture)),
-                HandlerType = typeof(VacCountSettingHandler),
-                IsAppliedInstantly = false
-            });
-            settingsRegistry.Add(new SettingDefinition
-            {
-                Key = Globals.SettingKeys.UpdateCheck,
-                Name = Resources.SettingUpdateCheckName,
-                Description = Resources.SettingUpdateCheckDescription,
-                Type = SettingType.Boolean,
-                StorageType = SettingStorageType.Api,
-                DefaultValue = true
-            });
-            settingsRegistry.Add(new SettingDefinition
-            {
-                Key = Globals.SettingKeys.ResumeDelay,
-                Name = Resources.SettingResumeDelayName,
-                Description = Resources.SettingResumeDelayDescription,
-                Type = SettingType.Integer,
-                StorageType = SettingStorageType.Api,
-                DefaultValue = 10
-            });
+                shell.Show();
+            }
 
             var navigationManager = containerProvider.Resolve<INavigationManager>();
+            navigationManager.Navigate<StartupView>(AppGlobals.PrismRegions.Main);
+        }
+
+        private static void RegisterMenuItems(IContainerProvider containerProvider)
+        {
             var menuItemRegistry = containerProvider.Resolve<IMenuItemRegistry>();
 
             // File
@@ -206,6 +253,102 @@ namespace Micser.App
                 Command = new NavigationCommand<AboutView>(AppGlobals.PrismRegions.Main),
                 IconTemplateName = "Icon_HelpApplication_16x"
             });
+        }
+
+        private static void RegisterSettings(IContainerProvider containerProvider)
+        {
+            var settingsRegistry = containerProvider.Resolve<ISettingsRegistry>();
+
+            settingsRegistry.Add(new SettingDefinition
+            {
+                Key = AppGlobals.SettingKeys.Language,
+                Name = "Language",
+                Description = "Sets the display language.",
+                DefaultValue = "en",
+                Type = SettingType.List,
+                StorageType = SettingStorageType.Internal,
+                List = AppGlobals.AvailableCultures.ToDictionary<string, object, string>(c => c, c => new CultureInfo(c).NativeName)
+            });
+            settingsRegistry.Add(new SettingDefinition
+            {
+                Key = AppGlobals.SettingKeys.MinimizeToTray,
+                Name = Resources.SettingMinimizeToTrayName,
+                Description = Resources.SettingMinimizeToTrayDescription,
+                DefaultValue = true,
+                Type = SettingType.Boolean
+            });
+            settingsRegistry.Add(new SettingDefinition
+            {
+                Key = AppGlobals.SettingKeys.Startup,
+                Name = Resources.SettingStartupName,
+                Description = Resources.SettingStartupDescription,
+                DefaultValue = true,
+                Type = SettingType.Boolean,
+                StorageType = SettingStorageType.Custom,
+                HandlerType = typeof(StartupSettingHandler)
+            });
+            settingsRegistry.Add(new SettingDefinition
+            {
+                Key = AppGlobals.SettingKeys.StartupMinimized,
+                Name = Resources.SettingStartupMinimizedName,
+                Description = Resources.SettingStartupMinimizedDescription,
+                DefaultValue = true,
+                Type = SettingType.Boolean,
+                StorageType = SettingStorageType.Internal,
+                IsEnabled = s => s.GetSetting<bool>(AppGlobals.SettingKeys.Startup)
+            });
+            settingsRegistry.Add(new SettingDefinition
+            {
+                Key = AppGlobals.SettingKeys.ColorTheme,
+                Name = Resources.SettingColorThemeName,
+                Description = Resources.SettingColorThemeDescription,
+                DefaultValue = "Default",
+                Type = SettingType.List,
+                StorageType = SettingStorageType.Internal,
+                HandlerType = typeof(ColorThemeSettingHandler)
+            });
+            settingsRegistry.Add(new SettingDefinition
+            {
+                Key = AppGlobals.SettingKeys.ShellState,
+                Type = SettingType.Object,
+                StorageType = SettingStorageType.Internal,
+                IsHidden = true
+            });
+            settingsRegistry.Add(new SettingDefinition
+            {
+                Key = AppGlobals.SettingKeys.VacCount,
+                Name = Resources.SettingVacCountName,
+                Description = Resources.SettingVacCountDescription,
+                Type = SettingType.List,
+                StorageType = SettingStorageType.Custom,
+                DefaultValue = 1,
+                List = Enumerable.Range(1, Globals.MaxVacCount).ToDictionary(x => (object)x, x => x.ToString(CultureInfo.InvariantCulture)),
+                HandlerType = typeof(VacCountSettingHandler),
+                IsAppliedInstantly = false
+            });
+            settingsRegistry.Add(new SettingDefinition
+            {
+                Key = Globals.SettingKeys.UpdateCheck,
+                Name = Resources.SettingUpdateCheckName,
+                Description = Resources.SettingUpdateCheckDescription,
+                Type = SettingType.Boolean,
+                StorageType = SettingStorageType.Api,
+                DefaultValue = true
+            });
+            settingsRegistry.Add(new SettingDefinition
+            {
+                Key = Globals.SettingKeys.ResumeDelay,
+                Name = Resources.SettingResumeDelayName,
+                Description = Resources.SettingResumeDelayDescription,
+                Type = SettingType.Integer,
+                StorageType = SettingStorageType.Api,
+                DefaultValue = 10
+            });
+        }
+
+        private static void RegisterToolBarItems(IContainerProvider containerProvider)
+        {
+            var navigationManager = containerProvider.Resolve<INavigationManager>();
 
             // main tool bar
             var toolBarRegistry = containerProvider.Resolve<IToolBarRegistry>();
@@ -257,23 +400,6 @@ namespace Micser.App
                 Description = Resources.ToolBarSettingsDescription,
                 IconTemplateName = "Icon_Settings_16x"
             });
-
-            navigationManager.Navigate<StartupView>(AppGlobals.PrismRegions.Main);
-
-            containerProvider.Resolve<IApplicationStateService>().Initialize();
-        }
-
-        public void RegisterTypes(IContainerRegistry containerRegistry)
-        {
-            containerRegistry.RegisterView<MainMenuView, MainMenuViewModel>();
-            containerRegistry.RegisterView<MainStatusBarView, MainStatusBarViewModel>();
-            containerRegistry.RegisterView<ToolBarView, ToolBarViewModel>();
-
-            containerRegistry.RegisterView<StartupView, StartupViewModel>();
-            containerRegistry.RegisterView<StatusView, StatusViewModel>();
-            containerRegistry.RegisterView<MainView, MainViewModel>();
-            containerRegistry.RegisterView<SettingsView, SettingsViewModel>();
-            containerRegistry.RegisterView<AboutView, AboutViewModel>();
         }
     }
 }
