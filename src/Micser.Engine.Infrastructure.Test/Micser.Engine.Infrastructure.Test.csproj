@@ -48,7 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="NLog">
-      <Version>4.6.5</Version>
+      <Version>4.6.6</Version>
     </PackageReference>
     <PackageReference Include="xunit">
       <Version>2.4.1</Version>

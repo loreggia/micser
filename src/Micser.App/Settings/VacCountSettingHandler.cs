@@ -25,7 +25,7 @@ namespace Micser.App.Settings
 
         public async Task<object> LoadSettingAsync(object value)
         {
-            return await Task.Run(GetRegistryValue);
+            return await Task.Run(GetRegistryValue).ConfigureAwait(false);
         }
 
         public async Task<object> SaveSettingAsync(object value)
@@ -37,7 +37,7 @@ namespace Micser.App.Settings
 
             try
             {
-                await _engineApiClient.StopAsync();
+                await _engineApiClient.StopAsync().ConfigureAwait(false);
 
                 var process = new Process
                 {
@@ -73,7 +73,7 @@ namespace Micser.App.Settings
             }
             finally
             {
-                await _engineApiClient.StartAsync();
+                await _engineApiClient.StartAsync().ConfigureAwait(false);
             }
 
             return GetRegistryValue();

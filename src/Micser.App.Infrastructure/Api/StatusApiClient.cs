@@ -23,7 +23,7 @@ namespace Micser.App.Infrastructure.Api
         /// </summary>
         public async Task<ServiceResult<object>> GetStatus()
         {
-            var response = await _apiEndPoint.SendMessageAsync(new JsonRequest(ResourceName));
+            var response = await _apiEndPoint.SendMessageAsync(new JsonRequest(ResourceName)).ConfigureAwait(false);
             return new ServiceResult<object>(response);
         }
     }

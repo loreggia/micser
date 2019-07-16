@@ -44,7 +44,7 @@ namespace Micser.Plugins.Main.Modules
             var data = _sampleProcessor.GetFftData();
             if (data != null)
             {
-                await _apiEndPoint.SendMessageAsync(new JsonRequest("spectrum", null, data));
+                await _apiEndPoint.SendMessageAsync(new JsonRequest("spectrum", null, data)).ConfigureAwait(false);
             }
 
             if (!_isDisposed)

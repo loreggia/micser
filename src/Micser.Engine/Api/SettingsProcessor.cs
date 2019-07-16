@@ -14,7 +14,7 @@ namespace Micser.Engine.Api
         {
             _settingsService = settingsService;
             AddAction("getsetting", key => GetValue(key));
-            AddAction("setsetting", async dto => await SetValueAsync(dto));
+            AddAction("setsetting", dto => SetValueAsync(dto));
         }
 
         private object GetValue(string key)
@@ -28,7 +28,7 @@ namespace Micser.Engine.Api
 
         private async Task<object> SetValueAsync(SettingValueDto dto)
         {
-            await _settingsService.SetSettingAsync(dto.Key, dto.Value);
+            await _settingsService.SetSettingAsync(dto.Key, dto.Value).ConfigureAwait(false);
             return _settingsService.GetSetting(dto.Key);
         }
     }

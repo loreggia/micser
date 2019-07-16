@@ -39,7 +39,7 @@ namespace Micser.Common.Updates
 
                 using (var webClient = new WebClient())
                 {
-                    await webClient.DownloadFileTaskAsync(manifest.FileName, fileName);
+                    await webClient.DownloadFileTaskAsync(manifest.FileName, fileName).ConfigureAwait(false);
                 }
 
                 return fileName;
@@ -58,7 +58,7 @@ namespace Micser.Common.Updates
             {
                 using (var webClient = new WebClient())
                 {
-                    var json = await webClient.DownloadStringTaskAsync(Settings.ManifestUrl);
+                    var json = await webClient.DownloadStringTaskAsync(Settings.ManifestUrl).ConfigureAwait(false);
                     return JsonConvert.DeserializeObject<UpdateManifest>(json);
                 }
             }

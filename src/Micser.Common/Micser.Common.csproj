@@ -13,7 +13,7 @@
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <TargetFrameworkProfile />
-	<DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
+    <DisableFastUpToDateCheck>true</DisableFastUpToDateCheck>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -131,9 +131,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="CommonServiceLocator">
-      <Version>2.0.4</Version>
-    </PackageReference>
     <PackageReference Include="CSCore">
       <Version>1.2.1.2</Version>
     </PackageReference>
@@ -141,15 +138,9 @@
       <Version>12.0.2</Version>
     </PackageReference>
     <PackageReference Include="NLog">
-      <Version>4.6.5</Version>
-    </PackageReference>
-    <PackageReference Include="Prism.Core">
-      <Version>7.1.0.431</Version>
+      <Version>4.6.6</Version>
     </PackageReference>
     <PackageReference Include="Prism.Unity">
-      <Version>7.1.0.431</Version>
-    </PackageReference>
-    <PackageReference Include="Prism.Wpf">
       <Version>7.1.0.431</Version>
     </PackageReference>
     <PackageReference Include="SQLite.CodeFirst">

@@ -44,7 +44,7 @@ namespace Micser.App.Settings
 
             if (value is bool isEnabled)
             {
-                await Task.Run(() => SaveSetting(isEnabled));
+                await Task.Run(() => SaveSetting(isEnabled)).ConfigureAwait(false);
             }
             else
             {

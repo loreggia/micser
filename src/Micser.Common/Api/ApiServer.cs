@@ -48,11 +48,11 @@ namespace Micser.Common.Api
                     State = EndPointState.Connecting;
                 }
 
-                InClient = await _listener.AcceptTcpClientAsync();
+                InClient = await _listener.AcceptTcpClientAsync().ConfigureAwait(false);
                 InClient.Client.SetKeepAlive();
                 InStream = InClient.GetStream();
 
-                OutClient = await _listener.AcceptTcpClientAsync();
+                OutClient = await _listener.AcceptTcpClientAsync().ConfigureAwait(false);
                 OutClient.Client.SetKeepAlive();
                 OutStream = OutClient.GetStream();
 

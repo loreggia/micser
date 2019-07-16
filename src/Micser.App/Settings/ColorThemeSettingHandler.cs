@@ -32,7 +32,7 @@ namespace Micser.App.Settings
 
         public async Task<object> LoadSettingAsync(object value)
         {
-            await LoadThemeFilesAsync();
+            await LoadThemeFilesAsync().ConfigureAwait(false);
 
             if (value is string name && _themeFiles.TryGetValue(name, out var fileName))
             {
@@ -44,7 +44,7 @@ namespace Micser.App.Settings
 
         public async Task<object> SaveSettingAsync(object value)
         {
-            await LoadThemeFilesAsync();
+            await LoadThemeFilesAsync().ConfigureAwait(false);
 
             if (value is string name && _themeFiles.TryGetValue(name, out var fileName))
             {

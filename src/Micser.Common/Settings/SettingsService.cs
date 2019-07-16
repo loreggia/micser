@@ -118,7 +118,7 @@ namespace Micser.Common.Settings
                         }
                         else if (setting.StorageType == SettingStorageType.Api)
                         {
-                            var settingValueResult = await _apiClient.GetSetting(setting.Key);
+                            var settingValueResult = await _apiClient.GetSetting(setting.Key).ConfigureAwait(false);
 
                             if (settingValueResult.IsSuccess)
                             {
@@ -141,7 +141,7 @@ namespace Micser.Common.Settings
 
                             if (handler != null)
                             {
-                                value = await handler.LoadSettingAsync(value ?? setting.DefaultValue);
+                                value = await handler.LoadSettingAsync(value ?? setting.DefaultValue).ConfigureAwait(false);
                             }
                         }
 
@@ -163,7 +163,7 @@ namespace Micser.Common.Settings
         /// <inheritdoc />
         public async Task<bool> SetSettingAsync(string key, object value)
         {
-            await LoadAsync();
+            await LoadAsync().ConfigureAwait(false);
 
             var setting = _registry.Items.FirstOrDefault(i => string.Equals(i.Key, key, StringComparison.InvariantCultureIgnoreCase));
 
@@ -175,7 +175,7 @@ namespace Micser.Common.Settings
             if (setting?.HandlerType != null)
             {
                 var handler = _settingHandlerFactory.Create(setting.HandlerType);
-                value = await handler.SaveSettingAsync(value);
+                value = await handler.SaveSettingAsync(value).ConfigureAwait(false);
             }
 
             var oldValue = _settings.ContainsKey(key) ? _settings[key] : null;
@@ -213,7 +213,7 @@ namespace Micser.Common.Settings
             }
             else if (setting.StorageType == SettingStorageType.Api)
             {
-                var setSettingResult = await _apiClient.SetSetting(setting.Key, value);
+                var setSettingResult = await _apiClient.SetSetting(setting.Key, value).ConfigureAwait(false);
 
                 if (setSettingResult.IsSuccess)
                 {
