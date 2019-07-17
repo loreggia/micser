@@ -13,13 +13,13 @@ namespace Micser.App.Infrastructure.Settings
         /// The command to execute when the "Apply" button is pressed.
         /// </summary>
         public static readonly DependencyProperty ApplyCommandProperty = DependencyProperty.Register(
-            nameof(ApplyCommand), typeof(ICommand), typeof(SettingContainer), new PropertyMetadata(default(ICommand)));
+            nameof(ApplyCommand), typeof(ICommand), typeof(SettingContainer), new PropertyMetadata(null));
 
         /// <summary>
         /// The description that is shown as a tooltip and in the info popup.
         /// </summary>
         public static readonly DependencyProperty DescriptionProperty = DependencyProperty.Register(
-            nameof(Description), typeof(string), typeof(SettingContainer), new PropertyMetadata(default(string)));
+            nameof(Description), typeof(string), typeof(SettingContainer), new PropertyMetadata(null));
 
         /// <summary>
         /// Indicates whether the control is busy (i.e. while saving).
@@ -31,13 +31,13 @@ namespace Micser.App.Infrastructure.Settings
         /// The main label text (setting name).
         /// </summary>
         public static readonly DependencyProperty LabelProperty = DependencyProperty.Register(
-            nameof(Label), typeof(string), typeof(SettingContainer), new PropertyMetadata(default(string)));
+            nameof(Label), typeof(object), typeof(SettingContainer), new PropertyMetadata(null));
 
         /// <summary>
         /// A value indicating whether the "Apply" button is visible.
         /// </summary>
         public static readonly DependencyProperty ShowApplyButtonProperty = DependencyProperty.Register(
-            nameof(ShowApplyButton), typeof(bool), typeof(SettingContainer), new PropertyMetadata(default(bool)));
+            nameof(ShowApplyButton), typeof(bool), typeof(SettingContainer), new PropertyMetadata(null));
 
         /// <summary>
         /// Gets or sets the command to execute when the "Apply" button is pressed.
@@ -73,9 +73,9 @@ namespace Micser.App.Infrastructure.Settings
         /// Gets or sets the label text.
         /// Wraps the <see cref="LabelProperty"/> dependency property.
         /// </summary>
-        public string Label
+        public object Label
         {
-            get => (string)GetValue(LabelProperty);
+            get => GetValue(LabelProperty);
             set => SetValue(LabelProperty, value);
         }
 

@@ -19,7 +19,7 @@ namespace Micser.App.Infrastructure.Menu
         /// <summary>
         /// Gets or sets the text that is displayed on this item.
         /// </summary>
-        public string Header { get; set; }
+        public object Header { get; set; }
 
         /// <summary>
         /// Gets or sets the resource name of the <see cref="DataTemplate"/> to use as icon.

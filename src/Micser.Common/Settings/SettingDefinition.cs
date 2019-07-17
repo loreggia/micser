@@ -117,7 +117,7 @@ namespace Micser.Common.Settings
         /// <summary>
         /// Gets or sets the name that is displayed for this setting.
         /// </summary>
-        public string Name { get; set; }
+        public object Name { get; set; }
 
         /// <summary>
         /// Gets or sets the storage type. Default is <see cref="SettingStorageType.Internal"/>.

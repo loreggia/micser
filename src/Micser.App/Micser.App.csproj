@@ -76,6 +76,7 @@
     </Compile>
     <Compile Include="MainShellViewModel.cs" />
     <Compile Include="Settings\ColorThemeSettingHandler.cs" />
+    <Compile Include="Settings\LanguageSettingHandler.cs" />
     <Compile Include="Settings\ShellState.cs" />
     <Compile Include="Settings\StartupSettingHandler.cs" />
     <Compile Include="Settings\VacCountSettingHandler.cs" />
