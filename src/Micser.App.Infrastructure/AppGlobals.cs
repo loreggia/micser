@@ -78,6 +78,7 @@
         public static class SettingKeys
         {
             public const string ColorTheme = "ColorTheme";
+            public const string IsWidgetToolBoxOpen = "IsWidgetToolBoxOpen";
             public const string Language = "Language";
             public const string MinimizeToTray = "MinimizeToTray";
             public const string ShellState = "ShellState";
