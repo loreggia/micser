@@ -305,6 +305,24 @@ namespace Micser.App.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Sets the active display language..
+        /// </summary>
+        public static string SettingLanguageDescription {
+            get {
+                return ResourceManager.GetString("SettingLanguageDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Language.
+        /// </summary>
+        public static string SettingLanguageName {
+            get {
+                return ResourceManager.GetString("SettingLanguageName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to If enabled, the program will minimize to the system tray instead of minimizing to the task bar..
         /// </summary>
         public static string SettingMinimizeToTrayDescription {

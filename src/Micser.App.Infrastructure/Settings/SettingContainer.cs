@@ -19,7 +19,7 @@ namespace Micser.App.Infrastructure.Settings
         /// The description that is shown as a tooltip and in the info popup.
         /// </summary>
         public static readonly DependencyProperty DescriptionProperty = DependencyProperty.Register(
-            nameof(Description), typeof(string), typeof(SettingContainer), new PropertyMetadata(null));
+            nameof(Description), typeof(object), typeof(SettingContainer), new PropertyMetadata(null));
 
         /// <summary>
         /// Indicates whether the control is busy (i.e. while saving).
@@ -53,9 +53,9 @@ namespace Micser.App.Infrastructure.Settings
         /// Gets or sets the description.
         /// Wraps the <see cref="DescriptionProperty"/> dependency property.
         /// </summary>
-        public string Description
+        public object Description
         {
-            get => (string)GetValue(DescriptionProperty);
+            get => GetValue(DescriptionProperty);
             set => SetValue(DescriptionProperty, value);
         }
 

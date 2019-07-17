@@ -259,4 +259,10 @@
   <data name="SettingResumeDelayName" xml:space="preserve">
     <value>Resume Delay (s)</value>
   </data>
+  <data name="SettingLanguageDescription" xml:space="preserve">
+    <value>Sets the active display language.</value>
+  </data>
+  <data name="SettingLanguageName" xml:space="preserve">
+    <value>Language</value>
+  </data>
 </root>

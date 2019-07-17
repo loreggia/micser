@@ -79,9 +79,9 @@ namespace Micser.Common.Settings
         public object DefaultValue { get; set; }
 
         /// <summary>
-        /// Gets or sets the description text that is shown as a help for this setting in the settings view.
+        /// Gets or sets the description content that is shown as a help for this setting in the settings view.
         /// </summary>
-        public string Description { get; set; }
+        public object Description { get; set; }
 
         /// <summary>
         /// Gets or sets the type of a setting handler that is used to process loading/saving of the setting.

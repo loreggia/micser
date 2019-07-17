@@ -131,6 +131,11 @@ namespace Micser.App
             navigationManager.Navigate<StartupView>(AppGlobals.PrismRegions.Main);
         }
 
+        private static object Localize(string key)
+        {
+            return new ResourceElement(Resources.ResourceManager, key);
+        }
+
         private static void RegisterMenuItems(IContainerProvider containerProvider)
         {
             var menuItemRegistry = containerProvider.Resolve<IMenuItemRegistry>();
@@ -138,13 +143,13 @@ namespace Micser.App
             // File
             menuItemRegistry.Add(new MenuItemDescription
             {
-                Header = new ResourceElement(Resources.ResourceManager, nameof(Resources.MenuItemFileHeader)),
+                Header = Localize(nameof(Resources.MenuItemFileHeader)),
                 Id = AppGlobals.MenuItemIds.File
             });
             // File->Import
             menuItemRegistry.Add(new MenuItemDescription
             {
-                Header = new ResourceElement(Resources.ResourceManager, nameof(Resources.MenuItemImportHeader)),
+                Header = Localize(nameof(Resources.MenuItemImportHeader)),
                 Id = AppGlobals.MenuItemIds.FileImport,
                 ParentId = AppGlobals.MenuItemIds.File,
                 Command = CustomApplicationCommands.Import,
@@ -153,7 +158,7 @@ namespace Micser.App
             // File->Export
             menuItemRegistry.Add(new MenuItemDescription
             {
-                Header = new ResourceElement(Resources.ResourceManager, nameof(Resources.MenuItemExportHeader)),
+                Header = Localize(nameof(Resources.MenuItemExportHeader)),
                 Id = AppGlobals.MenuItemIds.FileExport,
                 ParentId = AppGlobals.MenuItemIds.File,
                 Command = CustomApplicationCommands.Export,
@@ -163,7 +168,7 @@ namespace Micser.App
             // File->Exit
             menuItemRegistry.Add(new MenuItemDescription
             {
-                Header = new ResourceElement(Resources.ResourceManager, nameof(Resources.MenuItemExitHeader)),
+                Header = Localize(nameof(Resources.MenuItemExitHeader)),
                 Id = AppGlobals.MenuItemIds.FileExit,
                 ParentId = AppGlobals.MenuItemIds.File,
                 Command = CustomApplicationCommands.Exit
@@ -172,13 +177,13 @@ namespace Micser.App
             // Tools
             menuItemRegistry.Add(new MenuItemDescription
             {
-                Header = new ResourceElement(Resources.ResourceManager, nameof(Resources.MenuItemToolsHeader)),
+                Header = Localize(nameof(Resources.MenuItemToolsHeader)),
                 Id = AppGlobals.MenuItemIds.Tools
             });
             // Tools->Refresh
             menuItemRegistry.Add(new MenuItemDescription
             {
-                Header = new ResourceElement(Resources.ResourceManager, nameof(Resources.MenuItemRefreshHeader)),
+                Header = Localize(nameof(Resources.MenuItemRefreshHeader)),
                 Id = AppGlobals.MenuItemIds.ToolsRefresh,
                 ParentId = AppGlobals.MenuItemIds.Tools,
                 Command = CustomApplicationCommands.Refresh,
@@ -189,7 +194,7 @@ namespace Micser.App
             var engineApiClient = containerProvider.Resolve<EngineApiClient>();
             menuItemRegistry.Add(new MenuItemDescription
             {
-                Header = new ResourceElement(Resources.ResourceManager, nameof(Resources.MenuItemStartHeader)),
+                Header = Localize(nameof(Resources.MenuItemStartHeader)),
                 Id = AppGlobals.MenuItemIds.ToolsStart,
                 ParentId = AppGlobals.MenuItemIds.Tools,
                 Command = new AsyncDelegateCommand(async () => await engineApiClient.StartAsync(), async () => !(await engineApiClient.GetStatusAsync()).IsSuccess),
@@ -198,7 +203,7 @@ namespace Micser.App
             // Tools->Stop
             menuItemRegistry.Add(new MenuItemDescription
             {
-                Header = new ResourceElement(Resources.ResourceManager, nameof(Resources.MenuItemStopHeader)),
+                Header = Localize(nameof(Resources.MenuItemStopHeader)),
                 Id = AppGlobals.MenuItemIds.ToolsStop,
                 ParentId = AppGlobals.MenuItemIds.Tools,
                 Command = new AsyncDelegateCommand(async () => await engineApiClient.StopAsync(), async () => (await engineApiClient.GetStatusAsync()).IsSuccess),
@@ -207,7 +212,7 @@ namespace Micser.App
             // Tools->Restart
             menuItemRegistry.Add(new MenuItemDescription
             {
-                Header = new ResourceElement(Resources.ResourceManager, nameof(Resources.MenuItemRestartHeader)),
+                Header = Localize(nameof(Resources.MenuItemRestartHeader)),
                 Id = AppGlobals.MenuItemIds.ToolsRestart,
                 ParentId = AppGlobals.MenuItemIds.Tools,
                 Command = new AsyncDelegateCommand(async () => await engineApiClient.RestartAsync(), async () => (await engineApiClient.GetStatusAsync()).IsSuccess),
@@ -217,7 +222,7 @@ namespace Micser.App
             // Tools->Settings
             menuItemRegistry.Add(new MenuItemDescription
             {
-                Header = new ResourceElement(Resources.ResourceManager, nameof(Resources.MenuItemSettingsHeader)),
+                Header = Localize(nameof(Resources.MenuItemSettingsHeader)),
                 Id = AppGlobals.MenuItemIds.ToolsSettings,
                 ParentId = AppGlobals.MenuItemIds.Tools,
                 Command = new NavigationCommand<SettingsView>(AppGlobals.PrismRegions.Main),
@@ -227,13 +232,13 @@ namespace Micser.App
             // Help
             menuItemRegistry.Add(new MenuItemDescription
             {
-                Header = new ResourceElement(Resources.ResourceManager, nameof(Resources.MenuItemHelpHeader)),
+                Header = Localize(nameof(Resources.MenuItemHelpHeader)),
                 Id = AppGlobals.MenuItemIds.Help
             });
             var updateHandler = containerProvider.Resolve<UpdateHandler>();
             menuItemRegistry.Add(new MenuItemDescription
             {
-                Header = new ResourceElement(Resources.ResourceManager, nameof(Resources.MenuItemCheckUpdateHeader)),
+                Header = Localize(nameof(Resources.MenuItemCheckUpdateHeader)),
                 Id = AppGlobals.MenuItemIds.HelpCheckUpdate,
                 ParentId = AppGlobals.MenuItemIds.Help,
                 Command = new DelegateCommand(async () => await updateHandler.CheckForUpdateAsync()),
@@ -243,7 +248,7 @@ namespace Micser.App
             // Help->About
             menuItemRegistry.Add(new MenuItemDescription
             {
-                Header = new ResourceElement(Resources.ResourceManager, nameof(Resources.MenuItemAboutHeader)),
+                Header = Localize(nameof(Resources.MenuItemAboutHeader)),
                 Id = AppGlobals.MenuItemIds.HelpAbout,
                 ParentId = AppGlobals.MenuItemIds.Help,
                 Command = new NavigationCommand<AboutView>(AppGlobals.PrismRegions.Main),
@@ -258,8 +263,8 @@ namespace Micser.App
             settingsRegistry.Add(new SettingDefinition
             {
                 Key = AppGlobals.SettingKeys.Language,
-                Name = "Language",
-                Description = "Sets the display language.",
+                Name = Localize(nameof(Resources.SettingLanguageName)),
+                Description = Localize(nameof(Resources.SettingLanguageDescription)),
                 DefaultValue = "en",
                 Type = SettingType.List,
                 StorageType = SettingStorageType.Internal,
@@ -268,16 +273,16 @@ namespace Micser.App
             settingsRegistry.Add(new SettingDefinition
             {
                 Key = AppGlobals.SettingKeys.MinimizeToTray,
-                Name = Resources.SettingMinimizeToTrayName,
-                Description = Resources.SettingMinimizeToTrayDescription,
+                Name = Localize(nameof(Resources.SettingMinimizeToTrayName)),
+                Description = Localize(nameof(Resources.SettingMinimizeToTrayDescription)),
                 DefaultValue = true,
                 Type = SettingType.Boolean
             });
             settingsRegistry.Add(new SettingDefinition
             {
                 Key = AppGlobals.SettingKeys.Startup,
-                Name = Resources.SettingStartupName,
-                Description = Resources.SettingStartupDescription,
+                Name = Localize(nameof(Resources.SettingStartupName)),
+                Description = Localize(nameof(Resources.SettingStartupDescription)),
                 DefaultValue = true,
                 Type = SettingType.Boolean,
                 StorageType = SettingStorageType.Custom,
@@ -286,8 +291,8 @@ namespace Micser.App
             settingsRegistry.Add(new SettingDefinition
             {
                 Key = AppGlobals.SettingKeys.StartupMinimized,
-                Name = Resources.SettingStartupMinimizedName,
-                Description = Resources.SettingStartupMinimizedDescription,
+                Name = Localize(nameof(Resources.SettingStartupMinimizedName)),
+                Description = Localize(nameof(Resources.SettingStartupMinimizedDescription)),
                 DefaultValue = true,
                 Type = SettingType.Boolean,
                 StorageType = SettingStorageType.Internal,
@@ -296,8 +301,8 @@ namespace Micser.App
             settingsRegistry.Add(new SettingDefinition
             {
                 Key = AppGlobals.SettingKeys.ColorTheme,
-                Name = Resources.SettingColorThemeName,
-                Description = Resources.SettingColorThemeDescription,
+                Name = Localize(nameof(Resources.SettingColorThemeName)),
+                Description = Localize(nameof(Resources.SettingColorThemeDescription)),
                 DefaultValue = "Default",
                 Type = SettingType.List,
                 StorageType = SettingStorageType.Internal,
@@ -313,8 +318,8 @@ namespace Micser.App
             settingsRegistry.Add(new SettingDefinition
             {
                 Key = AppGlobals.SettingKeys.VacCount,
-                Name = Resources.SettingVacCountName,
-                Description = Resources.SettingVacCountDescription,
+                Name = Localize(nameof(Resources.SettingVacCountName)),
+                Description = Localize(nameof(Resources.SettingVacCountDescription)),
                 Type = SettingType.List,
                 StorageType = SettingStorageType.Custom,
                 DefaultValue = 1,
@@ -325,8 +330,8 @@ namespace Micser.App
             settingsRegistry.Add(new SettingDefinition
             {
                 Key = Globals.SettingKeys.UpdateCheck,
-                Name = Resources.SettingUpdateCheckName,
-                Description = Resources.SettingUpdateCheckDescription,
+                Name = Localize(nameof(Resources.SettingUpdateCheckName)),
+                Description = Localize(nameof(Resources.SettingUpdateCheckDescription)),
                 Type = SettingType.Boolean,
                 StorageType = SettingStorageType.Api,
                 DefaultValue = true
@@ -334,8 +339,8 @@ namespace Micser.App
             settingsRegistry.Add(new SettingDefinition
             {
                 Key = Globals.SettingKeys.ResumeDelay,
-                Name = Resources.SettingResumeDelayName,
-                Description = Resources.SettingResumeDelayDescription,
+                Name = Localize(nameof(Resources.SettingResumeDelayName)),
+                Description = Localize(nameof(Resources.SettingResumeDelayDescription)),
                 Type = SettingType.Integer,
                 StorageType = SettingStorageType.Api,
                 DefaultValue = 10
@@ -354,7 +359,7 @@ namespace Micser.App
             toolBarRegistry.AddItem(AppGlobals.ToolBarIds.Main, new ToolBarButton
             {
                 Command = goHomeCommand,
-                Description = Resources.ToolBarHomeDescription,
+                Description = Localize(nameof(Resources.ToolBarHomeDescription)),
                 IconTemplateName = "Icon_Home_16x"
             });
 
@@ -363,7 +368,7 @@ namespace Micser.App
             toolBarRegistry.AddItem(AppGlobals.ToolBarIds.Main, new ToolBarButton
             {
                 Command = goBackCommand,
-                Description = Resources.ToolBarBackDescription,
+                Description = Localize(nameof(Resources.ToolBarBackDescription)),
                 IconTemplateName = "Icon_Backward_16x"
             });
 
@@ -372,7 +377,7 @@ namespace Micser.App
             toolBarRegistry.AddItem(AppGlobals.ToolBarIds.Main, new ToolBarButton
             {
                 Command = goForwardCommand,
-                Description = Resources.ToolBarForwardDescription,
+                Description = Localize(nameof(Resources.ToolBarForwardDescription)),
                 IconTemplateName = "Icon_Forward_16x"
             });
 
@@ -380,20 +385,20 @@ namespace Micser.App
             toolBarRegistry.AddItem(AppGlobals.ToolBarIds.Main, new ToolBarButton
             {
                 Command = CustomApplicationCommands.Delete,
-                Description = Resources.ToolBarDeleteDescription,
+                Description = Localize(nameof(Resources.ToolBarDeleteDescription)),
                 IconTemplateName = "Icon_Delete_16x"
             });
             toolBarRegistry.AddItem(AppGlobals.ToolBarIds.Main, new ToolBarButton
             {
                 Command = CustomApplicationCommands.Refresh,
-                Description = Resources.ToolBarRefreshDescription,
+                Description = Localize(nameof(Resources.ToolBarRefreshDescription)),
                 IconTemplateName = "Icon_Refresh_16x"
             });
             toolBarRegistry.AddItem(AppGlobals.ToolBarIds.Main, new ToolBarSeparator());
             toolBarRegistry.AddItem(AppGlobals.ToolBarIds.Main, new ToolBarButton
             {
                 Command = new NavigationCommand<SettingsView>(AppGlobals.PrismRegions.Main),
-                Description = Resources.ToolBarSettingsDescription,
+                Description = Localize(nameof(Resources.ToolBarSettingsDescription)),
                 IconTemplateName = "Icon_Settings_16x"
             });
         }
