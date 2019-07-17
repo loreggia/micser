@@ -2,6 +2,7 @@
 using Micser.App.Infrastructure.Api;
 using Micser.App.Infrastructure.DataAccess;
 using Micser.App.Infrastructure.Extensions;
+using Micser.App.Infrastructure.Localization;
 using Micser.App.Infrastructure.Menu;
 using Micser.App.Infrastructure.Themes;
 using Micser.App.Infrastructure.ToolBars;
@@ -24,11 +25,9 @@ using Prism.Events;
 using Prism.Ioc;
 using Prism.Regions;
 using Prism.Unity;
-using System;
 using System.Data.Entity;
 using System.Globalization;
 using System.Linq;
-using System.Threading;
 using System.Windows;
 using Unity;
 using Unity.Injection;
@@ -99,21 +98,6 @@ namespace Micser.App
         {
             var settingsService = containerProvider.Resolve<ISettingsService>();
             await settingsService.LoadAsync();
-            var cultureCode = settingsService.GetSetting<string>(AppGlobals.SettingKeys.Language);
-
-            try
-            {
-                var cultureInfo = new CultureInfo(cultureCode);
-                Thread.CurrentThread.CurrentUICulture = cultureInfo;
-                Application.Current.Dispatcher.Thread.CurrentUICulture = cultureInfo;
-                CultureInfo.CurrentUICulture = cultureInfo;
-                CultureInfo.DefaultThreadCurrentUICulture = cultureInfo;
-            }
-            catch (Exception ex)
-            {
-                var logger = containerProvider.Resolve<ILogger>();
-                logger.Error(ex);
-            }
 
             var shell = containerProvider.Resolve<MainShell>();
             shell.DataContext = containerProvider.Resolve<MainShellViewModel>();
@@ -152,11 +136,15 @@ namespace Micser.App
             var menuItemRegistry = containerProvider.Resolve<IMenuItemRegistry>();
 
             // File
-            menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemFileHeader, Id = AppGlobals.MenuItemIds.File });
+            menuItemRegistry.Add(new MenuItemDescription
+            {
+                Header = new ResourceElement(Resources.ResourceManager, nameof(Resources.MenuItemFileHeader)),
+                Id = AppGlobals.MenuItemIds.File
+            });
             // File->Import
             menuItemRegistry.Add(new MenuItemDescription
             {
-                Header = Resources.MenuItemImportHeader,
+                Header = new ResourceElement(Resources.ResourceManager, nameof(Resources.MenuItemImportHeader)),
                 Id = AppGlobals.MenuItemIds.FileImport,
                 ParentId = AppGlobals.MenuItemIds.File,
                 Command = CustomApplicationCommands.Import,
@@ -165,7 +153,7 @@ namespace Micser.App
             // File->Export
             menuItemRegistry.Add(new MenuItemDescription
             {
-                Header = Resources.MenuItemExportHeader,
+                Header = new ResourceElement(Resources.ResourceManager, nameof(Resources.MenuItemExportHeader)),
                 Id = AppGlobals.MenuItemIds.FileExport,
                 ParentId = AppGlobals.MenuItemIds.File,
                 Command = CustomApplicationCommands.Export,
@@ -175,18 +163,22 @@ namespace Micser.App
             // File->Exit
             menuItemRegistry.Add(new MenuItemDescription
             {
-                Header = Resources.MenuItemExitHeader,
+                Header = new ResourceElement(Resources.ResourceManager, nameof(Resources.MenuItemExitHeader)),
                 Id = AppGlobals.MenuItemIds.FileExit,
                 ParentId = AppGlobals.MenuItemIds.File,
                 Command = CustomApplicationCommands.Exit
             });
 
             // Tools
-            menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemToolsHeader, Id = AppGlobals.MenuItemIds.Tools });
+            menuItemRegistry.Add(new MenuItemDescription
+            {
+                Header = new ResourceElement(Resources.ResourceManager, nameof(Resources.MenuItemToolsHeader)),
+                Id = AppGlobals.MenuItemIds.Tools
+            });
             // Tools->Refresh
             menuItemRegistry.Add(new MenuItemDescription
             {
-                Header = Resources.MenuItemRefreshHeader,
+                Header = new ResourceElement(Resources.ResourceManager, nameof(Resources.MenuItemRefreshHeader)),
                 Id = AppGlobals.MenuItemIds.ToolsRefresh,
                 ParentId = AppGlobals.MenuItemIds.Tools,
                 Command = CustomApplicationCommands.Refresh,
@@ -197,7 +189,7 @@ namespace Micser.App
             var engineApiClient = containerProvider.Resolve<EngineApiClient>();
             menuItemRegistry.Add(new MenuItemDescription
             {
-                Header = Resources.MenuItemStartHeader,
+                Header = new ResourceElement(Resources.ResourceManager, nameof(Resources.MenuItemStartHeader)),
                 Id = AppGlobals.MenuItemIds.ToolsStart,
                 ParentId = AppGlobals.MenuItemIds.Tools,
                 Command = new AsyncDelegateCommand(async () => await engineApiClient.StartAsync(), async () => !(await engineApiClient.GetStatusAsync()).IsSuccess),
@@ -206,7 +198,7 @@ namespace Micser.App
             // Tools->Stop
             menuItemRegistry.Add(new MenuItemDescription
             {
-                Header = Resources.MenuItemStopHeader,
+                Header = new ResourceElement(Resources.ResourceManager, nameof(Resources.MenuItemStopHeader)),
                 Id = AppGlobals.MenuItemIds.ToolsStop,
                 ParentId = AppGlobals.MenuItemIds.Tools,
                 Command = new AsyncDelegateCommand(async () => await engineApiClient.StopAsync(), async () => (await engineApiClient.GetStatusAsync()).IsSuccess),
@@ -215,7 +207,7 @@ namespace Micser.App
             // Tools->Restart
             menuItemRegistry.Add(new MenuItemDescription
             {
-                Header = Resources.MenuItemRestartHeader,
+                Header = new ResourceElement(Resources.ResourceManager, nameof(Resources.MenuItemRestartHeader)),
                 Id = AppGlobals.MenuItemIds.ToolsRestart,
                 ParentId = AppGlobals.MenuItemIds.Tools,
                 Command = new AsyncDelegateCommand(async () => await engineApiClient.RestartAsync(), async () => (await engineApiClient.GetStatusAsync()).IsSuccess),
@@ -225,7 +217,7 @@ namespace Micser.App
             // Tools->Settings
             menuItemRegistry.Add(new MenuItemDescription
             {
-                Header = Resources.MenuItemSettingsHeader,
+                Header = new ResourceElement(Resources.ResourceManager, nameof(Resources.MenuItemSettingsHeader)),
                 Id = AppGlobals.MenuItemIds.ToolsSettings,
                 ParentId = AppGlobals.MenuItemIds.Tools,
                 Command = new NavigationCommand<SettingsView>(AppGlobals.PrismRegions.Main),
@@ -233,11 +225,15 @@ namespace Micser.App
             });
 
             // Help
-            menuItemRegistry.Add(new MenuItemDescription { Header = Resources.MenuItemHelpHeader, Id = AppGlobals.MenuItemIds.Help });
+            menuItemRegistry.Add(new MenuItemDescription
+            {
+                Header = new ResourceElement(Resources.ResourceManager, nameof(Resources.MenuItemHelpHeader)),
+                Id = AppGlobals.MenuItemIds.Help
+            });
             var updateHandler = containerProvider.Resolve<UpdateHandler>();
             menuItemRegistry.Add(new MenuItemDescription
             {
-                Header = Resources.MenuItemCheckUpdateHeader,
+                Header = new ResourceElement(Resources.ResourceManager, nameof(Resources.MenuItemCheckUpdateHeader)),
                 Id = AppGlobals.MenuItemIds.HelpCheckUpdate,
                 ParentId = AppGlobals.MenuItemIds.Help,
                 Command = new DelegateCommand(async () => await updateHandler.CheckForUpdateAsync()),
@@ -247,7 +243,7 @@ namespace Micser.App
             // Help->About
             menuItemRegistry.Add(new MenuItemDescription
             {
-                Header = Resources.MenuItemAboutHeader,
+                Header = new ResourceElement(Resources.ResourceManager, nameof(Resources.MenuItemAboutHeader)),
                 Id = AppGlobals.MenuItemIds.HelpAbout,
                 ParentId = AppGlobals.MenuItemIds.Help,
                 Command = new NavigationCommand<AboutView>(AppGlobals.PrismRegions.Main),
@@ -267,7 +263,7 @@ namespace Micser.App
                 DefaultValue = "en",
                 Type = SettingType.List,
                 StorageType = SettingStorageType.Internal,
-                List = AppGlobals.AvailableCultures.ToDictionary<string, object, string>(c => c, c => new CultureInfo(c).NativeName)
+                HandlerType = typeof(LanguageSettingHandler)
             });
             settingsRegistry.Add(new SettingDefinition
             {

@@ -8,7 +8,7 @@ namespace Micser.App.Infrastructure.Localization
         private readonly string _key;
         private readonly ResourceManager _resourceManager;
 
-        private object _value;
+        private string _value;
 
         public ResourceData(ResourceManager resourceManager, string key)
         {
@@ -20,7 +20,7 @@ namespace Micser.App.Infrastructure.Localization
             UpdateValue();
         }
 
-        public object Value
+        public string Value
         {
             get => _value;
             set => SetProperty(ref _value, value);
@@ -30,6 +30,11 @@ namespace Micser.App.Infrastructure.Localization
         {
             Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        public override string ToString()
+        {
+            return Value;
         }
 
         protected virtual void Dispose(bool disposing)

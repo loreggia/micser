@@ -11,9 +11,11 @@
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:app="clr-namespace:Micser.App"
         xmlns:interaction="clr-namespace:Micser.App.Infrastructure.Interaction;assembly=Micser.App.Infrastructure"
+        xmlns:l="clr-namespace:Micser.App.Infrastructure.Localization;assembly=Micser.App.Infrastructure"
         mc:Ignorable="d"
         x:Name="Window"
-        Title="{x:Static p:Resources.ApplicationTitle}"
+        l:LocalizationManager.ResourceManager="{x:Static p:Resources.ResourceManager}"
+        Title="{l:Resx ApplicationTitle}"
         Style="{DynamicResource DefaultWindowStyle}"
         Height="600"
         Width="800"
@@ -53,7 +55,7 @@
         <ContentControl Grid.Row="3" x:Name="StatusRegion" regions:RegionManager.RegionName="{x:Static ai:AppGlobals+PrismRegions.Status}"
                         Style="{StaticResource RegionStyle}" />
 
-        <tb:TaskbarIcon Grid.Row="3" x:Name="TaskbarIcon" MenuActivation="RightClick" ToolTipText="{x:Static p:Resources.ApplicationTitle}"
+        <tb:TaskbarIcon Grid.Row="3" x:Name="TaskbarIcon" MenuActivation="RightClick" ToolTipText="{l:Resx ApplicationTitle}"
                         TrayMouseDoubleClick="OnTrayMouseDoubleClick" IconSource="logo.ico">
             <tb:TaskbarIcon.ContextMenu>
                 <ContextMenu>

@@ -9,17 +9,19 @@
         xmlns:converter="clr-namespace:Micser.App.Infrastructure.Converter;assembly=Micser.App.Infrastructure"
         xmlns:themes="clr-namespace:Micser.App.Infrastructure.Themes;assembly=Micser.App.Infrastructure"
         xmlns:p="clr-namespace:Micser.App.Properties"
+        xmlns:l="clr-namespace:Micser.App.Infrastructure.Localization;assembly=Micser.App.Infrastructure"
         mc:Ignorable="d"
         d:DesignHeight="450"
         d:DesignWidth="800"
         d:DataContext="{d:DesignInstance vm:AboutViewModel}"
-        x:Name="AboutViewElement">
+        x:Name="AboutViewElement"
+        l:LocalizationManager.ResourceManager="{x:Static p:Resources.ResourceManager}">
     <ScrollViewer HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
         <StackPanel Orientation="Vertical" MaxWidth="800">
             <ContentControl ContentTemplate="{DynamicResource Logo}" Margin="50" MinWidth="64" MaxWidth="512" />
             <TextBlock Text="{Binding AboutText}" FontWeight="Bold" FontSize="16" HorizontalAlignment="Center" Margin="0,10,0,0" />
             <TextBlock Text="{Binding VersionText}" FontSize="14" HorizontalAlignment="Center" Margin="0,10,0,0" />
-            <TextBlock Text="{x:Static p:Resources.AboutLibrariesTitle}" FontSize="14" HorizontalAlignment="Center" Margin="0,10,0,0" />
+            <TextBlock Text="{l:Resx AboutLibrariesTitle}" FontSize="14" HorizontalAlignment="Center" Margin="0,10,0,0" />
             <ItemsControl ItemsSource="{Binding Libraries}">
                 <ItemsControl.ItemTemplate>
                     <DataTemplate DataType="{x:Type vm:LibraryInfo}">
@@ -32,7 +34,7 @@
                                 </Hyperlink>
                                 <Hyperlink x:Name="LicenseLink" Command="{Binding DataContext.LoadLicenseCommand, ElementName=AboutViewElement}" CommandParameter="{Binding}" Foreground="{DynamicResource {themes:BrushThemeKey DefaultForeground}}">
                                     <Hyperlink.Inlines>
-                                        <Run Text="{x:Static p:Resources.ViewLicense}" />
+                                        <Run Text="{l:Resx ViewLicense}" />
                                     </Hyperlink.Inlines>
                                 </Hyperlink>
                             </TextBlock>
@@ -50,7 +52,7 @@
 
                                         <TextBlock Grid.Row="0" Grid.Column="0" Padding="10" FontWeight="Bold">
                                             <Run Text="{Binding Name}" />
-                                            <Run Text="{x:Static p:Resources.License}" />
+                                            <Run Text="{l:Resx License}" />
                                         </TextBlock>
                                         <Button Grid.Row="0" Grid.Column="1" BorderThickness="0" Content="X" Width="20" Height="20" HorizontalAlignment="Right" VerticalAlignment="Top"
                                                 Command="{Binding DataContext.ClosePopupCommand, ElementName=AboutViewElement}" CommandParameter="{Binding}" />

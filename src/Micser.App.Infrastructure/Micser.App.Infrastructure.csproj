@@ -111,6 +111,7 @@
     <Compile Include="Interaction\FileDialogConfirmation.cs" />
     <Compile Include="Localization\LocalizationManager.cs" />
     <Compile Include="Localization\ResourceData.cs" />
+    <Compile Include="Localization\ResourceElement.cs" />
     <Compile Include="Localization\ResxExtension.cs" />
     <Compile Include="ModulesSerializer.cs" />
     <Compile Include="Properties\Resources.Designer.cs">

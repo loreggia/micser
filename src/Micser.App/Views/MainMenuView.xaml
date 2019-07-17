@@ -34,7 +34,13 @@
                         </Style>
                     </HierarchicalDataTemplate.ItemContainerStyle>
 
-                    <ContentPresenter Content="{Binding Item.Header}" RecognizesAccessKey="True" />
+                    <ContentControl Content="{Binding Item.Header}">
+                        <ContentControl.ContentTemplate>
+                            <DataTemplate>
+                                <AccessText Text="{Binding}" />
+                            </DataTemplate>
+                        </ContentControl.ContentTemplate>
+                    </ContentControl>
                 </HierarchicalDataTemplate>
             </Menu.ItemTemplate>
         </Menu>
