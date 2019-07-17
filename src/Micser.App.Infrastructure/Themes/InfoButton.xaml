@@ -17,12 +17,11 @@
                                        HorizontalOffset="{Binding ActualWidth, ElementName=PopupBorder, Converter={converter:RelativeCenterPlacementConverter}}">
                                 <Border x:Name="PopupBorder" Style="{DynamicResource PopupBorder}">
                                     <ContentControl Content="{TemplateBinding Content}" Foreground="{DynamicResource {themes:BrushThemeKey DefaultForeground}}" Margin="10">
-                                        <ContentControl.Resources>
-                                            <Style TargetType="{x:Type TextBlock}">
-                                                <!--todo-->
-                                                <Setter Property="TextWrapping" Value="Wrap" />
-                                            </Style>
-                                        </ContentControl.Resources>
+                                        <ContentControl.ContentTemplate>
+                                            <DataTemplate>
+                                                <TextBlock Text="{Binding}" TextWrapping="Wrap" />
+                                            </DataTemplate>
+                                        </ContentControl.ContentTemplate>
                                     </ContentControl>
                                 </Border>
                             </Popup>
