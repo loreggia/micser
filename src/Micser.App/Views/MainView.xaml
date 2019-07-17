@@ -72,7 +72,7 @@
 
         <GridSplitter Grid.Row="2" ResizeDirection="Rows" ResizeBehavior="PreviousAndNext" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Center" Visibility="{Binding IsExpanded, ElementName=ToolboxExpander, Converter={converter:BooleanToVisibilityConverter}}" />
 
-        <Expander x:Name="ToolboxExpander" Grid.Row="3" Header="Widgets" IsExpanded="False" ExpandDirection="Up">
+        <Expander x:Name="ToolboxExpander" Grid.Row="3" Header="Widgets" IsExpanded="{Binding IsWidgetToolBoxOpen}" ExpandDirection="Up">
             <w:WidgetToolbox ItemsSource="{Binding AvailableWidgets}" />
 
             <in:Interaction.Triggers>

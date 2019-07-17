@@ -345,6 +345,13 @@ namespace Micser.App
                 StorageType = SettingStorageType.Api,
                 DefaultValue = 10
             });
+
+            settingsRegistry.Add(new SettingDefinition
+            {
+                IsHidden = true,
+                Key = AppGlobals.SettingKeys.IsWidgetToolBoxOpen,
+                DefaultValue = true
+            });
         }
 
         private static void RegisterToolBarItems(IContainerProvider containerProvider)

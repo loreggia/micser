@@ -3,7 +3,9 @@ using Micser.App.Infrastructure.Api;
 using Micser.App.Infrastructure.Interaction;
 using Micser.App.Infrastructure.Widgets;
 using Micser.App.Properties;
+using Micser.Common.Extensions;
 using Micser.Common.Modules;
+using Micser.Common.Settings;
 using NLog;
 using Prism.Commands;
 using Prism.Events;
@@ -29,6 +31,7 @@ namespace Micser.App.ViewModels
         private readonly ModulesSerializer _modulesSerializer;
         private readonly INavigationManager _navigationManager;
         private readonly ICollection<WidgetViewModel> _savingBuffer;
+        private readonly ISettingsService _settingsService;
         private readonly IWidgetRegistry _widgetRegistry;
         private readonly ObservableCollection<WidgetViewModel> _widgets;
         private SubscriptionToken _apiEventSubscription;
@@ -36,6 +39,7 @@ namespace Micser.App.ViewModels
         private IEnumerable<ModuleConnectionDto> _connectionDtos;
         private bool _isLoaded;
         private bool _isLoading;
+        private bool _isWidgetToolBoxOpen;
         private IEnumerable<ModuleDto> _moduleDtos;
 
         public MainViewModel(
@@ -44,6 +48,7 @@ namespace Micser.App.ViewModels
             ILogger logger,
             INavigationManager navigationManager,
             IEventAggregator eventAggregator,
+            ISettingsService settingsService,
             ModulesApiClient modulesApiClient,
             ModuleConnectionsApiClient connectionsApiClient,
             ModulesSerializer modulesSerializer)
@@ -52,6 +57,7 @@ namespace Micser.App.ViewModels
             _logger = logger;
             _navigationManager = navigationManager;
             _eventAggregator = eventAggregator;
+            _settingsService = settingsService;
             _modulesApiClient = modulesApiClient;
             _connectionsApiClient = connectionsApiClient;
             _modulesSerializer = modulesSerializer;
@@ -98,6 +104,18 @@ namespace Micser.App.ViewModels
 
         public InteractionRequest<IConfirmation> ImportFileRequest { get; set; }
 
+        public bool IsWidgetToolBoxOpen
+        {
+            get => _isWidgetToolBoxOpen;
+            set
+            {
+                if (SetProperty(ref _isWidgetToolBoxOpen, value))
+                {
+                    _settingsService.SetSettingAsync(AppGlobals.SettingKeys.IsWidgetToolBoxOpen, value);
+                }
+            }
+        }
+
         public ICommand RefreshCommand { get; }
 
         public IWidgetFactory WidgetFactory { get; }
@@ -116,6 +134,8 @@ namespace Micser.App.ViewModels
             base.OnNavigatedTo(parameter);
 
             _apiEventSubscription = _eventAggregator.GetEvent<ApiEvent>().Subscribe(OnApiEvent);
+
+            IsWidgetToolBoxOpen = _settingsService.GetSetting<bool>(AppGlobals.SettingKeys.IsWidgetToolBoxOpen);
 
             if (_isLoaded)
             {
