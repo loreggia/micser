@@ -255,4 +255,10 @@
   <data name="SettingResumeDelayName" xml:space="preserve">
     <value>Standby-Startverzögerung</value>
   </data>
+  <data name="SettingLanguageName" xml:space="preserve">
+    <value>Sprache</value>
+  </data>
+  <data name="SettingLanguageDescription" xml:space="preserve">
+    <value>Setzt die aktive Anzeigesprache.</value>
+  </data>
 </root>
