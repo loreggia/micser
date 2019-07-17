@@ -35,9 +35,9 @@ namespace Micser.App.Infrastructure.ToolBars
         }
 
         /// <summary>
-        /// Gets or sets the item's description that is shown as a tool tip.
+        /// Gets or sets the item's description content that is shown as a tool tip.
         /// </summary>
-        public string Description { get; set; }
+        public object Description { get; set; }
 
         /// <summary>
         /// Gets or sets the name/key of a <see cref="DataTemplate"/> resource to use as the item's icon.
@@ -45,9 +45,9 @@ namespace Micser.App.Infrastructure.ToolBars
         public string IconTemplateName { get; set; }
 
         /// <summary>
-        /// Gets or sets the name/header of the item.
+        /// Gets or sets the name/header content of the item.
         /// </summary>
-        public string Name { get; set; }
+        public object Name { get; set; }
 
         /// <summary>
         /// Gets or sets the order amongst the tool bar items in the same tool bar.
