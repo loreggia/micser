@@ -32,7 +32,7 @@ namespace Micser.App.Settings
                 try
                 {
                     var culture = new CultureInfo(cultureCode);
-                    LocalizationManager.Instance.UiCulture = culture;
+                    LocalizationManager.UiCulture = culture;
                     return cultureCode;
                 }
                 catch
