@@ -7,20 +7,26 @@ using System.Windows.Data;
 
 namespace Micser.App.Infrastructure.Localization
 {
+    /// <summary>
+    /// A <see cref="FrameworkElement"/> that replaces itself with a bound resource value for the current UI culture.
+    /// </summary>
     public class ResourceElement : FrameworkElement, INotifyPropertyChanged, IDisposable
     {
+        /// <summary>
+        /// DependencyProperty for the <see cref="Key"/> property.
+        /// </summary>
         public static readonly DependencyProperty KeyProperty = DependencyProperty.Register(
             nameof(Key), typeof(string), typeof(ResourceElement), new PropertyMetadata(null, OnPropertyChanged));
 
+        /// <summary>
+        /// DependencyProperty for the <see cref="ResourceManager"/> property.
+        /// </summary>
         public static readonly DependencyProperty ResourceManagerProperty = DependencyProperty.Register(
             nameof(ResourceManager), typeof(ResourceManager), typeof(ResourceElement), new PropertyMetadata(null, OnPropertyChanged));
 
         private string _content;
 
-        static ResourceElement()
-        {
-        }
-
+        /// <inheritdoc />
         public ResourceElement(ResourceManager resourceManager, string key)
             : this()
         {
@@ -30,13 +36,18 @@ namespace Micser.App.Infrastructure.Localization
             Loaded += OnLoaded;
         }
 
+        /// <inheritdoc />
         public ResourceElement()
         {
-            LocalizationManager.Instance.UiCultureChanged += OnUiCultureChanged;
+            LocalizationManager.UiCultureChanged += OnUiCultureChanged;
         }
 
+        /// <inheritdoc />
         public event PropertyChangedEventHandler PropertyChanged;
 
+        /// <summary>
+        /// Gets or sets the localized content. This is not a dependency property and will automatically get bound to the parent's content.
+        /// </summary>
         public string Content
         {
             get => _content;
@@ -50,37 +61,53 @@ namespace Micser.App.Infrastructure.Localization
             }
         }
 
+        /// <summary>
+        /// Gets or sets the resource key.
+        /// </summary>
         public string Key
         {
             get => (string)GetValue(KeyProperty);
             set => SetValue(KeyProperty, value);
         }
 
+        /// <summary>
+        /// Gets or sets the resource manager containing the resource. If this is null, the inherited value of the LocalizationManager.ResourceManager attached property is used.
+        /// </summary>
         public ResourceManager ResourceManager
         {
             get => (ResourceManager)GetValue(ResourceManagerProperty);
             set => SetValue(ResourceManagerProperty, value);
         }
 
+        /// <inheritdoc />
         public void Dispose()
         {
             Dispose(true);
             GC.SuppressFinalize(this);
         }
 
+        /// <summary>
+        /// Returns the localized content.
+        /// </summary>
         public override string ToString()
         {
             return Content;
         }
 
+        /// <summary>
+        /// Releases resources and unregisters events.
+        /// </summary>
         protected virtual void Dispose(bool disposing)
         {
             if (disposing)
             {
-                LocalizationManager.Instance.UiCultureChanged -= OnUiCultureChanged;
+                LocalizationManager.UiCultureChanged -= OnUiCultureChanged;
             }
         }
 
+        /// <summary>
+        /// Raises the <see cref="PropertyChanged"/> event.
+        /// </summary>
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
@@ -100,6 +127,7 @@ namespace Micser.App.Infrastructure.Localization
                 return;
             }
 
+            // create a binding from the parent to this element's content.
             var binding = new Binding(nameof(Content))
             {
                 Source = this,
@@ -127,7 +155,7 @@ namespace Micser.App.Infrastructure.Localization
         {
             var resourceManager = ResourceManager ?? LocalizationManager.GetResourceManager(this);
             var key = Key;
-            Content = (key != null ? resourceManager?.GetString(Key, LocalizationManager.Instance.UiCulture) : null) ?? $"#{Key}#";
+            Content = (key != null ? resourceManager?.GetString(Key, LocalizationManager.UiCulture) : null) ?? $"#{Key}#";
         }
     }
 }

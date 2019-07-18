@@ -5,20 +5,28 @@ using System.Windows;
 
 namespace Micser.App.Infrastructure.Localization
 {
-    public class LocalizationManager
+    /// <summary>
+    /// Provides global UI culture settings.
+    /// </summary>
+    public static class LocalizationManager
     {
+        /// <summary>
+        /// Dependency property for the ResourceManager attached property.
+        /// </summary>
         public static readonly DependencyProperty ResourceManagerProperty = DependencyProperty.RegisterAttached(
             "ResourceManager", typeof(ResourceManager), typeof(LocalizationManager), new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.Inherits));
 
-        private static LocalizationManager _instance;
+        private static CultureInfo _uiCulture;
 
-        private CultureInfo _uiCulture;
+        /// <summary>
+        /// Fires when the <see cref="UiCulture"/> has changed.
+        /// </summary>
+        public static event EventHandler UiCultureChanged;
 
-        public event EventHandler UiCultureChanged;
-
-        public static LocalizationManager Instance => _instance ?? (_instance = new LocalizationManager());
-
-        public CultureInfo UiCulture
+        /// <summary>
+        /// Gets or sets the current UI culture.
+        /// </summary>
+        public static CultureInfo UiCulture
         {
             get => _uiCulture;
             set
@@ -31,19 +39,25 @@ namespace Micser.App.Infrastructure.Localization
             }
         }
 
+        /// <summary>
+        /// Gets the ResourceManager attached property value. This property is inheritable.
+        /// </summary>
         public static ResourceManager GetResourceManager(DependencyObject element)
         {
             return (ResourceManager)element.GetValue(ResourceManagerProperty);
         }
 
+        /// <summary>
+        /// Sets the ResourceManager attached property value. This property is inheritable.
+        /// </summary>
         public static void SetResourceManager(DependencyObject element, ResourceManager value)
         {
             element.SetValue(ResourceManagerProperty, value);
         }
 
-        private void OnUiCultureChanged(EventArgs e)
+        private static void OnUiCultureChanged(EventArgs e)
         {
-            UiCultureChanged?.Invoke(this, e);
+            UiCultureChanged?.Invoke(null, e);
         }
     }
 }
