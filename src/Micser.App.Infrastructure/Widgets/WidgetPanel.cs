@@ -258,7 +258,7 @@ namespace Micser.App.Infrastructure.Widgets
                 }
 
                 var vm = WidgetFactory.CreateViewModel(description.ViewModelType);
-                vm.Name = description.Name;
+                vm.Name = description.Name?.ToString();
                 vm.Position = e.GetPosition(this);
 
                 if (WidgetsSource is ICollection<WidgetViewModel> collection)

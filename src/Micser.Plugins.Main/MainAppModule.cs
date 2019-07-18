@@ -1,5 +1,6 @@
 ﻿using Micser.App.Infrastructure;
 using Micser.App.Infrastructure.Extensions;
+using Micser.App.Infrastructure.Localization;
 using Micser.App.Infrastructure.Themes;
 using Micser.Common.Extensions;
 using Micser.Plugins.Main.Api;
@@ -22,15 +23,32 @@ namespace Micser.Plugins.Main
 
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            containerRegistry.RegisterWidget<DeviceInputWidget, DeviceInputViewModel>(Resources.DeviceInputWidgetName, Resources.DeviceInputWidgetDescription);
-            containerRegistry.RegisterWidget<DeviceInputWidget, LoopbackDeviceInputViewModel>(Resources.LoopbackDeviceInputWidgetName, Resources.LoopbackDeviceInputWidgetDescription);
-            containerRegistry.RegisterWidget<DeviceOutputWidget, DeviceOutputViewModel>(Resources.DeviceOutputWidgetName, Resources.DeviceOutputWidgetDescription);
-            containerRegistry.RegisterWidget<CompressorWidget, CompressorViewModel>(Resources.CompressorWidgetName, Resources.CompressorWidgetDescription);
-            containerRegistry.RegisterWidget<GainWidget, GainViewModel>(Resources.GainWidgetName, Resources.GainWidgetDescription);
-            containerRegistry.RegisterWidget<SpectrumWidget, SpectrumViewModel>(Resources.SpectrumWidgetName, Resources.SpectrumWidgetDescription);
+            containerRegistry.RegisterWidget<DeviceInputWidget, DeviceInputViewModel>(
+                Localize(nameof(Resources.DeviceInputWidgetName)),
+                Localize(nameof(Resources.DeviceInputWidgetDescription)));
+            containerRegistry.RegisterWidget<DeviceInputWidget, LoopbackDeviceInputViewModel>(
+                Localize(nameof(Resources.LoopbackDeviceInputWidgetName)),
+                Localize(nameof(Resources.LoopbackDeviceInputWidgetDescription)));
+            containerRegistry.RegisterWidget<DeviceOutputWidget, DeviceOutputViewModel>(
+                Localize(nameof(Resources.DeviceOutputWidgetName)),
+                Localize(nameof(Resources.DeviceOutputWidgetDescription)));
+            containerRegistry.RegisterWidget<CompressorWidget, CompressorViewModel>(
+                Localize(nameof(Resources.CompressorWidgetName)),
+                Localize(nameof(Resources.CompressorWidgetDescription)));
+            containerRegistry.RegisterWidget<GainWidget, GainViewModel>(
+                Localize(nameof(Resources.GainWidgetName)),
+                Localize(nameof(Resources.GainWidgetDescription)));
+            containerRegistry.RegisterWidget<SpectrumWidget, SpectrumViewModel>(
+                Localize(nameof(Resources.SpectrumWidgetName)),
+                Localize(nameof(Resources.SpectrumWidgetDescription)));
 
             var container = containerRegistry.GetContainer();
             container.RegisterRequestProcessor<SpectrumRequestProcessor>();
+        }
+
+        private static object Localize(string key)
+        {
+            return new ResourceElement(Resources.ResourceManager, key);
         }
     }
 }

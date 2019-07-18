@@ -15,7 +15,7 @@ namespace Micser.App.Infrastructure.Localization
         public static readonly DependencyProperty ResourceManagerProperty = DependencyProperty.Register(
             nameof(ResourceManager), typeof(ResourceManager), typeof(ResourceElement), new PropertyMetadata(null, OnPropertyChanged));
 
-        private object _content;
+        private string _content;
 
         static ResourceElement()
         {
@@ -37,7 +37,7 @@ namespace Micser.App.Infrastructure.Localization
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        public object Content
+        public string Content
         {
             get => _content;
             set
@@ -66,6 +66,11 @@ namespace Micser.App.Infrastructure.Localization
         {
             Dispose(true);
             GC.SuppressFinalize(this);
+        }
+
+        public override string ToString()
+        {
+            return Content;
         }
 
         protected virtual void Dispose(bool disposing)
