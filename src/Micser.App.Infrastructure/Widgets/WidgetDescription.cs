@@ -10,12 +10,12 @@ namespace Micser.App.Infrastructure.Widgets
         /// <summary>
         /// Gets or sets the description/help text that is displayed in the widget tool box.
         /// </summary>
-        public string Description { get; set; }
+        public object Description { get; set; }
 
         /// <summary>
         /// Gets or sets the default name of the widget.
         /// </summary>
-        public string Name { get; set; }
+        public object Name { get; set; }
 
         /// <summary>
         /// Gets or sets the type of the widget's view model.

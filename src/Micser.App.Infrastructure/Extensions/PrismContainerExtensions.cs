@@ -45,7 +45,7 @@ namespace Micser.App.Infrastructure.Extensions
         /// <param name="containerRegistry"></param>
         /// <param name="defaultName">The default name that is shown in the widget tool box and used when creating a widget.</param>
         /// <param name="description">A description that is shown in the widget tool box.</param>
-        public static void RegisterWidget<TWidget, TViewModel>(this IContainerRegistry containerRegistry, string defaultName, string description)
+        public static void RegisterWidget<TWidget, TViewModel>(this IContainerRegistry containerRegistry, object defaultName, object description)
             where TWidget : Widget
             where TViewModel : WidgetViewModel
         {
