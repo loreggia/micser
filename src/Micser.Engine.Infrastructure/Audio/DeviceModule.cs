@@ -13,7 +13,14 @@ namespace Micser.Engine.Infrastructure.Audio
     /// </summary>
     public abstract class DeviceModule : AudioModule
     {
+        /// <summary>
+        /// The api end point for communication with the UI.
+        /// </summary>
         protected readonly IApiEndPoint ApiEndPoint;
+
+        /// <summary>
+        /// The module service for access to the module DB.
+        /// </summary>
         protected readonly IModuleService ModuleService;
 
         private DeviceDescription _deviceDescription;
@@ -28,6 +35,9 @@ namespace Micser.Engine.Infrastructure.Audio
             DeviceEnumerator.DeviceStateChanged += DeviceStateChanged;
         }
 
+        /// <summary>
+        /// Gets or sets the adapter name that is used as a fallback when the device is disconnected or plugged into another USB port.
+        /// </summary>
         public string AdapterName { get; set; }
 
         /// <summary>
@@ -63,6 +73,9 @@ namespace Micser.Engine.Infrastructure.Audio
         /// </summary>
         protected MMDeviceEnumerator DeviceEnumerator { get; }
 
+        /// <summary>
+        /// Gets the type of devices that are available to this module.
+        /// </summary>
         protected abstract DeviceType DeviceType { get; }
 
         /// <inheritdoc />
