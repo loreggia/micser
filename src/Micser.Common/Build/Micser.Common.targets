@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <!-- https://stackoverflow.com/a/3405932/1511066 -->
-  <Target Name="ExecRunBuildTasks" BeforeTargets="BeforeBuild" Outputs="dummy.file">
+  <Target Name="ExecRunBuildTasks" BeforeTargets="CoreCompile" Outputs="dummy.file">
     <Message Text="Running custom build tasks..." Importance="High" />
     <Exec Command="&quot;$(MSBuildBinPath)\MSBuild.exe&quot; /t:RunBuildTasks /p:RunBuildTasks=true /p:Configuration=$(Configuration) &quot;$(ProjectDir)$(ProjectFileName)&quot;" />
   </Target>
