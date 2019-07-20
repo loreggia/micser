@@ -1,12 +1,22 @@
 ﻿using CSCore.CoreAudioAPI;
 using CSCore.SoundIn;
+using Micser.Common.Api;
+using Micser.Common.Devices;
 using Micser.Engine.Infrastructure.Audio;
+using Micser.Engine.Infrastructure.Services;
 
 namespace Micser.Plugins.Main.Modules
 {
     public class DeviceInputModule : DeviceModule
     {
         private WasapiCapture _capture;
+
+        public DeviceInputModule(IApiEndPoint apiEndPoint, IModuleService moduleService)
+            : base(apiEndPoint, moduleService)
+        {
+        }
+
+        protected override DeviceType DeviceType => DeviceType.Input;
 
         protected virtual WasapiCapture CreateCapture()
         {
@@ -26,9 +36,9 @@ namespace Micser.Plugins.Main.Modules
             base.DisposeDevice();
         }
 
-        protected override void OnDeviceStateChanged(DeviceState deviceState)
+        protected override void OnDeviceStateChanged(DeviceDescription deviceDescription)
         {
-            if (deviceState == DeviceState.Active)
+            if (deviceDescription.IsActive)
             {
                 _capture.Start();
             }
