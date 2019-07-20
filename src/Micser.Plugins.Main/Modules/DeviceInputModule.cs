@@ -38,13 +38,15 @@ namespace Micser.Plugins.Main.Modules
 
         protected override void OnDeviceStateChanged(DeviceDescription deviceDescription)
         {
+            base.OnDeviceStateChanged(deviceDescription);
+
             if (deviceDescription.IsActive)
             {
-                _capture.Start();
+                _capture?.Start();
             }
             else
             {
-                _capture.Stop();
+                _capture?.Stop();
             }
         }
 
