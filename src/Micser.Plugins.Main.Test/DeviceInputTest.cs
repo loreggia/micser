@@ -1,8 +1,12 @@
 ﻿using CSCore;
 using CSCore.CoreAudioAPI;
+using Micser.Common.Api;
 using Micser.Common.Devices;
+using Micser.Common.Modules;
 using Micser.Engine.Infrastructure.Audio;
+using Micser.Engine.Infrastructure.Services;
 using Micser.Plugins.Main.Modules;
+using Moq;
 using System;
 using System.Threading.Tasks;
 using Xunit;
@@ -15,7 +19,12 @@ namespace Micser.Plugins.Main.Test
         [Trait("Category", "Sound")]
         public async Task TestActualInput()
         {
-            var module = new DeviceInputModule();
+            var apiEndPointMock = new Mock<IApiEndPoint>();
+            apiEndPointMock.Setup(e => e.SendMessageAsync(It.IsAny<JsonRequest>())).ReturnsAsync(new JsonResponse(true));
+            var moduleServiceMock = new Mock<IModuleService>();
+            moduleServiceMock.Setup(e => e.GetById(It.IsAny<long>())).Returns<long>(id => new ModuleDto { Id = id, State = new ModuleState() });
+
+            var module = new DeviceInputModule(apiEndPointMock.Object, moduleServiceMock.Object);
 
             using (var deviceEnumerator = new MMDeviceEnumerator())
             {
