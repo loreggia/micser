@@ -142,6 +142,7 @@ namespace Micser.Common.Api
 
             try
             {
+                _listener?.Stop();
                 Disconnect();
             }
             catch
