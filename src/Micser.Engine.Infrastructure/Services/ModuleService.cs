@@ -105,7 +105,18 @@ namespace Micser.Engine.Infrastructure.Services
                     return false;
                 }
 
-                module.StateJson = JsonConvert.SerializeObject(moduleDto.State);
+                var state = JsonConvert.DeserializeObject<ModuleState>(module.StateJson);
+                state.IsMuted = moduleDto.State.IsMuted;
+                state.UseSystemVolume = moduleDto.State.UseSystemVolume;
+                state.Volume = moduleDto.State.Volume;
+                foreach (var data in moduleDto.State.Data)
+                {
+                    state.Data[data.Key] = data.Value;
+                }
+
+                module.StateJson = JsonConvert.SerializeObject(state);
+
+                moduleDto.State = state;
 
                 return uow.Complete() >= 0;
             }

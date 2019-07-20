@@ -1,7 +1,9 @@
 ﻿using CSCore.CoreAudioAPI;
 using Micser.Common;
+using Micser.Common.Api;
 using Micser.Common.Devices;
 using Micser.Common.Modules;
+using Micser.Engine.Infrastructure.Services;
 using System.Threading.Tasks;
 
 namespace Micser.Engine.Infrastructure.Audio
@@ -11,14 +13,22 @@ namespace Micser.Engine.Infrastructure.Audio
     /// </summary>
     public abstract class DeviceModule : AudioModule
     {
+        protected readonly IApiEndPoint ApiEndPoint;
+        protected readonly IModuleService ModuleService;
+
         private DeviceDescription _deviceDescription;
 
         /// <inheritdoc />
-        protected DeviceModule()
+        protected DeviceModule(IApiEndPoint apiEndPoint, IModuleService moduleService)
         {
+            ApiEndPoint = apiEndPoint;
+            ModuleService = moduleService;
+
             DeviceEnumerator = new MMDeviceEnumerator();
             DeviceEnumerator.DeviceStateChanged += DeviceStateChanged;
         }
+
+        public string AdapterName { get; set; }
 
         /// <summary>
         /// Gets or sets the currently selected device. Changing the device will call <see cref="InitializeDevice"/>.
@@ -31,7 +41,12 @@ namespace Micser.Engine.Infrastructure.Audio
                 var oldId = _deviceDescription?.Id;
                 _deviceDescription = value;
 
-                if (oldId != _deviceDescription?.Id)
+                if (value?.AdapterName != null)
+                {
+                    AdapterName = value.AdapterName;
+                }
+
+                if (oldId != value?.Id)
                 {
                     InitializeDevice();
                 }
@@ -48,11 +63,14 @@ namespace Micser.Engine.Infrastructure.Audio
         /// </summary>
         protected MMDeviceEnumerator DeviceEnumerator { get; }
 
+        protected abstract DeviceType DeviceType { get; }
+
         /// <inheritdoc />
         public override ModuleState GetState()
         {
             var state = base.GetState();
             state.Data[Globals.StateKeys.DeviceId] = DeviceDescription?.Id;
+            state.Data[nameof(AdapterName)] = AdapterName;
             return state;
         }
 
@@ -70,6 +88,11 @@ namespace Micser.Engine.Infrastructure.Audio
             else
             {
                 DeviceDescription = null;
+            }
+
+            if (AdapterName == null)
+            {
+                AdapterName = state.Data.GetObject<string>(nameof(AdapterName));
             }
         }
 
@@ -114,12 +137,29 @@ namespace Micser.Engine.Infrastructure.Audio
         /// <summary>
         /// Callback when the state of the active device changes. Calls <see cref="OnInitializeDevice"/> if it is active or <see cref="DisposeDevice"/> otherwise.
         /// </summary>
-        /// <param name="deviceState">The new device state.</param>
-        protected virtual void OnDeviceStateChanged(DeviceState deviceState)
+        /// <param name="deviceDescription">The device description of the device.</param>
+        protected virtual void OnDeviceStateChanged(DeviceDescription deviceDescription)
         {
-            if (deviceState == DeviceState.Active)
+            if (deviceDescription.IsActive)
             {
-                OnInitializeDevice();
+                if (DeviceDescription == null &&
+                    deviceDescription.AdapterName == AdapterName)
+                {
+                    DeviceDescription = deviceDescription;
+
+                    // save current state and signal UI refresh
+                    var moduleDto = ModuleService.GetById(Id);
+                    moduleDto.State = GetState();
+
+                    if (ModuleService.Update(moduleDto))
+                    {
+                        ApiEndPoint.SendMessageAsync(new JsonRequest("modules", "refresh", moduleDto));
+                    }
+                }
+                else
+                {
+                    OnInitializeDevice();
+                }
             }
             else
             {
@@ -136,9 +176,14 @@ namespace Micser.Engine.Infrastructure.Audio
 
         private async void DeviceStateChanged(object sender, DeviceStateChangedEventArgs e)
         {
-            if (e.DeviceId == DeviceDescription?.Id)
+            var deviceService = new DeviceService();
+            var deviceDescription = deviceService.GetDescription(e.DeviceId);
+
+            if (e.DeviceId == DeviceDescription?.Id ||
+                deviceDescription.Type == DeviceType &&
+                deviceDescription.AdapterName == AdapterName)
             {
-                await Task.Run(() => OnDeviceStateChanged(e.DeviceState)).ConfigureAwait(false);
+                await Task.Run(() => OnDeviceStateChanged(deviceDescription)).ConfigureAwait(false);
             }
         }
     }
