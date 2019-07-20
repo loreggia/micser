@@ -116,10 +116,20 @@ namespace Micser.Common.Test.Api
                 Assert.True(serverTask.Result);
                 Assert.True(clientTask.Result);
 
+                while (server.State != EndPointState.Connected &&
+                       client.State != EndPointState.Connected)
+                {
+                    await Task.Delay(10);
+                }
+
+                _testOutputHelper.WriteLine("Sending message...");
                 result = await client.SendMessageAsync(new JsonRequest("Resource", "Action", "Content"));
+                _testOutputHelper.WriteLine("Message sent");
 
                 Assert.NotNull(result);
-                Assert.True(result.IsSuccess, $"Message: '{result.Message}', IsConnected: {result.IsConnected}, Content: {result.Content}");
+                Assert.True(result.IsSuccess, $"Message: '{result.Message}', IsConnected: {result.IsConnected}, Content: {result.Content}, Server state: {server.State}, Client state: {client.State}");
+
+                server.Stop();
             }
         }
 
