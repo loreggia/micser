@@ -4,6 +4,7 @@ using System;
 using System.IO;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Micser.Common.Api
@@ -61,6 +62,7 @@ namespace Micser.Common.Api
 
         private readonly IRequestProcessorFactory _requestProcessorFactory;
         private readonly SemaphoreQueue _sendMessageSemaphore;
+        private bool _isReading;
 
         /// <inheritdoc />
         protected ApiEndPoint(IApiConfiguration configuration, IRequestProcessorFactory requestProcessorFactory, ILogger logger)
@@ -160,6 +162,11 @@ namespace Micser.Common.Api
                 State = EndPointState.Disconnected;
             }
 
+            while (_isReading)
+            {
+                Thread.Sleep(10);
+            }
+
             Logger.Info("Disconnected");
         }
 
@@ -192,12 +199,14 @@ namespace Micser.Common.Api
             {
                 try
                 {
+                    _isReading = true;
                     var message = await ApiProtocol.ReceiveMessage(InStream).ConfigureAwait(false);
                     if (message == null && State == EndPointState.Connected)
                     {
                         Disconnect();
                         return;
                     }
+
                     var response = await ProcessMessage(message).ConfigureAwait(false);
                     await ApiProtocol.WriteMessage(InStream, response).ConfigureAwait(false);
                 }
@@ -209,6 +218,10 @@ namespace Micser.Common.Api
                     }
 
                     Disconnect();
+                }
+                finally
+                {
+                    _isReading = false;
                 }
             }
         }

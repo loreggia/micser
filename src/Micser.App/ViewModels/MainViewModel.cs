@@ -395,11 +395,13 @@ namespace Micser.App.ViewModels
             }
         }
 
-        private void OnApiEvent(ApiEvent.ApiData data)
+        private async void OnApiEvent(ApiEvent.ApiData data)
         {
-            if (data.Action == "updatevolume" && data.Content is ModuleDto moduleDto && moduleDto.State != null)
+            if (data.Action == "updatevolume")
             {
-                if (Widgets.FirstOrDefault(w => w.Id == moduleDto.Id) is AudioWidgetViewModel widget)
+                if (data.Content is ModuleDto moduleDto &&
+                    moduleDto.State != null &&
+                    Widgets.FirstOrDefault(w => w.Id == moduleDto.Id) is AudioWidgetViewModel widget)
                 {
                     try
                     {
@@ -412,6 +414,25 @@ namespace Micser.App.ViewModels
                     {
                         _isLoading = false;
                     }
+                }
+            }
+            else if (data.Action == "refresh")
+            {
+                if (data.Content is ModuleDto moduleDto && moduleDto.State != null)
+                {
+                    try
+                    {
+                        _isLoading = true;
+                        Widgets.FirstOrDefault(w => w.Id == moduleDto.Id)?.LoadState(moduleDto.State);
+                    }
+                    finally
+                    {
+                        _isLoading = false;
+                    }
+                }
+                else
+                {
+                    await LoadDataAsync();
                 }
             }
         }

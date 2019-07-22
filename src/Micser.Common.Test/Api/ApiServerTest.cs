@@ -119,7 +119,9 @@ namespace Micser.Common.Test.Api
                 result = await client.SendMessageAsync(new JsonRequest("Resource", "Action", "Content"));
 
                 Assert.NotNull(result);
-                Assert.True(result.IsSuccess, $"Message: '{result.Message}', IsConnected: {result.IsConnected}, Content: {result.Content}");
+                Assert.True(result.IsSuccess, $"Message: '{result.Message}', IsConnected: {result.IsConnected}, Content: {result.Content}, Server state: {server.State}, Client state: {client.State}");
+
+                server.Stop();
             }
         }
 
@@ -281,7 +283,7 @@ namespace Micser.Common.Test.Api
         private static IRequestProcessorFactory GetFactory()
         {
             var processorMock = new Mock<IRequestProcessor>();
-            processorMock.Setup(p => p.ProcessAsync(It.IsAny<string>(), It.IsAny<object>())).Returns<string, Task<object>>((n, c) => Task.FromResult(new JsonResponse(true, c)));
+            processorMock.Setup(p => p.ProcessAsync(It.IsAny<string>(), It.IsAny<object>())).ReturnsAsync((string n, object c) => new JsonResponse(true, c));
             var factoryMock = new Mock<IRequestProcessorFactory>();
             factoryMock.Setup(f => f.Create(It.IsAny<string>())).Returns(processorMock.Object);
             return factoryMock.Object;

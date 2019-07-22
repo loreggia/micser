@@ -3,7 +3,10 @@ using CSCore.CoreAudioAPI;
 using CSCore.DSP;
 using CSCore.SoundOut;
 using CSCore.Streams;
+using Micser.Common.Api;
+using Micser.Common.Devices;
 using Micser.Engine.Infrastructure.Audio;
+using Micser.Engine.Infrastructure.Services;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -23,7 +26,8 @@ namespace Micser.Plugins.Main.Modules
         private float _volume;
         private VolumeSource _volumeSource;
 
-        public DeviceOutputModule()
+        public DeviceOutputModule(IApiEndPoint apiEndPoint, IModuleService moduleService)
+            : base(apiEndPoint, moduleService)
         {
             _inputBuffers = new ConcurrentDictionary<long, WriteableBufferingSource>();
             _inputSources = new ConcurrentDictionary<long, ISampleSource>();
@@ -74,6 +78,8 @@ namespace Micser.Plugins.Main.Modules
                 }
             }
         }
+
+        protected override DeviceType DeviceType => DeviceType.Output;
 
         public override void AddOutput(IAudioModule module)
         {
@@ -186,7 +192,7 @@ namespace Micser.Plugins.Main.Modules
             var restart = _outputMixer != null;
 
             _outputMixer = new MixerSampleSource(format.Channels, format.SampleRate) { DivideResult = false, FillWithZeros = true };
-            _volumeSource = new VolumeSource(_outputMixer);
+            _volumeSource = new VolumeSource(_outputMixer) { DisposeBaseSource = false };
 
             foreach (var sampleSource in _inputSources.Values)
             {
