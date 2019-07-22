@@ -148,6 +148,8 @@
     </PackageReference>
     <PackageReference Include="System.Data.SQLite">
       <Version>1.0.111</Version>
+	  <IncludeAssets>All</IncludeAssets>
+      <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="System.Data.SQLite.EF6.Migrations">
       <Version>1.0.106</Version>
