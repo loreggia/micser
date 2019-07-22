@@ -43,7 +43,6 @@ namespace Micser.Setup
             project.DigitalSignature = new DigitalSignature
             {
                 PfxFilePath = @"..\..\crt\Certificate.pfx",
-                Password = "testing",
                 Description = "Micser",
                 TimeUrl = new Uri("http://timestamp.verisign.com/scripts/timstamp.dll")
             };
