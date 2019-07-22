@@ -46,8 +46,17 @@
     <Compile Include="..\Micser.Common\Extensions\RegexExtensions.cs">
       <Link>RegexExtensions.cs</Link>
     </Compile>
+    <Compile Include="..\Micser.Common\Updates\UpdateManifest.cs">
+      <Link>UpdateManifest.cs</Link>
+    </Compile>
+    <Compile Include="CreateUpdateManifest.cs" />
     <Compile Include="UpdateAssemblyVersion.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json">
+      <Version>12.0.2</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
