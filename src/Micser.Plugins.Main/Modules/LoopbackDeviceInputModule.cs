@@ -1,4 +1,7 @@
 ﻿using CSCore.SoundIn;
+using Micser.Common.Api;
+using Micser.Common.Devices;
+using Micser.Engine.Infrastructure.Services;
 
 namespace Micser.Plugins.Main.Modules
 {
@@ -6,7 +9,8 @@ namespace Micser.Plugins.Main.Modules
     {
         private int _latency;
 
-        public LoopbackDeviceInputModule()
+        public LoopbackDeviceInputModule(IApiEndPoint apiEndPoint, IModuleService moduleService)
+            : base(apiEndPoint, moduleService)
         {
             Latency = 1;
         }
@@ -23,6 +27,8 @@ namespace Micser.Plugins.Main.Modules
                 }
             }
         }
+
+        protected override DeviceType DeviceType => DeviceType.Output;
 
         protected override WasapiCapture CreateCapture()
         {

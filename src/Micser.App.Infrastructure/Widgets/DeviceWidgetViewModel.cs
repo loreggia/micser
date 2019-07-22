@@ -68,8 +68,13 @@ namespace Micser.App.Infrastructure.Widgets
         {
             base.SetState(state);
 
-            var deviceId = state?.Data.GetObject<string>(Globals.StateKeys.DeviceId);
-            SelectedDeviceDescription = deviceId != null ? DeviceDescriptions?.FirstOrDefault(d => d.Id == deviceId) : null;
+            if (state == null || DeviceDescriptions == null)
+            {
+                return;
+            }
+
+            var deviceId = state.Data.GetObject<string>(Globals.StateKeys.DeviceId);
+            SelectedDeviceDescription = deviceId != null ? DeviceDescriptions.FirstOrDefault(d => d.Id == deviceId) : null;
         }
 
         /// <inheritdoc />

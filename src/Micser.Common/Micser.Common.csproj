@@ -163,7 +163,13 @@
   <ItemGroup>
     <Resource Include="Properties\Version.txt" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\Micser.BuildTasks\Micser.BuildTasks.csproj">
+      <Project>{9b270774-3850-4c23-abcf-587bcfff4844}</Project>
+      <Name>Micser.BuildTasks</Name>
+      <Private>False</Private>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="$(ProjectDir)Build\Micser.Common.targets" />
 </Project>
