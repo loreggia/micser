@@ -4,7 +4,9 @@
                     xmlns:themes="clr-namespace:Micser.App.Infrastructure.Themes"
                     xmlns:infrastructure="clr-namespace:Micser.App.Infrastructure"
                     xmlns:controls="clr-namespace:Micser.App.Infrastructure.Controls"
-                    xmlns:converter="clr-namespace:Micser.App.Infrastructure.Converter">
+                    xmlns:converter="clr-namespace:Micser.App.Infrastructure.Converter"
+                    xmlns:l="clr-namespace:Micser.App.Infrastructure.Localization"
+                    xmlns:p="clr-namespace:Micser.App.Infrastructure.Properties">
 
     <DataTemplate x:Key="DefaultHeaderTemplate" DataType="{x:Type widgets:WidgetViewModel}">
         <Grid MinHeight="16">
@@ -13,7 +15,7 @@
             <widgets:DragThumb Margin="0,0,32,0" Visibility="{Binding Path=IsEditing, ElementName=TextBlock, Converter={converter:BooleanToVisibilityConverter TrueValue=Collapsed, FalseValue=Visible}}">
                 <widgets:DragThumb.ContextMenu>
                     <ContextMenu>
-                        <MenuItem Header="Delete" Command="{x:Static infrastructure:CustomApplicationCommands.Delete}" Icon="{DynamicResource Icon_Delete_16x}" />
+                        <MenuItem Header="{l:Resx Delete, ResourceManager={x:Static p:Resources.ResourceManager}}" Command="{x:Static infrastructure:CustomApplicationCommands.Delete}" Icon="{DynamicResource Icon_Delete_16x}" />
                     </ContextMenu>
                 </widgets:DragThumb.ContextMenu>
             </widgets:DragThumb>
