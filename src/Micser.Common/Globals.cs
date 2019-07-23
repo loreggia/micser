@@ -174,7 +174,6 @@ namespace Micser.Common
         /// </summary>
         public static class Updates
         {
-            public const string ManifestUrl = "https://micser.lloreggia.ch/update/manifest.json";
             public static readonly string TempFolder = Path.Combine(AppDataFolder, "Updates");
         }
 

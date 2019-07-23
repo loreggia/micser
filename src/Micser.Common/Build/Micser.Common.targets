@@ -5,6 +5,8 @@
     <VersionFile Condition="'$(VersionFile)' == ''">Properties/Version.txt</VersionFile>
     <InputFile Condition="'$(InputFile)' == ''">Properties/GlobalAssemblyInfoTemplate.cs</InputFile>
     <OutputFile Condition="'$(OutputFile)' == ''">Properties/GlobalAssemblyInfo.cs</OutputFile>
+    <Version></Version>
+    <DescriptionFile Condition="'$(DescriptionFile)' == ''">$(ProjectDir)..\..\doc\ReleaseNotes.txt</DescriptionFile>
   </PropertyGroup>
 
   <!-- https://stackoverflow.com/a/3405932/1511066 -->
@@ -15,11 +17,20 @@
 
   <Target Name="RunBuildTasks" Condition="$(RunBuildTasks)">
     <CallTarget Targets="UpdateVersion" />
+    <CallTarget Targets="CreateUpdateManifests" />
   </Target>
 
   <UsingTask TaskName="UpdateAssemblyVersion" AssemblyFile="$(ProjectDir)..\Micser.BuildTasks\bin\$(Configuration)\Micser.BuildTasks.dll" />
+  <UsingTask TaskName="CreateUpdateManifest" AssemblyFile="$(ProjectDir)..\Micser.BuildTasks\bin\$(Configuration)\Micser.BuildTasks.dll" />
 
   <Target Name="UpdateVersion">
-    <UpdateAssemblyVersion InputFileName="$(InputFile)" OutputFileName="$(OutputFile)" VersionFileName="$(VersionFile)" />
+    <UpdateAssemblyVersion InputFileName="$(InputFile)" OutputFileName="$(OutputFile)" VersionFileName="$(VersionFile)" Version="$(Version)">
+      <Output TaskParameter="Version" PropertyName="Version" />
+    </UpdateAssemblyVersion>
+  </Target>
+
+  <Target Name="CreateUpdateManifests">
+    <CreateUpdateManifest DescriptionFileName="$(DescriptionFile)" OutputFileName="$(ProjectDir)..\..\bin\manifest-x64.json" Version="$(Version)" />
+    <CreateUpdateManifest DescriptionFileName="$(DescriptionFile)" OutputFileName="$(ProjectDir)..\..\bin\manifest-x86.json" Version="$(Version)" />
   </Target>
 </Project>

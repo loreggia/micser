@@ -105,11 +105,17 @@
     <Compile Include="Modules\SaveStateAttribute.cs" />
     <Compile Include="OrderedParameterOverride.cs" />
     <Compile Include="Properties\GlobalAssemblyInfo.cs" />
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+      <DependentUpon>Settings.settings</DependentUpon>
+    </Compile>
     <Compile Include="Updates\HttpUpdateService.cs" />
     <Compile Include="Updates\HttpUpdateSettings.cs" />
     <Compile Include="Updates\IUpdateService.cs" />
     <Compile Include="Updates\UpdateManifest.cs" />
     <Compile Include="Updates\UpdateService.cs" />
+    <None Include="app.config" />
     <None Include="Properties\GlobalAssemblyInfoTemplate.cs" />
     <Compile Include="SemaphoreQueue.cs" />
     <Compile Include="Settings\ISettingHandler.cs" />
@@ -129,6 +135,10 @@
     <Compile Include="IItemRegistry.cs" />
     <Compile Include="ItemRegistry.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <None Include="Properties\Settings.settings">
+      <Generator>PublicSettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CSCore">
@@ -148,7 +158,7 @@
     </PackageReference>
     <PackageReference Include="System.Data.SQLite">
       <Version>1.0.111</Version>
-	  <IncludeAssets>All</IncludeAssets>
+      <IncludeAssets>All</IncludeAssets>
       <PrivateAssets>None</PrivateAssets>
     </PackageReference>
     <PackageReference Include="System.Data.SQLite.EF6.Migrations">
@@ -170,6 +180,7 @@
       <Project>{9b270774-3850-4c23-abcf-587bcfff4844}</Project>
       <Name>Micser.BuildTasks</Name>
       <Private>False</Private>
+	  <ReferenceOutputAssembly>False</ReferenceOutputAssembly>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
