@@ -2,6 +2,7 @@
 using Micser.Common.Api;
 using Micser.Common.DataAccess;
 using Micser.Common.DataAccess.Repositories;
+using Micser.Common.Properties;
 using Micser.Common.Settings;
 using Micser.Common.Updates;
 using Micser.Engine.Infrastructure.DataAccess;
@@ -51,7 +52,7 @@ namespace Micser.Engine.Infrastructure
 
             container.RegisterSingleton<IRequestProcessorFactory, RequestProcessorFactory>();
 
-            container.RegisterInstance(new HttpUpdateSettings { ManifestUrl = Globals.Updates.ManifestUrl });
+            container.RegisterInstance(new HttpUpdateSettings { ManifestUrl = Settings.Default.UpdateManifestUrl });
             container.RegisterSingleton<IUpdateService, HttpUpdateService>();
 
             var server = container.Resolve<IApiServer>();

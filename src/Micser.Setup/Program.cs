@@ -170,8 +170,7 @@ namespace Micser.Setup
                 .On(NativeDialogs.InstallDirDlg, Buttons.Back, new ShowDialog(NativeDialogs.WelcomeDlg))
                 .On(NativeDialogs.MaintenanceTypeDlg, "ChangeButton", new ShowDialog(NativeDialogs.CustomizeDlg))
                 .On(NativeDialogs.CustomizeDlg, Buttons.Back, new ShowDialog(NativeDialogs.MaintenanceTypeDlg, Condition.Installed))
-                .On(NativeDialogs.ExitDialog, Buttons.Finish, new ExecuteCustomAction(launchAppAction, new Condition("WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1") & Condition.NOT_Installed))
-                ;
+                .On(NativeDialogs.ExitDialog, Buttons.Finish, new ExecuteCustomAction(launchAppAction, new Condition("WIXUI_EXITDIALOGOPTIONALCHECKBOX = 1") & Condition.NOT_Installed));
             project.CustomUI.Properties.Remove("ARPNOMODIFY");
 
             project.AddProperty(new Property("WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT", "Launch Micser"));
@@ -182,7 +181,7 @@ namespace Micser.Setup
             project.Include(WixExtension.UI);
             project.Include(WixExtension.NetFx);
 
-            project.BuildMsi();
+            project.BuildMsi($"Installer\\Micser-{project.Version}-{project.Platform}.msi");
         }
     }
 }

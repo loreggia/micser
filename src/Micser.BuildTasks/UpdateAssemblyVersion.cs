@@ -22,6 +22,9 @@ namespace Micser.BuildTasks
         [Required]
         public string OutputFileName { get; set; }
 
+        [Output]
+        public string Version { get; set; }
+
         [Required]
         public string VersionFileName { get; set; }
 
@@ -55,6 +58,8 @@ namespace Micser.BuildTasks
                 var inputContent = File.ReadAllText(InputFileName);
                 var output = _rxAssemblyVersion.ReplaceGroup(inputContent, "version", version);
                 File.WriteAllText(OutputFileName, output);
+
+                Version = version;
 
                 return true;
             }

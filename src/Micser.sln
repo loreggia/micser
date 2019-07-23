@@ -70,6 +70,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Doc", "Doc", "{3C6959B4-BB2
 		..\License.md = ..\License.md
 		..\Readme.md = ..\Readme.md
 		..\doc\Reiss-Tutorialondynamicrangecompression.pdf = ..\doc\Reiss-Tutorialondynamicrangecompression.pdf
+		..\doc\ReleaseNotes.txt = ..\doc\ReleaseNotes.txt
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Micser.DriverUtility", "Micser.DriverUtility\Micser.DriverUtility.csproj", "{B63FFC5B-C668-4A79-9E01-E01659C63C44}"

@@ -89,7 +89,7 @@ namespace Micser.App
             containerRegistry.RegisterView<AboutView, AboutViewModel>();
 
             container.RegisterRequestProcessor<UpdatesRequestProcessor>();
-            containerRegistry.RegisterInstance(new HttpUpdateSettings { ManifestUrl = Globals.Updates.ManifestUrl });
+            containerRegistry.RegisterInstance(new HttpUpdateSettings { ManifestUrl = Common.Properties.Settings.Default.UpdateManifestUrl });
             containerRegistry.RegisterSingleton<IUpdateService, HttpUpdateService>();
             containerRegistry.RegisterSingleton<UpdateHandler>();
         }

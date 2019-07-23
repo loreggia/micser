@@ -1,6 +1,7 @@
 ﻿using Microsoft.Build.Framework;
 using Microsoft.Build.Utilities;
 using Micser.Common.Updates;
+using Newtonsoft.Json;
 using System;
 using System.IO;
 
@@ -14,6 +15,9 @@ namespace Micser.BuildTasks
         [Required]
         public string OutputFileName { get; set; }
 
+        [Required]
+        public string Version { get; set; }
+
         public override bool Execute()
         {
             if (!File.Exists(DescriptionFileName))
@@ -22,14 +26,27 @@ namespace Micser.BuildTasks
                 return false;
             }
 
-            var description = File.ReadAllText(DescriptionFileName);
-
-            var updateManifest = new UpdateManifest
+            try
             {
-                Date = DateTime.UtcNow,
-                Description = description,
-                FileName =
+                var description = File.ReadAllText(DescriptionFileName);
+
+                var updateManifest = new UpdateManifest
+                {
+                    Date = DateTime.UtcNow,
+                    Description = description,
+                    FileName = "",
+                    Version = Version
+                };
+
+                File.WriteAllText(OutputFileName, JsonConvert.SerializeObject(updateManifest));
             }
+            catch (Exception ex)
+            {
+                Log.LogErrorFromException(ex);
+                return false;
+            }
+
+            return true;
         }
     }
 }
