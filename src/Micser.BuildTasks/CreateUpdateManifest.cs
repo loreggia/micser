@@ -38,6 +38,12 @@ namespace Micser.BuildTasks
                     Version = Version
                 };
 
+                var outputDir = Path.GetDirectoryName(OutputFileName);
+                if (!string.IsNullOrEmpty(outputDir))
+                {
+                    Directory.CreateDirectory(outputDir);
+                }
+
                 File.WriteAllText(OutputFileName, JsonConvert.SerializeObject(updateManifest));
             }
             catch (Exception ex)
