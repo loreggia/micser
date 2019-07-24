@@ -162,4 +162,9 @@
   <data name="Delete" xml:space="preserve">
     <value>Löschen</value>
   </data>
+  <data name="UpdateAvailableMessageFormat" xml:space="preserve">
+    <value>Es ist ein Update verfügbar:
+{0}
+Möchten Sie die Installation jetzt starten?</value>
+  </data>
 </root>

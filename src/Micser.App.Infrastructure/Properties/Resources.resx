@@ -156,6 +156,11 @@
   <data name="UpdateAvailable" xml:space="preserve">
     <value>Micser update available</value>
   </data>
+  <data name="UpdateAvailableMessageFormat" xml:space="preserve">
+    <value>There is an update available:
+{0}
+Do you want to install it now?</value>
+  </data>
   <data name="UseSystemVolume" xml:space="preserve">
     <value>Use system volume</value>
   </data>
