@@ -79,6 +79,15 @@ namespace Micser.Plugins.Main.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Downward.
+        /// </summary>
+        public static string CompressorDownward {
+            get {
+                return ResourceManager.GetString("CompressorDownward", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Advanced controls.
         /// </summary>
         public static string CompressorEnableAdvancedControls {
@@ -138,6 +147,15 @@ namespace Micser.Plugins.Main.Properties {
         public static string CompressorType {
             get {
                 return ResourceManager.GetString("CompressorType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Upward.
+        /// </summary>
+        public static string CompressorUpward {
+            get {
+                return ResourceManager.GetString("CompressorUpward", resourceCulture);
             }
         }
         
