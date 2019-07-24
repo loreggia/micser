@@ -189,7 +189,7 @@ namespace Micser.App.Infrastructure.Properties {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Use system volume.
+        ///   Looks up a localized string similar to System volume.
         /// </summary>
         public static string UseSystemVolume {
             get {

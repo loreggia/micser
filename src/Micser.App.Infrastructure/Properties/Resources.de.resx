@@ -154,7 +154,7 @@
     <value>Micser Update verfügbar</value>
   </data>
   <data name="UseSystemVolume" xml:space="preserve">
-    <value>Systemlautstärke verwenden</value>
+    <value>Systemlautstärke</value>
   </data>
   <data name="Volume" xml:space="preserve">
     <value>Lautstärke (%)</value>

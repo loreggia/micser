@@ -162,7 +162,7 @@
 Do you want to install it now?</value>
   </data>
   <data name="UseSystemVolume" xml:space="preserve">
-    <value>Use system volume</value>
+    <value>System volume</value>
   </data>
   <data name="Volume" xml:space="preserve">
     <value>Volume (%)</value>
