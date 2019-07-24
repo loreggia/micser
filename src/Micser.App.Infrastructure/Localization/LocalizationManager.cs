@@ -31,11 +31,10 @@ namespace Micser.App.Infrastructure.Localization
             get => _uiCulture;
             set
             {
-                if (!Equals(_uiCulture, value))
-                {
-                    _uiCulture = value;
-                    OnUiCultureChanged(EventArgs.Empty);
-                }
+                _uiCulture = value;
+                CultureInfo.CurrentUICulture = value;
+                CultureInfo.DefaultThreadCurrentUICulture = value;
+                OnUiCultureChanged(EventArgs.Empty);
             }
         }
 

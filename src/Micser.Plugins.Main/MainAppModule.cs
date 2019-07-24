@@ -15,6 +15,11 @@ namespace Micser.Plugins.Main
 {
     public class MainAppModule : IAppModule
     {
+        public MainAppModule()
+        {
+            LocalizationManager.UiCultureChanged += OnUiCultureChanged;
+        }
+
         public void OnInitialized(IContainerProvider containerProvider)
         {
             var resourceRegistry = containerProvider.Resolve<IResourceRegistry>();
@@ -49,6 +54,11 @@ namespace Micser.Plugins.Main
         private static object Localize(string key)
         {
             return new ResourceElement(Resources.ResourceManager, key);
+        }
+
+        private static void OnUiCultureChanged(object sender, EventArgs e)
+        {
+            Resources.Culture = LocalizationManager.UiCulture;
         }
     }
 }

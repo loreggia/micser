@@ -1,4 +1,7 @@
-﻿using Prism.Ioc;
+﻿using Micser.App.Infrastructure.Localization;
+using Micser.App.Infrastructure.Properties;
+using Prism.Ioc;
+using System;
 
 namespace Micser.App.Infrastructure
 {
@@ -8,6 +11,12 @@ namespace Micser.App.Infrastructure
     public class InfrastructureModule : IAppModule
     {
         /// <inheritdoc />
+        public InfrastructureModule()
+        {
+            LocalizationManager.UiCultureChanged += OnUiCultureChanged;
+        }
+
+        /// <inheritdoc />
         public void OnInitialized(IContainerProvider containerProvider)
         {
         }
@@ -15,6 +24,11 @@ namespace Micser.App.Infrastructure
         /// <inheritdoc />
         public void RegisterTypes(IContainerRegistry containerRegistry)
         {
+        }
+
+        private static void OnUiCultureChanged(object sender, EventArgs e)
+        {
+            Resources.Culture = LocalizationManager.UiCulture;
         }
     }
 }
