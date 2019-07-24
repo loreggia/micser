@@ -25,6 +25,7 @@ using Prism.Events;
 using Prism.Ioc;
 using Prism.Regions;
 using Prism.Unity;
+using System;
 using System.Data.Entity;
 using System.Globalization;
 using System.Linq;
@@ -37,6 +38,11 @@ namespace Micser.App
 {
     public class AppModule : IAppModule
     {
+        public AppModule()
+        {
+            LocalizationManager.UiCultureChanged += OnUiCultureChanged;
+        }
+
         public void OnInitialized(IContainerProvider containerProvider)
         {
             RegisterSettings(containerProvider);
@@ -134,6 +140,11 @@ namespace Micser.App
         private static object Localize(string key)
         {
             return new ResourceElement(Resources.ResourceManager, key);
+        }
+
+        private static void OnUiCultureChanged(object sender, EventArgs e)
+        {
+            Resources.Culture = LocalizationManager.UiCulture;
         }
 
         private static void RegisterMenuItems(IContainerProvider containerProvider)
