@@ -178,6 +178,17 @@ namespace Micser.App.Infrastructure.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to There is an update available:
+        ///{0}
+        ///Do you want to install it now?.
+        /// </summary>
+        public static string UpdateAvailableMessageFormat {
+            get {
+                return ResourceManager.GetString("UpdateAvailableMessageFormat", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Use system volume.
         /// </summary>
         public static string UseSystemVolume {

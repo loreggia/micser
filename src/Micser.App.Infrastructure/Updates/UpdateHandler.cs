@@ -87,6 +87,7 @@ namespace Micser.App.Infrastructure.Updates
         /// <param name="manifest">The update manifest of the available update.</param>
         public void ShowUpdateAvailable(UpdateManifest manifest)
         {
+            var message = string.Format(Resources.UpdateAvailableMessageFormat, manifest.Description);
             _eventAggregator
                 .GetEvent<MessageBoxEvent>()
                 .Publish(new MessageBoxEventArgs
@@ -99,7 +100,7 @@ namespace Micser.App.Infrastructure.Updates
                         }
                     },
                     IsModal = true,
-                    Message = manifest.Description,
+                    Message = message,
                     Title = Resources.UpdateAvailable,
                     Type = MessageBoxType.Question
                 });
