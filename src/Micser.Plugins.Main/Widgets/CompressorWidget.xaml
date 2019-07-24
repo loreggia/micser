@@ -46,9 +46,9 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
-            <RadioButton Grid.Column="0" GroupName="CompressorType" Content="Upward" VerticalAlignment="Center"
+            <RadioButton Grid.Column="0" Content="{l:Resx CompressorUpward}" VerticalAlignment="Center"
                          IsChecked="{Binding Type, Mode=TwoWay, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static audio:CompressorType.Upward}}" Margin="0,0,5,0" />
-            <RadioButton Grid.Column="1" GroupName="CompressorType" Content="Downward" VerticalAlignment="Center"
+            <RadioButton Grid.Column="1" Content="{l:Resx CompressorDownward}" VerticalAlignment="Center"
                          IsChecked="{Binding Type, Mode=TwoWay, Converter={StaticResource EnumToBooleanConverter}, ConverterParameter={x:Static audio:CompressorType.Downward}}" />
         </Grid>
 

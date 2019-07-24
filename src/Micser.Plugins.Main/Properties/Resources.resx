@@ -123,6 +123,9 @@
   <data name="CompressorAttack" xml:space="preserve">
     <value>Attack (ms)</value>
   </data>
+  <data name="CompressorDownward" xml:space="preserve">
+    <value>Downward</value>
+  </data>
   <data name="CompressorEnableAdvancedControls" xml:space="preserve">
     <value>Advanced controls</value>
   </data>
@@ -143,6 +146,9 @@
   </data>
   <data name="CompressorType" xml:space="preserve">
     <value>Type</value>
+  </data>
+  <data name="CompressorUpward" xml:space="preserve">
+    <value>Upward</value>
   </data>
   <data name="CompressorWidgetDescription" xml:space="preserve">
     <value>Compresses the audio that is routed through this widget. In "upward" mode this means that silent sounds will get louder; in "downward" mode loud sounds are getting quieter.</value>

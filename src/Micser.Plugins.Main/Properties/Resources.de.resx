@@ -189,4 +189,10 @@
   <data name="SpectrumWidgetName" xml:space="preserve">
     <value>Spektrum</value>
   </data>
+  <data name="CompressorDownward" xml:space="preserve">
+    <value>Abwärts</value>
+  </data>
+  <data name="CompressorUpward" xml:space="preserve">
+    <value>Aufwärts</value>
+  </data>
 </root>
