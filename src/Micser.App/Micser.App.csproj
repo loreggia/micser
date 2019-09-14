@@ -80,6 +80,8 @@
     <Compile Include="Settings\ShellState.cs" />
     <Compile Include="Settings\StartupSettingHandler.cs" />
     <Compile Include="Settings\VacCountSettingHandler.cs" />
+    <Compile Include="Shortcuts\KeyboardHook.cs" />
+    <Compile Include="Shortcuts\VirtualKey.cs" />
     <Compile Include="SingleInstance.cs" />
     <Compile Include="ViewModels\AboutViewModel.cs" />
     <Compile Include="ViewModels\LibraryInfo.cs" />

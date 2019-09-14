@@ -10,6 +10,7 @@ using Micser.App.Infrastructure.Updates;
 using Micser.App.Infrastructure.Widgets;
 using Micser.App.Properties;
 using Micser.App.Settings;
+using Micser.App.Shortcuts;
 using Micser.App.ViewModels;
 using Micser.App.Views;
 using Micser.Common;
@@ -98,6 +99,8 @@ namespace Micser.App
             containerRegistry.RegisterInstance(new HttpUpdateSettings { ManifestUrl = Common.Properties.Settings.Default.UpdateManifestUrl });
             containerRegistry.RegisterSingleton<IUpdateService, HttpUpdateService>();
             containerRegistry.RegisterSingleton<UpdateHandler>();
+
+            containerRegistry.RegisterSingleton<KeyboardHook>();
         }
 
         private static async void InitializeShell(IContainerProvider containerProvider)

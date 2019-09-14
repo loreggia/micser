@@ -3,6 +3,7 @@ using Microsoft.Shell;
 using Micser.App.Infrastructure;
 using Micser.App.Infrastructure.Themes;
 using Micser.App.Settings;
+using Micser.App.Shortcuts;
 using Micser.Common;
 using Micser.Common.Api;
 using Micser.Common.Settings;
@@ -32,6 +33,7 @@ namespace Micser.App
         private readonly Timer _reconnectTimer;
         private IApiEndPoint _apiEndPoint;
         private ArgumentDictionary _argumentDictionary;
+        private KeyboardHook _keyboardHook;
         private MainShell _shell;
 
         public MicserApplication()
@@ -75,6 +77,9 @@ namespace Micser.App
         {
             base.Initialize();
             InitializeModules();
+
+            _keyboardHook = GetService<KeyboardHook>();
+            _keyboardHook.KeyboardPressed += OnKeyboardPressed;
         }
 
         public bool SignalExternalCommandLineArgs(IList<string> args)
@@ -232,6 +237,11 @@ namespace Micser.App
             }
 
             Logger.Debug("Plugins loaded");
+        }
+
+        private static void OnKeyboardPressed(object sender, KeyboardHookEventArgs e)
+        {
+            Console.WriteLine($"{e.KeyboardState}, {e.KeyboardData.VirtualCode}");
         }
 
         private static void SetStatus(string text)
