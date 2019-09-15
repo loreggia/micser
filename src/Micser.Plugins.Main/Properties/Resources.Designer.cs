@@ -277,6 +277,33 @@ namespace Micser.Plugins.Main.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Pitch.
+        /// </summary>
+        public static string Pitch {
+            get {
+                return ResourceManager.GetString("Pitch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Changes the audio pitch up or down..
+        /// </summary>
+        public static string PitchWidgetDescription {
+            get {
+                return ResourceManager.GetString("PitchWidgetDescription", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pitch.
+        /// </summary>
+        public static string PitchWidgetName {
+            get {
+                return ResourceManager.GetString("PitchWidgetName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Visualizes the audio spectrum..
         /// </summary>
         public static string SpectrumWidgetDescription {

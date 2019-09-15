@@ -189,6 +189,15 @@
   <data name="Name" xml:space="preserve">
     <value>Name</value>
   </data>
+  <data name="Pitch" xml:space="preserve">
+    <value>Pitch</value>
+  </data>
+  <data name="PitchWidgetDescription" xml:space="preserve">
+    <value>Changes the audio pitch up or down.</value>
+  </data>
+  <data name="PitchWidgetName" xml:space="preserve">
+    <value>Pitch</value>
+  </data>
   <data name="SpectrumWidgetDescription" xml:space="preserve">
     <value>Visualizes the audio spectrum.</value>
   </data>

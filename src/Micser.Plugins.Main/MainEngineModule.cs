@@ -19,7 +19,8 @@ namespace Micser.Plugins.Main
                 typeof(DeviceOutputModule),
                 typeof(CompressorModule),
                 typeof(GainModule),
-                typeof(SpectrumModule));
+                typeof(SpectrumModule),
+                typeof(PitchModule));
         }
     }
 }
