@@ -46,6 +46,9 @@ namespace Micser.Plugins.Main
             containerRegistry.RegisterWidget<SpectrumWidget, SpectrumViewModel>(
                 Localize(nameof(Resources.SpectrumWidgetName)),
                 Localize(nameof(Resources.SpectrumWidgetDescription)));
+            containerRegistry.RegisterWidget<PitchWidget, PitchViewModel>(
+                Localize(nameof(Resources.PitchWidgetName)),
+                Localize(nameof(Resources.PitchWidgetDescription)));
 
             var container = containerRegistry.GetContainer();
             container.RegisterRequestProcessor<SpectrumRequestProcessor>();

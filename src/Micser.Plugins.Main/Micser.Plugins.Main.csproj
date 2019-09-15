@@ -57,6 +57,7 @@
     <Compile Include="Audio\EqualizerSampleProcessor.cs" />
     <Compile Include="Audio\FilterDescription.cs" />
     <Compile Include="Audio\GainSampleProcessor.cs" />
+    <Compile Include="Audio\PitchSampleProcessor.cs" />
     <Compile Include="Audio\SpectrumFftProvider.cs" />
     <Compile Include="Audio\SpectrumSampleProcessor.cs" />
     <Compile Include="Audio\WriteableBufferingSource.cs" />
@@ -68,6 +69,7 @@
     <Compile Include="Modules\EqualizerModule.cs" />
     <Compile Include="Modules\GainModule.cs" />
     <Compile Include="Modules\LoopbackDeviceInputModule.cs" />
+    <Compile Include="Modules\PitchModule.cs" />
     <Compile Include="Modules\SpectrumModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
@@ -77,6 +79,10 @@
     </Compile>
     <Compile Include="Widgets\CompressorViewModel.cs" />
     <Compile Include="Widgets\PeakSpectrum.cs" />
+    <Compile Include="Widgets\PitchViewModel.cs" />
+    <Compile Include="Widgets\PitchWidget.xaml.cs">
+      <DependentUpon>PitchWidget.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Widgets\SpectrumWidget.xaml.cs">
       <DependentUpon>SpectrumWidget.xaml</DependentUpon>
     </Compile>
@@ -107,6 +113,10 @@
     <Page Include="Themes\Generic.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Widgets\PitchWidget.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Widgets\SpectrumWidget.xaml">
       <Generator>MSBuild:Compile</Generator>
