@@ -1,6 +1,7 @@
 ﻿using Micser.App.Infrastructure.Extensions;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -248,6 +249,13 @@ namespace Micser.App.Infrastructure.Widgets
                     IsSelected = true;
                 }
             }
+        }
+
+        /// <inheritdoc />
+        protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
+        {
+            base.OnRenderSizeChanged(sizeInfo);
+            Debug.WriteLine($"Widget resized: {sizeInfo.NewSize}");
         }
 
         private static void OnPositionPropertyChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)

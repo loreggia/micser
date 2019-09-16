@@ -12,7 +12,7 @@
                  mc:Ignorable="d"
                  d:DataContext="{d:DesignInstance local:GainViewModel}"
                  MinWidth="250"
-                 MinHeight="150"
+                 MinHeight="70"
                  l:LocalizationManager.ResourceManager="{x:Static p:Resources.ResourceManager}">
     <Grid>
         <Grid.RowDefinitions>
