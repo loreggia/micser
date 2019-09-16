@@ -13,7 +13,7 @@
              d:DesignWidth="250"
              d:DesignHeight="100"
              MinWidth="250"
-             MinHeight="150"
+             MinHeight="180"
              d:DataContext="{d:DesignInstance local:PitchViewModel}"
              l:LocalizationManager.ResourceManager="{x:Static p:Resources.ResourceManager}">
     <Grid>
