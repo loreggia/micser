@@ -38,7 +38,10 @@ namespace Micser.Plugins.Main.Modules
             var fftQualityPow = (int)MathExtensions.Lerp(8, 12, qualityFactor);
             FftSize = (int)Math.Pow(2, fftQualityPow);
             Oversampling = (int)MathExtensions.Lerp(4f, 8f, qualityFactor);
-            PitchFactor = MathExtensions.Lerp(0.5f, 2f, (pitch + 1f) / 2f);
+
+            PitchFactor = pitch < 0f
+                ? MathExtensions.Lerp(0.5f, 1f, pitch + 1)
+                : MathExtensions.Lerp(1f, 2f, pitch);
         }
 
         public class Defaults
