@@ -48,6 +48,7 @@
     <Compile Include="ArgumentDictionaryTest.cs" />
     <Compile Include="DataAccess\UnitOfWorkTest.cs" />
     <Compile Include="DeviceServiceTest.cs" />
+    <Compile Include="Extensions\MathExtensionsTest.cs" />
     <Compile Include="Extensions\RegexExtensionsTest.cs" />
     <Compile Include="SerializationTest.cs" />
     <Compile Include="TestFileManager.cs" />

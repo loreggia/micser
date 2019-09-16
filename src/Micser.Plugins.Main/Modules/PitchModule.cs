@@ -1,6 +1,8 @@
-﻿using Micser.Common.Modules;
+﻿using Micser.Common.Extensions;
+using Micser.Common.Modules;
 using Micser.Engine.Infrastructure.Audio;
 using Micser.Plugins.Main.Audio;
+using System;
 
 namespace Micser.Plugins.Main.Modules
 {
@@ -11,18 +13,36 @@ namespace Micser.Plugins.Main.Modules
             AddSampleProcessor(new PitchSampleProcessor(this));
         }
 
-        [SaveState(Defaults.FftSize)]
         public int FftSize { get; set; }
+        public int Oversampling { get; set; }
 
         [SaveState(Defaults.Pitch)]
         public float Pitch { get; set; }
 
+        public float PitchFactor { get; set; }
+
         [SaveState(Defaults.Quality)]
         public int Quality { get; set; }
 
+        public override void SetState(ModuleState state)
+        {
+            base.SetState(state);
+
+            var quality = Quality;
+            MathExtensions.Clamp(ref quality, 1, 10);
+            var pitch = Pitch;
+            MathExtensions.Clamp(ref pitch, -1f, 1f);
+
+            // [256..4096] -> map quality [1..10] to [8..12]
+            var qualityFactor = MathExtensions.InverseLerp(1f, 10f, quality);
+            var fftQualityPow = (int)MathExtensions.Lerp(8, 12, qualityFactor);
+            FftSize = (int)Math.Pow(2, fftQualityPow);
+            Oversampling = (int)MathExtensions.Lerp(4f, 8f, qualityFactor);
+            PitchFactor = MathExtensions.Lerp(0.5f, 2f, (pitch + 1f) / 2f);
+        }
+
         public class Defaults
         {
-            public const int FftSize = 1024;
             public const float Pitch = 1f;
             public const int Quality = 4;
         }

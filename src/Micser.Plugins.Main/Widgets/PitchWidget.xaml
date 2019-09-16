@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:widgets="clr-namespace:Micser.App.Infrastructure.Widgets;assembly=Micser.App.Infrastructure"
-             xmlns:localization="clr-namespace:Micser.App.Infrastructure.Localization;assembly=Micser.App.Infrastructure"
+             xmlns:l="clr-namespace:Micser.App.Infrastructure.Localization;assembly=Micser.App.Infrastructure"
              xmlns:p="clr-namespace:Micser.Plugins.Main.Properties"
              xmlns:local="clr-namespace:Micser.Plugins.Main.Widgets"
              xmlns:i="clr-namespace:Micser.App.Infrastructure;assembly=Micser.App.Infrastructure"
@@ -15,7 +15,7 @@
              MinWidth="250"
              MinHeight="150"
              d:DataContext="{d:DesignInstance local:PitchViewModel}"
-             localization:LocalizationManager.ResourceManager="{x:Static p:Resources.ResourceManager}">
+             l:LocalizationManager.ResourceManager="{x:Static p:Resources.ResourceManager}">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -27,13 +27,15 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <Label Grid.Row="0" Grid.Column="0" Target="{Binding ElementName=SldPitch}" Content="{localization:Resx Pitch}" VerticalAlignment="Center" />
-        <controls:EditableSlider Grid.Row="0" Grid.Column="1" x:Name="SldPitch" HorizontalAlignment="Stretch" VerticalAlignment="Center" Minimum="0.5" Maximum="2" Value="{Binding Pitch, Mode=TwoWay}" />
+        <widgets:AudioWidgetControls Grid.Row="0" Grid.ColumnSpan="2" />
 
-        <Label Grid.Row="1" Grid.Column="0" Target="{Binding ElementName=SldFftSize}" Content="{localization:Resx FftSize}" VerticalAlignment="Center" />
-        <controls:EditableSlider Grid.Row="1" Grid.Column="1" x:Name="SldFftSize" HorizontalAlignment="Stretch" VerticalAlignment="Center" Minimum="7" Maximum="12" Value="{Binding FftSize, Mode=TwoWay}" />
+        <Label Grid.Row="1" Grid.Column="0" Target="{Binding ElementName=SldPitch}" Content="{l:Resx Pitch}" VerticalAlignment="Center" />
+        <controls:EditableSlider Grid.Row="1" Grid.Column="1" x:Name="SldPitch" HorizontalAlignment="Stretch" VerticalAlignment="Center" Minimum="-1" Maximum="1" Value="{Binding Pitch, Mode=TwoWay}" />
 
-        <Label Grid.Row="2" Grid.Column="0" Target="{Binding ElementName=SldQuality}" Content="{localization:Resx Quality}" VerticalAlignment="Center" />
-        <controls:EditableSlider Grid.Row="2" Grid.Column="1" x:Name="SldQuality" HorizontalAlignment="Stretch" VerticalAlignment="Center" Minimum="4" Maximum="64" Value="{Binding Quality, Mode=TwoWay}" />
+        <StackPanel Grid.Row="2" Grid.Column="0" Orientation="Horizontal">
+            <Label Target="{Binding ElementName=SldQuality}" Content="{l:Resx PitchQuality}" VerticalAlignment="Center" />
+            <controls:InfoButton Content="{l:Resx PitchQualityInfo}" Margin="5,0,0,0" />
+        </StackPanel>
+        <controls:EditableSlider Grid.Row="2" Grid.Column="1" x:Name="SldQuality" HorizontalAlignment="Stretch" VerticalAlignment="Center" Minimum="1" Maximum="10" Value="{Binding Quality, Mode=TwoWay}" />
     </Grid>
 </widgets:Widget>

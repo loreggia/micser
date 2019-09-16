@@ -195,4 +195,19 @@
   <data name="CompressorUpward" xml:space="preserve">
     <value>Aufwärts</value>
   </data>
+  <data name="PitchWidgetName" xml:space="preserve">
+    <value>Tonhöhe</value>
+  </data>
+  <data name="Pitch" xml:space="preserve">
+    <value>Tonhöhe</value>
+  </data>
+  <data name="PitchQuality" xml:space="preserve">
+    <value>Qualität</value>
+  </data>
+  <data name="PitchQualityInfo" xml:space="preserve">
+    <value>Hohe Qualität benötigt mehr CPU-Leistung und hat eine höhere Latenz zur Folge.</value>
+  </data>
+  <data name="PitchWidgetDescription" xml:space="preserve">
+    <value>Verändert die Tonhöhe nach oben oder unten.</value>
+  </data>
 </root>

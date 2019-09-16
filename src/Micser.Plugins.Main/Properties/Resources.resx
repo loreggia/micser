@@ -192,6 +192,12 @@
   <data name="Pitch" xml:space="preserve">
     <value>Pitch</value>
   </data>
+  <data name="PitchQuality" xml:space="preserve">
+    <value>Quality</value>
+  </data>
+  <data name="PitchQualityInfo" xml:space="preserve">
+    <value>High quality uses more CPU power and has a higher latency.</value>
+  </data>
   <data name="PitchWidgetDescription" xml:space="preserve">
     <value>Changes the audio pitch up or down.</value>
   </data>

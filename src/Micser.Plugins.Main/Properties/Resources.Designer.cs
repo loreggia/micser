@@ -286,6 +286,24 @@ namespace Micser.Plugins.Main.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Quality.
+        /// </summary>
+        public static string PitchQuality {
+            get {
+                return ResourceManager.GetString("PitchQuality", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to High quality uses more CPU power and has a higher latency..
+        /// </summary>
+        public static string PitchQualityInfo {
+            get {
+                return ResourceManager.GetString("PitchQualityInfo", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Changes the audio pitch up or down..
         /// </summary>
         public static string PitchWidgetDescription {
