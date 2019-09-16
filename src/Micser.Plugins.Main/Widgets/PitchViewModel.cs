@@ -7,22 +7,13 @@ namespace Micser.Plugins.Main.Widgets
 {
     public class PitchViewModel : AudioWidgetViewModel
     {
-        private int _fftSize;
         private float _pitch;
-
         private int _quality;
 
         public PitchViewModel()
         {
             AddInput("Input1");
             AddOutput("Output1");
-        }
-
-        [SaveState(PitchModule.Defaults.FftSize)]
-        public int FftSize
-        {
-            get => _fftSize;
-            set => SetProperty(ref _fftSize, value);
         }
 
         public override Type ModuleType => typeof(PitchModule);

@@ -49,7 +49,6 @@
 #endregion Copyright
 
 using CSCore;
-using Micser.Common.Extensions;
 using Micser.Engine.Infrastructure.Audio;
 using Micser.Plugins.Main.Modules;
 using System;
@@ -72,9 +71,9 @@ namespace Micser.Plugins.Main.Audio
         private readonly float[] _synFreq = new float[MAX_FRAME_LENGTH];
         private readonly float[] _synMagn = new float[MAX_FRAME_LENGTH];
 
-        private int _fftSizePow;
+        private int _fftSize;
+        private int _oversampling;
         private float _pitch;
-        private int _quality;
         private long _rover;
         private int _sampleRate;
 
@@ -85,9 +84,9 @@ namespace Micser.Plugins.Main.Audio
 
         public override void Process(WaveFormat waveFormat, float[] channelSamples)
         {
-            if (Math.Abs(_pitch - _module.Pitch) > AudioModule.Epsilon ||
-                _fftSizePow != _module.FftSize ||
-                _quality != _module.Quality ||
+            if (Math.Abs(_pitch - _module.PitchFactor) > AudioModule.Epsilon ||
+                _fftSize != _module.FftSize ||
+                _oversampling != _module.Oversampling ||
                 _sampleRate != waveFormat.SampleRate)
             {
                 Init(waveFormat);
@@ -151,12 +150,9 @@ namespace Micser.Plugins.Main.Audio
 
         private void Init(WaveFormat waveFormat)
         {
-            _pitch = _module.Pitch;
-            MathExtensions.Clamp(ref _pitch, 0.5f, 2f);
-            _quality = _module.Quality;
-            MathExtensions.Clamp(ref _quality, 4, 64);
-            _fftSizePow = _module.FftSize;
-            MathExtensions.Clamp(ref _fftSizePow, 7, 12);
+            _pitch = _module.PitchFactor;
+            _fftSize = _module.FftSize;
+            _oversampling = _module.Oversampling;
             _sampleRate = waveFormat.SampleRate;
 
             _rover = 0;
@@ -177,8 +173,8 @@ namespace Micser.Plugins.Main.Audio
             var sampleCount = data.Length;
             var inData = data;
             var outData = data;
-            var osamp = _quality;
-            var fftFrameSize = (int)Math.Pow(2, _fftSizePow);
+            var osamp = _oversampling;
+            var fftFrameSize = _fftSize;
             var sampleRate = _sampleRate;
             var pitchShift = _pitch;
 

@@ -42,6 +42,18 @@
         }
 
         /// <summary>
+        /// Inverse linear interpolation (calculate the interpolation factor).
+        /// </summary>
+        /// <param name="min">The value where the result is 0.</param>
+        /// <param name="max">The value where the result is 1.</param>
+        /// <param name="value">The actual value.</param>
+        /// <returns>The interpolation factor.</returns>
+        public static float InverseLerp(float min, float max, float value)
+        {
+            return (value - min) / (max - min);
+        }
+
+        /// <summary>
         /// Linear interpolation between a minimum and a maximum.
         /// </summary>
         /// <param name="min">The minimum value (when <paramref name="amount"/> is 0).</param>
