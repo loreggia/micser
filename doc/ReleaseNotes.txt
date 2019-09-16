@@ -1,1 +1,1 @@
-Initial Release
+Added new Pitch module
