@@ -92,6 +92,11 @@ namespace Micser.Plugins.Main.Audio
                 Init(waveFormat);
             }
 
+            if (Math.Abs(_module.Pitch) < AudioModule.Epsilon)
+            {
+                return;
+            }
+
             PitchShift(channelSamples);
         }
 
