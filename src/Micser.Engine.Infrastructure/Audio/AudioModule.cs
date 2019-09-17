@@ -50,6 +50,9 @@ namespace Micser.Engine.Infrastructure.Audio
         public virtual long Id { get; set; }
 
         /// <inheritdoc />
+        public bool IsEnabled { get; set; }
+
+        /// <inheritdoc />
         public virtual bool IsMuted { get; set; }
 
         /// <inheritdoc />
@@ -98,6 +101,7 @@ namespace Micser.Engine.Infrastructure.Audio
         {
             var state = new ModuleState
             {
+                IsEnabled = IsEnabled,
                 IsMuted = IsMuted,
                 Volume = Volume,
                 UseSystemVolume = UseSystemVolume
@@ -145,6 +149,7 @@ namespace Micser.Engine.Infrastructure.Audio
                 return;
             }
 
+            IsEnabled = state.IsEnabled;
             IsMuted = state.IsMuted;
             Volume = state.Volume;
             UseSystemVolume = state.UseSystemVolume;
@@ -155,7 +160,7 @@ namespace Micser.Engine.Infrastructure.Audio
         /// <inheritdoc />
         public virtual void Write(IAudioModule source, WaveFormat waveFormat, byte[] buffer, int offset, int count)
         {
-            if (IsMuted || Math.Abs(Volume) < Epsilon)
+            if (IsEnabled && (IsMuted || Math.Abs(Volume) < Epsilon))
             {
                 return;
             }
@@ -163,7 +168,7 @@ namespace Micser.Engine.Infrastructure.Audio
             byte[] nextBuffer = null;
             int nextOffset;
 
-            if (Math.Abs(Volume - 1f) < Epsilon && _sampleProcessors.All(p => p is VolumeSampleProcessor))
+            if (!IsEnabled || Math.Abs(Volume - 1f) < Epsilon && _sampleProcessors.All(p => p is VolumeSampleProcessor))
             {
                 nextBuffer = buffer;
                 nextOffset = offset;

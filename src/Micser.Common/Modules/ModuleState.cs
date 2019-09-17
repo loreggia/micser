@@ -25,6 +25,11 @@ namespace Micser.Common.Modules
         public StateDictionary Data { get; set; }
 
         /// <summary>
+        /// Gets or sets a value whether the module is enabled.
+        /// </summary>
+        public bool IsEnabled { get; set; }
+
+        /// <summary>
         /// Gets or sets a value whether the module is muted.
         /// </summary>
         public bool IsMuted { get; set; }
