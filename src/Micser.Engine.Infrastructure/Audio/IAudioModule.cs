@@ -11,6 +11,11 @@ namespace Micser.Engine.Infrastructure.Audio
     public interface IAudioModule : IIdentifiable, IDisposable
     {
         /// <summary>
+        /// Gets or sets whether the module is enabled. A disabled module will pass through the audio without affecting it.
+        /// </summary>
+        bool IsEnabled { get; set; }
+
+        /// <summary>
         /// Gets or sets whether the module is muted and will not output any data.
         /// </summary>
         bool IsMuted { get; set; }

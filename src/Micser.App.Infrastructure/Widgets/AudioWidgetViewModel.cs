@@ -8,9 +8,7 @@ namespace Micser.App.Infrastructure.Widgets
     public abstract class AudioWidgetViewModel : WidgetViewModel
     {
         private bool _isMuted;
-
         private bool _useSystemVolume;
-
         private float _volume;
 
         /// <inheritdoc />
@@ -50,6 +48,7 @@ namespace Micser.App.Infrastructure.Widgets
         public override ModuleState GetState()
         {
             var state = base.GetState();
+            state.IsEnabled = IsEnabled;
             state.Volume = Volume;
             state.IsMuted = IsMuted;
             state.UseSystemVolume = UseSystemVolume;
@@ -66,6 +65,7 @@ namespace Micser.App.Infrastructure.Widgets
                 return;
             }
 
+            IsEnabled = state.IsEnabled;
             Volume = state.Volume;
             IsMuted = state.IsMuted;
             UseSystemVolume = state.UseSystemVolume;

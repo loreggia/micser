@@ -11,8 +11,9 @@
     <DataTemplate x:Key="DefaultHeaderTemplate" DataType="{x:Type widgets:WidgetViewModel}">
         <Grid MinHeight="16">
             <Border Background="{DynamicResource {themes:BrushThemeKey WidgetHeaderBackground}}" />
-            <controls:EditableTextBlock x:Name="TextBlock" Text="{Binding Name}" Margin="8,0,8,0" HorizontalAlignment="Stretch" />
-            <widgets:DragThumb Margin="0,0,32,0" Visibility="{Binding Path=IsEditing, ElementName=TextBlock, Converter={converter:BooleanToVisibilityConverter TrueValue=Collapsed, FalseValue=Visible}}">
+            <CheckBox IsChecked="{Binding IsEnabled, Mode=TwoWay}" Width="32" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,0,0,0" />
+            <controls:EditableTextBlock x:Name="TextBlock" Text="{Binding Name}" Margin="40,0,8,0" HorizontalAlignment="Stretch" />
+            <widgets:DragThumb Margin="32,0,32,0" Visibility="{Binding Path=IsEditing, ElementName=TextBlock, Converter={converter:BooleanToVisibilityConverter TrueValue=Collapsed, FalseValue=Visible}}">
                 <widgets:DragThumb.ContextMenu>
                     <ContextMenu>
                         <MenuItem Header="{l:Resx Delete, ResourceManager={x:Static p:Resources.ResourceManager}}" Command="{x:Static infrastructure:CustomApplicationCommands.Delete}" Icon="{DynamicResource Icon_Delete_16x}" />

@@ -106,6 +106,7 @@ namespace Micser.Engine.Infrastructure.Services
                 }
 
                 var state = JsonConvert.DeserializeObject<ModuleState>(module.StateJson);
+                state.IsEnabled = moduleDto.State.IsEnabled;
                 state.IsMuted = moduleDto.State.IsMuted;
                 state.UseSystemVolume = moduleDto.State.UseSystemVolume;
                 state.Volume = moduleDto.State.Volume;

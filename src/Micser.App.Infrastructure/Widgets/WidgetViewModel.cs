@@ -15,6 +15,7 @@ namespace Micser.App.Infrastructure.Widgets
         private readonly ObservableCollection<ConnectorViewModel> _inputConnectors;
         private readonly ObservableCollection<ConnectorViewModel> _outputConnectors;
         private long _id;
+        private bool _isEnabled;
         private bool _isSelected;
         private ModuleState _loadingWidgetState;
         private string _name;
@@ -41,6 +42,16 @@ namespace Micser.App.Infrastructure.Widgets
         /// Gets the available input connectors.
         /// </summary>
         public IEnumerable<ConnectorViewModel> InputConnectors => _inputConnectors;
+
+        /// <summary>
+        /// Gets or sets a value that indicates whether the module is enabled.
+        /// </summary>
+        [SaveState(true)]
+        public bool IsEnabled
+        {
+            get => _isEnabled;
+            set => SetProperty(ref _isEnabled, value);
+        }
 
         /// <summary>
         /// Gets a value whether the widget is initialized, meaning <see cref="Initialize"/> has been called.
