@@ -62,7 +62,10 @@ namespace Micser.Plugins.Main.Modules
 
         private void OnCaptureDataAvailable(object sender, DataAvailableEventArgs e)
         {
-            Write(this, e.Format, e.Data, e.Offset, e.ByteCount);
+            if (IsEnabled)
+            {
+                Write(this, e.Format, e.Data, e.Offset, e.ByteCount);
+            }
         }
     }
 }
