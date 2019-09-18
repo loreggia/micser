@@ -1,1 +1,5 @@
-Added new Pitch module
+2019-09-18
+- Added checkboxes to enable/disable widgets
+
+2019-09-16
+- Added new Pitch module
