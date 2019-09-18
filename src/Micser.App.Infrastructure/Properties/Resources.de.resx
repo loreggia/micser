@@ -167,4 +167,7 @@
 {0}
 Möchten Sie die Installation jetzt starten?</value>
   </data>
+  <data name="Enabled" xml:space="preserve">
+    <value>Aktiviert</value>
+  </data>
 </root>

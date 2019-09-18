@@ -11,7 +11,7 @@
     <DataTemplate x:Key="DefaultHeaderTemplate" DataType="{x:Type widgets:WidgetViewModel}">
         <Grid MinHeight="16">
             <Border Background="{DynamicResource {themes:BrushThemeKey WidgetHeaderBackground}}" />
-            <CheckBox IsChecked="{Binding IsEnabled, Mode=TwoWay}" Width="32" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,0,0,0" />
+            <CheckBox IsChecked="{Binding IsEnabled, Mode=TwoWay}" Width="32" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,0,0,0" ToolTip="{l:Resx Enabled, ResourceManager={x:Static p:Resources.ResourceManager}}" />
             <controls:EditableTextBlock x:Name="TextBlock" Text="{Binding Name}" Margin="40,0,8,0" HorizontalAlignment="Stretch" />
             <widgets:DragThumb Margin="32,0,32,0" Visibility="{Binding Path=IsEditing, ElementName=TextBlock, Converter={converter:BooleanToVisibilityConverter TrueValue=Collapsed, FalseValue=Visible}}">
                 <widgets:DragThumb.ContextMenu>
