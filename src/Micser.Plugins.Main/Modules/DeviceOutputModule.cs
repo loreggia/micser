@@ -93,6 +93,11 @@ namespace Micser.Plugins.Main.Modules
 
         public override void Write(IAudioModule source, WaveFormat waveFormat, byte[] buffer, int offset, int count)
         {
+            if (!IsEnabled)
+            {
+                return;
+            }
+
             if (_volumeSource != null)
             {
                 _volumeSource.Volume = IsMuted ? 0f : _volume;
