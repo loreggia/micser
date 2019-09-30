@@ -7,16 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Audio\DeviceOutputTest.cs" />
-    <Compile Remove="Audio\MixerTest.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="Audio\DeviceOutputTest.cs" />
-    <None Include="Audio\MixerTest.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.3.0" />
     <PackageReference Include="Moq" Version="4.13.0" />
     <PackageReference Include="xunit" Version="2.4.1" />
@@ -31,8 +21,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Micser.Common.Test.Core\Micser.Common.Test.Core.csproj" />
-    <ProjectReference Include="..\Micser.Engine.Core\Micser.Engine.Core.csproj" />
+    <ProjectReference Include="..\Micser.App.Infrastructure.Core\Micser.App.Infrastructure.csproj" />
+    <ProjectReference Include="..\Micser.Common.Test.Core\Micser.Common.Test.csproj" />
   </ItemGroup>
 
 </Project>

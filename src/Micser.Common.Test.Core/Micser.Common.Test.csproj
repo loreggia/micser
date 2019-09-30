@@ -21,8 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Micser.App.Infrastructure.Core\Micser.App.Infrastructure.Core.csproj" />
-    <ProjectReference Include="..\Micser.Common.Test.Core\Micser.Common.Test.Core.csproj" />
+    <ProjectReference Include="..\Micser.Common.Core\Micser.Common.csproj" />
   </ItemGroup>
 
 </Project>

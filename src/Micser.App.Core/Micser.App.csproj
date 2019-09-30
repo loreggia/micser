@@ -11,7 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Micser.App.Infrastructure.Core\Micser.App.Infrastructure.Core.csproj" />
+    <ProjectReference Include="..\Micser.App.Infrastructure.Core\Micser.App.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
