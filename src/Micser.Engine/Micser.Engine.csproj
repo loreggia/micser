@@ -93,10 +93,6 @@
       <Project>{c5d0038c-8258-4bb4-9723-f3855f583e95}</Project>
       <Name>Micser.Engine.Infrastructure</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Micser.Common\Micser.Common.csproj">
-      <Project>{e14431b4-f54a-4d36-b505-1d3407252430}</Project>
-      <Name>Micser.Common</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CSCore">

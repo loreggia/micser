@@ -64,12 +64,6 @@
       <Version>4.6.6</Version>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Micser.Common\Micser.Common.csproj">
-      <Project>{e14431b4-f54a-4d36-b505-1d3407252430}</Project>
-      <Name>Micser.Common</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>@rem robocopy $(TargetDir) \\192.168.0.171\DriverUtility\ /S /E /Z /R:1 /W:1 /NP /V

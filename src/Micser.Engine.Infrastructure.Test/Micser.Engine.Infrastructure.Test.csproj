@@ -62,20 +62,6 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Micser.Common.Test\Micser.Common.Test.csproj">
-      <Project>{5CB07365-3143-4B65-9118-7B255AACAC6F}</Project>
-      <Name>Micser.Common.Test</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Micser.Common\Micser.Common.csproj">
-      <Project>{E14431B4-F54A-4D36-B505-1D3407252430}</Project>
-      <Name>Micser.Common</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Micser.Engine.Infrastructure\Micser.Engine.Infrastructure.csproj">
-      <Project>{C5D0038C-8258-4BB4-9723-F3855F583E95}</Project>
-      <Name>Micser.Engine.Infrastructure</Name>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

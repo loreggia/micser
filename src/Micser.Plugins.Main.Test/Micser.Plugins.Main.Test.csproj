@@ -71,10 +71,6 @@
       <Project>{C5D0038C-8258-4BB4-9723-F3855F583E95}</Project>
       <Name>Micser.Engine.Infrastructure</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Micser.Plugins.Main\Micser.Plugins.Main.csproj">
-      <Project>{6824c944-0750-41d6-898e-f05cdf0fb90a}</Project>
-      <Name>Micser.Plugins.Main</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets" Condition="Exists('$(VSToolsPath)\TeamTest\Microsoft.TestTools.targets')" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
