@@ -63,17 +63,9 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Micser.App.Infrastructure\Micser.App.Infrastructure.csproj">
-      <Project>{26b45a3b-725b-48e1-b272-4b0875b0c04a}</Project>
-      <Name>Micser.App.Infrastructure</Name>
-    </ProjectReference>
     <ProjectReference Include="..\Micser.Common.Test\Micser.Common.Test.csproj">
       <Project>{5cb07365-3143-4b65-9118-7b255aacac6f}</Project>
       <Name>Micser.Common.Test</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Micser.Common\Micser.Common.csproj">
-      <Project>{E14431B4-F54A-4D36-B505-1D3407252430}</Project>
-      <Name>Micser.Common</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
