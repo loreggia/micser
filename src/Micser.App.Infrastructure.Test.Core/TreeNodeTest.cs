@@ -1,8 +1,7 @@
-﻿using Micser.App.Infrastructure;
-using System.Linq;
+﻿using System.Linq;
 using Xunit;
 
-namespace Micser.Common.Test
+namespace Micser.App.Infrastructure.Test
 {
     public class TreeNodeTest
     {

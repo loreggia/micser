@@ -1,6 +1,6 @@
-﻿using Micser.Common.DataAccess;
+﻿using Microsoft.EntityFrameworkCore;
+using Micser.Common.DataAccess;
 using Micser.Engine.Infrastructure.DataAccess.Models;
-using System.Data.Entity;
 using System.Linq;
 
 namespace Micser.Engine.Infrastructure.DataAccess.Repositories

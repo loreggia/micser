@@ -1,15 +1,14 @@
-﻿using Micser.Common;
+﻿using Microsoft.EntityFrameworkCore;
+using Micser.Common;
 using Micser.Common.Api;
 using Micser.Common.DataAccess;
 using Micser.Common.DataAccess.Repositories;
-using Micser.Common.Properties;
 using Micser.Common.Settings;
 using Micser.Common.Updates;
 using Micser.Engine.Infrastructure.DataAccess;
 using Micser.Engine.Infrastructure.DataAccess.Repositories;
 using Micser.Engine.Infrastructure.Services;
 using NLog;
-using System.Data.Entity;
 using Unity;
 using Unity.Injection;
 using Unity.Resolution;

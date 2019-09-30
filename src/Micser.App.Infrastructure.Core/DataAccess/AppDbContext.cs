@@ -1,9 +1,7 @@
-﻿using Micser.Common;
+﻿using Microsoft.EntityFrameworkCore;
+using Micser.Common;
 using Micser.Common.DataAccess.Models;
 using System;
-using System.Data.Entity;
-using System.Data.Entity.Migrations;
-using System.Data.SQLite.EF6.Migrations;
 
 namespace Micser.App.Infrastructure.DataAccess
 {
@@ -27,10 +25,10 @@ namespace Micser.App.Infrastructure.DataAccess
         /// <summary>
         /// The application setting store.
         /// </summary>
-        public IDbSet<SettingValue> Settings { get; set; }
+        public DbSet<SettingValue> Settings { get; set; }
 
         /// <inheritdoc />
-        protected override void OnModelCreating(DbModelBuilder modelBuilder)
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             Database.SetInitializer(new MigrateDatabaseToLatestVersion<AppDbContext, ContextMigrationConfiguration>(true));
         }
