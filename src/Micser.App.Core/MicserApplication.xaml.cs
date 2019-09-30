@@ -1,5 +1,4 @@
-﻿using CommonServiceLocator;
-using Microsoft.Shell;
+﻿using Microsoft.Shell;
 using Micser.App.Infrastructure;
 using Micser.App.Infrastructure.Themes;
 using Micser.App.Settings;
@@ -9,9 +8,6 @@ using Micser.Common.Settings;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
-using Prism.Events;
-using Prism.Ioc;
-using Prism.Modularity;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -50,11 +46,11 @@ namespace Micser.App
         }
 
         [STAThread]
-        public static int Main()
+        public static int Main(string[] args)
         {
             var enableSingleInstance = !Debugger.IsAttached;
 
-            if (enableSingleInstance && !SingleInstance<MicserApplication>.InitializeAsFirstInstance(Unique))
+            if (enableSingleInstance && !SingleInstance<MicserApplication>.InitializeAsFirstInstance(Unique, args))
             {
                 return 0;
             }
