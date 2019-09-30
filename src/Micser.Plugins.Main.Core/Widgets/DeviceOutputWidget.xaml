@@ -3,18 +3,18 @@
                  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                  xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
                  xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-                 xmlns:p="clr-namespace:Micser.Plugins.Main.Properties"
                  xmlns:local="clr-namespace:Micser.Plugins.Main.Widgets"
                  xmlns:widgets="clr-namespace:Micser.App.Infrastructure.Widgets;assembly=Micser.App.Infrastructure"
                  xmlns:i="clr-namespace:Micser.App.Infrastructure;assembly=Micser.App.Infrastructure"
                  xmlns:extensions="clr-namespace:Micser.App.Infrastructure.Extensions;assembly=Micser.App.Infrastructure"
                  xmlns:devices="clr-namespace:Micser.Common.Devices;assembly=Micser.Common"
                  xmlns:l="clr-namespace:Micser.App.Infrastructure.Localization;assembly=Micser.App.Infrastructure"
+                 xmlns:r="clr-namespace:Micser.Plugins.Main.Resources"
                  mc:Ignorable="d"
                  d:DataContext="{d:DesignInstance local:DeviceOutputViewModel}"
                  MinWidth="250"
                  MinHeight="150"
-                 l:LocalizationManager.ResourceManager="{x:Static p:Resources.ResourceManager}">
+                 l:LocalizationManager.ResourceManager="{x:Static r:Strings.ResourceManager}">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />

@@ -8,14 +8,14 @@
         xmlns:controls="clr-namespace:Micser.App.Infrastructure.Controls;assembly=Micser.App.Infrastructure"
         xmlns:converter="clr-namespace:Micser.App.Infrastructure.Converter;assembly=Micser.App.Infrastructure"
         xmlns:themes="clr-namespace:Micser.App.Infrastructure.Themes;assembly=Micser.App.Infrastructure"
-        xmlns:p="clr-namespace:Micser.App.Properties"
         xmlns:l="clr-namespace:Micser.App.Infrastructure.Localization;assembly=Micser.App.Infrastructure"
+        xmlns:r="clr-namespace:Micser.App.Resources"
         mc:Ignorable="d"
         d:DesignHeight="450"
         d:DesignWidth="800"
         d:DataContext="{d:DesignInstance vm:AboutViewModel}"
         x:Name="AboutViewElement"
-        l:LocalizationManager.ResourceManager="{x:Static p:Resources.ResourceManager}">
+        l:LocalizationManager.ResourceManager="{x:Static r:Strings.ResourceManager}">
     <ScrollViewer HorizontalAlignment="Stretch" VerticalAlignment="Stretch" HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Auto">
         <StackPanel Orientation="Vertical" MaxWidth="800">
             <ContentControl ContentTemplate="{DynamicResource Logo}" Margin="50" MinWidth="64" MaxWidth="512" />

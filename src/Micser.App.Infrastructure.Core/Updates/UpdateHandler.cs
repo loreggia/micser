@@ -1,7 +1,6 @@
 ﻿using Micser.App.Infrastructure.Interaction;
-using Micser.App.Infrastructure.Properties;
+using Micser.App.Infrastructure.Resources;
 using Micser.Common.Updates;
-using Prism.Events;
 using System.Threading.Tasks;
 
 namespace Micser.App.Infrastructure.Updates
@@ -38,8 +37,8 @@ namespace Micser.App.Infrastructure.Updates
                     .GetEvent<MessageBoxEvent>()
                     .Publish(new MessageBoxEventArgs
                     {
-                        Title = Resources.Information,
-                        Message = Resources.NoUpdateAvailable,
+                        Title = Strings.Information,
+                        Message = Strings.NoUpdateAvailable,
                         Type = MessageBoxType.Information,
                         IsModal = true,
                     });
@@ -57,7 +56,7 @@ namespace Micser.App.Infrastructure.Updates
 
             if (fileName == null)
             {
-                error = Resources.ErrorInstallerDownload;
+                error = Strings.ErrorInstallerDownload;
             }
             else
             {
@@ -65,7 +64,7 @@ namespace Micser.App.Infrastructure.Updates
 
                 if (!executeResult)
                 {
-                    error = Resources.ErrorInstallerExecution;
+                    error = Strings.ErrorInstallerExecution;
                 }
             }
 
@@ -73,7 +72,7 @@ namespace Micser.App.Infrastructure.Updates
             {
                 _eventAggregator.GetEvent<MessageBoxEvent>().Publish(new MessageBoxEventArgs
                 {
-                    Title = Resources.Error,
+                    Title = Strings.Error,
                     Message = error,
                     Type = MessageBoxType.Error,
                     IsModal = true
@@ -87,7 +86,7 @@ namespace Micser.App.Infrastructure.Updates
         /// <param name="manifest">The update manifest of the available update.</param>
         public void ShowUpdateAvailable(UpdateManifest manifest)
         {
-            var message = string.Format(Resources.UpdateAvailableMessageFormat, manifest.Description);
+            var message = string.Format(Strings.UpdateAvailableMessageFormat, manifest.Description);
             _eventAggregator
                 .GetEvent<MessageBoxEvent>()
                 .Publish(new MessageBoxEventArgs
@@ -101,7 +100,7 @@ namespace Micser.App.Infrastructure.Updates
                     },
                     IsModal = true,
                     Message = message,
-                    Title = Resources.UpdateAvailable,
+                    Title = Strings.UpdateAvailable,
                     Type = MessageBoxType.Question
                 });
         }

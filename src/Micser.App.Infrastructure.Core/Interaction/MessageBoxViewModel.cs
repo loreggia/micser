@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Micser.App.Infrastructure.Resources;
+using System;
 using System.Drawing;
 using System.Windows;
 
@@ -114,21 +115,21 @@ namespace Micser.App.Infrastructure.Interaction
             switch (Buttons)
             {
                 case MessageBoxButton.OK:
-                    ConfirmationText = Resources.MessageBoxButtonOk;
+                    ConfirmationText = Strings.MessageBoxButtonOk;
                     CancelText = null;
                     break;
 
                 case MessageBoxButton.OKCancel:
-                    ConfirmationText = Resources.MessageBoxButtonOk;
-                    CancelText = Resources.MessageBoxButtonCancel;
+                    ConfirmationText = Strings.MessageBoxButtonOk;
+                    CancelText = Strings.MessageBoxButtonCancel;
                     break;
 
                 case MessageBoxButton.YesNoCancel:
                     throw new NotSupportedException("MessageBoxButton mode YesNoCancel is not supported.");
 
                 case MessageBoxButton.YesNo:
-                    ConfirmationText = Resources.MessageBoxButtonYes;
-                    CancelText = Resources.MessageBoxButtonNo;
+                    ConfirmationText = Strings.MessageBoxButtonYes;
+                    CancelText = Strings.MessageBoxButtonNo;
                     break;
 
                 default:
