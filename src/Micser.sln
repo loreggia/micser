@@ -37,29 +37,29 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{0375FFB5
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Micser.BuildTasks", "Micser.BuildTasks\Micser.BuildTasks.csproj", "{9B270774-3850-4C23-ABCF-587BCFFF4844}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Micser.App.Core", "Micser.App.Core\Micser.App.Core.csproj", "{24E5774C-1B7C-4462-9F2A-33112FE6CC42}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Micser.App", "Micser.App.Core\Micser.App.csproj", "{24E5774C-1B7C-4462-9F2A-33112FE6CC42}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Micser.App.Infrastructure.Core", "Micser.App.Infrastructure.Core\Micser.App.Infrastructure.Core.csproj", "{8A884468-6D03-4C33-B998-1224C6D83E00}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Micser.App.Infrastructure", "Micser.App.Infrastructure.Core\Micser.App.Infrastructure.csproj", "{8A884468-6D03-4C33-B998-1224C6D83E00}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Micser.Common.Core", "Micser.Common.Core\Micser.Common.Core.csproj", "{5051C74D-25AB-4F5A-8D0B-DBBD4428C602}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Micser.Common", "Micser.Common.Core\Micser.Common.csproj", "{5051C74D-25AB-4F5A-8D0B-DBBD4428C602}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Micser.DriverUtility.Core", "Micser.DriverUtility.Core\Micser.DriverUtility.Core.csproj", "{FD978BE4-F1D9-41FC-954E-0197401310C1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Micser.DriverUtility", "Micser.DriverUtility.Core\Micser.DriverUtility.csproj", "{FD978BE4-F1D9-41FC-954E-0197401310C1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Micser.Engine.Core", "Micser.Engine.Core\Micser.Engine.Core.csproj", "{11175E3F-FAC6-44DE-BCB3-A6FD09E49009}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Micser.Engine", "Micser.Engine.Core\Micser.Engine.csproj", "{11175E3F-FAC6-44DE-BCB3-A6FD09E49009}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Micser.Engine.Infrastructure.Core", "Micser.Engine.Infrastructure.Core\Micser.Engine.Infrastructure.Core.csproj", "{570B8FBA-BAAF-41BA-A5CB-6733A1855270}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Micser.Engine.Infrastructure", "Micser.Engine.Infrastructure.Core\Micser.Engine.Infrastructure.csproj", "{570B8FBA-BAAF-41BA-A5CB-6733A1855270}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Micser.Plugins.Main.Core", "Micser.Plugins.Main.Core\Micser.Plugins.Main.Core.csproj", "{759CC293-5392-4CB0-BB52-32107030662B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Micser.Plugins.Main", "Micser.Plugins.Main.Core\Micser.Plugins.Main.csproj", "{759CC293-5392-4CB0-BB52-32107030662B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Micser.App.Infrastructure.Test.Core", "Micser.App.Infrastructure.Test.Core\Micser.App.Infrastructure.Test.Core.csproj", "{97C9DA12-BB48-4D63-A110-537261C1057B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Micser.App.Infrastructure.Test", "Micser.App.Infrastructure.Test.Core\Micser.App.Infrastructure.Test.csproj", "{97C9DA12-BB48-4D63-A110-537261C1057B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Micser.Common.Test.Core", "Micser.Common.Test.Core\Micser.Common.Test.Core.csproj", "{13BB7D2F-1F5B-433C-971D-36043909E5B0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Micser.Common.Test", "Micser.Common.Test.Core\Micser.Common.Test.csproj", "{13BB7D2F-1F5B-433C-971D-36043909E5B0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Micser.Engine.Infrastructure.Test.Core", "Micser.Engine.Infrastructure.Test.Core\Micser.Engine.Infrastructure.Test.Core.csproj", "{C43BCE58-18AA-4544-A1E0-C5407D1467A6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Micser.Engine.Infrastructure.Test", "Micser.Engine.Infrastructure.Test.Core\Micser.Engine.Infrastructure.Test.csproj", "{C43BCE58-18AA-4544-A1E0-C5407D1467A6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Micser.Engine.Test.Core", "Micser.Engine.Test.Core\Micser.Engine.Test.Core.csproj", "{7DFFDC03-2CCB-44C6-B149-63F0A96330B4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Micser.Engine.Test", "Micser.Engine.Test.Core\Micser.Engine.Test.csproj", "{7DFFDC03-2CCB-44C6-B149-63F0A96330B4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Micser.Plugins.Main.Test.Core", "Micser.Plugins.Main.Test.Core\Micser.Plugins.Main.Test.Core.csproj", "{8B4D74C3-A5B7-404B-A768-55963593EAD2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Micser.Plugins.Main.Test", "Micser.Plugins.Main.Test.Core\Micser.Plugins.Main.Test.csproj", "{8B4D74C3-A5B7-404B-A768-55963593EAD2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
