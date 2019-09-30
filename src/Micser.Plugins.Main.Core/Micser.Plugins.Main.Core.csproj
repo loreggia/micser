@@ -5,4 +5,10 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Micser.App.Infrastructure.Core\Micser.App.Infrastructure.Core.csproj" />
+    <ProjectReference Include="..\Micser.Common.Core\Micser.Common.Core.csproj" />
+    <ProjectReference Include="..\Micser.Engine.Infrastructure.Core\Micser.Engine.Infrastructure.Core.csproj" />
+  </ItemGroup>
+
 </Project>
