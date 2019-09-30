@@ -1,6 +1,5 @@
 ﻿using Micser.App.Infrastructure.Localization;
-using Micser.App.Infrastructure.Properties;
-using Prism.Ioc;
+using Micser.App.Infrastructure.Resources;
 using System;
 
 namespace Micser.App.Infrastructure
@@ -28,7 +27,7 @@ namespace Micser.App.Infrastructure
 
         private static void OnUiCultureChanged(object sender, EventArgs e)
         {
-            Resources.Culture = LocalizationManager.UiCulture;
+            Strings.Culture = LocalizationManager.UiCulture;
         }
     }
 }

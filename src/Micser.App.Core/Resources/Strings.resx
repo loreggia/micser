@@ -141,10 +141,6 @@
   <data name="JsonFiles" xml:space="preserve">
     <value>JSON files</value>
   </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="libraries" type="System.Resources.ResXFileRef, System.Windows.Forms">
-    <value>..\Resources\libraries.json;System.Byte[], mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
-  </data>
   <data name="MenuItemAboutHeader" xml:space="preserve">
     <value>_About</value>
   </data>
