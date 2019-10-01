@@ -37,6 +37,11 @@ namespace Micser.Common.Extensions
             container.RegisterSingleton(typeof(TFrom), typeof(TTo), name);
         }
 
+        public static void RegisterSingleton<T>(this IContainerProvider container, string name = null)
+        {
+            container.RegisterSingleton(typeof(T), typeof(T), name);
+        }
+
         /// <summary>
         /// Registers multiple types for a specific interface as singletons. The types are registered using their <see cref="Type.AssemblyQualifiedName"/> as registration name.
         /// </summary>

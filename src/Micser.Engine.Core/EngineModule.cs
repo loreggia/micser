@@ -1,11 +1,11 @@
-﻿using Micser.Common;
+﻿using Microsoft.Extensions.Configuration;
+using Micser.Common;
 using Micser.Common.Audio;
 using Micser.Common.Extensions;
 using Micser.Common.Settings;
 using Micser.Engine.Api;
 using Micser.Engine.Audio;
 using Micser.Engine.Infrastructure;
-using Unity;
 
 namespace Micser.Engine
 {
@@ -34,6 +34,11 @@ namespace Micser.Engine
 
         public void RegisterTypes(IContainerProvider container)
         {
+            var configurationBuilder = new ConfigurationBuilder();
+            configurationBuilder.AddJsonFile("appsettings.json", false);
+            var configuration = configurationBuilder.Build();
+            container.RegisterInstance<IConfiguration>(configuration);
+
             container.RegisterRequestProcessor<EngineProcessor>();
             container.RegisterRequestProcessor<StatusProcessor>();
             container.RegisterRequestProcessor<ModulesProcessor>();

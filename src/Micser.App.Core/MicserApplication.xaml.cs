@@ -1,15 +1,16 @@
-﻿using Microsoft.Shell;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Shell;
 using Micser.App.Infrastructure;
 using Micser.App.Infrastructure.Themes;
 using Micser.App.Settings;
 using Micser.Common;
 using Micser.Common.Api;
+using Micser.Common.Extensions;
 using Micser.Common.Settings;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -28,6 +29,7 @@ namespace Micser.App
         private readonly Timer _reconnectTimer;
         private IApiEndPoint _apiEndPoint;
         private ArgumentDictionary _argumentDictionary;
+        private IContainerProvider _containerProvider;
         private MainShell _shell;
 
         public MicserApplication()
@@ -38,11 +40,8 @@ namespace Micser.App
 
             _reconnectTimer = new Timer(1000) { AutoReset = false };
             _reconnectTimer.Elapsed += OnReconnectTimerElapsed;
-        }
 
-        public static T GetService<T>()
-        {
-            return ServiceLocator.Current.GetInstance<T>();
+            _containerProvider = new UnityContainerProvider();
         }
 
         [STAThread]
@@ -73,7 +72,7 @@ namespace Micser.App
             InitializeModules();
         }
 
-        public bool SignalExternalCommandLineArgs(IList<string> args)
+        public void SignalExternalCommandLineArgs(string[] args)
         {
             if (MainWindow != null)
             {
@@ -87,8 +86,6 @@ namespace Micser.App
 
                 MainWindow.Activate();
             }
-
-            return true;
         }
 
         protected override void ConfigureModuleCatalog(IModuleCatalog moduleCatalog)
@@ -112,13 +109,13 @@ namespace Micser.App
 
             base.InitializeModules();
 
-            var resourceRegistry = GetService<IResourceRegistry>();
+            var resourceRegistry = _containerProvider.Resolve<IResourceRegistry>();
             foreach (var dictionary in resourceRegistry.Items)
             {
                 Current.Resources.MergedDictionaries.Add(dictionary);
             }
 
-            var eventAggregator = GetService<IEventAggregator>();
+            var eventAggregator = _containerProvider.Resolve<IEventAggregator>();
             var modulesLoadedEvent = eventAggregator.GetEvent<ApplicationEvents.ModulesLoaded>();
             modulesLoadedEvent.Publish();
         }
@@ -143,7 +140,7 @@ namespace Micser.App
                     State = _shell.WindowState
                 };
 
-                var settingsService = GetService<ISettingsService>();
+                var settingsService = _containerProvider.Resolve<ISettingsService>();
                 settingsService.SetSettingAsync(AppGlobals.SettingKeys.ShellState, state).GetAwaiter().GetResult();
 
                 _shell = null;
@@ -156,7 +153,7 @@ namespace Micser.App
 
         protected override void OnInitialized()
         {
-            _apiEndPoint = GetService<IApiEndPoint>();
+            _apiEndPoint = _containerProvider.Resolve<IApiEndPoint>();
             _reconnectTimer.Start();
 
             Logger.Info("Ready");
@@ -195,7 +192,7 @@ namespace Micser.App
             base.OnStartup(e);
         }
 
-        protected override void RegisterTypes(IContainerRegistry containerRegistry)
+        protected override void RegisterTypes(IContainerProvider containerRegistry)
         {
             containerRegistry.RegisterInstance(_argumentDictionary);
         }
@@ -230,13 +227,6 @@ namespace Micser.App
             Logger.Debug("Plugins loaded");
         }
 
-        private static void SetStatus(string text)
-        {
-            var eventAggregator = GetService<IEventAggregator>();
-            var statusChangeEvent = eventAggregator.GetEvent<ApplicationEvents.StatusChange>();
-            statusChangeEvent.Publish(text);
-        }
-
         private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
             if (Debugger.IsAttached)
@@ -257,6 +247,13 @@ namespace Micser.App
             }
 
             _reconnectTimer.Start();
+        }
+
+        private void SetStatus(string text)
+        {
+            var eventAggregator = _containerProvider.Resolve<IEventAggregator>();
+            var statusChangeEvent = eventAggregator.GetEvent<ApplicationEvents.StatusChange>();
+            statusChangeEvent.Publish(text);
         }
     }
 }

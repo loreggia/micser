@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Micser.Common;
 using Micser.Common.DataAccess.Models;
 using System;
@@ -10,15 +11,17 @@ namespace Micser.App.Infrastructure.DataAccess
     /// </summary>
     public class AppDbContext : DbContext
     {
+        private readonly IConfiguration _configuration;
+
         static AppDbContext()
         {
             AppDomain.CurrentDomain.SetData("DataDirectory", Globals.AppDataFolder);
         }
 
         /// <inheritdoc />
-        public AppDbContext()
-            : base("DefaultConnection")
+        public AppDbContext(IConfiguration configuration)
         {
+            _configuration = configuration;
         }
 
         // ReSharper disable once UnusedMember.Global
@@ -28,21 +31,12 @@ namespace Micser.App.Infrastructure.DataAccess
         public DbSet<SettingValue> Settings { get; set; }
 
         /// <inheritdoc />
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            Database.SetInitializer(new MigrateDatabaseToLatestVersion<AppDbContext, ContextMigrationConfiguration>(true));
-        }
-    }
+            var cs = _configuration.GetConnectionString("DefaultConnection");
+            optionsBuilder.UseSqlite(cs);
 
-    /// <inheritdoc />
-    public class ContextMigrationConfiguration : DbMigrationsConfiguration<AppDbContext>
-    {
-        /// <inheritdoc />
-        public ContextMigrationConfiguration()
-        {
-            AutomaticMigrationsEnabled = true;
-            AutomaticMigrationDataLossAllowed = true;
-            SetSqlGenerator("System.Data.SQLite", new SQLiteMigrationSqlGenerator());
+            base.OnConfiguring(optionsBuilder);
         }
     }
 }

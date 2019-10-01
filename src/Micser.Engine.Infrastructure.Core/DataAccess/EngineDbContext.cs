@@ -1,37 +1,21 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Micser.Common.DataAccess.Models;
 using Micser.Engine.Infrastructure.DataAccess.Models;
 
 namespace Micser.Engine.Infrastructure.DataAccess
 {
     /// <summary>
-    /// Migration configuration that enables automatic DB migrations.
-    /// </summary>
-    public class ContextMigrationConfiguration : DbMigrationsConfiguration<EngineDbContext>
-    {
-        /// <inheritdoc />
-        public ContextMigrationConfiguration()
-        {
-            AutomaticMigrationsEnabled = true;
-            AutomaticMigrationDataLossAllowed = true;
-            SetSqlGenerator("System.Data.SQLite", new SQLiteMigrationSqlGenerator());
-        }
-    }
-
-    /// <summary>
     /// The EF database context for engine storage.
     /// </summary>
     public class EngineDbContext : DbContext
     {
-        static EngineDbContext()
-        {
-            Database.SetInitializer(new MigrateDatabaseToLatestVersion<EngineDbContext, ContextMigrationConfiguration>(true));
-        }
+        private readonly IConfiguration _configuration;
 
         /// <inheritdoc />
-        public EngineDbContext()
-            : base("DefaultConnection")
+        public EngineDbContext(IConfiguration configuration)
         {
+            _configuration = configuration;
         }
 
         // ReSharper disable once UnusedMember.Global
@@ -53,15 +37,24 @@ namespace Micser.Engine.Infrastructure.DataAccess
         public DbSet<SettingValue> Settings { get; set; }
 
         /// <inheritdoc />
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            var cs = _configuration.GetConnectionString("DefaultConnection");
+            optionsBuilder.UseSqlite(cs);
+
+            base.OnConfiguring(optionsBuilder);
+        }
+
+        /// <inheritdoc />
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Module>()
                 .HasMany(m => m.SourceModuleConnections)
-                .WithRequired(c => c.SourceModule)
+                .WithOne(c => c.SourceModule)
                 .HasForeignKey(c => c.SourceModuleId);
             modelBuilder.Entity<Module>()
                 .HasMany(m => m.TargetModuleConnections)
-                .WithRequired(c => c.TargetModule)
+                .WithOne(c => c.TargetModule)
                 .HasForeignKey(c => c.TargetModuleId);
         }
     }

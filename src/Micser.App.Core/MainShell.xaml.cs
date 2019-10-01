@@ -14,12 +14,14 @@ namespace Micser.App
     public partial class MainShell
     {
         private readonly IRegionManager _regionManager;
+        private readonly ISettingsService _settingsService;
 
-        public MainShell(IRegionManager regionManager)
+        public MainShell(IRegionManager regionManager, ISettingsService settingsService)
         {
             InitializeComponent();
 
             _regionManager = regionManager;
+            _settingsService = settingsService;
 
             Loaded += MainShell_Loaded;
         }
@@ -36,8 +38,7 @@ namespace Micser.App
             if (WindowState == WindowState.Minimized)
             {
                 // ISettingsService is not yet available when the shell is created, so we can't use constructor injection
-                var settingsService = MicserApplication.GetService<ISettingsService>();
-                if (settingsService.GetSetting<bool>(AppGlobals.SettingKeys.MinimizeToTray))
+                if (_settingsService.GetSetting<bool>(AppGlobals.SettingKeys.MinimizeToTray))
                 {
                     Hide();
                 }

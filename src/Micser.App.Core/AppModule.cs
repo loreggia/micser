@@ -1,8 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Micser.App.Infrastructure;
 using Micser.App.Infrastructure.Api;
+using Micser.App.Infrastructure.Commands;
 using Micser.App.Infrastructure.DataAccess;
-using Micser.App.Infrastructure.Extensions;
 using Micser.App.Infrastructure.Localization;
 using Micser.App.Infrastructure.Menu;
 using Micser.App.Infrastructure.Themes;
@@ -25,9 +26,6 @@ using System;
 using System.Globalization;
 using System.Linq;
 using System.Windows;
-using Unity;
-using Unity.Injection;
-using Unity.Resolution;
 
 namespace Micser.App
 {
@@ -49,50 +47,54 @@ namespace Micser.App
             containerProvider.Resolve<IApplicationStateService>().Initialize();
         }
 
-        public void RegisterTypes(IContainerRegistry containerRegistry)
+        public void RegisterTypes(IContainerProvider container)
         {
-            var container = containerRegistry.GetContainer();
-            container.RegisterType<ILogger>(new InjectionFactory(c => LogManager.GetCurrentClassLogger()));
+            var configurationBuilder = new ConfigurationBuilder();
+            configurationBuilder.AddJsonFile("appsettings.json", false);
+            var configuration = configurationBuilder.Build();
+            container.RegisterInstance<IConfiguration>(configuration);
+
+            container.RegisterFactory<ILogger>(c => LogManager.GetCurrentClassLogger());
 
             container.RegisterType<DbContext, AppDbContext>();
-            container.RegisterInstance<IRepositoryFactory>(new RepositoryFactory((t, c) => (IRepository)container.Resolve(t, new ParameterOverride("context", c))));
+            container.RegisterInstance<IRepositoryFactory>(new RepositoryFactory(t => (IRepository)container.Resolve(t)));
             container.RegisterInstance<IUnitOfWorkFactory>(new UnitOfWorkFactory(() => container.Resolve<IUnitOfWork>()));
             container.RegisterType<IUnitOfWork, UnitOfWork>();
 
-            containerRegistry.RegisterSingleton<INavigationManager, NavigationManager>();
+            container.RegisterSingleton<INavigationManager, NavigationManager>();
 
-            containerRegistry.RegisterSingleton<IApplicationStateService, ApplicationStateService>();
+            container.RegisterSingleton<IApplicationStateService, ApplicationStateService>();
 
-            containerRegistry.RegisterSingleton<IResourceRegistry, ResourceRegistry>();
-            containerRegistry.RegisterSingleton<IMenuItemRegistry, MenuItemRegistry>();
-            containerRegistry.RegisterSingleton<IToolBarRegistry, ToolBarRegistry>();
-            containerRegistry.RegisterSingleton<IWidgetRegistry, WidgetRegistry>();
-            containerRegistry.RegisterSingleton<IWidgetFactory, WidgetFactory>();
+            container.RegisterSingleton<IResourceRegistry, ResourceRegistry>();
+            container.RegisterSingleton<IMenuItemRegistry, MenuItemRegistry>();
+            container.RegisterSingleton<IToolBarRegistry, ToolBarRegistry>();
+            container.RegisterSingleton<IWidgetRegistry, WidgetRegistry>();
+            container.RegisterSingleton<IWidgetFactory, WidgetFactory>();
 
-            containerRegistry.RegisterSingleton<IRequestProcessorFactory, RequestProcessorFactory>();
-            containerRegistry.RegisterSingleton<IApiEndPoint, ApiClient>();
-            containerRegistry.RegisterInstance<IApiConfiguration>(new ApiConfiguration { Port = Globals.ApiPort });
-            containerRegistry.Register<IRequestProcessor, ApiEventRequestProcessor>();
+            container.RegisterSingleton<IRequestProcessorFactory, RequestProcessorFactory>();
+            container.RegisterSingleton<IApiEndPoint, ApiClient>();
+            container.RegisterInstance<IApiConfiguration>(new ApiConfiguration { Port = Globals.ApiPort });
+            container.RegisterType<IRequestProcessor, ApiEventRequestProcessor>();
 
-            containerRegistry.RegisterSingleton<ISettingsRegistry, SettingsRegistry>();
-            containerRegistry.RegisterSingleton<ISettingsService, SettingsService>();
-            containerRegistry.Register<ISettingValueRepository, SettingValueRepository>();
+            container.RegisterSingleton<ISettingsRegistry, SettingsRegistry>();
+            container.RegisterSingleton<ISettingsService, SettingsService>();
+            container.RegisterType<ISettingValueRepository, SettingValueRepository>();
             container.RegisterInstance<ISettingHandlerFactory>(new SettingHandlerFactory(t => (ISettingHandler)container.Resolve(t)));
 
-            containerRegistry.RegisterView<MainMenuView, MainMenuViewModel>();
-            containerRegistry.RegisterView<MainStatusBarView, MainStatusBarViewModel>();
-            containerRegistry.RegisterView<ToolBarView, ToolBarViewModel>();
+            container.RegisterView<MainMenuView, MainMenuViewModel>();
+            container.RegisterView<MainStatusBarView, MainStatusBarViewModel>();
+            container.RegisterView<ToolBarView, ToolBarViewModel>();
 
-            containerRegistry.RegisterView<StartupView, StartupViewModel>();
-            containerRegistry.RegisterView<StatusView, StatusViewModel>();
-            containerRegistry.RegisterView<MainView, MainViewModel>();
-            containerRegistry.RegisterView<SettingsView, SettingsViewModel>();
-            containerRegistry.RegisterView<AboutView, AboutViewModel>();
+            container.RegisterView<StartupView, StartupViewModel>();
+            container.RegisterView<StatusView, StatusViewModel>();
+            container.RegisterView<MainView, MainViewModel>();
+            container.RegisterView<SettingsView, SettingsViewModel>();
+            container.RegisterView<AboutView, AboutViewModel>();
 
             container.RegisterRequestProcessor<UpdatesRequestProcessor>();
-            containerRegistry.RegisterInstance(new HttpUpdateSettings { ManifestUrl = Common.Properties.Settings.Default.UpdateManifestUrl });
-            containerRegistry.RegisterSingleton<IUpdateService, HttpUpdateService>();
-            containerRegistry.RegisterSingleton<UpdateHandler>();
+            container.RegisterInstance(new HttpUpdateSettings { ManifestUrl = Common.Properties.Settings.Default.UpdateManifestUrl });
+            container.RegisterSingleton<IUpdateService, HttpUpdateService>();
+            container.RegisterSingleton<UpdateHandler>();
         }
 
         private static async void InitializeShell(IContainerProvider containerProvider)
