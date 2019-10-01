@@ -1,9 +1,7 @@
-﻿using Micser.App.Infrastructure.DataAccess;
+﻿using Microsoft.EntityFrameworkCore;
 using Micser.Common.DataAccess;
 using Micser.Common.DataAccess.Repositories;
-using System.Data.Entity;
 using Unity;
-using Unity.Resolution;
 using Xunit;
 
 namespace Micser.Common.Test.DataAccess
@@ -18,8 +16,8 @@ namespace Micser.Common.Test.DataAccess
         public void IsCreatingNewUoW()
         {
             var container = new UnityContainer();
-            container.RegisterType<DbContext, AppDbContext>();
-            container.RegisterInstance<IRepositoryFactory>(new RepositoryFactory((t, c) => (IRepository)container.Resolve(t, new ParameterOverride("context", c))));
+            container.RegisterType<DbContext, TestDbContext>();
+            container.RegisterInstance<IRepositoryFactory>(new RepositoryFactory(t => (IRepository)container.Resolve(t)));
             container.RegisterInstance<IUnitOfWorkFactory>(new UnitOfWorkFactory(() => container.Resolve<IUnitOfWork>()));
             container.RegisterType<IUnitOfWork, UnitOfWork>();
 

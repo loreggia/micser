@@ -1,8 +1,7 @@
-﻿using Micser.App.Infrastructure.Api;
+﻿using Micser.App.Infrastructure.Events;
 using Micser.App.Infrastructure.Widgets;
 using Micser.Plugins.Main.Api;
 using Micser.Plugins.Main.Modules;
-using Prism.Events;
 using System;
 
 namespace Micser.Plugins.Main.Widgets
@@ -13,7 +12,7 @@ namespace Micser.Plugins.Main.Widgets
         public const string OutputConnectorName = "Output1";
         private readonly IEventAggregator _eventAggregator;
         private SpectrumData _spectrumData;
-        private SubscriptionToken _subToken;
+        private IEventSubscription _subToken;
 
         public SpectrumViewModel(IEventAggregator eventAggregator)
         {
@@ -45,7 +44,7 @@ namespace Micser.Plugins.Main.Widgets
             {
                 if (_subToken != null)
                 {
-                    _eventAggregator.GetEvent<ApiEvent>().Unsubscribe(_subToken);
+                    _eventAggregator.GetEvent<SpectrumDataEvent>().Unsubscribe(_subToken);
                     _subToken = null;
                 }
             }

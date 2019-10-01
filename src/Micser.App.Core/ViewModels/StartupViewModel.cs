@@ -1,10 +1,11 @@
 ﻿using Micser.App.Infrastructure;
+using Micser.App.Infrastructure.Events;
+using Micser.App.Infrastructure.Navigation;
 using Micser.App.Settings;
 using Micser.App.Views;
 using Micser.Common.Api;
 using Micser.Common.Extensions;
 using Micser.Common.Settings;
-using Prism.Events;
 using System.Threading.Tasks;
 using System.Windows;
 

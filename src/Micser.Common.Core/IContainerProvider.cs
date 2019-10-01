@@ -5,9 +5,11 @@ namespace Micser.Common
 {
     public interface IContainerProvider : IDisposable
     {
-        void RegisterFactory<T>(Func<IContainerProvider, T> factory);
+        void RegisterFactory(Type from, Func<IContainerProvider, object> factory, string name = null);
 
-        void RegisterInstance<T>(T instance);
+        void RegisterInstance(Type from, object instance, string name = null);
+
+        void RegisterInstance(object instance, string name = null);
 
         void RegisterSingleton(Type from, Type to, string name = null);
 

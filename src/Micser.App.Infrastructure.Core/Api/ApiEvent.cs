@@ -1,12 +1,12 @@
-﻿using Micser.Common.Api;
-using Prism.Events;
+﻿using Micser.App.Infrastructure.Events;
+using Micser.Common.Api;
 
 namespace Micser.App.Infrastructure.Api
 {
     /// <summary>
     /// An event that contains data sent from the engine to the UI.
     /// </summary>
-    public class ApiEvent : PubSubEvent<ApiEvent.ApiData>
+    public class ApiEvent : Event<ApiEvent.ApiData>
     {
         /// <summary>
         /// The data object passed in an <see cref="ApiEvent"/>.

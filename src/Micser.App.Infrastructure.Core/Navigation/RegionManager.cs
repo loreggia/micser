@@ -1,6 +1,6 @@
 ﻿using System.Windows;
 
-namespace Micser.App.Infrastructure
+namespace Micser.App.Infrastructure.Navigation
 {
     public class RegionManager : IRegionManager
     {

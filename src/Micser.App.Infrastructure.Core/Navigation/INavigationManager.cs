@@ -1,4 +1,4 @@
-﻿namespace Micser.App.Infrastructure
+﻿namespace Micser.App.Infrastructure.Navigation
 {
     /// <summary>
     /// Handles UI navigation.

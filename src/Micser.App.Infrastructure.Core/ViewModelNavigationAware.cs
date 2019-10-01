@@ -1,4 +1,4 @@
-﻿using Prism.Regions;
+﻿using Micser.App.Infrastructure.Navigation;
 
 namespace Micser.App.Infrastructure
 {

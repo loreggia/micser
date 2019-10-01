@@ -12,6 +12,7 @@
         xmlns:interaction="clr-namespace:Micser.App.Infrastructure.Interaction;assembly=Micser.App.Infrastructure"
         xmlns:l="clr-namespace:Micser.App.Infrastructure.Localization;assembly=Micser.App.Infrastructure"
         xmlns:r="clr-namespace:Micser.App.Resources"
+        xmlns:navigation="clr-namespace:Micser.App.Infrastructure.Navigation;assembly=Micser.App.Infrastructure"
         mc:Ignorable="d"
         x:Name="Window"
         l:LocalizationManager.ResourceManager="{x:Static r:Strings.ResourceManager}"
@@ -46,13 +47,13 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <ContentControl Grid.Row="0" x:Name="MenuRegion" ai:RegionManager.RegionName="{x:Static ai:AppGlobals+PrismRegions.Menu}"
+        <ContentControl Grid.Row="0" x:Name="MenuRegion" navigation:RegionManager.RegionName="{x:Static ai:AppGlobals+PrismRegions.Menu}"
                         Style="{StaticResource RegionStyle}" />
-        <ContentControl Grid.Row="1" x:Name="TopToolBarRegion" ai:RegionManager.RegionName="{x:Static ai:AppGlobals+PrismRegions.TopToolBar}"
+        <ContentControl Grid.Row="1" x:Name="TopToolBarRegion" navigation:RegionManager.RegionName="{x:Static ai:AppGlobals+PrismRegions.TopToolBar}"
                         Style="{StaticResource RegionStyle}" />
-        <ContentControl Grid.Row="2" x:Name="MainRegion" ai:RegionManager.RegionName="{x:Static ai:AppGlobals+PrismRegions.Main}"
+        <ContentControl Grid.Row="2" x:Name="MainRegion" navigation:RegionManager.RegionName="{x:Static ai:AppGlobals+PrismRegions.Main}"
                         Style="{StaticResource RegionStyle}" />
-        <ContentControl Grid.Row="3" x:Name="StatusRegion" ai:RegionManager.RegionName="{x:Static ai:AppGlobals+PrismRegions.Status}"
+        <ContentControl Grid.Row="3" x:Name="StatusRegion" navigation:RegionManager.RegionName="{x:Static ai:AppGlobals+PrismRegions.Status}"
                         Style="{StaticResource RegionStyle}" />
 
         <tb:TaskbarIcon Grid.Row="3" x:Name="TaskbarIcon" MenuActivation="RightClick" ToolTipText="{l:Resx ApplicationTitle}"

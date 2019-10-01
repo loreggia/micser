@@ -93,6 +93,25 @@ namespace Microsoft.Shell
             ((TApplication)Application.Current).SignalExternalCommandLineArgs(args);
         }
 
+        private static void OnPipeConnected(IAsyncResult ar)
+        {
+            _serverPipe.EndWaitForConnection(ar);
+
+            var data = new byte[1024];
+            var offset = 0;
+            int read;
+            var content = new StringBuilder();
+
+            while ((read = _serverPipe.Read(data, offset, data.Length)) > 0)
+            {
+                content.Append(Encoding.UTF8.GetString(data, offset, read));
+                offset += read;
+            }
+
+            var args = JsonConvert.DeserializeObject<string[]>(content.ToString());
+            ActivateFirstInstance(args);
+        }
+
         /// <summary>
         /// Creates a client channel and obtains a reference to the remoting service exposed by the server -
         /// in this case, the remoting service exposed by the first instance. Calls a function of the remoting service

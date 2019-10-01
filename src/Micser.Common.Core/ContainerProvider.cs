@@ -20,9 +20,19 @@ namespace Micser.Common
             _container.Dispose();
         }
 
-        public void RegisterFactory<TFrom>(Func<IContainerProvider, TFrom> factory)
+        public void RegisterFactory(Type from, Func<IContainerProvider, object> factory, string name = null)
         {
-            _container.RegisterFactory<TFrom>(c => factory(this));
+            _container.RegisterFactory(from, name, c => factory(this));
+        }
+
+        public void RegisterInstance(Type from, object instance, string name = null)
+        {
+            _container.RegisterInstance(from, name, instance);
+        }
+
+        public void RegisterInstance(object instance, string name = null)
+        {
+            _container.RegisterInstance(name, instance);
         }
 
         public void RegisterSingleton(Type from, Type to, string name = null)

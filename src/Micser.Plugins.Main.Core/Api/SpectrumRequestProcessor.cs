@@ -1,5 +1,5 @@
-﻿using Micser.Common.Api;
-using Prism.Events;
+﻿using Micser.App.Infrastructure.Events;
+using Micser.Common.Api;
 
 namespace Micser.Plugins.Main.Api
 {

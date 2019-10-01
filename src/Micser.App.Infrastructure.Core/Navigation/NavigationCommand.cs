@@ -1,7 +1,6 @@
-﻿using CommonServiceLocator;
-using Prism.Commands;
+﻿using Micser.App.Infrastructure.Commands;
 
-namespace Micser.App.Infrastructure
+namespace Micser.App.Infrastructure.Navigation
 {
     /// <summary>
     /// A delegate command that navigates to a specific view when executed.
