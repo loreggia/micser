@@ -1,5 +1,4 @@
-﻿using Prism.Interactivity.InteractionRequest;
-using System.Windows;
+﻿using System.Windows;
 
 namespace Micser.App.Infrastructure.Interaction
 {

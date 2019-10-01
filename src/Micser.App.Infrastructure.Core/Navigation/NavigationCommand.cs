@@ -7,13 +7,17 @@ namespace Micser.App.Infrastructure.Navigation
     /// </summary>
     public class NavigationCommand<TView> : DelegateCommandBase
     {
+        private readonly INavigationManager _navigationManager;
+
         /// <summary>
         /// Creates an instance of the <see cref="NavigationCommand{TView}"/> class.
         /// </summary>
+        /// <param name="navigationManager">The navigation manager.</param>
         /// <param name="regionName">The region to perform the navigation in.</param>
         /// <param name="parameter">The parameter object to pass to the navigation call.</param>
-        public NavigationCommand(string regionName, object parameter = null)
+        public NavigationCommand(INavigationManager navigationManager, string regionName, object parameter = null)
         {
+            _navigationManager = navigationManager;
             RegionName = regionName;
             Parameter = parameter;
         }
@@ -37,8 +41,7 @@ namespace Micser.App.Infrastructure.Navigation
         /// <inheritdoc />
         protected override void Execute(object parameter)
         {
-            var navigationManager = ServiceLocator.Current.GetInstance<INavigationManager>();
-            navigationManager.Navigate<TView>(RegionName, Parameter);
+            _navigationManager.Navigate<TView>(RegionName, Parameter);
         }
     }
 }

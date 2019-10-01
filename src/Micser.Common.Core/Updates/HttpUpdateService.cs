@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
 using NLog;
 using System;
 using System.IO;
@@ -18,10 +19,13 @@ namespace Micser.Common.Updates
         protected readonly HttpUpdateSettings Settings;
 
         /// <inheritdoc />
-        public HttpUpdateService(HttpUpdateSettings settings, ILogger logger)
+        public HttpUpdateService(IConfiguration configuration, ILogger logger)
             : base(logger)
         {
-            Settings = settings;
+            Settings = configuration
+                .GetSection(Globals.AppSettingSections.Update.HttpUpdateSettings)
+                .Get<HttpUpdateSettings>()
+                ?? throw new MissingConfigurationException(Globals.AppSettingSections.Update.HttpUpdateSettings);
         }
 
         /// <inheritdoc />

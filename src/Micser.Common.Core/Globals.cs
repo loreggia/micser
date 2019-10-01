@@ -60,6 +60,15 @@ namespace Micser.Common
             public const string Updates = "updates";
         }
 
+        public static class AppSettingSections
+        {
+            public static class Update
+            {
+                public const string Name = "Update";
+                public static readonly string HttpUpdateSettings = Name + ":HttpUpdateSettings";
+            }
+        }
+
         /// <summary>
         /// Constants for managing the virtual audio cable driver using the Micser.DriverUtility application
         /// </summary>

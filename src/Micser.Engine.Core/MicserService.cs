@@ -1,4 +1,5 @@
-﻿using Micser.Common;
+﻿using Microsoft.Extensions.Hosting;
+using Micser.Common;
 using Micser.Common.Api;
 using Micser.Common.Audio;
 using Micser.Common.Extensions;
@@ -11,13 +12,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.ServiceProcess;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Timers;
+using Timer = System.Timers.Timer;
 
 namespace Micser.Engine
 {
-    public partial class MicserService : ServiceBase
+    public class MicserService : IHostedService
     {
         private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
         private readonly ICollection<IEngineModule> _plugins;
@@ -36,8 +38,6 @@ namespace Micser.Engine
 
         public MicserService()
         {
-            InitializeComponent();
-
             _plugins = new List<IEngineModule>();
             _reconnectTimer = new Timer(1000) { AutoReset = false };
             _reconnectTimer.Elapsed += OnReconnectTimerElapsed;
@@ -45,7 +45,7 @@ namespace Micser.Engine
             _updateTimer.Elapsed += OnUpdateTimerElapsed;
         }
 
-        public void ManualStart()
+        public async Task StartAsync(CancellationToken cancellationToken)
         {
             Logger.Info("Starting service");
 
@@ -60,7 +60,7 @@ namespace Micser.Engine
             _server.Start();
 
             _settingsService = _containerProvider.Resolve<ISettingsService>();
-            _settingsService.LoadAsync().ConfigureAwait(false).GetAwaiter().GetResult();
+            await _settingsService.LoadAsync().ConfigureAwait(false);
 
             if (_settingsService.GetSetting<bool>(Globals.SettingKeys.IsEngineRunning))
             {
@@ -73,7 +73,7 @@ namespace Micser.Engine
             Logger.Info("Service started");
         }
 
-        public void ManualStop()
+        public async Task StopAsync(CancellationToken cancellationToken)
         {
             Logger.Info("Stopping service");
 
@@ -90,7 +90,7 @@ namespace Micser.Engine
             Logger.Info("Service stopped");
         }
 
-        protected override bool OnPowerEvent(PowerBroadcastStatus powerStatus)
+        /*protected override bool OnPowerEvent(PowerBroadcastStatus powerStatus)
         {
             var isSuspending = powerStatus == PowerBroadcastStatus.Suspend;
             var isResuming = powerStatus == PowerBroadcastStatus.ResumeSuspend;
@@ -125,31 +125,7 @@ namespace Micser.Engine
             }
 
             return base.OnPowerEvent(powerStatus);
-        }
-
-        protected override void OnStart(string[] args)
-        {
-            try
-            {
-                ManualStart();
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex, "Error while starting the service.");
-            }
-        }
-
-        protected override void OnStop()
-        {
-            try
-            {
-                ManualStop();
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex, "Error while stopping the service.");
-            }
-        }
+        }*/
 
         private void LoadPlugins(IContainerProvider container)
         {

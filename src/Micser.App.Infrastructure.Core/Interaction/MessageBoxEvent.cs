@@ -30,7 +30,7 @@ namespace Micser.App.Infrastructure.Interaction
     }
 
     /// <summary>
-    /// A prism <see cref="PubSubEvent{TPayload}"/> for displaying a message box.
+    /// An <see cref="Event{TPayload}"/> for displaying a message box.
     /// </summary>
     public class MessageBoxEvent : Event<MessageBoxEventArgs>
     {
