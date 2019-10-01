@@ -1,8 +1,7 @@
-﻿using Prism.Events;
-using Prism.Regions;
+﻿using Micser.App.Infrastructure.Events;
 using System;
 
-namespace Micser.App.Infrastructure
+namespace Micser.App.Infrastructure.Navigation
 {
     /// <inheritdoc cref="INavigationManager" />
     public class NavigationManager : INavigationManager, IDisposable

@@ -1,4 +1,5 @@
-﻿using Micser.App.Infrastructure.Interaction;
+﻿using Micser.App.Infrastructure.Events;
+using Micser.App.Infrastructure.Interaction;
 using Micser.App.Infrastructure.Resources;
 using Micser.Common.Updates;
 using System.Threading.Tasks;

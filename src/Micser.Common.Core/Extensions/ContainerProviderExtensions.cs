@@ -8,6 +8,16 @@ namespace Micser.Common.Extensions
 {
     public static class ContainerProviderExtensions
     {
+        public static void RegisterFactory<T>(this IContainerProvider container, Func<IContainerProvider, object> factory, string name = null)
+        {
+            container.RegisterFactory(typeof(T), factory, name);
+        }
+
+        public static void RegisterInstance<T>(this IContainerProvider container, T instance, string name = null)
+        {
+            container.RegisterInstance(typeof(T), instance, name);
+        }
+
         /// <summary>
         /// Registers a request processor. If the <paramref name="name"/> parameter is not specified the processor has to be annotated with a <see cref="RequestProcessorNameAttribute"/> attribute.
         /// </summary>
@@ -70,6 +80,11 @@ namespace Micser.Common.Extensions
         public static void RegisterType<TFrom, TTo>(this IContainerProvider container, string name = null)
         {
             container.RegisterType(typeof(TFrom), typeof(TTo), name);
+        }
+
+        public static void RegisterType<T>(this IContainerProvider container, string name = null)
+        {
+            container.RegisterType(typeof(T), name);
         }
 
         /// <summary>

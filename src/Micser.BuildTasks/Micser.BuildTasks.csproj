@@ -43,10 +43,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\Micser.Common\Extensions\RegexExtensions.cs">
+    <Compile Include="..\Micser.Common.Core\Extensions\RegexExtensions.cs">
       <Link>RegexExtensions.cs</Link>
     </Compile>
-    <Compile Include="..\Micser.Common\Updates\UpdateManifest.cs">
+    <Compile Include="..\Micser.Common.Core\Updates\UpdateManifest.cs">
       <Link>UpdateManifest.cs</Link>
     </Compile>
     <Compile Include="CreateUpdateManifest.cs" />

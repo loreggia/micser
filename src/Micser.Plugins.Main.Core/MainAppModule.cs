@@ -2,12 +2,11 @@
 using Micser.App.Infrastructure.Extensions;
 using Micser.App.Infrastructure.Localization;
 using Micser.App.Infrastructure.Themes;
+using Micser.Common;
 using Micser.Common.Extensions;
 using Micser.Plugins.Main.Api;
-using Micser.Plugins.Main.Properties;
+using Micser.Plugins.Main.Resources;
 using Micser.Plugins.Main.Widgets;
-using Prism.Ioc;
-using Prism.Unity;
 using System;
 using System.Windows;
 
@@ -26,42 +25,41 @@ namespace Micser.Plugins.Main
             resourceRegistry.Add(new ResourceDictionary { Source = new Uri("Micser.Plugins.Main;component/Themes/Generic.xaml", UriKind.Relative) });
         }
 
-        public void RegisterTypes(IContainerRegistry containerRegistry)
+        public void RegisterTypes(IContainerProvider container)
         {
-            containerRegistry.RegisterWidget<DeviceInputWidget, DeviceInputViewModel>(
-                Localize(nameof(Resources.DeviceInputWidgetName)),
-                Localize(nameof(Resources.DeviceInputWidgetDescription)));
-            containerRegistry.RegisterWidget<DeviceInputWidget, LoopbackDeviceInputViewModel>(
-                Localize(nameof(Resources.LoopbackDeviceInputWidgetName)),
-                Localize(nameof(Resources.LoopbackDeviceInputWidgetDescription)));
-            containerRegistry.RegisterWidget<DeviceOutputWidget, DeviceOutputViewModel>(
-                Localize(nameof(Resources.DeviceOutputWidgetName)),
-                Localize(nameof(Resources.DeviceOutputWidgetDescription)));
-            containerRegistry.RegisterWidget<CompressorWidget, CompressorViewModel>(
-                Localize(nameof(Resources.CompressorWidgetName)),
-                Localize(nameof(Resources.CompressorWidgetDescription)));
-            containerRegistry.RegisterWidget<GainWidget, GainViewModel>(
-                Localize(nameof(Resources.GainWidgetName)),
-                Localize(nameof(Resources.GainWidgetDescription)));
-            containerRegistry.RegisterWidget<SpectrumWidget, SpectrumViewModel>(
-                Localize(nameof(Resources.SpectrumWidgetName)),
-                Localize(nameof(Resources.SpectrumWidgetDescription)));
-            containerRegistry.RegisterWidget<PitchWidget, PitchViewModel>(
-                Localize(nameof(Resources.PitchWidgetName)),
-                Localize(nameof(Resources.PitchWidgetDescription)));
+            container.RegisterWidget<DeviceInputWidget, DeviceInputViewModel>(
+                Localize(nameof(Strings.DeviceInputWidgetName)),
+                Localize(nameof(Strings.DeviceInputWidgetDescription)));
+            container.RegisterWidget<DeviceInputWidget, LoopbackDeviceInputViewModel>(
+                Localize(nameof(Strings.LoopbackDeviceInputWidgetName)),
+                Localize(nameof(Strings.LoopbackDeviceInputWidgetDescription)));
+            container.RegisterWidget<DeviceOutputWidget, DeviceOutputViewModel>(
+                Localize(nameof(Strings.DeviceOutputWidgetName)),
+                Localize(nameof(Strings.DeviceOutputWidgetDescription)));
+            container.RegisterWidget<CompressorWidget, CompressorViewModel>(
+                Localize(nameof(Strings.CompressorWidgetName)),
+                Localize(nameof(Strings.CompressorWidgetDescription)));
+            container.RegisterWidget<GainWidget, GainViewModel>(
+                Localize(nameof(Strings.GainWidgetName)),
+                Localize(nameof(Strings.GainWidgetDescription)));
+            container.RegisterWidget<SpectrumWidget, SpectrumViewModel>(
+                Localize(nameof(Strings.SpectrumWidgetName)),
+                Localize(nameof(Strings.SpectrumWidgetDescription)));
+            container.RegisterWidget<PitchWidget, PitchViewModel>(
+                Localize(nameof(Strings.PitchWidgetName)),
+                Localize(nameof(Strings.PitchWidgetDescription)));
 
-            var container = containerRegistry.GetContainer();
             container.RegisterRequestProcessor<SpectrumRequestProcessor>();
         }
 
         private static object Localize(string key)
         {
-            return new ResourceElement(Resources.ResourceManager, key);
+            return new ResourceElement(Strings.ResourceManager, key);
         }
 
         private static void OnUiCultureChanged(object sender, EventArgs e)
         {
-            Resources.Culture = LocalizationManager.UiCulture;
+            Strings.Culture = LocalizationManager.UiCulture;
         }
     }
 }

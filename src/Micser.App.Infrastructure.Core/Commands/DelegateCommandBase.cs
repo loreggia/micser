@@ -1,23 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq.Expressions;
+using System.Reflection;
 using System.Windows.Input;
 
 namespace Micser.App.Infrastructure.Commands
 {
     public abstract class DelegateCommandBase : ICommand
     {
-        private readonly Action<object> _action;
-        private readonly Func<object, bool> _canExecute;
-
-        protected DelegateCommandBase()
-        {
-        }
-
-        protected DelegateCommandBase(Action<object> action, Func<object, bool> canExecute)
-        {
-            _action = action;
-            _canExecute = canExecute;
-        }
-
         public event EventHandler CanExecuteChanged;
 
         bool ICommand.CanExecute(object parameter)
@@ -27,22 +18,46 @@ namespace Micser.App.Infrastructure.Commands
 
         void ICommand.Execute(object parameter)
         {
-            throw new NotImplementedException();
+            Execute(parameter);
         }
 
-        protected virtual bool CanExecute(object parameter)
-        {
-            return _canExecute?.Invoke(parameter) ?? true;
-        }
-
-        protected virtual void Execute(object parameter)
-        {
-            _action?.Invoke(parameter);
-        }
-
-        protected virtual void RaiseCanExecuteChanged()
+        public virtual void RaiseCanExecuteChanged()
         {
             CanExecuteChanged?.Invoke(this, EventArgs.Empty);
+        }
+
+        protected abstract bool CanExecute(object parameter);
+
+        protected abstract void Execute(object parameter);
+
+        protected virtual void ObservesPropertyInternal(Expression propertyExpression)
+        {
+            var propNameStack = new Stack<PropertyInfo>();
+
+            while (propertyExpression is MemberExpression temp)
+            {
+                propertyExpression = temp.Expression;
+                propNameStack.Push(temp.Member as PropertyInfo);
+            }
+
+            if (!(propertyExpression is ConstantExpression constantExpression))
+            {
+                throw new NotSupportedException();
+            }
+
+            var propOwnerObject = constantExpression.Value;
+
+            if (!(propOwnerObject is INotifyPropertyChanged inpcObject))
+            {
+                throw new InvalidOperationException();
+            }
+
+            inpcObject.PropertyChanged += OnObservedPropertyChanged;
+        }
+
+        private void OnObservedPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            RaiseCanExecuteChanged();
         }
     }
 }

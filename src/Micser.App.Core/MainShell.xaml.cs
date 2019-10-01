@@ -1,4 +1,5 @@
 ﻿using Micser.App.Infrastructure;
+using Micser.App.Infrastructure.Navigation;
 using Micser.Common.Extensions;
 using Micser.Common.Settings;
 using System;

@@ -1,7 +1,6 @@
 ﻿using Micser.App.Infrastructure;
+using Micser.App.Infrastructure.Events;
 using Micser.App.Infrastructure.Interaction;
-using Prism.Events;
-using Prism.Interactivity.InteractionRequest;
 using System;
 using System.Windows;
 

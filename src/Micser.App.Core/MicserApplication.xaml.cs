@@ -1,6 +1,6 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Shell;
+﻿using Microsoft.Shell;
 using Micser.App.Infrastructure;
+using Micser.App.Infrastructure.Events;
 using Micser.App.Infrastructure.Themes;
 using Micser.App.Settings;
 using Micser.Common;

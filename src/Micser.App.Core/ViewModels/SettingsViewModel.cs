@@ -1,10 +1,8 @@
 ﻿using Micser.App.Infrastructure;
+using Micser.App.Infrastructure.Commands;
 using Micser.App.Infrastructure.Interaction;
 using Micser.App.Infrastructure.Settings;
-using Micser.App.Properties;
 using Micser.Common.Settings;
-using Prism.Commands;
-using Prism.Interactivity.InteractionRequest;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -25,9 +23,9 @@ namespace Micser.App.ViewModels
             _settingsService = settingsService;
             _settingsSerializer = settingsSerializer;
 
-            RefreshCommand = new DelegateCommand(async () => await LoadAsync(), () => !IsBusy);
-            ImportCommand = new DelegateCommand(async () => await ImportAsync(), () => !IsBusy);
-            ExportCommand = new DelegateCommand(async () => await ExportAsync(), () => !IsBusy);
+            RefreshCommand = new DelegateCommand(async _ => await LoadAsync(), _ => !IsBusy);
+            ImportCommand = new DelegateCommand(async _ => await ImportAsync(), _ => !IsBusy);
+            ExportCommand = new DelegateCommand(async _ => await ExportAsync(), _ => !IsBusy);
             AddCommandBinding(CustomApplicationCommands.Refresh, RefreshCommand);
             AddCommandBinding(CustomApplicationCommands.Import, ImportCommand);
             AddCommandBinding(CustomApplicationCommands.Export, ExportCommand);

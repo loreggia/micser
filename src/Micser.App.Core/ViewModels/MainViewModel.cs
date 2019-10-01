@@ -1,15 +1,13 @@
 ﻿using Micser.App.Infrastructure;
 using Micser.App.Infrastructure.Api;
+using Micser.App.Infrastructure.Events;
 using Micser.App.Infrastructure.Interaction;
+using Micser.App.Infrastructure.Navigation;
 using Micser.App.Infrastructure.Widgets;
-using Micser.App.Properties;
 using Micser.Common.Extensions;
 using Micser.Common.Modules;
 using Micser.Common.Settings;
 using NLog;
-using Prism.Commands;
-using Prism.Events;
-using Prism.Interactivity.InteractionRequest;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
