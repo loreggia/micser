@@ -14,7 +14,6 @@ using System.Reflection;
 using System.ServiceProcess;
 using System.Threading.Tasks;
 using System.Timers;
-using Unity;
 
 namespace Micser.Engine
 {
@@ -24,6 +23,7 @@ namespace Micser.Engine
         private readonly ICollection<IEngineModule> _plugins;
         private readonly Timer _reconnectTimer;
         private readonly Timer _updateTimer;
+        private UnityContainerProvider _containerProvider;
         private IAudioEngine _engine;
         private IApiServer _server;
         private ISettingsService _settingsService;
@@ -49,17 +49,17 @@ namespace Micser.Engine
         {
             Logger.Info("Starting service");
 
-            var container = new UnityContainer();
+            _containerProvider = new UnityContainerProvider();
 
-            LoadPlugins(container);
+            LoadPlugins(_containerProvider);
 
-            _server = container.Resolve<IApiServer>();
-            _engine = container.Resolve<IAudioEngine>();
-            _updateService = container.Resolve<IUpdateService>();
+            _server = _containerProvider.Resolve<IApiServer>();
+            _engine = _containerProvider.Resolve<IAudioEngine>();
+            _updateService = _containerProvider.Resolve<IUpdateService>();
 
             _server.Start();
 
-            _settingsService = container.Resolve<ISettingsService>();
+            _settingsService = _containerProvider.Resolve<ISettingsService>();
             _settingsService.LoadAsync().ConfigureAwait(false).GetAwaiter().GetResult();
 
             if (_settingsService.GetSetting<bool>(Globals.SettingKeys.IsEngineRunning))
@@ -84,6 +84,8 @@ namespace Micser.Engine
             _engine.Stop();
 
             _plugins.Clear();
+
+            _containerProvider.Dispose();
 
             Logger.Info("Service stopped");
         }
@@ -149,7 +151,7 @@ namespace Micser.Engine
             }
         }
 
-        private void LoadPlugins(IUnityContainer container)
+        private void LoadPlugins(IContainerProvider container)
         {
             Logger.Info("Loading plugins");
 

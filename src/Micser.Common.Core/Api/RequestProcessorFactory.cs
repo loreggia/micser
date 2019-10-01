@@ -1,5 +1,4 @@
 ﻿using Micser.Common.Extensions;
-using Unity;
 
 namespace Micser.Common.Api
 {
@@ -8,13 +7,13 @@ namespace Micser.Common.Api
     /// </summary>
     public class RequestProcessorFactory : IRequestProcessorFactory
     {
-        private readonly IUnityContainer _container;
+        private readonly IContainerProvider _container;
 
         /// <summary>
         /// Creates an instance of the <see cref="RequestProcessorFactory"/> class.
         /// </summary>
         /// <param name="container">The container where the request processors are registered.</param>
-        public RequestProcessorFactory(IUnityContainer container)
+        public RequestProcessorFactory(IContainerProvider container)
         {
             _container = container;
         }

@@ -1,5 +1,6 @@
 ﻿using Micser.App.Infrastructure.Localization;
 using Micser.App.Infrastructure.Resources;
+using Micser.Common;
 using System;
 
 namespace Micser.App.Infrastructure
@@ -21,7 +22,7 @@ namespace Micser.App.Infrastructure
         }
 
         /// <inheritdoc />
-        public void RegisterTypes(IContainerRegistry containerRegistry)
+        public void RegisterTypes(IContainerProvider containerRegistry)
         {
         }
 

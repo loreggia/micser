@@ -1,16 +1,16 @@
-﻿using System;
+﻿using Micser.Common;
+using System;
 using System.Windows;
-using Unity;
 
 namespace Micser.App.Infrastructure.Widgets
 {
     /// <inheritdoc cref="IWidgetFactory"/>
     public class WidgetFactory : IWidgetFactory
     {
-        private readonly IUnityContainer _container;
+        private readonly IContainerProvider _container;
 
         /// <inheritdoc />
-        public WidgetFactory(IUnityContainer container)
+        public WidgetFactory(IContainerProvider container)
         {
             _container = container;
         }

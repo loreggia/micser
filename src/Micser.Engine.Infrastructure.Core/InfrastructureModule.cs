@@ -3,15 +3,13 @@ using Micser.Common;
 using Micser.Common.Api;
 using Micser.Common.DataAccess;
 using Micser.Common.DataAccess.Repositories;
+using Micser.Common.Extensions;
 using Micser.Common.Settings;
 using Micser.Common.Updates;
 using Micser.Engine.Infrastructure.DataAccess;
 using Micser.Engine.Infrastructure.DataAccess.Repositories;
 using Micser.Engine.Infrastructure.Services;
 using NLog;
-using Unity;
-using Unity.Injection;
-using Unity.Resolution;
 
 namespace Micser.Engine.Infrastructure
 {
@@ -21,17 +19,17 @@ namespace Micser.Engine.Infrastructure
     public class InfrastructureModule : IEngineModule
     {
         /// <inheritdoc />
-        public void OnInitialized(IUnityContainer container)
+        public void OnInitialized(IContainerProvider container)
         {
         }
 
         /// <inheritdoc />
-        public void RegisterTypes(IUnityContainer container)
+        public void RegisterTypes(IContainerProvider container)
         {
-            container.RegisterType<ILogger>(new InjectionFactory(c => LogManager.GetCurrentClassLogger()));
+            container.RegisterFactory<ILogger>(c => LogManager.GetCurrentClassLogger());
 
             container.RegisterType<DbContext, EngineDbContext>();
-            container.RegisterInstance<IRepositoryFactory>(new RepositoryFactory((t, c) => (IRepository)container.Resolve(t, new ParameterOverride("context", c))));
+            container.RegisterInstance<IRepositoryFactory>(new RepositoryFactory(t => (IRepository)container.Resolve(t)));
             container.RegisterInstance<IUnitOfWorkFactory>(new UnitOfWorkFactory(() => container.Resolve<IUnitOfWork>()));
             container.RegisterType<IUnitOfWork, UnitOfWork>();
 

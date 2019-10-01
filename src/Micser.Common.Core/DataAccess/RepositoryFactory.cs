@@ -6,10 +6,10 @@ namespace Micser.Common.DataAccess
     /// <inheritdoc cref="IRepositoryFactory"/>
     public class RepositoryFactory : IRepositoryFactory
     {
-        private readonly Func<Type, DbContext, IRepository> _factory;
+        private readonly Func<Type, IRepository> _factory;
 
         /// <inheritdoc />
-        public RepositoryFactory(Func<Type, DbContext, IRepository> factory)
+        public RepositoryFactory(Func<Type, IRepository> factory)
         {
             _factory = factory;
         }
@@ -18,7 +18,7 @@ namespace Micser.Common.DataAccess
         public T Create<T>(DbContext context)
             where T : class, IRepository
         {
-            return _factory(typeof(T), context) as T;
+            return _factory(typeof(T)) as T;
         }
     }
 }

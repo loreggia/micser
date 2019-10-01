@@ -1,4 +1,4 @@
-﻿using Unity;
+﻿using Micser.Common;
 
 namespace Micser.Engine.Infrastructure
 {
@@ -11,11 +11,11 @@ namespace Micser.Engine.Infrastructure
         /// Initializes the module (after all modules have registered their types in the DI container).
         /// </summary>
         /// <param name="container">The fully registered container.</param>
-        void OnInitialized(IUnityContainer container);
+        void OnInitialized(IContainerProvider container);
 
         /// <summary>
         /// Lets the module register its types in the DI container.
         /// </summary>
-        void RegisterTypes(IUnityContainer container);
+        void RegisterTypes(IContainerProvider container);
     }
 }

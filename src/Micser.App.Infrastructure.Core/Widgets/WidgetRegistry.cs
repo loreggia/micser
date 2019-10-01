@@ -1,15 +1,16 @@
-﻿using System.Collections.Generic;
-using Unity;
+﻿using Micser.Common;
+using Micser.Common.Extensions;
+using System.Collections.Generic;
 
 namespace Micser.App.Infrastructure.Widgets
 {
     /// <inheritdoc cref="IWidgetRegistry"/>
     public class WidgetRegistry : IWidgetRegistry
     {
-        private readonly IUnityContainer _container;
+        private readonly IContainerProvider _container;
 
         /// <inheritdoc />
-        public WidgetRegistry(IUnityContainer container)
+        public WidgetRegistry(IContainerProvider container)
         {
             _container = container;
         }
