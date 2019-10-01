@@ -48,6 +48,10 @@ namespace Micser.Engine.Infrastructure.DataAccess
         /// <inheritdoc />
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<SettingValue>()
+                .HasIndex(x => x.Key)
+                .IsUnique();
+
             modelBuilder.Entity<Module>()
                 .HasMany(m => m.SourceModuleConnections)
                 .WithOne(c => c.SourceModule)

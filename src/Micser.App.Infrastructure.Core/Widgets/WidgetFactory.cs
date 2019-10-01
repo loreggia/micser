@@ -1,4 +1,5 @@
 ﻿using Micser.Common;
+using Micser.Common.Extensions;
 using System;
 using System.Windows;
 

@@ -1,38 +1,34 @@
 ﻿using System;
-using System.Collections.Generic;
 
 namespace Micser.App.Infrastructure.Events
 {
-    public abstract class Event<TData>
+    public abstract class Event : EventBase
     {
-        private readonly List<IEventSubscription> _subscriptions;
-
-        protected Event()
+        public virtual void Publish()
         {
-            _subscriptions = new List<IEventSubscription>();
+            PublishInternal(null);
         }
 
-        public virtual void Publish(TData data)
+        public virtual IEventSubscription Subscribe(Action handler)
         {
-            foreach (var subscription in _subscriptions)
-            {
-                subscription.Handler(data);
-            }
-        }
-
-        public virtual IEventSubscription Subscribe(Action<TData> handler)
-        {
-            var subscription = new EventSubscription<TData>(handler);
-            _subscriptions.Add(subscription);
+            var subscription = new EventSubscription(handler);
+            SubscribeInternal(subscription);
             return subscription;
         }
+    }
 
-        public void Unsubscribe(IEventSubscription subscription)
+    public abstract class Event<T> : EventBase
+    {
+        public virtual void Publish(T data)
         {
-            if (_subscriptions.Contains(subscription))
-            {
-                _subscriptions.Remove(subscription);
-            }
+            PublishInternal(data);
+        }
+
+        public virtual IEventSubscription Subscribe(Action<T> handler)
+        {
+            var subscription = new EventSubscription<T>(handler);
+            SubscribeInternal(subscription);
+            return subscription;
         }
     }
 }
