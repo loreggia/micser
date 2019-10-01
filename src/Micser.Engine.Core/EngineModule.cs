@@ -11,7 +11,7 @@ namespace Micser.Engine
 {
     public class EngineModule : IEngineModule
     {
-        public void OnInitialized(IUnityContainer container)
+        public void OnInitialized(IContainerProvider container)
         {
             var settingsRegistry = container.Resolve<ISettingsRegistry>();
 
@@ -32,7 +32,7 @@ namespace Micser.Engine
             });
         }
 
-        public void RegisterTypes(IUnityContainer container)
+        public void RegisterTypes(IContainerProvider container)
         {
             container.RegisterRequestProcessor<EngineProcessor>();
             container.RegisterRequestProcessor<StatusProcessor>();

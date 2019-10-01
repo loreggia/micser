@@ -1,4 +1,5 @@
 ﻿using CSCore.CoreAudioAPI;
+using Micser.Common;
 using Micser.Common.Api;
 using Micser.Common.Audio;
 using Micser.Engine.Infrastructure.Audio;
@@ -8,14 +9,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Unity;
 
 namespace Micser.Engine.Audio
 {
     public sealed class AudioEngine : IAudioEngine
     {
         private readonly IApiServer _apiServer;
-        private readonly IUnityContainer _container;
+        private readonly IContainerProvider _container;
         private readonly MMDeviceEnumerator _deviceEnumerator;
         private readonly AudioEndpointVolumeCallback _endpointVolumeCallback;
         private readonly ILogger _logger;
@@ -26,7 +26,7 @@ namespace Micser.Engine.Audio
 
         public AudioEngine(
             // todo create audio module factory
-            IUnityContainer container,
+            IContainerProvider container,
             ILogger logger,
             IModuleService moduleService,
             IModuleConnectionService moduleConnectionService,
