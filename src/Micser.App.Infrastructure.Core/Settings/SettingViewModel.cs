@@ -1,6 +1,6 @@
-﻿using Micser.Common.Extensions;
+﻿using Micser.App.Infrastructure.Commands;
+using Micser.Common.Extensions;
 using Micser.Common.Settings;
-using Prism.Commands;
 using System.Collections.Generic;
 using System.Windows.Input;
 
@@ -90,7 +90,7 @@ namespace Micser.App.Infrastructure.Settings
             Definition = definition;
             _settingsService = settingsService;
 
-            ApplyCommand = new DelegateCommand(Apply).ObservesCanExecute(() => IsChanged);
+            ApplyCommand = new DelegateCommand(Apply, () => IsChanged).ObservesProperty(() => IsChanged);
 
             settingsService.SettingChanged += OnSettingChanged;
             _value = settingsService.GetSetting<T>(definition.Key);

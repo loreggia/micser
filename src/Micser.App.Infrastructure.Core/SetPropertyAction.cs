@@ -1,7 +1,7 @@
-﻿using System.ComponentModel;
+﻿using Microsoft.Xaml.Behaviors;
+using System.ComponentModel;
 using System.Reflection;
 using System.Windows;
-using System.Windows.Interactivity;
 
 namespace Micser.App.Infrastructure
 {

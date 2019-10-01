@@ -17,14 +17,14 @@ namespace Micser.App.Infrastructure
         /// Checks whether this instance qualifies as a navigation target and will be reused instead of creating a new instance upon navigation.
         /// Returns true unless the view model has been disposed.
         /// </summary>
-        public virtual bool IsNavigationTarget(NavigationContext navigationContext)
+        public virtual bool IsNavigationTarget(NavigationContext context)
         {
             return !IsDisposed;
         }
 
-        void INavigationAware.OnNavigatedFrom(NavigationContext navigationContext)
+        void INavigationAware.OnNavigatedFrom(NavigationContext context)
         {
-            OnNavigatedFrom(navigationContext.Parameters[AppGlobals.NavigationParameterKey]);
+            OnNavigatedFrom(context.Parameter);
 
             if (DisposeOnNavigatedFrom)
             {
@@ -32,9 +32,9 @@ namespace Micser.App.Infrastructure
             }
         }
 
-        void INavigationAware.OnNavigatedTo(NavigationContext navigationContext)
+        void INavigationAware.OnNavigatedTo(NavigationContext context)
         {
-            OnNavigatedTo(navigationContext.Parameters[AppGlobals.NavigationParameterKey]);
+            OnNavigatedTo(context.Parameter);
         }
 
         /// <summary>

@@ -1,4 +1,6 @@
-﻿using Micser.Common;
+﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Micser.Common;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
@@ -6,31 +8,14 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.ServiceProcess;
-using System.Threading;
+using System.Threading.Tasks;
 
 namespace Micser.Engine
 {
     internal static class Program
     {
-        /// <summary>
-        /// The main entry point for the application.
-        /// </summary>
-        internal static void Main(params string[] arguments)
+        private static void InitializeLogging()
         {
-            try
-            {
-                // try setting process priority to high
-                using (var process = Process.GetCurrentProcess())
-                {
-                    process.PriorityClass = ProcessPriorityClass.High;
-                }
-            }
-            catch
-            {
-                // ignore
-            }
-
             var config = new LoggingConfiguration();
             config.AddTarget(new ColoredConsoleTarget("ConsoleTarget")
             {
@@ -52,20 +37,48 @@ namespace Micser.Engine
             config.AddRuleForAllLevels("DebuggerTarget");
 
             LogManager.Configuration = config;
+        }
 
-            var service = new MicserService();
+        /// <summary>
+        /// The main entry point for the application.
+        /// </summary>
+        private static async Task Main(params string[] arguments)
+        {
+            TrySetPriority();
+            InitializeLogging();
 
-            if (arguments.Any(a => string.Equals("manual", a, StringComparison.InvariantCultureIgnoreCase)))
-            {
-                service.ManualStart();
+            var isService = !(Debugger.IsAttached || arguments.Contains("--console"));
 
-                while (true)
+            var builder = new HostBuilder()
+                .ConfigureServices((hostContext, services) =>
                 {
-                    Thread.Sleep(100);
+                    services.AddHostedService<MicserService>();
+                });
+
+            if (isService)
+            {
+                await builder.RunAsServiceAsync();
+            }
+            else
+            {
+                await builder.RunConsoleAsync();
+            }
+        }
+
+        private static void TrySetPriority()
+        {
+            try
+            {
+                // try setting process priority to high
+                using (var process = Process.GetCurrentProcess())
+                {
+                    process.PriorityClass = ProcessPriorityClass.High;
                 }
             }
-
-            ServiceBase.Run(new ServiceBase[] { service });
+            catch
+            {
+                // ignore
+            }
         }
     }
 }

@@ -95,7 +95,6 @@ namespace Micser.App
             container.RegisterView<AboutView, AboutViewModel>();
 
             container.RegisterRequestProcessor<UpdatesRequestProcessor>();
-            container.RegisterInstance(new HttpUpdateSettings { ManifestUrl = Common.Properties.Settings.Default.UpdateManifestUrl });
             container.RegisterSingleton<IUpdateService, HttpUpdateService>();
             container.RegisterSingleton<UpdateHandler>();
         }
@@ -150,6 +149,7 @@ namespace Micser.App
         private static void RegisterMenuItems(IContainerProvider containerProvider)
         {
             var menuItemRegistry = containerProvider.Resolve<IMenuItemRegistry>();
+            var navigationManager = containerProvider.Resolve<INavigationManager>();
 
             // File
             menuItemRegistry.Add(new MenuItemDescription
@@ -236,7 +236,7 @@ namespace Micser.App
                 Header = Localize(nameof(Strings.MenuItemSettingsHeader)),
                 Id = AppGlobals.MenuItemIds.ToolsSettings,
                 ParentId = AppGlobals.MenuItemIds.Tools,
-                Command = new NavigationCommand<SettingsView>(AppGlobals.PrismRegions.Main),
+                Command = new NavigationCommand<SettingsView>(navigationManager, AppGlobals.PrismRegions.Main),
                 IconTemplateName = "Icon_Settings_16x"
             });
 
@@ -262,7 +262,7 @@ namespace Micser.App
                 Header = Localize(nameof(Strings.MenuItemAboutHeader)),
                 Id = AppGlobals.MenuItemIds.HelpAbout,
                 ParentId = AppGlobals.MenuItemIds.Help,
-                Command = new NavigationCommand<AboutView>(AppGlobals.PrismRegions.Main),
+                Command = new NavigationCommand<AboutView>(navigationManager, AppGlobals.PrismRegions.Main),
                 IconTemplateName = "Icon_HelpApplication_16x"
             });
         }
@@ -415,7 +415,7 @@ namespace Micser.App
             toolBarRegistry.AddItem(AppGlobals.ToolBarIds.Main, new ToolBarSeparator());
             toolBarRegistry.AddItem(AppGlobals.ToolBarIds.Main, new ToolBarButton
             {
-                Command = new NavigationCommand<SettingsView>(AppGlobals.PrismRegions.Main),
+                Command = new NavigationCommand<SettingsView>(navigationManager, AppGlobals.PrismRegions.Main),
                 Description = Localize(nameof(Strings.ToolBarSettingsDescription)),
                 IconTemplateName = "Icon_Settings_16x"
             });

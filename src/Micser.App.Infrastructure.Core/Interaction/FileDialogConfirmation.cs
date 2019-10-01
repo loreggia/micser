@@ -1,5 +1,4 @@
-﻿using Prism.Interactivity.InteractionRequest;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace Micser.App.Infrastructure.Interaction

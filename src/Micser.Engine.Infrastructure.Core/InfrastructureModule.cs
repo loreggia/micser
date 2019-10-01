@@ -49,7 +49,6 @@ namespace Micser.Engine.Infrastructure
 
             container.RegisterSingleton<IRequestProcessorFactory, RequestProcessorFactory>();
 
-            container.RegisterInstance(new HttpUpdateSettings { ManifestUrl = Settings.Default.UpdateManifestUrl });
             container.RegisterSingleton<IUpdateService, HttpUpdateService>();
 
             var server = container.Resolve<IApiServer>();
