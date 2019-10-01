@@ -1,9 +1,11 @@
 ﻿using Micser.App.Infrastructure;
 using Micser.App.Infrastructure.Api;
+using Micser.App.Infrastructure.Commands;
 using Micser.App.Infrastructure.Events;
 using Micser.App.Infrastructure.Interaction;
 using Micser.App.Infrastructure.Navigation;
 using Micser.App.Infrastructure.Widgets;
+using Micser.App.Resources;
 using Micser.Common.Extensions;
 using Micser.Common.Modules;
 using Micser.Common.Settings;
@@ -260,8 +262,8 @@ namespace Micser.App.ViewModels
 
         private void ImportFile()
         {
-            var confirmation = new FileDialogConfirmation { Title = Resources.ImportConfigurationDialogTitle, DefaultExtension = ".json" };
-            confirmation.AddFilter(Resources.JsonFiles, "*.json");
+            var confirmation = new FileDialogConfirmation { Title = Strings.ImportConfigurationDialogTitle, DefaultExtension = ".json" };
+            confirmation.AddFilter(Strings.JsonFiles, "*.json");
             ImportFileRequest.Raise(confirmation, async c =>
             {
                 if (!c.Confirmed)

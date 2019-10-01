@@ -8,7 +8,6 @@
         /// <summary>
         /// Gets or sets the unique setting key name.
         /// </summary>
-        [Index(IsUnique = true)]
         public string Key { get; set; }
 
         /// <summary>

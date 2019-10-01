@@ -38,5 +38,14 @@ namespace Micser.App.Infrastructure.DataAccess
 
             base.OnConfiguring(optionsBuilder);
         }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<SettingValue>()
+                .HasIndex(x => x.Key)
+                .IsUnique();
+
+            base.OnModelCreating(modelBuilder);
+        }
     }
 }

@@ -2,6 +2,7 @@
 using Micser.App.Infrastructure.Commands;
 using Micser.App.Infrastructure.Interaction;
 using Micser.App.Infrastructure.Settings;
+using Micser.App.Resources;
 using Micser.Common.Settings;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,9 +24,9 @@ namespace Micser.App.ViewModels
             _settingsService = settingsService;
             _settingsSerializer = settingsSerializer;
 
-            RefreshCommand = new DelegateCommand(async _ => await LoadAsync(), _ => !IsBusy);
-            ImportCommand = new DelegateCommand(async _ => await ImportAsync(), _ => !IsBusy);
-            ExportCommand = new DelegateCommand(async _ => await ExportAsync(), _ => !IsBusy);
+            RefreshCommand = new DelegateCommand(async () => await LoadAsync(), () => !IsBusy);
+            ImportCommand = new DelegateCommand(async () => await ImportAsync(), () => !IsBusy);
+            ExportCommand = new DelegateCommand(async () => await ExportAsync(), () => !IsBusy);
             AddCommandBinding(CustomApplicationCommands.Refresh, RefreshCommand);
             AddCommandBinding(CustomApplicationCommands.Import, ImportCommand);
             AddCommandBinding(CustomApplicationCommands.Export, ExportCommand);
@@ -59,8 +60,8 @@ namespace Micser.App.ViewModels
 
         private Task ExportAsync()
         {
-            var confirmation = new FileDialogConfirmation { Title = Resources.ExportSettingsDialogTitle, DefaultExtension = ".json" };
-            confirmation.AddFilter(Resources.JsonFiles, "*.json");
+            var confirmation = new FileDialogConfirmation { Title = Strings.ExportSettingsDialogTitle, DefaultExtension = ".json" };
+            confirmation.AddFilter(Strings.JsonFiles, "*.json");
             ExportFileRequest.Raise(confirmation, c =>
             {
                 if (!c.Confirmed)
@@ -81,8 +82,8 @@ namespace Micser.App.ViewModels
 
         private Task ImportAsync()
         {
-            var confirmation = new FileDialogConfirmation { Title = Resources.ImportSettingsDialogTitle, DefaultExtension = ".json" };
-            confirmation.AddFilter(Resources.JsonFiles, "*.json");
+            var confirmation = new FileDialogConfirmation { Title = Strings.ImportSettingsDialogTitle, DefaultExtension = ".json" };
+            confirmation.AddFilter(Strings.JsonFiles, "*.json");
             ImportFileRequest.Raise(confirmation, async c =>
             {
                 if (!c.Confirmed)

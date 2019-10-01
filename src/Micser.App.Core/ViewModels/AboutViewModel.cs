@@ -1,7 +1,7 @@
 ﻿using Micser.App.Infrastructure;
-using Micser.App.Properties;
+using Micser.App.Infrastructure.Commands;
+using Micser.App.Resources;
 using Newtonsoft.Json;
-using Prism.Commands;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -20,9 +20,9 @@ namespace Micser.App.ViewModels
 
         public AboutViewModel()
         {
-            _aboutText = Resources.AboutText;
+            _aboutText = Strings.AboutText;
             var version = Assembly.GetExecutingAssembly().GetName().Version.ToString();
-            _versionText = $"{Resources.AboutVersionText} {version}";
+            _versionText = $"{Strings.AboutVersionText} {version}";
 
             LoadLicenseCommand = new DelegateCommand<LibraryInfo>(LoadLicense);
             OpenLibraryUrlCommand = new DelegateCommand<LibraryInfo>(OpenLibraryUrl);
@@ -106,7 +106,7 @@ namespace Micser.App.ViewModels
         {
             return Task.Run(() =>
             {
-                using (var libJsonStream = new MemoryStream(Resources.libraries))
+                using (var libJsonStream = new MemoryStream(Files.libraries))
                 using (var streamReader = new StreamReader(libJsonStream))
                 using (var jsonReader = new JsonTextReader(streamReader))
                 {
