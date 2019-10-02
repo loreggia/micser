@@ -73,7 +73,7 @@ namespace Micser.Engine
             Logger.Info("Service started");
         }
 
-        public async Task StopAsync(CancellationToken cancellationToken)
+        public Task StopAsync(CancellationToken cancellationToken)
         {
             Logger.Info("Stopping service");
 
@@ -88,6 +88,8 @@ namespace Micser.Engine
             _containerProvider.Dispose();
 
             Logger.Info("Service stopped");
+
+            return Task.CompletedTask;
         }
 
         /*protected override bool OnPowerEvent(PowerBroadcastStatus powerStatus)

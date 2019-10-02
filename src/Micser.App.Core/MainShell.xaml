@@ -55,8 +55,7 @@
         <ContentControl Grid.Row="3" x:Name="StatusRegion" regions:RegionManager.RegionName="{x:Static ai:AppGlobals+PrismRegions.Status}"
                         Style="{StaticResource RegionStyle}" />
 
-        <!--TODO-->
-        <!--<tb:TaskbarIcon Grid.Row="3" x:Name="TaskbarIcon" MenuActivation="RightClick" ToolTipText="{l:Resx ApplicationTitle}"
+        <tb:TaskbarIcon Grid.Row="3" x:Name="TaskbarIcon" MenuActivation="RightClick" ToolTipText="{l:Resx ApplicationTitle}"
                         TrayMouseDoubleClick="OnTrayMouseDoubleClick" IconSource="logo.ico">
             <tb:TaskbarIcon.ContextMenu>
                 <ContextMenu>
@@ -64,7 +63,7 @@
                     <MenuItem Header="Exit" Click="TaskbarIconExitClick" />
                 </ContextMenu>
             </tb:TaskbarIcon.ContextMenu>
-        </tb:TaskbarIcon>-->
+        </tb:TaskbarIcon>
     </Grid>
 
     <i:Interaction.Triggers>
