@@ -21,6 +21,10 @@ namespace Micser.Engine.Infrastructure
         /// <inheritdoc />
         public void OnInitialized(IContainerProvider container)
         {
+            using (var dbContext = container.Resolve<DbContext>())
+            {
+                dbContext.Database.Migrate();
+            }
         }
 
         /// <inheritdoc />

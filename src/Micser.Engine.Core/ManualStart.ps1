@@ -1,1 +1,1 @@
-﻿& .\Micser.Engine.exe manual
+﻿& .\Micser.Engine.exe --console

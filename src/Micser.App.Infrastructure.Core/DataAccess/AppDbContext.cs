@@ -34,6 +34,7 @@ namespace Micser.App.Infrastructure.DataAccess
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             var cs = _configuration.GetConnectionString("DefaultConnection");
+            cs = cs.Replace(Globals.ConnectionStringFolder, Globals.AppDataFolder);
             optionsBuilder.UseSqlite(cs);
 
             base.OnConfiguring(optionsBuilder);
