@@ -1,4 +1,5 @@
 ﻿using Micser.App.Infrastructure.Navigation;
+using Prism.Regions;
 
 namespace Micser.App.Infrastructure
 {
@@ -24,7 +25,7 @@ namespace Micser.App.Infrastructure
 
         void INavigationAware.OnNavigatedFrom(NavigationContext context)
         {
-            OnNavigatedFrom(context.Parameter);
+            OnNavigatedFrom(context.Parameters[AppGlobals.NavigationParameterKey]);
 
             if (DisposeOnNavigatedFrom)
             {
@@ -34,7 +35,7 @@ namespace Micser.App.Infrastructure
 
         void INavigationAware.OnNavigatedTo(NavigationContext context)
         {
-            OnNavigatedTo(context.Parameter);
+            OnNavigatedTo(context.Parameters[AppGlobals.NavigationParameterKey]);
         }
 
         /// <summary>

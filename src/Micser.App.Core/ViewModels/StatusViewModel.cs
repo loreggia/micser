@@ -1,9 +1,9 @@
 ﻿using Micser.App.Infrastructure;
 using Micser.App.Infrastructure.Api;
-using Micser.App.Infrastructure.Commands;
 using Micser.App.Infrastructure.Navigation;
 using Micser.App.Views;
 using Micser.Common.Api;
+using Prism.Commands;
 using System;
 
 namespace Micser.App.ViewModels
@@ -29,7 +29,7 @@ namespace Micser.App.ViewModels
             _navigationManager = navigationManager;
             _statusApiClient = statusApiClient;
 
-            ActionCommand = new DelegateCommand(OnActionCommand, _ => CanExecuteAction).ObservesProperty(() => CanExecuteAction);
+            ActionCommand = new DelegateCommand(OnActionCommand).ObservesCanExecute(() => CanExecuteAction);
             _apiEndPoint = apiEndPoint;
         }
 
@@ -84,7 +84,7 @@ namespace Micser.App.ViewModels
             }
         }
 
-        private async void OnActionCommand(object parameter)
+        private async void OnActionCommand()
         {
             try
             {

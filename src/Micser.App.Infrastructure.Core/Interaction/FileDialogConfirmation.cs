@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using Prism.Interactivity.InteractionRequest;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace Micser.App.Infrastructure.Interaction
 {
     /// <summary>
-    /// Open/save file dialog confirmation for use with an <see cref="InteractionRequest{IConfirmation}"/>.
+    /// Open/save file dialog confirmation for use with an <see cref="InteractionRequest{T}"/>.
     /// </summary>
     public class FileDialogConfirmation : Confirmation
     {

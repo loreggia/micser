@@ -1,7 +1,5 @@
 ﻿using Micser.App.Infrastructure;
 using Micser.App.Infrastructure.Api;
-using Micser.App.Infrastructure.Commands;
-using Micser.App.Infrastructure.Events;
 using Micser.App.Infrastructure.Interaction;
 using Micser.App.Infrastructure.Navigation;
 using Micser.App.Infrastructure.Widgets;
@@ -10,6 +8,9 @@ using Micser.Common.Extensions;
 using Micser.Common.Modules;
 using Micser.Common.Settings;
 using NLog;
+using Prism.Commands;
+using Prism.Events;
+using Prism.Interactivity.InteractionRequest;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -236,8 +237,8 @@ namespace Micser.App.ViewModels
 
         private void ExportFile()
         {
-            var confirmation = new FileDialogConfirmation { Title = Resources.ExportConfigurationDialogTitle, DefaultExtension = ".json" };
-            confirmation.AddFilter(Resources.JsonFiles, "*.json");
+            var confirmation = new FileDialogConfirmation { Title = Strings.ExportConfigurationDialogTitle, DefaultExtension = ".json" };
+            confirmation.AddFilter(Strings.JsonFiles, "*.json");
             ExportFileRequest.Raise(confirmation, async c =>
             {
                 if (!c.Confirmed)

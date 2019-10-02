@@ -1,4 +1,5 @@
 ﻿using Microsoft.Xaml.Behaviors;
+using Prism.Interactivity.InteractionRequest;
 using System;
 using System.Windows;
 

@@ -6,8 +6,8 @@
         xmlns:i="clr-namespace:Micser.App.Infrastructure;assembly=Micser.App.Infrastructure"
         xmlns:vm="clr-namespace:Micser.App.ViewModels"
         xmlns:settings="clr-namespace:Micser.App.Infrastructure.Settings;assembly=Micser.App.Infrastructure"
-        xmlns:int="http://schemas.microsoft.com/expression/2010/interactivity"
-        xmlns:ir="http://prismlibrary.com/"
+        xmlns:in="http://schemas.microsoft.com/xaml/behaviors"
+        xmlns:ir="clr-namespace:Prism.Interactivity.InteractionRequest;assembly=Micser.App.Prism"
         xmlns:interaction="clr-namespace:Micser.App.Infrastructure.Interaction;assembly=Micser.App.Infrastructure"
         mc:Ignorable="d"
         d:DesignHeight="500"
@@ -18,12 +18,12 @@
         <settings:SettingsPanel ItemsSource="{Binding Settings}" MaxWidth="800" />
     </ScrollViewer>
 
-    <int:Interaction.Triggers>
+    <in:Interaction.Triggers>
         <ir:InteractionRequestTrigger SourceObject="{Binding ImportFileRequest}">
             <interaction:OpenFileDialogAction />
         </ir:InteractionRequestTrigger>
         <ir:InteractionRequestTrigger SourceObject="{Binding ExportFileRequest}">
             <interaction:SaveFileDialogAction />
         </ir:InteractionRequestTrigger>
-    </int:Interaction.Triggers>
+    </in:Interaction.Triggers>
 </i:View>

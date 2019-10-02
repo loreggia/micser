@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Micser.App.Infrastructure.Core\Micser.App.Infrastructure.csproj" />
+    <ProjectReference Include="..\Micser.App.Prism\Micser.App.Prism.csproj" />
   </ItemGroup>
 
   <ItemGroup>

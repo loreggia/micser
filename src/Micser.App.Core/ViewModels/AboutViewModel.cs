@@ -1,7 +1,7 @@
 ﻿using Micser.App.Infrastructure;
-using Micser.App.Infrastructure.Commands;
 using Micser.App.Resources;
 using Newtonsoft.Json;
+using Prism.Commands;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;

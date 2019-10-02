@@ -1,4 +1,4 @@
-﻿using Micser.App.Infrastructure.Events;
+﻿using Prism.Events;
 
 namespace Micser.App.Infrastructure
 {

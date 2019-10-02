@@ -1,4 +1,4 @@
-﻿using Micser.App.Infrastructure.Events;
+﻿using Prism.Events;
 
 namespace Micser.App.Infrastructure
 {
@@ -10,14 +10,14 @@ namespace Micser.App.Infrastructure
         /// <summary>
         /// An event that is fired after all available modules have finished loading.
         /// </summary>
-        public class ModulesLoaded : Event<>
+        public class ModulesLoaded : PubSubEvent
         {
         }
 
         /// <summary>
         /// An event that is fired after a navigation has occurred.
         /// </summary>
-        public class Navigated : Event<Navigated.NavigationInfo>
+        public class Navigated : PubSubEvent<Navigated.NavigationInfo>
         {
             /// <summary>
             /// The data passed in the <see cref="Navigated"/> event.
@@ -44,7 +44,7 @@ namespace Micser.App.Infrastructure
         /// <summary>
         /// An event containing <see cref="string"/> data to display in the main status bar.
         /// </summary>
-        public class StatusChange : Event<string>
+        public class StatusChange : PubSubEvent<string>
         {
         }
     }

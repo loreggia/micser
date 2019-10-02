@@ -1,4 +1,5 @@
-﻿using Micser.App.Infrastructure.Events;
+﻿using Prism.Events;
+using Prism.Regions;
 using System;
 
 namespace Micser.App.Infrastructure.Navigation

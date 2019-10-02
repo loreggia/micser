@@ -1,6 +1,5 @@
 ﻿using Microsoft.Shell;
 using Micser.App.Infrastructure;
-using Micser.App.Infrastructure.Events;
 using Micser.App.Infrastructure.Themes;
 using Micser.App.Settings;
 using Micser.Common;
@@ -10,6 +9,9 @@ using Micser.Common.Settings;
 using NLog;
 using NLog.Config;
 using NLog.Targets;
+using Prism.Events;
+using Prism.Ioc;
+using Prism.Modularity;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -18,6 +20,7 @@ using System.Reflection;
 using System.Timers;
 using System.Windows;
 using System.Windows.Threading;
+using IContainerProvider = Micser.Common.IContainerProvider;
 
 namespace Micser.App
 {
@@ -92,8 +95,9 @@ namespace Micser.App
         {
             base.ConfigureModuleCatalog(moduleCatalog);
 
-            moduleCatalog.AddModule<AppModule>();
-            moduleCatalog.AddModule<InfrastructureModule>();
+            //todo
+            //moduleCatalog.AddModule<AppModule>();
+            //moduleCatalog.AddModule<InfrastructureModule>();
 
             LoadPlugins(moduleCatalog);
         }
@@ -192,12 +196,12 @@ namespace Micser.App
             base.OnStartup(e);
         }
 
-        protected override void RegisterTypes(IContainerProvider containerRegistry)
+        protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
             containerRegistry.RegisterInstance(_argumentDictionary);
         }
 
-        private static void LoadPlugins(IModuleCatalog moduleCatalog)
+        private void LoadPlugins(IModuleCatalog moduleCatalog)
         {
             Logger.Debug("Loading plugins");
             SetStatus("Loading plugins...");

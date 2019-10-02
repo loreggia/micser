@@ -1,5 +1,6 @@
 ﻿using Microsoft.Win32;
 using Microsoft.Xaml.Behaviors;
+using Prism.Interactivity.InteractionRequest;
 using System.Windows;
 
 namespace Micser.App.Infrastructure.Interaction

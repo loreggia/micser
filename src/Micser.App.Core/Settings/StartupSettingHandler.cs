@@ -1,11 +1,8 @@
-﻿using IWshRuntimeLibrary;
-using Micser.App.Infrastructure;
-using Micser.App.Properties;
+﻿using Micser.App.Resources;
 using Micser.Common.Settings;
 using NLog;
 using System;
 using System.IO;
-using System.Reflection;
 using System.Threading.Tasks;
 using File = System.IO.File;
 
@@ -14,7 +11,7 @@ namespace Micser.App.Settings
     public class StartupSettingHandler : ISettingHandler
     {
         private static readonly string StartupFolder = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
-        private static readonly string StartupShortcutFileName = Resources.ApplicationTitle + ".lnk";
+        private static readonly string StartupShortcutFileName = Strings.ApplicationTitle + ".lnk";
         private readonly ILogger _logger;
 
         public StartupSettingHandler(ILogger logger)
@@ -64,12 +61,13 @@ namespace Micser.App.Settings
                 // create shortcut
                 try
                 {
-                    var shell = new WshShell();
-                    var shortcut = (IWshShortcut)shell.CreateShortcut(fileName);
-                    shortcut.TargetPath = Assembly.GetExecutingAssembly().Location;
-                    shortcut.WorkingDirectory = Path.GetDirectoryName(shortcut.TargetPath);
-                    shortcut.Arguments = "-" + AppGlobals.ProgramArguments.Startup;
-                    shortcut.Save();
+                    //todo
+                    //var shell = new WshShell();
+                    //var shortcut = (IWshShortcut)shell.CreateShortcut(fileName);
+                    //shortcut.TargetPath = Assembly.GetExecutingAssembly().Location;
+                    //shortcut.WorkingDirectory = Path.GetDirectoryName(shortcut.TargetPath);
+                    //shortcut.Arguments = "-" + AppGlobals.ProgramArguments.Startup;
+                    //shortcut.Save();
                 }
                 catch (Exception ex)
                 {

@@ -1,7 +1,7 @@
 ﻿using Micser.App.Infrastructure;
-using Micser.App.Infrastructure.Navigation;
 using Micser.Common.Extensions;
 using Micser.Common.Settings;
+using Prism.Regions;
 using System;
 using System.ComponentModel;
 using System.Windows;
@@ -59,7 +59,8 @@ namespace Micser.App
 
         private void OnTrayMouseDoubleClick(object sender, RoutedEventArgs e)
         {
-            CustomApplicationCommands.Restore.Execute(null, TaskbarIcon);
+            // todo
+            //CustomApplicationCommands.Restore.Execute(null, TaskbarIcon);
         }
 
         private void RestoreCommand_Executed(object sender, ExecutedRoutedEventArgs e)
@@ -80,13 +81,15 @@ namespace Micser.App
 
         private void TaskbarIconExitClick(object sender, RoutedEventArgs e)
         {
-            CustomApplicationCommands.Exit.Execute(null, TaskbarIcon);
+            // todo
+            //CustomApplicationCommands.Exit.Execute(null, TaskbarIcon);
         }
 
         private void TaskbarIconRestoreClick(object sender, RoutedEventArgs e)
         {
             // using application commands doesn't work in the taskbar context menu
-            CustomApplicationCommands.Restore.Execute(null, TaskbarIcon);
+            // todo
+            //CustomApplicationCommands.Restore.Execute(null, TaskbarIcon);
         }
     }
 }
