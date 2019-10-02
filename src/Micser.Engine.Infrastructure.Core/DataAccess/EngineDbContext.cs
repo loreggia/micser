@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Micser.Common;
 using Micser.Common.DataAccess.Models;
 using Micser.Engine.Infrastructure.DataAccess.Models;
 
@@ -40,6 +41,7 @@ namespace Micser.Engine.Infrastructure.DataAccess
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             var cs = _configuration.GetConnectionString("DefaultConnection");
+            cs = cs.Replace(Globals.ConnectionStringFolder, Globals.AppDataFolder);
             optionsBuilder.UseSqlite(cs);
 
             base.OnConfiguring(optionsBuilder);

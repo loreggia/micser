@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "Micser.Engine": {
+      "commandName": "Project",
+      "commandLineArgs": "--console"
+    }
+  }
+}

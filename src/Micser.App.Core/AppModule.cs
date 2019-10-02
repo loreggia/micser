@@ -41,15 +41,20 @@ namespace Micser.App
             LocalizationManager.UiCultureChanged += OnUiCultureChanged;
         }
 
-        public void OnInitialized(IContainerProvider containerProvider)
+        public void OnInitialized(IContainerProvider container)
         {
-            RegisterSettings(containerProvider);
-            RegisterMenuItems(containerProvider);
-            RegisterToolBarItems(containerProvider);
+            using (var dbContext = container.Resolve<DbContext>())
+            {
+                dbContext.Database.Migrate();
+            }
 
-            InitializeShell(containerProvider);
+            RegisterSettings(container);
+            RegisterMenuItems(container);
+            RegisterToolBarItems(container);
 
-            containerProvider.Resolve<IApplicationStateService>().Initialize();
+            InitializeShell(container);
+
+            container.Resolve<IApplicationStateService>().Initialize();
         }
 
         public void RegisterTypes(IContainerProvider container)

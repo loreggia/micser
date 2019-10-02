@@ -22,6 +22,8 @@ namespace Micser.Common
 #endif
         ;
 
+        public const string ConnectionStringFolder = "|DataDirectory|";
+
         /// <summary>
         /// The name of the virtual audio cable device. This has to be equal to the "DeviceName" string in Micser.Vac.Driver.inf
         /// </summary>
