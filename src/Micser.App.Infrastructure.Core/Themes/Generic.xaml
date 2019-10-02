@@ -5,25 +5,25 @@
     <ResourceDictionary.MergedDictionaries>
         <!--<ResourceDictionary Source="Colors.Default.xaml" />-->
 
-        <ResourceDictionary Source="BusyPanel.xaml" />
-        <ResourceDictionary Source="Connection.xaml" />
-        <ResourceDictionary Source="Connector.xaml" />
-        <ResourceDictionary Source="EditableSlider.xaml" />
-        <ResourceDictionary Source="EditableTextBlock.xaml" />
-        <ResourceDictionary Source="Expander.xaml" />
-        <ResourceDictionary Source="Icons.xaml" />
-        <ResourceDictionary Source="InfoButton.xaml" />
-        <ResourceDictionary Source="LinePanel.xaml" />
-        <ResourceDictionary Source="Menu.xaml" />
-        <ResourceDictionary Source="Slider.xaml" />
-        <ResourceDictionary Source="SettingsPanel.xaml" />
-        <ResourceDictionary Source="Thumbs.xaml" />
-        <ResourceDictionary Source="ToolBar.xaml" />
-        <ResourceDictionary Source="View.xaml" />
-        <ResourceDictionary Source="Widget.xaml" />
-        <ResourceDictionary Source="WidgetPanel.xaml" />
-        <ResourceDictionary Source="WidgetToolbox.xaml" />
-        <ResourceDictionary Source="WidgetToolboxItem.xaml" />
+        <ResourceDictionary Source="/Micser.App.Infrastructure;component/Themes/BusyPanel.xaml" />
+        <ResourceDictionary Source="/Micser.App.Infrastructure;component/Themes/Connection.xaml" />
+        <ResourceDictionary Source="/Micser.App.Infrastructure;component/Themes/Connector.xaml" />
+        <ResourceDictionary Source="/Micser.App.Infrastructure;component/Themes/EditableSlider.xaml" />
+        <ResourceDictionary Source="/Micser.App.Infrastructure;component/Themes/EditableTextBlock.xaml" />
+        <ResourceDictionary Source="/Micser.App.Infrastructure;component/Themes/Expander.xaml" />
+        <ResourceDictionary Source="/Micser.App.Infrastructure;component/Themes/Icons.xaml" />
+        <ResourceDictionary Source="/Micser.App.Infrastructure;component/Themes/InfoButton.xaml" />
+        <ResourceDictionary Source="/Micser.App.Infrastructure;component/Themes/LinePanel.xaml" />
+        <ResourceDictionary Source="/Micser.App.Infrastructure;component/Themes/Menu.xaml" />
+        <ResourceDictionary Source="/Micser.App.Infrastructure;component/Themes/Slider.xaml" />
+        <ResourceDictionary Source="/Micser.App.Infrastructure;component/Themes/SettingsPanel.xaml" />
+        <ResourceDictionary Source="/Micser.App.Infrastructure;component/Themes/Thumbs.xaml" />
+        <ResourceDictionary Source="/Micser.App.Infrastructure;component/Themes/ToolBar.xaml" />
+        <ResourceDictionary Source="/Micser.App.Infrastructure;component/Themes/View.xaml" />
+        <ResourceDictionary Source="/Micser.App.Infrastructure;component/Themes/Widget.xaml" />
+        <ResourceDictionary Source="/Micser.App.Infrastructure;component/Themes/WidgetPanel.xaml" />
+        <ResourceDictionary Source="/Micser.App.Infrastructure;component/Themes/WidgetToolbox.xaml" />
+        <ResourceDictionary Source="/Micser.App.Infrastructure;component/Themes/WidgetToolboxItem.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
     <Style TargetType="{x:Type Window}" x:Key="DefaultWindowStyle">

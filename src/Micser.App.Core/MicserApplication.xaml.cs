@@ -12,6 +12,7 @@ using NLog.Targets;
 using Prism.Events;
 using Prism.Ioc;
 using Prism.Modularity;
+using Prism.Unity;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -43,8 +44,6 @@ namespace Micser.App
 
             _reconnectTimer = new Timer(1000) { AutoReset = false };
             _reconnectTimer.Elapsed += OnReconnectTimerElapsed;
-
-            _containerProvider = new UnityContainerProvider();
         }
 
         [STAThread]
@@ -95,9 +94,8 @@ namespace Micser.App
         {
             base.ConfigureModuleCatalog(moduleCatalog);
 
-            //todo
-            //moduleCatalog.AddModule<AppModule>();
-            //moduleCatalog.AddModule<InfrastructureModule>();
+            moduleCatalog.AddModule<ProxyModule<AppModule>>(nameof(AppModule));
+            moduleCatalog.AddModule<ProxyModule<InfrastructureModule>>(nameof(InfrastructureModule));
 
             LoadPlugins(moduleCatalog);
         }
@@ -194,6 +192,13 @@ namespace Micser.App
             Logger.Info("Starting...");
 
             base.OnStartup(e);
+        }
+
+        protected override void RegisterRequiredTypes(IContainerRegistry containerRegistry)
+        {
+            var container = containerRegistry.GetContainer();
+            _containerProvider = new UnityContainerProvider(container);
+            base.RegisterRequiredTypes(containerRegistry);
         }
 
         protected override void RegisterTypes(IContainerRegistry containerRegistry)

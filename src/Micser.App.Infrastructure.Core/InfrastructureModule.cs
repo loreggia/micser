@@ -1,7 +1,10 @@
 ﻿using Micser.App.Infrastructure.Localization;
 using Micser.App.Infrastructure.Resources;
+using Micser.App.Infrastructure.Themes;
 using Micser.Common;
+using Micser.Common.Extensions;
 using System;
+using System.Windows;
 
 namespace Micser.App.Infrastructure
 {
@@ -19,6 +22,8 @@ namespace Micser.App.Infrastructure
         /// <inheritdoc />
         public void OnInitialized(IContainerProvider containerProvider)
         {
+            var resourceRegistry = containerProvider.Resolve<IResourceRegistry>();
+            resourceRegistry.Add(new ResourceDictionary { Source = new Uri("/Micser.App.Infrastructure;component/Themes/Generic.xaml", UriKind.Relative) });
         }
 
         /// <inheritdoc />

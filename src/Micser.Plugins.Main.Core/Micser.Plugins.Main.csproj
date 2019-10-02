@@ -6,6 +6,23 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Themes\Colors.Light.ini" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Page Remove="Themes\Colors.Light.xaml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="Themes\Colors.Light.ini">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Themes\Colors.Light.xaml">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Micser.App.Infrastructure.Core\Micser.App.Infrastructure.csproj" />
     <ProjectReference Include="..\Micser.Common.Core\Micser.Common.csproj" />
     <ProjectReference Include="..\Micser.Engine.Infrastructure.Core\Micser.Engine.Infrastructure.csproj" />

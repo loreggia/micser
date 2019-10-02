@@ -1,8 +1,11 @@
-﻿using Micser.App.Resources;
+﻿using IWshRuntimeLibrary;
+using Micser.App.Infrastructure;
+using Micser.App.Resources;
 using Micser.Common.Settings;
 using NLog;
 using System;
 using System.IO;
+using System.Reflection;
 using System.Threading.Tasks;
 using File = System.IO.File;
 
@@ -61,13 +64,12 @@ namespace Micser.App.Settings
                 // create shortcut
                 try
                 {
-                    //todo
-                    //var shell = new WshShell();
-                    //var shortcut = (IWshShortcut)shell.CreateShortcut(fileName);
-                    //shortcut.TargetPath = Assembly.GetExecutingAssembly().Location;
-                    //shortcut.WorkingDirectory = Path.GetDirectoryName(shortcut.TargetPath);
-                    //shortcut.Arguments = "-" + AppGlobals.ProgramArguments.Startup;
-                    //shortcut.Save();
+                    var shell = new WshShell();
+                    var shortcut = (IWshShortcut)shell.CreateShortcut(fileName);
+                    shortcut.TargetPath = Assembly.GetExecutingAssembly().Location;
+                    shortcut.WorkingDirectory = Path.GetDirectoryName(shortcut.TargetPath);
+                    shortcut.Arguments = "-" + AppGlobals.ProgramArguments.Startup;
+                    shortcut.Save();
                 }
                 catch (Exception ex)
                 {
