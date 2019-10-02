@@ -1,4 +1,5 @@
 ﻿using Micser.App.Infrastructure.Resources;
+using Prism.Interactivity.InteractionRequest;
 using System;
 using System.Drawing;
 using System.Windows;

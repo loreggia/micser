@@ -1,7 +1,7 @@
-﻿using Micser.App.Infrastructure.Events;
-using Micser.App.Infrastructure.Interaction;
+﻿using Micser.App.Infrastructure.Interaction;
 using Micser.App.Infrastructure.Resources;
 using Micser.Common.Updates;
+using Prism.Events;
 using System.Threading.Tasks;
 
 namespace Micser.App.Infrastructure.Updates

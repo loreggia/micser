@@ -1,5 +1,5 @@
-﻿using Micser.App.Infrastructure.Events;
-using Micser.Common.Api;
+﻿using Micser.Common.Api;
+using Prism.Events;
 using System.Threading.Tasks;
 
 namespace Micser.App.Infrastructure.Api

@@ -1,9 +1,10 @@
 ﻿using Micser.App.Infrastructure;
-using Micser.App.Infrastructure.Commands;
 using Micser.App.Infrastructure.Interaction;
 using Micser.App.Infrastructure.Settings;
 using Micser.App.Resources;
 using Micser.Common.Settings;
+using Prism.Commands;
+using Prism.Interactivity.InteractionRequest;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;

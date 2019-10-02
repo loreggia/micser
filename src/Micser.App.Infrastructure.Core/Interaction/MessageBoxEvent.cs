@@ -1,4 +1,4 @@
-﻿using Micser.App.Infrastructure.Events;
+﻿using Prism.Events;
 using System;
 
 namespace Micser.App.Infrastructure.Interaction
@@ -32,7 +32,7 @@ namespace Micser.App.Infrastructure.Interaction
     /// <summary>
     /// An <see cref="Event{TPayload}"/> for displaying a message box.
     /// </summary>
-    public class MessageBoxEvent : Event<MessageBoxEventArgs>
+    public class MessageBoxEvent : PubSubEvent<MessageBoxEventArgs>
     {
     }
 

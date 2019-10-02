@@ -1,4 +1,4 @@
-﻿using Micser.App.Infrastructure.Commands;
+﻿using Prism.Commands;
 
 namespace Micser.App.Infrastructure.Navigation
 {
