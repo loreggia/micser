@@ -219,11 +219,22 @@ namespace Micser.App
                 {
                     var assembly = Assembly.LoadFile(moduleFile.FullName);
                     var moduleTypes = assembly.GetExportedTypes().Where(t => typeof(IAppModule).IsAssignableFrom(t));
+
                     foreach (var moduleType in moduleTypes)
                     {
-                        if (moduleCatalog.Modules.All(m => m.ModuleType != moduleType.AssemblyQualifiedName))
+                        if (moduleCatalog.Modules.Any(m => m.ModuleType == moduleType.AssemblyQualifiedName))
+                        {
+                            continue;
+                        }
+
+                        if (typeof(IModule).IsAssignableFrom(moduleType))
                         {
                             moduleCatalog.AddModule(moduleType);
+                        }
+                        else
+                        {
+                            var proxyType = typeof(ProxyModule<>).MakeGenericType(moduleType);
+                            moduleCatalog.AddModule(proxyType);
                         }
                     }
                 }

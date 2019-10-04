@@ -34,6 +34,9 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Micser.Setup.CustomActions", "Micser.Setup.CustomActions\Micser.Setup.CustomActions.csproj", "{1E05C6E2-F8DA-495C-988D-2566B52E05A6}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{0375FFB5-1AD8-422F-8D7B-91B8FF152018}"
+	ProjectSection(SolutionItems) = preProject
+		Directory.Build.props = Directory.Build.props
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Micser.BuildTasks", "Micser.BuildTasks\Micser.BuildTasks.csproj", "{9B270774-3850-4C23-ABCF-587BCFFF4844}"
 EndProject
@@ -61,7 +64,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Micser.Engine.Test", "Micse
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Micser.Plugins.Main.Test", "Micser.Plugins.Main.Test.Core\Micser.Plugins.Main.Test.csproj", "{8B4D74C3-A5B7-404B-A768-55963593EAD2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Micser.App.Prism", "Micser.App.Prism\Micser.App.Prism.csproj", "{4E9D4BDB-2D7D-4481-9E85-1BBCF653BFF3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Micser.App.Prism", "Micser.App.Prism\Micser.App.Prism.csproj", "{4E9D4BDB-2D7D-4481-9E85-1BBCF653BFF3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

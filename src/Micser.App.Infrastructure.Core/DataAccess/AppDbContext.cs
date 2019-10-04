@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Configuration;
 using Micser.Common;
 using Micser.Common.DataAccess.Models;
-using System;
 
 namespace Micser.App.Infrastructure.DataAccess
 {
@@ -12,11 +11,6 @@ namespace Micser.App.Infrastructure.DataAccess
     public class AppDbContext : DbContext
     {
         private readonly IConfiguration _configuration;
-
-        static AppDbContext()
-        {
-            AppDomain.CurrentDomain.SetData("DataDirectory", Globals.AppDataFolder);
-        }
 
         /// <inheritdoc />
         public AppDbContext(IConfiguration configuration)
