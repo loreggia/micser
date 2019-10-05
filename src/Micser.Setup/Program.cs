@@ -51,7 +51,7 @@ namespace Micser.Setup
             project.Package.Attributes.Add("Manufacturer", "Lucas Loreggia");
             project.Package.Attributes.Add("Description", "Micser Installer");
 
-            var appFile = System.IO.Path.GetFullPath(System.IO.Path.Combine(project.SourceBaseDir, "App", "Micser.App.exe"));
+            var appFile = System.IO.Path.GetFullPath(System.IO.Path.Combine(project.SourceBaseDir, "App", "Micser.App.dll"));
             var appAssembly = System.Reflection.Assembly.LoadFrom(appFile);
             project.Version = appAssembly.GetName().Version;
 
