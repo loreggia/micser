@@ -13,9 +13,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Micser.Common.Core\Micser.Common.csproj" />
-    <ProjectReference Include="..\Micser.Engine.Infrastructure.Core\Micser.Engine.Infrastructure.csproj" />
-    <ProjectReference Include="..\Micser.Plugins.Main.Core\Micser.Plugins.Main.csproj" />
+    <ProjectReference Include="..\Micser.Common\Micser.Common.csproj" />
+    <ProjectReference Include="..\Micser.Engine.Infrastructure\Micser.Engine.Infrastructure.csproj" />
+    <ProjectReference Include="..\Micser.Plugins.Main\Micser.Plugins.Main.csproj" />
   </ItemGroup>
 
   <ItemGroup>

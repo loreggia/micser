@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Micser.Common.Core\Micser.Common.csproj" />
+    <ProjectReference Include="..\Micser.Common\Micser.Common.csproj" />
   </ItemGroup>
 
 </Project>

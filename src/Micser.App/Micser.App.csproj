@@ -30,9 +30,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Micser.App.Infrastructure.Core\Micser.App.Infrastructure.csproj" />
+    <ProjectReference Include="..\Micser.App.Infrastructure\Micser.App.Infrastructure.csproj" />
     <ProjectReference Include="..\Micser.App.Prism\Micser.App.Prism.csproj" />
-    <ProjectReference Include="..\Micser.Plugins.Main.Core\Micser.Plugins.Main.csproj" />
+    <ProjectReference Include="..\Micser.Plugins.Main\Micser.Plugins.Main.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
@@ -31,8 +31,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Micser.Common.Test.Core\Micser.Common.Test.csproj" />
-    <ProjectReference Include="..\Micser.Engine.Core\Micser.Engine.csproj" />
+    <ProjectReference Include="..\Micser.Common.Test\Micser.Common.Test.csproj" />
+    <ProjectReference Include="..\Micser.Engine\Micser.Engine.csproj" />
   </ItemGroup>
 
 </Project>
