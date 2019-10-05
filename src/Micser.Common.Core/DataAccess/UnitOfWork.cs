@@ -6,20 +6,20 @@ namespace Micser.Common.DataAccess
     /// <inheritdoc cref="IUnitOfWork" />
     public class UnitOfWork : IUnitOfWork
     {
-        private readonly DbContext _context;
-        private readonly IRepositoryFactory _repositoryFactory;
+        protected readonly DbContext Context;
+        protected readonly IRepositoryFactory RepositoryFactory;
 
         /// <inheritdoc />
         public UnitOfWork(DbContext context, IRepositoryFactory repositoryFactory)
         {
-            _context = context;
-            _repositoryFactory = repositoryFactory;
+            Context = context;
+            RepositoryFactory = repositoryFactory;
         }
 
         /// <inheritdoc />
         public int Complete()
         {
-            return _context.SaveChanges();
+            return Context.SaveChanges();
         }
 
         /// <inheritdoc />
@@ -32,7 +32,7 @@ namespace Micser.Common.DataAccess
         /// <inheritdoc />
         public T GetRepository<T>() where T : class, IRepository
         {
-            return _repositoryFactory.Create<T>(_context);
+            return RepositoryFactory.Create<T>(Context);
         }
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace Micser.Common.DataAccess
         /// </summary>
         protected virtual void Dispose(bool disposing)
         {
-            _context?.Dispose();
+            Context?.Dispose();
         }
     }
 }
