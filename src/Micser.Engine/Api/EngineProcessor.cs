@@ -19,9 +19,9 @@ namespace Micser.Engine.Api
             _audioEngine = audioEngine;
             _settingsService = settingsService;
 
-            AddAction("start", _ => Start());
-            AddAction("stop", _ => Stop());
-            AddAction("restart", _ => Restart());
+            AddAsyncAction("start", _ => Start());
+            AddAsyncAction("stop", _ => Stop());
+            AddAsyncAction("restart", _ => Restart());
             AddAction("getstatus", _ => GetStatus());
         }
 
@@ -30,7 +30,7 @@ namespace Micser.Engine.Api
             return _audioEngine.IsRunning;
         }
 
-        private async Task<bool> Restart()
+        private async Task<object> Restart()
         {
             _audioEngine.Stop();
             _audioEngine.Start();
@@ -40,7 +40,7 @@ namespace Micser.Engine.Api
             return true;
         }
 
-        private async Task<bool> Start()
+        private async Task<object> Start()
         {
             _audioEngine.Start();
 
@@ -49,7 +49,7 @@ namespace Micser.Engine.Api
             return true;
         }
 
-        private async Task<bool> Stop()
+        private async Task<object> Stop()
         {
             _audioEngine.Stop();
 
