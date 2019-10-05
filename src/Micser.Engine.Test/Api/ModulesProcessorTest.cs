@@ -20,7 +20,7 @@ namespace Micser.Engine.Test.Api
         }
 
         [Fact]
-        public async Task Delete()
+        public async Task DeleteExisting()
         {
             var audioEngineMock = new Mock<IAudioEngine>();
             var moduleServiceMock = new Mock<IModuleService>();
@@ -38,6 +38,21 @@ namespace Micser.Engine.Test.Api
             var content = result.Content as ModuleDto;
             Assert.NotNull(content);
             Assert.Equal(4, content.Id);
+        }
+
+        [Fact]
+        public async Task DeleteNotExisting()
+        {
+            var audioEngineMock = new Mock<IAudioEngine>();
+            var moduleServiceMock = new Mock<IModuleService>();
+            var connectionServiceMock = new Mock<IModuleConnectionService>();
+
+            var modulesProcessor = new ModulesProcessor(audioEngineMock.Object, moduleServiceMock.Object, connectionServiceMock.Object, LogManager.GetCurrentClassLogger());
+
+            var result = await modulesProcessor.ProcessAsync("delete", 0L).ConfigureAwait(false);
+
+            Assert.NotNull(result);
+            Assert.False(result.IsSuccess);
         }
 
         [Fact]
