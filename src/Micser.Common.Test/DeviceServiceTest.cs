@@ -22,9 +22,10 @@ namespace Micser.Common.Test
             var devices = service.GetDevices(DeviceType.Input);
             var devicesArray = devices.ToArray();
 
-            Assert.True(devicesArray.Length > 0);
+            Assert.NotNull(devicesArray);
             foreach (var deviceDescription in devicesArray)
             {
+                Assert.NotNull(deviceDescription.Id);
                 _testOutputHelper.WriteLine($"{deviceDescription.FriendlyName}: {deviceDescription.Id}");
             }
         }
@@ -37,9 +38,10 @@ namespace Micser.Common.Test
             var devices = service.GetDevices(DeviceType.Output);
             var devicesArray = devices.ToArray();
 
-            Assert.True(devicesArray.Length > 0);
+            Assert.NotNull(devicesArray);
             foreach (var deviceDescription in devicesArray)
             {
+                Assert.NotNull(deviceDescription.Id);
                 _testOutputHelper.WriteLine($"{deviceDescription.FriendlyName}: {deviceDescription.Id}");
             }
         }
