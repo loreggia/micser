@@ -35,7 +35,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Micser.App.Prism\Micser.App.Prism.csproj" />
-    <ProjectReference Include="..\Micser.Common.Core\Micser.Common.csproj" />
+    <ProjectReference Include="..\Micser.Common\Micser.Common.csproj" />
   </ItemGroup>
 
   <ItemGroup>

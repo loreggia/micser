@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
@@ -7,7 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="CSCore" Version="1.2.1.2" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.3.0" />
     <PackageReference Include="Moq" Version="4.13.0" />
     <PackageReference Include="xunit" Version="2.4.1" />
@@ -22,7 +21,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Micser.Plugins.Main.Core\Micser.Plugins.Main.csproj" />
+    <ProjectReference Include="..\Micser.Common.Test\Micser.Common.Test.csproj" />
+    <ProjectReference Include="..\Micser.Engine.Infrastructure\Micser.Engine.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="DataAccess\" />
   </ItemGroup>
 
 </Project>
