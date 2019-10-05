@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
@@ -13,4 +13,12 @@
     <PackageReference Include="Unity" Version="5.11.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Micser.BuildTasks\Micser.BuildTasks.csproj">
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+      <Private>false</Private>
+    </ProjectReference>
+  </ItemGroup>
+
+  <Import Project="$(ProjectDir)Build\Micser.Common.targets" />
 </Project>
