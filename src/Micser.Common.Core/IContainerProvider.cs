@@ -19,6 +19,8 @@ namespace Micser.Common
 
         object Resolve(Type type, string name = null);
 
+        object Resolve(Type type, string name, params DependencyOverride[] dependencyOverrides);
+
         IEnumerable<object> ResolveAll(Type type);
     }
 }

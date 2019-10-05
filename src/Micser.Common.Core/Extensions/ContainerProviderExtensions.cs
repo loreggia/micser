@@ -78,6 +78,7 @@ namespace Micser.Common.Extensions
         }
 
         public static void RegisterType<TFrom, TTo>(this IContainerProvider container, string name = null)
+            where TTo : TFrom
         {
             container.RegisterType(typeof(TFrom), typeof(TTo), name);
         }
@@ -115,6 +116,11 @@ namespace Micser.Common.Extensions
         public static T Resolve<T>(this IContainerProvider containerProvider, string name = null)
         {
             return (T)containerProvider.Resolve(typeof(T), name);
+        }
+
+        public static T Resolve<T>(this IContainerProvider containerProvider, string name, params DependencyOverride[] dependencyOverrides)
+        {
+            return (T)containerProvider.Resolve(typeof(T), name, dependencyOverrides);
         }
 
         public static IEnumerable<T> ResolveAll<T>(this IContainerProvider container)

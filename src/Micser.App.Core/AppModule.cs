@@ -67,7 +67,7 @@ namespace Micser.App
             container.RegisterFactory<ILogger>(c => LogManager.GetCurrentClassLogger());
 
             container.RegisterType<DbContext, AppDbContext>();
-            container.RegisterInstance<IRepositoryFactory>(new RepositoryFactory(t => (IRepository)container.Resolve(t)));
+            container.RegisterInstance<IRepositoryFactory>(new RepositoryFactory((t, c) => (IRepository)container.Resolve(t, null, new DependencyOverride<DbContext>(c))));
             container.RegisterInstance<IUnitOfWorkFactory>(new UnitOfWorkFactory(() => container.Resolve<IUnitOfWork>()));
             container.RegisterType<IUnitOfWork, UnitOfWork>();
 

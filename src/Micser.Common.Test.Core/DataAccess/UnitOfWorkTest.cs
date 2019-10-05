@@ -1,52 +1,30 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Micser.Common.DataAccess;
-using Micser.Common.DataAccess.Repositories;
-using System.ComponentModel.DataAnnotations;
-using Unity;
+using Micser.Common.Extensions;
 using Xunit;
 
 namespace Micser.Common.Test.DataAccess
 {
-    public class TestDbContext : DbContext
-    {
-        public DbSet<TestModel> TestModels { get; set; }
-
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlite("Data source=test.db");
-
-            base.OnConfiguring(optionsBuilder);
-        }
-    }
-
-    public class TestModel
-    {
-        public string Content { get; set; }
-
-        [Key]
-        public long Id { get; set; }
-    }
-
     public class UnitOfWorkTest
     {
         [Fact]
         public void IsCreatingNewUoW()
         {
-            var container = new UnityContainer();
+            var container = new UnityContainerProvider();
             container.RegisterType<DbContext, TestDbContext>();
-            container.RegisterInstance<IRepositoryFactory>(new RepositoryFactory(t => (IRepository)container.Resolve(t)));
+            container.RegisterInstance<IRepositoryFactory>(new RepositoryFactory((t, c) => (IRepository)container.Resolve(t, null, new DependencyOverride<DbContext>(c))));
             container.RegisterInstance<IUnitOfWorkFactory>(new UnitOfWorkFactory(() => container.Resolve<IUnitOfWork>()));
             container.RegisterType<IUnitOfWork, UnitOfWork>();
 
-            container.RegisterType<ISettingValueRepository, SettingValueRepository>();
+            container.RegisterType<ITestModelRepository, TestModelRepository>();
 
             var factory = container.Resolve<IUnitOfWorkFactory>();
             var uow1 = factory.Create();
-            var repo1 = uow1.GetRepository<ISettingValueRepository>();
+            var repo1 = uow1.GetRepository<ITestModelRepository>();
             uow1.Dispose();
 
             var uow2 = factory.Create();
-            var repo2 = uow2.GetRepository<ISettingValueRepository>();
+            var repo2 = uow2.GetRepository<ITestModelRepository>();
             uow2.Dispose();
 
             Assert.NotSame(uow1, uow2);
@@ -54,7 +32,30 @@ namespace Micser.Common.Test.DataAccess
         }
 
         [Fact]
-        public void SaveData()
+        public void IsSameDbContext()
+        {
+            var container = new UnityContainerProvider();
+            container.RegisterType<DbContext, TestDbContext>();
+            container.RegisterInstance<IRepositoryFactory>(new RepositoryFactory((t, c) => (IRepository)container.Resolve(t, null, new DependencyOverride<DbContext>(c))));
+            container.RegisterInstance<IUnitOfWorkFactory>(new UnitOfWorkFactory(() => container.Resolve<IUnitOfWork>()));
+            container.RegisterType<IUnitOfWork, TestUnitOfWork>();
+
+            container.RegisterType<ITestModelRepository, TestModelRepository>();
+
+            var factory = container.Resolve<IUnitOfWorkFactory>();
+            using (var uow = factory.Create())
+            {
+                var uowContext = ((TestUnitOfWork)uow).DbContext;
+
+                var repository = uow.GetRepository<ITestModelRepository>();
+                var repositoryContext = ((TestModelRepository)repository).DbContext;
+
+                Assert.Same(uowContext, repositoryContext);
+            }
+        }
+
+        [Fact]
+        public void IsSavingData()
         {
             var testModel = new TestModel { Content = "Test1" };
 

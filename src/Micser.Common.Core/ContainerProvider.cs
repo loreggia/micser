@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Unity;
 using Unity.Lifetime;
+using Unity.Resolution;
 
 namespace Micser.Common
 {
@@ -53,6 +55,16 @@ namespace Micser.Common
         public object Resolve(Type type, string name)
         {
             return _container.Resolve(type, name);
+        }
+
+        public object Resolve(Type type, string name, params DependencyOverride[] dependencyOverrides)
+        {
+            var overrides = dependencyOverrides
+                .Select(x => new Unity.Resolution.DependencyOverride(x.DependencyType, x.Instance))
+                .Cast<ResolverOverride>()
+                .ToArray();
+
+            return _container.Resolve(type, name, overrides);
         }
 
         public IEnumerable<object> ResolveAll(Type type)
