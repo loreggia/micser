@@ -25,4 +25,8 @@
     <ProjectReference Include="..\Micser.Engine.Infrastructure.Core\Micser.Engine.Infrastructure.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="DataAccess\" />
+  </ItemGroup>
+
 </Project>

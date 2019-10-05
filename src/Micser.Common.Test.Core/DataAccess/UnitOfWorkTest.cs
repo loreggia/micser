@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Micser.Common.DataAccess;
 using Micser.Common.DataAccess.Repositories;
+using System.ComponentModel.DataAnnotations;
 using Unity;
 using Xunit;
 
@@ -8,6 +9,22 @@ namespace Micser.Common.Test.DataAccess
 {
     public class TestDbContext : DbContext
     {
+        public DbSet<TestModel> TestModels { get; set; }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseSqlite("Data source=test.db");
+
+            base.OnConfiguring(optionsBuilder);
+        }
+    }
+
+    public class TestModel
+    {
+        public string Content { get; set; }
+
+        [Key]
+        public long Id { get; set; }
     }
 
     public class UnitOfWorkTest
@@ -34,6 +51,34 @@ namespace Micser.Common.Test.DataAccess
 
             Assert.NotSame(uow1, uow2);
             Assert.NotSame(repo1, repo2);
+        }
+
+        [Fact]
+        public void SaveData()
+        {
+            var testModel = new TestModel { Content = "Test1" };
+
+            using (var db = new TestDbContext())
+            {
+                db.Database.EnsureDeleted();
+                db.Database.EnsureCreated();
+            }
+
+            using (var db = new TestDbContext())
+            {
+                db.TestModels.Add(testModel);
+                db.SaveChanges();
+            }
+
+            Assert.NotEqual(0, testModel.Id);
+
+            using (var db = new TestDbContext())
+            {
+                var result = db.TestModels.Find(testModel.Id);
+
+                Assert.NotNull(result);
+                Assert.Equal(testModel.Content, result.Content);
+            }
         }
     }
 }

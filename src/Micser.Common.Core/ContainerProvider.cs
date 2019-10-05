@@ -30,7 +30,7 @@ namespace Micser.Common
             _container.RegisterInstance(from, name, instance);
         }
 
-        public void RegisterInstance(object instance, string name = null)
+        public void RegisterInstance<T>(T instance, string name = null)
         {
             _container.RegisterInstance(name, instance);
         }

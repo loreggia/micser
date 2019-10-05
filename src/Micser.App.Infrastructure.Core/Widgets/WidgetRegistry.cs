@@ -16,6 +16,6 @@ namespace Micser.App.Infrastructure.Widgets
         }
 
         /// <inheritdoc />
-        public IEnumerable<WidgetDescription> Widgets => _container.Resolve<IEnumerable<WidgetDescription>>();
+        public IEnumerable<WidgetDescription> Widgets => _container.ResolveAll<WidgetDescription>();
     }
 }
