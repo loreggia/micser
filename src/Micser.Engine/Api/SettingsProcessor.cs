@@ -14,7 +14,7 @@ namespace Micser.Engine.Api
         {
             _settingsService = settingsService;
             AddAction("getsetting", key => GetValue(key));
-            AddAction("setsetting", dto => SetValueAsync(dto));
+            AddAsyncAction("setsetting", dto => SetValueAsync(dto));
         }
 
         private object GetValue(string key)

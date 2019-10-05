@@ -41,7 +41,7 @@ namespace Micser.Common.Api
         /// <param name="name">The name of the action (case insensitive).</param>
         /// <param name="action">An async action function.</param>
         /// <exception cref="ArgumentNullException"><paramref name="action"/> cannot be null.</exception>
-        public void AddAction(string name, Func<dynamic, Task<object>> action)
+        public void AddAsyncAction(string name, Func<dynamic, Task<object>> action)
         {
             name = name ?? "";
             _actions[name.ToLower()] = action ?? throw new ArgumentNullException(nameof(action));
