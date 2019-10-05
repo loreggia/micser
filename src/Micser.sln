@@ -26,11 +26,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Plugins", "Plugins", "{99E2
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Doc", "Doc", "{3C6959B4-BB20-417E-A105-BD99D25F229B}"
 	ProjectSection(SolutionItems) = preProject
-		..\doc\compressor-curve.html = ..\doc\compressor-curve.html
-		..\doc\compressor-curve2.html = ..\doc\compressor-curve2.html
 		..\License.md = ..\License.md
 		..\Readme.md = ..\Readme.md
-		..\doc\Reiss-Tutorialondynamicrangecompression.pdf = ..\doc\Reiss-Tutorialondynamicrangecompression.pdf
 		..\doc\ReleaseNotes.txt = ..\doc\ReleaseNotes.txt
 	EndProjectSection
 EndProject
