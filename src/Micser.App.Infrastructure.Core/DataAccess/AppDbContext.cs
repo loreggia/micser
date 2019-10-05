@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Configuration;
 using Micser.Common;
 using Micser.Common.DataAccess.Models;
+using System.IO;
 
 namespace Micser.App.Infrastructure.DataAccess
 {
@@ -28,7 +29,18 @@ namespace Micser.App.Infrastructure.DataAccess
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             var cs = _configuration.GetConnectionString("DefaultConnection");
-            cs = cs.Replace(Globals.ConnectionStringFolder, Globals.AppDataFolder);
+            var directory = Globals.AppDataFolder;
+
+#if DEBUG
+            directory = Path.Combine(directory, "Debug");
+#endif
+
+            if (!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            cs = cs.Replace(Globals.ConnectionStringFolder, directory);
             optionsBuilder.UseSqlite(cs);
 
             base.OnConfiguring(optionsBuilder);

@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Micser.Common.DataAccess
 {
@@ -11,6 +12,7 @@ namespace Micser.Common.DataAccess
         /// Gets or sets the ID key property.
         /// </summary>
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public long Id { get; set; }
     }
 }

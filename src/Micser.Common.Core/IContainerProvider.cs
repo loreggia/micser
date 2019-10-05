@@ -9,7 +9,7 @@ namespace Micser.Common
 
         void RegisterInstance(Type from, object instance, string name = null);
 
-        void RegisterInstance(object instance, string name = null);
+        void RegisterInstance<T>(T instance, string name = null);
 
         void RegisterSingleton(Type from, Type to, string name = null);
 
