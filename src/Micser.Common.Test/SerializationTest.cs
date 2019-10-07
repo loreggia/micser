@@ -1,6 +1,5 @@
 ﻿using Micser.Common.Modules;
 using Newtonsoft.Json;
-using System.Windows;
 using Xunit;
 
 namespace Micser.Common.Test
@@ -18,8 +17,8 @@ namespace Micser.Common.Test
                 {
                     Data =
                     {
-                        {"Position", new Point(1, 2)},
-                        {"Size", new Size(3, 4)}
+                        {"Position", "1,2"},
+                        {"Size", "3,4"}
                     }
                 },
                 WidgetType = "TestType2"
