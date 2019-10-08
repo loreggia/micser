@@ -20,5 +20,4 @@
     </ProjectReference>
   </ItemGroup>
 
-  <Import Project="$(ProjectDir)Build\Micser.Common.targets" />
 </Project>
