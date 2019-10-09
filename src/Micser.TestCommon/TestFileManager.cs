@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Xunit.Abstractions;
 
-namespace Micser.Common.Test
+namespace Micser.TestCommon
 {
     public class TestFileManager
     {

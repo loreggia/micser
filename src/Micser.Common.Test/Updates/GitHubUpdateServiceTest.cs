@@ -1,4 +1,5 @@
 ﻿using Micser.Common.Updates;
+using Micser.TestCommon;
 using NLog;
 using System.Threading.Tasks;
 using Xunit;
@@ -10,7 +11,7 @@ namespace Micser.Common.Test.Updates
     {
         public GitHubUpdateServiceTest(ITestOutputHelper testOutputHelper)
         {
-            TestOutputHelperTarget.ConfigureLogger(testOutputHelper);
+            TestOutputLogger.Configure(testOutputHelper);
         }
 
         [Fact]

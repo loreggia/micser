@@ -1,9 +1,8 @@
 ﻿using NLog;
-using NLog.Config;
 using NLog.Targets;
 using Xunit.Abstractions;
 
-namespace Micser.Common.Test
+namespace Micser.TestCommon
 {
     [Target("Test")]
     public class TestOutputHelperTarget : TargetWithLayout
@@ -13,14 +12,6 @@ namespace Micser.Common.Test
         public TestOutputHelperTarget(ITestOutputHelper testOutputHelper)
         {
             _testOutputHelper = testOutputHelper;
-        }
-
-        public static void ConfigureLogger(ITestOutputHelper testOutputHelper)
-        {
-            var config = new LoggingConfiguration();
-            config.AddTarget("Test", new TestOutputHelperTarget(testOutputHelper));
-            config.AddRuleForAllLevels("Test");
-            LogManager.Configuration = config;
         }
 
         protected override void Write(LogEventInfo logEvent)
