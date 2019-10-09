@@ -57,7 +57,13 @@ namespace Micser.Common.Updates
             client.DefaultRequestHeaders.Add("Accept", AcceptHeader);
             client.DefaultRequestHeaders.Add("User-Agent", UserAgentHeader);
 
-            await using var stream = await client.GetStreamAsync(GetLatestReleaseUrlPath).ConfigureAwait(false);
+            var response = await client.GetAsync(GetLatestReleaseUrlPath).ConfigureAwait(false);
+            if (!response.IsSuccessStatusCode)
+            {
+                return null;
+            }
+
+            await using var stream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
             using var streamReader = new StreamReader(stream);
             using var reader = new JsonTextReader(streamReader);
             var serializer = JsonSerializer.CreateDefault();
