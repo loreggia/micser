@@ -1,4 +1,5 @@
 ﻿using Micser.Common.Api;
+using Micser.TestCommon;
 using Moq;
 using NLog;
 using System.Collections.Generic;
@@ -17,7 +18,7 @@ namespace Micser.Common.Test.Api
         public ApiServerTest(ITestOutputHelper testOutputHelper)
         {
             _testOutputHelper = testOutputHelper;
-            TestOutputHelperTarget.ConfigureLogger(testOutputHelper);
+            TestOutputLogger.Configure(testOutputHelper);
         }
 
         [Fact]

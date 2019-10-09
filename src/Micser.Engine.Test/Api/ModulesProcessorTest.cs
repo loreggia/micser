@@ -1,8 +1,8 @@
 ﻿using Micser.Common.Audio;
 using Micser.Common.Modules;
-using Micser.Common.Test;
 using Micser.Engine.Api;
 using Micser.Engine.Infrastructure.Services;
+using Micser.TestCommon;
 using Moq;
 using NLog;
 using System.Collections.Generic;
@@ -16,7 +16,7 @@ namespace Micser.Engine.Test.Api
     {
         public ModulesProcessorTest(ITestOutputHelper testOutputHelper)
         {
-            TestOutputHelperTarget.ConfigureLogger(testOutputHelper);
+            TestOutputLogger.Configure(testOutputHelper);
         }
 
         [Fact]

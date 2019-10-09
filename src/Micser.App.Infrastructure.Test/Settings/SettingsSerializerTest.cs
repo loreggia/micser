@@ -1,5 +1,5 @@
 ﻿using Micser.Common.Settings;
-using Micser.Common.Test;
+using Micser.TestCommon;
 using Moq;
 using Newtonsoft.Json.Linq;
 using NLog;
@@ -18,7 +18,7 @@ namespace Micser.App.Infrastructure.Test.Settings
         public SettingsSerializerTest(ITestOutputHelper testOutputHelper)
         {
             _testFileManager = new TestFileManager(testOutputHelper);
-            TestOutputHelperTarget.ConfigureLogger(testOutputHelper);
+            TestOutputLogger.Configure(testOutputHelper);
         }
 
         public void Dispose()
