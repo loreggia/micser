@@ -50,7 +50,7 @@ namespace Micser.Common.Api
                 await _pipe.DisposeAsync().ConfigureAwait(false);
             }
 
-            _pipe = new NamedPipeServerStream(_configuration.PipeName, PipeDirection.InOut, 1, PipeTransmissionMode.Message, PipeOptions.Asynchronous);
+            _pipe = new NamedPipeServerStream(_configuration.PipeName, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
             _pipe.BeginWaitForConnection(OnConnectionReceived, null);
 
             return true;
@@ -91,13 +91,13 @@ namespace Micser.Common.Api
                     var emptyByteArray = new byte[0];
                     await _pipe.ReadAsync(emptyByteArray, 0, 0, _cancellationTokenSource.Token).ConfigureAwait(false);
 
-                    var request = Serializer.Deserialize<ApiRequest>(_pipe);
+                    var request = Serializer.DeserializeWithLengthPrefix<ApiRequest>(_pipe, PrefixStyle.Base128);
                     var requestProcessor = _requestProcessorFactory.Create(request.Resource);
                     var response = await requestProcessor.ProcessAsync(request.Action, request.Content).ConfigureAwait(false);
 
                     // don't block when writing the response either
                     var ms = new MemoryStream();
-                    Serializer.Serialize(ms, response);
+                    Serializer.SerializeWithLengthPrefix(ms, response, PrefixStyle.Base128);
                     await _pipe.WriteAsync(ms.GetBuffer(), 0, (int)ms.Length, _cancellationTokenSource.Token).ConfigureAwait(false);
                 }
                 catch (Exception ex)
