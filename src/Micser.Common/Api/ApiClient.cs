@@ -77,13 +77,13 @@ namespace Micser.Common.Api
             }
 
             var ms = new MemoryStream();
-            Serializer.Serialize(ms, request);
+            Serializer.SerializeWithLengthPrefix(ms, request, PrefixStyle.Base128);
             await _pipe.WriteAsync(ms.GetBuffer(), 0, (int)ms.Length).ConfigureAwait(false);
 
             // "dummy" read (0 bytes) so the thread is not blocked and can be cancelled with the cancellation token
             var emptyByteArray = new byte[0];
             await _pipe.ReadAsync(emptyByteArray, 0, 0).ConfigureAwait(false);
-            return Serializer.Deserialize<ApiResponse>(_pipe);
+            return Serializer.DeserializeWithLengthPrefix<ApiResponse>(_pipe, PrefixStyle.Base128);
         }
 
         protected override void Dispose(bool disposing)

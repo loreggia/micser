@@ -20,50 +20,12 @@ namespace Micser.Common.Test.Api
 
         [Fact]
         [Trait("Category", "Network")]
-        public async Task BiDirectionalMessaging()
-        {
-            var configuration = GetConfiguration();
-            var factory = GetFactory();
-
-            _testOutputHelper.WriteLine($"{nameof(ClientReconnect)}: using pipe {configuration.PipeName}");
-
-            using (var server = new ApiServer(configuration, factory, LogManager.GetLogger("Server")))
-            using (var client = new ApiClient(configuration, LogManager.GetLogger("Client")))
-            {
-                var startResult = await server.StartServerAsync();
-                Assert.True(startResult);
-
-                var connectResult = await client.ConnectAsync();
-                Assert.True(connectResult);
-
-                var response = await client.SendMessageAsync(new ApiRequest("Resource", "Action", "Content"));
-                Assert.NotNull(response);
-            }
-        }
-
-        [Fact]
-        [Trait("Category", "Network")]
         public async Task ClientReconnect()
         {
             var configuration = GetConfiguration();
             var factory = GetFactory();
 
             _testOutputHelper.WriteLine($"{nameof(ClientReconnect)}: using pipe {configuration.PipeName}");
-
-            using (var server = new ApiServer(configuration, factory, LogManager.GetLogger("Server")))
-            using (var client = new ApiClient(configuration, LogManager.GetLogger("Client")))
-            {
-            }
-        }
-
-        [Fact]
-        [Trait("Category", "Network")]
-        public async Task SendClientToServer()
-        {
-            var configuration = GetConfiguration();
-            var factory = GetFactory();
-
-            _testOutputHelper.WriteLine($"{nameof(SendClientToServer)}: using pipe {configuration.PipeName}");
 
             using (var server = new ApiServer(configuration, factory, LogManager.GetLogger("Server")))
             using (var client = new ApiClient(configuration, LogManager.GetLogger("Client")))
@@ -88,16 +50,26 @@ namespace Micser.Common.Test.Api
 
         [Fact]
         [Trait("Category", "Network")]
-        public async Task SendServerToClient()
+        public async Task SendMessage()
         {
             var configuration = GetConfiguration();
             var factory = GetFactory();
 
-            _testOutputHelper.WriteLine($"{nameof(SendServerToClient)}: using pipe {configuration.PipeName}");
+            _testOutputHelper.WriteLine($"{nameof(ClientReconnect)}: using pipe {configuration.PipeName}");
 
             using (var server = new ApiServer(configuration, factory, LogManager.GetLogger("Server")))
             using (var client = new ApiClient(configuration, LogManager.GetLogger("Client")))
             {
+                var startResult = await server.StartServerAsync();
+                Assert.True(startResult);
+
+                var connectResult = await client.ConnectAsync();
+                Assert.True(connectResult);
+
+                var response = await client.SendMessageAsync(new ApiRequest("Resource", "Action", "Content"));
+                Assert.NotNull(response);
+                Assert.True(response.IsSuccess);
+                Assert.Equal("Content", response.Content);
             }
         }
 
