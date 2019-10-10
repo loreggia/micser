@@ -16,6 +16,24 @@ namespace Micser.Common.Test.Api
         }
 
         [Fact]
+        public async Task ConnectMultipleClients_IsFailure()
+        {
+            var configuration = ApiTestHelper.GetConfiguration();
+            var factory = ApiTestHelper.GetRequestProcessorFactory();
+
+            using var server = new ApiServer(configuration, factory, LogManager.GetLogger("Server"));
+            using var client1 = new ApiClient(configuration, LogManager.GetLogger("Client1"));
+            using var client2 = new ApiClient(configuration, LogManager.GetLogger("Client2"));
+
+            var result = await server.StartAsync();
+            Assert.True(result);
+            result = await client1.ConnectAsync();
+            Assert.True(result);
+            result = await client2.ConnectAsync();
+            Assert.False(result);
+        }
+
+        [Fact]
         public async Task StartServer_IsSuccess()
         {
             var configuration = ApiTestHelper.GetConfiguration();

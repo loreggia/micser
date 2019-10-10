@@ -5,7 +5,7 @@ namespace Micser.Common.Api
     /// <summary>
     /// An API endpoint that acts as the server when establishing a connection.
     /// </summary>
-    public interface IApiServer : IApiEndPoint
+    public interface IApiServer
     {
         /// <summary>
         /// Gets the current server state.

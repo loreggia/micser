@@ -48,7 +48,7 @@ namespace Micser.App.ViewModels
             for (int i = 0; i < 5; i++)
             {
                 var result = await _apiClient.ConnectAsync();
-                isConnected = result || _apiClient.ConnectionState == ConnectionState.Connected;
+                isConnected = result || _apiClient.State == ConnectionState.Connected;
 
                 if (isConnected)
                 {
