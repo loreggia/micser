@@ -7,12 +7,12 @@
     public class ServiceResult<TData>
     {
         /// <inheritdoc />
-        public ServiceResult(JsonResponse message)
+        public ServiceResult(ApiResponse message, bool isConnected = true)
         {
             IsSuccess = message.IsSuccess;
             Message = message.Message;
             Data = message.Content is TData data ? data : default;
-            IsConnected = message.IsConnected;
+            IsConnected = isConnected;//todo
         }
 
         /// <summary>

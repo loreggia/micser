@@ -1,174 +1,110 @@
-﻿using Micser.Common.Extensions;
-using NLog;
+﻿using NLog;
+using ProtoBuf;
 using System;
-using System.Net;
-using System.Net.Sockets;
+using System.IO;
+using System.IO.Pipes;
+using System.Threading;
 using System.Threading.Tasks;
-
-#pragma warning disable 4014
 
 namespace Micser.Common.Api
 {
-    /// <inheritdoc cref="IApiServer" />
-    public class ApiServer : ApiEndPoint, IApiServer
+    public class ApiServer : DisposableBase, IApiServer
     {
-        private readonly TcpListener _listener;
+        private readonly IApiServerConfiguration _configuration;
+        private readonly ILogger _logger;
+        private readonly IRequestProcessorFactory _requestProcessorFactory;
+        private readonly object _stateLock = new object();
+        private CancellationTokenSource _cancellationTokenSource;
+        private NamedPipeServerStream _pipe;
 
-        /// <inheritdoc />
-        public ApiServer(IApiConfiguration configuration, IRequestProcessorFactory requestProcessorFactory, ILogger logger)
-            : base(configuration, requestProcessorFactory, logger)
+        public ApiServer(IApiServerConfiguration configuration, IRequestProcessorFactory requestProcessorFactory, ILogger logger)
         {
-            ServerState = ServerState.Stopped;
-            var endPoint = new IPEndPoint(IPAddress.Loopback, Configuration.Port);
-            _listener = new TcpListener(endPoint);
+            _configuration = configuration;
+            _requestProcessorFactory = requestProcessorFactory;
+            _logger = logger;
         }
 
-        /// <inheritdoc />
+        public ConnectionState ConnectionState { get; protected set; }
+
         public ServerState ServerState { get; protected set; }
 
-        /// <inheritdoc />
-        public override async Task<bool> ConnectAsync()
+        public async Task<bool> StartServerAsync()
         {
-            if (IsDisposed || State != EndPointState.Disconnected || ServerState != ServerState.Started)
-            {
-                return false;
-            }
-
-            try
-            {
-                Logger.Info("API server connecting");
-
-                lock (StateLock)
-                {
-                    if (State != EndPointState.Disconnected || ServerState != ServerState.Started)
-                    {
-                        return false;
-                    }
-
-                    State = EndPointState.Connecting;
-                }
-
-                InClient = await _listener.AcceptTcpClientAsync().ConfigureAwait(false);
-                InClient.Client.SetKeepAlive();
-                InStream = InClient.GetStream();
-
-                OutClient = await _listener.AcceptTcpClientAsync().ConfigureAwait(false);
-                OutClient.Client.SetKeepAlive();
-                OutStream = OutClient.GetStream();
-
-                lock (StateLock)
-                {
-                    State = EndPointState.Connected;
-                }
-
-                Logger.Info("API server connected");
-
-                Task.Run(ReaderThread);
-
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex);
-                return false;
-            }
-        }
-
-        /// <inheritdoc />
-        /// <exception cref="ObjectDisposedException" />
-        public bool Start()
-        {
-            if (IsDisposed)
-            {
-                throw new ObjectDisposedException(nameof(ApiServer));
-            }
-
-            Logger.Info($"Starting API server. Current state: {ServerState}");
-
             if (ServerState != ServerState.Stopped)
             {
-                return ServerState == ServerState.Started;
+                return false;
             }
 
-            lock (StateLock)
+            lock (_stateLock)
             {
                 if (ServerState != ServerState.Stopped)
                 {
-                    return ServerState == ServerState.Started;
+                    return false;
                 }
 
                 ServerState = ServerState.Starting;
             }
 
-            try
+            if (_pipe != null)
             {
-                _listener.Start();
-
-                lock (StateLock)
-                {
-                    ServerState = ServerState.Started;
-                }
-
-                Logger.Info("API server started");
-
-                return true;
+                await _pipe.DisposeAsync().ConfigureAwait(false);
             }
-            catch (Exception ex)
-            {
-                Logger.Error(ex);
-                return false;
-            }
+
+            _pipe = new NamedPipeServerStream(_configuration.PipeName, PipeDirection.InOut, 1, PipeTransmissionMode.Message, PipeOptions.Asynchronous);
+            _pipe.BeginWaitForConnection(OnConnectionReceived, null);
+
+            return true;
         }
 
-        /// <inheritdoc />
-        public void Stop()
+        public void StopServer()
         {
-            Logger.Info("Stopping server");
-
-            if (ServerState != ServerState.Started)
+            if (_cancellationTokenSource != null &&
+                !_cancellationTokenSource.IsCancellationRequested)
             {
-                return;
+                _cancellationTokenSource.Cancel();
             }
 
-            lock (StateLock)
-            {
-                if (ServerState != ServerState.Started)
-                {
-                    return;
-                }
-
-                ServerState = ServerState.Stopping;
-            }
-
-            try
-            {
-                _listener?.Stop();
-                Disconnect();
-            }
-            catch
-            {
-                // Ignored
-            }
-            finally
-            {
-                lock (StateLock)
-                {
-                    ServerState = ServerState.Stopped;
-                }
-
-                Logger.Info("Server stopped");
-            }
+            _pipe?.Dispose();
         }
 
-        /// <inheritdoc />
         protected override void Dispose(bool disposing)
         {
-            if (disposing)
-            {
-                Stop();
-            }
+            StopServer();
+        }
 
-            base.Dispose(disposing);
+        private void OnConnectionReceived(IAsyncResult ar)
+        {
+            _pipe.EndWaitForConnection(ar);
+
+            _cancellationTokenSource = new CancellationTokenSource();
+
+            Task.Run(ReaderThread);
+        }
+
+        private async Task ReaderThread()
+        {
+            while (!_cancellationTokenSource.IsCancellationRequested)
+            {
+                try
+                {
+                    // "dummy" read (0 bytes) so the thread is not blocked and can be cancelled with the cancellation token
+                    var emptyByteArray = new byte[0];
+                    await _pipe.ReadAsync(emptyByteArray, 0, 0, _cancellationTokenSource.Token).ConfigureAwait(false);
+
+                    var request = Serializer.Deserialize<ApiRequest>(_pipe);
+                    var requestProcessor = _requestProcessorFactory.Create(request.Resource);
+                    var response = await requestProcessor.ProcessAsync(request.Action, request.Content).ConfigureAwait(false);
+
+                    // don't block when writing the response either
+                    var ms = new MemoryStream();
+                    Serializer.Serialize(ms, response);
+                    await _pipe.WriteAsync(ms.GetBuffer(), 0, (int)ms.Length, _cancellationTokenSource.Token).ConfigureAwait(false);
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex);
+                }
+            }
         }
     }
 }

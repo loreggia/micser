@@ -2,7 +2,6 @@
 using NLog;
 using System;
 using System.IO;
-using System.Net.Sockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -31,34 +30,9 @@ namespace Micser.Common.Api
         protected readonly ILogger Logger;
 
         /// <summary>
-        /// The task that is created by the <see cref="ConnectAsync"/> method.
-        /// </summary>
-        protected Task ConnectTask;
-
-        /// <summary>
-        /// Client that handles incoming messages.
-        /// </summary>
-        protected TcpClient InClient;
-
-        /// <summary>
-        /// The TCP stream for receiving data.
-        /// </summary>
-        protected Stream InStream;
-
-        /// <summary>
         /// Indicates whether the instance has been disposed of.
         /// </summary>
         protected bool IsDisposed;
-
-        /// <summary>
-        /// Handles outgoing messages.
-        /// </summary>
-        protected TcpClient OutClient;
-
-        /// <summary>
-        /// The TCP stream for sending data.
-        /// </summary>
-        protected Stream OutStream;
 
         private readonly IRequestProcessorFactory _requestProcessorFactory;
         private readonly SemaphoreQueue _sendMessageSemaphore;

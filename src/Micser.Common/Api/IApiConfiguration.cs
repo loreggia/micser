@@ -5,9 +5,6 @@
     /// </summary>
     public interface IApiConfiguration
     {
-        /// <summary>
-        /// Gets the main TCP port to use for API communications.
-        /// </summary>
-        int Port { get; }
+        string PipeName { get; }
     }
 }

@@ -1,120 +1,93 @@
-﻿using Micser.Common.Extensions;
-using NLog;
+﻿using NLog;
+using ProtoBuf;
 using System;
-using System.Net;
-using System.Net.Sockets;
+using System.IO;
+using System.IO.Pipes;
 using System.Threading.Tasks;
-
-#pragma warning disable 4014
 
 namespace Micser.Common.Api
 {
-    /// <summary>
-    /// An API endpoint that acts as the client upon connection. Communication is otherwise bidirectional.
-    /// </summary>
-    public class ApiClient : ApiEndPoint
+    public class ApiClient : DisposableBase, IApiClient
     {
-        /// <summary>
-        /// Creates a new instance of the <see cref="ApiClient"/> class.
-        /// </summary>
-        public ApiClient(IApiConfiguration configuration, IRequestProcessorFactory requestProcessorFactory, ILogger logger)
-            : base(configuration, requestProcessorFactory, logger)
+        private const int ConnectTimeout = 1000;
+        private readonly IApiClientConfiguration _configuration;
+        private readonly ILogger _logger;
+        private readonly object _stateLock = new object();
+        private NamedPipeClientStream _pipe;
+
+        public ApiClient(IApiClientConfiguration configuration, ILogger logger)
         {
+            _configuration = configuration;
+            _logger = logger;
         }
 
-        /// <summary>
-        /// Tries to connect to an <see cref="ApiServer"/>. Waits until a connection is established.
-        /// </summary>
-        public override async Task<bool> ConnectAsync()
+        public ConnectionState ConnectionState { get; private set; }
+
+        public async Task<bool> ConnectAsync()
         {
-            if (IsDisposed || State != EndPointState.Disconnected)
+            if (ConnectionState != ConnectionState.Disconnected)
             {
                 return false;
             }
+
+            lock (_stateLock)
+            {
+                if (ConnectionState != ConnectionState.Disconnected)
+                {
+                    return false;
+                }
+
+                ConnectionState = ConnectionState.Connecting;
+            }
+
+            if (_pipe != null)
+            {
+                await _pipe.DisposeAsync().ConfigureAwait(false);
+            }
+
+            _pipe = new NamedPipeClientStream(".", _configuration.PipeName, PipeDirection.InOut, PipeOptions.Asynchronous);
 
             try
             {
-                Logger.Info("API client connecting");
+                await _pipe.ConnectAsync(ConnectTimeout);
 
-                lock (StateLock)
+                lock (_stateLock)
                 {
-                    if (State != EndPointState.Disconnected)
-                    {
-                        return false;
-                    }
-
-                    State = EndPointState.Connecting;
+                    ConnectionState = ConnectionState.Connected;
                 }
-
-                OutClient = new TcpClient();
-                await OutClient.ConnectAsync(IPAddress.Loopback, Configuration.Port).ConfigureAwait(false);
-                if (OutClient.Client == null)
-                {
-                    OutClient?.Dispose();
-                    OutClient = null;
-                    return false;
-                }
-
-                OutStream = OutClient.GetStream();
-                if (OutStream == null)
-                {
-                    OutClient?.Dispose();
-                    OutClient = null;
-                    return false;
-                }
-                OutClient.Client.SetKeepAlive();
-
-                InClient = new TcpClient();
-                await InClient.ConnectAsync(IPAddress.Loopback, Configuration.Port).ConfigureAwait(false);
-                if (InClient.Client == null)
-                {
-                    OutStream?.Dispose();
-                    OutClient?.Dispose();
-                    OutClient = null;
-                    InClient?.Dispose();
-                    InClient = null;
-                    return false;
-                }
-
-                InStream = InClient.GetStream();
-                if (InStream == null)
-                {
-                    OutStream?.Dispose();
-                    OutClient?.Dispose();
-                    OutClient = null;
-                    InClient?.Dispose();
-                    InClient = null;
-                    return false;
-                }
-                InClient.Client.SetKeepAlive();
-
-                lock (StateLock)
-                {
-                    State = EndPointState.Connected;
-                }
-
-                Logger.Info("API client connected");
-
-                Task.Run(ReaderThread);
 
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
-                Logger.Error(ex);
-
-                lock (StateLock)
-                {
-                    OutClient?.Dispose();
-                    OutClient = null;
-                    InClient?.Dispose();
-                    InClient = null;
-
-                    State = EndPointState.Disconnected;
-                }
-
                 return false;
             }
+        }
+
+        public void Disconnect()
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<ApiResponse> SendMessageAsync(ApiRequest request)
+        {
+            if (ConnectionState != ConnectionState.Connected && !(await ConnectAsync().ConfigureAwait(false)))
+            {
+                return new ApiResponse(false);
+            }
+
+            var ms = new MemoryStream();
+            Serializer.Serialize(ms, request);
+            await _pipe.WriteAsync(ms.GetBuffer(), 0, (int)ms.Length).ConfigureAwait(false);
+
+            // "dummy" read (0 bytes) so the thread is not blocked and can be cancelled with the cancellation token
+            var emptyByteArray = new byte[0];
+            await _pipe.ReadAsync(emptyByteArray, 0, 0).ConfigureAwait(false);
+            return Serializer.Deserialize<ApiResponse>(_pipe);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
         }
     }
 }

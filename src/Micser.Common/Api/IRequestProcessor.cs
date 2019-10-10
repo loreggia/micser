@@ -13,6 +13,6 @@ namespace Micser.Common.Api
         /// <param name="action">The action name that was sent in <see cref="JsonRequest.Action"/>.</param>
         /// <param name="content">The deserialized message content.</param>
         /// <returns>A <see cref="JsonResponse"/> that will be sent back.</returns>
-        Task<JsonResponse> ProcessAsync(string action, object content);
+        Task<ApiResponse> ProcessAsync(string action, object content);
     }
 }
