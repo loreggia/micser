@@ -82,9 +82,11 @@ namespace Micser.App
             container.RegisterSingleton<IWidgetFactory, WidgetFactory>();
 
             container.RegisterSingleton<IRequestProcessorFactory, RequestProcessorFactory>();
-            container.RegisterSingleton<IApiEndPoint, ApiClient>();
-            container.RegisterInstance<IApiConfiguration>(new ApiConfiguration { Port = Globals.ApiPort });
             container.RegisterType<IRequestProcessor, ApiEventRequestProcessor>();
+            container.RegisterSingleton<IApiServer, ApiServer>();
+            container.RegisterInstance<IApiServerConfiguration>(new ApiConfiguration { PipeName = Globals.AppPipeName });
+            container.RegisterSingleton<IApiClient, ApiClient>();
+            container.RegisterInstance<IApiClientConfiguration>(new ApiConfiguration { PipeName = Globals.EnginePipeName });
 
             container.RegisterSingleton<ISettingsRegistry, SettingsRegistry>();
             container.RegisterSingleton<ISettingsService, SettingsService>();

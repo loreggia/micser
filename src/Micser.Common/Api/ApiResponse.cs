@@ -6,7 +6,7 @@ namespace Micser.Common.Api
     /// A message that represents the response from an API call.
     /// </summary>
     [ProtoContract]
-    public class ApiResponse
+    public sealed class ApiResponse
     {
         /// <inheritdoc />
         public ApiResponse()

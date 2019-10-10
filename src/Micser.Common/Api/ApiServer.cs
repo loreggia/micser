@@ -26,23 +26,23 @@ namespace Micser.Common.Api
 
         public ConnectionState ConnectionState { get; protected set; }
 
-        public ServerState ServerState { get; protected set; }
+        public ServerState State { get; protected set; }
 
-        public async Task<bool> StartServerAsync()
+        public async Task<bool> StartAsync()
         {
-            if (ServerState != ServerState.Stopped)
+            if (State != ServerState.Stopped)
             {
                 return false;
             }
 
             lock (_stateLock)
             {
-                if (ServerState != ServerState.Stopped)
+                if (State != ServerState.Stopped)
                 {
                     return false;
                 }
 
-                ServerState = ServerState.Starting;
+                State = ServerState.Starting;
             }
 
             if (_pipe != null)
@@ -50,35 +50,92 @@ namespace Micser.Common.Api
                 await _pipe.DisposeAsync().ConfigureAwait(false);
             }
 
-            _pipe = new NamedPipeServerStream(_configuration.PipeName, PipeDirection.InOut, 1, PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
-            _pipe.BeginWaitForConnection(OnConnectionReceived, null);
+            try
+            {
+                _pipe = new NamedPipeServerStream(_configuration.PipeName, PipeDirection.InOut, 1,
+                    PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
+                _pipe.BeginWaitForConnection(OnConnectionReceived, null);
 
-            return true;
+                lock (_stateLock)
+                {
+                    State = ServerState.Started;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                _logger.Error(ex);
+                lock (_stateLock)
+                {
+                    State = ServerState.Stopped;
+                }
+                return false;
+            }
         }
 
-        public void StopServer()
+        public void Stop()
         {
-            if (_cancellationTokenSource != null &&
-                !_cancellationTokenSource.IsCancellationRequested)
+            if (State != ServerState.Started)
             {
-                _cancellationTokenSource.Cancel();
+                return;
             }
 
-            _pipe?.Dispose();
+            lock (_stateLock)
+            {
+                if (State != ServerState.Started)
+                {
+                    return;
+                }
+
+                State = ServerState.Stopping;
+            }
+
+            try
+            {
+                if (_cancellationTokenSource != null &&
+                    !_cancellationTokenSource.IsCancellationRequested)
+                {
+                    _cancellationTokenSource.Cancel();
+                }
+
+                _pipe?.Dispose();
+            }
+            finally
+            {
+                lock (_stateLock)
+                {
+                    State = ServerState.Stopped;
+                }
+            }
         }
 
         protected override void Dispose(bool disposing)
         {
-            StopServer();
+            try
+            {
+                Stop();
+            }
+            catch
+            {
+                // ignore
+            }
         }
 
         private void OnConnectionReceived(IAsyncResult ar)
         {
-            _pipe.EndWaitForConnection(ar);
+            try
+            {
+                _pipe.EndWaitForConnection(ar);
 
-            _cancellationTokenSource = new CancellationTokenSource();
+                _cancellationTokenSource = new CancellationTokenSource();
 
-            Task.Run(ReaderThread);
+                Task.Run(ReaderThread);
+            }
+            catch
+            {
+                Stop();
+            }
         }
 
         private async Task ReaderThread()

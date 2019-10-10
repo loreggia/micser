@@ -43,6 +43,7 @@ namespace Micser.Common.Extensions
         }
 
         public static void RegisterSingleton<TFrom, TTo>(this IContainerProvider container, string name = null)
+            where TTo : TFrom
         {
             container.RegisterSingleton(typeof(TFrom), typeof(TTo), name);
         }

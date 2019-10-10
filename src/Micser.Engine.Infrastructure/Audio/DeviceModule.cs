@@ -16,7 +16,7 @@ namespace Micser.Engine.Infrastructure.Audio
         /// <summary>
         /// The api end point for communication with the UI.
         /// </summary>
-        protected readonly IApiEndPoint ApiEndPoint;
+        protected readonly IApiClient ApiClient;
 
         /// <summary>
         /// The module service for access to the module DB.
@@ -26,9 +26,9 @@ namespace Micser.Engine.Infrastructure.Audio
         private DeviceDescription _deviceDescription;
 
         /// <inheritdoc />
-        protected DeviceModule(IApiEndPoint apiEndPoint, IModuleService moduleService)
+        protected DeviceModule(IApiClient apiClient, IModuleService moduleService)
         {
-            ApiEndPoint = apiEndPoint;
+            ApiClient = apiClient;
             ModuleService = moduleService;
 
             DeviceEnumerator = new MMDeviceEnumerator();
@@ -166,7 +166,7 @@ namespace Micser.Engine.Infrastructure.Audio
 
                     if (ModuleService.Update(moduleDto))
                     {
-                        ApiEndPoint.SendMessageAsync(new JsonRequest("modules", "refresh", moduleDto));
+                        ApiClient.SendMessageAsync(new ApiRequest("modules", "refresh", moduleDto));
                     }
                 }
                 else

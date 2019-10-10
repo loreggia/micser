@@ -20,12 +20,12 @@ namespace Micser.App.Infrastructure.Api
         /// <summary>
         /// Publishes an <see cref="ApiEvent"/> via <see cref="IEventAggregator"/> for incoming requests.
         /// </summary>
-        public Task<JsonResponse> ProcessAsync(string action, object content)
+        public Task<ApiResponse> ProcessAsync(string action, object content)
         {
             var apiEvent = _eventAggregator.GetEvent<ApiEvent>();
             var data = new ApiEvent.ApiData(action, content);
             apiEvent.Publish(data);
-            var result = data.Response ?? new JsonResponse(false);
+            var result = data.Response ?? new ApiResponse(false);
             return Task.FromResult(result);
         }
     }

@@ -26,8 +26,8 @@ namespace Micser.Plugins.Main.Modules
         private float _volume;
         private VolumeSource _volumeSource;
 
-        public DeviceOutputModule(IApiEndPoint apiEndPoint, IModuleService moduleService)
-            : base(apiEndPoint, moduleService)
+        public DeviceOutputModule(IApiClient apiClient, IModuleService moduleService)
+            : base(apiClient, moduleService)
         {
             _inputBuffers = new ConcurrentDictionary<long, WriteableBufferingSource>();
             _inputSources = new ConcurrentDictionary<long, ISampleSource>();

@@ -13,7 +13,7 @@ namespace Micser.App.ViewModels
 {
     public class StartupViewModel : ViewModelNavigationAware
     {
-        private readonly IApiEndPoint _apiEndPoint;
+        private readonly IApiClient _apiClient;
         private readonly INavigationManager _navigationManager;
         private readonly ISettingsService _settingsService;
 
@@ -22,11 +22,11 @@ namespace Micser.App.ViewModels
             IEventAggregator eventAggregator,
             INavigationManager navigationManager,
             ISettingsService settingsService,
-            IApiEndPoint apiEndPoint)
+            IApiClient apiClient)
         {
             _navigationManager = navigationManager;
             _settingsService = settingsService;
-            _apiEndPoint = apiEndPoint;
+            _apiClient = apiClient;
 
             IsBusy = true;
 
@@ -47,7 +47,8 @@ namespace Micser.App.ViewModels
 
             for (int i = 0; i < 5; i++)
             {
-                isConnected = _apiEndPoint.State == EndPointState.Connected;
+                var result = await _apiClient.ConnectAsync();
+                isConnected = result || _apiClient.ConnectionState == ConnectionState.Connected;
 
                 if (isConnected)
                 {

@@ -49,7 +49,9 @@ namespace Micser.Engine.Infrastructure
             container.RegisterInstance<ISettingHandlerFactory>(new SettingHandlerFactory(t => (ISettingHandler)container.Resolve(t)));
 
             container.RegisterSingleton<IApiServer, ApiServer>();
-            container.RegisterInstance<IApiConfiguration>(new ApiConfiguration { Port = Globals.ApiPort });
+            container.RegisterInstance<IApiServerConfiguration>(new ApiConfiguration { PipeName = Globals.EnginePipeName });
+            container.RegisterSingleton<IApiClient, ApiClient>();
+            container.RegisterInstance<IApiClientConfiguration>(new ApiConfiguration { PipeName = Globals.AppPipeName });
 
             container.RegisterSingleton<IRequestProcessorFactory, RequestProcessorFactory>();
 
