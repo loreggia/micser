@@ -19,7 +19,7 @@ namespace Micser.Common.Test.Api
         {
             var json = "{\"Content\":{\"IntProperty\":42,\"StringProperty\":\"Test\"},\"ContentType\":\"Micser.Common.Test.Api.JsonMessageTest+TestClass, Micser.Common.Test, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null\",\"IsSuccess\":true}";
 
-            var message = JsonConvert.DeserializeObject<JsonResponse>(json);
+            var message = JsonConvert.DeserializeObject<ApiResponse>(json);
 
             Assert.NotNull(message);
             Assert.NotNull(message.Content);

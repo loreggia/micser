@@ -9,10 +9,10 @@ namespace Micser.Common.Api
     public class SettingsApiClient
     {
         private const string ResourceName = Globals.ApiResources.Settings;
-        private readonly IApiEndPoint _apiEndPoint;
+        private readonly IApiClient _apiEndPoint;
 
         /// <inheritdoc />
-        public SettingsApiClient(IApiEndPoint apiEndPoint)
+        public SettingsApiClient(IApiClient apiEndPoint)
         {
             _apiEndPoint = apiEndPoint;
         }
@@ -22,7 +22,7 @@ namespace Micser.Common.Api
         /// </summary>
         public async Task<ServiceResult<SettingValueDto>> GetSetting(string key)
         {
-            var response = await _apiEndPoint.SendMessageAsync(new JsonRequest(ResourceName, "getsetting", key)).ConfigureAwait(false);
+            var response = await _apiEndPoint.SendMessageAsync(new ApiRequest(ResourceName, "getsetting", key)).ConfigureAwait(false);
             return new ServiceResult<SettingValueDto>(response);
         }
 
@@ -31,7 +31,7 @@ namespace Micser.Common.Api
         /// </summary>
         public async Task<ServiceResult<SettingValueDto>> SetSetting(string key, object value)
         {
-            var response = await _apiEndPoint.SendMessageAsync(new JsonRequest(ResourceName, "setsetting", new SettingValueDto { Key = key, Value = value })).ConfigureAwait(false);
+            var response = await _apiEndPoint.SendMessageAsync(new ApiRequest(ResourceName, "setsetting", new SettingValueDto { Key = key, Value = value })).ConfigureAwait(false);
             return new ServiceResult<SettingValueDto>(response);
         }
     }

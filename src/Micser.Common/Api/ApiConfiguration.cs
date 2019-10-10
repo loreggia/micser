@@ -1,9 +1,8 @@
 ﻿namespace Micser.Common.Api
 {
     /// <inheritdoc cref="IApiConfiguration" />
-    public class ApiConfiguration : IApiConfiguration
+    public class ApiConfiguration : IApiServerConfiguration, IApiClientConfiguration
     {
-        /// <inheritdoc />
-        public int Port { get; set; }
+        public string PipeName { get; set; }
     }
 }
