@@ -56,9 +56,6 @@ namespace Micser.Engine.Infrastructure
             container.RegisterSingleton<IRequestProcessorFactory, RequestProcessorFactory>();
 
             container.RegisterSingleton<IUpdateService, HttpUpdateService>();
-
-            var server = container.Resolve<IApiServer>();
-            container.RegisterInstance<IApiEndPoint>(server);
         }
     }
 }

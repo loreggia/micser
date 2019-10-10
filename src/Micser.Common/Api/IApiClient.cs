@@ -2,8 +2,13 @@
 
 namespace Micser.Common.Api
 {
-    public interface IApiClient : IApiEndPoint
+    public interface IApiClient
     {
+        /// <summary>
+        /// Gets the current connection state.
+        /// </summary>
+        ConnectionState State { get; }
+
         /// <summary>
         /// Tries to connect to the remote end point.
         /// </summary>

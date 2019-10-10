@@ -12,6 +12,7 @@ namespace Micser.Common.Api
     {
         private readonly IApiServerConfiguration _configuration;
         private readonly ILogger _logger;
+        private readonly SemaphoreSlim _readerSemaphore = new SemaphoreSlim(1, 1);
         private readonly IRequestProcessorFactory _requestProcessorFactory;
         private readonly object _stateLock = new object();
         private CancellationTokenSource _cancellationTokenSource;
@@ -22,11 +23,11 @@ namespace Micser.Common.Api
             _configuration = configuration;
             _requestProcessorFactory = requestProcessorFactory;
             _logger = logger;
+
+            _cancellationTokenSource = new CancellationTokenSource();
         }
 
-        public ConnectionState ConnectionState { get; protected set; }
-
-        public ServerState State { get; protected set; }
+        public ServerState State { get; private set; }
 
         public async Task<bool> StartAsync()
         {
@@ -99,10 +100,13 @@ namespace Micser.Common.Api
                     _cancellationTokenSource.Cancel();
                 }
 
+                _readerSemaphore.Wait(100);
                 _pipe?.Dispose();
+                _pipe = null;
             }
             finally
             {
+                _readerSemaphore.Release();
                 lock (_stateLock)
                 {
                     State = ServerState.Stopped;
@@ -128,9 +132,14 @@ namespace Micser.Common.Api
             {
                 _pipe.EndWaitForConnection(ar);
 
-                _cancellationTokenSource = new CancellationTokenSource();
+                if (_cancellationTokenSource.IsCancellationRequested)
+                {
+                    _cancellationTokenSource = new CancellationTokenSource();
+                }
 
-                Task.Run(ReaderThread);
+                var token = _cancellationTokenSource.Token;
+
+                Task.Run(() => ReaderThread(token), token);
             }
             catch
             {
@@ -138,17 +147,29 @@ namespace Micser.Common.Api
             }
         }
 
-        private async Task ReaderThread()
+        private async Task ReaderThread(CancellationToken ct)
         {
-            while (!_cancellationTokenSource.IsCancellationRequested)
+            while (true)
             {
+                ct.ThrowIfCancellationRequested();
+
                 try
                 {
                     // "dummy" read (0 bytes) so the thread is not blocked and can be cancelled with the cancellation token
                     var emptyByteArray = new byte[0];
                     await _pipe.ReadAsync(emptyByteArray, 0, 0, _cancellationTokenSource.Token).ConfigureAwait(false);
 
+                    ct.ThrowIfCancellationRequested();
+
+                    await _readerSemaphore.WaitAsync(ct);
+
                     var request = Serializer.DeserializeWithLengthPrefix<ApiRequest>(_pipe, PrefixStyle.Base128);
+
+                    if (request == null)
+                    {
+                        continue;
+                    }
+
                     var requestProcessor = _requestProcessorFactory.Create(request.Resource);
                     var response = await requestProcessor.ProcessAsync(request.Action, request.Content).ConfigureAwait(false);
 
@@ -157,9 +178,18 @@ namespace Micser.Common.Api
                     Serializer.SerializeWithLengthPrefix(ms, response, PrefixStyle.Base128);
                     await _pipe.WriteAsync(ms.GetBuffer(), 0, (int)ms.Length, _cancellationTokenSource.Token).ConfigureAwait(false);
                 }
+                catch (OperationCanceledException)
+                {
+                    throw;
+                }
                 catch (Exception ex)
                 {
                     _logger.Error(ex);
+                    _pipe.BeginWaitForConnection(OnConnectionReceived, null);
+                }
+                finally
+                {
+                    _readerSemaphore.Release();
                 }
             }
         }
