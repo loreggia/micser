@@ -10,16 +10,16 @@ namespace Micser.Common.Api
         /// <summary>
         /// Gets the current server state.
         /// </summary>
-        ServerState ServerState { get; }
+        ServerState State { get; }
 
         /// <summary>
         /// Starts listening for connections.
         /// </summary>
-        Task<bool> StartServerAsync();
+        Task<bool> StartAsync();
 
         /// <summary>
         /// Stops listening for connections.
         /// </summary>
-        void StopServer();
+        void Stop();
     }
 }

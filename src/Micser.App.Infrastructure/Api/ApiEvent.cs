@@ -33,7 +33,7 @@ namespace Micser.App.Infrastructure.Api
             /// <summary>
             /// Gets or sets the response to be sent back to the engine.
             /// </summary>
-            public JsonResponse Response { get; set; }
+            public ApiResponse Response { get; set; }
         }
     }
 }

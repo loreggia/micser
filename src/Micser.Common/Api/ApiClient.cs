@@ -1,6 +1,5 @@
 ﻿using NLog;
 using ProtoBuf;
-using System;
 using System.IO;
 using System.IO.Pipes;
 using System.Threading.Tasks;
@@ -60,13 +59,38 @@ namespace Micser.Common.Api
             }
             catch
             {
+                lock (_stateLock)
+                {
+                    ConnectionState = ConnectionState.Disconnected;
+                }
+
                 return false;
             }
         }
 
         public void Disconnect()
         {
-            throw new NotImplementedException();
+            if (ConnectionState != ConnectionState.Connected)
+            {
+                return;
+            }
+
+            lock (_stateLock)
+            {
+                if (ConnectionState != ConnectionState.Connected)
+                {
+                    return;
+                }
+
+                ConnectionState = ConnectionState.Disconnecting;
+            }
+
+            _pipe?.Dispose();
+
+            lock (_stateLock)
+            {
+                ConnectionState = ConnectionState.Disconnected;
+            }
         }
 
         public async Task<ApiResponse> SendMessageAsync(ApiRequest request)
@@ -88,6 +112,14 @@ namespace Micser.Common.Api
 
         protected override void Dispose(bool disposing)
         {
+            try
+            {
+                Disconnect();
+            }
+            catch
+            {
+                // ignore
+            }
         }
     }
 }

@@ -6,7 +6,7 @@ namespace Micser.Common.Api
     /// A message that represents the request of an API call.
     /// </summary>
     [ProtoContract]
-    public class ApiRequest
+    public sealed class ApiRequest
     {
         /// <inheritdoc />
         public ApiRequest()
@@ -14,7 +14,7 @@ namespace Micser.Common.Api
         }
 
         /// <summary>
-        /// Creates an instance of the <see cref="JsonRequest"/> class requesting a specific resource.
+        /// Creates an instance of the <see cref="ApiRequest"/> class requesting a specific resource.
         /// </summary>
         public ApiRequest(string resource, string action = null, object content = null)
         {

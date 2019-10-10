@@ -3,7 +3,6 @@ using Micser.App.Infrastructure;
 using Micser.App.Infrastructure.Themes;
 using Micser.App.Settings;
 using Micser.Common;
-using Micser.Common.Api;
 using Micser.Common.Extensions;
 using Micser.Common.Settings;
 using NLog;
@@ -18,7 +17,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Timers;
 using System.Windows;
 using System.Windows.Threading;
 using IContainerProvider = Micser.Common.IContainerProvider;
@@ -30,8 +28,6 @@ namespace Micser.App
         private const string Unique = "{50CD2933-87A9-4411-9577-56401F034A60}";
 
         private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
-        private readonly Timer _reconnectTimer;
-        private IApiEndPoint _apiEndPoint;
         private ArgumentDictionary _argumentDictionary;
         private IContainerProvider _containerProvider;
         private MainShell _shell;
@@ -41,9 +37,6 @@ namespace Micser.App
             InitializeComponent();
 
             DispatcherUnhandledException += OnDispatcherUnhandledException;
-
-            _reconnectTimer = new Timer(1000) { AutoReset = false };
-            _reconnectTimer.Elapsed += OnReconnectTimerElapsed;
         }
 
         [STAThread]
@@ -128,9 +121,6 @@ namespace Micser.App
 
         protected override void OnExit(ExitEventArgs e)
         {
-            _reconnectTimer.Stop();
-            _reconnectTimer.Dispose();
-
             if (_shell != null)
             {
                 var state = new ShellState
@@ -155,9 +145,6 @@ namespace Micser.App
 
         protected override void OnInitialized()
         {
-            _apiEndPoint = _containerProvider.Resolve<IApiEndPoint>();
-            _reconnectTimer.Start();
-
             Logger.Info("Ready");
             SetStatus("Ready");
         }
@@ -256,17 +243,6 @@ namespace Micser.App
 
             Logger.Error(e.Exception, "Unhandled application exception.");
             e.Handled = true;
-        }
-
-        private async void OnReconnectTimerElapsed(object sender, ElapsedEventArgs e)
-        {
-            if (_apiEndPoint != null &&
-                _apiEndPoint.State == EndPointState.Disconnected)
-            {
-                await _apiEndPoint.ConnectAsync().ConfigureAwait(false);
-            }
-
-            _reconnectTimer.Start();
         }
 
         private void SetStatus(string text)

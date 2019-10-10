@@ -7,14 +7,14 @@ namespace Micser.Plugins.Main.Modules
 {
     public class SpectrumModule : AudioModule
     {
-        private readonly IApiEndPoint _apiEndPoint;
+        private readonly IApiClient _apiClient;
         private readonly SpectrumSampleProcessor _sampleProcessor;
         private readonly Timer _timer;
         private bool _isDisposed;
 
-        public SpectrumModule(IApiEndPoint apiEndPoint)
+        public SpectrumModule(IApiClient apiClient)
         {
-            _apiEndPoint = apiEndPoint;
+            _apiClient = apiClient;
 
             _sampleProcessor = new SpectrumSampleProcessor();
             AddSampleProcessor(_sampleProcessor);
@@ -44,7 +44,7 @@ namespace Micser.Plugins.Main.Modules
             var data = _sampleProcessor.GetFftData();
             if (data != null)
             {
-                await _apiEndPoint.SendMessageAsync(new JsonRequest("spectrum", null, data)).ConfigureAwait(false);
+                await _apiClient.SendMessageAsync(new ApiRequest("spectrum", null, data)).ConfigureAwait(false);
             }
 
             if (!_isDisposed)

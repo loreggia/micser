@@ -9,8 +9,8 @@ namespace Micser.Plugins.Main.Modules
     {
         private int _latency;
 
-        public LoopbackDeviceInputModule(IApiEndPoint apiEndPoint, IModuleService moduleService)
-            : base(apiEndPoint, moduleService)
+        public LoopbackDeviceInputModule(IApiClient apiClient, IModuleService moduleService)
+            : base(apiClient, moduleService)
         {
             Latency = 1;
         }

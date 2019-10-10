@@ -2,7 +2,6 @@
 using Micser.App.Infrastructure.Api;
 using Micser.App.Infrastructure.Navigation;
 using Micser.App.Views;
-using Micser.Common.Api;
 using Prism.Commands;
 using System;
 
@@ -16,7 +15,6 @@ namespace Micser.App.ViewModels
 
     public class StatusViewModel : ViewModelNavigationAware
     {
-        private readonly IApiEndPoint _apiEndPoint;
         private readonly INavigationManager _navigationManager;
         private readonly StatusApiClient _statusApiClient;
         private string _actionText;
@@ -24,13 +22,12 @@ namespace Micser.App.ViewModels
         private StatusType _currentStatus;
         private string _statusText;
 
-        public StatusViewModel(INavigationManager navigationManager, IApiEndPoint apiEndPoint, StatusApiClient statusApiClient)
+        public StatusViewModel(INavigationManager navigationManager, StatusApiClient statusApiClient)
         {
             _navigationManager = navigationManager;
             _statusApiClient = statusApiClient;
 
             ActionCommand = new DelegateCommand(OnActionCommand).ObservesCanExecute(() => CanExecuteAction);
-            _apiEndPoint = apiEndPoint;
         }
 
         public DelegateCommand ActionCommand { get; set; }
@@ -98,25 +95,15 @@ namespace Micser.App.ViewModels
                         break;
 
                     case StatusType.ConnectionFailed:
-                        var isConnected = _apiEndPoint.State == EndPointState.Connected;
+                        var statusResult = await _statusApiClient.GetStatus();
 
-                        if (!isConnected)
+                        if (statusResult.IsSuccess)
                         {
-                            isConnected = await _apiEndPoint.ConnectAsync();
-                        }
-
-                        if (isConnected)
-                        {
-                            var statusResult = await _statusApiClient.GetStatus();
-
-                            if (statusResult.IsSuccess)
-                            {
-                                _navigationManager.Navigate<MainStatusBarView>(AppGlobals.PrismRegions.Status);
-                                _navigationManager.Navigate<MainMenuView>(AppGlobals.PrismRegions.Menu);
-                                _navigationManager.Navigate<ToolBarView>(AppGlobals.PrismRegions.TopToolBar, AppGlobals.ToolBarIds.Main);
-                                _navigationManager.Navigate<MainView>(AppGlobals.PrismRegions.Main);
-                                return;
-                            }
+                            _navigationManager.Navigate<MainStatusBarView>(AppGlobals.PrismRegions.Status);
+                            _navigationManager.Navigate<MainMenuView>(AppGlobals.PrismRegions.Menu);
+                            _navigationManager.Navigate<ToolBarView>(AppGlobals.PrismRegions.TopToolBar, AppGlobals.ToolBarIds.Main);
+                            _navigationManager.Navigate<MainView>(AppGlobals.PrismRegions.Main);
+                            return;
                         }
 
                         CanExecuteAction = true;

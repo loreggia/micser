@@ -12,15 +12,26 @@ namespace Micser.Common
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
 
         /// <summary>
-        /// The TCP port over which the API is talking.
+        /// The pipe name of the engine API server.
         /// </summary>
-        public const int ApiPort =
+        public const string AppPipeName =
 #if DEBUG
-            60667
+            "Micser.App.Debug"
 #else
-            60666
+            "Micser.App"
 #endif
         ;
+
+        /// <summary>
+        /// The pipe name of the engine API server.
+        /// </summary>
+        public const string EnginePipeName =
+#if DEBUG
+                "Micser.Engine.Debug"
+#else
+            "Micser.Engine"
+#endif
+            ;
 
         public const string ConnectionStringFolder = "|DataDirectory|";
 

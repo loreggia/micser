@@ -11,8 +11,8 @@ namespace Micser.Plugins.Main.Modules
     {
         private WasapiCapture _capture;
 
-        public DeviceInputModule(IApiEndPoint apiEndPoint, IModuleService moduleService)
-            : base(apiEndPoint, moduleService)
+        public DeviceInputModule(IApiClient apiClient, IModuleService moduleService)
+            : base(apiClient, moduleService)
         {
         }
 

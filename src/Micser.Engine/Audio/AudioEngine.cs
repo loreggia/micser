@@ -14,6 +14,7 @@ namespace Micser.Engine.Audio
 {
     public sealed class AudioEngine : IAudioEngine
     {
+        private readonly IApiClient _apiClient;
         private readonly IApiServer _apiServer;
         private readonly IContainerProvider _container;
         private readonly MMDeviceEnumerator _deviceEnumerator;
@@ -30,13 +31,15 @@ namespace Micser.Engine.Audio
             ILogger logger,
             IModuleService moduleService,
             IModuleConnectionService moduleConnectionService,
-            IApiServer apiServer)
+            IApiServer apiServer,
+            IApiClient apiClient)
         {
             _container = container;
             _logger = logger;
             _moduleService = moduleService;
             _moduleConnectionService = moduleConnectionService;
             _apiServer = apiServer;
+            _apiClient = apiClient;
             _modules = new List<IAudioModule>();
             _deviceEnumerator = new MMDeviceEnumerator();
             _endpointVolumeCallback = new AudioEndpointVolumeCallback();
@@ -210,7 +213,7 @@ namespace Micser.Engine.Audio
                     moduleDto.State.IsMuted = _endpointVolume.IsMuted;
                     moduleDto.State.Volume = _endpointVolume.MasterVolumeLevelScalar;
                     _moduleService.Update(moduleDto);
-                    _apiServer.SendMessageAsync(new JsonRequest("modules", "updatevolume", moduleDto));
+                    _apiClient.SendMessageAsync(new ApiRequest("modules", "updatevolume", moduleDto));
                 }
 
                 audioModule.SetState(moduleDto.State);
@@ -270,7 +273,7 @@ namespace Micser.Engine.Audio
 
                     _moduleService.Update(moduleDto);
 
-                    _apiServer.SendMessageAsync(new JsonRequest("modules", "updatevolume", moduleDto));
+                    _apiClient.SendMessageAsync(new ApiRequest("modules", "updatevolume", moduleDto));
                 }
             }).ConfigureAwait(false);
         }

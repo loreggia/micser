@@ -12,12 +12,12 @@ namespace Micser.App.Infrastructure.Api
     public class ModuleConnectionsApiClient
     {
         private const string ResourceName = Globals.ApiResources.ModuleConnections;
-        private readonly IApiEndPoint _apiEndPoint;
+        private readonly IApiClient _apiClient;
 
         /// <inheritdoc />
-        public ModuleConnectionsApiClient(IApiEndPoint apiEndPoint)
+        public ModuleConnectionsApiClient(IApiClient apiClient)
         {
-            _apiEndPoint = apiEndPoint;
+            _apiClient = apiClient;
         }
 
         /// <summary>
@@ -25,7 +25,7 @@ namespace Micser.App.Infrastructure.Api
         /// </summary>
         public async Task<ServiceResult<ModuleConnectionDto>> CreateAsync(ModuleConnectionDto connectionDto)
         {
-            var response = await _apiEndPoint.SendMessageAsync(new JsonRequest(ResourceName, "insert", connectionDto)).ConfigureAwait(false);
+            var response = await _apiClient.SendMessageAsync(new ApiRequest(ResourceName, "insert", connectionDto)).ConfigureAwait(false);
             return new ServiceResult<ModuleConnectionDto>(response);
         }
 
@@ -35,7 +35,7 @@ namespace Micser.App.Infrastructure.Api
         /// <param name="id">The ID of the connection to delete.</param>
         public async Task<ServiceResult<ModuleConnectionDto>> DeleteAsync(long id)
         {
-            var response = await _apiEndPoint.SendMessageAsync(new JsonRequest(ResourceName, "delete", id)).ConfigureAwait(false);
+            var response = await _apiClient.SendMessageAsync(new ApiRequest(ResourceName, "delete", id)).ConfigureAwait(false);
             return new ServiceResult<ModuleConnectionDto>(response);
         }
 
@@ -44,7 +44,7 @@ namespace Micser.App.Infrastructure.Api
         /// </summary>
         public async Task<ServiceResult<IEnumerable<ModuleConnectionDto>>> GetAllAsync()
         {
-            var response = await _apiEndPoint.SendMessageAsync(new JsonRequest(ResourceName, "getall")).ConfigureAwait(false);
+            var response = await _apiClient.SendMessageAsync(new ApiRequest(ResourceName, "getall")).ConfigureAwait(false);
             return new ServiceResult<IEnumerable<ModuleConnectionDto>>(response);
         }
 
@@ -53,7 +53,7 @@ namespace Micser.App.Infrastructure.Api
         /// </summary>
         public async Task<ServiceResult<ModuleConnectionDto>> UpdateAsync(ModuleConnectionDto connectionDto)
         {
-            var response = await _apiEndPoint.SendMessageAsync(new JsonRequest(ResourceName, "update", connectionDto)).ConfigureAwait(false);
+            var response = await _apiClient.SendMessageAsync(new ApiRequest(ResourceName, "update", connectionDto)).ConfigureAwait(false);
             return new ServiceResult<ModuleConnectionDto>(response);
         }
     }

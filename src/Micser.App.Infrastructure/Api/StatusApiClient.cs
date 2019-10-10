@@ -10,12 +10,12 @@ namespace Micser.App.Infrastructure.Api
     public class StatusApiClient
     {
         private const string ResourceName = Globals.ApiResources.Status;
-        private readonly IApiEndPoint _apiEndPoint;
+        private readonly IApiClient _apiClient;
 
         /// <inheritdoc />
-        public StatusApiClient(IApiEndPoint apiEndPoint)
+        public StatusApiClient(IApiClient apiClient)
         {
-            _apiEndPoint = apiEndPoint;
+            _apiClient = apiClient;
         }
 
         /// <summary>
@@ -23,7 +23,7 @@ namespace Micser.App.Infrastructure.Api
         /// </summary>
         public async Task<ServiceResult<object>> GetStatus()
         {
-            var response = await _apiEndPoint.SendMessageAsync(new JsonRequest(ResourceName)).ConfigureAwait(false);
+            var response = await _apiClient.SendMessageAsync(new ApiRequest(ResourceName)).ConfigureAwait(false);
             return new ServiceResult<object>(response);
         }
     }
