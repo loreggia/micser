@@ -1,4 +1,5 @@
-﻿using Micser.Common.Modules;
+﻿using Micser.Common.Extensions;
+using Micser.Common.Modules;
 using Newtonsoft.Json;
 using Xunit;
 
