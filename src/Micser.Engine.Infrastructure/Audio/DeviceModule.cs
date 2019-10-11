@@ -2,6 +2,7 @@
 using Micser.Common;
 using Micser.Common.Api;
 using Micser.Common.Devices;
+using Micser.Common.Extensions;
 using Micser.Common.Modules;
 using Micser.Engine.Infrastructure.Services;
 using System.Threading.Tasks;
