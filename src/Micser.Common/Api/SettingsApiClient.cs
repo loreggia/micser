@@ -1,4 +1,5 @@
 ﻿using Micser.Common.Settings;
+using ProtoBuf.Meta;
 using System.Threading.Tasks;
 
 namespace Micser.Common.Api
@@ -9,7 +10,17 @@ namespace Micser.Common.Api
     public class SettingsApiClient
     {
         private const string ResourceName = Globals.ApiResources.Settings;
+        private static readonly bool IsConfigured;
         private readonly IApiClient _apiEndPoint;
+
+        static SettingsApiClient()
+        {
+            if (!IsConfigured)
+            {
+                RuntimeTypeModel.Default[typeof(SettingValueDto)].SetSurrogate(typeof(SettingValueSurrogate));
+                IsConfigured = true;
+            }
+        }
 
         /// <inheritdoc />
         public SettingsApiClient(IApiClient apiEndPoint)
