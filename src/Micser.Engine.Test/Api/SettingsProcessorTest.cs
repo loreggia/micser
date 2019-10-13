@@ -47,8 +47,9 @@ namespace Micser.Engine.Test.Api
 
             Assert.NotNull(result);
             Assert.True(result.IsSuccess);
-            Assert.NotNull(result.Content);
-            Assert.Equal("value", result.Content);
+            var resultDto = result.Content as SettingValueDto;
+            Assert.NotNull(resultDto);
+            Assert.Equal("value", resultDto.Value);
         }
     }
 }

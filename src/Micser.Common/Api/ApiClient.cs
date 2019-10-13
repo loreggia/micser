@@ -112,15 +112,16 @@ namespace Micser.Common.Api
 
         public async Task<ApiResponse> SendMessageAsync(ApiRequest request)
         {
+            await _sendMessageSemaphore.WaitAsync();
+
             if (State != ConnectionState.Connected && !(await ConnectAsync().ConfigureAwait(false)))
             {
+                _sendMessageSemaphore.Release();
                 return new ApiResponse(false);
             }
 
             try
             {
-                await _sendMessageSemaphore.WaitAsync();
-
                 var ms = new MemoryStream();
                 Serializer.SerializeWithLengthPrefix(ms, request, PrefixStyle.Base128);
                 await _pipe.WriteAsync(ms.GetBuffer(), 0, (int)ms.Length).ConfigureAwait(false);
