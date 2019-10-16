@@ -9,7 +9,7 @@ namespace Micser.Common.Api
 {
     public class ApiClient : DisposableBase, IApiClient
     {
-        private const int ConnectTimeout = 1000;
+        private const int ConnectTimeout = 10;
         private readonly IApiClientConfiguration _configuration;
         private readonly SemaphoreSlim _connectSemaphore = new SemaphoreSlim(1, 1);
         private readonly ILogger _logger;

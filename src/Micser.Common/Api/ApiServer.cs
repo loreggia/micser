@@ -168,7 +168,10 @@ namespace Micser.Common.Api
 
                     if (count == 0)
                     {
-                        continue;
+                        _readerSemaphore.Release();
+                        Stop();
+                        await StartAsync().ConfigureAwait(false);
+                        return;
                     }
 
                     _readerStream.Position = 0;
@@ -185,19 +188,19 @@ namespace Micser.Common.Api
                     await Task.Run(() => _pipe.WaitForPipeDrain()).ConfigureAwait(false);
 
                     await _messageSerializer.SerializeAsync(_pipe, response).ConfigureAwait(false);
+                    _readerSemaphore.Release();
                 }
                 catch (OperationCanceledException)
                 {
+                    _readerSemaphore.Release();
                     return;
                 }
                 catch (Exception ex)
                 {
                     _logger.Error(ex);
-                    _pipe.BeginWaitForConnection(OnConnectionReceived, null);
-                }
-                finally
-                {
                     _readerSemaphore.Release();
+                    Stop();
+                    await StartAsync().ConfigureAwait(false);
                 }
             }
         }
