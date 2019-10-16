@@ -1,7 +1,8 @@
-﻿using NLog;
-using ProtoBuf;
+﻿using Micser.Common.Extensions;
+using NLog;
 using System.IO;
 using System.IO.Pipes;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Micser.Common.Api
@@ -10,16 +11,22 @@ namespace Micser.Common.Api
     {
         private const int ConnectTimeout = 1000;
         private readonly IApiClientConfiguration _configuration;
+        private readonly SemaphoreSlim _connectSemaphore = new SemaphoreSlim(1, 1);
         private readonly ILogger _logger;
+        private readonly IMessageSerializer _messageSerializer;
+        private readonly MemoryStream _readerStream;
+        private readonly SemaphoreQueue _sendMessageSemaphore = new SemaphoreQueue(1);
         private readonly object _stateLock = new object();
         private NamedPipeClientStream _pipe;
-        private SemaphoreQueue _sendMessageSemaphore = new SemaphoreQueue(1);
         private ConnectionState _state;
 
-        public ApiClient(IApiClientConfiguration configuration, ILogger logger)
+        public ApiClient(IApiClientConfiguration configuration, IMessageSerializer messageSerializer, ILogger logger)
         {
             _configuration = configuration;
+            _messageSerializer = messageSerializer;
             _logger = logger;
+
+            _readerStream = new MemoryStream(1024);
         }
 
         public ConnectionState State
@@ -39,12 +46,14 @@ namespace Micser.Common.Api
             private set => _state = value;
         }
 
-        public async Task<bool> ConnectAsync()
+        public async Task<bool> ConnectAsync(CancellationToken token)
         {
             if (State != ConnectionState.Disconnected)
             {
                 return false;
             }
+
+            await _connectSemaphore.WaitAsync(token).ConfigureAwait(false);
 
             lock (_stateLock)
             {
@@ -52,20 +61,19 @@ namespace Micser.Common.Api
                 {
                     return false;
                 }
-
-                State = ConnectionState.Connecting;
             }
-
-            if (_pipe != null)
-            {
-                await _pipe.DisposeAsync().ConfigureAwait(false);
-            }
-
-            _pipe = new NamedPipeClientStream(".", _configuration.PipeName, PipeDirection.InOut, PipeOptions.Asynchronous);
 
             try
             {
-                await _pipe.ConnectAsync(ConnectTimeout);
+                if (_pipe != null)
+                {
+                    await _pipe.DisposeAsync().ConfigureAwait(false);
+                }
+
+                _pipe = new NamedPipeClientStream(".", _configuration.PipeName, PipeDirection.InOut, PipeOptions.Asynchronous | PipeOptions.WriteThrough);
+
+                await _pipe.ConnectAsync(ConnectTimeout, token).ConfigureAwait(false);
+                _pipe.ReadMode = PipeTransmissionMode.Message;
 
                 lock (_stateLock)
                 {
@@ -82,6 +90,10 @@ namespace Micser.Common.Api
                 }
 
                 return false;
+            }
+            finally
+            {
+                _connectSemaphore.Release();
             }
         }
 
@@ -110,26 +122,30 @@ namespace Micser.Common.Api
             }
         }
 
-        public async Task<ApiResponse> SendMessageAsync(ApiRequest request)
+        public async Task<ApiResponse> SendMessageAsync(ApiRequest request, CancellationToken token)
         {
-            await _sendMessageSemaphore.WaitAsync();
-
-            if (State != ConnectionState.Connected && !(await ConnectAsync().ConfigureAwait(false)))
+            if (State != ConnectionState.Connected && !await ConnectAsync(token).ConfigureAwait(false))
             {
-                _sendMessageSemaphore.Release();
                 return new ApiResponse(false);
             }
 
+            await _sendMessageSemaphore.WaitAsync().ConfigureAwait(false);
+            token.ThrowIfCancellationRequested();
+
             try
             {
-                var ms = new MemoryStream();
-                Serializer.SerializeWithLengthPrefix(ms, request, PrefixStyle.Base128);
-                await _pipe.WriteAsync(ms.GetBuffer(), 0, (int)ms.Length).ConfigureAwait(false);
+                await _messageSerializer.SerializeAsync(_pipe, request).ConfigureAwait(false);
+                await Task.Run(() => _pipe.WaitForPipeDrain(), token).ConfigureAwait(false);
 
-                // "dummy" read (0 bytes) so the thread is not blocked and can be cancelled with the cancellation token
-                var emptyByteArray = new byte[0];
-                await _pipe.ReadAsync(emptyByteArray, 0, 0).ConfigureAwait(false);
-                return Serializer.DeserializeWithLengthPrefix<ApiResponse>(_pipe, PrefixStyle.Base128);
+                _readerStream.Position = 0;
+                var count = await _pipe.CopyMessageToAsync(_readerStream, token).ConfigureAwait(false);
+                if (count == 0)
+                {
+                    return new ApiResponse(false);
+                }
+
+                _readerStream.Position = 0;
+                return await _messageSerializer.DeserializeAsync<ApiResponse>(_readerStream).ConfigureAwait(false);
             }
             catch (IOException)
             {
@@ -147,6 +163,7 @@ namespace Micser.Common.Api
             try
             {
                 Disconnect();
+                _readerStream.Dispose();
             }
             catch
             {

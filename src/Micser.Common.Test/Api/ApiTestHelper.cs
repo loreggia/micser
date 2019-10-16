@@ -11,6 +11,11 @@ namespace Micser.Common.Test.Api
             return new ApiConfiguration { PipeName = "Micser.Common.Test." + Guid.NewGuid() };
         }
 
+        public static IMessageSerializer GetMessageSerializer()
+        {
+            return new MessagePackMessageSerializer();
+        }
+
         public static IRequestProcessorFactory GetRequestProcessorFactory()
         {
             var processorMock = new Mock<IRequestProcessor>();

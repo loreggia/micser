@@ -2,6 +2,7 @@
 using Micser.Common;
 using Micser.Common.Api;
 using Micser.Common.Audio;
+using Micser.Common.Extensions;
 using Micser.Engine.Infrastructure.Audio;
 using Micser.Engine.Infrastructure.Services;
 using NLog;
@@ -100,6 +101,12 @@ namespace Micser.Engine.Audio
         public void RemoveConnection(long id)
         {
             var connectionDto = _moduleConnectionService.GetById(id);
+
+            if (connectionDto == null)
+            {
+                return;
+            }
+
             var source = _modules.FirstOrDefault(m => m.Id == connectionDto.SourceId);
             var target = _modules.FirstOrDefault(m => m.Id == connectionDto.TargetId);
 
@@ -213,7 +220,7 @@ namespace Micser.Engine.Audio
                     moduleDto.State.IsMuted = _endpointVolume.IsMuted;
                     moduleDto.State.Volume = _endpointVolume.MasterVolumeLevelScalar;
                     _moduleService.Update(moduleDto);
-                    _apiClient.SendMessageAsync(new ApiRequest("modules", "updatevolume", moduleDto));
+                    _apiClient.SendMessageAsync("modules", "updatevolume", moduleDto);
                 }
 
                 audioModule.SetState(moduleDto.State);
@@ -273,7 +280,7 @@ namespace Micser.Engine.Audio
 
                     _moduleService.Update(moduleDto);
 
-                    _apiClient.SendMessageAsync(new ApiRequest("modules", "updatevolume", moduleDto));
+                    _apiClient.SendMessageAsync("modules", "updatevolume", moduleDto);
                 }
             }).ConfigureAwait(false);
         }

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Threading;
+using System.Threading.Tasks;
 
 namespace Micser.Common.Api
 {
@@ -12,7 +13,7 @@ namespace Micser.Common.Api
         /// <summary>
         /// Tries to connect to the remote end point.
         /// </summary>
-        Task<bool> ConnectAsync();
+        Task<bool> ConnectAsync(CancellationToken token);
 
         /// <summary>
         /// Disconnects the client connection.
@@ -23,6 +24,7 @@ namespace Micser.Common.Api
         /// Sends a message to the connected endpoint.
         /// </summary>
         /// <param name="request">The request message.</param>
-        Task<ApiResponse> SendMessageAsync(ApiRequest request);
+        /// <param name="token">The cancellation token.</param>
+        Task<ApiResponse> SendMessageAsync(ApiRequest request, CancellationToken token);
     }
 }

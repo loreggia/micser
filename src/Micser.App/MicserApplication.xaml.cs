@@ -3,6 +3,7 @@ using Micser.App.Infrastructure;
 using Micser.App.Infrastructure.Themes;
 using Micser.App.Settings;
 using Micser.Common;
+using Micser.Common.Api;
 using Micser.Common.Extensions;
 using Micser.Common.Settings;
 using NLog;
@@ -121,6 +122,9 @@ namespace Micser.App
 
         protected override void OnExit(ExitEventArgs e)
         {
+            var apiServer = _containerProvider.Resolve<IApiServer>();
+            apiServer.Stop();
+
             if (_shell != null)
             {
                 var state = new ShellState
@@ -145,6 +149,9 @@ namespace Micser.App
 
         protected override void OnInitialized()
         {
+            var apiServer = _containerProvider.Resolve<IApiServer>();
+            apiServer.StartAsync();
+
             Logger.Info("Ready");
             SetStatus("Ready");
         }

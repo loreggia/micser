@@ -1,5 +1,5 @@
-﻿using Micser.Common.Settings;
-using ProtoBuf.Meta;
+﻿using Micser.Common.Extensions;
+using Micser.Common.Settings;
 using System.Threading.Tasks;
 
 namespace Micser.Common.Api
@@ -10,17 +10,7 @@ namespace Micser.Common.Api
     public class SettingsApiClient
     {
         private const string ResourceName = Globals.ApiResources.Settings;
-        private static readonly bool IsConfigured;
         private readonly IApiClient _apiEndPoint;
-
-        static SettingsApiClient()
-        {
-            if (!IsConfigured)
-            {
-                RuntimeTypeModel.Default[typeof(SettingValueDto)].SetSurrogate(typeof(SettingValueSurrogate));
-                IsConfigured = true;
-            }
-        }
 
         /// <inheritdoc />
         public SettingsApiClient(IApiClient apiEndPoint)
@@ -33,7 +23,7 @@ namespace Micser.Common.Api
         /// </summary>
         public async Task<ServiceResult<SettingValueDto>> GetSetting(string key)
         {
-            var response = await _apiEndPoint.SendMessageAsync(new ApiRequest(ResourceName, "getsetting", key)).ConfigureAwait(false);
+            var response = await _apiEndPoint.SendMessageAsync(ResourceName, "getsetting", key).ConfigureAwait(false);
             return new ServiceResult<SettingValueDto>(response);
         }
 
@@ -42,7 +32,7 @@ namespace Micser.Common.Api
         /// </summary>
         public async Task<ServiceResult<SettingValueDto>> SetSetting(string key, object value)
         {
-            var response = await _apiEndPoint.SendMessageAsync(new ApiRequest(ResourceName, "setsetting", new SettingValueDto { Key = key, Value = value })).ConfigureAwait(false);
+            var response = await _apiEndPoint.SendMessageAsync(ResourceName, "setsetting", new SettingValueDto { Key = key, Value = value }).ConfigureAwait(false);
             return new ServiceResult<SettingValueDto>(response);
         }
     }

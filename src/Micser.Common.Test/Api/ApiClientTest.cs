@@ -1,7 +1,7 @@
 ﻿using Micser.Common.Api;
+using Micser.Common.Extensions;
 using Micser.TestCommon;
 using NLog;
-using ProtoBuf;
 using System.Diagnostics;
 using System.Threading.Tasks;
 using Xunit;
@@ -21,9 +21,10 @@ namespace Micser.Common.Test.Api
         {
             var configuration = ApiTestHelper.GetConfiguration();
             var factory = ApiTestHelper.GetRequestProcessorFactory();
+            var serializer = ApiTestHelper.GetMessageSerializer();
 
-            using var server = new ApiServer(configuration, factory, LogManager.GetLogger("Server"));
-            using var client = new ApiClient(configuration, LogManager.GetLogger("Client"));
+            using var server = new ApiServer(configuration, factory, serializer, LogManager.GetLogger("Server"));
+            using var client = new ApiClient(configuration, serializer, LogManager.GetLogger("Client"));
 
             var result = await server.StartAsync();
             Assert.True(result);
@@ -40,7 +41,8 @@ namespace Micser.Common.Test.Api
         public async Task ConnectWithoutServer_IsFailure()
         {
             var configuration = ApiTestHelper.GetConfiguration();
-            using var client = new ApiClient(configuration, LogManager.GetLogger("Client"));
+            var serializer = ApiTestHelper.GetMessageSerializer();
+            using var client = new ApiClient(configuration, serializer, LogManager.GetLogger("Client"));
 
             var result = await client.ConnectAsync();
 
@@ -53,9 +55,10 @@ namespace Micser.Common.Test.Api
         {
             var configuration = ApiTestHelper.GetConfiguration();
             var factory = ApiTestHelper.GetRequestProcessorFactory();
+            var serializer = ApiTestHelper.GetMessageSerializer();
 
-            using var server = new ApiServer(configuration, factory, LogManager.GetLogger("Server"));
-            using var client = new ApiClient(configuration, LogManager.GetLogger("Client"));
+            using var server = new ApiServer(configuration, factory, serializer, LogManager.GetLogger("Server"));
+            using var client = new ApiClient(configuration, serializer, LogManager.GetLogger("Client"));
 
             var result = await server.StartAsync();
             Assert.True(result);
@@ -66,7 +69,7 @@ namespace Micser.Common.Test.Api
 
             server.Stop();
 
-            var response = await client.SendMessageAsync(new ApiRequest("Resource", "Action", "Content"));
+            var response = await client.SendMessageAsync("Resource", "Action", "Content");
             Assert.False(response.IsSuccess);
             Assert.Equal(ConnectionState.Disconnected, client.State);
         }
@@ -77,9 +80,10 @@ namespace Micser.Common.Test.Api
             var configuration = ApiTestHelper.GetConfiguration();
             var factory = ApiTestHelper.GetRequestProcessorFactory();
             var logger = LogManager.GetCurrentClassLogger();
+            var serializer = ApiTestHelper.GetMessageSerializer();
 
-            using var server = new ApiServer(configuration, factory, LogManager.GetLogger("Server"));
-            using var client = new ApiClient(configuration, LogManager.GetLogger("Client"));
+            using var server = new ApiServer(configuration, factory, serializer, LogManager.GetLogger("Server"));
+            using var client = new ApiClient(configuration, serializer, LogManager.GetLogger("Client"));
 
             var startResult = await server.StartAsync();
             Assert.True(startResult);
@@ -94,7 +98,7 @@ namespace Micser.Common.Test.Api
 
             for (var i = 0; i < count; i++)
             {
-                tasks[i] = client.SendMessageAsync(new ApiRequest("Parallel", "Action", new TestData { Value = i }));
+                tasks[i] = client.SendMessageAsync("Parallel", "Action", new TestData { Value = i });
             }
 
             await Task.WhenAll(tasks);
@@ -118,19 +122,20 @@ namespace Micser.Common.Test.Api
         {
             var configuration = ApiTestHelper.GetConfiguration();
             var factory = ApiTestHelper.GetRequestProcessorFactory();
+            var serializer = ApiTestHelper.GetMessageSerializer();
 
-            using var server = new ApiServer(configuration, factory, LogManager.GetLogger("Server"));
-            using var client = new ApiClient(configuration, LogManager.GetLogger("Client"));
+            using var server = new ApiServer(configuration, factory, serializer, LogManager.GetLogger("Server"));
+            using var client = new ApiClient(configuration, serializer, LogManager.GetLogger("Client"));
 
-            var startResult = await server.StartAsync();
+            var startResult = await server.StartAsync().ConfigureAwait(false);
             Assert.True(startResult);
             Assert.Equal(ServerState.Started, server.State);
 
-            var connectResult = await client.ConnectAsync();
+            var connectResult = await client.ConnectAsync().ConfigureAwait(false);
             Assert.True(connectResult);
             Assert.Equal(ConnectionState.Connected, client.State);
 
-            var response = await client.SendMessageAsync(new ApiRequest("Resource", "Action", "Content"));
+            var response = await client.SendMessageAsync("Resource", "Action", "Content").ConfigureAwait(false);
             Assert.NotNull(response);
             Assert.True(response.IsSuccess);
             Assert.Equal("Content", response.Content);
@@ -141,38 +146,36 @@ namespace Micser.Common.Test.Api
         {
             var configuration = ApiTestHelper.GetConfiguration();
             var factory = ApiTestHelper.GetRequestProcessorFactory();
+            var serializer = ApiTestHelper.GetMessageSerializer();
 
-            using var server = new ApiServer(configuration, factory, LogManager.GetLogger("Server"));
-            using var client = new ApiClient(configuration, LogManager.GetLogger("Client"));
+            using var server = new ApiServer(configuration, factory, serializer, LogManager.GetLogger("Server"));
+            using var client = new ApiClient(configuration, serializer, LogManager.GetLogger("Client"));
 
             var startResult = await server.StartAsync();
             Assert.True(startResult);
 
-            var response = await client.SendMessageAsync(new ApiRequest("Resource", "Action", "Content"));
+            var response = await client.SendMessageAsync("Resource", "Action", "Content");
             Assert.NotNull(response);
             Assert.True(response.IsSuccess);
-            Assert.Equal("Content", response.Content);
         }
 
         [Fact]
         public async Task SendMessageWithoutServer_IsFailure()
         {
             var configuration = ApiTestHelper.GetConfiguration();
+            var serializer = ApiTestHelper.GetMessageSerializer();
 
-            using var client = new ApiClient(configuration, LogManager.GetLogger("Client"));
-            var response = await client.SendMessageAsync(new ApiRequest("Resource", "Action", "Content"));
+            using var client = new ApiClient(configuration, serializer, LogManager.GetLogger("Client"));
+            var response = await client.SendMessageAsync("Resource", "Action", "Content");
 
             Assert.NotNull(response);
             Assert.False(response.IsSuccess);
         }
 
-        [ProtoContract]
-        private class TestData
+        public class TestData
         {
-            [ProtoMember(1)]
             public int Value { get; set; }
 
-            [ProtoMember(2)]
             public double[] Values { get; set; }
         }
     }

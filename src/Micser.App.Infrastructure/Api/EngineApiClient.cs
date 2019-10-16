@@ -1,5 +1,6 @@
 ﻿using Micser.Common;
 using Micser.Common.Api;
+using Micser.Common.Extensions;
 using System.Threading.Tasks;
 
 namespace Micser.App.Infrastructure.Api
@@ -23,7 +24,7 @@ namespace Micser.App.Infrastructure.Api
         /// </summary>
         public async Task<ServiceResult<bool>> GetStatusAsync()
         {
-            var response = await _apiClient.SendMessageAsync(new ApiRequest(ResourceName, "getstatus")).ConfigureAwait(false);
+            var response = await _apiClient.SendMessageAsync(ResourceName, "getstatus").ConfigureAwait(false);
             return new ServiceResult<bool>(response);
         }
 
@@ -32,7 +33,7 @@ namespace Micser.App.Infrastructure.Api
         /// </summary>
         public async Task<ServiceResult<bool>> RestartAsync()
         {
-            var response = await _apiClient.SendMessageAsync(new ApiRequest(ResourceName, "restart")).ConfigureAwait(false);
+            var response = await _apiClient.SendMessageAsync(ResourceName, "restart").ConfigureAwait(false);
             return new ServiceResult<bool>(response);
         }
 
@@ -41,7 +42,7 @@ namespace Micser.App.Infrastructure.Api
         /// </summary>
         public async Task<ServiceResult<bool>> StartAsync()
         {
-            var response = await _apiClient.SendMessageAsync(new ApiRequest(ResourceName, "start")).ConfigureAwait(false);
+            var response = await _apiClient.SendMessageAsync(ResourceName, "start").ConfigureAwait(false);
             return new ServiceResult<bool>(response);
         }
 
@@ -50,7 +51,7 @@ namespace Micser.App.Infrastructure.Api
         /// </summary>
         public async Task<ServiceResult<bool>> StopAsync()
         {
-            var response = await _apiClient.SendMessageAsync(new ApiRequest(ResourceName, "stop")).ConfigureAwait(false);
+            var response = await _apiClient.SendMessageAsync(ResourceName, "stop").ConfigureAwait(false);
             return new ServiceResult<bool>(response);
         }
     }
