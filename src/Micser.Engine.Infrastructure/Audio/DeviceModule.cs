@@ -167,7 +167,7 @@ namespace Micser.Engine.Infrastructure.Audio
 
                     if (ModuleService.Update(moduleDto))
                     {
-                        ApiClient.SendMessageAsync(new ApiRequest("modules", "refresh", moduleDto));
+                        ApiClient.SendMessageAsync("modules", "refresh", moduleDto);
                     }
                 }
                 else

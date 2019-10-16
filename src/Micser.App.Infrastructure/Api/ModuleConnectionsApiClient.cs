@@ -1,5 +1,6 @@
 ﻿using Micser.Common;
 using Micser.Common.Api;
+using Micser.Common.Extensions;
 using Micser.Common.Modules;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -25,7 +26,7 @@ namespace Micser.App.Infrastructure.Api
         /// </summary>
         public async Task<ServiceResult<ModuleConnectionDto>> CreateAsync(ModuleConnectionDto connectionDto)
         {
-            var response = await _apiClient.SendMessageAsync(new ApiRequest(ResourceName, "insert", connectionDto)).ConfigureAwait(false);
+            var response = await _apiClient.SendMessageAsync(ResourceName, "insert", connectionDto).ConfigureAwait(false);
             return new ServiceResult<ModuleConnectionDto>(response);
         }
 
@@ -35,7 +36,7 @@ namespace Micser.App.Infrastructure.Api
         /// <param name="id">The ID of the connection to delete.</param>
         public async Task<ServiceResult<ModuleConnectionDto>> DeleteAsync(long id)
         {
-            var response = await _apiClient.SendMessageAsync(new ApiRequest(ResourceName, "delete", id)).ConfigureAwait(false);
+            var response = await _apiClient.SendMessageAsync(ResourceName, "delete", id).ConfigureAwait(false);
             return new ServiceResult<ModuleConnectionDto>(response);
         }
 
@@ -44,7 +45,7 @@ namespace Micser.App.Infrastructure.Api
         /// </summary>
         public async Task<ServiceResult<IEnumerable<ModuleConnectionDto>>> GetAllAsync()
         {
-            var response = await _apiClient.SendMessageAsync(new ApiRequest(ResourceName, "getall")).ConfigureAwait(false);
+            var response = await _apiClient.SendMessageAsync(ResourceName, "getall").ConfigureAwait(false);
             return new ServiceResult<IEnumerable<ModuleConnectionDto>>(response);
         }
 
@@ -53,7 +54,7 @@ namespace Micser.App.Infrastructure.Api
         /// </summary>
         public async Task<ServiceResult<ModuleConnectionDto>> UpdateAsync(ModuleConnectionDto connectionDto)
         {
-            var response = await _apiClient.SendMessageAsync(new ApiRequest(ResourceName, "update", connectionDto)).ConfigureAwait(false);
+            var response = await _apiClient.SendMessageAsync(ResourceName, "update", connectionDto).ConfigureAwait(false);
             return new ServiceResult<ModuleConnectionDto>(response);
         }
     }

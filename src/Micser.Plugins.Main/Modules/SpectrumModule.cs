@@ -1,4 +1,5 @@
 ﻿using Micser.Common.Api;
+using Micser.Common.Extensions;
 using Micser.Engine.Infrastructure.Audio;
 using Micser.Plugins.Main.Audio;
 using System.Timers;
@@ -44,7 +45,7 @@ namespace Micser.Plugins.Main.Modules
             var data = _sampleProcessor.GetFftData();
             if (data != null)
             {
-                await _apiClient.SendMessageAsync(new ApiRequest("spectrum", null, data)).ConfigureAwait(false);
+                await _apiClient.SendMessageAsync("spectrum", null, data).ConfigureAwait(false);
             }
 
             if (!_isDisposed)

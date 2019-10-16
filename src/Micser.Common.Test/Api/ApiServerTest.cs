@@ -1,4 +1,5 @@
 ﻿using Micser.Common.Api;
+using Micser.Common.Extensions;
 using Micser.TestCommon;
 using NLog;
 using System.Threading.Tasks;
@@ -20,10 +21,11 @@ namespace Micser.Common.Test.Api
         {
             var configuration = ApiTestHelper.GetConfiguration();
             var factory = ApiTestHelper.GetRequestProcessorFactory();
+            var serializer = ApiTestHelper.GetMessageSerializer();
 
-            using var server = new ApiServer(configuration, factory, LogManager.GetLogger("Server"));
-            using var client1 = new ApiClient(configuration, LogManager.GetLogger("Client1"));
-            using var client2 = new ApiClient(configuration, LogManager.GetLogger("Client2"));
+            using var server = new ApiServer(configuration, factory, serializer, LogManager.GetLogger("Server"));
+            using var client1 = new ApiClient(configuration, serializer, LogManager.GetLogger("Client1"));
+            using var client2 = new ApiClient(configuration, serializer, LogManager.GetLogger("Client2"));
 
             var result = await server.StartAsync();
             Assert.True(result);
@@ -38,8 +40,9 @@ namespace Micser.Common.Test.Api
         {
             var configuration = ApiTestHelper.GetConfiguration();
             var factory = ApiTestHelper.GetRequestProcessorFactory();
+            var serializer = ApiTestHelper.GetMessageSerializer();
 
-            using var server = new ApiServer(configuration, factory, LogManager.GetLogger("Server"));
+            using var server = new ApiServer(configuration, factory, serializer, LogManager.GetLogger("Server"));
 
             var result = await server.StartAsync();
 
@@ -51,9 +54,10 @@ namespace Micser.Common.Test.Api
         public async Task StartServerWithDifferentName_IsSuccess()
         {
             var factory = ApiTestHelper.GetRequestProcessorFactory();
+            var serializer = ApiTestHelper.GetMessageSerializer();
 
-            using var server1 = new ApiServer(new ApiConfiguration("Micser.Test.1"), factory, LogManager.GetLogger("Server1"));
-            using var server2 = new ApiServer(new ApiConfiguration("Micser.Test.2"), factory, LogManager.GetLogger("Server2"));
+            using var server1 = new ApiServer(new ApiConfiguration("Micser.Test.1"), factory, serializer, LogManager.GetLogger("Server1"));
+            using var server2 = new ApiServer(new ApiConfiguration("Micser.Test.2"), factory, serializer, LogManager.GetLogger("Server2"));
 
             var result1 = await server1.StartAsync();
             var result2 = await server2.StartAsync();
@@ -69,9 +73,10 @@ namespace Micser.Common.Test.Api
         {
             var configuration = ApiTestHelper.GetConfiguration();
             var factory = ApiTestHelper.GetRequestProcessorFactory();
+            var serializer = ApiTestHelper.GetMessageSerializer();
 
-            using var server1 = new ApiServer(configuration, factory, LogManager.GetLogger("Server1"));
-            using var server2 = new ApiServer(configuration, factory, LogManager.GetLogger("Server2"));
+            using var server1 = new ApiServer(configuration, factory, serializer, LogManager.GetLogger("Server1"));
+            using var server2 = new ApiServer(configuration, factory, serializer, LogManager.GetLogger("Server2"));
 
             var result1 = await server1.StartAsync();
             var result2 = await server2.StartAsync();

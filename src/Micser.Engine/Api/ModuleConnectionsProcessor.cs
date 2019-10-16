@@ -26,14 +26,14 @@ namespace Micser.Engine.Api
 
         private object DeleteConnection(long id)
         {
+            _audioEngine.RemoveConnection(id);
+
             var connection = _moduleConnectionService.Delete(id);
 
             if (connection == null)
             {
                 return false;
             }
-
-            _audioEngine.RemoveConnection(id);
 
             return connection;
         }

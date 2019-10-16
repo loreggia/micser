@@ -87,6 +87,7 @@ namespace Micser.App
             container.RegisterInstance<IApiServerConfiguration>(new ApiConfiguration { PipeName = Globals.AppPipeName });
             container.RegisterSingleton<IApiClient, ApiClient>();
             container.RegisterInstance<IApiClientConfiguration>(new ApiConfiguration { PipeName = Globals.EnginePipeName });
+            container.RegisterSingleton<IMessageSerializer, MessagePackMessageSerializer>();
 
             container.RegisterSingleton<ISettingsRegistry, SettingsRegistry>();
             container.RegisterSingleton<ISettingsService, SettingsService>();

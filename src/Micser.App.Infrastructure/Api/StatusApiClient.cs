@@ -1,5 +1,6 @@
 ﻿using Micser.Common;
 using Micser.Common.Api;
+using Micser.Common.Extensions;
 using System.Threading.Tasks;
 
 namespace Micser.App.Infrastructure.Api
@@ -23,7 +24,7 @@ namespace Micser.App.Infrastructure.Api
         /// </summary>
         public async Task<ServiceResult<object>> GetStatus()
         {
-            var response = await _apiClient.SendMessageAsync(new ApiRequest(ResourceName)).ConfigureAwait(false);
+            var response = await _apiClient.SendMessageAsync(ResourceName).ConfigureAwait(false);
             return new ServiceResult<object>(response);
         }
     }

@@ -188,7 +188,7 @@ namespace Micser.Engine
 
                     do
                     {
-                        result = await _apiClient.SendMessageAsync(new ApiRequest(Globals.ApiResources.Updates, "updateavailable", updateManifest)).ConfigureAwait(false);
+                        result = await _apiClient.SendMessageAsync(Globals.ApiResources.Updates, "updateavailable", updateManifest).ConfigureAwait(false);
 
                         if (!result.IsSuccess)
                         {

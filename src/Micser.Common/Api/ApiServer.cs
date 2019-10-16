@@ -1,5 +1,5 @@
-﻿using NLog;
-using ProtoBuf;
+﻿using Micser.Common.Extensions;
+using NLog;
 using System;
 using System.IO;
 using System.IO.Pipes;
@@ -12,18 +12,22 @@ namespace Micser.Common.Api
     {
         private readonly IApiServerConfiguration _configuration;
         private readonly ILogger _logger;
+        private readonly IMessageSerializer _messageSerializer;
         private readonly SemaphoreSlim _readerSemaphore = new SemaphoreSlim(1, 1);
+        private readonly MemoryStream _readerStream;
         private readonly IRequestProcessorFactory _requestProcessorFactory;
         private readonly object _stateLock = new object();
         private CancellationTokenSource _cancellationTokenSource;
         private NamedPipeServerStream _pipe;
 
-        public ApiServer(IApiServerConfiguration configuration, IRequestProcessorFactory requestProcessorFactory, ILogger logger)
+        public ApiServer(IApiServerConfiguration configuration, IRequestProcessorFactory requestProcessorFactory, IMessageSerializer messageSerializer, ILogger logger)
         {
             _configuration = configuration;
             _requestProcessorFactory = requestProcessorFactory;
+            _messageSerializer = messageSerializer;
             _logger = logger;
 
+            _readerStream = new MemoryStream(1024);
             _cancellationTokenSource = new CancellationTokenSource();
         }
 
@@ -54,7 +58,7 @@ namespace Micser.Common.Api
             try
             {
                 _pipe = new NamedPipeServerStream(_configuration.PipeName, PipeDirection.InOut, 1,
-                    PipeTransmissionMode.Byte, PipeOptions.Asynchronous);
+                    PipeTransmissionMode.Message, PipeOptions.Asynchronous | PipeOptions.WriteThrough);
                 _pipe.BeginWaitForConnection(OnConnectionReceived, null);
 
                 lock (_stateLock)
@@ -119,6 +123,7 @@ namespace Micser.Common.Api
             try
             {
                 Stop();
+                _readerStream.Dispose();
             }
             catch
             {
@@ -155,15 +160,19 @@ namespace Micser.Common.Api
 
                 try
                 {
-                    // "dummy" read (0 bytes) so the thread is not blocked and can be cancelled with the cancellation token
-                    var emptyByteArray = new byte[0];
-                    await _pipe.ReadAsync(emptyByteArray, 0, 0, _cancellationTokenSource.Token).ConfigureAwait(false);
-
+                    await _readerSemaphore.WaitAsync(ct);
                     ct.ThrowIfCancellationRequested();
 
-                    await _readerSemaphore.WaitAsync(ct);
+                    _readerStream.Position = 0;
+                    var count = await _pipe.CopyMessageToAsync(_readerStream, ct);
 
-                    var request = Serializer.DeserializeWithLengthPrefix<ApiRequest>(_pipe, PrefixStyle.Base128);
+                    if (count == 0)
+                    {
+                        continue;
+                    }
+
+                    _readerStream.Position = 0;
+                    var request = await _messageSerializer.DeserializeAsync<ApiRequest>(_readerStream).ConfigureAwait(false);
 
                     if (request == null)
                     {
@@ -173,14 +182,13 @@ namespace Micser.Common.Api
                     var requestProcessor = _requestProcessorFactory.Create(request.Resource);
                     var response = await requestProcessor.ProcessAsync(request.Action, request.Content).ConfigureAwait(false);
 
-                    // don't block when writing the response either
-                    var ms = new MemoryStream();
-                    Serializer.SerializeWithLengthPrefix(ms, response, PrefixStyle.Base128);
-                    await _pipe.WriteAsync(ms.GetBuffer(), 0, (int)ms.Length, _cancellationTokenSource.Token).ConfigureAwait(false);
+                    await Task.Run(() => _pipe.WaitForPipeDrain()).ConfigureAwait(false);
+
+                    await _messageSerializer.SerializeAsync(_pipe, response).ConfigureAwait(false);
                 }
                 catch (OperationCanceledException)
                 {
-                    throw;
+                    return;
                 }
                 catch (Exception ex)
                 {

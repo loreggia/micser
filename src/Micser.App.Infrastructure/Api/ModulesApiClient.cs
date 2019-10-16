@@ -1,5 +1,6 @@
 ﻿using Micser.Common;
 using Micser.Common.Api;
+using Micser.Common.Extensions;
 using Micser.Common.Modules;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -25,7 +26,7 @@ namespace Micser.App.Infrastructure.Api
         /// </summary>
         public async Task<ServiceResult<ModuleDto>> CreateAsync(ModuleDto moduleDto)
         {
-            var response = await _apiClient.SendMessageAsync(new ApiRequest(ResourceName, "insert", moduleDto)).ConfigureAwait(false);
+            var response = await _apiClient.SendMessageAsync(ResourceName, "insert", moduleDto).ConfigureAwait(false);
             return new ServiceResult<ModuleDto>(response);
         }
 
@@ -34,7 +35,7 @@ namespace Micser.App.Infrastructure.Api
         /// </summary>
         public async Task<ServiceResult<ModuleDto>> DeleteAsync(long id)
         {
-            var response = await _apiClient.SendMessageAsync(new ApiRequest(ResourceName, "delete", id)).ConfigureAwait(false);
+            var response = await _apiClient.SendMessageAsync(ResourceName, "delete", id).ConfigureAwait(false);
             return new ServiceResult<ModuleDto>(response);
         }
 
@@ -43,7 +44,7 @@ namespace Micser.App.Infrastructure.Api
         /// </summary>
         public async Task<ServiceResult<IEnumerable<ModuleDto>>> GetAllAsync()
         {
-            var response = await _apiClient.SendMessageAsync(new ApiRequest(ResourceName, "getall")).ConfigureAwait(false);
+            var response = await _apiClient.SendMessageAsync(ResourceName, "getall").ConfigureAwait(false);
             return new ServiceResult<IEnumerable<ModuleDto>>(response);
         }
 
@@ -53,7 +54,7 @@ namespace Micser.App.Infrastructure.Api
         /// </summary>
         public async Task<bool> ImportConfigurationAsync(ModulesExportDto dto)
         {
-            var response = await _apiClient.SendMessageAsync(new ApiRequest(ResourceName, "import", dto)).ConfigureAwait(false);
+            var response = await _apiClient.SendMessageAsync(ResourceName, "import", dto).ConfigureAwait(false);
             return response.IsSuccess;
         }
 
@@ -62,7 +63,7 @@ namespace Micser.App.Infrastructure.Api
         /// </summary>
         public async Task<ServiceResult<ModuleDto>> UpdateAsync(ModuleDto moduleDto)
         {
-            var response = await _apiClient.SendMessageAsync(new ApiRequest(ResourceName, "update", moduleDto)).ConfigureAwait(false);
+            var response = await _apiClient.SendMessageAsync(ResourceName, "update", moduleDto).ConfigureAwait(false);
             return new ServiceResult<ModuleDto>(response);
         }
     }
