@@ -80,7 +80,7 @@ namespace Micser.Common.Settings
                 return;
             }
 
-            _loadSemaphore.Wait();
+            await _loadSemaphore.WaitAsync().ConfigureAwait(false);
 
             if (_isLoaded && !forceReload)
             {
