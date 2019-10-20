@@ -135,6 +135,11 @@ namespace Micser.Common.Api
         {
             try
             {
+                if (_pipe == null)
+                {
+                    return;
+                }
+
                 _pipe.EndWaitForConnection(ar);
 
                 if (_cancellationTokenSource.IsCancellationRequested)
