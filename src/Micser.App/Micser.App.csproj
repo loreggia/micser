@@ -5,6 +5,7 @@
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <UseWPF>true</UseWPF>
     <LangVersion>8</LangVersion>
+    <ApplicationIcon>..\..\gfx\logo.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
