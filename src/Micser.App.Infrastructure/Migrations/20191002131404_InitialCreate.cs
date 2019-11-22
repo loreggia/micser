@@ -7,10 +7,10 @@ namespace Micser.App.Infrastructure.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Settings",
-                columns: table => new
+                "Settings",
+                table => new
                 {
-                    Id = table.Column<long>(nullable: false)
+                    Id = table.Column<long>()
                         .Annotation("Sqlite:Autoincrement", true),
                     Key = table.Column<string>(nullable: true),
                     ValueJson = table.Column<string>(nullable: true),
@@ -22,16 +22,16 @@ namespace Micser.App.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_Settings_Key",
-                table: "Settings",
-                column: "Key",
+                "IX_Settings_Key",
+                "Settings",
+                "Key",
                 unique: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Settings");
+                "Settings");
         }
     }
 }

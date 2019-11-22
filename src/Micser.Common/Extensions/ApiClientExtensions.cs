@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Micser.Common.Extensions
 {
-    public static class IApiClientExtensions
+    public static class ApiClientExtensions
     {
         public static Task<bool> ConnectAsync(this IApiClient apiClient)
         {

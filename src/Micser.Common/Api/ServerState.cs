@@ -16,12 +16,12 @@
         Stopping,
 
         /// <summary>
-        /// The server is started. Use the <see cref="IApiEndPoint.State"/> property to get the current connection state.
+        /// The server is started. Use the <see cref="IApiServer.State"/> property to get the current connection state.
         /// </summary>
         Started,
 
         /// <summary>
-        /// The <see cref="IApiServer.Start"/> method has been called on the server but not completed yet.
+        /// The <see cref="IApiServer.StartAsync"/> method has been called on the server but not completed yet.
         /// </summary>
         Starting
     }

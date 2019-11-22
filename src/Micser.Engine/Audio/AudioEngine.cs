@@ -16,7 +16,6 @@ namespace Micser.Engine.Audio
     public sealed class AudioEngine : IAudioEngine
     {
         private readonly IApiClient _apiClient;
-        private readonly IApiServer _apiServer;
         private readonly IContainerProvider _container;
         private readonly MMDeviceEnumerator _deviceEnumerator;
         private readonly AudioEndpointVolumeCallback _endpointVolumeCallback;
@@ -32,14 +31,12 @@ namespace Micser.Engine.Audio
             ILogger logger,
             IModuleService moduleService,
             IModuleConnectionService moduleConnectionService,
-            IApiServer apiServer,
             IApiClient apiClient)
         {
             _container = container;
             _logger = logger;
             _moduleService = moduleService;
             _moduleConnectionService = moduleConnectionService;
-            _apiServer = apiServer;
             _apiClient = apiClient;
             _modules = new List<IAudioModule>();
             _deviceEnumerator = new MMDeviceEnumerator();

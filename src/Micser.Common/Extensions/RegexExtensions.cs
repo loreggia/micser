@@ -1,5 +1,4 @@
-﻿using System.Linq;
-using System.Text;
+﻿using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Micser.Common.Extensions
@@ -30,7 +29,7 @@ namespace Micser.Common.Extensions
                     var sb = new StringBuilder();
                     var previousCaptureEnd = 0;
 
-                    foreach (var capture in group.Captures.Cast<Capture>())
+                    foreach (Capture capture in group.Captures)
                     {
                         var currentCaptureEnd = capture.Index + capture.Length - m.Index;
                         var currentCaptureLength = capture.Index - m.Index - previousCaptureEnd;

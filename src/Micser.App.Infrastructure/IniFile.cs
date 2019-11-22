@@ -53,29 +53,28 @@ namespace Micser.App.Infrastructure
         {
             _values.Clear();
 
-            using (var reader = new StreamReader(_fileName))
+            using var reader = new StreamReader(_fileName);
+            
+            string line, currentSection = "default";
+            while ((line = reader.ReadLine()) != null)
             {
-                string line, currentSection = "default";
-                while ((line = reader.ReadLine()) != null)
+                var sectionMatch = RxSection.Match(line);
+                if (sectionMatch.Success && sectionMatch.Groups["section"]?.Value is string section)
                 {
-                    var sectionMatch = RxSection.Match(line);
-                    if (sectionMatch.Success && sectionMatch.Groups["section"]?.Value is string section)
+                    currentSection = section.ToLower();
+
+                    if (!_values.ContainsKey(currentSection))
                     {
-                        currentSection = section.ToLower();
-
-                        if (!_values.ContainsKey(currentSection))
-                        {
-                            _values.Add(currentSection, new Dictionary<string, string>());
-                        }
-
-                        continue;
+                        _values.Add(currentSection, new Dictionary<string, string>());
                     }
 
-                    var valueMatch = RxValue.Match(line);
-                    if (valueMatch.Success && valueMatch.Groups["key"]?.Value is string key)
-                    {
-                        _values[currentSection][key.ToLower()] = valueMatch.Groups["value"]?.Value;
-                    }
+                    continue;
+                }
+
+                var valueMatch = RxValue.Match(line);
+                if (valueMatch.Success && valueMatch.Groups["key"]?.Value is string key)
+                {
+                    _values[currentSection][key.ToLower()] = valueMatch.Groups["value"]?.Value;
                 }
             }
         }

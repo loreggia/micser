@@ -23,7 +23,7 @@ namespace Micser.Plugins.Main.Audio
         public float GetFftFrequency(int index)
         {
             var fftSize = (int)FftSize;
-            return index * SampleRate / fftSize;
+            return index * SampleRate / (float)fftSize;
         }
     }
 }

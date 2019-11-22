@@ -1,7 +1,7 @@
 ﻿namespace Micser.Common.Api
 {
     /// <summary>
-    /// Defines connection states for an <see cref="IApiEndPoint"/>.
+    /// Defines connection states for an <see cref="IApiClient"/>.
     /// </summary>
     public enum ConnectionState
     {
