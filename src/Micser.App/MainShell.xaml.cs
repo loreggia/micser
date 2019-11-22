@@ -1,7 +1,6 @@
 ﻿using Micser.App.Infrastructure;
 using Micser.Common.Extensions;
 using Micser.Common.Settings;
-using Prism.Regions;
 using System;
 using System.ComponentModel;
 using System.Windows;
@@ -14,14 +13,12 @@ namespace Micser.App
     /// </summary>
     public partial class MainShell
     {
-        private readonly IRegionManager _regionManager;
         private readonly ISettingsService _settingsService;
 
-        public MainShell(IRegionManager regionManager, ISettingsService settingsService)
+        public MainShell(ISettingsService settingsService)
         {
             InitializeComponent();
 
-            _regionManager = regionManager;
             _settingsService = settingsService;
 
             Loaded += MainShell_Loaded;

@@ -57,19 +57,19 @@ namespace Micser.Plugins.Main.Audio
 {
     public class PitchSampleProcessor : SampleProcessor
     {
-        private const int MAX_FRAME_LENGTH = 4096;
+        private const int MaxFrameLength = 4096;
 
-        private readonly float[] _anaFreq = new float[MAX_FRAME_LENGTH];
-        private readonly float[] _anaMagn = new float[MAX_FRAME_LENGTH];
-        private readonly float[] _fftWorksp = new float[2 * MAX_FRAME_LENGTH];
-        private readonly float[] _inFiFo = new float[MAX_FRAME_LENGTH];
-        private readonly float[] _lastPhase = new float[MAX_FRAME_LENGTH / 2 + 1];
+        private readonly float[] _anaFreq = new float[MaxFrameLength];
+        private readonly float[] _anaMagn = new float[MaxFrameLength];
+        private readonly float[] _fftWorksp = new float[2 * MaxFrameLength];
+        private readonly float[] _inFiFo = new float[MaxFrameLength];
+        private readonly float[] _lastPhase = new float[MaxFrameLength / 2 + 1];
         private readonly PitchModule _module;
-        private readonly float[] _outFiFo = new float[MAX_FRAME_LENGTH];
-        private readonly float[] _outputAccum = new float[2 * MAX_FRAME_LENGTH];
-        private readonly float[] _sumPhase = new float[MAX_FRAME_LENGTH / 2 + 1];
-        private readonly float[] _synFreq = new float[MAX_FRAME_LENGTH];
-        private readonly float[] _synMagn = new float[MAX_FRAME_LENGTH];
+        private readonly float[] _outFiFo = new float[MaxFrameLength];
+        private readonly float[] _outputAccum = new float[2 * MaxFrameLength];
+        private readonly float[] _sumPhase = new float[MaxFrameLength / 2 + 1];
+        private readonly float[] _synFreq = new float[MaxFrameLength];
+        private readonly float[] _synMagn = new float[MaxFrameLength];
 
         private int _fftSize;
         private int _oversampling;

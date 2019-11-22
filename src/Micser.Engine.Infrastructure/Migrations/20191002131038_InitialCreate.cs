@@ -7,10 +7,10 @@ namespace Micser.Engine.Infrastructure.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Modules",
-                columns: table => new
+                "Modules",
+                table => new
                 {
-                    Id = table.Column<long>(nullable: false)
+                    Id = table.Column<long>()
                         .Annotation("Sqlite:Autoincrement", true),
                     ModuleType = table.Column<string>(nullable: true),
                     StateJson = table.Column<string>(nullable: true),
@@ -22,10 +22,10 @@ namespace Micser.Engine.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Settings",
-                columns: table => new
+                "Settings",
+                table => new
                 {
-                    Id = table.Column<long>(nullable: false)
+                    Id = table.Column<long>()
                         .Annotation("Sqlite:Autoincrement", true),
                     Key = table.Column<string>(nullable: true),
                     ValueJson = table.Column<string>(nullable: true),
@@ -37,60 +37,60 @@ namespace Micser.Engine.Infrastructure.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "ModuleConnections",
-                columns: table => new
+                "ModuleConnections",
+                table => new
                 {
-                    Id = table.Column<long>(nullable: false)
+                    Id = table.Column<long>()
                         .Annotation("Sqlite:Autoincrement", true),
                     SourceConnectorName = table.Column<string>(nullable: true),
-                    SourceModuleId = table.Column<long>(nullable: false),
+                    SourceModuleId = table.Column<long>(),
                     TargetConnectorName = table.Column<string>(nullable: true),
-                    TargetModuleId = table.Column<long>(nullable: false)
+                    TargetModuleId = table.Column<long>()
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ModuleConnections", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_ModuleConnections_Modules_SourceModuleId",
-                        column: x => x.SourceModuleId,
-                        principalTable: "Modules",
-                        principalColumn: "Id",
+                        "FK_ModuleConnections_Modules_SourceModuleId",
+                        x => x.SourceModuleId,
+                        "Modules",
+                        "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_ModuleConnections_Modules_TargetModuleId",
-                        column: x => x.TargetModuleId,
-                        principalTable: "Modules",
-                        principalColumn: "Id",
+                        "FK_ModuleConnections_Modules_TargetModuleId",
+                        x => x.TargetModuleId,
+                        "Modules",
+                        "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_ModuleConnections_SourceModuleId",
-                table: "ModuleConnections",
-                column: "SourceModuleId");
+                "IX_ModuleConnections_SourceModuleId",
+                "ModuleConnections",
+                "SourceModuleId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ModuleConnections_TargetModuleId",
-                table: "ModuleConnections",
-                column: "TargetModuleId");
+                "IX_ModuleConnections_TargetModuleId",
+                "ModuleConnections",
+                "TargetModuleId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Settings_Key",
-                table: "Settings",
-                column: "Key",
+                "IX_Settings_Key",
+                "Settings",
+                "Key",
                 unique: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "ModuleConnections");
+                "ModuleConnections");
 
             migrationBuilder.DropTable(
-                name: "Settings");
+                "Settings");
 
             migrationBuilder.DropTable(
-                name: "Modules");
+                "Modules");
         }
     }
 }

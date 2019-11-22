@@ -264,7 +264,7 @@ namespace Micser.App.Infrastructure.Behaviors
                 {
                     while (true)
                     {
-                        var ind = text.IndexOf(NumberFormatInfo.CurrentInfo.NumberDecimalSeparator);
+                        var ind = text.IndexOf(NumberFormatInfo.CurrentInfo.NumberDecimalSeparator, StringComparison.Ordinal);
                         if (ind == -1)
                         {
                             break;
@@ -331,7 +331,7 @@ namespace Micser.App.Infrastructure.Behaviors
                     var newVal = ValidateLimits(GetMinimumValue(textBox), GetMaximumValue(textBox), val);
                     if (val != newVal)
                     {
-                        text = newVal.ToString();
+                        text = newVal.ToString(CultureInfo.CurrentCulture);
                     }
                     else if (val == 0)
                     {
