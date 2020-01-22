@@ -1,5 +1,7 @@
 ﻿using CSCore.CoreAudioAPI;
+using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Micser.Common.Devices
@@ -53,8 +55,16 @@ namespace Micser.Common.Devices
         {
             using (var deviceEnumerator = new MMDeviceEnumerator())
             {
-                var device = deviceEnumerator.GetDevice(id);
-                return GetDescription(device);
+                try
+                {
+                    var device = deviceEnumerator.GetDevice(id);
+                    return GetDescription(device);
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex);
+                    return null;
+                }
             }
         }
 

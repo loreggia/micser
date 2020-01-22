@@ -194,8 +194,7 @@ namespace Micser.Engine.Infrastructure.Audio
             var deviceDescription = deviceService.GetDescription(e.DeviceId);
 
             if (e.DeviceId == DeviceDescription?.Id ||
-                deviceDescription.Type == DeviceType &&
-                deviceDescription.AdapterName == AdapterName)
+                deviceDescription != null && deviceDescription.Type == DeviceType && deviceDescription.AdapterName == AdapterName)
             {
                 await Task.Run(() => OnDeviceStateChanged(deviceDescription)).ConfigureAwait(false);
             }
