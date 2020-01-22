@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <UseWPF>true</UseWPF>
     <LangVersion>8</LangVersion>
     <ApplicationIcon>..\..\gfx\logo.ico</ApplicationIcon>
@@ -26,14 +26,13 @@
 
   <ItemGroup>
     <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="1.0.8" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.1" />
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.0.0" />
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.0.1" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Micser.App.Infrastructure\Micser.App.Infrastructure.csproj" />
-    <ProjectReference Include="..\Micser.App.Prism\Micser.App.Prism.csproj" />
     <ProjectReference Include="..\Micser.Plugins.Main\Micser.Plugins.Main.csproj" />
   </ItemGroup>
 

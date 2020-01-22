@@ -11,7 +11,7 @@
     xmlns:converter="clr-namespace:Micser.App.Infrastructure.Converter;assembly=Micser.App.Infrastructure"
     xmlns:ii="clr-namespace:Micser.App.Infrastructure.Interaction;assembly=Micser.App.Infrastructure"
     xmlns:in="http://schemas.microsoft.com/xaml/behaviors"
-    xmlns:ir="clr-namespace:Prism.Interactivity.InteractionRequest;assembly=Micser.App.Prism"
+    xmlns:ir="http://prismlibrary.com/"
     mc:Ignorable="d"
     d:DataContext="{d:DesignInstance vm:MainViewModel}"
     d:DesignWidth="300"
