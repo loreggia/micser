@@ -12,9 +12,9 @@
       <DrvDir>$(BinDir)Driver</DrvDir>
     </PropertyGroup>
     <ItemGroup>
-      <AppFiles Include="$(SolutionDir)Micser.App\bin\$(ConfigurationName)\netcoreapp3.0\**\*.*" Exclude="$(SolutionDir)Micser.App\bin\$(ConfigurationName)\**\*.pdb" />
-      <AppFiles Include="$(SolutionDir)Micser.Engine\bin\$(ConfigurationName)\netcoreapp3.0\**\*.*" Exclude="$(SolutionDir)Micser.Engine\bin\$(ConfigurationName)\**\*.pdb" />
-      <AppFiles Include="$(SolutionDir)Micser.DriverUtility\bin\$(ConfigurationName)\netcoreapp3.0\**\*.*" Exclude="$(SolutionDir)Micser.DriverUtility\bin\$(ConfigurationName)\**\*.pdb" />
+      <AppFiles Include="$(SolutionDir)Micser.App\bin\$(ConfigurationName)\netcoreapp3.1\**\*.*" Exclude="$(SolutionDir)Micser.App\bin\$(ConfigurationName)\**\*.pdb" />
+      <AppFiles Include="$(SolutionDir)Micser.Engine\bin\$(ConfigurationName)\netcoreapp3.1\**\*.*" Exclude="$(SolutionDir)Micser.Engine\bin\$(ConfigurationName)\**\*.pdb" />
+      <AppFiles Include="$(SolutionDir)Micser.DriverUtility\bin\$(ConfigurationName)\netcoreapp3.1\**\*.*" Exclude="$(SolutionDir)Micser.DriverUtility\bin\$(ConfigurationName)\**\*.pdb" />
       <DriverFiles Include="$(SolutionDir)Micser.Vac.Package\bin\$(ConfigurationName)\**\*.*" />
     </ItemGroup>
     <Copy SourceFiles="@(AppFiles)" DestinationFolder="$(AppDir)\%(RecursiveDir)" />

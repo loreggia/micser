@@ -11,7 +11,7 @@
         xmlns:l="clr-namespace:Micser.App.Infrastructure.Localization;assembly=Micser.App.Infrastructure"
         xmlns:r="clr-namespace:Micser.App.Resources"
         xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-        xmlns:regions="clr-namespace:Prism.Regions;assembly=Micser.App.Prism"
+        xmlns:regions="http://prismlibrary.com/"
         mc:Ignorable="d"
         x:Name="Window"
         l:LocalizationManager.ResourceManager="{x:Static r:Strings.ResourceManager}"
