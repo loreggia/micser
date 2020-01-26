@@ -10,7 +10,7 @@ using Micser.Common.Settings;
 using NLog;
 using Prism.Commands;
 using Prism.Events;
-using Prism.Interactivity.InteractionRequest;
+using Prism.Services.Dialogs;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -26,6 +26,7 @@ namespace Micser.App.ViewModels
     {
         private readonly ObservableCollection<ConnectionViewModel> _connections;
         private readonly ModuleConnectionsApiClient _connectionsApiClient;
+        private readonly IDialogService _dialogService;
         private readonly IEventAggregator _eventAggregator;
         private readonly ILogger _logger;
         private readonly ModulesApiClient _modulesApiClient;
@@ -50,6 +51,7 @@ namespace Micser.App.ViewModels
             INavigationManager navigationManager,
             IEventAggregator eventAggregator,
             ISettingsService settingsService,
+            IDialogService dialogService,
             ModulesApiClient modulesApiClient,
             ModuleConnectionsApiClient connectionsApiClient,
             ModulesSerializer modulesSerializer)
@@ -59,6 +61,7 @@ namespace Micser.App.ViewModels
             _navigationManager = navigationManager;
             _eventAggregator = eventAggregator;
             _settingsService = settingsService;
+            _dialogService = dialogService;
             _modulesApiClient = modulesApiClient;
             _connectionsApiClient = connectionsApiClient;
             _modulesSerializer = modulesSerializer;
@@ -80,11 +83,9 @@ namespace Micser.App.ViewModels
 
             ImportFileCommand = new DelegateCommand(ImportFile, () => !IsBusy);
             AddCommandBinding(CustomApplicationCommands.Import, ImportFileCommand);
-            ImportFileRequest = new InteractionRequest<IConfirmation>();
 
             ExportFileCommand = new DelegateCommand(ExportFile, () => !IsBusy);
             AddCommandBinding(CustomApplicationCommands.Export, ExportFileCommand);
-            ExportFileRequest = new InteractionRequest<IConfirmation>();
         }
 
         public IEnumerable<WidgetDescription> AvailableWidgets
@@ -99,11 +100,7 @@ namespace Micser.App.ViewModels
 
         public ICommand ExportFileCommand { get; }
 
-        public InteractionRequest<IConfirmation> ExportFileRequest { get; set; }
-
         public ICommand ImportFileCommand { get; }
-
-        public InteractionRequest<IConfirmation> ImportFileRequest { get; set; }
 
         public bool IsWidgetToolBoxOpen
         {
@@ -235,61 +232,45 @@ namespace Micser.App.ViewModels
             viewModel.PropertyChanged -= OnWidgetPropertyChanged;
         }
 
-        private void ExportFile()
+        private async void ExportFile()
         {
-            var confirmation = new FileDialogConfirmation { Title = Strings.ExportConfigurationDialogTitle, DefaultExtension = ".json" };
-            confirmation.AddFilter(Strings.JsonFiles, "*.json");
-            ExportFileRequest.Raise(confirmation, async c =>
+            if (_dialogService.ShowSaveFileDialog(
+                new FileDialogOptions(Strings.ExportConfigurationDialogTitle, ".json"),
+                out var fileName))
             {
-                if (!c.Confirmed)
+                await LoadDataAsync();
+
+                var data = new ModulesExportDto
                 {
-                    return;
-                }
+                    Modules = _moduleDtos.ToArray(),
+                    Connections = _connectionDtos.ToArray()
+                };
 
-                if (c.Content is string fileName)
-                {
-                    await LoadDataAsync();
-
-                    var data = new ModulesExportDto
-                    {
-                        Modules = _moduleDtos.ToArray(),
-                        Connections = _connectionDtos.ToArray()
-                    };
-
-                    _modulesSerializer.Export(fileName, data);
-                }
-            });
+                _modulesSerializer.Export(fileName, data);
+            }
         }
 
-        private void ImportFile()
+        private async void ImportFile()
         {
-            var confirmation = new FileDialogConfirmation { Title = Strings.ImportConfigurationDialogTitle, DefaultExtension = ".json" };
-            confirmation.AddFilter(Strings.JsonFiles, "*.json");
-            ImportFileRequest.Raise(confirmation, async c =>
+            if (_dialogService.ShowOpenFileDialog(
+                new FileDialogOptions(Strings.ImportConfigurationDialogTitle, ".json"),
+                out var fileName))
             {
-                if (!c.Confirmed)
+                var dto = _modulesSerializer.Import(fileName);
+
+                if (dto == null)
                 {
+                    _logger.Error("Import data is empty.");
                     return;
                 }
 
-                if (c.Content is string fileName)
+                if (await _modulesApiClient.ImportConfigurationAsync(dto))
                 {
-                    var dto = _modulesSerializer.Import(fileName);
-
-                    if (dto == null)
-                    {
-                        _logger.Error("Import data is empty.");
-                        return;
-                    }
-
-                    if (await _modulesApiClient.ImportConfigurationAsync(dto))
-                    {
-                        _logger.Warn("Import failed. See engine log for details.");
-                    }
-
-                    await LoadDataAsync();
+                    _logger.Warn("Import failed. See engine log for details.");
                 }
-            });
+
+                await LoadDataAsync();
+            }
         }
 
         private async Task LoadConnections()

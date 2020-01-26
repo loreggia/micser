@@ -4,7 +4,7 @@ using Micser.App.Infrastructure.Settings;
 using Micser.App.Resources;
 using Micser.Common.Settings;
 using Prism.Commands;
-using Prism.Interactivity.InteractionRequest;
+using Prism.Services.Dialogs;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,36 +14,34 @@ namespace Micser.App.ViewModels
 {
     public class SettingsViewModel : ViewModelNavigationAware
     {
+        private readonly IDialogService _dialogService;
         private readonly ISettingsRegistry _settingsRegistry;
         private readonly SettingsSerializer _settingsSerializer;
         private readonly ISettingsService _settingsService;
         private IEnumerable<ISettingViewModel> _settings;
 
-        public SettingsViewModel(ISettingsRegistry settingsRegistry, ISettingsService settingsService, SettingsSerializer settingsSerializer)
+        public SettingsViewModel(
+            ISettingsRegistry settingsRegistry,
+            ISettingsService settingsService,
+            IDialogService dialogService,
+            SettingsSerializer settingsSerializer)
         {
             _settingsRegistry = settingsRegistry;
             _settingsService = settingsService;
+            _dialogService = dialogService;
             _settingsSerializer = settingsSerializer;
 
             RefreshCommand = new DelegateCommand(async () => await LoadAsync(), () => !IsBusy);
             ImportCommand = new DelegateCommand(async () => await ImportAsync(), () => !IsBusy);
             ExportCommand = new DelegateCommand(async () => await ExportAsync(), () => !IsBusy);
+
             AddCommandBinding(CustomApplicationCommands.Refresh, RefreshCommand);
             AddCommandBinding(CustomApplicationCommands.Import, ImportCommand);
             AddCommandBinding(CustomApplicationCommands.Export, ExportCommand);
-
-            ImportFileRequest = new InteractionRequest<IConfirmation>();
-            ExportFileRequest = new InteractionRequest<IConfirmation>();
         }
 
         public ICommand ExportCommand { get; }
-
-        public InteractionRequest<IConfirmation> ExportFileRequest { get; }
-
         public ICommand ImportCommand { get; }
-
-        public InteractionRequest<IConfirmation> ImportFileRequest { get; }
-
         public ICommand RefreshCommand { get; }
 
         public IEnumerable<ISettingViewModel> Settings
@@ -61,45 +59,33 @@ namespace Micser.App.ViewModels
 
         private Task ExportAsync()
         {
-            var confirmation = new FileDialogConfirmation { Title = Strings.ExportSettingsDialogTitle, DefaultExtension = ".json" };
-            confirmation.AddFilter(Strings.JsonFiles, "*.json");
-            ExportFileRequest.Raise(confirmation, c =>
+            if (_dialogService.ShowSaveFileDialog(
+                new FileDialogOptions(Strings.ExportSettingsDialogTitle, ".json"),
+                out var fileName))
             {
-                if (!c.Confirmed)
-                {
-                    return;
-                }
-
-                var fileName = c.Content as string;
                 var result = _settingsSerializer.Export(fileName);
 
                 // todo show notification
                 if (result)
                 {
                 }
-            });
+            }
+
             return Task.CompletedTask;
         }
 
-        private Task ImportAsync()
+        private async Task ImportAsync()
         {
-            var confirmation = new FileDialogConfirmation { Title = Strings.ImportSettingsDialogTitle, DefaultExtension = ".json" };
-            confirmation.AddFilter(Strings.JsonFiles, "*.json");
-            ImportFileRequest.Raise(confirmation, async c =>
+            if (_dialogService.ShowSaveFileDialog(
+                new FileDialogOptions(Strings.ExportSettingsDialogTitle, ".json"),
+                out var fileName))
             {
-                if (!c.Confirmed)
-                {
-                    return;
-                }
-
-                var fileName = c.Content as string;
                 var result = _settingsSerializer.Import(fileName);
                 if (result)
                 {
                     await LoadAsync();
                 }
-            });
-            return Task.CompletedTask;
+            }
         }
 
         private async Task LoadAsync()

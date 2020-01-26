@@ -19,11 +19,11 @@
     </ScrollViewer>
 
     <in:Interaction.Triggers>
-        <ir:InteractionRequestTrigger SourceObject="{Binding ImportFileRequest}">
+        <!--<ir:InteractionRequestTrigger SourceObject="{Binding ImportFileRequest}">
             <interaction:OpenFileDialogAction />
         </ir:InteractionRequestTrigger>
         <ir:InteractionRequestTrigger SourceObject="{Binding ExportFileRequest}">
             <interaction:SaveFileDialogAction />
-        </ir:InteractionRequestTrigger>
+        </ir:InteractionRequestTrigger>-->
     </in:Interaction.Triggers>
 </i:View>

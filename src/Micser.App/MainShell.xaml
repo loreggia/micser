@@ -65,12 +65,4 @@
             </tb:TaskbarIcon.ContextMenu>
         </tb:TaskbarIcon>
     </Grid>
-
-    <i:Interaction.Triggers>
-        <i:EventTrigger EventName="Raised" SourceObject="{Binding MessageBoxInteractionRequest}">
-            <i:EventTrigger.Actions>
-                <interaction:MessageBoxAction />
-            </i:EventTrigger.Actions>
-        </i:EventTrigger>
-    </i:Interaction.Triggers>
 </Window>

@@ -1,18 +1,21 @@
-﻿using Prism.Interactivity.InteractionRequest;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
 namespace Micser.App.Infrastructure.Interaction
 {
-    /// <summary>
-    /// Open/save file dialog confirmation for use with an <see cref="InteractionRequest{T}"/>.
-    /// </summary>
-    public class FileDialogConfirmation : Confirmation
+    public class FileDialogOptions
     {
         private readonly Dictionary<string, string[]> _filters;
 
-        /// <inheritdoc />
-        public FileDialogConfirmation()
+        public FileDialogOptions(string title, string defaultExtension, string fileName = null)
+            : this()
+        {
+            Title = title;
+            DefaultExtension = defaultExtension;
+            FileName = fileName;
+        }
+
+        public FileDialogOptions()
         {
             _filters = new Dictionary<string, string[]>();
         }
@@ -23,9 +26,19 @@ namespace Micser.App.Infrastructure.Interaction
         public string DefaultExtension { get; set; }
 
         /// <summary>
+        /// Gets or sets the default file name.
+        /// </summary>
+        public string FileName { get; set; }
+
+        /// <summary>
         /// Gets the processed filter string.
         /// </summary>
         public string Filter => string.Join("|", _filters.Select(f => f.Key + "|" + string.Join(";", f.Value)));
+
+        /// <summary>
+        /// Gets or sets the dialog title.
+        /// </summary>
+        public string Title { get; set; }
 
         /// <summary>
         /// Adds a file type filter.

@@ -62,9 +62,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Micser.Engine.Test", "Micse
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Micser.Plugins.Main.Test", "Micser.Plugins.Main.Test\Micser.Plugins.Main.Test.csproj", "{8B4D74C3-A5B7-404B-A768-55963593EAD2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Micser.App.Prism", "Micser.App.Prism\Micser.App.Prism.csproj", "{4E9D4BDB-2D7D-4481-9E85-1BBCF653BFF3}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Micser.TestCommon", "Micser.TestCommon\Micser.TestCommon.csproj", "{8991D1F2-5151-4D54-BFC1-31989770B6AB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Micser.TestCommon", "Micser.TestCommon\Micser.TestCommon.csproj", "{8991D1F2-5151-4D54-BFC1-31989770B6AB}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -210,14 +208,6 @@ Global
 		{8B4D74C3-A5B7-404B-A768-55963593EAD2}.Release|x64.Build.0 = Release|Any CPU
 		{8B4D74C3-A5B7-404B-A768-55963593EAD2}.Release|x86.ActiveCfg = Release|Any CPU
 		{8B4D74C3-A5B7-404B-A768-55963593EAD2}.Release|x86.Build.0 = Release|Any CPU
-		{4E9D4BDB-2D7D-4481-9E85-1BBCF653BFF3}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{4E9D4BDB-2D7D-4481-9E85-1BBCF653BFF3}.Debug|x64.Build.0 = Debug|Any CPU
-		{4E9D4BDB-2D7D-4481-9E85-1BBCF653BFF3}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{4E9D4BDB-2D7D-4481-9E85-1BBCF653BFF3}.Debug|x86.Build.0 = Debug|Any CPU
-		{4E9D4BDB-2D7D-4481-9E85-1BBCF653BFF3}.Release|x64.ActiveCfg = Release|Any CPU
-		{4E9D4BDB-2D7D-4481-9E85-1BBCF653BFF3}.Release|x64.Build.0 = Release|Any CPU
-		{4E9D4BDB-2D7D-4481-9E85-1BBCF653BFF3}.Release|x86.ActiveCfg = Release|Any CPU
-		{4E9D4BDB-2D7D-4481-9E85-1BBCF653BFF3}.Release|x86.Build.0 = Release|Any CPU
 		{8991D1F2-5151-4D54-BFC1-31989770B6AB}.Debug|x64.ActiveCfg = Debug|Any CPU
 		{8991D1F2-5151-4D54-BFC1-31989770B6AB}.Debug|x64.Build.0 = Debug|Any CPU
 		{8991D1F2-5151-4D54-BFC1-31989770B6AB}.Debug|x86.ActiveCfg = Debug|Any CPU
