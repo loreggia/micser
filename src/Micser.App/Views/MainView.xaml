@@ -84,11 +84,11 @@
     </Grid>
 
     <in:Interaction.Triggers>
-        <ir:InteractionRequestTrigger SourceObject="{Binding ImportFileRequest}">
+        <!--<ir:InteractionRequestTrigger SourceObject="{Binding ImportFileRequest}">
             <ii:OpenFileDialogAction />
         </ir:InteractionRequestTrigger>
         <ir:InteractionRequestTrigger SourceObject="{Binding ExportFileRequest}">
             <ii:SaveFileDialogAction />
-        </ir:InteractionRequestTrigger>
+        </ir:InteractionRequestTrigger>-->
     </in:Interaction.Triggers>
 </i:View>

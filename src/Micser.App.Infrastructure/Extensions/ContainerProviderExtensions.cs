@@ -1,6 +1,7 @@
 ﻿using Micser.App.Infrastructure.Widgets;
 using Micser.Common;
 using Micser.Common.Extensions;
+using Prism.Services.Dialogs;
 using System.Windows;
 
 namespace Micser.App.Infrastructure.Extensions
@@ -10,6 +11,19 @@ namespace Micser.App.Infrastructure.Extensions
     /// </summary>
     public static class ContainerProviderExtensions
     {
+        /// <summary>
+        /// Registers a dialog for use with the Prism <see cref="IDialogService"/>.
+        /// </summary>
+        /// <typeparam name="TView">The view type of the dialog.</typeparam>
+        /// <typeparam name="TViewModel">The dialog's view model type.</typeparam>
+        /// <param name="container">The container.</param>
+        public static void RegisterDialog<TView, TViewModel>(this IContainerProvider container)
+            where TView : FrameworkElement
+            where TViewModel : IDialogAware, IViewModel
+        {
+            container.RegisterView<TView, TViewModel>();
+        }
+
         /// <summary>
         /// Registers a view and it's corresponding view model.
         /// </summary>

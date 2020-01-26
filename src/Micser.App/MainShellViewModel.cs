@@ -1,7 +1,7 @@
 ﻿using Micser.App.Infrastructure;
 using Micser.App.Infrastructure.Interaction;
 using Prism.Events;
-using Prism.Interactivity.InteractionRequest;
+using Prism.Services.Dialogs;
 using System;
 using System.Windows;
 
@@ -9,14 +9,13 @@ namespace Micser.App
 {
     public class MainShellViewModel : ViewModel
     {
-        public MainShellViewModel(IEventAggregator eventAggregator)
-        {
-            MessageBoxInteractionRequest = new InteractionRequest<IConfirmation>();
+        private readonly IDialogService _dialogService;
 
+        public MainShellViewModel(IEventAggregator eventAggregator, IDialogService dialogService)
+        {
+            _dialogService = dialogService;
             eventAggregator.GetEvent<MessageBoxEvent>().Subscribe(ShowMessageBox, ThreadOption.UIThread, false);
         }
-
-        public InteractionRequest<IConfirmation> MessageBoxInteractionRequest { get; }
 
         private void ShowMessageBox(MessageBoxEventArgs args)
         {
@@ -49,18 +48,8 @@ namespace Micser.App
                     throw new ArgumentOutOfRangeException();
             }
 
-            MessageBoxInteractionRequest.Raise(new Confirmation
-            {
-                Title = args.Title,
-                Content = new MessageBoxContent
-                {
-                    Buttons = buttons,
-                    Image = image,
-                    Message = args.Message,
-                    IsModal = args.IsModal,
-                    ParentWindow = Application.Current.MainWindow
-                }
-            }, c => args.Callback?.Invoke(c.Confirmed));
+            // TODO return ButtonResult?
+            _dialogService.ShowMessageBox(args.Message, buttons, image, result => args.Callback?.Invoke(result == ButtonResult.OK || result == ButtonResult.Yes));
         }
     }
 }

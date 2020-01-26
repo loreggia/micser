@@ -5,6 +5,7 @@ using Micser.App.Infrastructure.Api;
 using Micser.App.Infrastructure.Commands;
 using Micser.App.Infrastructure.DataAccess;
 using Micser.App.Infrastructure.Extensions;
+using Micser.App.Infrastructure.Interaction;
 using Micser.App.Infrastructure.Localization;
 using Micser.App.Infrastructure.Menu;
 using Micser.App.Infrastructure.Navigation;
@@ -93,6 +94,8 @@ namespace Micser.App
             container.RegisterSingleton<ISettingsService, SettingsService>();
             container.RegisterType<ISettingValueRepository, SettingValueRepository>();
             container.RegisterInstance<ISettingHandlerFactory>(new SettingHandlerFactory(t => (ISettingHandler)container.Resolve(t)));
+
+            container.RegisterDialog<MessageBoxView, MessageBoxViewModel>();
 
             container.RegisterView<MainMenuView, MainMenuViewModel>();
             container.RegisterView<MainStatusBarView, MainStatusBarViewModel>();

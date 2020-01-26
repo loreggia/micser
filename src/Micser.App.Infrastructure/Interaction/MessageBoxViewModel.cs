@@ -1,5 +1,5 @@
-﻿using Micser.App.Infrastructure.Resources;
-using Prism.Interactivity.InteractionRequest;
+﻿using Prism.Commands;
+using Prism.Services.Dialogs;
 using System;
 using System.Drawing;
 using System.Windows;
@@ -9,23 +9,22 @@ namespace Micser.App.Infrastructure.Interaction
     /// <summary>
     /// View model for generic message box interaction requests.
     /// </summary>
-    public class MessageBoxViewModel : ViewModel
+    public class MessageBoxViewModel : ViewModel, IDialogAware
     {
         private MessageBoxButton _buttons;
-        private string _cancelText;
-        private INotification _confirmation;
-        private string _confirmationText;
         private MessageBoxImage _image;
         private Icon _imageIcon;
         private string _message;
+        private IDialogParameters _parameters;
         private string _title;
 
         /// <inheritdoc />
         public MessageBoxViewModel()
         {
-            SetButtonTexts();
-            SetImageIcon();
+            CloseCommand = new DelegateCommand<ButtonResult?>(CloseDialog);
         }
+
+        public event Action<IDialogResult> RequestClose;
 
         /// <summary>
         /// Gets or sets the confirmation/cancel button layout and labeling.
@@ -33,32 +32,13 @@ namespace Micser.App.Infrastructure.Interaction
         public MessageBoxButton Buttons
         {
             get => _buttons;
-            set
-            {
-                if (SetProperty(ref _buttons, value))
-                {
-                    SetButtonTexts();
-                }
-            }
+            set => SetProperty(ref _buttons, value);
         }
 
         /// <summary>
-        /// Gets or sets the text shown on the cancel button.
+        /// Gets a command that closes the dialog. Requires a parameter of type <see cref="ButtonResult"/>.
         /// </summary>
-        public string CancelText
-        {
-            get => _cancelText;
-            set => SetProperty(ref _cancelText, value);
-        }
-
-        /// <summary>
-        /// Gets or sets the text shown on the confirmation button.
-        /// </summary>
-        public string ConfirmationText
-        {
-            get => _confirmationText;
-            set => SetProperty(ref _confirmationText, value);
-        }
+        public DelegateCommand<ButtonResult?> CloseCommand { get; }
 
         /// <summary>
         /// Gets or sets the image type of the icon displayed in the message box.
@@ -94,15 +74,6 @@ namespace Micser.App.Infrastructure.Interaction
         }
 
         /// <summary>
-        /// Gets or sets the notification/confirmation interaction request.
-        /// </summary>
-        public INotification Notification
-        {
-            get => _confirmation;
-            set => SetProperty(ref _confirmation, value);
-        }
-
-        /// <summary>
         /// Gets or sets the message box title text.
         /// </summary>
         public string Title
@@ -111,34 +82,37 @@ namespace Micser.App.Infrastructure.Interaction
             set => SetProperty(ref _title, value);
         }
 
-        private void SetButtonTexts()
+        public virtual bool CanCloseDialog()
         {
-            switch (Buttons)
-            {
-                case MessageBoxButton.OK:
-                    ConfirmationText = Strings.MessageBoxButtonOk;
-                    CancelText = null;
-                    break;
-
-                case MessageBoxButton.OKCancel:
-                    ConfirmationText = Strings.MessageBoxButtonOk;
-                    CancelText = Strings.MessageBoxButtonCancel;
-                    break;
-
-                case MessageBoxButton.YesNoCancel:
-                    throw new NotSupportedException("MessageBoxButton mode YesNoCancel is not supported.");
-
-                case MessageBoxButton.YesNo:
-                    ConfirmationText = Strings.MessageBoxButtonYes;
-                    CancelText = Strings.MessageBoxButtonNo;
-                    break;
-
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            return true;
         }
 
-        private void SetImageIcon()
+        public virtual void OnDialogClosed()
+        {
+        }
+
+        public void OnDialogOpened(IDialogParameters parameters)
+        {
+            _parameters = parameters;
+
+            Message = parameters.GetValue<string>("message");
+            Image = parameters.GetValue<MessageBoxImage>("image");
+            Buttons = parameters.GetValue<MessageBoxButton>("buttons");
+
+            SetImageIcon();
+        }
+
+        protected virtual void CloseDialog(ButtonResult? result)
+        {
+            OnRequestClose(new DialogResult(result ?? ButtonResult.None, _parameters));
+        }
+
+        protected virtual void OnRequestClose(IDialogResult result)
+        {
+            RequestClose?.Invoke(result);
+        }
+
+        protected virtual void SetImageIcon()
         {
             switch (Image)
             {
