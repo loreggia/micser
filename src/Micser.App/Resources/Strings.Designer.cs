@@ -70,7 +70,7 @@ namespace Micser.App.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Micser - The managed audio routing framework..
+        ///   Looks up a localized string similar to Micser - .NET audio routing framework.
         /// </summary>
         public static string AboutText {
             get {
@@ -358,7 +358,7 @@ namespace Micser.App.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to If enabled, the program will start minimized on system startup (when &quot;Startup&quot; is enabled).
+        ///   Looks up a localized string similar to If enabled, the program will start minimized on system startup (when &quot;Startup&quot; is enabled)..
         /// </summary>
         public static string SettingStartupMinimizedDescription {
             get {
