@@ -1,0 +1,27 @@
+name: micser CI
+
+on: [push]
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 3.1.100
+
+#      run: dotnet build --configuration Release
+    - name: Setup Build
+      uses: warrenbuckley/Setup-MSBuild@v1
+
+    - name: Build
+      working-directory: src
+      run: msbuild Micser.sln /p:Platform=x64 /p:Configuration=Release
+
+    - name: Test
+      working-directory: src
+      run: dotnet test Micser.sln --configuration Release
