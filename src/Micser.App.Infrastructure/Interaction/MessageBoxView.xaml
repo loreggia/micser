@@ -45,10 +45,14 @@
         </Grid>
 
         <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
-            <Button Content="OK" IsDefault="True" MinWidth="75" Command="{Binding CloseCommand}" CommandParameter="{x:Static dialogs:ButtonResult.OK}" />
-            <Button Content="Yes" IsDefault="True" MinWidth="75" Command="{Binding CloseCommand}" CommandParameter="{x:Static dialogs:ButtonResult.Yes}" />
-            <Button Content="No" MinWidth="75" Command="{Binding CloseCommand}" CommandParameter="{x:Static dialogs:ButtonResult.No}" />
-            <Button Content="Cancel" IsCancel="True" MinWidth="75" Command="{Binding CloseCommand}" CommandParameter="{x:Static dialogs:ButtonResult.Cancel}" />
+            <Button Content="OK" IsDefault="True" MinWidth="75" Command="{Binding CloseCommand}" CommandParameter="{x:Static dialogs:ButtonResult.OK}"
+                    Visibility="{Binding Buttons, Converter={converter:MessageBoxButtonToVisibilityConverter}, ConverterParameter={x:Static converter:MessageBoxButtonType.Ok}}" />
+            <Button Content="Yes" IsDefault="True" MinWidth="75" Command="{Binding CloseCommand}" CommandParameter="{x:Static dialogs:ButtonResult.Yes}"
+                    Visibility="{Binding Buttons, Converter={converter:MessageBoxButtonToVisibilityConverter}, ConverterParameter={x:Static converter:MessageBoxButtonType.Yes}}" />
+            <Button Content="No" MinWidth="75" Command="{Binding CloseCommand}" CommandParameter="{x:Static dialogs:ButtonResult.No}"
+                    Visibility="{Binding Buttons, Converter={converter:MessageBoxButtonToVisibilityConverter}, ConverterParameter={x:Static converter:MessageBoxButtonType.No}}" />
+            <Button Content="Cancel" IsCancel="True" MinWidth="75" Command="{Binding CloseCommand}" CommandParameter="{x:Static dialogs:ButtonResult.Cancel}"
+                    Visibility="{Binding Buttons, Converter={converter:MessageBoxButtonToVisibilityConverter}, ConverterParameter={x:Static converter:MessageBoxButtonType.Cancel}}" />
         </StackPanel>
     </Grid>
 </i:View>
