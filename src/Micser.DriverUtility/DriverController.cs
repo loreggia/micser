@@ -67,7 +67,7 @@ namespace Micser.DriverUtility
 
                         uint bytesReturned = 0;
                         var overlapped = new NativeOverlapped();
-                        var success = SafeNativeMethods.DeviceIoControl(hFileHandle, ioCtlReload, null, 0, null, 0, ref bytesReturned, ref overlapped);
+                        var success = SafeNativeMethods.DeviceIoControl(hFileHandle, ioCtlReload, IntPtr.Zero, 0, IntPtr.Zero, 0, ref bytesReturned, ref overlapped);
 
                         if (!success)
                         {
@@ -142,11 +142,15 @@ namespace Micser.DriverUtility
             [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
             public static extern SafeFileHandle CreateFile(
                 string lpFileName,
-                [MarshalAs(UnmanagedType.U4)] FileAccess dwDesiredAccess,
-                [MarshalAs(UnmanagedType.U4)] FileShare dwShareMode,
+                [MarshalAs(UnmanagedType.U4)]
+                FileAccess dwDesiredAccess,
+                [MarshalAs(UnmanagedType.U4)]
+                FileShare dwShareMode,
                 IntPtr lpSecurityAttributes,
-                [MarshalAs(UnmanagedType.U4)] FileMode dwCreationDisposition,
-                [MarshalAs(UnmanagedType.U4)] FileAttributes dwFlagsAndAttributes,
+                [MarshalAs(UnmanagedType.U4)]
+                FileMode dwCreationDisposition,
+                [MarshalAs(UnmanagedType.U4)]
+                FileAttributes dwFlagsAndAttributes,
                 IntPtr hTemplateFile);
 
             public static uint CtlCode(uint deviceType, uint function, uint method, uint fileAccess)
@@ -158,14 +162,12 @@ namespace Micser.DriverUtility
             public static extern bool DeviceIoControl(
                 SafeFileHandle hDevice,
                 uint IoControlCode,
-                [MarshalAs(UnmanagedType.AsAny)]
-                [In] object InBuffer,
+                IntPtr InBuffer,
                 uint nInBufferSize,
-                [MarshalAs(UnmanagedType.AsAny)]
-                [Out] object OutBuffer,
+                IntPtr OutBuffer,
                 uint nOutBufferSize,
                 ref uint pBytesReturned,
-                [In] ref NativeOverlapped Overlapped
+                ref NativeOverlapped Overlapped
             );
         }
     }
