@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AboutText" xml:space="preserve">
-    <value>Micser - Das .NET Audio-Routing-Framework</value>
+    <value>Micser - .NET Audio-Routing-Framework</value>
   </data>
   <data name="AboutVersionText" xml:space="preserve">
     <value>Version:</value>
@@ -181,7 +181,7 @@
     <value>E_xtras</value>
   </data>
   <data name="SettingColorThemeDescription" xml:space="preserve">
-    <value>Definiert das aktive Farbthema der Benutzeroberfläche</value>
+    <value>Definiert das aktive Farbthema der Benutzeroberfläche.</value>
   </data>
   <data name="SettingColorThemeName" xml:space="preserve">
     <value>Farbthema</value>

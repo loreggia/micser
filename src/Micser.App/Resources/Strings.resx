@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="AboutText" xml:space="preserve">
-    <value>Micser - The managed audio routing framework.</value>
+    <value>Micser - .NET audio routing framework</value>
   </data>
   <data name="AboutVersionText" xml:space="preserve">
     <value>Version:</value>
@@ -196,7 +196,7 @@
     <value>If enabled, the program will start when you log in.</value>
   </data>
   <data name="SettingStartupMinimizedDescription" xml:space="preserve">
-    <value>If enabled, the program will start minimized on system startup (when "Startup" is enabled)</value>
+    <value>If enabled, the program will start minimized on system startup (when "Startup" is enabled).</value>
   </data>
   <data name="SettingStartupMinimizedName" xml:space="preserve">
     <value>Start minimized</value>
