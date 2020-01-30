@@ -24,7 +24,7 @@ jobs:
 
     - name: Build
       working-directory: src
-      run: msbuild Micser.sln /p:Platform=x64 /p:Configuration=Release
+      run: msbuild Micser.sln /p:Platform=x64 /p:Configuration=Release /t:Restore;Build
 
     - name: Test
       working-directory: src
