@@ -1,19 +1,16 @@
-﻿using Microsoft.EntityFrameworkCore.Design;
-using Microsoft.Extensions.Configuration;
-using System.Collections.Generic;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
 
 namespace Micser.App.Infrastructure.DataAccess
 {
+    // ReSharper disable once UnusedMember.Global
     public class DesignTimeFactory : IDesignTimeDbContextFactory<AppDbContext>
     {
         public AppDbContext CreateDbContext(string[] args)
         {
-            var configurationBuilder = new ConfigurationBuilder();
-            configurationBuilder.AddInMemoryCollection(new Dictionary<string, string>
-            {
-                {"ConnectionStrings:DefaultConnection", "DesignTimeAppDb.db"}
-            });
-            return new AppDbContext(configurationBuilder.Build());
+            var builder = new DbContextOptionsBuilder();
+            builder.UseSqlite("DesignTimeAppDb.db");
+            return new AppDbContext(builder.Options);
         }
     }
 }

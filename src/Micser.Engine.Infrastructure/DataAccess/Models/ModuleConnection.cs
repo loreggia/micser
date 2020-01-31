@@ -1,4 +1,4 @@
-﻿using Micser.Common.DataAccess;
+﻿using Micser.Common.DataAccess.Entities;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Micser.Engine.Infrastructure.DataAccess.Models
@@ -6,7 +6,7 @@ namespace Micser.Engine.Infrastructure.DataAccess.Models
     /// <summary>
     /// Storage class for module connections.
     /// </summary>
-    public class ModuleConnection : Model
+    public class ModuleConnection : Entity
     {
         /// <summary>
         /// Gets or sets the name of the connector on the source widget.

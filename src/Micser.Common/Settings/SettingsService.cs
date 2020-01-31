@@ -1,7 +1,7 @@
-﻿using Micser.Common.Api;
+﻿using Microsoft.EntityFrameworkCore;
+using Micser.Common.Api;
 using Micser.Common.DataAccess;
-using Micser.Common.DataAccess.Models;
-using Micser.Common.DataAccess.Repositories;
+using Micser.Common.DataAccess.Entities;
 using Newtonsoft.Json;
 using NLog;
 using System;
@@ -18,7 +18,7 @@ namespace Micser.Common.Settings
     public class SettingsService : ISettingsService, IDisposable
     {
         private readonly SettingsApiClient _apiClient;
-        private readonly IUnitOfWorkFactory _database;
+        private readonly IDbContextFactory _dbContextFactory;
         private readonly SemaphoreSlim _loadSemaphore;
         private readonly ILogger _logger;
         private readonly ISettingsRegistry _registry;
@@ -28,7 +28,7 @@ namespace Micser.Common.Settings
 
         /// <inheritdoc />
         public SettingsService(
-            IUnitOfWorkFactory database,
+            IDbContextFactory dbContextFactory,
             ISettingHandlerFactory settingHandlerFactory,
             ISettingsRegistry registry,
             SettingsApiClient apiClient,
@@ -37,7 +37,7 @@ namespace Micser.Common.Settings
             _settings = new ConcurrentDictionary<string, object>();
             _loadSemaphore = new SemaphoreSlim(1, 1);
 
-            _database = database;
+            _dbContextFactory = dbContextFactory;
             _settingHandlerFactory = settingHandlerFactory;
             _registry = registry;
             _apiClient = apiClient;
@@ -90,63 +90,60 @@ namespace Micser.Common.Settings
 
             try
             {
-                using (var uow = _database.Create())
+                await using var dbContext = _dbContextFactory.Create();
+
+                foreach (var setting in _registry.Items)
                 {
-                    var settingRepo = uow.GetRepository<ISettingValueRepository>();
+                    object value = null;
 
-                    foreach (var setting in _registry.Items)
+                    if (setting.StorageType == SettingStorageType.Internal)
                     {
-                        object value = null;
+                        var settingValue = dbContext.Set<SettingValue>().FirstOrDefault(s => s.Key == setting.Key);
 
-                        if (setting.StorageType == SettingStorageType.Internal)
+                        if (settingValue?.ValueType != null)
                         {
-                            var settingValue = settingRepo.GetByKey(setting.Key);
+                            var type = Type.GetType(settingValue.ValueType);
 
-                            if (settingValue?.ValueType != null)
+                            if (type != null)
                             {
-                                var type = Type.GetType(settingValue.ValueType);
-
-                                if (type != null)
-                                {
-                                    value = JsonConvert.DeserializeObject(settingValue.ValueJson, type);
-                                }
-                            }
-                            else
-                            {
-                                value = setting.DefaultValue;
+                                value = JsonConvert.DeserializeObject(settingValue.ValueJson, type);
                             }
                         }
-                        else if (setting.StorageType == SettingStorageType.Api)
+                        else
                         {
-                            var settingValueResult = await _apiClient.GetSetting(setting.Key).ConfigureAwait(false);
-
-                            if (settingValueResult.IsSuccess)
-                            {
-                                value = settingValueResult.Data != null ? settingValueResult.Data.Value : setting.DefaultValue;
-                            }
-                            else
-                            {
-                                _logger.Warn($"Failed to get a setting from the setting API. Key: {setting.Key}, Result: {settingValueResult.Message}");
-                            }
+                            value = setting.DefaultValue;
                         }
-
-                        if (setting.HandlerType != null)
-                        {
-                            var handler = _settingHandlerFactory.Create(setting.HandlerType);
-
-                            if (handler is IListSettingHandler listHandler)
-                            {
-                                setting.List = listHandler.CreateList();
-                            }
-
-                            if (handler != null)
-                            {
-                                value = await handler.LoadSettingAsync(value ?? setting.DefaultValue).ConfigureAwait(false);
-                            }
-                        }
-
-                        _settings[setting.Key] = value;
                     }
+                    else if (setting.StorageType == SettingStorageType.Api)
+                    {
+                        var settingValueResult = await _apiClient.GetSetting(setting.Key).ConfigureAwait(false);
+
+                        if (settingValueResult.IsSuccess)
+                        {
+                            value = settingValueResult.Data != null ? settingValueResult.Data.Value : setting.DefaultValue;
+                        }
+                        else
+                        {
+                            _logger.Warn($"Failed to get a setting from the setting API. Key: {setting.Key}, Result: {settingValueResult.Message}");
+                        }
+                    }
+
+                    if (setting.HandlerType != null)
+                    {
+                        var handler = _settingHandlerFactory.Create(setting.HandlerType);
+
+                        if (handler is IListSettingHandler listHandler)
+                        {
+                            setting.List = listHandler.CreateList();
+                        }
+
+                        if (handler != null)
+                        {
+                            value = await handler.LoadSettingAsync(value ?? setting.DefaultValue).ConfigureAwait(false);
+                        }
+                    }
+
+                    _settings[setting.Key] = value;
                 }
             }
             catch (Exception ex)
@@ -186,30 +183,29 @@ namespace Micser.Common.Settings
 
             if (setting == null || setting.StorageType == SettingStorageType.Internal)
             {
-                using (var uow = _database.Create())
+                await using var dbContext = _dbContextFactory.Create();
+                var dbSet = dbContext.Set<SettingValue>();
+                var settingValue = await dbSet.FirstOrDefaultAsync(s => s.Key == key).ConfigureAwait(false)
+                                   ?? new SettingValue { Key = key };
+
+                var type = value?.GetType();
+
+                if (type == null)
                 {
-                    var settingRepo = uow.GetRepository<ISettingValueRepository>();
-                    var settingValue = settingRepo.GetByKey(key) ?? new SettingValue { Key = key };
-
-                    var type = value?.GetType();
-
-                    if (type == null)
-                    {
-                        settingValue.ValueJson = null;
-                    }
-                    else
-                    {
-                        settingValue.ValueType = type.AssemblyQualifiedName;
-                        settingValue.ValueJson = JsonConvert.SerializeObject(value);
-                    }
-
-                    if (settingValue.Id <= 0)
-                    {
-                        settingRepo.Add(settingValue);
-                    }
-
-                    uow.Complete();
+                    settingValue.ValueJson = null;
                 }
+                else
+                {
+                    settingValue.ValueType = type.AssemblyQualifiedName;
+                    settingValue.ValueJson = JsonConvert.SerializeObject(value);
+                }
+
+                if (settingValue.Id <= 0)
+                {
+                    dbSet.Add(settingValue);
+                }
+
+                await dbContext.SaveChangesAsync().ConfigureAwait(false);
             }
             else if (setting.StorageType == SettingStorageType.Api)
             {

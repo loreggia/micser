@@ -1,6 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore.Design;
-using Microsoft.Extensions.Configuration;
-using System.Collections.Generic;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Design;
 
 namespace Micser.Engine.Infrastructure.DataAccess
 {
@@ -9,12 +8,9 @@ namespace Micser.Engine.Infrastructure.DataAccess
     {
         public EngineDbContext CreateDbContext(string[] args)
         {
-            var configurationBuilder = new ConfigurationBuilder();
-            configurationBuilder.AddInMemoryCollection(new Dictionary<string, string>
-            {
-                {"ConnectionStrings:DefaultConnection", "DesignTimeEngineDb.db"}
-            });
-            return new EngineDbContext(configurationBuilder.Build());
+            var builder = new DbContextOptionsBuilder();
+            builder.UseSqlite("DesignTimeEngineDb.db");
+            return new EngineDbContext(builder.Options);
         }
     }
 }

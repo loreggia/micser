@@ -20,7 +20,6 @@ using Micser.App.Views;
 using Micser.Common;
 using Micser.Common.Api;
 using Micser.Common.DataAccess;
-using Micser.Common.DataAccess.Repositories;
 using Micser.Common.Extensions;
 using Micser.Common.Settings;
 using Micser.Common.Updates;
@@ -44,7 +43,7 @@ namespace Micser.App
 
         public void OnInitialized(IContainerProvider container)
         {
-            using (var dbContext = container.Resolve<DbContext>())
+            using (var dbContext = container.Resolve<IDbContextFactory>().Create())
             {
                 dbContext.Database.Migrate();
             }
@@ -67,10 +66,7 @@ namespace Micser.App
 
             container.RegisterFactory<ILogger>(c => LogManager.GetCurrentClassLogger());
 
-            container.RegisterType<DbContext, AppDbContext>();
-            container.RegisterInstance<IRepositoryFactory>(new RepositoryFactory((t, c) => (IRepository)container.Resolve(t, null, new DependencyOverride<DbContext>(c))));
-            container.RegisterInstance<IUnitOfWorkFactory>(new UnitOfWorkFactory(() => container.Resolve<IUnitOfWork>()));
-            container.RegisterType<IUnitOfWork, UnitOfWork>();
+            container.RegisterInstance<IDbContextFactory>(new DbContextFactory(() => new AppDbContext(container.GetDbContextOptions<AppDbContext>())));
 
             container.RegisterSingleton<INavigationManager, NavigationManager>();
 
@@ -92,7 +88,6 @@ namespace Micser.App
 
             container.RegisterSingleton<ISettingsRegistry, SettingsRegistry>();
             container.RegisterSingleton<ISettingsService, SettingsService>();
-            container.RegisterType<ISettingValueRepository, SettingValueRepository>();
             container.RegisterInstance<ISettingHandlerFactory>(new SettingHandlerFactory(t => (ISettingHandler)container.Resolve(t)));
 
             container.RegisterDialog<MessageBoxView, MessageBoxViewModel>();

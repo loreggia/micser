@@ -1,7 +1,8 @@
 ﻿using Micser.Common.DataAccess;
+using Micser.Common.Extensions;
 using Micser.Common.Modules;
+using Micser.Engine.Infrastructure.DataAccess;
 using Micser.Engine.Infrastructure.DataAccess.Models;
-using Micser.Engine.Infrastructure.DataAccess.Repositories;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -10,74 +11,64 @@ namespace Micser.Engine.Infrastructure.Services
     /// <inheritdoc cref="IModuleConnectionService"/>
     public class ModuleConnectionService : IModuleConnectionService
     {
-        private readonly IUnitOfWorkFactory _uowFactory;
+        private readonly IDbContextFactory _dbContextFactory;
 
         /// <inheritdoc />
-        public ModuleConnectionService(IUnitOfWorkFactory uowFactory)
+        public ModuleConnectionService(IDbContextFactory dbContextFactory)
         {
-            _uowFactory = uowFactory;
+            _dbContextFactory = dbContextFactory;
         }
 
         /// <inheritdoc />
         public ModuleConnectionDto Delete(long id)
         {
-            using (var uow = _uowFactory.Create())
+            using var context = _dbContextFactory.Create<EngineDbContext>();
+            var connection = context.ModuleConnections.Find(id);
+
+            if (connection == null)
             {
-                var connections = uow.GetRepository<IModuleConnectionRepository>();
-                var connection = connections.Get(id);
-
-                if (connection == null)
-                {
-                    return null;
-                }
-
-                connections.Remove(connection);
-                uow.Complete();
-
-                return GetModuleConnectionDto(connection);
+                return null;
             }
+
+            context.ModuleConnections.Remove(connection);
+            context.SaveChanges();
+
+            return GetModuleConnectionDto(connection);
         }
 
         /// <inheritdoc />
         public IEnumerable<ModuleConnectionDto> GetAll()
         {
-            using (var uow = _uowFactory.Create())
-            {
-                return uow.GetRepository<IModuleConnectionRepository>().GetAll().Select(GetModuleConnectionDto);
-            }
+            using var dbContext = _dbContextFactory.Create<EngineDbContext>();
+            return dbContext.ModuleConnections.AsEnumerable().Select(GetModuleConnectionDto).ToArray();
         }
 
         /// <inheritdoc />
         public ModuleConnectionDto GetById(long id)
         {
-            using (var uow = _uowFactory.Create())
-            {
-                var connection = uow.GetRepository<IModuleConnectionRepository>().Get(id);
-                return GetModuleConnectionDto(connection);
-            }
+            using var dbContext = _dbContextFactory.Create<EngineDbContext>();
+            var connection = dbContext.ModuleConnections.Find(id);
+            return GetModuleConnectionDto(connection);
         }
 
         /// <inheritdoc />
         public bool Insert(ModuleConnectionDto dto)
         {
-            using (var uow = _uowFactory.Create())
+            using var dbContext = _dbContextFactory.Create<EngineDbContext>();
+            var connection = dbContext.ModuleConnections.SingleOrDefault(c => c.SourceModuleId == dto.SourceId && c.TargetModuleId == dto.TargetId);
+
+            if (connection != null)
             {
-                var connections = uow.GetRepository<IModuleConnectionRepository>();
-                var connection = connections.GetBySourceAndTargetIds(dto.SourceId, dto.TargetId);
+                return false;
+            }
 
-                if (connection != null)
-                {
-                    return false;
-                }
+            connection = GetModuleConnection(dto);
+            dbContext.ModuleConnections.Add(connection);
 
-                connection = GetModuleConnection(dto);
-                connections.Add(connection);
-
-                if (uow.Complete() > 0)
-                {
-                    dto.Id = connection.Id;
-                    return true;
-                }
+            if (dbContext.SaveChanges() > 0)
+            {
+                dto.Id = connection.Id;
+                return true;
             }
 
             return false;
@@ -86,33 +77,27 @@ namespace Micser.Engine.Infrastructure.Services
         /// <inheritdoc />
         public bool Truncate()
         {
-            using (var uow = _uowFactory.Create())
-            {
-                var repository = uow.GetRepository<IModuleConnectionRepository>();
-                var connections = repository.GetAll();
-                repository.RemoveRange(connections);
-                return uow.Complete() >= 0;
-            }
+            using var dbContext = _dbContextFactory.Create<EngineDbContext>();
+            var connections = dbContext.ModuleConnections.AsEnumerable();
+            dbContext.ModuleConnections.RemoveRange(connections);
+            return dbContext.SaveChanges() >= 0;
         }
 
         /// <inheritdoc />
         public bool Update(ModuleConnectionDto dto)
         {
-            using (var uow = _uowFactory.Create())
+            using var dbContext = _dbContextFactory.Create<EngineDbContext>();
+            var connection = dbContext.ModuleConnections.Find(dto.Id);
+
+            if (connection == null)
             {
-                var connections = uow.GetRepository<IModuleConnectionRepository>();
-                var connection = connections.Get(dto.Id);
-
-                if (connection == null)
-                {
-                    return false;
-                }
-
-                connection.SourceModuleId = dto.SourceId;
-                connection.TargetModuleId = dto.TargetId;
-
-                return uow.Complete() > 0;
+                return false;
             }
+
+            connection.SourceModuleId = dto.SourceId;
+            connection.TargetModuleId = dto.TargetId;
+
+            return dbContext.SaveChanges() > 0;
         }
 
         private static ModuleConnection GetModuleConnection(ModuleConnectionDto dto)
