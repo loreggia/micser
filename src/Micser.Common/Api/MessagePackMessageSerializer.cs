@@ -8,21 +8,52 @@ namespace Micser.Common.Api
 {
     public class MessagePackMessageSerializer : IMessageSerializer
     {
+        private static readonly MessagePackSerializerOptions Options;
+
         static MessagePackMessageSerializer()
         {
-            CompositeResolver.RegisterAndSetAsDefault(
-                new IMessagePackFormatter[] { TypelessFormatter.Instance },
-                new[] { ContractlessStandardResolver.Instance });
+            var resolver = CompositeResolver.Create(
+                new[] { TypelessFormatter.Instance },
+                new[] { TypelessObjectResolver.Instance, ContractlessStandardResolver.Instance });
+            Options = MessagePackSerializerOptions
+                    .Standard
+                    .WithResolver(resolver);
         }
 
         public async Task<T> DeserializeAsync<T>(Stream stream)
         {
-            return await MessagePackSerializer.DeserializeAsync<T>(stream).ConfigureAwait(false);
+            try
+            {
+                return await MessagePackSerializer.DeserializeAsync<T>(stream, Options).ConfigureAwait(false);
+            }
+            catch (MessagePackSerializationException ex)
+            {
+                // unwrap exceptions
+                if (ex.InnerException != null)
+                {
+                    throw ex.InnerException;
+                }
+
+                throw;
+            }
         }
 
         public async Task SerializeAsync<T>(Stream stream, T value)
         {
-            await MessagePackSerializer.SerializeAsync(stream, value).ConfigureAwait(false);
+            try
+            {
+                await MessagePackSerializer.SerializeAsync(stream, value, Options).ConfigureAwait(false);
+            }
+            catch (MessagePackSerializationException ex)
+            {
+                // unwrap exceptions
+                if (ex.InnerException != null)
+                {
+                    throw ex.InnerException;
+                }
+
+                throw;
+            }
         }
     }
 }
