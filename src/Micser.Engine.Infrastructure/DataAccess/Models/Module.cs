@@ -1,4 +1,4 @@
-﻿using Micser.Common.DataAccess;
+﻿using Micser.Common.DataAccess.Entities;
 using Micser.Common.Modules;
 using System.Collections.Generic;
 
@@ -7,7 +7,7 @@ namespace Micser.Engine.Infrastructure.DataAccess.Models
     /// <summary>
     /// Storage class for modules.
     /// </summary>
-    public class Module : Model
+    public class Module : Entity
     {
         /// <summary>
         /// Gets or sets the assembly-qualified type of the module.

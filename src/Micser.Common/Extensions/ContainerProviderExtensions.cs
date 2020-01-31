@@ -1,6 +1,9 @@
-﻿using Micser.Common.Api;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Micser.Common.Api;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Unity;
 
@@ -8,6 +11,28 @@ namespace Micser.Common.Extensions
 {
     public static class ContainerProviderExtensions
     {
+        public static DbContextOptions GetDbContextOptions<TContext>(this IContainerProvider container, string connectionStringName = "DefaultConnection")
+            where TContext : DbContext
+        {
+            var configuration = container.Resolve<IConfiguration>();
+            var cs = configuration.GetConnectionString(connectionStringName);
+            var directory = Globals.AppDataFolder;
+
+#if DEBUG
+            directory = Path.Combine(directory, "Debug");
+#endif
+
+            if (!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            cs = cs.Replace(Globals.ConnectionStringFolder, directory);
+            return new DbContextOptionsBuilder<TContext>()
+                .UseSqlite(cs)
+                .Options;
+        }
+
         public static void RegisterFactory<T>(this IContainerProvider container, Func<IContainerProvider, object> factory, string name = null)
         {
             container.RegisterFactory(typeof(T), factory, name);

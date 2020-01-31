@@ -2,12 +2,10 @@
 using Micser.Common;
 using Micser.Common.Api;
 using Micser.Common.DataAccess;
-using Micser.Common.DataAccess.Repositories;
 using Micser.Common.Extensions;
 using Micser.Common.Settings;
 using Micser.Common.Updates;
 using Micser.Engine.Infrastructure.DataAccess;
-using Micser.Engine.Infrastructure.DataAccess.Repositories;
 using Micser.Engine.Infrastructure.Services;
 using NLog;
 
@@ -21,25 +19,16 @@ namespace Micser.Engine.Infrastructure
         /// <inheritdoc />
         public void OnInitialized(IContainerProvider container)
         {
-            using (var dbContext = container.Resolve<DbContext>())
-            {
-                dbContext.Database.Migrate();
-            }
+            using var dbContext = container.Resolve<IDbContextFactory>().Create();
+            dbContext.Database.Migrate();
         }
 
         /// <inheritdoc />
         public void RegisterTypes(IContainerProvider container)
         {
-            container.RegisterFactory<ILogger>(c => LogManager.GetCurrentClassLogger());
+            container.RegisterFactory<ILogger>(_ => LogManager.GetCurrentClassLogger());
 
-            container.RegisterType<DbContext, EngineDbContext>();
-            container.RegisterInstance<IRepositoryFactory>(new RepositoryFactory((t, c) => (IRepository)container.Resolve(t, null, new DependencyOverride<DbContext>(c))));
-            container.RegisterInstance<IUnitOfWorkFactory>(new UnitOfWorkFactory(() => container.Resolve<IUnitOfWork>()));
-            container.RegisterType<IUnitOfWork, UnitOfWork>();
-
-            container.RegisterType<IModuleRepository, ModuleRepository>();
-            container.RegisterType<IModuleConnectionRepository, ModuleConnectionRepository>();
-            container.RegisterType<ISettingValueRepository, SettingValueRepository>();
+            container.RegisterInstance<IDbContextFactory>(new DbContextFactory(() => new EngineDbContext(container.GetDbContextOptions<EngineDbContext>())));
 
             container.RegisterType<IModuleService, ModuleService>();
             container.RegisterType<IModuleConnectionService, ModuleConnectionService>();

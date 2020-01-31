@@ -1,7 +1,8 @@
 ﻿using Micser.Common.DataAccess;
+using Micser.Common.Extensions;
 using Micser.Common.Modules;
+using Micser.Engine.Infrastructure.DataAccess;
 using Micser.Engine.Infrastructure.DataAccess.Models;
-using Micser.Engine.Infrastructure.DataAccess.Repositories;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,51 +12,44 @@ namespace Micser.Engine.Infrastructure.Services
     /// <inheritdoc cref="IModuleService"/>
     public class ModuleService : IModuleService
     {
-        private readonly IUnitOfWorkFactory _uowFactory;
+        private readonly IDbContextFactory _dbContextFactory;
 
         /// <inheritdoc />
-        public ModuleService(IUnitOfWorkFactory uowFactory)
+        public ModuleService(IDbContextFactory dbContextFactory)
         {
-            _uowFactory = uowFactory;
+            _dbContextFactory = dbContextFactory;
         }
 
         /// <inheritdoc />
         public ModuleDto Delete(long id)
         {
-            using (var uow = _uowFactory.Create())
+            using var dbContext = _dbContextFactory.Create<EngineDbContext>();
+
+            var module = dbContext.Modules.Find(id);
+            if (module == null)
             {
-                var modules = uow.GetRepository<IModuleRepository>();
-
-                var module = modules.Get(id);
-                if (module == null)
-                {
-                    return null;
-                }
-
-                modules.Remove(module);
-                uow.Complete();
-
-                return GetModuleDto(module);
+                return null;
             }
+
+            dbContext.Modules.Remove(module);
+            dbContext.SaveChanges();
+
+            return GetModuleDto(module);
         }
 
         /// <inheritdoc />
         public IEnumerable<ModuleDto> GetAll()
         {
-            using (var uow = _uowFactory.Create())
-            {
-                return uow.GetRepository<IModuleRepository>().GetAll().Select(GetModuleDto);
-            }
+            using var dbContext = _dbContextFactory.Create<EngineDbContext>();
+            return dbContext.Modules.AsEnumerable().Select(GetModuleDto).ToArray();
         }
 
         /// <inheritdoc />
         public ModuleDto GetById(long id)
         {
-            using (var uow = _uowFactory.Create())
-            {
-                var module = uow.GetRepository<IModuleRepository>().Get(id);
-                return GetModuleDto(module);
-            }
+            using var dbContext = _dbContextFactory.Create<EngineDbContext>();
+            var module = dbContext.Modules.Find(id);
+            return GetModuleDto(module);
         }
 
         /// <inheritdoc />
@@ -63,18 +57,13 @@ namespace Micser.Engine.Infrastructure.Services
         {
             var module = GetModule(moduleDto);
 
-            using (var uow = _uowFactory.Create())
+            using var dbContext = _dbContextFactory.Create<EngineDbContext>();
+            dbContext.Modules.Add(module);
+
+            if (dbContext.SaveChanges() > 0)
             {
-                var modules = uow.GetRepository<IModuleRepository>();
-                modules.Add(module);
-
-                var count = uow.Complete();
-
-                if (count > 0)
-                {
-                    moduleDto.Id = module.Id;
-                    return true;
-                }
+                moduleDto.Id = module.Id;
+                return true;
             }
 
             return false;
@@ -83,44 +72,38 @@ namespace Micser.Engine.Infrastructure.Services
         /// <inheritdoc />
         public bool Truncate()
         {
-            using (var uow = _uowFactory.Create())
-            {
-                var repository = uow.GetRepository<IModuleRepository>();
-                var modules = repository.GetAll();
-                repository.RemoveRange(modules);
-                return uow.Complete() >= 0;
-            }
+            using var dbContext = _dbContextFactory.Create<EngineDbContext>();
+            var modules = dbContext.Modules.AsEnumerable();
+            dbContext.Modules.RemoveRange(modules);
+            return dbContext.SaveChanges() >= 0;
         }
 
         /// <inheritdoc />
         public bool Update(ModuleDto moduleDto)
         {
-            using (var uow = _uowFactory.Create())
+            using var dbContext = _dbContextFactory.Create<EngineDbContext>();
+            var module = dbContext.Modules.Find(moduleDto.Id);
+
+            if (module == null)
             {
-                var modules = uow.GetRepository<IModuleRepository>();
-                var module = modules.Get(moduleDto.Id);
-
-                if (module == null)
-                {
-                    return false;
-                }
-
-                var state = JsonConvert.DeserializeObject<ModuleState>(module.StateJson);
-                state.IsEnabled = moduleDto.State.IsEnabled;
-                state.IsMuted = moduleDto.State.IsMuted;
-                state.UseSystemVolume = moduleDto.State.UseSystemVolume;
-                state.Volume = moduleDto.State.Volume;
-                foreach (var data in moduleDto.State.Data)
-                {
-                    state.Data[data.Key] = data.Value;
-                }
-
-                module.StateJson = JsonConvert.SerializeObject(state);
-
-                moduleDto.State = state;
-
-                return uow.Complete() >= 0;
+                return false;
             }
+
+            var state = JsonConvert.DeserializeObject<ModuleState>(module.StateJson);
+            state.IsEnabled = moduleDto.State.IsEnabled;
+            state.IsMuted = moduleDto.State.IsMuted;
+            state.UseSystemVolume = moduleDto.State.UseSystemVolume;
+            state.Volume = moduleDto.State.Volume;
+            foreach (var data in moduleDto.State.Data)
+            {
+                state.Data[data.Key] = data.Value;
+            }
+
+            module.StateJson = JsonConvert.SerializeObject(state);
+
+            moduleDto.State = state;
+
+            return dbContext.SaveChanges() >= 0;
         }
 
         private static Module GetModule(ModuleDto moduleDto)

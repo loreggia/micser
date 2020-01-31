@@ -1,9 +1,9 @@
-﻿namespace Micser.Common.DataAccess.Models
+﻿namespace Micser.Common.DataAccess.Entities
 {
     /// <summary>
     /// Contains a JSON-serialized setting value.
     /// </summary>
-    public class SettingValue : Model
+    public class SettingValue : Entity
     {
         /// <summary>
         /// Gets or sets the unique setting key name.
