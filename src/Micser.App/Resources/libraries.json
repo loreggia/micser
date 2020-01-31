@@ -1,10 +1,5 @@
 [
   {
-    "Name": "CommonServiceLocator",
-    "Url": "https://github.com/unitycontainer/commonservicelocator",
-    "LicenseUrl": "https://raw.githubusercontent.com/unitycontainer/commonservicelocator/master/LICENSE"
-  },
-  {
     "Name": "CSCore",
     "Url": "https://github.com/filoe/cscore",
     "LicenseUrl": "https://raw.githubusercontent.com/filoe/cscore/master/license.md"
@@ -13,6 +8,16 @@
     "Name": "Hardcodet.NotifyIcon.Wpf",
     "Url": "http://www.hardcodet.net/wpf-notifyicon",
     "LicenseUrl": ""
+  },
+  {
+    "Name": "MessagePack-CSharp",
+    "Url": "https://github.com/neuecc/MessagePack-CSharp",
+    "LicenseUrl": "https://github.com/neuecc/MessagePack-CSharp/blob/master/LICENSE"
+  },
+  {
+    "Name": "Microsoft.EntityFrameworkCore",
+    "Url": "https://docs.microsoft.com/ef/core/",
+    "LicenseUrl": "https://github.com/dotnet/efcore/blob/master/LICENSE.txt"
   },
   {
     "Name": "Moq",
@@ -33,21 +38,6 @@
     "Name": "Prism",
     "Url": "https://github.com/PrismLibrary/Prism",
     "LicenseUrl": "https://raw.githubusercontent.com/PrismLibrary/Prism/master/LICENSE"
-  },
-  {
-    "Name": "SQLite.CodeFirst",
-    "Url": "https://github.com/msallin/SQLiteCodeFirst",
-    "LicenseUrl": "https://raw.githubusercontent.com/msallin/SQLiteCodeFirst/master/LICENSE"
-  },
-  {
-    "Name": "System.Data.SQLite",
-    "Url": "https://system.data.sqlite.org/index.html/doc/trunk/www/index.wiki",
-    "LicenseUrl": "https://system.data.sqlite.org/index.html/doc/trunk/www/copyright.wiki"
-  },
-  {
-    "Name": "System.Data.SQLite.EF6.Migrations",
-    "Url": "https://github.com/bubibubi/db2ef6migrations",
-    "LicenseUrl": ""
   },
   {
     "Name": "Unity",
