@@ -24,4 +24,4 @@ jobs:
 
     - name: Test
       working-directory: src
-      run: dotnet test Micser.sln --configuration Debug
+      run: dotnet test Micser.sln --configuration Test
