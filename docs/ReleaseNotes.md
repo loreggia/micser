@@ -1,2 +1,4 @@
-# 2.0.0 (2019-10-08)
-* Migrated to .NET Core 3.0
+# 2.1.0 (2020-03-05)
+* Use official Prism package for .NET Core
+* Dialogs refactoring
+* Data access refactoring
