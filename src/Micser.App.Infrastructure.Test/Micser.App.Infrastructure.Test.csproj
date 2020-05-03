@@ -5,6 +5,7 @@
     <UseWPF>true</UseWPF>
     <IsPackable>false</IsPackable>
     <OutputType>Library</OutputType>
+    <IsTestProject>true</IsTestProject>
   </PropertyGroup>
 
   <ItemGroup>
