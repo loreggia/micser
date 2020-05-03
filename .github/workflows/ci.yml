@@ -7,9 +7,6 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - name: Test
-      run: more "C:\Program Files (x86)\Windows Kits\10\Vsix\VS2019\vsixversion.txt"
-      
     - name: Checkout
       uses: actions/checkout@v2
 
@@ -18,14 +15,13 @@ jobs:
       with:
         dotnet-version: 3.1.100
 
-#      run: dotnet build --configuration Release
     - name: Setup Build
       uses: warrenbuckley/Setup-MSBuild@v1
 
     - name: Build
       working-directory: src
-      run: msbuild Micser.sln /p:Platform=x64 /p:Configuration=Release /restore
+      run: msbuild Micser.sln /p:Platform=x64 /p:Configuration=Debug /restore
 
     - name: Test
       working-directory: src
-      run: dotnet test Micser.sln --configuration Release
+      run: dotnet test Micser.sln --configuration Debug
