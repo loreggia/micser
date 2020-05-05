@@ -4,10 +4,10 @@ Micser is a modular audio routing framework for Microsoft Windows (mostly) writt
 ## Building
 ### Requirements
 * Visual Studio 2019
- * .NET Core SDK 3.1
- * Windows 10 SDK, version 10.0.18362.0
- * WDK for Windows 10, version 1903
- * MSVC v142 build tools & spectre-mitigated libs (v14.21)
+  * .NET Core SDK 3.1
+  * Windows 10 SDK, version 10.0.18362.0
+  * WDK for Windows 10, version 1903
+  * MSVC v142 build tools & spectre-mitigated libs (v14.21)
 * WiX Toolset 3.11.1
 
 [![Build Status](https://dev.azure.com/loreggia/micser/_apis/build/status/micser%20CI?branchName=master)](https://dev.azure.com/loreggia/micser/_build/latest?definitionId=4&branchName=master)
