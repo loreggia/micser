@@ -1,6 +1,11 @@
 # Micser
 Micser is a modular audio routing framework for Microsoft Windows (mostly) written in C#.
 
+The application includes the following parts:
+* WPF application with graphical audio routing using widgets
+* Audio engine Windows service
+* Virtual audio cable driver with a configurable number of devices (WIP, will require an extended validation code signing certificate)
+
 ## Building
 ### Requirements
 * Visual Studio 2019
