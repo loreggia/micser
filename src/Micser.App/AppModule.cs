@@ -31,6 +31,7 @@ using System;
 using System.Globalization;
 using System.Linq;
 using System.Windows;
+using File = System.IO.File;
 
 namespace Micser.App
 {
@@ -142,6 +143,11 @@ namespace Micser.App
 
             var navigationManager = containerProvider.Resolve<INavigationManager>();
             navigationManager.Navigate<StartupView>(AppGlobals.PrismRegions.Main);
+        }
+
+        private static bool IsVacInstalled()
+        {
+            return File.Exists(@"Driver\Micser.Vac.Driver.sys");
         }
 
         private static object Localize(string key)
@@ -334,18 +340,23 @@ namespace Micser.App
                 StorageType = SettingStorageType.Internal,
                 IsHidden = true
             });
-            settingsRegistry.Add(new SettingDefinition
+
+            if (IsVacInstalled())
             {
-                Key = AppGlobals.SettingKeys.VacCount,
-                Name = Localize(nameof(Strings.SettingVacCountName)),
-                Description = Localize(nameof(Strings.SettingVacCountDescription)),
-                Type = SettingType.List,
-                StorageType = SettingStorageType.Custom,
-                DefaultValue = 1,
-                List = Enumerable.Range(1, Globals.MaxVacCount).ToDictionary(x => (object)x, x => x.ToString(CultureInfo.InvariantCulture)),
-                HandlerType = typeof(VacCountSettingHandler),
-                IsAppliedInstantly = false
-            });
+                settingsRegistry.Add(new SettingDefinition
+                {
+                    Key = AppGlobals.SettingKeys.VacCount,
+                    Name = Localize(nameof(Strings.SettingVacCountName)),
+                    Description = Localize(nameof(Strings.SettingVacCountDescription)),
+                    Type = SettingType.List,
+                    StorageType = SettingStorageType.Custom,
+                    DefaultValue = 1,
+                    List = Enumerable.Range(1, Globals.MaxVacCount).ToDictionary(x => (object)x, x => x.ToString(CultureInfo.InvariantCulture)),
+                    HandlerType = typeof(VacCountSettingHandler),
+                    IsAppliedInstantly = false
+                });
+            }
+
             settingsRegistry.Add(new SettingDefinition
             {
                 Key = Globals.SettingKeys.UpdateCheck,
