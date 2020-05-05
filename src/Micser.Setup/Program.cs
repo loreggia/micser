@@ -1,5 +1,6 @@
 ﻿using Micser.Setup.CustomActions;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using WixSharp;
 using WixSharp.CommonTasks;
@@ -12,6 +13,8 @@ namespace Micser.Setup
     {
         private static void Main()
         {
+            const bool enableVac = false;
+
             bool FileFilter(string file)
             {
                 var excludedFiles = new[]
@@ -64,60 +67,44 @@ namespace Micser.Setup
                     { "InstallDefault", "followParent" }
                 }
             };
-            var vacFeature = new Feature("Virtual Audio Cable", "Installs the Micser Virtual Audio Cable driver.", true, true)
-            {
-                Id = new Id("VacFeature"),
-                Attributes =
-                {
-                    { "AllowAdvertise", "no" },
-                    { "InstallDefault", "followParent" }
-                }
-            };
+
             project.DefaultFeature.AllowChange = false;
             project.DefaultFeature.Attributes.Add("AllowAdvertise", "no");
             project.DefaultFeature.Attributes.Add("InstallDefault", "local");
             project.DefaultFeature.Display = FeatureDisplay.expand;
             project.DefaultFeature.Children.Add(coreFeature);
-            project.DefaultFeature.Children.Add(vacFeature);
 
             var appId = new Id("MicserAppExe");
 
-            project.Dirs = new[]
-            {
-                new Dir(coreFeature, @"%ProgramFiles%\Micser",
-                    new Files(coreFeature, @"App\*.*", FileFilter),
-                    new File(appId, coreFeature, @"App\Micser.App.exe"),
-                    new File(new Id("MicserEngineExe"), coreFeature, @"App\Micser.Engine.exe")
+            var programFilesDir = new Dir(coreFeature, @"%ProgramFiles%\Micser",
+                new Files(coreFeature, @"App\*.*", FileFilter),
+                new File(appId, coreFeature, @"App\Micser.App.exe"),
+                new File(new Id("MicserEngineExe"), coreFeature, @"App\Micser.Engine.exe")
+                {
+                    ServiceInstaller = new ServiceInstaller("Micser.Engine")
                     {
-                        ServiceInstaller = new ServiceInstaller("Micser.Engine")
-                        {
-                            StartOn = SvcEvent.Install_Wait,
-                            StopOn = SvcEvent.InstallUninstall_Wait,
-                            RemoveOn = SvcEvent.Uninstall_Wait,
-                            Type = SvcType.ownProcess,
-                            Account = "LocalSystem",
-                            Description = "Micser Audio Engine Service",
-                            DisplayName = "Micser Engine",
-                            Start = SvcStartType.auto,
-                            DelayedAutoStart = false,
-                            Vital = true,
-                            Interactive = false,
-                            FirstFailureActionType = FailureActionType.restart,
-                            SecondFailureActionType = FailureActionType.restart,
-                            ThirdFailureActionType = FailureActionType.restart
-                        }
-                    },
-                    new Dir(vacFeature, @"Driver",
-                        new Files(vacFeature, @"Driver\Micser.Vac.Package\*.*")
-                    )
-                ),
-                new Dir(coreFeature, @"%ProgramMenu%\Micser",
-                    new ExeFileShortcut(coreFeature, "Micser", @"[INSTALLDIR]\Micser.App.exe", ""),
-                    new ExeFileShortcut(coreFeature, "Uninstall Micser", "[SystemFolder]msiexec.exe", "/x [ProductCode]")
-                )
-            };
+                        StartOn = SvcEvent.Install_Wait,
+                        StopOn = SvcEvent.InstallUninstall_Wait,
+                        RemoveOn = SvcEvent.Uninstall_Wait,
+                        Type = SvcType.ownProcess,
+                        Account = "LocalSystem",
+                        Description = "Micser Audio Engine Service",
+                        DisplayName = "Micser Engine",
+                        Start = SvcStartType.auto,
+                        DelayedAutoStart = false,
+                        Vital = true,
+                        Interactive = false,
+                        FirstFailureActionType = FailureActionType.restart,
+                        SecondFailureActionType = FailureActionType.restart,
+                        ThirdFailureActionType = FailureActionType.restart
+                    }
+                }
+            );
 
-            var vacFeatureCondition = Condition.Create("&VacFeature = 3");
+            var programMenuDir = new Dir(coreFeature, @"%ProgramMenu%\Micser",
+                new ExeFileShortcut(coreFeature, "Micser", @"[INSTALLDIR]\Micser.App.exe", ""),
+                new ExeFileShortcut(coreFeature, "Uninstall Micser", "[SystemFolder]msiexec.exe", "/x [ProductCode]")
+            );
 
 #if X64
             project.Platform = Platform.x64;
@@ -127,9 +114,28 @@ namespace Micser.Setup
 
             var launchAppAction = new Id("LaunchApp");
 
-            project.Actions = new Action[]
+            var actions = new List<Action>();
+
+            if (enableVac)
             {
-                new ManagedAction(
+                var vacFeature = new Feature("Virtual Audio Cable", "Installs the Micser Virtual Audio Cable driver.", true, true)
+                {
+                    Id = new Id("VacFeature"),
+                    Attributes =
+                    {
+                        { "AllowAdvertise", "no" },
+                        { "InstallDefault", "followParent" }
+                    }
+                };
+                project.DefaultFeature.Children.Add(vacFeature);
+
+                programFilesDir.Dirs[0].AddDir(new Dir(vacFeature, @"Driver",
+                    new Files(vacFeature, @"Driver\Micser.Vac.Package\*.*")
+                ));
+
+                var vacFeatureCondition = Condition.Create("&VacFeature = 3");
+
+                actions.Add(new ManagedAction(
                     DriverActions.InstallDriver,
                     typeof(DriverActions).Assembly.Location,
                     Return.check,
@@ -141,9 +147,8 @@ namespace Micser.Setup
                     Impersonate = false,
                     Execute = Execute.deferred,
                     UsesProperties = ""
-                },
-
-                new ManagedAction(
+                });
+                actions.Add(new ManagedAction(
                     DriverActions.UninstallDriver,
                     typeof(DriverActions).Assembly.Location,
                     Return.check,
@@ -155,14 +160,17 @@ namespace Micser.Setup
                     Impersonate = false,
                     Execute = Execute.deferred,
                     UsesProperties = ""
-                },
+                });
+            }
 
-                new InstalledFileAction(launchAppAction, appId, "")
-                {
-                    Impersonate = true,
-                    Sequence = Sequence.NotInSequence
-                }
-            };
+            actions.Add(new InstalledFileAction(launchAppAction, appId, "")
+            {
+                Impersonate = true,
+                Sequence = Sequence.NotInSequence
+            });
+
+            project.Dirs = new[] { programFilesDir, programMenuDir };
+            project.Actions = actions.ToArray();
 
             project.UI = WUI.WixUI_Common;
             project.CustomUI = new CommomDialogsUI()
@@ -175,8 +183,6 @@ namespace Micser.Setup
 
             project.AddProperty(new Property("WIXUI_EXITDIALOGOPTIONALCHECKBOXTEXT", "Launch Micser"));
             project.AddProperty(new Property("WIXUI_EXITDIALOGOPTIONALCHECKBOX", "1"));
-
-            project.SetNetFxPrerequisite("WIXNETFX4RELEASEINSTALLED >= '#461808'");
 
             project.Include(WixExtension.UI);
             project.Include(WixExtension.NetFx);
