@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Api\Protos\Spectrum.proto" />
     <None Remove="Themes\Colors.Light.ini" />
   </ItemGroup>
 
@@ -35,7 +36,10 @@
     <ProjectReference Include="..\Micser.App.Infrastructure\Micser.App.Infrastructure.csproj" />
     <ProjectReference Include="..\Micser.Common\Micser.Common.csproj" />
     <ProjectReference Include="..\Micser.Engine.Infrastructure\Micser.Engine.Infrastructure.csproj" />
-    <ProjectReference Include="..\Micser.Plugins.Main.Api\Micser.Plugins.Main.Api.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="Api\Protos\Spectrum.proto" GrpcServices="Both" ProtoCompile="true" />
   </ItemGroup>
 
   <ItemGroup>
