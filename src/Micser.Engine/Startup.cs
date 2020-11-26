@@ -18,14 +18,14 @@ namespace Micser.Engine
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app)
         {
-            app.UseModules<IEngineModule>();
+            app.UseModules();
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddNlog("Micser.Engine.log");
-            services.AddModules<IEngineModule>();
+            services.AddModules<IEngineModule>(typeof(EngineModule), typeof(InfrastructureModule));
 
             services.AddGrpc();
 

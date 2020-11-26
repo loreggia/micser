@@ -93,14 +93,13 @@ namespace Micser.Common.Extensions
             return services;
         }
 
-        public static IApplicationBuilder UseModules<TModule>(this IApplicationBuilder app)
-            where TModule : IModule
+        public static IApplicationBuilder UseModules(this IApplicationBuilder app)
         {
-            var plugins = app.ApplicationServices.GetRequiredService<IEnumerable<TModule>>();
+            var modules = app.ApplicationServices.GetRequiredService<IEnumerable<IModule>>();
 
-            foreach (var plugin in plugins)
+            foreach (var module in modules)
             {
-                plugin.Initialize(app);
+                module.Initialize(app);
             }
 
             return app;
