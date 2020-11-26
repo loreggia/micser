@@ -14,12 +14,6 @@ namespace Micser.Engine
     {
         public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
-            //services.AddRequestProcessor<EngineProcessor>();
-            //services.AddRequestProcessor<StatusProcessor>();
-            //services.AddRequestProcessor<ModulesProcessor>();
-            //services.AddRequestProcessor<ModuleConnectionsProcessor>();
-            //services.AddRequestProcessor<SettingsProcessor>();
-
             services.AddSingleton<IAudioEngine, AudioEngine>();
         }
 

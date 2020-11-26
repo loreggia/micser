@@ -1,9 +1,9 @@
-﻿using Micser.App.Infrastructure;
-using Micser.App.Infrastructure.Api;
+﻿using System;
+using Micser.App.Infrastructure;
 using Micser.App.Infrastructure.Navigation;
 using Micser.App.Views;
+using Micser.Common.Api;
 using Prism.Commands;
-using System;
 
 namespace Micser.App.ViewModels
 {
@@ -15,17 +15,17 @@ namespace Micser.App.ViewModels
 
     public class StatusViewModel : ViewModelNavigationAware
     {
+        private readonly EngineApiClient _engineApiClient;
         private readonly INavigationManager _navigationManager;
-        private readonly StatusApiClient _statusApiClient;
         private string _actionText;
         private bool _canExecuteAction;
         private StatusType _currentStatus;
         private string _statusText;
 
-        public StatusViewModel(INavigationManager navigationManager, StatusApiClient statusApiClient)
+        public StatusViewModel(INavigationManager navigationManager, EngineApiClient engineApiClient)
         {
             _navigationManager = navigationManager;
-            _statusApiClient = statusApiClient;
+            _engineApiClient = engineApiClient;
 
             ActionCommand = new DelegateCommand(OnActionCommand).ObservesCanExecute(() => CanExecuteAction);
         }
@@ -95,9 +95,9 @@ namespace Micser.App.ViewModels
                         break;
 
                     case StatusType.ConnectionFailed:
-                        var statusResult = await _statusApiClient.GetStatus();
+                        var statusResult = await _engineApiClient.GetStatusAsync(new Empty());
 
-                        if (statusResult.IsSuccess)
+                        if (statusResult != null)
                         {
                             _navigationManager.Navigate<MainStatusBarView>(AppGlobals.PrismRegions.Status);
                             _navigationManager.Navigate<MainMenuView>(AppGlobals.PrismRegions.Menu);

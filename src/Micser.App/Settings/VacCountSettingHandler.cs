@@ -1,14 +1,14 @@
-﻿using Microsoft.Win32;
-using Micser.App.Infrastructure.Api;
-using Micser.Common;
-using Micser.Common.Extensions;
-using Micser.Common.Settings;
-using NLog;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
+using Microsoft.Win32;
+using Micser.Common;
+using Micser.Common.Api;
+using Micser.Common.Extensions;
+using Micser.Common.Settings;
+using NLog;
 
 namespace Micser.App.Settings
 {

@@ -1,17 +1,4 @@
-﻿using Micser.App.Infrastructure;
-using Micser.App.Infrastructure.Api;
-using Micser.App.Infrastructure.Interaction;
-using Micser.App.Infrastructure.Navigation;
-using Micser.App.Infrastructure.Widgets;
-using Micser.App.Resources;
-using Micser.Common.Extensions;
-using Micser.Common.Modules;
-using Micser.Common.Settings;
-using NLog;
-using Prism.Commands;
-using Prism.Events;
-using Prism.Services.Dialogs;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
@@ -19,6 +6,21 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Micser.App.Infrastructure;
+using Micser.App.Infrastructure.Api;
+using Micser.App.Infrastructure.Interaction;
+using Micser.App.Infrastructure.Navigation;
+using Micser.App.Infrastructure.Widgets;
+using Micser.App.Resources;
+using Micser.Common.Api;
+using Micser.Common.Api.Extensions;
+using Micser.Common.Extensions;
+using Micser.Common.Modules;
+using Micser.Common.Settings;
+using NLog;
+using Prism.Commands;
+using Prism.Events;
+using Prism.Services.Dialogs;
 
 namespace Micser.App.ViewModels
 {
@@ -147,18 +149,18 @@ namespace Micser.App.ViewModels
 
         private async void CreateConnection(ConnectionViewModel viewModel)
         {
-            var connectionDto = new ModuleConnectionDto
+            var connection = new ModuleConnection
             {
                 SourceConnectorName = viewModel.Source.Name,
                 SourceId = viewModel.Source.Widget.Id,
                 TargetConnectorName = viewModel.Target.Name,
                 TargetId = viewModel.Target.Widget.Id
             };
-            var result = await _connectionsApiClient.CreateAsync(connectionDto);
+            var result = await _connectionsApiClient.CreateAsync(connection);
 
-            if (result.IsSuccess)
+            if (result != null)
             {
-                viewModel.Id = result.Data.Id;
+                viewModel.Id = result.Id;
                 viewModel.SourceChanged += OnConnectionSourceChanged;
                 viewModel.TargetChanged += OnConnectionTargetChanged;
             }
@@ -170,20 +172,20 @@ namespace Micser.App.ViewModels
 
         private async void CreateModule(WidgetViewModel viewModel)
         {
-            var moduleDto = new ModuleDto
+            var module = new Module
             {
                 ModuleType = viewModel.ModuleType.AssemblyQualifiedName,
                 WidgetType = viewModel.GetType().AssemblyQualifiedName,
-                State = viewModel.GetState()
+                State = { viewModel.GetState() }
             };
-            var result = await _modulesApiClient.CreateAsync(moduleDto);
+            var result = await _modulesApiClient.CreateAsync(module);
 
-            if (result.IsSuccess)
+            if (result != null)
             {
-                viewModel.Id = result.Data.Id;
-                if (moduleDto.State != null)
+                viewModel.Id = result.Id;
+                if (module.State.Count > 0)
                 {
-                    viewModel.LoadState(moduleDto.State);
+                    viewModel.LoadState(module.AsDto().State);
                 }
                 viewModel.PropertyChanged += OnWidgetPropertyChanged;
             }
@@ -209,9 +211,9 @@ namespace Micser.App.ViewModels
 
         private async void DeleteConnection(ConnectionViewModel viewModel)
         {
-            var result = await _connectionsApiClient.DeleteAsync(viewModel.Id);
+            var result = await _connectionsApiClient.DeleteAsync(new Identifiable { Id = viewModel.Id });
 
-            if (!result.IsSuccess)
+            if (!result.Value)
             {
                 // TODO error handling
             }
@@ -222,9 +224,9 @@ namespace Micser.App.ViewModels
 
         private async void DeleteModule(WidgetViewModel viewModel)
         {
-            var result = await _modulesApiClient.DeleteAsync(viewModel.Id);
+            var result = await _modulesApiClient.DeleteAsync(new Identifiable { Id = viewModel.Id });
 
-            if (!result.IsSuccess)
+            if (!result.Value)
             {
                 // TODO error handling / reload everything
             }
@@ -264,7 +266,14 @@ namespace Micser.App.ViewModels
                     return;
                 }
 
-                if (await _modulesApiClient.ImportConfigurationAsync(dto))
+                var request = new ImportRequest
+                {
+                    Modules = { dto.Modules.Select(x => x.AsApiModel()) },
+                    Connections = { dto.Connections.Select(x => x.AsApiModel()) }
+                };
+                var result = await _modulesApiClient.ImportAsync(request);
+
+                if (!result.Value)
                 {
                     _logger.Warn("Import failed. See engine log for details.");
                 }
@@ -275,46 +284,40 @@ namespace Micser.App.ViewModels
 
         private async Task LoadConnections()
         {
-            var connectionsResult = await _connectionsApiClient.GetAllAsync();
+            var connectionsResult = await _connectionsApiClient.GetAllAsync(new Empty());
 
-            if (connectionsResult.IsSuccess)
+            _connectionDtos = connectionsResult.Items.Select(x => x.AsDto()).ToArray();
+
+            foreach (var connectionDto in _connectionDtos)
             {
-                _connectionDtos = connectionsResult.Data;
-
-                if (_connectionDtos != null)
+                try
                 {
-                    foreach (var connectionDto in _connectionDtos)
+                    var sourceWidget = Widgets.FirstOrDefault(w => w.Id == connectionDto.SourceId);
+                    var targetWidget = Widgets.FirstOrDefault(w => w.Id == connectionDto.TargetId);
+
+                    var source = sourceWidget?.OutputConnectors.FirstOrDefault(c => c.Name == connectionDto.SourceConnectorName);
+                    var target = targetWidget?.InputConnectors.FirstOrDefault(c => c.Name == connectionDto.TargetConnectorName);
+
+                    if (source != null && target != null)
                     {
-                        try
+                        var cvm = new ConnectionViewModel
                         {
-                            var sourceWidget = Widgets.FirstOrDefault(w => w.Id == connectionDto.SourceId);
-                            var targetWidget = Widgets.FirstOrDefault(w => w.Id == connectionDto.TargetId);
-
-                            var source = sourceWidget?.OutputConnectors.FirstOrDefault(c => c.Name == connectionDto.SourceConnectorName);
-                            var target = targetWidget?.InputConnectors.FirstOrDefault(c => c.Name == connectionDto.TargetConnectorName);
-
-                            if (source != null && target != null)
-                            {
-                                var cvm = new ConnectionViewModel
-                                {
-                                    Id = connectionDto.Id,
-                                    Source = source,
-                                    Target = target
-                                };
-                                _connections.Add(cvm);
-                                cvm.SourceChanged += OnConnectionSourceChanged;
-                                cvm.TargetChanged += OnConnectionTargetChanged;
-                            }
-                            else
-                            {
-                                _logger.Warn($"Could not load widget connection. ID: {connectionDto.Id}");
-                            }
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.Error(ex, "Could not load widget connection. ID: {0}", connectionDto.Id);
-                        }
+                            Id = connectionDto.Id,
+                            Source = source,
+                            Target = target
+                        };
+                        _connections.Add(cvm);
+                        cvm.SourceChanged += OnConnectionSourceChanged;
+                        cvm.TargetChanged += OnConnectionTargetChanged;
                     }
+                    else
+                    {
+                        _logger.Warn($"Could not load widget connection. ID: {connectionDto.Id}");
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error(ex, "Could not load widget connection. ID: {0}", connectionDto.Id);
                 }
             }
         }
@@ -345,41 +348,31 @@ namespace Micser.App.ViewModels
 
         private async Task LoadWidgetsAsync()
         {
-            var modulesResult = await _modulesApiClient.GetAllAsync();
+            var modulesResult = await _modulesApiClient.GetAllAsync(new Empty());
 
-            if (modulesResult.IsSuccess)
+            _moduleDtos = modulesResult.Items.Select(x => x.AsDto()).ToArray();
+
+            foreach (var module in _moduleDtos)
             {
-                _moduleDtos = modulesResult.Data;
-
-                if (_moduleDtos != null)
+                try
                 {
-                    foreach (var module in _moduleDtos)
-                    {
-                        try
-                        {
-                            var type = Type.GetType(module.WidgetType);
-                            var vm = WidgetFactory.CreateViewModel(type);
-                            vm.Id = module.Id;
-                            vm.LoadState(module.State);
-                            vm.PropertyChanged += OnWidgetPropertyChanged;
-                            _widgets.Add(vm);
-                        }
-                        catch (Exception ex)
-                        {
-                            _logger.Error(ex, "Could not load widget. ID: {0}", module.Id);
-                        }
-                    }
+                    var type = Type.GetType(module.WidgetType);
+                    var vm = WidgetFactory.CreateViewModel(type);
+                    vm.Id = module.Id;
+                    vm.LoadState(module.State);
+                    vm.PropertyChanged += OnWidgetPropertyChanged;
+                    _widgets.Add(vm);
                 }
-            }
-            else
-            {
-                _logger.Error(modulesResult);
+                catch (Exception ex)
+                {
+                    _logger.Error(ex, "Could not load widget. ID: {0}", module.Id);
+                }
             }
         }
 
         private async void OnApiEvent(ApiEvent.ApiData data)
         {
-            if (data.Action == "updatevolume")
+            if (data.Action == "VolumeChanged")
             {
                 if (data.Content is ModuleDto moduleDto &&
                     moduleDto.State != null &&
@@ -494,14 +487,14 @@ namespace Micser.App.ViewModels
                     _savingBuffer.Remove(vm);
                 }
 
-                var moduleDto = new ModuleDto
+                var moduleDto = new Module
                 {
                     Id = vm.Id,
-                    State = vm.GetState()
+                    State = { vm.GetState() }
                 };
                 var result = await _modulesApiClient.UpdateAsync(moduleDto);
 
-                if (!result.IsSuccess)
+                if (result != null)
                 {
                     // TODO error handling
                 }
@@ -551,7 +544,7 @@ namespace Micser.App.ViewModels
 
         private async void UpdateConnection(ConnectionViewModel viewModel)
         {
-            var connectionDto = new ModuleConnectionDto
+            var connectionDto = new ModuleConnection
             {
                 Id = viewModel.Id,
                 SourceConnectorName = viewModel.Source.Name,
@@ -561,9 +554,9 @@ namespace Micser.App.ViewModels
             };
             var result = await _connectionsApiClient.UpdateAsync(connectionDto);
 
-            if (result.IsSuccess)
+            if (result != null)
             {
-                viewModel.Id = result.Data.Id;
+                viewModel.Id = result.Id;
             }
             else
             {

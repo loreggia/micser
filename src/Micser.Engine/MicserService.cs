@@ -8,7 +8,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Micser.Common;
-using Micser.Common.Api;
 using Micser.Common.Audio;
 using Micser.Common.Extensions;
 using Micser.Common.Settings;
@@ -26,7 +25,6 @@ namespace Micser.Engine
         private readonly ICollection<IEngineModule> _plugins;
         private readonly IServiceProvider _serviceProvider;
         private readonly Timer _updateTimer;
-        private IApiClient _apiClient;
         private IAudioEngine _audioEngine;
         private ISettingsService _settingsService;
         private IUpdateService _updateService;

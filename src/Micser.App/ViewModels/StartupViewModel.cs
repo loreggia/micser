@@ -1,19 +1,16 @@
-﻿using Micser.App.Infrastructure;
+﻿using System.Windows;
+using Micser.App.Infrastructure;
 using Micser.App.Infrastructure.Navigation;
 using Micser.App.Settings;
 using Micser.App.Views;
-using Micser.Common.Api;
 using Micser.Common.Extensions;
 using Micser.Common.Settings;
 using Prism.Events;
-using System.Threading.Tasks;
-using System.Windows;
 
 namespace Micser.App.ViewModels
 {
     public class StartupViewModel : ViewModelNavigationAware
     {
-        private readonly IApiClient _apiClient;
         private readonly INavigationManager _navigationManager;
         private readonly ISettingsService _settingsService;
 
@@ -21,12 +18,10 @@ namespace Micser.App.ViewModels
             IApplicationStateService applicationStateService,
             IEventAggregator eventAggregator,
             INavigationManager navigationManager,
-            ISettingsService settingsService,
-            IApiClient apiClient)
+            ISettingsService settingsService)
         {
             _navigationManager = navigationManager;
             _settingsService = settingsService;
-            _apiClient = apiClient;
 
             IsBusy = true;
 
@@ -45,18 +40,19 @@ namespace Micser.App.ViewModels
         {
             bool isConnected = false;
 
-            for (int i = 0; i < 5; i++)
-            {
-                var result = await _apiClient.ConnectAsync();
-                isConnected = result || _apiClient.State == ConnectionState.Connected;
+            // todo
+            //for (int i = 0; i < 5; i++)
+            //{
+            //    var result = await _apiClient.ConnectAsync();
+            //    isConnected = result || _apiClient.State == ConnectionState.Connected;
 
-                if (isConnected)
-                {
-                    break;
-                }
+            //    if (isConnected)
+            //    {
+            //        break;
+            //    }
 
-                await Task.Delay(1000);
-            }
+            //    await Task.Delay(1000);
+            //}
 
             await _settingsService.LoadAsync(true);
 

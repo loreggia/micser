@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Micser.Common.Api;
 using Micser.Common.Extensions;
 using Micser.Engine.Infrastructure;
 
@@ -20,11 +19,6 @@ namespace Micser.Engine
         public void Configure(IApplicationBuilder app)
         {
             app.UseModules<IEngineModule>();
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapGrpcService<ApiServer>();
-            });
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
