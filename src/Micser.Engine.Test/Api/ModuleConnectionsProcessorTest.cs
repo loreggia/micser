@@ -20,7 +20,7 @@ namespace Micser.Engine.Test.Api
             serviceMock.Setup(x => x.Delete(It.IsAny<long>())).Returns<long>(id => new ModuleConnectionDto { Id = id }).Verifiable();
             audioEngineMock.Setup(x => x.RemoveConnection(It.IsAny<long>())).Verifiable();
 
-            var processor = new ModuleConnectionsProcessor(audioEngineMock.Object, serviceMock.Object);
+            var processor = new ModuleConnectionsApiService(audioEngineMock.Object, serviceMock.Object);
 
             var result = await processor.ProcessAsync("delete", 1L).ConfigureAwait(false);
 
@@ -37,7 +37,7 @@ namespace Micser.Engine.Test.Api
             var audioEngineMock = new Mock<IAudioEngine>();
             var serviceMock = new Mock<IModuleConnectionService>();
 
-            var processor = new ModuleConnectionsProcessor(audioEngineMock.Object, serviceMock.Object);
+            var processor = new ModuleConnectionsApiService(audioEngineMock.Object, serviceMock.Object);
 
             var result = await processor.ProcessAsync("delete", -1L).ConfigureAwait(false);
 
@@ -53,7 +53,7 @@ namespace Micser.Engine.Test.Api
 
             serviceMock.Setup(x => x.GetAll()).Returns(new[] { new ModuleConnectionDto { Id = 69 } });
 
-            var processor = new ModuleConnectionsProcessor(audioEngineMock.Object, serviceMock.Object);
+            var processor = new ModuleConnectionsApiService(audioEngineMock.Object, serviceMock.Object);
 
             var result = await processor.ProcessAsync("getall", null).ConfigureAwait(false);
 
@@ -71,7 +71,7 @@ namespace Micser.Engine.Test.Api
             var audioEngineMock = new Mock<IAudioEngine>();
             var serviceMock = new Mock<IModuleConnectionService>();
 
-            var processor = new ModuleConnectionsProcessor(audioEngineMock.Object, serviceMock.Object);
+            var processor = new ModuleConnectionsApiService(audioEngineMock.Object, serviceMock.Object);
 
             var dto = new ModuleConnectionDto();
             var result = await processor.ProcessAsync("insert", dto).ConfigureAwait(false);
@@ -89,7 +89,7 @@ namespace Micser.Engine.Test.Api
             audioEngineMock.Setup(x => x.AddConnection(It.IsAny<long>())).Verifiable();
             serviceMock.Setup(x => x.Insert(It.IsAny<ModuleConnectionDto>())).Returns(true);
 
-            var processor = new ModuleConnectionsProcessor(audioEngineMock.Object, serviceMock.Object);
+            var processor = new ModuleConnectionsApiService(audioEngineMock.Object, serviceMock.Object);
 
             var dto = new ModuleConnectionDto
             {
@@ -117,7 +117,7 @@ namespace Micser.Engine.Test.Api
             serviceMock.Setup(x => x.GetById(It.IsAny<long>())).Returns<long>(id => new ModuleConnectionDto { Id = id });
             serviceMock.Setup(x => x.Update(It.IsAny<ModuleConnectionDto>())).Returns(true);
 
-            var processor = new ModuleConnectionsProcessor(audioEngineMock.Object, serviceMock.Object);
+            var processor = new ModuleConnectionsApiService(audioEngineMock.Object, serviceMock.Object);
 
             var dto = new ModuleConnectionDto
             {
@@ -142,7 +142,7 @@ namespace Micser.Engine.Test.Api
             var audioEngineMock = new Mock<IAudioEngine>();
             var serviceMock = new Mock<IModuleConnectionService>();
 
-            var processor = new ModuleConnectionsProcessor(audioEngineMock.Object, serviceMock.Object);
+            var processor = new ModuleConnectionsApiService(audioEngineMock.Object, serviceMock.Object);
 
             var dto = new ModuleConnectionDto { Id = -1 };
             var result = await processor.ProcessAsync("update", dto).ConfigureAwait(false);

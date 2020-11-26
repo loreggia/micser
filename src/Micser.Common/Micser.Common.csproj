@@ -6,7 +6,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Api\Protos\api.proto" />
+    <None Remove="Api\Protos\Common.proto" />
+    <None Remove="Api\Protos\Engine.proto" />
+    <None Remove="Api\Protos\EngineEvents.proto" />
+    <None Remove="Api\Protos\ModuleConnections.proto" />
+    <None Remove="Api\Protos\Modules.proto" />
+    <None Remove="Api\Protos\Settings.proto" />
   </ItemGroup>
 
   <ItemGroup>
@@ -21,7 +26,12 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="Api\Protos\api.proto" />
+    <Protobuf Include="Api\Protos\ModuleConnections.proto" />
+    <Protobuf Include="Api\Protos\Modules.proto" />
+    <Protobuf Include="Api\Protos\Common.proto" />
+    <Protobuf Include="Api\Protos\Engine.proto" />
+    <Protobuf Include="Api\Protos\Settings.proto" />
+    <Protobuf Include="Api\Protos\EngineEvents.proto" />
   </ItemGroup>
 
 </Project>

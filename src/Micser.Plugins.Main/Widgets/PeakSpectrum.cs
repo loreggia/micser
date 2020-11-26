@@ -1,10 +1,10 @@
-﻿using Micser.App.Infrastructure.Controls;
+﻿using System;
+using System.Collections.Generic;
+using System.Windows;
+using Micser.App.Infrastructure.Controls;
 using Micser.Common.Audio;
 using Micser.Common.Extensions;
 using Micser.Plugins.Main.Api;
-using System;
-using System.Collections.Generic;
-using System.Windows;
 
 namespace Micser.Plugins.Main.Widgets
 {
@@ -39,7 +39,7 @@ namespace Micser.Plugins.Main.Widgets
         {
             var width = ActualWidth;
             var height = ActualHeight;
-            var valueCount = data.Values.Length;
+            var valueCount = data.Values.Count;
 
             var maxFreqLog = Math.Log(valueCount);
 
@@ -62,7 +62,7 @@ namespace Micser.Plugins.Main.Widgets
                 return;
             }
 
-            var valueCount = data.Values.Length;
+            var valueCount = data.Values.Count;
             var points = new List<Point>();
 
             for (int i = 0; i < valueCount; i++)

@@ -1,5 +1,4 @@
 ﻿using CSCore.SoundIn;
-using Micser.Common.Api;
 using Micser.Common.Devices;
 using Micser.Engine.Infrastructure.Services;
 
@@ -9,8 +8,8 @@ namespace Micser.Plugins.Main.Modules
     {
         private int _latency;
 
-        public LoopbackDeviceInputModule(IApiClient apiClient, IModuleService moduleService)
-            : base(apiClient, moduleService)
+        public LoopbackDeviceInputModule(IModuleService moduleService)
+            : base(moduleService)
         {
             Latency = 1;
         }

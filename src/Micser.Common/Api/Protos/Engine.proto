@@ -1,0 +1,12 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "Micser.Common.Api";
+
+import "Api/Protos/Common.proto";
+
+service EngineRpcService {
+    rpc Start (Empty) returns (Status);
+    rpc Stop (Empty) returns (Status);
+    rpc Restart (Empty) returns (Status);
+    rpc GetStatus (Empty) returns (Status);
+}

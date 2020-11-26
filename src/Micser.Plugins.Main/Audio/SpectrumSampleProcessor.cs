@@ -9,7 +9,7 @@ namespace Micser.Plugins.Main.Audio
     {
         private float[] _fftBuffer;
         private SpectrumFftProvider _fftProvider;
-        private SpectrumData.SpectrumValue[] _spectrumValueBuffer;
+        private SpectrumValue[] _spectrumValueBuffer;
 
         public SpectrumSampleProcessor()
         {
@@ -35,7 +35,7 @@ namespace Micser.Plugins.Main.Audio
 
             return new SpectrumData
             {
-                Values = _spectrumValueBuffer
+                Values = { _spectrumValueBuffer }
             };
         }
 
@@ -47,7 +47,7 @@ namespace Micser.Plugins.Main.Audio
                 || _fftProvider.FftSize != FftSize)
             {
                 _fftBuffer = new float[(int)FftSize];
-                _spectrumValueBuffer = new SpectrumData.SpectrumValue[(int)FftSize / 2];
+                _spectrumValueBuffer = new SpectrumValue[(int)FftSize / 2];
                 _fftProvider = new SpectrumFftProvider(waveFormat.SampleRate, waveFormat.Channels, FftSize);
             }
 

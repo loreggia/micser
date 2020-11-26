@@ -1,10 +1,11 @@
-﻿using Micser.App.Infrastructure.Localization;
+﻿using System;
+using System.Windows;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Micser.App.Infrastructure.Localization;
 using Micser.App.Infrastructure.Resources;
 using Micser.App.Infrastructure.Themes;
-using Micser.Common;
-using Micser.Common.Extensions;
-using System;
-using System.Windows;
 
 namespace Micser.App.Infrastructure
 {
@@ -20,15 +21,15 @@ namespace Micser.App.Infrastructure
         }
 
         /// <inheritdoc />
-        public void OnInitialized(IContainerProvider containerProvider)
+        public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
-            var resourceRegistry = containerProvider.Resolve<IResourceRegistry>();
-            resourceRegistry.Add(new ResourceDictionary { Source = new Uri("/Micser.App.Infrastructure;component/Themes/Generic.xaml", UriKind.Relative) });
         }
 
         /// <inheritdoc />
-        public void RegisterTypes(IContainerProvider containerRegistry)
+        public void Initialize(IApplicationBuilder app)
         {
+            var resourceRegistry = app.ApplicationServices.GetRequiredService<IResourceRegistry>();
+            resourceRegistry.Add(new ResourceDictionary { Source = new Uri("/Micser.App.Infrastructure;component/Themes/Generic.xaml", UriKind.Relative) });
         }
 
         private static void OnUiCultureChanged(object sender, EventArgs e)

@@ -1,15 +1,14 @@
-﻿using CSCore;
+﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
+using CSCore;
 using CSCore.CoreAudioAPI;
 using CSCore.DSP;
 using CSCore.SoundOut;
 using CSCore.Streams;
-using Micser.Common.Api;
 using Micser.Common.Devices;
 using Micser.Engine.Infrastructure.Audio;
 using Micser.Engine.Infrastructure.Services;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using WriteableBufferingSource = Micser.Plugins.Main.Audio.WriteableBufferingSource;
 
 namespace Micser.Plugins.Main.Modules
@@ -26,8 +25,8 @@ namespace Micser.Plugins.Main.Modules
         private float _volume;
         private VolumeSource _volumeSource;
 
-        public DeviceOutputModule(IApiClient apiClient, IModuleService moduleService)
-            : base(apiClient, moduleService)
+        public DeviceOutputModule(IModuleService moduleService)
+            : base(moduleService)
         {
             _inputBuffers = new ConcurrentDictionary<long, WriteableBufferingSource>();
             _inputSources = new ConcurrentDictionary<long, ISampleSource>();

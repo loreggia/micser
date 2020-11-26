@@ -1,31 +1,31 @@
-﻿using Micser.Common;
-using Micser.Common.Extensions;
-using System;
+﻿using System;
 using System.Windows;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Micser.App.Infrastructure.Widgets
 {
     /// <inheritdoc cref="IWidgetFactory"/>
     public class WidgetFactory : IWidgetFactory
     {
-        private readonly IContainerProvider _container;
+        private readonly IServiceProvider _serviceProvider;
 
         /// <inheritdoc />
-        public WidgetFactory(IContainerProvider container)
+        public WidgetFactory(IServiceProvider serviceProvider)
         {
-            _container = container;
+            _serviceProvider = serviceProvider;
         }
 
         /// <inheritdoc />
         public virtual WidgetViewModel CreateViewModel(Type widgetVmType)
         {
-            return (WidgetViewModel)_container.Resolve(widgetVmType);
+            return (WidgetViewModel)_serviceProvider.GetRequiredService(widgetVmType);
         }
 
         /// <inheritdoc />
         public virtual Widget CreateWidget(WidgetViewModel viewModel)
         {
-            var result = _container.Resolve<Widget>(viewModel.GetType().AssemblyQualifiedName);
+            //var result = _container.GetRequiredService<Widget>(viewModel.GetType().AssemblyQualifiedName);
+            var result = _serviceProvider.GetRequiredService<Widget>();
             result.DataContext = viewModel;
             result.Loaded += OnWidgetLoaded;
             return result;

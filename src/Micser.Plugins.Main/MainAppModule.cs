@@ -1,14 +1,14 @@
-﻿using Micser.App.Infrastructure;
+﻿using System;
+using System.Windows;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Micser.App.Infrastructure;
 using Micser.App.Infrastructure.Extensions;
 using Micser.App.Infrastructure.Localization;
 using Micser.App.Infrastructure.Themes;
-using Micser.Common;
-using Micser.Common.Extensions;
-using Micser.Plugins.Main.Api;
 using Micser.Plugins.Main.Resources;
 using Micser.Plugins.Main.Widgets;
-using System;
-using System.Windows;
 
 namespace Micser.Plugins.Main
 {
@@ -19,13 +19,7 @@ namespace Micser.Plugins.Main
             LocalizationManager.UiCultureChanged += OnUiCultureChanged;
         }
 
-        public void OnInitialized(IContainerProvider containerProvider)
-        {
-            var resourceRegistry = containerProvider.Resolve<IResourceRegistry>();
-            resourceRegistry.Add(new ResourceDictionary { Source = new Uri("Micser.Plugins.Main;component/Themes/Generic.xaml", UriKind.Relative) });
-        }
-
-        public void RegisterTypes(IContainerProvider container)
+        public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
             container.RegisterWidget<DeviceInputWidget, DeviceInputViewModel>(
                 Localize(nameof(Strings.DeviceInputWidgetName)),
@@ -48,8 +42,12 @@ namespace Micser.Plugins.Main
             container.RegisterWidget<PitchWidget, PitchViewModel>(
                 Localize(nameof(Strings.PitchWidgetName)),
                 Localize(nameof(Strings.PitchWidgetDescription)));
+        }
 
-            container.RegisterRequestProcessor<SpectrumRequestProcessor>();
+        public void Initialize(IApplicationBuilder app)
+        {
+            var resourceRegistry = app.ApplicationServices.GetRequiredService<IResourceRegistry>();
+            resourceRegistry.Add(new ResourceDictionary { Source = new Uri("Micser.Plugins.Main;component/Themes/Generic.xaml", UriKind.Relative) });
         }
 
         private static object Localize(string key)

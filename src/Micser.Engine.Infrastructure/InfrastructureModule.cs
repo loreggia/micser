@@ -1,4 +1,4 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -41,9 +41,9 @@ namespace Micser.Engine.Infrastructure
         }
 
         /// <inheritdoc />
-        public void OnInitialized(IServiceProvider serviceProvider)
+        public void Initialize(IApplicationBuilder app)
         {
-            using var dbContext = serviceProvider.GetRequiredService<IDbContextFactory<EngineDbContext>>().CreateDbContext();
+            using var dbContext = app.ApplicationServices.GetRequiredService<IDbContextFactory<EngineDbContext>>().CreateDbContext();
             dbContext.Database.Migrate();
         }
     }

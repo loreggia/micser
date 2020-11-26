@@ -29,7 +29,7 @@ namespace Micser.Engine.Test.Api
             audioEngineMock.Setup(x => x.RemoveModule(It.IsAny<long>())).Verifiable();
             moduleServiceMock.Setup(x => x.Delete(It.IsAny<long>())).Returns<long>(id => new ModuleDto { Id = id }).Verifiable();
 
-            var modulesProcessor = new ModulesProcessor(audioEngineMock.Object, moduleServiceMock.Object, connectionServiceMock.Object, LogManager.GetCurrentClassLogger());
+            var modulesProcessor = new ModulesApiService(audioEngineMock.Object, moduleServiceMock.Object, connectionServiceMock.Object, LogManager.GetCurrentClassLogger());
 
             var result = await modulesProcessor.ProcessAsync("delete", 4L).ConfigureAwait(false);
 
@@ -47,7 +47,7 @@ namespace Micser.Engine.Test.Api
             var moduleServiceMock = new Mock<IModuleService>();
             var connectionServiceMock = new Mock<IModuleConnectionService>();
 
-            var modulesProcessor = new ModulesProcessor(audioEngineMock.Object, moduleServiceMock.Object, connectionServiceMock.Object, LogManager.GetCurrentClassLogger());
+            var modulesProcessor = new ModulesApiService(audioEngineMock.Object, moduleServiceMock.Object, connectionServiceMock.Object, LogManager.GetCurrentClassLogger());
 
             var result = await modulesProcessor.ProcessAsync("delete", 0L).ConfigureAwait(false);
 
@@ -64,7 +64,7 @@ namespace Micser.Engine.Test.Api
 
             moduleServiceMock.Setup(x => x.GetAll()).Returns(new[] { new ModuleDto { Id = 42 } }).Verifiable();
 
-            var modulesProcessor = new ModulesProcessor(audioEngineMock.Object, moduleServiceMock.Object, connectionServiceMock.Object, LogManager.GetCurrentClassLogger());
+            var modulesProcessor = new ModulesApiService(audioEngineMock.Object, moduleServiceMock.Object, connectionServiceMock.Object, LogManager.GetCurrentClassLogger());
 
             var result = await modulesProcessor.ProcessAsync("getall", null).ConfigureAwait(false);
 
@@ -83,7 +83,7 @@ namespace Micser.Engine.Test.Api
             var moduleServiceMock = new Mock<IModuleService>();
             var connectionServiceMock = new Mock<IModuleConnectionService>();
 
-            var modulesProcessor = new ModulesProcessor(audioEngineMock.Object, moduleServiceMock.Object, connectionServiceMock.Object, LogManager.GetCurrentClassLogger());
+            var modulesProcessor = new ModulesApiService(audioEngineMock.Object, moduleServiceMock.Object, connectionServiceMock.Object, LogManager.GetCurrentClassLogger());
 
             var dto = new ModuleDto();
             var result = await modulesProcessor.ProcessAsync("insert", dto).ConfigureAwait(false);
@@ -102,7 +102,7 @@ namespace Micser.Engine.Test.Api
             audioEngineMock.Setup(x => x.AddModule(It.IsAny<long>())).Verifiable();
             moduleServiceMock.Setup(x => x.Insert(It.IsAny<ModuleDto>())).Returns(true).Verifiable();
 
-            var modulesProcessor = new ModulesProcessor(audioEngineMock.Object, moduleServiceMock.Object, connectionServiceMock.Object, LogManager.GetCurrentClassLogger());
+            var modulesProcessor = new ModulesApiService(audioEngineMock.Object, moduleServiceMock.Object, connectionServiceMock.Object, LogManager.GetCurrentClassLogger());
 
             var dto = new ModuleDto
             {
@@ -130,7 +130,7 @@ namespace Micser.Engine.Test.Api
             moduleServiceMock.Setup(x => x.Update(It.IsAny<ModuleDto>())).Returns(true);
             audioEngineMock.Setup(x => x.UpdateModule(It.IsAny<long>())).Verifiable();
 
-            var modulesProcessor = new ModulesProcessor(audioEngineMock.Object, moduleServiceMock.Object, connectionServiceMock.Object, LogManager.GetCurrentClassLogger());
+            var modulesProcessor = new ModulesApiService(audioEngineMock.Object, moduleServiceMock.Object, connectionServiceMock.Object, LogManager.GetCurrentClassLogger());
 
             var dto = new ModuleDto
             {
@@ -157,7 +157,7 @@ namespace Micser.Engine.Test.Api
 
             moduleServiceMock.Setup(x => x.GetById(It.IsAny<long>())).Returns((ModuleDto)null);
 
-            var modulesProcessor = new ModulesProcessor(audioEngineMock.Object, moduleServiceMock.Object, connectionServiceMock.Object, LogManager.GetCurrentClassLogger());
+            var modulesProcessor = new ModulesApiService(audioEngineMock.Object, moduleServiceMock.Object, connectionServiceMock.Object, LogManager.GetCurrentClassLogger());
 
             var dto = new ModuleDto
             {

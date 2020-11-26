@@ -1,0 +1,24 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "Micser.Common.Api";
+
+import "Api/Protos/Common.proto";
+
+service ModuleConnectionsRpcService {
+    rpc GetAll(Empty) returns (ModuleConnections);
+	rpc Create(ModuleConnection) returns (ModuleConnection);
+	rpc Update(ModuleConnection) returns (ModuleConnection);
+	rpc Delete(Identifiable) returns (Status);
+}
+
+message ModuleConnection {
+	int64 Id = 1;
+	int64 SourceId = 2;
+	string SourceConnectorName = 3;
+	int64 TargetId = 4;
+	string TargetConnectorName = 5;
+}
+
+message ModuleConnections {
+	repeated ModuleConnection Items = 1;
+}

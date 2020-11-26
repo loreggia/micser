@@ -1,0 +1,19 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "Micser.Plugins.Main.Api";
+
+service SpectrumRpcService {
+    rpc Connect(Empty) returns (stream SpectrumData);
+}
+
+message Empty {
+}
+
+message SpectrumData {
+    repeated SpectrumValue Values = 1;
+}
+
+message SpectrumValue {
+    float Frequency = 1;
+    float Value = 2;
+}

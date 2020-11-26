@@ -15,7 +15,7 @@ namespace Micser.Engine.Test.Api
 
             settingsServiceMock.Setup(x => x.GetSetting(It.IsAny<string>())).Returns("value").Verifiable();
 
-            var processor = new SettingsProcessor(settingsServiceMock.Object);
+            var processor = new SettingsApiService(settingsServiceMock.Object);
 
             var result = await processor.ProcessAsync("getsetting", "key");
 
@@ -38,7 +38,7 @@ namespace Micser.Engine.Test.Api
             settingsServiceMock.Setup(x => x.GetSetting(It.IsAny<string>())).Returns("value");
             settingsServiceMock.Setup(x => x.SetSettingAsync(It.IsAny<string>(), It.IsAny<object>())).Verifiable();
 
-            var processor = new SettingsProcessor(settingsServiceMock.Object);
+            var processor = new SettingsApiService(settingsServiceMock.Object);
 
             var dto = new SettingValueDto { Key = "key", Value = "value" };
             var result = await processor.ProcessAsync("setsetting", dto);

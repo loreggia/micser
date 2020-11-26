@@ -1,5 +1,11 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using System;
+using System.Globalization;
+using System.Linq;
+using System.Windows;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Micser.App.Infrastructure;
 using Micser.App.Infrastructure.Api;
 using Micser.App.Infrastructure.Commands;
@@ -19,18 +25,12 @@ using Micser.App.ViewModels;
 using Micser.App.Views;
 using Micser.Common;
 using Micser.Common.Api;
-using Micser.Common.DataAccess;
 using Micser.Common.Extensions;
 using Micser.Common.Settings;
 using Micser.Common.Updates;
-using NLog;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Regions;
-using System;
-using System.Globalization;
-using System.Linq;
-using System.Windows;
 using File = System.IO.File;
 
 namespace Micser.App
@@ -42,88 +42,76 @@ namespace Micser.App
             LocalizationManager.UiCultureChanged += OnUiCultureChanged;
         }
 
-        public void OnInitialized(IContainerProvider container)
+        public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
-            using (var dbContext = container.Resolve<IDbContextFactory>().Create())
+            services.AddNlog("Micser.App.log");
+
+            services.AddDbContext<AppDbContext>(configuration.GetConnectionString("DefaultConnection"));
+
+            services.AddSingleton<INavigationManager, NavigationManager>();
+
+            services.AddSingleton<IApplicationStateService, ApplicationStateService>();
+
+            services.AddSingleton<IResourceRegistry, ResourceRegistry>();
+            services.AddSingleton<IMenuItemRegistry, MenuItemRegistry>();
+            services.AddSingleton<IToolBarRegistry, ToolBarRegistry>();
+            services.AddSingleton<IWidgetRegistry, WidgetRegistry>();
+            services.AddSingleton<IWidgetFactory, WidgetFactory>();
+
+            services.AddSingleton<ISettingsRegistry, SettingsRegistry>();
+            services.AddSingleton<ISettingsService, SettingsService>();
+            services.AddSingleton<ISettingHandlerFactory>(sp => new SettingHandlerFactory(t => (ISettingHandler)sp.GetRequiredService(t)));
+
+            services.RegisterDialog<MessageBoxView, MessageBoxViewModel>();
+
+            services.RegisterView<MainMenuView, MainMenuViewModel>();
+            services.RegisterView<MainStatusBarView, MainStatusBarViewModel>();
+            services.RegisterView<ToolBarView, ToolBarViewModel>();
+
+            services.RegisterView<StartupView, StartupViewModel>();
+            services.RegisterView<StatusView, StatusViewModel>();
+            services.RegisterView<MainView, MainViewModel>();
+            services.RegisterView<SettingsView, SettingsViewModel>();
+            services.RegisterView<AboutView, AboutViewModel>();
+
+            services.AddSingleton<IUpdateService, HttpUpdateService>();
+            services.AddSingleton<UpdateHandler>();
+        }
+
+        public void Initialize(IApplicationBuilder app)
+        {
+            var serviceProvider = app.ApplicationServices;
+
+            using (var dbContext = serviceProvider.GetRequiredService<IDbContextFactory<AppDbContext>>().CreateDbContext())
             {
                 dbContext.Database.Migrate();
             }
 
-            RegisterSettings(container);
-            RegisterMenuItems(container);
-            RegisterToolBarItems(container);
+            RegisterSettings(serviceProvider);
+            RegisterMenuItems(serviceProvider);
+            RegisterToolBarItems(serviceProvider);
 
-            InitializeShell(container);
+            InitializeShell(serviceProvider);
 
-            container.Resolve<IApplicationStateService>().Initialize();
+            serviceProvider.GetRequiredService<IApplicationStateService>().Initialize();
         }
 
-        public void RegisterTypes(IContainerProvider container)
+        private static async void InitializeShell(IServiceProvider serviceProvider)
         {
-            var configurationBuilder = new ConfigurationBuilder();
-            configurationBuilder.AddJsonFile("appsettings.json", false);
-            var configuration = configurationBuilder.Build();
-            container.RegisterInstance<IConfiguration>(configuration);
-
-            container.RegisterFactory<ILogger>(c => LogManager.GetCurrentClassLogger());
-
-            container.RegisterInstance<IDbContextFactory>(new DbContextFactory(() => new AppDbContext(container.GetDbContextOptions<AppDbContext>())));
-
-            container.RegisterSingleton<INavigationManager, NavigationManager>();
-
-            container.RegisterSingleton<IApplicationStateService, ApplicationStateService>();
-
-            container.RegisterSingleton<IResourceRegistry, ResourceRegistry>();
-            container.RegisterSingleton<IMenuItemRegistry, MenuItemRegistry>();
-            container.RegisterSingleton<IToolBarRegistry, ToolBarRegistry>();
-            container.RegisterSingleton<IWidgetRegistry, WidgetRegistry>();
-            container.RegisterSingleton<IWidgetFactory, WidgetFactory>();
-
-            container.RegisterSingleton<IRequestProcessorFactory, RequestProcessorFactory>();
-            container.RegisterType<IRequestProcessor, ApiEventRequestProcessor>();
-            container.RegisterSingleton<IApiServer, ApiServer>();
-            container.RegisterInstance<IApiServerConfiguration>(new ApiConfiguration { PipeName = Globals.AppPipeName });
-            container.RegisterSingleton<IApiClient, ApiClient>();
-            container.RegisterInstance<IApiClientConfiguration>(new ApiConfiguration { PipeName = Globals.EnginePipeName });
-            container.RegisterSingleton<IMessageSerializer, MessagePackMessageSerializer>();
-
-            container.RegisterSingleton<ISettingsRegistry, SettingsRegistry>();
-            container.RegisterSingleton<ISettingsService, SettingsService>();
-            container.RegisterInstance<ISettingHandlerFactory>(new SettingHandlerFactory(t => (ISettingHandler)container.Resolve(t)));
-
-            container.RegisterDialog<MessageBoxView, MessageBoxViewModel>();
-
-            container.RegisterView<MainMenuView, MainMenuViewModel>();
-            container.RegisterView<MainStatusBarView, MainStatusBarViewModel>();
-            container.RegisterView<ToolBarView, ToolBarViewModel>();
-
-            container.RegisterView<StartupView, StartupViewModel>();
-            container.RegisterView<StatusView, StatusViewModel>();
-            container.RegisterView<MainView, MainViewModel>();
-            container.RegisterView<SettingsView, SettingsViewModel>();
-            container.RegisterView<AboutView, AboutViewModel>();
-
-            container.RegisterRequestProcessor<UpdatesRequestProcessor>();
-            container.RegisterSingleton<IUpdateService, HttpUpdateService>();
-            container.RegisterSingleton<UpdateHandler>();
-        }
-
-        private static async void InitializeShell(IContainerProvider containerProvider)
-        {
-            var settingsService = containerProvider.Resolve<ISettingsService>();
+            var settingsService = serviceProvider.GetRequiredService<ISettingsService>();
             await settingsService.LoadAsync();
 
-            var shell = containerProvider.Resolve<MainShell>();
-            shell.DataContext = containerProvider.Resolve<MainShellViewModel>();
+            var shell = serviceProvider.GetRequiredService<MainShell>();
+            shell.DataContext = serviceProvider.GetRequiredService<MainShellViewModel>();
 
-            RegionManager.SetRegionManager(shell, containerProvider.Resolve<IRegionManager>());
+            RegionManager.SetRegionManager(shell, serviceProvider.GetRequiredService<IRegionManager>());
             RegionManager.UpdateRegions();
 
             Application.Current.MainWindow = shell;
 
             var showWindow = true;
 
-            var argumentDictionary = containerProvider.Resolve<ArgumentDictionary>();
+            var argumentDictionary = serviceProvider.GetRequiredService<ArgumentDictionary>();
             var isStartup = argumentDictionary.HasFlag(AppGlobals.ProgramArguments.Startup);
 
             if (isStartup)
@@ -141,7 +129,7 @@ namespace Micser.App
                 shell.Show();
             }
 
-            var navigationManager = containerProvider.Resolve<INavigationManager>();
+            var navigationManager = serviceProvider.GetRequiredService<INavigationManager>();
             navigationManager.Navigate<StartupView>(AppGlobals.PrismRegions.Main);
         }
 
@@ -160,10 +148,10 @@ namespace Micser.App
             Strings.Culture = LocalizationManager.UiCulture;
         }
 
-        private static void RegisterMenuItems(IContainerProvider containerProvider)
+        private static void RegisterMenuItems(IServiceProvider serviceProvider)
         {
-            var menuItemRegistry = containerProvider.Resolve<IMenuItemRegistry>();
-            var navigationManager = containerProvider.Resolve<INavigationManager>();
+            var menuItemRegistry = serviceProvider.GetRequiredService<IMenuItemRegistry>();
+            var navigationManager = serviceProvider.GetRequiredService<INavigationManager>();
 
             // File
             menuItemRegistry.Add(new MenuItemDescription
@@ -216,7 +204,7 @@ namespace Micser.App
             });
             menuItemRegistry.Add(new MenuItemDescription { IsSeparator = true, ParentId = AppGlobals.MenuItemIds.Tools });
             // Tools->Start
-            var engineApiClient = containerProvider.Resolve<EngineApiClient>();
+            var engineApiClient = serviceProvider.GetRequiredService<EngineApiClient>();
             menuItemRegistry.Add(new MenuItemDescription
             {
                 Header = Localize(nameof(Strings.MenuItemStartHeader)),
@@ -260,7 +248,7 @@ namespace Micser.App
                 Header = Localize(nameof(Strings.MenuItemHelpHeader)),
                 Id = AppGlobals.MenuItemIds.Help
             });
-            var updateHandler = containerProvider.Resolve<UpdateHandler>();
+            var updateHandler = serviceProvider.GetRequiredService<UpdateHandler>();
             menuItemRegistry.Add(new MenuItemDescription
             {
                 Header = Localize(nameof(Strings.MenuItemCheckUpdateHeader)),
@@ -281,9 +269,9 @@ namespace Micser.App
             });
         }
 
-        private static void RegisterSettings(IContainerProvider containerProvider)
+        private static void RegisterSettings(IServiceProvider serviceProvider)
         {
-            var settingsRegistry = containerProvider.Resolve<ISettingsRegistry>();
+            var settingsRegistry = serviceProvider.GetRequiredService<ISettingsRegistry>();
 
             settingsRegistry.Add(new SettingDefinition
             {
@@ -384,13 +372,13 @@ namespace Micser.App
             });
         }
 
-        private static void RegisterToolBarItems(IContainerProvider containerProvider)
+        private static void RegisterToolBarItems(IServiceProvider serviceProvider)
         {
-            var navigationManager = containerProvider.Resolve<INavigationManager>();
+            var navigationManager = serviceProvider.GetRequiredService<INavigationManager>();
 
             // main tool bar
-            var toolBarRegistry = containerProvider.Resolve<IToolBarRegistry>();
-            var eventAggregator = containerProvider.Resolve<IEventAggregator>();
+            var toolBarRegistry = serviceProvider.GetRequiredService<IToolBarRegistry>();
+            var eventAggregator = serviceProvider.GetRequiredService<IEventAggregator>();
 
             var goHomeCommand = new DelegateCommand(() => navigationManager.Navigate<MainView>(AppGlobals.PrismRegions.Main));
             toolBarRegistry.AddItem(AppGlobals.ToolBarIds.Main, new ToolBarButton

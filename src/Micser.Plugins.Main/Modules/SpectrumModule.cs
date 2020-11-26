@@ -1,22 +1,17 @@
-﻿using Micser.Common.Api;
-using Micser.Common.Extensions;
+﻿using System.Timers;
 using Micser.Engine.Infrastructure.Audio;
 using Micser.Plugins.Main.Audio;
-using System.Timers;
 
 namespace Micser.Plugins.Main.Modules
 {
     public class SpectrumModule : AudioModule
     {
-        private readonly IApiClient _apiClient;
         private readonly SpectrumSampleProcessor _sampleProcessor;
         private readonly Timer _timer;
         private bool _isDisposed;
 
-        public SpectrumModule(IApiClient apiClient)
+        public SpectrumModule()
         {
-            _apiClient = apiClient;
-
             _sampleProcessor = new SpectrumSampleProcessor();
             AddSampleProcessor(_sampleProcessor);
 
@@ -45,7 +40,8 @@ namespace Micser.Plugins.Main.Modules
             var data = _sampleProcessor.GetFftData();
             if (data != null)
             {
-                await _apiClient.SendMessageAsync("spectrum", null, data).ConfigureAwait(false);
+                // todo
+                //await _apiClient.SendMessageAsync("spectrum", null, data).ConfigureAwait(false);
             }
 
             if (!_isDisposed)

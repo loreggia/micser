@@ -1,5 +1,4 @@
-﻿using Micser.Common.Api;
-using Prism.Events;
+﻿using Prism.Events;
 
 namespace Micser.App.Infrastructure.Api
 {
@@ -29,11 +28,6 @@ namespace Micser.App.Infrastructure.Api
             /// Gets the content that was sent from the engine.
             /// </summary>
             public object Content { get; }
-
-            /// <summary>
-            /// Gets or sets the response to be sent back to the engine.
-            /// </summary>
-            public ApiResponse Response { get; set; }
         }
     }
 }

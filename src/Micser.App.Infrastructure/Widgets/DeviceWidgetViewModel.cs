@@ -1,11 +1,11 @@
-﻿using CSCore.CoreAudioAPI;
+﻿using System.Collections.ObjectModel;
+using System.Linq;
+using System.Windows.Data;
+using CSCore.CoreAudioAPI;
 using Micser.Common;
 using Micser.Common.Devices;
 using Micser.Common.Extensions;
 using Micser.Common.Modules;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Windows.Data;
 
 namespace Micser.App.Infrastructure.Widgets
 {
@@ -52,7 +52,7 @@ namespace Micser.App.Infrastructure.Widgets
         public override ModuleState GetState()
         {
             var state = base.GetState();
-            state.Data[Globals.StateKeys.DeviceId] = SelectedDeviceDescription?.Id;
+            state[Globals.StateKeys.DeviceId] = SelectedDeviceDescription?.Id;
             return state;
         }
 
@@ -73,7 +73,7 @@ namespace Micser.App.Infrastructure.Widgets
                 return;
             }
 
-            var deviceId = state.Data.GetObject<string>(Globals.StateKeys.DeviceId);
+            var deviceId = state.GetObject<string>(Globals.StateKeys.DeviceId);
             SelectedDeviceDescription = deviceId != null ? DeviceDescriptions.FirstOrDefault(d => d.Id == deviceId) : null;
         }
 

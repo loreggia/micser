@@ -1,10 +1,10 @@
-﻿using Micser.Common.Modules;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using Micser.Common.Modules;
 
 namespace Micser.Common.Extensions
 {
@@ -40,7 +40,7 @@ namespace Micser.Common.Extensions
             {
                 var value = property.Key.GetValue(obj) ?? property.Value.DefaultValue;
 
-                state.Data[property.Key.Name] = value;
+                state[property.Key.Name] = value.ToType<string>();
             }
         }
 
@@ -70,9 +70,9 @@ namespace Micser.Common.Extensions
             {
                 object value;
                 var propertyType = property.Key.PropertyType;
-                if (state.Data.ContainsKey(property.Key.Name))
+                if (state.ContainsKey(property.Key.Name))
                 {
-                    value = state.Data[property.Key.Name];
+                    value = state[property.Key.Name];
                 }
                 else
                 {

@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using NLog.Config;
@@ -32,6 +34,38 @@ namespace Micser.Common.Extensions
             return services;
         }
 
+        public static IServiceCollection AddModules<TModule>(this IServiceCollection services, params Type[] staticModules)
+            where TModule : IModule
+        {
+            foreach (var module in staticModules)
+            {
+                services.AddSingleton(typeof(IModule), module);
+            }
+
+            var executingFile = new FileInfo(Assembly.GetExecutingAssembly().Location);
+
+            foreach (var moduleFile in executingFile.Directory.GetFiles(Globals.PluginSearchPattern))
+            {
+                try
+                {
+                    var assembly = Assembly.LoadFile(moduleFile.FullName);
+                    var moduleTypes = assembly.GetExportedTypes().Where(t => typeof(TModule).IsAssignableFrom(t));
+
+                    foreach (var moduleType in moduleTypes)
+                    {
+                        services.AddSingleton(typeof(IModule), moduleType);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    // todo
+                    //Logger.Debug(ex);
+                }
+            }
+
+            return services;
+        }
+
         public static IServiceCollection AddNlog(this IServiceCollection services, string fileName)
         {
             var config = new LoggingConfiguration();
@@ -59,35 +93,17 @@ namespace Micser.Common.Extensions
             return services;
         }
 
-        public static IServiceCollection AddPlugins<TPlugin>(this IServiceCollection services, params Type[] staticPlugins)
+        public static IApplicationBuilder UseModules<TModule>(this IApplicationBuilder app)
+            where TModule : IModule
         {
-            foreach (var module in staticPlugins)
+            var plugins = app.ApplicationServices.GetRequiredService<IEnumerable<TModule>>();
+
+            foreach (var plugin in plugins)
             {
-                services.AddSingleton(typeof(IModule), module);
+                plugin.Initialize(app);
             }
 
-            var executingFile = new FileInfo(Assembly.GetExecutingAssembly().Location);
-
-            foreach (var moduleFile in executingFile.Directory.GetFiles(Globals.PluginSearchPattern))
-            {
-                try
-                {
-                    var assembly = Assembly.LoadFile(moduleFile.FullName);
-                    var moduleTypes = assembly.GetExportedTypes().Where(t => typeof(TPlugin).IsAssignableFrom(t));
-
-                    foreach (var moduleType in moduleTypes)
-                    {
-                        services.AddSingleton(typeof(TPlugin), moduleType);
-                    }
-                }
-                catch (Exception ex)
-                {
-                    // todo
-                    //Logger.Debug(ex);
-                }
-            }
-
-            return services;
+            return app;
         }
     }
 }

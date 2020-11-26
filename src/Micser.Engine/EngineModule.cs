@@ -1,9 +1,10 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Micser.Common;
 using Micser.Common.Audio;
 using Micser.Common.Settings;
+using Micser.Engine.Api;
 using Micser.Engine.Audio;
 using Micser.Engine.Infrastructure;
 
@@ -22,9 +23,18 @@ namespace Micser.Engine
             services.AddSingleton<IAudioEngine, AudioEngine>();
         }
 
-        public void Initialize(IServiceProvider serviceProvider)
+        public void Initialize(IApplicationBuilder app)
         {
-            var settingsRegistry = serviceProvider.GetRequiredService<ISettingsRegistry>();
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapGrpcService<EngineApiService>();
+                endpoints.MapGrpcService<ModuleConnectionsApiService>();
+                endpoints.MapGrpcService<ModulesApiService>();
+                endpoints.MapGrpcService<SettingsApiService>();
+                endpoints.MapGrpcService<EngineEventsApiService>();
+            });
+
+            var settingsRegistry = app.ApplicationServices.GetRequiredService<ISettingsRegistry>();
 
             settingsRegistry.Add(new SettingDefinition
             {

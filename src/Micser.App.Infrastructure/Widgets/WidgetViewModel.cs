@@ -1,9 +1,9 @@
-﻿using Micser.Common.Extensions;
-using Micser.Common.Modules;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Windows;
+using Micser.Common.Extensions;
+using Micser.Common.Modules;
 
 namespace Micser.App.Infrastructure.Widgets
 {
@@ -112,13 +112,10 @@ namespace Micser.App.Infrastructure.Widgets
         {
             var state = new ModuleState
             {
-                Data =
-                {
-                    {AppGlobals.ModuleStateKeys.Left, Position.X},
-                    {AppGlobals.ModuleStateKeys.Top, Position.Y},
-                    {AppGlobals.ModuleStateKeys.Width, Size.Width},
-                    {AppGlobals.ModuleStateKeys.Height, Size.Height}
-                }
+                {AppGlobals.ModuleStateKeys.Left, Position.X.ToType<string>()},
+                {AppGlobals.ModuleStateKeys.Top, Position.Y.ToType<string>()},
+                {AppGlobals.ModuleStateKeys.Width, Size.Width.ToType<string>()},
+                {AppGlobals.ModuleStateKeys.Height, Size.Height.ToType<string>()}
             };
 
             this.GetStateProperties(state);
@@ -159,12 +156,12 @@ namespace Micser.App.Infrastructure.Widgets
         /// </summary>
         public virtual void SetState(ModuleState state)
         {
-            var left = state.Data.GetObject<double>(AppGlobals.ModuleStateKeys.Left);
-            var top = state.Data.GetObject<double>(AppGlobals.ModuleStateKeys.Top);
+            var left = state.GetObject<double>(AppGlobals.ModuleStateKeys.Left);
+            var top = state.GetObject<double>(AppGlobals.ModuleStateKeys.Top);
             Position = new Point(left, top);
 
-            var width = state.Data.GetObject<double>(AppGlobals.ModuleStateKeys.Width);
-            var height = state.Data.GetObject<double>(AppGlobals.ModuleStateKeys.Height);
+            var width = state.GetObject<double>(AppGlobals.ModuleStateKeys.Width);
+            var height = state.GetObject<double>(AppGlobals.ModuleStateKeys.Height);
             Size = new Size(width, height);
 
             this.SetStateProperties(state);

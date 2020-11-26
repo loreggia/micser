@@ -1,43 +1,26 @@
 ﻿using System.Windows;
+using Microsoft.Extensions.DependencyInjection;
 using Micser.App.Infrastructure.Widgets;
-using Prism.Ioc;
-using Prism.Services.Dialogs;
 
 namespace Micser.App.Infrastructure.Extensions
 {
-    /// <summary>
-    /// Provides helper extension methods for the <see cref="IContainerProvider"/> class.
-    /// </summary>
-    public static class ContainerProviderExtensions
+    public static class ConfigurationExtensions
     {
-        /// <summary>
-        /// Registers a dialog for use with the Prism <see cref="IDialogService"/>.
-        /// </summary>
-        /// <typeparam name="TView">The view type of the dialog.</typeparam>
-        /// <typeparam name="TViewModel">The dialog's view model type.</typeparam>
-        /// <param name="container">The container.</param>
-        public static void RegisterDialog<TView, TViewModel>(this IContainerRegistry container)
-            where TView : FrameworkElement
-            where TViewModel : IDialogAware, IViewModel
-        {
-            container.RegisterView<TView, TViewModel>();
-        }
-
         /// <summary>
         /// Registers a view and it's corresponding view model.
         /// </summary>
         /// <typeparam name="TView">The view type.</typeparam>
         /// <typeparam name="TViewModel">The view model type.</typeparam>
-        /// <param name="container"></param>
-        public static void RegisterView<TView, TViewModel>(this IContainerRegistry container)
+        public static void RegisterView<TView, TViewModel>(this IServiceCollection services)
             where TView : FrameworkElement
             where TViewModel : IViewModel
         {
-            //container.RegisterType<TView>();
-            //container.RegisterFactory<object>(c =>
+            services.AddTransient<TView>();
+            // TODO
+            //services.AddTransient<object>(sp =>
             //{
-            //    var view = c.Resolve<TView>();
-            //    var viewModel = c.Resolve<TViewModel>();
+            //    var view = sp.GetRequiredService<TView>();
+            //    var viewModel = sp.GetRequiredService<TViewModel>();
 
             //    view.DataContext = viewModel;
 
@@ -52,14 +35,15 @@ namespace Micser.App.Infrastructure.Extensions
         /// </summary>
         /// <typeparam name="TWidget">The widget view type.</typeparam>
         /// <typeparam name="TViewModel">The widget view model type.</typeparam>
-        /// <param name="container"></param>
+        /// <param name="services"></param>
         /// <param name="defaultName">The default name that is shown in the widget tool box and used when creating a widget.</param>
         /// <param name="description">A description that is shown in the widget tool box.</param>
-        public static void RegisterWidget<TWidget, TViewModel>(this IContainerRegistry container, object defaultName, object description)
+        public static void RegisterWidget<TWidget, TViewModel>(this IServiceCollection services, object defaultName, object description)
             where TWidget : Widget
             where TViewModel : WidgetViewModel
         {
-            //container.RegisterDelegate<Widget>((IContainerProvider c) =>
+            // TODO
+            //container.RegisterFactory<Widget>(c =>
             //{
             //    var widget = c.Resolve<TWidget>();
             //    return widget;

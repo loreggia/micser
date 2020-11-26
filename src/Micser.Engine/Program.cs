@@ -1,10 +1,8 @@
 ﻿using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
-using Micser.Common.Extensions;
-using Micser.Engine.Infrastructure;
 
 namespace Micser.Engine
 {
@@ -20,21 +18,14 @@ namespace Micser.Engine
             var isService = !(Debugger.IsAttached || arguments.Contains("--console"));
 
             var builder = Host.CreateDefaultBuilder(arguments)
-                .ConfigureServices((hostContext, services) =>
-                {
-                    services.AddNlog("Micser.Engine.log");
-                    services.AddPlugins<IEngineModule>();
-                    services.AddHostedService<MicserService>();
-                });
+                .ConfigureWebHostDefaults(webHostBuilder => webHostBuilder.UseStartup<Startup>());
 
             if (isService)
             {
-                await builder.RunAsServiceAsync();
+                builder.UseWindowsService();
             }
-            else
-            {
-                await builder.RunConsoleAsync();
-            }
+
+            await builder.Build().StartAsync();
         }
 
         private static void TrySetPriority()

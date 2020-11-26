@@ -49,8 +49,6 @@ namespace Micser.Engine
         {
             _logger.LogInformation("Starting service");
 
-            LoadPlugins();
-
             //_apiServer = _serviceProvider.Resolve<IApiServer>();
             //_apiClient = _serviceProvider.Resolve<IApiClient>();
 
@@ -126,18 +124,6 @@ namespace Micser.Engine
 
             return base.OnPowerEvent(powerStatus);
         }*/
-
-        private void LoadPlugins()
-        {
-            var plugins = _serviceProvider.GetRequiredService<IEnumerable<IEngineModule>>();
-
-            foreach (var engineModule in plugins)
-            {
-                _logger.LogInformation($"Loading plugin {engineModule.GetType().AssemblyQualifiedName}");
-                _plugins.Add(engineModule);
-                engineModule.Initialize(_serviceProvider);
-            }
-        }
 
         private async void OnUpdateTimerElapsed(object sender, ElapsedEventArgs e)
         {

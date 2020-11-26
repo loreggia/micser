@@ -85,9 +85,9 @@ namespace Micser.Engine.Infrastructure.Services
             state.IsMuted = moduleDto.State.IsMuted;
             state.UseSystemVolume = moduleDto.State.UseSystemVolume;
             state.Volume = moduleDto.State.Volume;
-            foreach (var data in moduleDto.State.Data)
+            foreach (var data in moduleDto.State)
             {
-                state.Data[data.Key] = data.Value;
+                state[data.Key] = data.Value;
             }
 
             module.StateJson = JsonConvert.SerializeObject(state);

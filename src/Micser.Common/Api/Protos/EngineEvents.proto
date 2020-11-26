@@ -1,0 +1,14 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "Micser.Common.Api";
+
+import "Api/Protos/Common.proto";
+
+service EngineEventsRpcService {
+    rpc Connect (Empty) returns (stream EngineEvent);
+}
+
+message EngineEvent {
+    string Type = 1;
+    string Content = 2;
+}

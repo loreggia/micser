@@ -6,6 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Api\Protos\Spectrum.proto" />
     <None Remove="Themes\Colors.Light.ini" />
   </ItemGroup>
 
@@ -23,9 +24,17 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Grpc.AspNetCore" Version="2.33.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Micser.App.Infrastructure\Micser.App.Infrastructure.csproj" />
     <ProjectReference Include="..\Micser.Common\Micser.Common.csproj" />
     <ProjectReference Include="..\Micser.Engine.Infrastructure\Micser.Engine.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="Api\Protos\Spectrum.proto" />
   </ItemGroup>
 
   <ItemGroup>

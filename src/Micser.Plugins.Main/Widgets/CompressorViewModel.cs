@@ -1,9 +1,9 @@
-﻿using Micser.App.Infrastructure.Widgets;
+﻿using System;
+using Micser.App.Infrastructure.Widgets;
 using Micser.Common.Extensions;
 using Micser.Common.Modules;
 using Micser.Plugins.Main.Audio;
 using Micser.Plugins.Main.Modules;
-using System;
 
 namespace Micser.Plugins.Main.Widgets
 {
@@ -110,14 +110,14 @@ namespace Micser.Plugins.Main.Widgets
         public override ModuleState GetState()
         {
             var state = base.GetState();
-            state.Data[nameof(EnableAdvancedControls)] = EnableAdvancedControls;
+            state[nameof(EnableAdvancedControls)] = EnableAdvancedControls.ToType<string>();
             return state;
         }
 
         public override void SetState(ModuleState state)
         {
             // EnableAdvancedControls has to be set before all other values
-            EnableAdvancedControls = state.Data.GetObject(nameof(EnableAdvancedControls), false);
+            EnableAdvancedControls = state.GetObject(nameof(EnableAdvancedControls), false);
             base.SetState(state);
         }
 

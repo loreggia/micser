@@ -1,11 +1,10 @@
-﻿using CSCore.CoreAudioAPI;
+﻿using System.Threading.Tasks;
+using CSCore.CoreAudioAPI;
 using Micser.Common;
-using Micser.Common.Api;
 using Micser.Common.Devices;
 using Micser.Common.Extensions;
 using Micser.Common.Modules;
 using Micser.Engine.Infrastructure.Services;
-using System.Threading.Tasks;
 
 namespace Micser.Engine.Infrastructure.Audio
 {
@@ -15,11 +14,6 @@ namespace Micser.Engine.Infrastructure.Audio
     public abstract class DeviceModule : AudioModule
     {
         /// <summary>
-        /// The api end point for communication with the UI.
-        /// </summary>
-        protected readonly IApiClient ApiClient;
-
-        /// <summary>
         /// The module service for access to the module DB.
         /// </summary>
         protected readonly IModuleService ModuleService;
@@ -27,9 +21,8 @@ namespace Micser.Engine.Infrastructure.Audio
         private DeviceDescription _deviceDescription;
 
         /// <inheritdoc />
-        protected DeviceModule(IApiClient apiClient, IModuleService moduleService)
+        protected DeviceModule(IModuleService moduleService)
         {
-            ApiClient = apiClient;
             ModuleService = moduleService;
 
             DeviceEnumerator = new MMDeviceEnumerator();
@@ -83,8 +76,8 @@ namespace Micser.Engine.Infrastructure.Audio
         public override ModuleState GetState()
         {
             var state = base.GetState();
-            state.Data[Globals.StateKeys.DeviceId] = DeviceDescription?.Id;
-            state.Data[nameof(AdapterName)] = AdapterName;
+            state[Globals.StateKeys.DeviceId] = DeviceDescription?.Id;
+            state[nameof(AdapterName)] = AdapterName;
             return state;
         }
 
@@ -93,7 +86,7 @@ namespace Micser.Engine.Infrastructure.Audio
         {
             base.SetState(state);
 
-            var deviceId = state?.Data.GetObject<string>(Globals.StateKeys.DeviceId);
+            var deviceId = state?.GetObject<string>(Globals.StateKeys.DeviceId);
             if (deviceId != null)
             {
                 var deviceService = new DeviceService();
@@ -106,7 +99,7 @@ namespace Micser.Engine.Infrastructure.Audio
 
             if (AdapterName == null)
             {
-                AdapterName = state.Data.GetObject<string>(nameof(AdapterName));
+                AdapterName = state.GetObject<string>(nameof(AdapterName));
             }
         }
 
@@ -167,7 +160,8 @@ namespace Micser.Engine.Infrastructure.Audio
 
                     if (ModuleService.Update(moduleDto))
                     {
-                        ApiClient.SendMessageAsync("modules", "refresh", moduleDto);
+                        // TODO
+                        //ApiClient.SendMessageAsync("modules", "refresh", moduleDto);
                     }
                 }
                 else
