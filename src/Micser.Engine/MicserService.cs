@@ -1,4 +1,12 @@
-﻿using Microsoft.Extensions.Hosting;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Timers;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Micser.Common;
 using Micser.Common.Api;
 using Micser.Common.Audio;
@@ -6,28 +14,20 @@ using Micser.Common.Extensions;
 using Micser.Common.Settings;
 using Micser.Common.Updates;
 using Micser.Engine.Infrastructure;
-using NLog;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Timers;
 using Timer = System.Timers.Timer;
 
 namespace Micser.Engine
 {
     public class MicserService : IHostedService
     {
-        private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
+        //private IApiServer _apiServer;
+
+        private readonly ILogger<MicserService> _logger;
         private readonly ICollection<IEngineModule> _plugins;
+        private readonly IServiceProvider _serviceProvider;
         private readonly Timer _updateTimer;
         private IApiClient _apiClient;
-        private IApiServer _apiServer;
-        private UnityContainerProvider _containerProvider;
-        private IAudioEngine _engine;
+        private IAudioEngine _audioEngine;
         private ISettingsService _settingsService;
         private IUpdateService _updateService;
 
@@ -36,8 +36,10 @@ namespace Micser.Engine
             Directory.CreateDirectory(Globals.AppDataFolder);
         }
 
-        public MicserService()
+        public MicserService(IServiceProvider serviceProvider, ILogger<MicserService> logger)
         {
+            _serviceProvider = serviceProvider;
+            _logger = logger;
             _plugins = new List<IEngineModule>();
             _updateTimer = new Timer(1000) { AutoReset = false };
             _updateTimer.Elapsed += OnUpdateTimerElapsed;
@@ -45,47 +47,45 @@ namespace Micser.Engine
 
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            Logger.Info("Starting service");
+            _logger.LogInformation("Starting service");
 
-            _containerProvider = new UnityContainerProvider();
+            LoadPlugins();
 
-            LoadPlugins(_containerProvider);
+            //_apiServer = _serviceProvider.Resolve<IApiServer>();
+            //_apiClient = _serviceProvider.Resolve<IApiClient>();
 
-            _apiServer = _containerProvider.Resolve<IApiServer>();
-            _apiClient = _containerProvider.Resolve<IApiClient>();
-            _engine = _containerProvider.Resolve<IAudioEngine>();
-            _updateService = _containerProvider.Resolve<IUpdateService>();
+            _audioEngine = _serviceProvider.GetRequiredService<IAudioEngine>();
+            _updateService = _serviceProvider.GetRequiredService<IUpdateService>();
 
-            await _apiServer.StartAsync();
+            //await _apiServer.StartAsync();
 
-            _settingsService = _containerProvider.Resolve<ISettingsService>();
+            _settingsService = _serviceProvider.GetRequiredService<ISettingsService>();
             await _settingsService.LoadAsync().ConfigureAwait(false);
 
             if (_settingsService.GetSetting<bool>(Globals.SettingKeys.IsEngineRunning))
             {
-                _engine.Start();
+                _audioEngine.Start();
             }
 
             _updateTimer.Start();
 
-            Logger.Info("Service started");
+            _logger.LogInformation("Service started");
         }
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
-            Logger.Info("Stopping service");
+            _logger.LogInformation("Stopping service");
 
             _updateTimer.Stop();
 
-            _apiClient.Disconnect();
-            _apiServer.Stop();
-            _engine.Stop();
+            //_apiClient.Disconnect();
+            //_apiServer.Stop();
+
+            _audioEngine.Stop();
 
             _plugins.Clear();
 
-            _containerProvider.Dispose();
-
-            Logger.Info("Service stopped");
+            _logger.LogInformation("Service stopped");
 
             return Task.CompletedTask;
         }
@@ -127,48 +127,16 @@ namespace Micser.Engine
             return base.OnPowerEvent(powerStatus);
         }*/
 
-        private void LoadPlugins(IContainerProvider container)
+        private void LoadPlugins()
         {
-            Logger.Info("Loading plugins");
+            var plugins = _serviceProvider.GetRequiredService<IEnumerable<IEngineModule>>();
 
-            _plugins.Clear();
-
-            _plugins.Add(new EngineModule());
-            _plugins.Add(new InfrastructureModule());
-
-            var executingFile = new FileInfo(Assembly.GetExecutingAssembly().Location);
-
-            foreach (var moduleFile in executingFile.Directory.GetFiles(Globals.PluginSearchPattern))
+            foreach (var engineModule in plugins)
             {
-                try
-                {
-                    var assembly = Assembly.LoadFile(moduleFile.FullName);
-                    var moduleTypes = assembly.GetExportedTypes().Where(t => typeof(IEngineModule).IsAssignableFrom(t));
-                    container.RegisterSingletons<IEngineModule>(moduleTypes);
-                    var modules = container.ResolveAll<IEngineModule>();
-                    foreach (var engineModule in modules)
-                    {
-                        _plugins.Add(engineModule);
-                        Logger.Info($"Loading plugin {engineModule.GetType().AssemblyQualifiedName}");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Logger.Debug(ex);
-                }
+                _logger.LogInformation($"Loading plugin {engineModule.GetType().AssemblyQualifiedName}");
+                _plugins.Add(engineModule);
+                engineModule.Initialize(_serviceProvider);
             }
-
-            foreach (var engineModule in _plugins)
-            {
-                engineModule.RegisterTypes(container);
-            }
-
-            foreach (var engineModule in _plugins)
-            {
-                engineModule.OnInitialized(container);
-            }
-
-            Logger.Info("Plugins loaded");
         }
 
         private async void OnUpdateTimerElapsed(object sender, ElapsedEventArgs e)
@@ -184,17 +152,17 @@ namespace Micser.Engine
 
                 if (_updateService.IsUpdateAvailable(updateManifest))
                 {
-                    ApiResponse result;
+                    //ApiResponse result;
 
-                    do
-                    {
-                        result = await _apiClient.SendMessageAsync(Globals.ApiResources.Updates, "updateavailable", updateManifest).ConfigureAwait(false);
+                    //do
+                    //{
+                    //    result = await _apiClient.SendMessageAsync(Globals.ApiResources.Updates, "updateavailable", updateManifest).ConfigureAwait(false);
 
-                        if (!result.IsSuccess)
-                        {
-                            await Task.Delay(1000).ConfigureAwait(false);
-                        }
-                    } while (!result.IsSuccess);
+                    //    if (!result.IsSuccess)
+                    //    {
+                    //        await Task.Delay(1000).ConfigureAwait(false);
+                    //    }
+                    //} while (!result.IsSuccess);
                 }
             }
 

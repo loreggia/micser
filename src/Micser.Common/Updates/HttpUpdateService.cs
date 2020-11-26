@@ -1,10 +1,10 @@
-﻿using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
-using NLog;
-using System;
+﻿using System;
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
+using NLog;
 
 namespace Micser.Common.Updates
 {
@@ -16,16 +16,13 @@ namespace Micser.Common.Updates
         /// <summary>
         /// Gets the update settings (manifest URL, ...).
         /// </summary>
-        protected readonly HttpUpdateSettings Settings;
+        protected readonly HttpUpdateOptions Options;
 
         /// <inheritdoc />
-        public HttpUpdateService(IConfiguration configuration, ILogger logger)
+        public HttpUpdateService(IOptions<HttpUpdateOptions> options, ILogger logger)
             : base(logger)
         {
-            Settings = configuration
-                .GetSection(Globals.AppSettingSections.Update.HttpUpdateSettings)
-                .Get<HttpUpdateSettings>()
-                ?? throw new MissingConfigurationException(Globals.AppSettingSections.Update.HttpUpdateSettings);
+            Options = options.Value ?? throw new MissingConfigurationException(Globals.AppSettingSections.Update.HttpUpdateSettings);
         }
 
         /// <inheritdoc />
@@ -62,7 +59,7 @@ namespace Micser.Common.Updates
             {
                 using (var webClient = new WebClient())
                 {
-                    var json = await webClient.DownloadStringTaskAsync(Settings.ManifestUrl).ConfigureAwait(false);
+                    var json = await webClient.DownloadStringTaskAsync(Options.ManifestUrl).ConfigureAwait(false);
                     return JsonConvert.DeserializeObject<UpdateManifest>(json);
                 }
             }

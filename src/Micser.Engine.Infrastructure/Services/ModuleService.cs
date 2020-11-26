@@ -1,38 +1,34 @@
-﻿using Micser.Common.DataAccess;
-using Micser.Common.Extensions;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Micser.Common.Modules;
 using Micser.Engine.Infrastructure.DataAccess;
 using Micser.Engine.Infrastructure.DataAccess.Models;
 using Newtonsoft.Json;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Micser.Engine.Infrastructure.Services
 {
     /// <inheritdoc cref="IModuleService"/>
     public class ModuleService : IModuleService
     {
-        private readonly IDbContextFactory _dbContextFactory;
+        private readonly EngineDbContext _dbContext;
 
         /// <inheritdoc />
-        public ModuleService(IDbContextFactory dbContextFactory)
+        public ModuleService(EngineDbContext dbContext)
         {
-            _dbContextFactory = dbContextFactory;
+            _dbContext = dbContext;
         }
 
         /// <inheritdoc />
         public ModuleDto Delete(long id)
         {
-            using var dbContext = _dbContextFactory.Create<EngineDbContext>();
-
-            var module = dbContext.Modules.Find(id);
+            var module = _dbContext.Modules.Find(id);
             if (module == null)
             {
                 return null;
             }
 
-            dbContext.Modules.Remove(module);
-            dbContext.SaveChanges();
+            _dbContext.Modules.Remove(module);
+            _dbContext.SaveChanges();
 
             return GetModuleDto(module);
         }
@@ -40,15 +36,13 @@ namespace Micser.Engine.Infrastructure.Services
         /// <inheritdoc />
         public IEnumerable<ModuleDto> GetAll()
         {
-            using var dbContext = _dbContextFactory.Create<EngineDbContext>();
-            return dbContext.Modules.AsEnumerable().Select(GetModuleDto).ToArray();
+            return _dbContext.Modules.AsEnumerable().Select(GetModuleDto).ToArray();
         }
 
         /// <inheritdoc />
         public ModuleDto GetById(long id)
         {
-            using var dbContext = _dbContextFactory.Create<EngineDbContext>();
-            var module = dbContext.Modules.Find(id);
+            var module = _dbContext.Modules.Find(id);
             return GetModuleDto(module);
         }
 
@@ -57,10 +51,9 @@ namespace Micser.Engine.Infrastructure.Services
         {
             var module = GetModule(moduleDto);
 
-            using var dbContext = _dbContextFactory.Create<EngineDbContext>();
-            dbContext.Modules.Add(module);
+            _dbContext.Modules.Add(module);
 
-            if (dbContext.SaveChanges() > 0)
+            if (_dbContext.SaveChanges() > 0)
             {
                 moduleDto.Id = module.Id;
                 return true;
@@ -72,17 +65,15 @@ namespace Micser.Engine.Infrastructure.Services
         /// <inheritdoc />
         public bool Truncate()
         {
-            using var dbContext = _dbContextFactory.Create<EngineDbContext>();
-            var modules = dbContext.Modules.AsEnumerable();
-            dbContext.Modules.RemoveRange(modules);
-            return dbContext.SaveChanges() >= 0;
+            var modules = _dbContext.Modules.AsEnumerable();
+            _dbContext.Modules.RemoveRange(modules);
+            return _dbContext.SaveChanges() >= 0;
         }
 
         /// <inheritdoc />
         public bool Update(ModuleDto moduleDto)
         {
-            using var dbContext = _dbContextFactory.Create<EngineDbContext>();
-            var module = dbContext.Modules.Find(moduleDto.Id);
+            var module = _dbContext.Modules.Find(moduleDto.Id);
 
             if (module == null)
             {
@@ -103,7 +94,7 @@ namespace Micser.Engine.Infrastructure.Services
 
             moduleDto.State = state;
 
-            return dbContext.SaveChanges() >= 0;
+            return _dbContext.SaveChanges() >= 0;
         }
 
         private static Module GetModule(ModuleDto moduleDto)

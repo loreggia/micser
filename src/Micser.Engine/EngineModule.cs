@@ -1,9 +1,9 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Micser.Common;
 using Micser.Common.Audio;
-using Micser.Common.Extensions;
 using Micser.Common.Settings;
-using Micser.Engine.Api;
 using Micser.Engine.Audio;
 using Micser.Engine.Infrastructure;
 
@@ -11,9 +11,20 @@ namespace Micser.Engine
 {
     public class EngineModule : IEngineModule
     {
-        public void OnInitialized(IContainerProvider container)
+        public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
-            var settingsRegistry = container.Resolve<ISettingsRegistry>();
+            //services.AddRequestProcessor<EngineProcessor>();
+            //services.AddRequestProcessor<StatusProcessor>();
+            //services.AddRequestProcessor<ModulesProcessor>();
+            //services.AddRequestProcessor<ModuleConnectionsProcessor>();
+            //services.AddRequestProcessor<SettingsProcessor>();
+
+            services.AddSingleton<IAudioEngine, AudioEngine>();
+        }
+
+        public void Initialize(IServiceProvider serviceProvider)
+        {
+            var settingsRegistry = serviceProvider.GetRequiredService<ISettingsRegistry>();
 
             settingsRegistry.Add(new SettingDefinition
             {
@@ -30,22 +41,6 @@ namespace Micser.Engine
                 Key = Globals.SettingKeys.ResumeDelay,
                 DefaultValue = 10
             });
-        }
-
-        public void RegisterTypes(IContainerProvider container)
-        {
-            var configurationBuilder = new ConfigurationBuilder();
-            configurationBuilder.AddJsonFile("appsettings.json", false);
-            var configuration = configurationBuilder.Build();
-            container.RegisterInstance<IConfiguration>(configuration);
-
-            container.RegisterRequestProcessor<EngineProcessor>();
-            container.RegisterRequestProcessor<StatusProcessor>();
-            container.RegisterRequestProcessor<ModulesProcessor>();
-            container.RegisterRequestProcessor<ModuleConnectionsProcessor>();
-            container.RegisterRequestProcessor<SettingsProcessor>();
-
-            container.RegisterSingleton<IAudioEngine, AudioEngine>();
         }
     }
 }

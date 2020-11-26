@@ -6,13 +6,22 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Api\Protos\api.proto" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="CSCore" Version="1.2.1.2" />
+    <PackageReference Include="Grpc.AspNetCore" Version="2.33.1" />
     <PackageReference Include="MessagePack" Version="2.2.60" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
-    <PackageReference Include="NLog" Version="4.7.5" />
+    <PackageReference Include="NLog.Extensions.Logging" Version="1.6.5" />
     <PackageReference Include="Unity" Version="5.11.9" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Protobuf Include="Api\Protos\api.proto" />
   </ItemGroup>
 
 </Project>

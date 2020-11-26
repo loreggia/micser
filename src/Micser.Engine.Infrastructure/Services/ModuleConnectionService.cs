@@ -1,37 +1,34 @@
-﻿using Micser.Common.DataAccess;
-using Micser.Common.Extensions;
+﻿using System.Collections.Generic;
+using System.Linq;
 using Micser.Common.Modules;
 using Micser.Engine.Infrastructure.DataAccess;
 using Micser.Engine.Infrastructure.DataAccess.Models;
-using System.Collections.Generic;
-using System.Linq;
 
 namespace Micser.Engine.Infrastructure.Services
 {
     /// <inheritdoc cref="IModuleConnectionService"/>
     public class ModuleConnectionService : IModuleConnectionService
     {
-        private readonly IDbContextFactory _dbContextFactory;
+        private readonly EngineDbContext _dbContext;
 
         /// <inheritdoc />
-        public ModuleConnectionService(IDbContextFactory dbContextFactory)
+        public ModuleConnectionService(EngineDbContext dbContext)
         {
-            _dbContextFactory = dbContextFactory;
+            _dbContext = dbContext;
         }
 
         /// <inheritdoc />
         public ModuleConnectionDto Delete(long id)
         {
-            using var context = _dbContextFactory.Create<EngineDbContext>();
-            var connection = context.ModuleConnections.Find(id);
+            var connection = _dbContext.ModuleConnections.Find(id);
 
             if (connection == null)
             {
                 return null;
             }
 
-            context.ModuleConnections.Remove(connection);
-            context.SaveChanges();
+            _dbContext.ModuleConnections.Remove(connection);
+            _dbContext.SaveChanges();
 
             return GetModuleConnectionDto(connection);
         }
@@ -39,23 +36,26 @@ namespace Micser.Engine.Infrastructure.Services
         /// <inheritdoc />
         public IEnumerable<ModuleConnectionDto> GetAll()
         {
-            using var dbContext = _dbContextFactory.Create<EngineDbContext>();
-            return dbContext.ModuleConnections.AsEnumerable().Select(GetModuleConnectionDto).ToArray();
+            return _dbContext
+                .ModuleConnections
+                .AsEnumerable()
+                .Select(GetModuleConnectionDto)
+                .ToArray();
         }
 
         /// <inheritdoc />
         public ModuleConnectionDto GetById(long id)
         {
-            using var dbContext = _dbContextFactory.Create<EngineDbContext>();
-            var connection = dbContext.ModuleConnections.Find(id);
+            var connection = _dbContext.ModuleConnections.Find(id);
             return GetModuleConnectionDto(connection);
         }
 
         /// <inheritdoc />
         public bool Insert(ModuleConnectionDto dto)
         {
-            using var dbContext = _dbContextFactory.Create<EngineDbContext>();
-            var connection = dbContext.ModuleConnections.SingleOrDefault(c => c.SourceModuleId == dto.SourceId && c.TargetModuleId == dto.TargetId);
+            var connection = _dbContext
+                .ModuleConnections
+                .SingleOrDefault(c => c.SourceModuleId == dto.SourceId && c.TargetModuleId == dto.TargetId);
 
             if (connection != null)
             {
@@ -63,9 +63,9 @@ namespace Micser.Engine.Infrastructure.Services
             }
 
             connection = GetModuleConnection(dto);
-            dbContext.ModuleConnections.Add(connection);
+            _dbContext.ModuleConnections.Add(connection);
 
-            if (dbContext.SaveChanges() > 0)
+            if (_dbContext.SaveChanges() > 0)
             {
                 dto.Id = connection.Id;
                 return true;
@@ -77,17 +77,15 @@ namespace Micser.Engine.Infrastructure.Services
         /// <inheritdoc />
         public bool Truncate()
         {
-            using var dbContext = _dbContextFactory.Create<EngineDbContext>();
-            var connections = dbContext.ModuleConnections.AsEnumerable();
-            dbContext.ModuleConnections.RemoveRange(connections);
-            return dbContext.SaveChanges() >= 0;
+            var connections = _dbContext.ModuleConnections.AsEnumerable();
+            _dbContext.ModuleConnections.RemoveRange(connections);
+            return _dbContext.SaveChanges() >= 0;
         }
 
         /// <inheritdoc />
         public bool Update(ModuleConnectionDto dto)
         {
-            using var dbContext = _dbContextFactory.Create<EngineDbContext>();
-            var connection = dbContext.ModuleConnections.Find(dto.Id);
+            var connection = _dbContext.ModuleConnections.Find(dto.Id);
 
             if (connection == null)
             {
@@ -97,7 +95,7 @@ namespace Micser.Engine.Infrastructure.Services
             connection.SourceModuleId = dto.SourceId;
             connection.TargetModuleId = dto.TargetId;
 
-            return dbContext.SaveChanges() > 0;
+            return _dbContext.SaveChanges() > 0;
         }
 
         private static ModuleConnection GetModuleConnection(ModuleConnectionDto dto)

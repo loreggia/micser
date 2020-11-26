@@ -1,16 +1,14 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Micser.Common.Api;
-using Micser.Common.DataAccess;
-using Micser.Common.DataAccess.Entities;
-using Newtonsoft.Json;
-using NLog;
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
+using Micser.Common.DataAccess.Entities;
+using Newtonsoft.Json;
+using NLog;
 
 namespace Micser.Common.Settings
 {
@@ -18,7 +16,7 @@ namespace Micser.Common.Settings
     public class SettingsService : ISettingsService, IDisposable
     {
         private readonly SettingsApiClient _apiClient;
-        private readonly IDbContextFactory _dbContextFactory;
+        private readonly IDbContextFactory<DbContext> _dbContextFactory;
         private readonly SemaphoreSlim _loadSemaphore;
         private readonly ILogger _logger;
         private readonly ISettingsRegistry _registry;
@@ -28,7 +26,7 @@ namespace Micser.Common.Settings
 
         /// <inheritdoc />
         public SettingsService(
-            IDbContextFactory dbContextFactory,
+            IDbContextFactory<DbContext> dbContextFactory,
             ISettingHandlerFactory settingHandlerFactory,
             ISettingsRegistry registry,
             SettingsApiClient apiClient,
@@ -90,7 +88,7 @@ namespace Micser.Common.Settings
 
             try
             {
-                await using var dbContext = _dbContextFactory.Create();
+                await using var dbContext = _dbContextFactory.CreateDbContext();
 
                 foreach (var setting in _registry.Items)
                 {
@@ -183,7 +181,7 @@ namespace Micser.Common.Settings
 
             if (setting == null || setting.StorageType == SettingStorageType.Internal)
             {
-                await using var dbContext = _dbContextFactory.Create();
+                await using var dbContext = _dbContextFactory.CreateDbContext();
                 var dbSet = dbContext.Set<SettingValue>();
                 var settingValue = await dbSet.FirstOrDefaultAsync(s => s.Key == key).ConfigureAwait(false)
                                    ?? new SettingValue { Key = key };
