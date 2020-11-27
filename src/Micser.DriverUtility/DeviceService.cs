@@ -1,12 +1,12 @@
-﻿using CSCore.CoreAudioAPI;
-using CSCore.Win32;
-using Micser.Common;
-using NLog;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using CSCore.CoreAudioAPI;
+using CSCore.Win32;
+using Micser.Common;
+using NLog;
 
 namespace Micser.DriverUtility
 {

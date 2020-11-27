@@ -1,4 +1,5 @@
 ﻿using CSCore.SoundIn;
+using Microsoft.Extensions.Logging;
 using Micser.Common.Devices;
 using Micser.Engine.Infrastructure.Services;
 
@@ -8,8 +9,8 @@ namespace Micser.Plugins.Main.Modules
     {
         private int _latency;
 
-        public LoopbackDeviceInputModule(IModuleService moduleService)
-            : base(moduleService)
+        public LoopbackDeviceInputModule(IModuleService moduleService, ILogger<LoopbackDeviceInputModule> logger)
+            : base(moduleService, logger)
         {
             Latency = 1;
         }

@@ -1,8 +1,8 @@
-﻿using Newtonsoft.Json;
-using NLog;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 
 namespace Micser.Common.Settings
 {
@@ -11,11 +11,11 @@ namespace Micser.Common.Settings
     /// </summary>
     public class SettingsSerializer
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<SettingsSerializer> _logger;
         private readonly ISettingsService _settingsService;
 
         /// <inheritdoc />
-        public SettingsSerializer(ILogger logger, ISettingsService settingsService)
+        public SettingsSerializer(ILogger<SettingsSerializer> logger, ISettingsService settingsService)
         {
             _logger = logger;
             _settingsService = settingsService;
@@ -41,7 +41,7 @@ namespace Micser.Common.Settings
             }
             catch (Exception ex)
             {
-                _logger.Error(ex);
+                _logger.LogError(ex, $"Export to '{fileName}' failed.");
                 return false;
             }
         }
@@ -55,7 +55,7 @@ namespace Micser.Common.Settings
             {
                 if (!File.Exists(fileName))
                 {
-                    _logger.Error($"Cannot load settings. File '{fileName}' not found.");
+                    _logger.LogError($"Cannot load settings. File '{fileName}' not found.");
                     return false;
                 }
 
@@ -76,7 +76,7 @@ namespace Micser.Common.Settings
             }
             catch (Exception ex)
             {
-                _logger.Error(ex);
+                _logger.LogError(ex, $"Import from '{fileName}' failed.");
                 return false;
             }
         }

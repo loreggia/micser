@@ -1,23 +1,23 @@
-﻿using Micser.App.Infrastructure;
-using Micser.Common.Settings;
-using NLog;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Markup;
+using Microsoft.Extensions.Logging;
+using Micser.App.Infrastructure;
+using Micser.Common.Settings;
 
 namespace Micser.App.Settings
 {
     public class ColorThemeSettingHandler : IListSettingHandler
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<ColorThemeSettingHandler> _logger;
         private readonly Dictionary<string, string> _themeFiles;
         private readonly Dictionary<object, string> _themeList;
 
-        public ColorThemeSettingHandler(ILogger logger)
+        public ColorThemeSettingHandler(ILogger<ColorThemeSettingHandler> logger)
         {
             _logger = logger;
             _themeList = new Dictionary<object, string>();
@@ -94,14 +94,14 @@ namespace Micser.App.Settings
 
                         if (string.IsNullOrEmpty(name))
                         {
-                            _logger.Error($"Theme definition '{iniFilePath}' is invalid.");
+                            _logger.LogError($"Theme definition '{iniFilePath}' is invalid.");
                             continue;
                         }
 
                         var themeFilePath = Path.ChangeExtension(iniFilePath, ".xaml");
                         if (!File.Exists(themeFilePath))
                         {
-                            _logger.Error($"Missing theme file for definition '{iniFilePath}'");
+                            _logger.LogError($"Missing theme file for definition '{iniFilePath}'");
                             continue;
                         }
 
@@ -110,7 +110,7 @@ namespace Micser.App.Settings
                     }
                     catch (Exception ex)
                     {
-                        _logger.Error(ex);
+                        _logger.LogError(ex, $"Failed to parse theme file '{iniFilePath}'.");
                     }
                 }
             }

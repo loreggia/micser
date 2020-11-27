@@ -2,11 +2,11 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Grpc.Core;
+using Microsoft.Extensions.Logging;
 using Micser.Common.Api;
 using Micser.Common.Api.Extensions;
 using Micser.Common.Audio;
 using Micser.Engine.Infrastructure.Services;
-using NLog;
 using Status = Micser.Common.Api.Status;
 
 namespace Micser.Engine.Api
@@ -15,10 +15,10 @@ namespace Micser.Engine.Api
     {
         private readonly IAudioEngine _audioEngine;
         private readonly IModuleConnectionService _connectionService;
-        private readonly ILogger _logger;
+        private readonly ILogger<ModulesApiService> _logger;
         private readonly IModuleService _moduleService;
 
-        public ModulesApiService(IAudioEngine audioEngine, IModuleService moduleService, IModuleConnectionService connectionService, ILogger logger)
+        public ModulesApiService(IAudioEngine audioEngine, IModuleService moduleService, IModuleConnectionService connectionService, ILogger<ModulesApiService> logger)
         {
             _audioEngine = audioEngine;
             _moduleService = moduleService;
@@ -86,13 +86,13 @@ namespace Micser.Engine.Api
 
                 if (!_connectionService.Truncate())
                 {
-                    _logger.Error("Could not truncate the connections table.");
+                    _logger.LogError("Could not truncate the connections table.");
                     return Status(false);
                 }
 
                 if (!_moduleService.Truncate())
                 {
-                    _logger.Error("Could not truncate the modules table.");
+                    _logger.LogError("Could not truncate the modules table.");
                     return Status(false);
                 }
 

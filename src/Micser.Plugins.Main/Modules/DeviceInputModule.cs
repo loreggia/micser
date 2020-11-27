@@ -1,5 +1,6 @@
 ﻿using CSCore.CoreAudioAPI;
 using CSCore.SoundIn;
+using Microsoft.Extensions.Logging;
 using Micser.Common.Devices;
 using Micser.Engine.Infrastructure.Audio;
 using Micser.Engine.Infrastructure.Services;
@@ -10,8 +11,8 @@ namespace Micser.Plugins.Main.Modules
     {
         private WasapiCapture _capture;
 
-        public DeviceInputModule(IModuleService moduleService)
-            : base(moduleService)
+        public DeviceInputModule(IModuleService moduleService, ILogger<DeviceInputModule> logger)
+            : base(moduleService, logger)
         {
         }
 

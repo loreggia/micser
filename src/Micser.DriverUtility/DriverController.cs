@@ -1,13 +1,13 @@
-﻿using Microsoft.Win32;
-using Microsoft.Win32.SafeHandles;
-using Micser.Common;
-using NLog;
-using System;
+﻿using System;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Security;
 using System.Threading;
+using Microsoft.Win32;
+using Microsoft.Win32.SafeHandles;
+using Micser.Common;
+using NLog;
 
 namespace Micser.DriverUtility
 {

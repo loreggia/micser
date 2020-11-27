@@ -1,10 +1,10 @@
-﻿using CSCore;
-using Micser.Common.Extensions;
-using Micser.Common.Modules;
-using NLog;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using CSCore;
+using Microsoft.Extensions.Logging;
+using Micser.Common.Extensions;
+using Micser.Common.Modules;
 
 namespace Micser.Engine.Infrastructure.Audio
 {
@@ -18,11 +18,7 @@ namespace Micser.Engine.Infrastructure.Audio
         /// </summary>
         public static readonly float Epsilon = float.Epsilon;
 
-        /// <summary>
-        /// The logger for the current class.
-        /// </summary>
-        protected static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
-
+        private readonly ILogger _logger;
         private readonly IList<IAudioModule> _outputs;
 
         private readonly IList<ISampleProcessor> _sampleProcessors;
@@ -31,8 +27,9 @@ namespace Micser.Engine.Infrastructure.Audio
         private IWaveBuffer _waveBuffer;
 
         /// <inheritdoc />
-        protected AudioModule()
+        protected AudioModule(ILogger logger)
         {
+            _logger = logger;
             _outputs = new List<IAudioModule>(2);
             _sampleProcessors = new List<ISampleProcessor>
             {
@@ -242,7 +239,7 @@ namespace Micser.Engine.Infrastructure.Audio
                             break;
 
                         default:
-                            Logger.Error($"Unsupported bitrate: {waveFormat.BitsPerSample} (only 8/16/24/32bit PCM audio is supported.");
+                            _logger.LogError($"Unsupported bitrate: {waveFormat.BitsPerSample} (only 8/16/24/32bit PCM audio is supported.");
                             return;
                     }
                 }
@@ -256,20 +253,20 @@ namespace Micser.Engine.Infrastructure.Audio
                             break;
 
                         default:
-                            Logger.Error("Only 32bit IEEE float audio is supported.");
+                            _logger.LogError("Only 32bit IEEE float audio is supported.");
                             return;
                     }
                 }
                 else
                 {
-                    Logger.Error($"Unsupported audio format '{waveFormat}'. Only PCM or IEEE audio is supported.");
+                    _logger.LogError($"Unsupported audio format '{waveFormat}'. Only PCM or IEEE audio is supported.");
                     return;
                 }
             }
 
             if (nextBuffer == null)
             {
-                Logger.Error("No buffer set to pass to output modules.");
+                _logger.LogError("No buffer set to pass to output modules.");
                 return;
             }
 

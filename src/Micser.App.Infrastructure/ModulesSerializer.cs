@@ -1,8 +1,8 @@
-﻿using Micser.Common.Modules;
-using Newtonsoft.Json;
-using NLog;
-using System;
+﻿using System;
 using System.IO;
+using Microsoft.Extensions.Logging;
+using Micser.Common.Modules;
+using Newtonsoft.Json;
 
 namespace Micser.App.Infrastructure
 {
@@ -11,10 +11,10 @@ namespace Micser.App.Infrastructure
     /// </summary>
     public class ModulesSerializer
     {
-        private readonly ILogger _logger;
+        private readonly ILogger<ModulesSerializer> _logger;
 
         /// <inheritdoc />
-        public ModulesSerializer(ILogger logger)
+        public ModulesSerializer(ILogger<ModulesSerializer> logger)
         {
             _logger = logger;
         }
@@ -39,7 +39,7 @@ namespace Micser.App.Infrastructure
             }
             catch (Exception ex)
             {
-                _logger.Error(ex);
+                _logger.LogError(ex, $"Export to '{fileName}' failed.");
                 return false;
             }
         }
@@ -61,7 +61,7 @@ namespace Micser.App.Infrastructure
             }
             catch (Exception ex)
             {
-                _logger.Error(ex);
+                _logger.LogError(ex, $"Import from '{fileName}' failed.");
                 return null;
             }
         }

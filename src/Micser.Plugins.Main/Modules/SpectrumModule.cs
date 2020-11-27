@@ -1,4 +1,5 @@
 ﻿using System.Timers;
+using Microsoft.Extensions.Logging;
 using Micser.Engine.Infrastructure.Audio;
 using Micser.Plugins.Main.Audio;
 
@@ -10,7 +11,8 @@ namespace Micser.Plugins.Main.Modules
         private readonly Timer _timer;
         private bool _isDisposed;
 
-        public SpectrumModule()
+        public SpectrumModule(ILogger<SpectrumModule> logger)
+            : base(logger)
         {
             _sampleProcessor = new SpectrumSampleProcessor();
             AddSampleProcessor(_sampleProcessor);

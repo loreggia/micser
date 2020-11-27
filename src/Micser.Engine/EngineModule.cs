@@ -2,10 +2,8 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Micser.Common;
-using Micser.Common.Audio;
 using Micser.Common.Settings;
 using Micser.Engine.Api;
-using Micser.Engine.Audio;
 using Micser.Engine.Infrastructure;
 
 namespace Micser.Engine
@@ -14,7 +12,6 @@ namespace Micser.Engine
     {
         public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
-            services.AddSingleton<IAudioEngine, AudioEngine>();
         }
 
         public void Initialize(IApplicationBuilder app)

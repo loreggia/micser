@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using CSCore.CoreAudioAPI;
+using Microsoft.Extensions.Logging;
 using Micser.Common.Audio;
 using Micser.Engine.Api;
 using Micser.Engine.Infrastructure.Audio;
 using Micser.Engine.Infrastructure.Services;
-using NLog;
 
 namespace Micser.Engine.Audio
 {
@@ -17,7 +17,7 @@ namespace Micser.Engine.Audio
         private readonly IServiceProvider _container;
         private readonly MMDeviceEnumerator _deviceEnumerator;
         private readonly AudioEndpointVolumeCallback _endpointVolumeCallback;
-        private readonly ILogger _logger;
+        private readonly ILogger<AudioEngine> _logger;
         private readonly IModuleConnectionService _moduleConnectionService;
         private readonly List<IAudioModule> _modules;
         private readonly IModuleService _moduleService;
@@ -26,7 +26,7 @@ namespace Micser.Engine.Audio
         public AudioEngine(
             // todo create audio module factory
             IServiceProvider container,
-            ILogger logger,
+            ILogger<AudioEngine> logger,
             IModuleService moduleService,
             IModuleConnectionService moduleConnectionService,
             EngineEventsApiService apiClient)
@@ -70,14 +70,12 @@ namespace Micser.Engine.Audio
                 }
                 else
                 {
-                    _logger.Warn(
-                        $"Could not create an instance of a module. ID: {moduleDto.Id}, Type: {moduleDto.ModuleType}");
+                    _logger.LogWarning($"Could not create an instance of a module. ID: {moduleDto.Id}, Type: {moduleDto.ModuleType}");
                 }
             }
             else
             {
-                _logger.Warn(
-                    $"Could not find module type. ID: {moduleDto.Id}, Type: {moduleDto.ModuleType}");
+                _logger.LogWarning($"Could not find module type. ID: {moduleDto.Id}, Type: {moduleDto.ModuleType}");
             }
         }
 
@@ -123,7 +121,7 @@ namespace Micser.Engine.Audio
 
         public void Start()
         {
-            _logger.Info("Starting audio engine");
+            _logger.LogInformation("Starting audio engine");
 
             Stop();
 
@@ -140,7 +138,7 @@ namespace Micser.Engine.Audio
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error(ex, "Could not load module. ID: {0}", module.Id);
+                    _logger.LogError(ex, "Could not load module. ID: {0}", module.Id);
                     _moduleService.Delete(module.Id);
                 }
             }
@@ -152,13 +150,13 @@ namespace Micser.Engine.Audio
 
                 if (source == null)
                 {
-                    _logger.Warn($"Source module for connection not found. ID: {connection.SourceId}");
+                    _logger.LogWarning($"Source module for connection not found. ID: {connection.SourceId}");
                     continue;
                 }
 
                 if (target == null)
                 {
-                    _logger.Warn($"Target module for connection not found. ID: {connection.TargetId}");
+                    _logger.LogWarning($"Target module for connection not found. ID: {connection.TargetId}");
                     continue;
                 }
 
@@ -166,7 +164,7 @@ namespace Micser.Engine.Audio
             }
 
             IsRunning = true;
-            _logger.Info("Audio engine started");
+            _logger.LogInformation("Audio engine started");
         }
 
         public void Stop()
@@ -176,7 +174,7 @@ namespace Micser.Engine.Audio
                 return;
             }
 
-            _logger.Info("Stopping audio engine");
+            _logger.LogInformation("Stopping audio engine");
 
             _deviceEnumerator.DefaultDeviceChanged -= DefaultDeviceChanged;
             _endpointVolumeCallback.NotifyRecived -= VolumeNotifyReceived;
@@ -184,20 +182,20 @@ namespace Micser.Engine.Audio
             _endpointVolume?.UnregisterControlChangeNotify(_endpointVolumeCallback);
             _endpointVolume?.Dispose();
 
-            _logger.Info($"Disposing modules ({_modules?.Count ?? 0})");
+            _logger.LogInformation($"Disposing modules ({_modules?.Count ?? 0})");
 
             if (_modules?.Count > 0)
             {
                 foreach (var audioModule in _modules)
                 {
-                    _logger.Info($"Disposing module {audioModule.Id} ({audioModule.GetType()})");
+                    _logger.LogInformation($"Disposing module {audioModule.Id} ({audioModule.GetType()})");
                     audioModule.Dispose();
                 }
 
                 _modules.Clear();
             }
 
-            _logger.Info("Audio engine stopped");
+            _logger.LogInformation("Audio engine stopped");
 
             IsRunning = false;
         }
@@ -249,7 +247,7 @@ namespace Micser.Engine.Audio
             }
             catch (Exception ex)
             {
-                _logger.Error(ex);
+                _logger.LogError(ex, "Failed to set up default endpoint callbacks.");
             }
         }
 

@@ -1,12 +1,12 @@
-﻿using IWshRuntimeLibrary;
-using Micser.App.Infrastructure;
-using Micser.App.Resources;
-using Micser.Common.Settings;
-using NLog;
-using System;
+﻿using System;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
+using IWshRuntimeLibrary;
+using Microsoft.Extensions.Logging;
+using Micser.App.Infrastructure;
+using Micser.App.Resources;
+using Micser.Common.Settings;
 using File = System.IO.File;
 
 namespace Micser.App.Settings
@@ -15,9 +15,9 @@ namespace Micser.App.Settings
     {
         private static readonly string StartupFolder = Environment.GetFolderPath(Environment.SpecialFolder.Startup);
         private static readonly string StartupShortcutFileName = Strings.ApplicationTitle + ".lnk";
-        private readonly ILogger _logger;
+        private readonly ILogger<StartupSettingHandler> _logger;
 
-        public StartupSettingHandler(ILogger logger)
+        public StartupSettingHandler(ILogger<StartupSettingHandler> logger)
         {
             _logger = logger;
         }
@@ -32,7 +32,7 @@ namespace Micser.App.Settings
             }
             catch (Exception ex)
             {
-                _logger.Error(ex);
+                _logger.LogError(ex, "Failed to load setting.");
             }
 
             return Task.FromResult(result);
@@ -48,7 +48,7 @@ namespace Micser.App.Settings
             }
             else
             {
-                _logger.Warn($"Invalid value '{value}', expected a boolean.");
+                _logger.LogWarning($"Invalid value '{value}', expected a boolean.");
             }
 
             return value;
@@ -73,7 +73,7 @@ namespace Micser.App.Settings
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error(ex, "Could not create the startup shortcut.");
+                    _logger.LogError(ex, "Could not create the startup shortcut.");
                 }
             }
             else if (!isEnabled && fileExists)
@@ -85,7 +85,7 @@ namespace Micser.App.Settings
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error(ex, "Could not delete the startup shortcut.");
+                    _logger.LogError(ex, "Could not delete the startup shortcut.");
                 }
             }
         }

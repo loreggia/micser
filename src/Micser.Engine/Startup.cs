@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Micser.Common.Audio;
 using Micser.Common.Extensions;
+using Micser.Engine.Audio;
 using Micser.Engine.Infrastructure;
 
 namespace Micser.Engine
@@ -29,6 +31,7 @@ namespace Micser.Engine
 
             services.AddGrpc();
 
+            services.AddSingleton<IAudioEngine, AudioEngine>();
             services.AddHostedService<MicserService>();
         }
     }

@@ -6,6 +6,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Microsoft.Extensions.Logging;
 using Micser.App.Infrastructure;
 using Micser.App.Infrastructure.Api;
 using Micser.App.Infrastructure.Interaction;
@@ -17,7 +18,6 @@ using Micser.Common.Api.Extensions;
 using Micser.Common.Extensions;
 using Micser.Common.Modules;
 using Micser.Common.Settings;
-using NLog;
 using Prism.Commands;
 using Prism.Events;
 using Prism.Services.Dialogs;
@@ -30,7 +30,7 @@ namespace Micser.App.ViewModels
         private readonly ModuleConnectionsApiClient _connectionsApiClient;
         private readonly IDialogService _dialogService;
         private readonly IEventAggregator _eventAggregator;
-        private readonly ILogger _logger;
+        private readonly ILogger<MainViewModel> _logger;
         private readonly ModulesApiClient _modulesApiClient;
         private readonly ModulesSerializer _modulesSerializer;
         private readonly INavigationManager _navigationManager;
@@ -49,7 +49,7 @@ namespace Micser.App.ViewModels
         public MainViewModel(
             IWidgetFactory widgetFactory,
             IWidgetRegistry widgetRegistry,
-            ILogger logger,
+            ILogger<MainViewModel> logger,
             INavigationManager navigationManager,
             IEventAggregator eventAggregator,
             ISettingsService settingsService,
@@ -262,7 +262,7 @@ namespace Micser.App.ViewModels
 
                 if (dto == null)
                 {
-                    _logger.Error("Import data is empty.");
+                    _logger.LogError("Import data is empty.");
                     return;
                 }
 
@@ -275,7 +275,7 @@ namespace Micser.App.ViewModels
 
                 if (!result.Value)
                 {
-                    _logger.Warn("Import failed. See engine log for details.");
+                    _logger.LogWarning("Import failed. See engine log for details.");
                 }
 
                 await LoadDataAsync();
@@ -312,12 +312,12 @@ namespace Micser.App.ViewModels
                     }
                     else
                     {
-                        _logger.Warn($"Could not load widget connection. ID: {connectionDto.Id}");
+                        _logger.LogWarning($"Could not load widget connection. ID: {connectionDto.Id}");
                     }
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error(ex, "Could not load widget connection. ID: {0}", connectionDto.Id);
+                    _logger.LogError(ex, "Could not load widget connection. ID: {0}", connectionDto.Id);
                 }
             }
         }
@@ -365,7 +365,7 @@ namespace Micser.App.ViewModels
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error(ex, "Could not load widget. ID: {0}", module.Id);
+                    _logger.LogError(ex, "Could not load widget. ID: {0}", module.Id);
                 }
             }
         }

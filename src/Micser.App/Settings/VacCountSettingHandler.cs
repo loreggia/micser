@@ -3,21 +3,21 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.Win32;
 using Micser.Common;
 using Micser.Common.Api;
 using Micser.Common.Extensions;
 using Micser.Common.Settings;
-using NLog;
 
 namespace Micser.App.Settings
 {
     public class VacCountSettingHandler : ISettingHandler
     {
         private readonly EngineApiClient _engineApiClient;
-        private readonly ILogger _logger;
+        private readonly ILogger<VacCountSettingHandler> _logger;
 
-        public VacCountSettingHandler(EngineApiClient engineApiClient, ILogger logger)
+        public VacCountSettingHandler(EngineApiClient engineApiClient, ILogger<VacCountSettingHandler> logger)
         {
             _logger = logger;
             _engineApiClient = engineApiClient;
@@ -54,22 +54,22 @@ namespace Micser.App.Settings
                 };
                 if (!process.Start())
                 {
-                    _logger.Error("Could not start the driver utility.");
+                    _logger.LogError("Could not start the driver utility.");
                 }
                 else if (!process.WaitForExit(30000))
                 {
-                    _logger.Error("The driver utility did not finish within 30 seconds. Aborting...");
+                    _logger.LogError("The driver utility did not finish within 30 seconds. Aborting...");
                     process.Kill();
                 }
 
                 if (process.ExitCode != Globals.DriverUtility.ReturnCodes.Success)
                 {
-                    _logger.Error($"Driver utility returned with exit code {process.ExitCode}");
+                    _logger.LogError($"Driver utility returned with exit code {process.ExitCode}");
                 }
             }
             catch (Exception ex)
             {
-                _logger.Error(ex);
+                _logger.LogError(ex, "Failed to save setting.");
             }
             finally
             {
@@ -88,7 +88,7 @@ namespace Micser.App.Settings
             }
             catch (Exception ex)
             {
-                _logger.Error(ex);
+                _logger.LogError(ex, "Failed to load registry value.");
                 return 1;
             }
         }

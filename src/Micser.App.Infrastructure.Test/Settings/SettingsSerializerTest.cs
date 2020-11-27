@@ -1,11 +1,10 @@
-﻿using Micser.Common.Settings;
+﻿using System;
+using System.Collections.Generic;
+using System.IO;
+using Micser.Common.Settings;
 using Micser.TestCommon;
 using Moq;
 using Newtonsoft.Json.Linq;
-using NLog;
-using System;
-using System.Collections.Generic;
-using System.IO;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -14,11 +13,12 @@ namespace Micser.App.Infrastructure.Test.Settings
     public class SettingsSerializerTest : IDisposable
     {
         private readonly TestFileManager _testFileManager;
+        private readonly ITestOutputHelper _testOutputHelper;
 
         public SettingsSerializerTest(ITestOutputHelper testOutputHelper)
         {
+            _testOutputHelper = testOutputHelper;
             _testFileManager = new TestFileManager(testOutputHelper);
-            TestOutputLogger.Configure(testOutputHelper);
         }
 
         public void Dispose()
@@ -39,7 +39,7 @@ namespace Micser.App.Infrastructure.Test.Settings
                 .Setup(s => s.SetSettingAsync(It.IsAny<string>(), It.IsAny<object>()))
                 .Callback<string, object>((key, value) => settings.Add(key, value));
 
-            var importer = new SettingsSerializer(LogManager.GetCurrentClassLogger(), settingsServiceMock.Object);
+            var importer = new SettingsSerializer(new TestLogger<SettingsSerializer>(_testOutputHelper), settingsServiceMock.Object);
             var result = importer.Import(fileName);
 
             Assert.True(result);
@@ -67,7 +67,7 @@ namespace Micser.App.Infrastructure.Test.Settings
                 {"StringKey", "Value"}
             });
 
-            var exporter = new SettingsSerializer(LogManager.GetCurrentClassLogger(), settingsServiceMock.Object);
+            var exporter = new SettingsSerializer(new TestLogger<SettingsSerializer>(_testOutputHelper), settingsServiceMock.Object);
 
             var result = exporter.Export(fileName);
 

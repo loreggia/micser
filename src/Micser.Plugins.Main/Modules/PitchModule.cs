@@ -1,14 +1,16 @@
-﻿using Micser.Common.Extensions;
+﻿using System;
+using Microsoft.Extensions.Logging;
+using Micser.Common.Extensions;
 using Micser.Common.Modules;
 using Micser.Engine.Infrastructure.Audio;
 using Micser.Plugins.Main.Audio;
-using System;
 
 namespace Micser.Plugins.Main.Modules
 {
     public class PitchModule : AudioModule
     {
-        public PitchModule()
+        public PitchModule(ILogger<PitchModule> logger)
+            : base(logger)
         {
             AddSampleProcessor(new PitchSampleProcessor(this));
         }

@@ -1,5 +1,6 @@
 ﻿using System.Threading.Tasks;
 using CSCore.CoreAudioAPI;
+using Microsoft.Extensions.Logging;
 using Micser.Common;
 using Micser.Common.Devices;
 using Micser.Common.Extensions;
@@ -21,7 +22,8 @@ namespace Micser.Engine.Infrastructure.Audio
         private DeviceDescription _deviceDescription;
 
         /// <inheritdoc />
-        protected DeviceModule(IModuleService moduleService)
+        protected DeviceModule(IModuleService moduleService, ILogger logger)
+            : base(logger)
         {
             ModuleService = moduleService;
 

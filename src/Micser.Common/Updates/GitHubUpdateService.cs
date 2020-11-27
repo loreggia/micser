@@ -1,12 +1,12 @@
-﻿using Micser.Common.Updates.GitHub;
-using Newtonsoft.Json;
-using NLog;
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Micser.Common.Updates.GitHub;
+using Newtonsoft.Json;
 
 namespace Micser.Common.Updates
 {
@@ -17,7 +17,7 @@ namespace Micser.Common.Updates
         private const string GetLatestReleaseUrlPath = "/repos/loreggia/micser/releases/latest";
         private const string UserAgentHeader = "micser-update";
 
-        public GitHubUpdateService(ILogger logger)
+        public GitHubUpdateService(ILogger<GitHubUpdateService> logger)
             : base(logger)
         {
         }
@@ -43,7 +43,7 @@ namespace Micser.Common.Updates
             }
             catch (Exception ex)
             {
-                Logger.Error(ex);
+                Logger.LogError(ex, $"Failed to download installer. {manifest}");
                 return null;
             }
         }

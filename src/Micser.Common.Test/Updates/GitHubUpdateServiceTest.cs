@@ -1,7 +1,6 @@
-﻿using Micser.Common.Updates;
+﻿using System.Threading.Tasks;
+using Micser.Common.Updates;
 using Micser.TestCommon;
-using NLog;
-using System.Threading.Tasks;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -9,15 +8,17 @@ namespace Micser.Common.Test.Updates
 {
     public class GitHubUpdateServiceTest
     {
+        private readonly ITestOutputHelper _testOutputHelper;
+
         public GitHubUpdateServiceTest(ITestOutputHelper testOutputHelper)
         {
-            TestOutputLogger.Configure(testOutputHelper);
+            _testOutputHelper = testOutputHelper;
         }
 
         [Fact]
         public async Task GetUpdateManifest()
         {
-            var service = new GitHubUpdateService(LogManager.GetCurrentClassLogger());
+            var service = new GitHubUpdateService(new TestLogger<GitHubUpdateService>(_testOutputHelper));
 
             var result = await service.GetUpdateManifestAsync();
 

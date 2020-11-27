@@ -6,9 +6,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Micser.Common.DataAccess.Entities;
 using Newtonsoft.Json;
-using NLog;
 
 namespace Micser.Common.Settings
 {
@@ -17,8 +17,9 @@ namespace Micser.Common.Settings
     {
         //private readonly SettingsApiClient _apiClient;
         private readonly IDbContextFactory<DbContext> _dbContextFactory;
+
         private readonly SemaphoreSlim _loadSemaphore;
-        private readonly ILogger _logger;
+        private readonly ILogger<SettingsService> _logger;
         private readonly ISettingsRegistry _registry;
         private readonly ISettingHandlerFactory _settingHandlerFactory;
         private readonly IDictionary<string, object> _settings;
@@ -30,7 +31,7 @@ namespace Micser.Common.Settings
             ISettingHandlerFactory settingHandlerFactory,
             ISettingsRegistry registry,
             //SettingsApiClient apiClient,
-            ILogger logger)
+            ILogger<SettingsService> logger)
         {
             _settings = new ConcurrentDictionary<string, object>();
             _loadSemaphore = new SemaphoreSlim(1, 1);
@@ -57,7 +58,7 @@ namespace Micser.Common.Settings
         {
             if (!_settings.TryGetValue(key, out var value))
             {
-                _logger.Warn($"Requested unregistered setting '{key}'.");
+                _logger.LogWarning($"Requested unregistered setting '{key}'.");
                 return null;
             }
 
@@ -146,7 +147,7 @@ namespace Micser.Common.Settings
             }
             catch (Exception ex)
             {
-                _logger.Error(ex);
+                _logger.LogError(ex, "Failed to load settings.");
             }
             finally
             {
@@ -164,7 +165,7 @@ namespace Micser.Common.Settings
 
             if (setting == null)
             {
-                _logger.Warn($"Saving unregistered setting '{key}'.");
+                _logger.LogWarning($"Saving unregistered setting '{key}'.");
             }
 
             if (setting?.HandlerType != null)

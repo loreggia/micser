@@ -1,9 +1,9 @@
-﻿using NLog;
-using System;
+﻿using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace Micser.Common.Updates
 {
@@ -39,7 +39,7 @@ namespace Micser.Common.Updates
 
             if (!File.Exists(path))
             {
-                Logger.Error($"The file '{path}' does not exist.");
+                Logger.LogError($"The file '{path}' does not exist.");
                 return false;
             }
 
@@ -54,12 +54,12 @@ namespace Micser.Common.Updates
                     return process.Start();
                 }
 
-                Logger.Error($"Only MSI files are supported. ({path})");
+                Logger.LogError($"Only MSI files are supported. ({path})");
                 return false;
             }
             catch (Exception ex)
             {
-                Logger.Error(ex);
+                Logger.LogError(ex, $"Failed to execute installer at '{path}'.");
                 return false;
             }
         }

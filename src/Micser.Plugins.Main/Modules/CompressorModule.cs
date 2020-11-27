@@ -1,4 +1,5 @@
-﻿using Micser.Common.Modules;
+﻿using Microsoft.Extensions.Logging;
+using Micser.Common.Modules;
 using Micser.Engine.Infrastructure.Audio;
 using Micser.Plugins.Main.Audio;
 
@@ -6,7 +7,8 @@ namespace Micser.Plugins.Main.Modules
 {
     public class CompressorModule : AudioModule
     {
-        public CompressorModule()
+        public CompressorModule(ILogger<CompressorModule> logger)
+            : base(logger)
         {
             AddSampleProcessor(new CompressorSampleProcessor(this));
         }

@@ -2,9 +2,9 @@
 using System.IO;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using NLog;
 
 namespace Micser.Common.Updates
 {
@@ -19,7 +19,7 @@ namespace Micser.Common.Updates
         protected readonly HttpUpdateOptions Options;
 
         /// <inheritdoc />
-        public HttpUpdateService(IOptions<HttpUpdateOptions> options, ILogger logger)
+        public HttpUpdateService(IOptions<HttpUpdateOptions> options, ILogger<HttpUpdateService> logger)
             : base(logger)
         {
             Options = options.Value ?? throw new MissingConfigurationException(Globals.AppSettingSections.Update.HttpUpdateSettings);
@@ -47,7 +47,7 @@ namespace Micser.Common.Updates
             }
             catch (Exception ex)
             {
-                Logger.Error(ex);
+                Logger.LogError(ex, $"Failed to download installer. {manifest}");
                 return null;
             }
         }
@@ -65,7 +65,7 @@ namespace Micser.Common.Updates
             }
             catch (Exception ex)
             {
-                Logger.Error(ex);
+                Logger.LogError(ex, "Failed to get update manifest.");
                 return null;
             }
         }

@@ -26,5 +26,10 @@ namespace Micser.Common.Updates
         /// Gets or sets the version string.
         /// </summary>
         public string Version { get; set; }
+
+        public override string ToString()
+        {
+            return $"Version: {Version}, FileName: {FileName}, Date: {Date}";
+        }
     }
 }

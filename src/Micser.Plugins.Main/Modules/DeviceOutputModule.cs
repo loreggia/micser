@@ -6,6 +6,7 @@ using CSCore.CoreAudioAPI;
 using CSCore.DSP;
 using CSCore.SoundOut;
 using CSCore.Streams;
+using Microsoft.Extensions.Logging;
 using Micser.Common.Devices;
 using Micser.Engine.Infrastructure.Audio;
 using Micser.Engine.Infrastructure.Services;
@@ -25,8 +26,8 @@ namespace Micser.Plugins.Main.Modules
         private float _volume;
         private VolumeSource _volumeSource;
 
-        public DeviceOutputModule(IModuleService moduleService)
-            : base(moduleService)
+        public DeviceOutputModule(IModuleService moduleService, ILogger<DeviceOutputModule> logger)
+            : base(moduleService, logger)
         {
             _inputBuffers = new ConcurrentDictionary<long, WriteableBufferingSource>();
             _inputSources = new ConcurrentDictionary<long, ISampleSource>();
