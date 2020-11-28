@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using CSCore.CoreAudioAPI;
@@ -213,8 +214,7 @@ namespace Micser.Engine.Audio
                     moduleDto.State.IsMuted = _endpointVolume.IsMuted;
                     moduleDto.State.Volume = _endpointVolume.MasterVolumeLevelScalar;
                     _moduleService.Update(moduleDto);
-                    // todo async & parameter
-                    _engineEventService.SendMessageAsync(new EngineEvent { Type = "VolumeChanged" });
+                    _engineEventService.SendMessageAsync(new EngineEvent { Type = "VolumeChanged", Content = moduleDto.Id.ToString(CultureInfo.InvariantCulture) });
                 }
 
                 audioModule.SetState(moduleDto.State);
@@ -274,8 +274,7 @@ namespace Micser.Engine.Audio
 
                     _moduleService.Update(moduleDto);
 
-                    // todo async & parameter
-                    _engineEventService.SendMessageAsync(new EngineEvent { Type = "VolumeChanged" });
+                    _engineEventService.SendMessageAsync(new EngineEvent { Type = "VolumeChanged", Content = moduleDto.Id.ToString(CultureInfo.InvariantCulture) });
                 }
             }).ConfigureAwait(false);
         }
