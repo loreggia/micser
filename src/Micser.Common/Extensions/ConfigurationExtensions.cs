@@ -5,6 +5,7 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using NLog.Config;
 using NLog.Extensions.Logging;
@@ -30,16 +31,35 @@ namespace Micser.Common.Extensions
 
             connectionString = connectionString.Replace(Globals.ConnectionStringFolder, directory);
 
-            services.AddDbContextFactory<TContext>(options => options.UseSqlite(connectionString));
+            void ConfigureDbContextOptions(DbContextOptionsBuilder options)
+            {
+                options.UseSqlite(connectionString);
+            }
+
+            services.AddDbContext<TContext>(ConfigureDbContextOptions);
+            services.AddDbContextFactory<TContext>(ConfigureDbContextOptions);
             return services;
         }
 
-        public static IServiceCollection AddModules<TModule>(this IServiceCollection services, params Type[] staticModules)
+        public static IServiceCollection AddModules<TModule>(this IServiceCollection services, IConfiguration configuration, params Type[] staticModules)
             where TModule : IModule
         {
+            void AddModule(Type moduleType)
+            {
+                if (Activator.CreateInstance(moduleType) is IModule module)
+                {
+                    services.AddSingleton(module);
+                    module.ConfigureServices(services, configuration);
+                }
+                else
+                {
+                    throw new InvalidOperationException($"Failed to activate module. Type: {moduleType}");
+                }
+            }
+
             foreach (var module in staticModules)
             {
-                services.AddSingleton(typeof(IModule), module);
+                AddModule(module);
             }
 
             var executingFile = new FileInfo(Assembly.GetExecutingAssembly().Location);
@@ -53,13 +73,19 @@ namespace Micser.Common.Extensions
 
                     foreach (var moduleType in moduleTypes)
                     {
-                        services.AddSingleton(typeof(IModule), moduleType);
+                        try
+                        {
+                            AddModule(moduleType);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw new InvalidOperationException($"Error during module activation. Assembly: {moduleFile} Module: {moduleType}", ex);
+                        }
                     }
                 }
                 catch (Exception ex)
                 {
-                    // todo
-                    //Logger.Debug(ex);
+                    throw new InvalidOperationException($"Error during module registration. Assembly: {moduleFile}.", ex);
                 }
             }
 
@@ -69,11 +95,6 @@ namespace Micser.Common.Extensions
         public static IServiceCollection AddNlog(this IServiceCollection services, string fileName)
         {
             var config = new LoggingConfiguration();
-            config.AddTarget(new ColoredConsoleTarget("ConsoleTarget")
-            {
-                Layout = @"${date:format=HH\:mm\:ss} ${level} ${message} ${exception}",
-                DetectConsoleAvailable = true
-            });
             config.AddTarget(new FileTarget("FileTarget")
             {
                 ArchiveNumbering = ArchiveNumberingMode.DateAndSequence,
@@ -82,13 +103,12 @@ namespace Micser.Common.Extensions
                 FileName = Path.Combine(Globals.AppDataFolder, fileName),
                 FileNameKind = FilePathKind.Absolute
             });
-            config.AddTarget(new DebuggerTarget("DebuggerTarget"));
-
-            config.AddRuleForAllLevels("ConsoleTarget");
             config.AddRuleForAllLevels("FileTarget");
-            config.AddRuleForAllLevels("DebuggerTarget");
 
-            services.AddLogging(options => options.AddNLog(config));
+            services.AddLogging(options =>
+            {
+                options.AddNLog(config);
+            });
 
             return services;
         }

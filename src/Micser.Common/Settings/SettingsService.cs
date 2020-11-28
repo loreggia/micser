@@ -13,13 +13,14 @@ using Newtonsoft.Json;
 namespace Micser.Common.Settings
 {
     /// <inheritdoc cref="ISettingsService"/>
-    public class SettingsService : ISettingsService, IDisposable
+    public class SettingsService<TDbContext> : ISettingsService, IDisposable
+        where TDbContext : DbContext
     {
         //private readonly SettingsApiClient _apiClient;
-        private readonly IDbContextFactory<DbContext> _dbContextFactory;
+        private readonly IDbContextFactory<TDbContext> _dbContextFactory;
 
         private readonly SemaphoreSlim _loadSemaphore;
-        private readonly ILogger<SettingsService> _logger;
+        private readonly ILogger<SettingsService<TDbContext>> _logger;
         private readonly ISettingsRegistry _registry;
         private readonly ISettingHandlerFactory _settingHandlerFactory;
         private readonly IDictionary<string, object> _settings;
@@ -27,11 +28,11 @@ namespace Micser.Common.Settings
 
         /// <inheritdoc />
         public SettingsService(
-            IDbContextFactory<DbContext> dbContextFactory,
+            IDbContextFactory<TDbContext> dbContextFactory,
             ISettingHandlerFactory settingHandlerFactory,
             ISettingsRegistry registry,
             //SettingsApiClient apiClient,
-            ILogger<SettingsService> logger)
+            ILogger<SettingsService<TDbContext>> logger)
         {
             _settings = new ConcurrentDictionary<string, object>();
             _loadSemaphore = new SemaphoreSlim(1, 1);
@@ -115,6 +116,7 @@ namespace Micser.Common.Settings
                     }
                     else if (setting.StorageType == SettingStorageType.Api)
                     {
+                        //todo
                         //var settingValueResult = await _apiClient.GetSetting(setting.Key).ConfigureAwait(false);
 
                         //if (settingValueResult.IsSuccess)
@@ -208,6 +210,7 @@ namespace Micser.Common.Settings
             }
             else if (setting.StorageType == SettingStorageType.Api)
             {
+                //todo
                 //var setSettingResult = await _apiClient.SetSetting(setting.Key, value).ConfigureAwait(false);
 
                 //if (setSettingResult.IsSuccess)

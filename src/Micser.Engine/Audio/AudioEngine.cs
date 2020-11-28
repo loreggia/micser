@@ -4,8 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using CSCore.CoreAudioAPI;
 using Microsoft.Extensions.Logging;
+using Micser.Common.Api;
 using Micser.Common.Audio;
-using Micser.Engine.Api;
 using Micser.Engine.Infrastructure.Audio;
 using Micser.Engine.Infrastructure.Services;
 
@@ -13,10 +13,10 @@ namespace Micser.Engine.Audio
 {
     public sealed class AudioEngine : IAudioEngine
     {
-        private readonly EngineEventsApiService _apiClient;
         private readonly IServiceProvider _container;
         private readonly MMDeviceEnumerator _deviceEnumerator;
         private readonly AudioEndpointVolumeCallback _endpointVolumeCallback;
+        private readonly IRpcStreamService<EngineEvent> _engineEventService;
         private readonly ILogger<AudioEngine> _logger;
         private readonly IModuleConnectionService _moduleConnectionService;
         private readonly List<IAudioModule> _modules;
@@ -29,13 +29,13 @@ namespace Micser.Engine.Audio
             ILogger<AudioEngine> logger,
             IModuleService moduleService,
             IModuleConnectionService moduleConnectionService,
-            EngineEventsApiService apiClient)
+            IRpcStreamService<EngineEvent> engineEventService)
         {
             _container = container;
             _logger = logger;
             _moduleService = moduleService;
             _moduleConnectionService = moduleConnectionService;
-            _apiClient = apiClient;
+            _engineEventService = engineEventService;
             _modules = new List<IAudioModule>();
             _deviceEnumerator = new MMDeviceEnumerator();
             _endpointVolumeCallback = new AudioEndpointVolumeCallback();
@@ -214,7 +214,7 @@ namespace Micser.Engine.Audio
                     moduleDto.State.Volume = _endpointVolume.MasterVolumeLevelScalar;
                     _moduleService.Update(moduleDto);
                     // todo async & parameter
-                    _apiClient.SendEvent("VolumeChanged");
+                    _engineEventService.SendMessageAsync(new EngineEvent { Type = "VolumeChanged" });
                 }
 
                 audioModule.SetState(moduleDto.State);
@@ -275,7 +275,7 @@ namespace Micser.Engine.Audio
                     _moduleService.Update(moduleDto);
 
                     // todo async & parameter
-                    _apiClient.SendEvent("VolumeChanged");
+                    _engineEventService.SendMessageAsync(new EngineEvent { Type = "VolumeChanged" });
                 }
             }).ConfigureAwait(false);
         }

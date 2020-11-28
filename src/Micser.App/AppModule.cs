@@ -57,7 +57,7 @@ namespace Micser.App
             services.AddSingleton<IWidgetFactory, WidgetFactory>();
 
             services.AddSingleton<ISettingsRegistry, SettingsRegistry>();
-            services.AddSingleton<ISettingsService, SettingsService>();
+            services.AddSingleton<ISettingsService, SettingsService<AppDbContext>>();
             services.AddSingleton<ISettingHandlerFactory>(sp => new SettingHandlerFactory(t => (ISettingHandler)sp.GetRequiredService(t)));
 
             // todo

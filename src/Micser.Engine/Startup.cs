@@ -1,9 +1,10 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System;
+using System.Diagnostics;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Micser.Common.Audio;
+using Microsoft.Extensions.Hosting;
 using Micser.Common.Extensions;
-using Micser.Engine.Audio;
 using Micser.Engine.Infrastructure;
 
 namespace Micser.Engine
@@ -18,21 +19,22 @@ namespace Micser.Engine
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app)
+        public void Configure(IApplicationBuilder app, IHostApplicationLifetime lifetime)
         {
+            lifetime.ApplicationStopping.Register(OnStopping);
+
             app.UseModules();
         }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddNlog("Micser.Engine.log");
-            services.AddModules<IEngineModule>(typeof(EngineModule), typeof(InfrastructureModule));
+            services.AddModules<IEngineModule>(Configuration, typeof(EngineModule), typeof(InfrastructureModule));
+        }
 
-            services.AddGrpc();
-
-            services.AddSingleton<IAudioEngine, AudioEngine>();
-            services.AddHostedService<MicserService>();
+        private void OnStopping()
+        {
+            Console.WriteLine(new StackTrace(true));
         }
     }
 }

@@ -1,31 +1,41 @@
 ﻿using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Hosting;
 
 namespace Micser.Engine
 {
     internal static class Program
     {
+        public static IHostBuilder CreateHostBuilder(string[] args)
+        {
+            return Host.CreateDefaultBuilder(args)
+                .ConfigureWebHostDefaults(webHostBuilder =>
+                {
+                    webHostBuilder.ConfigureKestrel(options =>
+                        options.ListenLocalhost(5001, listenOptions => listenOptions.Protocols = HttpProtocols.Http2));
+                    webHostBuilder.UseStartup<Startup>();
+                });
+        }
+
         /// <summary>
         /// The main entry point for the application.
         /// </summary>
-        private static async Task Main(params string[] arguments)
+        public static void Main(string[] args)
         {
             TrySetPriority();
 
-            var isService = !(Debugger.IsAttached || arguments.Contains("--console"));
+            var isService = !(Debugger.IsAttached || args.Contains("--console"));
 
-            var builder = Host.CreateDefaultBuilder(arguments)
-                .ConfigureWebHostDefaults(webHostBuilder => webHostBuilder.UseStartup<Startup>());
+            var hostBuilder = CreateHostBuilder(args);
 
             if (isService)
             {
-                builder.UseWindowsService();
+                hostBuilder.UseWindowsService();
             }
 
-            await builder.Build().StartAsync();
+            hostBuilder.Build().Run();
         }
 
         private static void TrySetPriority()
@@ -33,10 +43,8 @@ namespace Micser.Engine
             try
             {
                 // try setting process priority to high
-                using (var process = Process.GetCurrentProcess())
-                {
-                    process.PriorityClass = ProcessPriorityClass.High;
-                }
+                using var process = Process.GetCurrentProcess();
+                process.PriorityClass = ProcessPriorityClass.High;
             }
             catch
             {
