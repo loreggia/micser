@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Micser.Common.Settings;
@@ -13,6 +14,10 @@ namespace Micser.Engine.Infrastructure
     /// </summary>
     public class InfrastructureModule : IEngineModule
     {
+        public void Configure(IApplicationBuilder app)
+        {
+        }
+
         /// <inheritdoc />
         public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
@@ -26,8 +31,7 @@ namespace Micser.Engine.Infrastructure
             services.AddSingleton<IUpdateService, HttpUpdateService>();
         }
 
-        /// <inheritdoc />
-        public void Initialize(IApplicationBuilder app)
+        public void Initialize(IServiceProvider serviceProvider)
         {
         }
     }

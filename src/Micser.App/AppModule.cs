@@ -2,7 +2,6 @@
 using System.Globalization;
 using System.Linq;
 using System.Windows;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -44,11 +43,18 @@ namespace Micser.App
         {
             services.AddNlog("Micser.App.log");
 
+            services.AddDefaultRpcChannel();
+
+            services.Configure<HttpUpdateOptions>(configuration.GetSection(Globals.AppSettingSections.Update.HttpUpdateSettings));
+
             services.AddDbContext<AppDbContext>(configuration.GetConnectionString("DefaultConnection"));
 
             services.AddSingleton<INavigationManager, NavigationManager>();
 
             services.AddSingleton<IApplicationStateService, ApplicationStateService>();
+
+            services.AddSingleton<MainShell>();
+            services.AddSingleton<MainShellViewModel>();
 
             services.AddSingleton<IResourceRegistry, ResourceRegistry>();
             services.AddSingleton<IMenuItemRegistry, MenuItemRegistry>();
@@ -60,9 +66,12 @@ namespace Micser.App
             services.AddSingleton<ISettingsService, SettingsService<AppDbContext>>();
             services.AddSingleton<ISettingHandlerFactory>(sp => new SettingHandlerFactory(t => (ISettingHandler)sp.GetRequiredService(t)));
 
+            services.AddTransient<EngineApiClient>();
+            services.AddTransient<ModuleConnectionsApiClient>();
+            services.AddTransient<ModulesApiClient>();
+
             // todo
             //services.RegisterDialog<MessageBoxView, MessageBoxViewModel>();
-
             services.RegisterView<MainMenuView, MainMenuViewModel>();
             services.RegisterView<MainStatusBarView, MainStatusBarViewModel>();
             services.RegisterView<ToolBarView, ToolBarViewModel>();
@@ -77,10 +86,8 @@ namespace Micser.App
             services.AddSingleton<UpdateHandler>();
         }
 
-        public void Initialize(IApplicationBuilder app)
+        public void Initialize(IServiceProvider serviceProvider)
         {
-            var serviceProvider = app.ApplicationServices;
-
             using (var dbContext = serviceProvider.GetRequiredService<IDbContextFactory<AppDbContext>>().CreateDbContext())
             {
                 dbContext.Database.Migrate();

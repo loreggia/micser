@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Windows;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Micser.App.Infrastructure;
@@ -43,9 +42,9 @@ namespace Micser.Plugins.Main
             //    Localize(nameof(Strings.PitchWidgetDescription)));
         }
 
-        public void Initialize(IApplicationBuilder app)
+        public void Initialize(IServiceProvider serviceProvider)
         {
-            var resourceRegistry = app.ApplicationServices.GetRequiredService<IResourceRegistry>();
+            var resourceRegistry = serviceProvider.GetRequiredService<IResourceRegistry>();
             resourceRegistry.Add(new ResourceDictionary { Source = new Uri("Micser.Plugins.Main;component/Themes/Generic.xaml", UriKind.Relative) });
         }
 

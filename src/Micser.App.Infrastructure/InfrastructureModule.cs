@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Windows;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Micser.App.Infrastructure.Localization;
@@ -26,9 +25,9 @@ namespace Micser.App.Infrastructure
         }
 
         /// <inheritdoc />
-        public void Initialize(IApplicationBuilder app)
+        public void Initialize(IServiceProvider serviceProvider)
         {
-            var resourceRegistry = app.ApplicationServices.GetRequiredService<IResourceRegistry>();
+            var resourceRegistry = serviceProvider.GetRequiredService<IResourceRegistry>();
             resourceRegistry.Add(new ResourceDictionary { Source = new Uri("/Micser.App.Infrastructure;component/Themes/Generic.xaml", UriKind.Relative) });
         }
 

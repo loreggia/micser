@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -16,6 +17,20 @@ namespace Micser.Engine
 {
     public class EngineModule : IEngineModule
     {
+        public void Configure(IApplicationBuilder app)
+        {
+            app.UseRouting();
+
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapGrpcService<EngineApiService>();
+                endpoints.MapGrpcService<ModuleConnectionsApiService>();
+                endpoints.MapGrpcService<ModulesApiService>();
+                endpoints.MapGrpcService<SettingsApiService>();
+                endpoints.MapGrpcService<EngineEventsApiService>();
+            });
+        }
+
         public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
             services.AddNlog("Micser.Engine.log");
@@ -30,23 +45,12 @@ namespace Micser.Engine
             services.AddHostedService<MicserService>();
         }
 
-        public void Initialize(IApplicationBuilder app)
+        public void Initialize(IServiceProvider serviceProvider)
         {
-            using var dbContext = app.ApplicationServices.GetRequiredService<IDbContextFactory<EngineDbContext>>().CreateDbContext();
+            using var dbContext = serviceProvider.GetRequiredService<IDbContextFactory<EngineDbContext>>().CreateDbContext();
             dbContext.Database.Migrate();
 
-            app.UseRouting();
-
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapGrpcService<EngineApiService>();
-                endpoints.MapGrpcService<ModuleConnectionsApiService>();
-                endpoints.MapGrpcService<ModulesApiService>();
-                endpoints.MapGrpcService<SettingsApiService>();
-                endpoints.MapGrpcService<EngineEventsApiService>();
-            });
-
-            var settingsRegistry = app.ApplicationServices.GetRequiredService<ISettingsRegistry>();
+            var settingsRegistry = serviceProvider.GetRequiredService<ISettingsRegistry>();
 
             settingsRegistry.Add(new SettingDefinition
             {

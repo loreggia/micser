@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -17,6 +17,6 @@ namespace Micser.Common
         /// <summary>
         /// Initializes the module (after all modules have registered their types in the DI container).
         /// </summary>
-        void Initialize(IApplicationBuilder app);
+        void Initialize(IServiceProvider serviceProvider);
     }
 }

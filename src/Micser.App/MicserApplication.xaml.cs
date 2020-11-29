@@ -1,25 +1,41 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Shell;
+using Micser.App.Infrastructure;
+using Micser.App.Infrastructure.Themes;
+using Micser.App.Settings;
 using Micser.Common;
-using Prism.Modularity;
+using Micser.Common.Extensions;
+using Micser.Common.Settings;
+using Prism;
+using Prism.Events;
+using Prism.Ioc;
+using Prism.Microsoft.DependencyInjection;
 
 namespace Micser.App
 {
-    public partial class MicserApplication : Application, ISingleInstanceApp
+    public partial class MicserApplication : PrismApplicationBase, ISingleInstanceApp
     {
         private const string Unique = "{50CD2933-87A9-4411-9577-56401F034A60}";
 
         private ArgumentDictionary _argumentDictionary;
+        private IHost _host;
+        private CancellationTokenSource _hostCancellation;
+        private Task _hostTask;
+        private IServiceCollection _services;
         private MainShell _shell;
 
         public MicserApplication()
         {
             InitializeComponent();
-
             DispatcherUnhandledException += OnDispatcherUnhandledException;
         }
 
@@ -61,29 +77,41 @@ namespace Micser.App
             }
         }
 
-        protected Window CreateShell()
+        protected override IContainerExtension CreateContainerExtension()
+        {
+            return new PrismContainerExtension(_services);
+        }
+
+        protected override Window CreateShell()
         {
             return null;
         }
 
-        protected void InitializeModules()
+        protected override void InitializeModules()
         {
             SetStatus("Initializing...");
 
-            //base.InitializeModules();
+            base.InitializeModules();
 
-            //var resourceRegistry = _containerProvider.Resolve<IResourceRegistry>();
-            //foreach (var dictionary in resourceRegistry.Items)
-            //{
-            //    Current.Resources.MergedDictionaries.Add(dictionary);
-            //}
+            var modules = Container.Resolve<IEnumerable<IModule>>();
 
-            //var eventAggregator = _containerProvider.Resolve<IEventAggregator>();
-            //var modulesLoadedEvent = eventAggregator.GetEvent<ApplicationEvents.ModulesLoaded>();
-            //modulesLoadedEvent.Publish();
+            foreach (var module in modules)
+            {
+                module.Initialize(Container.Resolve<IServiceProvider>());
+            }
+
+            var resourceRegistry = Container.Resolve<IResourceRegistry>();
+            foreach (var dictionary in resourceRegistry.Items)
+            {
+                Current.Resources.MergedDictionaries.Add(dictionary);
+            }
+
+            var eventAggregator = Container.Resolve<IEventAggregator>();
+            var modulesLoadedEvent = eventAggregator.GetEvent<ApplicationEvents.ModulesLoaded>();
+            modulesLoadedEvent.Publish();
         }
 
-        protected void InitializeShell(Window shell)
+        protected override void InitializeShell(Window shell)
         {
         }
 
@@ -92,86 +120,64 @@ namespace Micser.App
             //var apiServer = _containerProvider.Resolve<IApiServer>();
             //apiServer.Stop();
 
-            //if (_shell != null)
-            //{
-            //    var state = new ShellState
-            //    {
-            //        Width = _shell.Width,
-            //        Height = _shell.Height,
-            //        Top = _shell.Top,
-            //        Left = _shell.Left,
-            //        State = _shell.WindowState
-            //    };
+            _hostCancellation.Cancel();
 
-            //    var settingsService = _containerProvider.Resolve<ISettingsService>();
-            //    settingsService.SetSettingAsync(AppGlobals.SettingKeys.ShellState, state).GetAwaiter().GetResult();
+            if (_shell != null)
+            {
+                var state = new ShellState
+                {
+                    Width = _shell.Width,
+                    Height = _shell.Height,
+                    Top = _shell.Top,
+                    Left = _shell.Left,
+                    State = _shell.WindowState
+                };
 
-            //    _shell = null;
-            //}
+                var settingsService = Container.Resolve<ISettingsService>();
+                settingsService.SetSettingAsync(AppGlobals.SettingKeys.ShellState, state).GetAwaiter().GetResult();
 
-            //base.OnExit(e);
+                _shell = null;
+            }
+
+            base.OnExit(e);
 
             //Logger.Info("Exiting...");
         }
 
-        protected void OnInitialized()
+        protected override void OnInitialized()
         {
+            // todo
             //var apiServer = _containerProvider.Resolve<IApiServer>();
             //apiServer.StartAsync();
 
             //Logger.Info("Ready");
-            //SetStatus("Ready");
+            SetStatus("Ready");
         }
 
         protected override void OnStartup(StartupEventArgs e)
         {
+            //Logger.Info("Starting...");
+
             _argumentDictionary = new ArgumentDictionary(e.Args);
             Directory.CreateDirectory(Globals.AppDataFolder);
 
-            //Logger.Info("Starting...");
+            _host = Host.CreateDefaultBuilder(e.Args)
+                .ConfigureServices((hostContext, services) =>
+                {
+                    services.AddModules<IAppModule>(hostContext.Configuration, typeof(AppModule), typeof(InfrastructureModule));
+
+                    _services = services;
+                })
+                .Build();
+            _hostCancellation = new CancellationTokenSource();
+            _hostTask = _host.StartAsync(_hostCancellation.Token);
 
             base.OnStartup(e);
         }
 
-        private void LoadPlugins(IModuleCatalog moduleCatalog)
+        protected override void RegisterTypes(IContainerRegistry containerRegistry)
         {
-            //Logger.Debug("Loading plugins");
-            //SetStatus("Loading plugins...");
-
-            //var executingFile = new FileInfo(Assembly.GetExecutingAssembly().Location);
-            //var moduleFiles = executingFile.Directory.GetFiles(Globals.PluginSearchPattern);
-            //foreach (var moduleFile in moduleFiles)
-            //{
-            //    try
-            //    {
-            //        var assembly = Assembly.LoadFile(moduleFile.FullName);
-            //        var moduleTypes = assembly.GetExportedTypes().Where(t => typeof(IAppModule).IsAssignableFrom(t));
-
-            //        foreach (var moduleType in moduleTypes)
-            //        {
-            //            if (moduleCatalog.Modules.Any(m => m.ModuleType == moduleType.AssemblyQualifiedName))
-            //            {
-            //                continue;
-            //            }
-
-            //            if (typeof(IModule).IsAssignableFrom(moduleType))
-            //            {
-            //                moduleCatalog.AddModule(moduleType);
-            //            }
-            //            else
-            //            {
-            //                var proxyType = typeof(ProxyModule<>).MakeGenericType(moduleType);
-            //                moduleCatalog.AddModule(proxyType);
-            //            }
-            //        }
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        Logger.Warn(ex);
-            //    }
-            //}
-
-            //Logger.Debug("Plugins loaded");
+            containerRegistry.RegisterInstance(_argumentDictionary);
         }
 
         private void OnDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
@@ -181,15 +187,16 @@ namespace Micser.App
                 Debugger.Break();
             }
 
+            // todo
             //Logger.Error(e.Exception, "Unhandled application exception.");
             e.Handled = true;
         }
 
         private void SetStatus(string text)
         {
-            //var eventAggregator = _containerProvider.Resolve<IEventAggregator>();
-            //var statusChangeEvent = eventAggregator.GetEvent<ApplicationEvents.StatusChange>();
-            //statusChangeEvent.Publish(text);
+            var eventAggregator = Container.Resolve<IEventAggregator>();
+            var statusChangeEvent = eventAggregator.GetEvent<ApplicationEvents.StatusChange>();
+            statusChangeEvent.Publish(text);
         }
     }
 }

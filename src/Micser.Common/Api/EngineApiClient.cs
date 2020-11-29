@@ -1,9 +1,15 @@
 ﻿using System.Threading.Tasks;
+using Grpc.Core;
 
 namespace Micser.Common.Api
 {
     public class EngineApiClient : EngineRpcService.EngineRpcServiceClient
     {
+        public EngineApiClient(ChannelBase channel)
+            : base(channel)
+        {
+        }
+
         public async Task<bool> GetStatusAsync()
         {
             var result = await GetStatusAsync(new Empty());

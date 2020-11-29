@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using Microsoft.AspNetCore.Builder;
+using Grpc.Core;
+using Grpc.Net.Client;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -38,6 +38,12 @@ namespace Micser.Common.Extensions
 
             services.AddDbContext<TContext>(ConfigureDbContextOptions);
             services.AddDbContextFactory<TContext>(ConfigureDbContextOptions);
+            return services;
+        }
+
+        public static IServiceCollection AddDefaultRpcChannel(this IServiceCollection services)
+        {
+            services.AddTransient<ChannelBase>(_ => GrpcChannel.ForAddress("http://localhost:5001"));
             return services;
         }
 
@@ -111,18 +117,6 @@ namespace Micser.Common.Extensions
             });
 
             return services;
-        }
-
-        public static IApplicationBuilder UseModules(this IApplicationBuilder app)
-        {
-            var modules = app.ApplicationServices.GetRequiredService<IEnumerable<IModule>>();
-
-            foreach (var module in modules)
-            {
-                module.Initialize(app);
-            }
-
-            return app;
         }
     }
 }

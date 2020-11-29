@@ -6,6 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Micser.Common.Extensions;
 using Micser.Engine.Infrastructure;
+using Micser.Engine.Infrastructure.Extensions;
 
 namespace Micser.Engine
 {

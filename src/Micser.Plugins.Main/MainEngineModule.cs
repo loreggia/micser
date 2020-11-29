@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Micser.Engine.Infrastructure;
@@ -10,6 +11,11 @@ namespace Micser.Plugins.Main
 {
     public class MainEngineModule : IEngineModule
     {
+        public void Configure(IApplicationBuilder app)
+        {
+            app.UseEndpoints(ep => ep.MapGrpcService<SpectrumApiService>());
+        }
+
         public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
             services.AddAudioModules(
@@ -22,9 +28,8 @@ namespace Micser.Plugins.Main
                 typeof(PitchModule));
         }
 
-        public void Initialize(IApplicationBuilder app)
+        public void Initialize(IServiceProvider serviceProvider)
         {
-            app.UseEndpoints(ep => ep.MapGrpcService<SpectrumApiService>());
         }
     }
 }

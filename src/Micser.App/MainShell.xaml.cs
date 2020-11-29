@@ -1,10 +1,10 @@
-﻿using Micser.App.Infrastructure;
-using Micser.Common.Extensions;
-using Micser.Common.Settings;
-using System;
+﻿using System;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Input;
+using Micser.App.Infrastructure;
+using Micser.Common.Extensions;
+using Micser.Common.Settings;
 
 namespace Micser.App
 {
@@ -35,7 +35,6 @@ namespace Micser.App
         {
             if (WindowState == WindowState.Minimized)
             {
-                // ISettingsService is not yet available when the shell is created, so we can't use constructor injection
                 if (_settingsService.GetSetting<bool>(AppGlobals.SettingKeys.MinimizeToTray))
                 {
                     Hide();

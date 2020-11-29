@@ -9,7 +9,8 @@ namespace Micser.Common.Api
         private readonly object _streamLock = new object();
         private AsyncServerStreamingCall<EngineEvent> _stream;
 
-        public EngineEventsClient()
+        public EngineEventsClient(ChannelBase channel)
+            : base(channel)
         {
         }
 
