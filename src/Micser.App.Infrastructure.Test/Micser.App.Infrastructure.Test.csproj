@@ -27,7 +27,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Micser.App.Infrastructure\Micser.App.Infrastructure.csproj" />
     <ProjectReference Include="..\Micser.TestCommon\Micser.TestCommon.csproj" />
   </ItemGroup>
 

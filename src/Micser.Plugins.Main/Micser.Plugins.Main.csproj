@@ -1,32 +1,35 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net5.0-windows</TargetFramework>
-    <UseWPF>true</UseWPF>
+    <TargetFramework>net5.0</TargetFramework>
+    <OutputType>Library</OutputType>
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Themes\Colors.Light.ini" />
+    <Compile Remove="Api\**" />
+    <Compile Remove="Themes\**" />
+    <Compile Remove="Widgets\**" />
+    <EmbeddedResource Remove="Api\**" />
+    <EmbeddedResource Remove="Themes\**" />
+    <EmbeddedResource Remove="Widgets\**" />
+    <None Remove="Api\**" />
+    <None Remove="Themes\**" />
+    <None Remove="Widgets\**" />
+    <Page Remove="Api\**" />
+    <Page Remove="Themes\**" />
+    <Page Remove="Widgets\**" />
   </ItemGroup>
 
   <ItemGroup>
-    <Page Remove="Themes\Colors.Light.xaml" />
+    <Compile Remove="AssemblyInfo.cs" />
+    <Compile Remove="Audio\SpectrumSampleProcessor.cs" />
+    <Compile Remove="MainAppModule.cs" />
+    <Compile Remove="Modules\SpectrumModule.cs" />
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="Themes\Colors.Light.ini">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Themes\Colors.Light.xaml">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Micser.App.Infrastructure\Micser.App.Infrastructure.csproj" />
     <ProjectReference Include="..\Micser.Common\Micser.Common.csproj" />
     <ProjectReference Include="..\Micser.Engine.Infrastructure\Micser.Engine.Infrastructure.csproj" />
-    <ProjectReference Include="..\Micser.Plugins.Main.Api\Micser.Plugins.Main.Api.csproj" />
   </ItemGroup>
 
   <ItemGroup>

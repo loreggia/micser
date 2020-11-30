@@ -1,0 +1,59 @@
+﻿@inherits LayoutComponentBase
+
+<Layout Sider="true">
+    <LayoutSider>
+        <LayoutSiderContent>
+            <Bar Breakpoint="Breakpoint.Desktop" NavigationBreakpoint="Breakpoint.Tablet" ThemeContrast="ThemeContrast.Dark"
+                 Mode="BarMode.VerticalInline" CollapseMode="BarCollapseMode.Small">
+                <BarToggler />
+                <BarBrand>
+                    <BarItem>
+                        <BarLink To="">
+                            <BarIcon IconName="customIcon" />
+                            Micser
+                        </BarLink>
+                    </BarItem>
+                </BarBrand>
+                <BarMenu>
+                    <BarStart>
+                        <BarItem>
+                            <BarLink To="">
+                                <BarIcon IconName="IconName.Dashboard" />
+                                Dashboard
+                            </BarLink>
+                        </BarItem>
+                    </BarStart>
+                </BarMenu>
+            </Bar>
+        </LayoutSiderContent>
+    </LayoutSider>
+    <Layout>
+        <LayoutHeader Fixed="true">
+            <Bar @bind-Visible="@topbarVisible" Breakpoint="Breakpoint.Desktop" Background="Background.Primary" ThemeContrast="ThemeContrast.Light">
+                <BarToggler />
+                <BarMenu>
+                    <BarStart>
+                        <BarItem>
+                            <BarLink To="">Home</BarLink>
+                        </BarItem>
+                        <BarItem>
+                            <BarLink To="counter">Counter</BarLink>
+                        </BarItem>
+                    </BarStart>
+                </BarMenu>
+            </Bar>
+        </LayoutHeader>
+        <LayoutContent Padding="Padding.Is4.OnX">
+            @Body
+        </LayoutContent>
+    </Layout>
+</Layout>
+
+@code
+{
+    private bool topbarVisible = false;
+
+    [CascadingParameter] protected Theme Theme { get; set; }
+
+    RenderFragment customIcon =@<img src="/_ui/img/logo.png" style="width:32px; height: 32px" />;
+}

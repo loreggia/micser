@@ -14,6 +14,7 @@
     <ProjectReference Include="..\Micser.Common\Micser.Common.csproj" />
     <ProjectReference Include="..\Micser.Engine.Infrastructure\Micser.Engine.Infrastructure.csproj" />
     <ProjectReference Include="..\Micser.Plugins.Main\Micser.Plugins.Main.csproj" />
+    <ProjectReference Include="..\Micser.UI\Micser.UI.csproj" />
   </ItemGroup>
 
 </Project>

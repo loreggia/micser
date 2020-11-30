@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using Micser.Common.Modules;
 using Micser.Engine.Infrastructure.DataAccess;
 using Micser.Engine.Infrastructure.DataAccess.Models;
@@ -10,25 +11,26 @@ namespace Micser.Engine.Infrastructure.Services
     /// <inheritdoc cref="IModuleService"/>
     public class ModuleService : IModuleService
     {
-        private readonly EngineDbContext _dbContext;
+        private readonly IDbContextFactory<EngineDbContext> _dbContextFactory;
 
         /// <inheritdoc />
-        public ModuleService(EngineDbContext dbContext)
+        public ModuleService(IDbContextFactory<EngineDbContext> dbContextFactory)
         {
-            _dbContext = dbContext;
+            _dbContextFactory = dbContextFactory;
         }
 
         /// <inheritdoc />
         public ModuleDto Delete(long id)
         {
-            var module = _dbContext.Modules.Find(id);
+            using var dbContext = _dbContextFactory.CreateDbContext();
+            var module = dbContext.Modules.Find(id);
             if (module == null)
             {
                 return null;
             }
 
-            _dbContext.Modules.Remove(module);
-            _dbContext.SaveChanges();
+            dbContext.Modules.Remove(module);
+            dbContext.SaveChanges();
 
             return GetModuleDto(module);
         }
@@ -36,24 +38,27 @@ namespace Micser.Engine.Infrastructure.Services
         /// <inheritdoc />
         public IEnumerable<ModuleDto> GetAll()
         {
-            return _dbContext.Modules.AsEnumerable().Select(GetModuleDto).ToArray();
+            using var dbContext = _dbContextFactory.CreateDbContext();
+            return dbContext.Modules.AsEnumerable().Select(GetModuleDto).ToArray();
         }
 
         /// <inheritdoc />
         public ModuleDto GetById(long id)
         {
-            var module = _dbContext.Modules.Find(id);
+            using var dbContext = _dbContextFactory.CreateDbContext();
+            var module = dbContext.Modules.Find(id);
             return GetModuleDto(module);
         }
 
         /// <inheritdoc />
         public bool Insert(ModuleDto moduleDto)
         {
+            using var dbContext = _dbContextFactory.CreateDbContext();
             var module = GetModule(moduleDto);
 
-            _dbContext.Modules.Add(module);
+            dbContext.Modules.Add(module);
 
-            if (_dbContext.SaveChanges() > 0)
+            if (dbContext.SaveChanges() > 0)
             {
                 moduleDto.Id = module.Id;
                 return true;
@@ -65,15 +70,17 @@ namespace Micser.Engine.Infrastructure.Services
         /// <inheritdoc />
         public bool Truncate()
         {
-            var modules = _dbContext.Modules.AsEnumerable();
-            _dbContext.Modules.RemoveRange(modules);
-            return _dbContext.SaveChanges() >= 0;
+            using var dbContext = _dbContextFactory.CreateDbContext();
+            var modules = dbContext.Modules.AsEnumerable();
+            dbContext.Modules.RemoveRange(modules);
+            return dbContext.SaveChanges() >= 0;
         }
 
         /// <inheritdoc />
         public bool Update(ModuleDto moduleDto)
         {
-            var module = _dbContext.Modules.Find(moduleDto.Id);
+            using var dbContext = _dbContextFactory.CreateDbContext();
+            var module = dbContext.Modules.Find(moduleDto.Id);
 
             if (module == null)
             {
@@ -94,7 +101,7 @@ namespace Micser.Engine.Infrastructure.Services
 
             moduleDto.State = state;
 
-            return _dbContext.SaveChanges() >= 0;
+            return dbContext.SaveChanges() >= 0;
         }
 
         private static Module GetModule(ModuleDto moduleDto)

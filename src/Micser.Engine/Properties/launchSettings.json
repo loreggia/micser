@@ -2,7 +2,10 @@
   "profiles": {
     "Micser.Engine": {
       "commandName": "Project",
-      "commandLineArgs": "--console"
+      "commandLineArgs": "--console",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
     }
   }
 }

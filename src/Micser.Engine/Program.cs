@@ -1,7 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Linq;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Hosting;
 
 namespace Micser.Engine
@@ -13,9 +12,7 @@ namespace Micser.Engine
             return Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webHostBuilder =>
                 {
-                    webHostBuilder.ConfigureKestrel(options =>
-                        options.ListenLocalhost(5001, listenOptions => listenOptions.Protocols = HttpProtocols.Http2));
-                    webHostBuilder.UseStartup<Startup>();
+                    webHostBuilder.UseSetting(WebHostDefaults.HostingStartupAssembliesKey, "Micser.Engine;Micser.UI");
                 });
         }
 

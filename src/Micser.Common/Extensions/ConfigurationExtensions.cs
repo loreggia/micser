@@ -36,7 +36,7 @@ namespace Micser.Common.Extensions
                 options.UseSqlite(connectionString);
             }
 
-            services.AddDbContext<TContext>(ConfigureDbContextOptions);
+            //services.AddDbContext<TContext>(ConfigureDbContextOptions, ServiceLifetime.Transient);
             services.AddDbContextFactory<TContext>(ConfigureDbContextOptions);
             return services;
         }
