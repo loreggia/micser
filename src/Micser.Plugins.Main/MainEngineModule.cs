@@ -5,6 +5,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Micser.Engine.Infrastructure;
 using Micser.Engine.Infrastructure.Extensions;
 using Micser.Plugins.Main.Modules;
+using Micser.Plugins.Main.Pages;
+using Micser.UI.Shared;
 
 namespace Micser.Plugins.Main
 {
@@ -25,6 +27,8 @@ namespace Micser.Plugins.Main
                 typeof(GainModule),
                 //typeof(SpectrumModule),
                 typeof(PitchModule));
+
+            services.AddScoped<IWidget, TestWidget>();
         }
 
         public void Initialize(IServiceProvider serviceProvider)

@@ -1,5 +1,29 @@
 ﻿@page "/"
+@inject IEnumerable<IWidget> Widgets
 
 <h1>Hello, world!</h1>
 
-Welcome to your new app.
+<Component1></Component1>
+
+@foreach (var widget in Widgets)
+{
+    <div class="col-6">
+        <div class="widget">
+            <h1>@widget.Title</h1>
+            <hr />
+            @RenderWidget(widget)
+        </div>
+    </div>
+}
+
+@code
+{
+    private RenderFragment RenderWidget(IWidget widget)
+    {
+        return new RenderFragment(builder =>
+        {
+            builder.OpenComponent(0, widget.GetType());
+            builder.CloseComponent();
+        });
+    }
+}

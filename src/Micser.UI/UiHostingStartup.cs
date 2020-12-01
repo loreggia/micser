@@ -4,7 +4,6 @@ using Blazorise.Material;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
 using Micser.UI;
 using Micser.UI.Data;
@@ -18,7 +17,7 @@ namespace Micser.UI
         public void Configure(IWebHostBuilder builder)
         {
             builder
-                .ConfigureServices(services =>
+                .ConfigureServices((context, services) =>
                 {
                     services.AddRazorPages();
                     services.AddServerSideBlazor();
@@ -34,6 +33,8 @@ namespace Micser.UI
                 })
                 .Configure((context, app) =>
                 {
+                    context.HostingEnvironment.ApplicationName = "Micser.UI";
+
                     if (context.HostingEnvironment.IsDevelopment())
                     {
                         app.UseDeveloperExceptionPage();
@@ -48,12 +49,12 @@ namespace Micser.UI
                     app.UseHttpsRedirection();
 
                     app.UseStaticFiles();
-                    var assembly = typeof(UiHostingStartup).Assembly;
-                    app.UseStaticFiles(new StaticFileOptions
-                    {
-                        RequestPath = "/_ui",
-                        FileProvider = new EmbeddedFileProvider(assembly, $"{assembly.GetName().Name}.wwwroot")
-                    });
+                    //var assembly = typeof(UiHostingStartup).Assembly;
+                    //app.UseStaticFiles(new StaticFileOptions
+                    //{
+                    //    RequestPath = "/_ui",
+                    //    FileProvider = new EmbeddedFileProvider(assembly, $"{assembly.GetName().Name}.wwwroot")
+                    //});
 
                     app.UseRouting();
 
