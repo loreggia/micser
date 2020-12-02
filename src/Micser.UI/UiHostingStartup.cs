@@ -1,4 +1,5 @@
-﻿using Blazorise;
+﻿using System;
+using Blazorise;
 using Blazorise.Icons.Material;
 using Blazorise.Material;
 using Microsoft.AspNetCore.Builder;
@@ -16,26 +17,39 @@ namespace Micser.UI
     {
         public void Configure(IWebHostBuilder builder)
         {
-            builder
-                .ConfigureServices((context, services) =>
+            builder.ConfigureServices(services =>
+            {
+                services.AddRazorPages();
+                services.AddServerSideBlazor();
+
+                services
+                    .AddBlazorise(options =>
+                    {
+                        options.ChangeTextOnKeyPress = true;
+                    })
+                    .AddMaterialProviders()
+                    .AddMaterialIcons();
+
+                services.AddScoped<WeatherForecastService>();
+
+                services.AddSingleton<IStartupFilter, UiHostingStartupFilter>();
+            });
+        }
+
+        public class UiHostingStartupFilter : IStartupFilter
+        {
+            private readonly IWebHostEnvironment _environment;
+
+            public UiHostingStartupFilter(IWebHostEnvironment environment)
+            {
+                _environment = environment;
+            }
+
+            public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next)
+            {
+                return app =>
                 {
-                    services.AddRazorPages();
-                    services.AddServerSideBlazor();
-
-                    services.AddBlazorise(options =>
-                        {
-                            options.ChangeTextOnKeyPress = true;
-                        })
-                        .AddMaterialProviders()
-                        .AddMaterialIcons();
-
-                    services.AddScoped<WeatherForecastService>();
-                })
-                .Configure((context, app) =>
-                {
-                    context.HostingEnvironment.ApplicationName = "Micser.UI";
-
-                    if (context.HostingEnvironment.IsDevelopment())
+                    if (_environment.IsDevelopment())
                     {
                         app.UseDeveloperExceptionPage();
                     }
@@ -49,12 +63,6 @@ namespace Micser.UI
                     app.UseHttpsRedirection();
 
                     app.UseStaticFiles();
-                    //var assembly = typeof(UiHostingStartup).Assembly;
-                    //app.UseStaticFiles(new StaticFileOptions
-                    //{
-                    //    RequestPath = "/_ui",
-                    //    FileProvider = new EmbeddedFileProvider(assembly, $"{assembly.GetName().Name}.wwwroot")
-                    //});
 
                     app.UseRouting();
 
@@ -67,7 +75,10 @@ namespace Micser.UI
                         endpoints.MapBlazorHub();
                         endpoints.MapFallbackToPage("/_Host");
                     });
-                });
+
+                    next(app);
+                };
+            }
         }
     }
 }

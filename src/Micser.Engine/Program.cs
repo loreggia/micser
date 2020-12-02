@@ -12,7 +12,8 @@ namespace Micser.Engine
             return Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webHostBuilder =>
                 {
-                    webHostBuilder.UseSetting(WebHostDefaults.HostingStartupAssembliesKey, "Micser.Engine;Micser.UI");
+                    webHostBuilder.UseStartup<Startup>();
+                    webHostBuilder.UseSetting(WebHostDefaults.HostingStartupAssembliesKey, "Micser.UI");
                 });
         }
 
