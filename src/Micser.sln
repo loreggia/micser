@@ -67,6 +67,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Micser.UI", "Micser.UI\Mics
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Micser.UI.Shared", "Micser.UI.Shared\Micser.UI.Shared.csproj", "{FBD903BF-3911-4B2D-8F1C-67E83A9A5661}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "App", "App", "{A9EF8586-7E3C-4D3F-9774-2E637B2CF4EF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
