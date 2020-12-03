@@ -5,18 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Remove="Api\Protos\Common.proto" />
-    <None Remove="Api\Protos\Engine.proto" />
-    <None Remove="Api\Protos\EngineEvents.proto" />
-    <None Remove="Api\Protos\ModuleConnections.proto" />
-    <None Remove="Api\Protos\Modules.proto" />
-    <None Remove="Api\Protos\Settings.proto" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="CSCore" Version="1.2.1.2" />
-    <PackageReference Include="Grpc.AspNetCore" Version="2.33.1" />
-    <PackageReference Include="MessagePack" Version="2.2.60" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />

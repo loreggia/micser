@@ -1,10 +1,20 @@
 ﻿using CSCore;
 using CSCore.DSP;
 using Micser.Engine.Infrastructure.Audio;
-using Micser.Plugins.Main.Api;
 
 namespace Micser.Plugins.Main.Audio
 {
+    public struct SpectrumValue
+    {
+        public double Frequency { get; set; }
+        public double Value { get; set; }
+    }
+
+    public class SpectrumData
+    {
+        public SpectrumValue[] Values { get; set; }
+    }
+
     public class SpectrumSampleProcessor : SampleProcessor
     {
         private float[] _fftBuffer;
@@ -35,7 +45,7 @@ namespace Micser.Plugins.Main.Audio
 
             return new SpectrumData
             {
-                Values = { _spectrumValueBuffer }
+                Values = _spectrumValueBuffer
             };
         }
 

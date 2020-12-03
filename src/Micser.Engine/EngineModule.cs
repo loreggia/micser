@@ -1,19 +1,13 @@
 ﻿using System;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Micser.Common;
 using Micser.Common.Settings;
-using Micser.Engine.Infrastructure;
 
 namespace Micser.Engine
 {
-    public class EngineModule : IEngineModule
+    public class EngineModule : IModule
     {
-        public void Configure(IApplicationBuilder app)
-        {
-        }
-
         public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
         }

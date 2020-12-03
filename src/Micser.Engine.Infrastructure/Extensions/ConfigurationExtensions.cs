@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Micser.Common;
 using Micser.Engine.Infrastructure.Audio;
@@ -19,21 +18,14 @@ namespace Micser.Engine.Infrastructure.Extensions
             return services;
         }
 
-        public static IApplicationBuilder UseModules(this IApplicationBuilder app)
+        public static void UseModules(this IServiceProvider services)
         {
-            var modules = app.ApplicationServices.GetRequiredService<IEnumerable<IModule>>();
+            var modules = services.GetRequiredService<IEnumerable<IModule>>();
 
             foreach (var module in modules)
             {
-                if (module is IEngineModule engineModule)
-                {
-                    engineModule.Configure(app);
-                }
-
-                module.Initialize(app.ApplicationServices);
+                module.Initialize(services);
             }
-
-            return app;
         }
     }
 }

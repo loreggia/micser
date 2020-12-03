@@ -1,23 +1,22 @@
 ﻿using System.Timers;
 using Microsoft.Extensions.Logging;
-using Micser.Common.Api;
+using Micser.Common.Events;
 using Micser.Engine.Infrastructure.Audio;
-using Micser.Plugins.Main.Api;
 using Micser.Plugins.Main.Audio;
 
 namespace Micser.Plugins.Main.Modules
 {
     public class SpectrumModule : AudioModule
     {
+        private readonly IEventAggregator _eventAggregator;
         private readonly SpectrumSampleProcessor _sampleProcessor;
-        private readonly IRpcStreamService<SpectrumData> _streamService;
         private readonly Timer _timer;
         private bool _isDisposed;
 
-        public SpectrumModule(IRpcStreamService<SpectrumData> streamService, ILogger<SpectrumModule> logger)
+        public SpectrumModule(IEventAggregator eventAggregator, ILogger<SpectrumModule> logger)
             : base(logger)
         {
-            _streamService = streamService;
+            _eventAggregator = eventAggregator;
             _sampleProcessor = new SpectrumSampleProcessor();
             AddSampleProcessor(_sampleProcessor);
 
@@ -46,7 +45,7 @@ namespace Micser.Plugins.Main.Modules
             var data = _sampleProcessor.GetFftData();
             if (data != null)
             {
-                await _streamService.SendMessageAsync(data);
+                _eventAggregator.Publish(data);
             }
 
             if (!_isDisposed)

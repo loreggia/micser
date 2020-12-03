@@ -1,6 +1,6 @@
-﻿using CSCore.Win32;
-using System;
+﻿using System;
 using System.IO;
+using CSCore.Win32;
 
 namespace Micser.Common
 {
@@ -10,28 +10,6 @@ namespace Micser.Common
     public static class Globals
     {
 #pragma warning disable CS1591 // Missing XML comment for publicly visible type or member
-
-        /// <summary>
-        /// The pipe name of the engine API server.
-        /// </summary>
-        public const string AppPipeName =
-#if DEBUG
-            "Micser.App.Debug"
-#else
-            "Micser.App"
-#endif
-        ;
-
-        /// <summary>
-        /// The pipe name of the engine API server.
-        /// </summary>
-        public const string EnginePipeName =
-#if DEBUG
-                "Micser.Engine.Debug"
-#else
-            "Micser.Engine"
-#endif
-            ;
 
         public const string ConnectionStringFolder = "|DataDirectory|";
 
@@ -61,17 +39,6 @@ namespace Micser.Common
         public static readonly string AppDataFolder = Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData, Environment.SpecialFolderOption.Create),
             "Micser");
-
-        public static class ApiResources
-        {
-            public const string Default = "<default>";
-            public const string Engine = "Engine";
-            public const string ModuleConnections = "moduleconnections";
-            public const string Modules = "modules";
-            public const string Settings = "settings";
-            public const string Status = "status";
-            public const string Updates = "updates";
-        }
 
         public static class AppSettingSections
         {

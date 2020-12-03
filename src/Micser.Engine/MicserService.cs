@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,7 +11,6 @@ using Micser.Common.Audio;
 using Micser.Common.Extensions;
 using Micser.Common.Settings;
 using Micser.Common.Updates;
-using Micser.Engine.Infrastructure;
 using Timer = System.Timers.Timer;
 
 namespace Micser.Engine
@@ -22,7 +20,6 @@ namespace Micser.Engine
         //private IApiServer _apiServer;
 
         private readonly ILogger<MicserService> _logger;
-        private readonly ICollection<IEngineModule> _plugins;
         private readonly IServiceProvider _serviceProvider;
         private readonly Timer _updateTimer;
         private IAudioEngine _audioEngine;
@@ -38,7 +35,6 @@ namespace Micser.Engine
         {
             _serviceProvider = serviceProvider;
             _logger = logger;
-            _plugins = new List<IEngineModule>();
             _updateTimer = new Timer(1000) { AutoReset = false };
             _updateTimer.Elapsed += OnUpdateTimerElapsed;
         }
@@ -47,13 +43,8 @@ namespace Micser.Engine
         {
             _logger.LogInformation("Starting service");
 
-            //_apiServer = _serviceProvider.Resolve<IApiServer>();
-            //_apiClient = _serviceProvider.Resolve<IApiClient>();
-
             _audioEngine = _serviceProvider.GetRequiredService<IAudioEngine>();
             _updateService = _serviceProvider.GetRequiredService<IUpdateService>();
-
-            //await _apiServer.StartAsync();
 
             _settingsService = _serviceProvider.GetRequiredService<ISettingsService>();
             await _settingsService.LoadAsync().ConfigureAwait(false);
@@ -74,24 +65,20 @@ namespace Micser.Engine
 
             _updateTimer.Stop();
 
-            //_apiClient.Disconnect();
-            //_apiServer.Stop();
-
             _audioEngine.Stop();
-
-            _plugins.Clear();
 
             _logger.LogInformation("Service stopped");
 
             return Task.CompletedTask;
         }
 
-        /*protected override bool OnPowerEvent(PowerBroadcastStatus powerStatus)
+        /*
+        protected override bool OnPowerEvent(PowerBroadcastStatus powerStatus)
         {
             var isSuspending = powerStatus == PowerBroadcastStatus.Suspend;
             var isResuming = powerStatus == PowerBroadcastStatus.ResumeSuspend;
 
-            Logger.Debug($"Changing power state: {powerStatus}, isSuspending: {isSuspending}, isResuming: {isResuming}");
+            _logger.Debug($"Changing power state: {powerStatus}, isSuspending: {isSuspending}, isResuming: {isResuming}");
 
             if (isSuspending)
             {
@@ -121,7 +108,8 @@ namespace Micser.Engine
             }
 
             return base.OnPowerEvent(powerStatus);
-        }*/
+        }
+        */
 
         private async void OnUpdateTimerElapsed(object sender, ElapsedEventArgs e)
         {

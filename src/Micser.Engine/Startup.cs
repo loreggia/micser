@@ -5,7 +5,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Micser.Common;
 using Micser.Common.Audio;
+using Micser.Common.Events;
 using Micser.Common.Extensions;
 using Micser.Engine.Audio;
 using Micser.Engine.Infrastructure;
@@ -28,7 +30,7 @@ namespace Micser.Engine
             var lifetime = app.ApplicationServices.GetRequiredService<IHostApplicationLifetime>();
             lifetime.ApplicationStopping.Register(OnStopping);
 
-            app.UseModules();
+            app.ApplicationServices.UseModules();
 
             var dbContextFactory = app.ApplicationServices.GetRequiredService<IDbContextFactory<EngineDbContext>>();
             using var dbContext = dbContextFactory.CreateDbContext();
@@ -39,10 +41,11 @@ namespace Micser.Engine
         {
             services.AddNlog("Micser.Engine.log");
 
-            services.AddModules<IEngineModule>(Configuration, typeof(EngineModule), typeof(InfrastructureModule));
+            services.AddModules<IModule>(Configuration, typeof(EngineModule), typeof(InfrastructureModule));
 
             services.AddDbContext<EngineDbContext>(Configuration.GetConnectionString("DefaultConnection"));
 
+            services.AddSingleton<IEventAggregator, EventAggregator>();
             services.AddSingleton<IAudioEngine, AudioEngine>();
 
             services.AddHostedService<MicserService>();

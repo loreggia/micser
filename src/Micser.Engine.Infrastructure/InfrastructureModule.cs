@@ -1,7 +1,7 @@
 ﻿using System;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Micser.Common;
 using Micser.Common.Settings;
 using Micser.Common.Updates;
 using Micser.Engine.Infrastructure.DataAccess;
@@ -12,12 +12,8 @@ namespace Micser.Engine.Infrastructure
     /// <summary>
     /// The main infrastructure module.
     /// </summary>
-    public class InfrastructureModule : IEngineModule
+    public class InfrastructureModule : IModule
     {
-        public void Configure(IApplicationBuilder app)
-        {
-        }
-
         /// <inheritdoc />
         public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
