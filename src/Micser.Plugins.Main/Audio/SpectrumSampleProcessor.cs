@@ -1,6 +1,6 @@
 ﻿using CSCore;
 using CSCore.DSP;
-using Micser.Engine.Infrastructure.Audio;
+using Micser.Common.Audio;
 
 namespace Micser.Plugins.Main.Audio
 {

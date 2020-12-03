@@ -23,8 +23,6 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="5.0.0" />
     <ProjectReference Include="..\Micser.Common\Micser.Common.csproj" />
-    <ProjectReference Include="..\Micser.Engine.Infrastructure\Micser.Engine.Infrastructure.csproj" />
-    <ProjectReference Include="..\Micser.UI.Shared\Micser.UI.Shared.csproj" />
   </ItemGroup>
 
   <ItemGroup>

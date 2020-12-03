@@ -1,24 +1,16 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="5.0.0" />
     <PackageReference Include="CSCore" Version="1.2.1.2" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="5.0.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="5.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="NLog.Extensions.Logging" Version="1.6.5" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Protobuf Include="Api\Protos\ModuleConnections.proto" />
-    <Protobuf Include="Api\Protos\Modules.proto" />
-    <Protobuf Include="Api\Protos\Common.proto" />
-    <Protobuf Include="Api\Protos\Engine.proto" />
-    <Protobuf Include="Api\Protos\Settings.proto" />
-    <Protobuf Include="Api\Protos\EngineEvents.proto" />
   </ItemGroup>
 
 </Project>

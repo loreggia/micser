@@ -1,7 +1,7 @@
 ﻿using CSCore.SoundIn;
 using Microsoft.Extensions.Logging;
-using Micser.Common.Devices;
-using Micser.Engine.Infrastructure.Services;
+using Micser.Common.Audio;
+using Micser.Common.Services;
 
 namespace Micser.Plugins.Main.Modules
 {

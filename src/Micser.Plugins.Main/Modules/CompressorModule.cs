@@ -1,6 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
+using Micser.Common.Audio;
 using Micser.Common.Modules;
-using Micser.Engine.Infrastructure.Audio;
 using Micser.Plugins.Main.Audio;
 
 namespace Micser.Plugins.Main.Modules

@@ -18,6 +18,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Micser.Common\Micser.Common.csproj" />
     <ProjectReference Include="..\Micser.Plugins.Main\Micser.Plugins.Main.csproj" />
   </ItemGroup>
 

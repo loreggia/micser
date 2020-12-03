@@ -49,9 +49,9 @@
 #endregion Copyright
 
 using CSCore;
-using Micser.Engine.Infrastructure.Audio;
 using Micser.Plugins.Main.Modules;
 using System;
+using Micser.Common.Audio;
 
 namespace Micser.Plugins.Main.Audio
 {

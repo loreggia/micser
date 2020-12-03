@@ -2,10 +2,10 @@
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Micser.Common;
-using Micser.Engine.Infrastructure.Extensions;
+using Micser.Common.Extensions;
+using Micser.Common.UI;
 using Micser.Plugins.Main.Modules;
 using Micser.Plugins.Main.Pages;
-using Micser.UI.Shared;
 
 namespace Micser.Plugins.Main
 {

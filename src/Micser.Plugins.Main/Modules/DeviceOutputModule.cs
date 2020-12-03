@@ -7,9 +7,8 @@ using CSCore.DSP;
 using CSCore.SoundOut;
 using CSCore.Streams;
 using Microsoft.Extensions.Logging;
-using Micser.Common.Devices;
-using Micser.Engine.Infrastructure.Audio;
-using Micser.Engine.Infrastructure.Services;
+using Micser.Common.Audio;
+using Micser.Common.Services;
 using WriteableBufferingSource = Micser.Plugins.Main.Audio.WriteableBufferingSource;
 
 namespace Micser.Plugins.Main.Modules

@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Micser.Common.Audio;
 using NLog.Config;
 using NLog.Extensions.Logging;
 using NLog.Targets;
@@ -13,6 +15,16 @@ namespace Micser.Common.Extensions
 {
     public static class ConfigurationExtensions
     {
+        public static IServiceCollection AddAudioModules(this IServiceCollection services, params Type[] types)
+        {
+            foreach (var type in types)
+            {
+                services.AddTransient(typeof(IAudioModule), type);
+            }
+
+            return services;
+        }
+
         public static IServiceCollection AddDbContext<TContext>(this IServiceCollection services, string connectionString)
             where TContext : DbContext
         {
@@ -109,6 +121,16 @@ namespace Micser.Common.Extensions
             });
 
             return services;
+        }
+
+        public static void UseModules(this IServiceProvider services)
+        {
+            var modules = services.GetRequiredService<IEnumerable<IModule>>();
+
+            foreach (var module in modules)
+            {
+                module.Initialize(services);
+            }
         }
     }
 }
