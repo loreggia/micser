@@ -6,7 +6,7 @@ using Micser.Common.Settings;
 
 namespace Micser
 {
-    public class EngineModule : IModule
+    public class EnginePlugin : IPlugin
     {
         public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {

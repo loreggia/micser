@@ -52,11 +52,11 @@ namespace Micser.Common.Extensions
         }
 
         public static IServiceCollection AddModules<TModule>(this IServiceCollection services, IConfiguration configuration, params Type[] staticModules)
-            where TModule : IModule
+            where TModule : IPlugin
         {
             void AddModule(Type moduleType)
             {
-                if (Activator.CreateInstance(moduleType) is IModule module)
+                if (Activator.CreateInstance(moduleType) is IPlugin module)
                 {
                     services.AddSingleton(module);
                     module.ConfigureServices(services, configuration);
@@ -125,7 +125,7 @@ namespace Micser.Common.Extensions
 
         public static void UseModules(this IServiceProvider services)
         {
-            var modules = services.GetRequiredService<IEnumerable<IModule>>();
+            var modules = services.GetRequiredService<IEnumerable<IPlugin>>();
 
             foreach (var module in modules)
             {

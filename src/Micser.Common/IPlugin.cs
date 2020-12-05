@@ -7,7 +7,7 @@ namespace Micser.Common
     /// <summary>
     /// Base interface for plugin modules.
     /// </summary>
-    public interface IModule
+    public interface IPlugin
     {
         /// <summary>
         /// Lets the module register its types in the DI container.

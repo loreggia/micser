@@ -44,7 +44,7 @@ namespace Micser
         {
             services.AddNlog("Micser.Engine.log");
 
-            services.AddModules<IModule>(Configuration, typeof(EngineModule));
+            services.AddModules<IPlugin>(Configuration, typeof(EnginePlugin));
 
             services.AddDbContext<EngineDbContext>(Configuration.GetConnectionString("DefaultConnection"));
 

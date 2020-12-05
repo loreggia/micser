@@ -1,7 +1,4 @@
 ﻿using System;
-using Blazorise;
-using Blazorise.Icons.Material;
-using Blazorise.Material;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -19,17 +16,6 @@ namespace Micser.UI
         {
             builder.ConfigureServices(services =>
             {
-                services.AddRazorPages();
-                services.AddServerSideBlazor();
-
-                services
-                    .AddBlazorise(options =>
-                    {
-                        options.ChangeTextOnKeyPress = true;
-                    })
-                    .AddMaterialProviders()
-                    .AddMaterialIcons();
-
                 services.AddScoped<WeatherForecastService>();
 
                 services.AddSingleton<IStartupFilter, UiHostingStartupFilter>();
@@ -65,10 +51,6 @@ namespace Micser.UI
                     app.UseStaticFiles();
 
                     app.UseRouting();
-
-                    app.ApplicationServices
-                        .UseMaterialProviders()
-                        .UseMaterialIcons();
 
                     app.UseEndpoints(endpoints =>
                     {

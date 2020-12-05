@@ -1,27 +1,10 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Themes\**" />
-    <Compile Remove="Widgets\**" />
-    <EmbeddedResource Remove="Themes\**" />
-    <EmbeddedResource Remove="Widgets\**" />
-    <None Remove="Themes\**" />
-    <None Remove="Widgets\**" />
-    <Page Remove="Themes\**" />
-    <Page Remove="Widgets\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="AssemblyInfo.cs" />
-    <Compile Remove="MainAppModule.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="5.0.0" />
     <ProjectReference Include="..\Micser.Common\Micser.Common.csproj" />
   </ItemGroup>
 
@@ -38,10 +21,6 @@
       <Generator>PublicResXFileCodeGenerator</Generator>
       <LastGenOutput>Strings.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="wwwroot\" />
   </ItemGroup>
 
 </Project>
