@@ -1,8 +1,15 @@
 ﻿@implements Micser.Common.UI.IWidget
 
-<h3>TestWidget Content</h3>
+<CardText>TestWidget Content</CardText>
 
 @code
 {
-    public string Title => "TestWidget";
+    public TestWidget()
+    {
+        Title = "TestWidget";
+    }
+
+    public string Title { get; set; }
+    public double Left { get; set; }
+    public double Top { get; set; }
 }

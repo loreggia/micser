@@ -23,26 +23,19 @@
                             </BarLink>
                         </BarItem>
                     </BarStart>
+                    <BarEnd>
+                        <BarItem>
+                            <BarLink To="/settings">
+                                <BarIcon IconName="IconName.Wrench" />
+                                Settings
+                            </BarLink>
+                        </BarItem>
+                    </BarEnd>
                 </BarMenu>
             </Bar>
         </LayoutSiderContent>
     </LayoutSider>
     <Layout>
-        <LayoutHeader Fixed="true">
-            <Bar @bind-Visible="@topbarVisible" Breakpoint="Breakpoint.Desktop" Background="Background.Primary" ThemeContrast="ThemeContrast.Light">
-                <BarToggler />
-                <BarMenu>
-                    <BarStart>
-                        <BarItem>
-                            <BarLink To="">Home</BarLink>
-                        </BarItem>
-                        <BarItem>
-                            <BarLink To="counter">Counter</BarLink>
-                        </BarItem>
-                    </BarStart>
-                </BarMenu>
-            </Bar>
-        </LayoutHeader>
         <LayoutContent Padding="Padding.Is4.OnX">
             @Body
         </LayoutContent>

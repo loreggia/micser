@@ -1,0 +1,51 @@
+﻿<div class="draggable @Class"
+     style="@($"top: {Top}px; left: {Left}px;")">
+    @ChildContent
+</div>
+
+@code
+{
+    private bool _isDragging;
+    private double _origLeft;
+    private double _origTop;
+    private double _startLeft;
+    private double _startTop;
+
+    [Parameter]
+    public double Top { get; set; }
+
+    [Parameter]
+    public double Left { get; set; }
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+
+    [Parameter]
+    public string Class { get; set; }
+
+    private void HandleMouseDown(MouseEventArgs e)
+    {
+        _isDragging = true;
+        _startLeft = e.ClientX;
+        _startTop = e.ClientY;
+        _origLeft = Left;
+        _origTop = Top;
+    }
+
+    private void HandleMouseMove(MouseEventArgs e)
+    {
+        if (!_isDragging)
+        {
+            return;
+        }
+
+        Left = _origLeft - (_startLeft - e.ClientX);
+        Top = _origTop - (_startTop - e.ClientY);
+        StateHasChanged();
+    }
+
+    private void HandleMouseUp(MouseEventArgs e)
+    {
+        _isDragging = false;
+    }
+}

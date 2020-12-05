@@ -2,6 +2,8 @@
 {
     public interface IWidget
     {
-        public string Title { get; }
+        public double Left { get; set; }
+        public string Title { get; set; }
+        public double Top { get; set; }
     }
 }

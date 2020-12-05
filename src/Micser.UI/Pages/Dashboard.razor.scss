@@ -1,0 +1,12 @@
+﻿.dashboard {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border: 1px solid black;
+
+    .widget {
+        position: absolute;
+        min-width: 100px;
+        min-height: 50px;
+    }
+}

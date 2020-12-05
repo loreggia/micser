@@ -1,0 +1,28 @@
+﻿@page "/"
+@inject IEnumerable<IWidget> Widgets
+
+<div class="dashboard">
+    @foreach (var widget in Widgets)
+    {
+        <Draggable Left="@widget.Left" Top="@widget.Top">
+            <Card>
+                <CardTitle>@widget.Title</CardTitle>
+                <CardBody>
+                    @RenderWidget(widget)
+                </CardBody>
+            </Card>
+        </Draggable>
+    }
+</div>
+
+@code
+{
+    private RenderFragment RenderWidget(IWidget widget)
+    {
+        return builder =>
+        {
+            builder.OpenComponent(0, widget.GetType());
+            builder.CloseComponent();
+        };
+    }
+}
