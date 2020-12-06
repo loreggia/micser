@@ -6,4 +6,7 @@
   <PropertyGroup>
     <Configurations>Debug;Release;Test</Configurations>
   </PropertyGroup>
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
 </Project>
