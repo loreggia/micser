@@ -8,8 +8,7 @@ import { Dashboard, Navigation, NotFound } from "./components";
 import { Routes } from "./utils/constants";
 
 import "./i18n";
-import "antd/dist/antd.css";
-import "./App.scss";
+import "./App.less";
 
 const Loader = styled.div`
     width: 100%;
