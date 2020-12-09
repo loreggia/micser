@@ -1,35 +1,41 @@
 import React from "react";
+import PropTypes from "prop-types";
 import styled from "styled-components";
 
-import { WidgetType } from "../propTypes";
+import { BoundsType } from "../propTypes";
 
-const Container = styled.div`
+const WidgetContainer = styled.div`
     position: absolute;
-    display: flex;
-    flex-direction: column;
-    top: ${(p) => p.bounds.top}px;
-    left: ${(p) => p.bounds.left}px;
-    width: ${(p) => p.bounds.width}px;
-    height: ${(p) => p.bounds.height}px;
+    top: ${(p) => p.top}px;
+    left: ${(p) => p.left}px;
+    width: ${(p) => p.width}px;
+    height: ${(p) => p.height}px;
+
+    & > * {
+        width: 100%;
+        height: 100%;
+    }
 `;
 
-const Header = styled.div`
-    flex: 0 0 auto;
-`;
-
-const Content = styled.div`
-    flex: 1 1 auto;
-`;
-
-const Widget = ({ className, bounds, header, children }) => {
+const Widget = ({ id, bounds, onMouseDown, children }) => {
     return (
-        <Container className={className} bounds={bounds}>
-            <Header>{header}</Header>
-            <Content>{children}</Content>
-        </Container>
+        <WidgetContainer
+            id={id}
+            top={bounds.top}
+            left={bounds.left}
+            width={bounds.width}
+            height={bounds.height}
+            onMouseDown={onMouseDown}
+        >
+            {children}
+        </WidgetContainer>
     );
 };
 
-Widget.propTypes = WidgetType;
+Widget.propTypes = {
+    id: PropTypes.any.isRequired,
+    bounds: BoundsType.isRequired,
+    children: PropTypes.any,
+};
 
 export default Widget;

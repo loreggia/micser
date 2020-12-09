@@ -1,14 +1,13 @@
 import PropTypes from "prop-types";
 
-export const BoundsType = {
+export const BoundsType = PropTypes.shape({
     top: PropTypes.number.isRequired,
     left: PropTypes.number.isRequired,
     width: PropTypes.number.isRequired,
     height: PropTypes.number.isRequired,
-};
+});
 
-export const WidgetType = {
-    className: PropTypes.string,
+export const WidgetType = PropTypes.shape({
     bounds: PropTypes.shape(BoundsType).isRequired,
-    header: PropTypes.any(PropTypes.string, PropTypes.element),
-};
+    header: PropTypes.oneOfType([PropTypes.string, PropTypes.element]),
+});

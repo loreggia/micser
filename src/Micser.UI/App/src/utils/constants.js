@@ -4,4 +4,7 @@ export const Routes = {
     dashboard: {
         index: "/",
     },
+    settings: {
+        index: "/settings",
+    },
 };

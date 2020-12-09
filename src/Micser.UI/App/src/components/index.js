@@ -1,4 +1,4 @@
-export { default as Alert } from "./Alert";
 export { default as Navigation } from "./Navigation";
+export { default as PageContainer } from "./PageContainer";
 
-export { Dashboard, NotFound } from "./Pages";
+export { Dashboard, NotFound, Settings } from "./Pages";

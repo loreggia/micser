@@ -1,9 +1,9 @@
 import React, { Suspense } from "react";
 import styled from "styled-components";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-import { Layout } from "antd";
+import { Layout, Spin } from "antd";
 
-import { Dashboard, Navigation, NotFound } from "./components";
+import { Dashboard, Navigation, NotFound, Settings } from "./components";
 
 import { Routes } from "./utils/constants";
 
@@ -18,29 +18,29 @@ const Loader = styled.div`
     align-items: center;
 `;
 
-const MainContent = styled(Layout.Content)`
-    padding: 20px;
-`;
-
 const App = () => {
     return (
-        <Suspense fallback={<Loader>Loading...</Loader>}>
+        <Suspense
+            fallback={
+                <Loader>
+                    <Spin tip="Loading..." />
+                </Loader>
+            }
+        >
             <Router>
                 <Layout style={{ minHeight: "100vh" }}>
                     <Navigation />
 
                     <Layout>
-                        <MainContent>
-                            <Switch>
-                                <Route path={Routes.dashboard.index} exact>
-                                    <Dashboard />
-                                </Route>
-                                {/* <Route path={Routes.settings.index}>
-                            <Settings />
-                        </Route> */}
-                                <NotFound />
-                            </Switch>
-                        </MainContent>
+                        <Switch>
+                            <Route path={Routes.dashboard.index} exact>
+                                <Dashboard />
+                            </Route>
+                            <Route path={Routes.settings.index}>
+                                <Settings />
+                            </Route>
+                            <NotFound />
+                        </Switch>
                     </Layout>
                 </Layout>
             </Router>

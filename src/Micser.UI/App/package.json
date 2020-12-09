@@ -5,11 +5,11 @@
     "license": "MIT",
     "private": true,
     "dependencies": {
-        "@craco/craco": "^5.9.0",
+        "@craco/craco": "^6.0.0",
         "@microsoft/signalr": "^5.0.0",
         "antd": "^4.9.2",
         "axios": "^0.21.0",
-        "craco-less": "^1.17.1",
+        "craco-antd": "^1.19.0",
         "fontsource-roboto": "^3.0.3",
         "i18next": "^19.8.4",
         "i18next-http-backend": "^1.0.21",

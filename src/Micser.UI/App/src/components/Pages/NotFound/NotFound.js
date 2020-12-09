@@ -1,12 +1,16 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-
-import Alert from "../../Alert";
+import { Alert } from "antd";
+import PageContainer from "../../PageContainer";
 
 const NotFound = () => {
     const { t } = useTranslation();
 
-    return <Alert color="error">{t("notFound.message")}</Alert>;
+    return (
+        <PageContainer>
+            <Alert type="error" message="Error" description={t("notFound.message")} showIcon />;
+        </PageContainer>
+    );
 };
 
 export default NotFound;
