@@ -17,9 +17,10 @@ const WidgetContainer = styled.div`
     }
 `;
 
-const Widget = ({ id, bounds, onMouseDown, children }) => {
+const Widget = ({ elementRef, id, bounds, onMouseDown, children }) => {
     return (
         <WidgetContainer
+            ref={elementRef}
             id={id}
             top={bounds.top}
             left={bounds.left}

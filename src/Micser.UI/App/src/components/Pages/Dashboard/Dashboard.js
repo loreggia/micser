@@ -4,7 +4,9 @@ import styled from "styled-components";
 import PageContainer from "../../PageContainer";
 import WidgetPanel from "../../WidgetPanel";
 
-const WidgetCard = styled(Card)``;
+const WidgetCard = styled(Card)`
+    box-shadow: 0 0 12px 0 rgba(255, 255, 255, 0.36);
+`;
 
 const Dashboard = () => {
     const [layout, setLayout] = useState([]);
@@ -34,7 +36,9 @@ const Dashboard = () => {
         <PageContainer noPadding>
             <WidgetPanel layout={layout} onLayoutChanged={(l) => setLayout(l)}>
                 {widgets.map((w) => (
-                    <WidgetCard key={w.id}>{w.header}</WidgetCard>
+                    <WidgetCard key={w.id} size="small" hoverable title={w.header}>
+                        Widget Content
+                    </WidgetCard>
                 ))}
             </WidgetPanel>
         </PageContainer>

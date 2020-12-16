@@ -1,12 +1,14 @@
-import React, { Children, useCallback, useEffect, useLayoutEffect, useState } from "react";
+import React, { Children, useCallback, useLayoutEffect, useState } from "react";
 import PropTypes from "prop-types";
 import styled from "styled-components";
 import { Widget } from "./components";
+import { useDragging } from "./hooks";
 
 const Container = styled.div`
     position: relative;
     width: 100%;
     height: 100%;
+    overflow: auto;
 `;
 
 const getLayoutItem = (layout, id) => {
@@ -14,8 +16,6 @@ const getLayoutItem = (layout, id) => {
 };
 
 const WidgetPanel = ({ layout, onLayoutChanged, children }) => {
-    const [dragStart, setDragStart] = useState();
-    const [origPos, setOrigPos] = useState();
     const [draggingWidget, setDraggingWidget] = useState();
 
     const updateLayout = useCallback(() => {
@@ -26,8 +26,8 @@ const WidgetPanel = ({ layout, onLayoutChanged, children }) => {
                 if (item === layoutItem) {
                     newItem.bounds = {
                         ...newItem.bounds,
-                        top: Number(draggingWidget.style.top.replace(/[a-z]+/, "")),
-                        left: Number(draggingWidget.style.left.replace(/[a-z]+/, "")),
+                        top: draggingWidget.offsetTop,
+                        left: draggingWidget.offsetLeft,
                     };
                 }
                 return newItem;
@@ -36,50 +36,16 @@ const WidgetPanel = ({ layout, onLayoutChanged, children }) => {
         }
     }, [draggingWidget, layout, onLayoutChanged]);
 
-    const handleMouseMove = useCallback(
-        (e) => {
-            if (!draggingWidget) {
-                return;
-            }
-            const { clientX, clientY } = e;
-
-            draggingWidget.style.left = origPos.left - (dragStart.left - clientX) + "px";
-            draggingWidget.style.top = origPos.top - (dragStart.top - clientY) + "px";
-        },
-        [dragStart, draggingWidget, origPos]
-    );
-
-    const handleMouseUp = useCallback(() => {
+    const onDragStart = useCallback((element) => {
+        setDraggingWidget(element);
+    }, []);
+    const onDrag = useCallback(() => {}, []);
+    const onDragEnd = useCallback(() => {
         updateLayout();
         setDraggingWidget();
     }, [updateLayout]);
 
-    const handleMouseDown = useCallback(
-        (e) => {
-            const widget = e.currentTarget;
-
-            if (!widget) {
-                return;
-            }
-
-            e.preventDefault();
-            setDraggingWidget(widget);
-            const layoutItem = getLayoutItem(layout, widget.id);
-            setOrigPos({ left: layoutItem.bounds.left, top: layoutItem.bounds.top });
-            setDragStart({ left: e.clientX, top: e.clientY });
-        },
-        [layout]
-    );
-
-    useEffect(() => {
-        window.addEventListener("mousemove", handleMouseMove);
-        window.addEventListener("mouseup", handleMouseUp);
-
-        return () => {
-            window.removeEventListener("mousemove", handleMouseMove);
-            window.removeEventListener("mouseup", handleMouseUp);
-        };
-    }, [handleMouseMove, handleMouseUp]);
+    const registerDragElement = useDragging({ onDragStart, onDrag, onDragEnd });
 
     useLayoutEffect(() => {}, [layout]);
 
@@ -95,7 +61,7 @@ const WidgetPanel = ({ layout, onLayoutChanged, children }) => {
         }
 
         return (
-            <Widget id={layoutItem.id} bounds={layoutItem.bounds} onMouseDown={handleMouseDown}>
+            <Widget elementRef={registerDragElement} id={layoutItem.id} bounds={layoutItem.bounds}>
                 {child}
             </Widget>
         );
