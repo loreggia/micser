@@ -34,6 +34,24 @@ namespace Micser.Common.Modules
         }
 
         /// <summary>
+        /// Gets or sets the left UI position.
+        /// </summary>
+        public float Left
+        {
+            get => TryGetValue(nameof(Left), out var value) ? value.ToType<float>() : default;
+            set => this[nameof(Left)] = value.ToType<string>();
+        }
+
+        /// <summary>
+        /// Gets or sets the top UI position.
+        /// </summary>
+        public float Top
+        {
+            get => TryGetValue(nameof(Top), out var value) ? value.ToType<float>() : default;
+            set => this[nameof(Top)] = value.ToType<string>();
+        }
+
+        /// <summary>
         /// Gets or sets a value whether the module uses the current system output volume.
         /// </summary>
         public bool UseSystemVolume

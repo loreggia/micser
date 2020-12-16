@@ -1,46 +1,56 @@
-import { Card } from "antd";
-import React, { useEffect, useMemo, useState } from "react";
-import styled from "styled-components";
+import React, { useCallback, useEffect, useMemo } from "react";
+import ReactFlow, { Background, Controls } from "react-flow-renderer";
+import { useApi } from "../../../hooks";
+import Loader from "../../Loader";
 import PageContainer from "../../PageContainer";
-import WidgetPanel from "../../WidgetPanel";
-
-const WidgetCard = styled(Card)`
-    box-shadow: 0 0 12px 0 rgba(255, 255, 255, 0.36);
-`;
 
 const Dashboard = () => {
-    const [layout, setLayout] = useState([]);
+    const [elements, setElements] = useState([]);
+    const [modulesApi, isLoadingModules] = useApi("Modules");
+    const [moduleConnectionsApi, isLoadingModuleConnections] = useApi("ModuleConnections");
 
-    const widgets = useMemo(
-        () => [
-            {
-                id: 1,
-                header: "Widget 1",
-                bounds: { top: 10, left: 10, width: 200, height: 100 },
-            },
-            {
-                id: 2,
-                header: "Widget 2",
-                bounds: { top: 200, left: 40, width: 200, height: 200 },
-            },
-        ],
-        []
-    );
+    const loadData = useCallback(async () => {
+        const pModules = modulesApi("/");
+        const pModuleConnections = moduleConnectionsApi("/");
+        const [modules, moduleConnections] = await Promise.all([pModules, pModuleConnections]);
+
+        if (modules.data && moduleConnections.data) {
+            const moduleElements = modules.data.map((dto) => ({
+                id: String(dto.id),
+                type: dto.widgetType,
+                position: { x: dto.state.left, y: dto.state.top },
+                data: dto.state,
+            }));
+            const connectionElements = moduleConnections.data.map((dto) => ({
+                id: String(dto.id),
+                source: String(dto.sourceId),
+                target: String(dto.targetId),
+                sourceHandle: dto.sourceConnectorName,
+                targetHandle: dto.targetConnectorName,
+                animated: true,
+                arrowHeadType: "arrow",
+            }));
+
+            setElements(moduleElements.concat(connectionElements));
+        }
+    }, [modulesApi, moduleConnectionsApi]);
 
     useEffect(() => {
-        const layout = widgets.map((w) => ({ id: w.id, bounds: w.bounds }));
-        setLayout(layout);
-    }, [widgets]);
+        loadData();
+    }, [loadData]);
+
+    const isLoading = isLoadingModules || isLoadingModuleConnections;
 
     return (
         <PageContainer noPadding>
-            <WidgetPanel layout={layout} onLayoutChanged={(l) => setLayout(l)}>
-                {widgets.map((w) => (
-                    <WidgetCard key={w.id} size="small" hoverable title={w.header}>
-                        Widget Content
-                    </WidgetCard>
-                ))}
-            </WidgetPanel>
+            {isLoading ? (
+                <Loader />
+            ) : (
+                <ReactFlow elements={elements} nodeTypes={nodeTypes} snapToGrid snapGrid={[10, 10]}>
+                    <Controls />
+                    <Background variant="dots" size={1} gap={10} color="#333" />
+                </ReactFlow>
+            )}
         </PageContainer>
     );
 };
