@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import ReactFlow, { Background, Controls } from "react-flow-renderer";
 import { useApi } from "../../../hooks";
 import Loader from "../../Loader";
@@ -34,6 +34,9 @@ const Dashboard = () => {
             setElements(moduleElements.concat(connectionElements));
         }
     }, [modulesApi, moduleConnectionsApi]);
+
+    // todo
+    const nodeTypes = [];
 
     useEffect(() => {
         loadData();

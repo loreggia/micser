@@ -8,7 +8,7 @@ const NotFound = () => {
 
     return (
         <PageContainer>
-            <Alert type="error" message="Error" description={t("notFound.message")} showIcon />;
+            <Alert type="error" message="Error" description={t("notFound.message")} showIcon />
         </PageContainer>
     );
 };

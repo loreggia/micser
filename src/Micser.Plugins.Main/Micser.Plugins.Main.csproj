@@ -23,4 +23,6 @@
     </EmbeddedResource>
   </ItemGroup>
 
+  <Import Project="..\Micser.Common\Build\UI.targets" />
+
 </Project>

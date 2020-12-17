@@ -64,6 +64,8 @@ namespace Micser.UI
                     app.UseApiExceptionHandler(_logger);
 
                     app.UseRouting();
+
+                    app.UseStaticFiles();
                     app.UseSpecificSpaStaticFiles(options =>
                         options
                             .WithRootPath(_environment.IsDevelopment()
