@@ -1,10 +1,14 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import ReactFlow, { Background, Controls } from "react-flow-renderer";
-import { useApi } from "../../../hooks";
-import Loader from "../../Loader";
+
 import PageContainer from "../../PageContainer";
+import Loader from "../../Loader";
+
+import { useApi } from "../../../hooks";
+import { PluginsContext } from "../../../hooks/usePlugins";
 
 const Dashboard = () => {
+    const plugins = useContext(PluginsContext);
     const [elements, setElements] = useState([]);
     const [modulesApi, isLoadingModules] = useApi("Modules");
     const [moduleConnectionsApi, isLoadingModuleConnections] = useApi("ModuleConnections");
@@ -35,11 +39,21 @@ const Dashboard = () => {
         }
     }, [modulesApi, moduleConnectionsApi]);
 
-    // todo
-    const nodeTypes = [];
+    const nodeTypes = useMemo(() => {
+        return plugins
+            .map((plugin) => {
+                if (plugin.widgets && plugin.widgets.length) {
+                    return plugin.widgets.reduce((x, w) => ({ ...x, [w.name]: w.component }), {});
+                }
+                return {};
+            })
+            .reduce((x, c) => ({ ...x, ...c }), {});
+    }, [plugins]);
+
+    console.log(nodeTypes);
 
     useEffect(() => {
-        // loadData();
+        loadData();
     }, [loadData]);
 
     const isLoading = isLoadingModules || isLoadingModuleConnections;
