@@ -2,7 +2,7 @@ import React from "react";
 import { DeviceInputWidget } from "./components";
 
 const Plugin = () => {
-  return {
+  const plugin = {
     name: "Main",
     widgets: [
       {
@@ -11,6 +11,9 @@ const Plugin = () => {
       },
     ],
   };
+
+  window.plugins = window.plugins || [];
+  window.plugins.push(plugin);
 };
 
-export default Plugin;
+Plugin();

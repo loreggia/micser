@@ -39,7 +39,7 @@ const Dashboard = () => {
     const nodeTypes = [];
 
     useEffect(() => {
-        loadData();
+        // loadData();
     }, [loadData]);
 
     const isLoading = isLoadingModules || isLoadingModuleConnections;

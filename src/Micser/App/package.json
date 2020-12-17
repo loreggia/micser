@@ -13,6 +13,7 @@
         "fontsource-roboto": "^3.0.3",
         "i18next": "^19.8.4",
         "i18next-http-backend": "^1.0.21",
+        "little-loader": "^0.2.0",
         "lodash": "^4.17.20",
         "prop-types": "^15.7.2",
         "react": "^17.0.1",

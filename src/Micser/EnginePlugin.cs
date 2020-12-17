@@ -8,6 +8,8 @@ namespace Micser
 {
     public class EnginePlugin : IPlugin
     {
+        public bool HasUI => false;
+
         public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
         }

@@ -13,7 +13,6 @@ namespace Micser
                 .ConfigureWebHostDefaults(webHostBuilder =>
                 {
                     webHostBuilder.UseStartup<Startup>();
-                    webHostBuilder.UseSetting(WebHostDefaults.HostingStartupAssembliesKey, "Micser.UI");
                 });
         }
 

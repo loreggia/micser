@@ -9,6 +9,8 @@ namespace Micser.Plugins.Main
 {
     public class MainPlugin : IPlugin
     {
+        public bool HasUI => true;
+
         public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {
             services.AddAudioModules(

@@ -1,10 +1,15 @@
 ﻿using System;
 using System.Diagnostics;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
+using Microsoft.Extensions.FileProviders.Physical;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using Micser.Audio;
 using Micser.Common;
 using Micser.Common.Audio;
@@ -16,6 +21,7 @@ using Micser.Common.Updates;
 using Micser.DataAccess;
 using Micser.Services;
 using Micser.Settings;
+using Micser.UI.Infrastructure;
 
 namespace Micser
 {
@@ -28,12 +34,49 @@ namespace Micser
 
         public IConfiguration Configuration { get; }
 
-        public void Configure(IApplicationBuilder app)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment environment, ILogger<Startup> logger)
         {
             var lifetime = app.ApplicationServices.GetRequiredService<IHostApplicationLifetime>();
             lifetime.ApplicationStopping.Register(OnStopping);
 
             app.ApplicationServices.UseModules();
+
+            if (environment.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+            else
+            {
+                app.UseHsts();
+            }
+
+            app.UseHttpsRedirection();
+
+            app.UseApiExceptionHandler(logger);
+
+            app.UseRouting();
+
+            app.UseStaticFiles();
+            app.UseSpecificSpaStaticFiles(options =>
+                options
+                    .WithRootPath(environment.IsDevelopment()
+                        ? "App/public"
+                        : "App/build")
+                    .WithRequestPaths("/locales")
+            );
+            app.UseEndpoints(endpoints =>
+            {
+                endpoints.MapControllers();
+            });
+
+            app.UseSpa(spa =>
+            {
+                spa.Options.SourcePath = "App";
+                if (environment.IsDevelopment())
+                {
+                    spa.UseReactDevelopmentServer("start");
+                }
+            });
 
             var dbContextFactory = app.ApplicationServices.GetRequiredService<IDbContextFactory<EngineDbContext>>();
             using var dbContext = dbContextFactory.CreateDbContext();
@@ -43,6 +86,18 @@ namespace Micser
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddNlog("Micser.Engine.log");
+
+            services.AddControllers();
+            services.AddSignalR(options =>
+            {
+                // increase max message size for spectrum data
+                options.MaximumReceiveMessageSize = 1024 * 1000;
+            });
+
+            services.AddSingleton<IFileProvider>(sp => new PhysicalFileProvider(sp.GetRequiredService<IWebHostEnvironment>().ContentRootPath, ExclusionFilters.Sensitive));
+
+            // In production, the React files will be served from this directory
+            services.AddSpaStaticFiles(configuration => configuration.RootPath = "App/build");
 
             services.AddModules<IPlugin>(Configuration, typeof(EnginePlugin));
 
