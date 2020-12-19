@@ -1,9 +1,7 @@
-import { useCallback, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import AxiosStatic from "axios";
-import trimStart from "lodash/trimStart";
-import trimEnd from "lodash/trimEnd";
 
-const useApi = (baseUrl, { defaultMethod } = { defaultMethod: "get" }) => {
+const useApi = (url, { autoLoad, method, data } = { autoLoad: true, method: "get" }) => {
     const axios = useMemo(
         () =>
             AxiosStatic.create({
@@ -12,23 +10,26 @@ const useApi = (baseUrl, { defaultMethod } = { defaultMethod: "get" }) => {
         []
     );
 
+    const [result, setResult] = useState();
     const [isLoading, setIsLoading] = useState(false);
+    const [isLoaded, setIsLoaded] = useState(false);
+    const [error, setError] = useState();
+    const [refreshIndex, setRefreshIndex] = useState(0);
 
-    const resolveMethod = useCallback((method) => (method || defaultMethod || "get").toLowerCase(), [defaultMethod]);
-    const resolveUrl = useCallback((url) => trimEnd(baseUrl, "/") + "/" + trimStart(url, "/"), [baseUrl]);
+    const refresh = () => {
+        setRefreshIndex(refreshIndex + 1);
+    };
 
-    const action = useCallback(
-        async ({ action, data, method, isCancelled = () => false } = {}) => {
-            let result = null;
+    useEffect(() => {
+        let isCancelled = false;
 
-            if (isCancelled()) {
-                return result;
-            }
-
+        const loadAsync = async () => {
             setIsLoading(true);
+            setIsLoaded(false);
+
             try {
-                const url = resolveUrl(action);
-                switch (resolveMethod(method)) {
+                let result = null;
+                switch (method) {
                     case "get":
                         result = await axios.get(url, {
                             params: data,
@@ -48,25 +49,38 @@ const useApi = (baseUrl, { defaultMethod } = { defaultMethod: "get" }) => {
                     default:
                         throw new Error("Invalid method");
                 }
+                if (!isCancelled) {
+                    setResult(result.data);
+                    setError(null);
+                    setIsLoading(false);
+                    setIsLoaded(true);
+                }
             } catch (error) {
                 console.log(error);
-                // onError &&
-                //     onError(
-                //         error.response && error.response.data
-                //             ? error.response.data
-                //             : { statusCode: 500, message: "Unknown error." }
-                //     );
+                if (!isCancelled) {
+                    setError(
+                        error.response && error.response.data
+                            ? error.response.data
+                            : { statusCode: 500, message: "Unknown error." }
+                    );
+                }
             } finally {
-                if (!isCancelled()) {
+                if (!isCancelled) {
                     setIsLoading(false);
                 }
             }
-            return result;
-        },
-        [resolveUrl, resolveMethod, axios]
-    );
+        };
 
-    return [action, isLoading];
+        if (autoLoad || refreshIndex > 1) {
+            loadAsync();
+        }
+
+        return () => {
+            isCancelled = true;
+        };
+    }, [axios, url, autoLoad, method, data, refreshIndex]);
+
+    return [result, isLoading, refresh, isLoaded, error];
 };
 
 export default useApi;

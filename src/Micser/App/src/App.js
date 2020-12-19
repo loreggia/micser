@@ -14,13 +14,13 @@ import "./App.less";
 const App = () => {
     const [plugins, isLoading] = usePlugins();
 
-    return isLoading ? (
-        <Loader />
-    ) : (
+    return (
         <PluginsContext.Provider value={plugins}>
             <Suspense fallback={<Loader />}>
                 <Router>
                     <Layout style={{ minHeight: "100vh" }}>
+                        {isLoading && <Loader />}
+
                         <Navigation />
 
                         <Layout>

@@ -1,13 +1,15 @@
 import React, { createContext, useEffect, useState } from "react";
 import ReactDOM from "react-dom";
 import * as antd from "antd";
+import styled from "styled-components";
 import load from "little-loader";
 
 import useApi from "./useApi";
 
 window.React = React;
 window.ReactDOM = ReactDOM;
-window.antd = antd;
+window.Antd = antd;
+window.StyledComponents = styled;
 window.process = { env: {} };
 
 export const PluginsContext = createContext([]);
@@ -25,30 +27,41 @@ const loadModuleAsync = (fileName, moduleName) => {
 };
 
 const usePlugins = () => {
-    const [pluginsApi, isLoading] = useApi("plugins");
+    const [pluginDefinitions, isLoading] = useApi("plugins");
     const [plugins, setPlugins] = useState([]);
 
     useEffect(() => {
-        const loadPlugins = async () => {
-            const result = await pluginsApi();
-            if (result.data) {
-                const plugins = [];
+        let isMounted = true;
 
-                for (let i = 0; i < result.data.length; i++) {
-                    let { assemblyName, moduleName } = result.data[i];
-                    let fileName = `/_content/${assemblyName}/plugin.js`;
-                    console.log("Loading plugin: " + fileName);
-                    let module = await loadModuleAsync(fileName, moduleName);
-                    let plugin = module.default();
-                    plugins.push(plugin);
+        const loadPluginsAsync = async () => {
+            const result = [];
+
+            for (let i = 0; i < pluginDefinitions.length; i++) {
+                let { assemblyName, moduleName } = pluginDefinitions[i];
+                let fileName = `/_content/${assemblyName}/plugin.js`;
+
+                console.log("Loading plugin: " + fileName);
+                let module = await loadModuleAsync(fileName, moduleName);
+
+                if (!isMounted) {
+                    return;
                 }
 
-                setPlugins(plugins);
+                let plugin = module.default();
+                result.push(plugin);
             }
+
+            setPlugins(result);
         };
 
-        loadPlugins();
-    }, [pluginsApi]);
+        if (pluginDefinitions) {
+            loadPluginsAsync();
+        }
+
+        return () => {
+            isMounted = false;
+        };
+    }, [pluginDefinitions]);
 
     return [plugins, isLoading];
 };

@@ -1,33 +1,32 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React from "react";
+import styled from "styled-components";
 import { Select } from "antd";
+import { Loader } from "../../../../Micser/App/src/components";
 import { useApi } from "../../../../Micser/App/src/hooks";
 
 const { Option } = Select;
 
+const Container = styled.div`
+    position: relative;
+    min-width: 100px;
+    max-width: 500px;
+`;
+
 const DeviceOutputWidget = ({ data }) => {
-    const [devices, setDevices] = useState([]);
-    const [devicesApi, isLoadingDevicesApi] = useApi("devices");
-
-    const loadDevices = useCallback(async () => {
-        const result = await devicesApi({ action: "Output" });
-        if (result.data) {
-            setDevices(result.data);
-        }
-    }, [devicesApi]);
-
-    useEffect(() => {
-        loadDevices();
-    }, []);
+    const [devices, isLoading] = useApi("Devices/Output");
 
     return (
-        <div>
-            {devices.map((d, i) => (
-                <p key={i}>
-                    {d.friendlyName}
-                    <br />
-                </p>
-            ))}
-        </div>
+        <Container>
+            {isLoading && <Loader />}
+            <Select defaultValue={data.state.deviceId}>
+                {devices &&
+                    devices.map((device) => (
+                        <Option key={device.id} value={device.id}>
+                            {device.friendlyName}
+                        </Option>
+                    ))}
+            </Select>
+        </Container>
     );
 };
 

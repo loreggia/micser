@@ -17,7 +17,7 @@ module.exports = {
                 options: {
                     presets: ["@babel/preset-env", "@babel/preset-react"],
                 },
-                include: [path.resolve(__dirname, "src")],
+                // include: [path.resolve(__dirname, "src")],
                 exclude: /node_modules/,
             },
         ],
@@ -25,6 +25,7 @@ module.exports = {
     externals: {
         react: "React",
         "react-dom": "ReactDOM",
-        antd: "antd",
+        antd: "Antd",
+        "styled-components": "StyledComponents",
     },
 };
