@@ -1,11 +1,13 @@
 import React, { createContext, useEffect, useState } from "react";
 import ReactDOM from "react-dom";
+import * as antd from "antd";
 import load from "little-loader";
 
 import useApi from "./useApi";
 
 window.React = React;
 window.ReactDOM = ReactDOM;
+window.antd = antd;
 window.process = { env: {} };
 
 export const PluginsContext = createContext([]);

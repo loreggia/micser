@@ -1,5 +1,8 @@
 import React, { useCallback, useEffect, useState } from "react";
+import { Select } from "antd";
 import { useApi } from "../../../../Micser/App/src/hooks";
+
+const { Option } = Select;
 
 const DeviceOutputWidget = ({ data }) => {
     const [devices, setDevices] = useState([]);
