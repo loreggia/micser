@@ -1,18 +1,21 @@
-import { DeviceInputWidget } from "./components";
+import { DeviceInputWidget, DeviceOutputWidget } from "./components";
 
 const Plugin = () => {
-  const plugin = {
-    name: "Main",
-    widgets: [
-      {
-        name: "DeviceInput",
-        component: DeviceInputWidget,
-      },
-    ],
-  };
-
-  window.plugins = window.plugins || [];
-  window.plugins.push(plugin);
+    return {
+        name: "Main",
+        widgets: [
+            {
+                name: "DeviceInput",
+                content: DeviceInputWidget,
+                outputHandles: ["Output01"],
+            },
+            {
+                name: "DeviceOutput",
+                content: DeviceOutputWidget,
+                inputHandles: ["Input01"],
+            },
+        ],
+    };
 };
 
-Plugin();
+export default Plugin;

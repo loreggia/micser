@@ -10,9 +10,9 @@ namespace Micser.Common
     public interface IPlugin
     {
         /// <summary>
-        /// Gets whether this plugin has a UI plugin component.
+        /// Gets this plugins UI module name (configured in plugin webpack config).
         /// </summary>
-        bool HasUI { get; }
+        string? UIModuleName { get; }
 
         /// <summary>
         /// Lets the module register its types in the DI container.

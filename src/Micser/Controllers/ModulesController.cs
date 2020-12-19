@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
+using Micser.Common.Controllers;
 using Micser.Common.Modules;
 using Micser.Common.Services;
 
-namespace Micser.UI.Controllers
+namespace Micser.Controllers
 {
     public class ModulesController : ApiController
     {

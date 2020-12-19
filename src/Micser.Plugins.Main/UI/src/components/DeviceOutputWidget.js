@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useApi } from "../../../../Micser/App/src/hooks";
 
-const DeviceInputWidget = ({ data }) => {
+const DeviceOutputWidget = ({ data }) => {
     const [devices, setDevices] = useState([]);
     const [devicesApi, isLoadingDevicesApi] = useApi("devices");
 
     const loadDevices = useCallback(async () => {
-        const result = await devicesApi({ action: "Input" });
+        const result = await devicesApi({ action: "Output" });
         if (result.data) {
             setDevices(result.data);
         }
@@ -28,4 +28,4 @@ const DeviceInputWidget = ({ data }) => {
     );
 };
 
-export default DeviceInputWidget;
+export default DeviceOutputWidget;

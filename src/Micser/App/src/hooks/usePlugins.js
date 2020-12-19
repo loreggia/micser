@@ -1,9 +1,26 @@
-import { createContext, useEffect, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
+import ReactDOM from "react-dom";
 import load from "little-loader";
 
 import useApi from "./useApi";
 
+window.React = React;
+window.ReactDOM = ReactDOM;
+window.process = { env: {} };
+
 export const PluginsContext = createContext([]);
+
+const loadModuleAsync = (fileName, moduleName) => {
+    return new Promise((resolve, reject) => {
+        load(fileName, (err) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve(window[moduleName]);
+            }
+        });
+    });
+};
 
 const usePlugins = () => {
     const [pluginsApi, isLoading] = useApi("plugins");
@@ -13,22 +30,18 @@ const usePlugins = () => {
         const loadPlugins = async () => {
             const result = await pluginsApi();
             if (result.data) {
-                const promises = result.data.map((name) => {
-                    const fileName = `/_content/${name}/plugin.js`;
+                const plugins = [];
+
+                for (let i = 0; i < result.data.length; i++) {
+                    let { assemblyName, moduleName } = result.data[i];
+                    let fileName = `/_content/${assemblyName}/plugin.js`;
                     console.log("Loading plugin: " + fileName);
-                    return new Promise((resolve) => {
-                        load(fileName, (err) => {
-                            if (err) {
-                                console.error(err);
-                            }
-                            resolve();
-                        });
-                    });
-                });
+                    let module = await loadModuleAsync(fileName, moduleName);
+                    let plugin = module.default();
+                    plugins.push(plugin);
+                }
 
-                await Promise.all(promises);
-
-                setPlugins(window.plugins || []);
+                setPlugins(plugins);
             }
         };
 

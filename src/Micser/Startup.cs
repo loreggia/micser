@@ -104,6 +104,8 @@ namespace Micser
             services.AddDbContext<EngineDbContext>(Configuration.GetConnectionString("DefaultConnection"));
 
             services.AddSingleton<IEventAggregator, EventAggregator>();
+
+            services.AddSingleton<DeviceService>();
             services.AddSingleton<IAudioEngine, AudioEngine>();
 
             services.AddTransient<IModuleService, ModuleService>();

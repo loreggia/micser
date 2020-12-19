@@ -9,7 +9,7 @@ namespace Micser.Plugins.Main
 {
     public class MainPlugin : IPlugin
     {
-        public bool HasUI => true;
+        public string UIModuleName => "micser-plugins-main";
 
         public void ConfigureServices(IServiceCollection services, IConfiguration configuration)
         {

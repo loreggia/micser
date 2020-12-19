@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Micser.Common;
+using Micser.Common.Controllers;
 
-namespace Micser.UI.Controllers
+namespace Micser.Controllers
 {
     public class PluginsController : ApiController
     {
@@ -16,12 +17,22 @@ namespace Micser.UI.Controllers
         }
 
         [Route("")]
-        public IEnumerable<string> GetPluginNames()
+        public IEnumerable<PluginDescription> GetPluginNames()
         {
             return _plugins
-                .Where(p => p.HasUI)
-                .Select(p => p.GetType().Assembly.GetName().Name ?? throw new InvalidOperationException("Plugin assembly could not be determined."))
+                .Where(p => p.UIModuleName != null)
+                .Select(p => new PluginDescription
+                {
+                    AssemblyName = p.GetType().Assembly.GetName().Name ?? throw new InvalidOperationException("Plugin assembly could not be determined."),
+                    ModuleName = p.UIModuleName!
+                })
                 .ToArray();
+        }
+
+        public class PluginDescription
+        {
+            public string AssemblyName { get; init; }
+            public string ModuleName { get; init; }
         }
     }
 }

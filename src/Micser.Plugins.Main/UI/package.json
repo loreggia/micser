@@ -1,25 +1,25 @@
 {
-  "name": "micser-plugins-main",
-  "version": "1.0.0",
-  "main": "dist/plugin.js",
-  "author": "Lucas Loreggia",
-  "license": "MIT",
-  "private": true,
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "webpack"
-  },
-  "dependencies": {
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1",
-    "react-flow-renderer": "^8.2.1"
-  },
-  "devDependencies": {
-    "@babel/core": "^7.12.10",
-    "@babel/preset-env": "^7.12.11",
-    "@babel/preset-react": "^7.12.10",
-    "babel-loader": "^8.2.2",
-    "webpack": "^5.10.3",
-    "webpack-cli": "^4.2.0"
-  }
+    "name": "micser-plugins-main",
+    "version": "1.0.0",
+    "main": "dist/plugin.js",
+    "author": "Lucas Loreggia",
+    "license": "MIT",
+    "private": true,
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "build": "webpack --mode production"
+    },
+    "dependencies": {
+        "react": "^17.0.1",
+        "react-dom": "^17.0.1"
+    },
+    "devDependencies": {
+        "@babel/core": "^7.12.10",
+        "@babel/preset-env": "^7.12.11",
+        "@babel/preset-react": "^7.12.10",
+        "babel-loader": "^8.2.2",
+        "webpack": "^5.10.3",
+        "webpack-cli": "^4.2.0",
+        "webpack-node-externals": "^2.5.2"
+    }
 }

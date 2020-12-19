@@ -3,7 +3,7 @@ import AxiosStatic from "axios";
 import trimStart from "lodash/trimStart";
 import trimEnd from "lodash/trimEnd";
 
-const useApi = (baseUrl, { defaultMethod, onError } = { defaultMethod: "get" }) => {
+const useApi = (baseUrl, { defaultMethod } = { defaultMethod: "get" }) => {
     const axios = useMemo(
         () =>
             AxiosStatic.create({
@@ -18,8 +18,13 @@ const useApi = (baseUrl, { defaultMethod, onError } = { defaultMethod: "get" }) 
     const resolveUrl = useCallback((url) => trimEnd(baseUrl, "/") + "/" + trimStart(url, "/"), [baseUrl]);
 
     const action = useCallback(
-        async (action, data, method) => {
+        async ({ action, data, method, isCancelled = () => false } = {}) => {
             let result = null;
+
+            if (isCancelled()) {
+                return result;
+            }
+
             setIsLoading(true);
             try {
                 const url = resolveUrl(action);
@@ -45,18 +50,20 @@ const useApi = (baseUrl, { defaultMethod, onError } = { defaultMethod: "get" }) 
                 }
             } catch (error) {
                 console.log(error);
-                onError &&
-                    onError(
-                        error.response && error.response.data
-                            ? error.response.data
-                            : { statusCode: 500, message: "Unknown error." }
-                    );
+                // onError &&
+                //     onError(
+                //         error.response && error.response.data
+                //             ? error.response.data
+                //             : { statusCode: 500, message: "Unknown error." }
+                //     );
             } finally {
-                setIsLoading(false);
+                if (!isCancelled()) {
+                    setIsLoading(false);
+                }
             }
             return result;
         },
-        [resolveUrl, resolveMethod, axios, onError]
+        [resolveUrl, resolveMethod, axios]
     );
 
     return [action, isLoading];
