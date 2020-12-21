@@ -6,12 +6,34 @@ import PageContainer from "../../PageContainer";
 
 import { PluginsContext } from "../../../hooks/usePlugins";
 import Widget, { WidgetTypesContext } from "./Widget";
+import { notification } from "antd";
+
+const showError = (error) => {
+    if (error) {
+        notification.open({
+            message: "Error",
+            description: error.message || error,
+            type: "error",
+        });
+    }
+};
 
 const Dashboard = () => {
     const plugins = useContext(PluginsContext);
     const [elements, setElements] = useState([]);
-    const [modules, isLoadingModules] = useApi("Modules");
-    const [moduleConnections, isLoadingModuleConnections] = useApi("ModuleConnections");
+    const [modules, isLoadingModules, refreshModules, modulesLoaded, modulesError] = useApi("Modules");
+    const [
+        moduleConnections,
+        isLoadingModuleConnections,
+        refreshModuleConnections,
+        moduleConnectionsLoaded,
+        moduleConnectionsError,
+    ] = useApi("ModuleConnections");
+
+    useEffect(() => {
+        showError(modulesError);
+        showError(moduleConnectionsError);
+    }, [modulesError, moduleConnectionsError]);
 
     const widgetTypes = useMemo(() => {
         return plugins.reduce((prev, curr) => prev.concat(curr.widgets), []);

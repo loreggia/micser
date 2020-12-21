@@ -10,6 +10,7 @@ module.exports = {
         libraryTarget: "umd",
         umdNamedDefine: true,
     },
+    devtool: "source-map",
     module: {
         rules: [
             {
