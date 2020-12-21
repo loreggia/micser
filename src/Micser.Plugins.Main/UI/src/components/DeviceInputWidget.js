@@ -1,31 +1,25 @@
 import React from "react";
-import styled from "styled-components";
 import { Select } from "antd";
 import { Loader, useApi } from "micser-common";
+import { DeviceSelect, WidgetContainer } from "./Common";
 
 const { Option } = Select;
-
-const Container = styled.div`
-    position: relative;
-    min-width: 100px;
-    max-width: 500px;
-`;
 
 const DeviceInputWidget = ({ data }) => {
     const [devices, isLoading] = useApi("Devices/Input");
 
     return (
-        <Container>
+        <WidgetContainer>
             {isLoading && <Loader />}
-            <Select defaultValue={data.state.deviceId}>
+            <DeviceSelect defaultValue={data.state.deviceId} dropdownMatchSelectWidth={false}>
                 {devices &&
                     devices.map((device) => (
                         <Option key={device.id} value={device.id}>
                             {device.friendlyName}
                         </Option>
                     ))}
-            </Select>
-        </Container>
+            </DeviceSelect>
+        </WidgetContainer>
     );
 };
 

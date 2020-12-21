@@ -3,6 +3,21 @@
 @import "./Theme.less";
 
 // fixes
-.react-flow__controls-button {
-    box-sizing: content-box;
+.react-flow {
+    &__controls-button {
+        box-sizing: content-box;
+    }
+
+    &__handle {
+        width: 16px;
+        height: 16px;
+
+        &-left {
+            left: -8px;
+        }
+
+        &-right {
+            right: -8px;
+        }
+    }
 }
