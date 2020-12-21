@@ -1,4 +1,5 @@
 const path = require("path");
+const nodeExternals = require("webpack-node-externals");
 
 module.exports = {
     entry: "./src/index.js",
@@ -17,15 +18,40 @@ module.exports = {
                 options: {
                     presets: ["@babel/preset-env", "@babel/preset-react"],
                 },
-                // include: [path.resolve(__dirname, "src")],
+                include: [path.resolve(__dirname, "src")],
                 exclude: /node_modules/,
             },
         ],
     },
-    externals: {
-        react: "React",
-        "react-dom": "ReactDOM",
-        antd: "Antd",
-        "styled-components": "StyledComponents",
-    },
+    externals: [nodeExternals()],
+    // externals: {
+    //     react: {
+    //         root: "React",
+    //         commonjs2: "react",
+    //         commonjs: "react",
+    //         amd: "react",
+    //         umd: "react",
+    //     },
+    //     "react-dom": {
+    //         root: "ReactDOM",
+    //         commonjs2: "react-dom",
+    //         commonjs: "react-dom",
+    //         amd: "react-dom",
+    //         umd: "react-dom",
+    //     },
+    //     antd: {
+    //         root: "Antd",
+    //         commonjs2: "antd",
+    //         commonjs: "antd",
+    //         amd: "antd",
+    //         umd: "antd",
+    //     },
+    //     "micser-common": {
+    //         root: "MicserCommon",
+    //         commonjs2: "micser-common",
+    //         commonjs: "micser-common",
+    //         amd: "micser-common",
+    //         umd: "micser-common",
+    //     },
+    // },
 };

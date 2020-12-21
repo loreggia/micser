@@ -1,15 +1,15 @@
-import React, { createContext, useEffect, useState } from "react";
-import ReactDOM from "react-dom";
-import * as antd from "antd";
-import styled from "styled-components";
+import { createContext, useEffect, useState } from "react";
+// import ReactDOM from "react-dom";
+// import * as antd from "antd";
+// import styled from "styled-components";
 import load from "little-loader";
+import { useApi } from "micser-common";
 
-import useApi from "./useApi";
-
-window.React = React;
-window.ReactDOM = ReactDOM;
-window.Antd = antd;
-window.StyledComponents = styled;
+// window.React = React;
+// window.ReactDOM = ReactDOM;
+// window.Antd = antd;
+// window.StyledComponents = styled;
+// window.MicserCommon = MicserCommon;
 window.process = { env: {} };
 
 export const PluginsContext = createContext([]);

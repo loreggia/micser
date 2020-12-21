@@ -1,10 +1,9 @@
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import ReactFlow, { Background, Controls } from "react-flow-renderer";
+import { Loader, useApi } from "micser-common";
 
 import PageContainer from "../../PageContainer";
-import Loader from "../../Loader";
 
-import { useApi } from "../../../hooks";
 import { PluginsContext } from "../../../hooks/usePlugins";
 import Widget, { WidgetTypesContext } from "./Widget";
 

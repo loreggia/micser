@@ -1,0 +1,40 @@
+{
+    "name": "micser-common",
+    "version": "1.0.13",
+    "author": "Lucas Loreggia",
+    "license": "MIT",
+    "private": true,
+    "main": "dist/main.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "start-storybook",
+        "build": "webpack --mode production"
+    },
+    "dependencies": {},
+    "devDependencies": {
+        "@babel/core": "^7.12.10",
+        "@babel/preset-env": "^7.12.11",
+        "@babel/preset-react": "^7.12.10",
+        "@storybook/addon-knobs": "^6.1.11",
+        "@storybook/preset-ant-design": "^0.0.1",
+        "@storybook/react": "^6.1.11",
+        "antd": "^4.9.4",
+        "axios": "^0.21.0",
+        "babel-loader": "^8.2.2",
+        "clean-webpack-plugin": "^3.0.0",
+        "path": "^0.12.7",
+        "react": "link:../node_modules/react",
+        "react-dom": "link:../node_modules/react-dom",
+        "styled-components": "^5.2.1",
+        "webpack": "^5.10.3",
+        "webpack-cli": "^4.2.0",
+        "webpack-node-externals": "^2.5.2"
+    },
+    "peerDependencies": {
+        "antd": ">=4.0.0",
+        "axios": ">=0.21.0",
+        "react": ">=17.0.0",
+        "react-dom": ">=17.0.0",
+        "styled-components": ">=5.0.0"
+    }
+}

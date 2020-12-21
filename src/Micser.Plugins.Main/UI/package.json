@@ -1,7 +1,6 @@
 {
     "name": "micser-plugins-main",
     "version": "1.0.0",
-    "main": "dist/plugin.js",
     "author": "Lucas Loreggia",
     "license": "MIT",
     "private": true,
@@ -11,6 +10,7 @@
     },
     "dependencies": {
         "antd": "^4.9.4",
+        "micser-common": "../../Micser.Common/UI",
         "react": "^17.0.1",
         "react-dom": "^17.0.1",
         "styled-components": "^5.2.1"

@@ -5,27 +5,28 @@
     "license": "MIT",
     "private": true,
     "dependencies": {
-        "@craco/craco": "^6.0.0",
         "@microsoft/signalr": "^5.0.0",
         "antd": "^4.9.2",
         "axios": "^0.21.0",
-        "craco-antd": "^1.19.0",
         "fontsource-roboto": "^3.0.3",
         "i18next": "^19.8.4",
         "i18next-http-backend": "^1.0.21",
         "little-loader": "^0.2.0",
         "lodash": "^4.17.20",
+        "micser-common": "file:../../Micser.Common/UI",
         "prop-types": "^15.7.2",
         "react": "^17.0.1",
         "react-dom": "^17.0.1",
         "react-flow-renderer": "^8.2.1",
         "react-i18next": "^11.7.3",
         "react-router-dom": "^5.2.0",
-        "react-scripts": "^4.0.1",
         "styled-components": "^5.2.1"
     },
     "devDependencies": {
-        "@types/jest": "^26.0.15"
+        "@craco/craco": "^6.0.0",
+        "@types/jest": "^26.0.15",
+        "craco-antd": "^1.19.0",
+        "react-scripts": "^4.0.1"
     },
     "scripts": {
         "start": "craco start",

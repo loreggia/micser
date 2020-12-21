@@ -1,8 +1,9 @@
 import React, { Suspense } from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { Layout } from "antd";
+import { Loader } from "micser-common";
 
-import { Dashboard, Loader, Navigation, NotFound, Settings } from "./components";
+import { Dashboard, Navigation, NotFound, Settings } from "./components";
 
 import { Routes } from "./utils/constants";
 import { usePlugins } from "./hooks";

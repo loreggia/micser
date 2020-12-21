@@ -1,8 +1,7 @@
 import React from "react";
 import styled from "styled-components";
 import { Select } from "antd";
-import { Loader } from "../../../../Micser/App/src/components";
-import { useApi } from "../../../../Micser/App/src/hooks";
+import { Loader, useApi } from "micser-common";
 
 const { Option } = Select;
 
