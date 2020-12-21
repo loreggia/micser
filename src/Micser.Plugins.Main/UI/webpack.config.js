@@ -23,35 +23,9 @@ module.exports = {
             },
         ],
     },
-    externals: [nodeExternals()],
-    // externals: {
-    //     react: {
-    //         root: "React",
-    //         commonjs2: "react",
-    //         commonjs: "react",
-    //         amd: "react",
-    //         umd: "react",
-    //     },
-    //     "react-dom": {
-    //         root: "ReactDOM",
-    //         commonjs2: "react-dom",
-    //         commonjs: "react-dom",
-    //         amd: "react-dom",
-    //         umd: "react-dom",
-    //     },
-    //     antd: {
-    //         root: "Antd",
-    //         commonjs2: "antd",
-    //         commonjs: "antd",
-    //         amd: "antd",
-    //         umd: "antd",
-    //     },
-    //     "micser-common": {
-    //         root: "MicserCommon",
-    //         commonjs2: "micser-common",
-    //         commonjs: "micser-common",
-    //         amd: "micser-common",
-    //         umd: "micser-common",
-    //     },
-    // },
+    externals: [
+        nodeExternals({
+            importType: "umd",
+        }),
+    ],
 };
