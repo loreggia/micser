@@ -6,7 +6,9 @@ import PageContainer from "../../PageContainer";
 
 import { PluginsContext } from "../../../hooks/usePlugins";
 import Widget, { WidgetTypesContext } from "./Widget";
-import { notification } from "antd";
+import { Card, Drawer, Menu, notification, Space, Typography } from "antd";
+import { AppstoreAddOutlined } from "@ant-design/icons";
+import styled from "styled-components";
 
 const showError = (error) => {
     if (error) {
@@ -18,9 +20,31 @@ const showError = (error) => {
     }
 };
 
+const FixedButton = styled.div`
+    position: fixed;
+    right: 32px;
+    top: 32px;
+    padding: 16px;
+    z-index: 2147483640;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 100%;
+    background: black;
+    box-shadow: 0 0 16px white, inset 0 0 2px white;
+
+    &:hover {
+        background: rgba(32, 32, 32, 1);
+        box-shadow: 0 0 16px white, inset 0 0 8px white;
+    }
+`;
+
+const { Text, Title } = Typography;
+
 const Dashboard = () => {
     const plugins = useContext(PluginsContext);
     const [elements, setElements] = useState([]);
+    const [isAddDrawerOpen, setIsAddDrawerOpen] = useState(false);
+
     const [modules, isLoadingModules, refreshModules, modulesLoaded, modulesError] = useApi("Modules");
     const [
         moduleConnections,
@@ -101,6 +125,20 @@ const Dashboard = () => {
                     <Controls />
                     <Background variant="dots" size={1} gap={10} color="#333" />
                 </ReactFlow>
+                <Drawer visible={isAddDrawerOpen} onClose={() => setIsAddDrawerOpen(false)}>
+                    <Title level={2}>Add Widget</Title>
+                    <Text type="secondary">Drag a widget from the list to the dashboard.</Text>
+                    <Space direction="vertical" size="middle" style={{ width: "100%" }}>
+                        {widgetTypes.map((widgetType, i) => (
+                            <Card key={i} size="small" title={widgetType.name} hoverable>
+                                {widgetType.description}
+                            </Card>
+                        ))}
+                    </Space>
+                </Drawer>
+                <FixedButton className="primary" onClick={() => setIsAddDrawerOpen(true)} hidden={isAddDrawerOpen}>
+                    <AppstoreAddOutlined style={{ fontSize: "32px" }} />
+                </FixedButton>
             </WidgetTypesContext.Provider>
         </PageContainer>
     );
