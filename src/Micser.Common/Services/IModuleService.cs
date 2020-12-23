@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Micser.Common.Modules;
 
 namespace Micser.Common.Services
@@ -13,37 +14,34 @@ namespace Micser.Common.Services
         /// </summary>
         /// <param name="id">The ID of the module to delete.</param>
         /// <returns>The deleted module.</returns>
-        ModuleDto Delete(long id);
+        Task<ModuleDto?> DeleteAsync(long id);
 
         /// <summary>
         /// Gets all modules.
         /// </summary>
-        IEnumerable<ModuleDto> GetAll();
+        IAsyncEnumerable<ModuleDto> GetAllAsync();
 
         /// <summary>
         /// Gets a module with the specified ID or null if no module exists with this ID.
         /// </summary>
         /// <param name="id">The ID of the module.</param>
-        ModuleDto GetById(long id);
+        Task<ModuleDto?> GetByIdAsync(long id);
 
         /// <summary>
         /// Inserts a new module to the DB.
         /// </summary>
         /// <param name="moduleDto">The module.</param>
-        /// <returns>True if the module was saved, otherwise false.</returns>
-        bool Insert(ModuleDto moduleDto);
+        Task InsertAsync(ModuleDto moduleDto);
 
         /// <summary>
         /// Deletes all modules from the DB.
         /// </summary>
-        /// <returns>True if the modules were deleted, otherwise false.</returns>
-        bool Truncate();
+        Task TruncateAsync();
 
         /// <summary>
         /// Updates an existing module.
         /// </summary>
         /// <param name="moduleDto">The module to update.</param>
-        /// <returns>True if the module was updated, otherwise false.</returns>
-        bool Update(ModuleDto moduleDto);
+        Task UpdateAsync(ModuleDto moduleDto);
     }
 }

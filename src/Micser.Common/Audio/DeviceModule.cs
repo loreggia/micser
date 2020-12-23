@@ -17,7 +17,7 @@ namespace Micser.Common.Audio
         /// </summary>
         protected readonly IModuleService ModuleService;
 
-        private DeviceDescription _deviceDescription;
+        private DeviceDescription? _deviceDescription;
 
         /// <inheritdoc />
         protected DeviceModule(IModuleService moduleService, ILogger logger)
@@ -32,12 +32,12 @@ namespace Micser.Common.Audio
         /// <summary>
         /// Gets or sets the adapter name that is used as a fallback when the device is disconnected or plugged into another USB port.
         /// </summary>
-        public string AdapterName { get; set; }
+        public string? AdapterName { get; set; }
 
         /// <summary>
         /// Gets or sets the currently selected device. Changing the device will call <see cref="InitializeDevice"/>.
         /// </summary>
-        public virtual DeviceDescription DeviceDescription
+        public virtual DeviceDescription? DeviceDescription
         {
             get => _deviceDescription;
             set
@@ -60,7 +60,7 @@ namespace Micser.Common.Audio
         /// <summary>
         /// Gets the CoreAudio device instance.
         /// </summary>
-        protected MMDevice Device { get; private set; }
+        protected MMDevice? Device { get; private set; }
 
         /// <summary>
         /// Gets the CoreAudio device enumerator.
@@ -145,7 +145,7 @@ namespace Micser.Common.Audio
         /// Callback when the state of the active device changes. Calls <see cref="OnInitializeDevice"/> if it is active or <see cref="DisposeDevice"/> otherwise.
         /// </summary>
         /// <param name="deviceDescription">The device description of the device.</param>
-        protected virtual void OnDeviceStateChanged(DeviceDescription deviceDescription)
+        protected virtual async void OnDeviceStateChanged(DeviceDescription deviceDescription)
         {
             if (deviceDescription.IsActive)
             {
@@ -155,11 +155,12 @@ namespace Micser.Common.Audio
                     DeviceDescription = deviceDescription;
 
                     // save current state and signal UI refresh
-                    var moduleDto = ModuleService.GetById(Id);
-                    moduleDto.State = GetState();
+                    var moduleDto = await ModuleService.GetByIdAsync(Id);
 
-                    if (ModuleService.Update(moduleDto))
+                    if (moduleDto != null)
                     {
+                        moduleDto.State = GetState();
+                        await ModuleService.UpdateAsync(moduleDto);
                         // TODO
                         //ApiClient.SendMessageAsync("modules", "refresh", moduleDto);
                     }
@@ -182,7 +183,7 @@ namespace Micser.Common.Audio
         {
         }
 
-        private async void DeviceStateChanged(object sender, DeviceStateChangedEventArgs e)
+        private async void DeviceStateChanged(object? sender, DeviceStateChangedEventArgs e)
         {
             var deviceService = new DeviceService();
             var deviceDescription = deviceService.GetDescription(e.DeviceId);

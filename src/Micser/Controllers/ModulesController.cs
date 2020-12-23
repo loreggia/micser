@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Micser.Common.Controllers;
 using Micser.Common.Modules;
@@ -15,10 +16,17 @@ namespace Micser.Controllers
             _moduleService = moduleService;
         }
 
-        [HttpGet("")]
-        public IEnumerable<ModuleDto> GetAll()
+        [HttpPost("")]
+        public async Task<ModuleDto> CreateAsync(ModuleDto module)
         {
-            return _moduleService.GetAll();
+            await _moduleService.InsertAsync(module);
+            return module;
+        }
+
+        [HttpGet("")]
+        public IAsyncEnumerable<ModuleDto> GetAllAsync()
+        {
+            return _moduleService.GetAllAsync();
         }
     }
 }

@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Micser.Common.Modules;
 using Micser.Common.Services;
 using Micser.DataAccess;
 using Micser.DataAccess.Entities;
+using Micser.UI.Infrastructure;
 using Newtonsoft.Json;
 
 namespace Micser.Services
@@ -21,71 +22,75 @@ namespace Micser.Services
         }
 
         /// <inheritdoc />
-        public ModuleDto Delete(long id)
+        public async Task<ModuleDto?> DeleteAsync(long id)
         {
-            using var dbContext = _dbContextFactory.CreateDbContext();
-            var module = dbContext.Modules.Find(id);
+            await using var dbContext = _dbContextFactory.CreateDbContext();
+            var module = await dbContext.Modules.FindAsync(id).ConfigureAwait(false);
+
             if (module == null)
             {
                 return null;
             }
 
             dbContext.Modules.Remove(module);
-            dbContext.SaveChanges();
+            await dbContext.SaveChangesAsync().ConfigureAwait(false);
 
             return GetModuleDto(module);
         }
 
         /// <inheritdoc />
-        public IEnumerable<ModuleDto> GetAll()
+        public async IAsyncEnumerable<ModuleDto> GetAllAsync()
         {
-            using var dbContext = _dbContextFactory.CreateDbContext();
-            return dbContext.Modules.AsEnumerable().Select(GetModuleDto).ToArray();
+            await using var dbContext = _dbContextFactory.CreateDbContext();
+            await foreach (var module in dbContext.Modules)
+            {
+                yield return GetModuleDto(module);
+            }
         }
 
         /// <inheritdoc />
-        public ModuleDto GetById(long id)
+        public async Task<ModuleDto?> GetByIdAsync(long id)
         {
-            using var dbContext = _dbContextFactory.CreateDbContext();
-            var module = dbContext.Modules.Find(id);
-            return GetModuleDto(module);
+            await using var dbContext = _dbContextFactory.CreateDbContext();
+            var module = await dbContext.Modules.FindAsync(id).ConfigureAwait(false);
+            return module == null ? null : GetModuleDto(module);
         }
 
         /// <inheritdoc />
-        public bool Insert(ModuleDto moduleDto)
+        public async Task InsertAsync(ModuleDto moduleDto)
         {
-            using var dbContext = _dbContextFactory.CreateDbContext();
             var module = GetModule(moduleDto);
 
-            dbContext.Modules.Add(module);
+            await using var dbContext = _dbContextFactory.CreateDbContext();
 
-            if (dbContext.SaveChanges() > 0)
+            await dbContext.Modules.AddAsync(module).ConfigureAwait(false);
+
+            if (await dbContext.SaveChangesAsync().ConfigureAwait(false) > 0)
             {
                 moduleDto.Id = module.Id;
-                return true;
             }
-
-            return false;
         }
 
         /// <inheritdoc />
-        public bool Truncate()
+        public async Task TruncateAsync()
         {
-            using var dbContext = _dbContextFactory.CreateDbContext();
-            var modules = dbContext.Modules.AsEnumerable();
-            dbContext.Modules.RemoveRange(modules);
-            return dbContext.SaveChanges() >= 0;
+            await using var dbContext = _dbContextFactory.CreateDbContext();
+            await foreach (var module in dbContext.Modules)
+            {
+                dbContext.Modules.Remove(module);
+            }
+            await dbContext.SaveChangesAsync().ConfigureAwait(false);
         }
 
         /// <inheritdoc />
-        public bool Update(ModuleDto moduleDto)
+        public async Task UpdateAsync(ModuleDto moduleDto)
         {
-            using var dbContext = _dbContextFactory.CreateDbContext();
-            var module = dbContext.Modules.Find(moduleDto.Id);
+            await using var dbContext = _dbContextFactory.CreateDbContext();
+            var module = await dbContext.Modules.FindAsync(moduleDto.Id).ConfigureAwait(false);
 
             if (module == null)
             {
-                return false;
+                throw new NotFoundApiException();
             }
 
             var state = JsonConvert.DeserializeObject<ModuleState>(module.StateJson);
@@ -102,16 +107,11 @@ namespace Micser.Services
 
             moduleDto.State = state;
 
-            return dbContext.SaveChanges() >= 0;
+            await dbContext.SaveChangesAsync().ConfigureAwait(false);
         }
 
         private static Module GetModule(ModuleDto moduleDto)
         {
-            if (moduleDto == null)
-            {
-                return null;
-            }
-
             return new Module
             {
                 ModuleType = moduleDto.ModuleType,
@@ -122,11 +122,6 @@ namespace Micser.Services
 
         private static ModuleDto GetModuleDto(Module module)
         {
-            if (module == null)
-            {
-                return null;
-            }
-
             return new ModuleDto
             {
                 Id = module.Id,

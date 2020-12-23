@@ -16,9 +16,9 @@ namespace Micser.Controllers
         }
 
         [HttpGet("")]
-        public IEnumerable<ModuleConnectionDto> GetAll()
+        public IAsyncEnumerable<ModuleConnectionDto> GetAll()
         {
-            return _moduleConnectionService.GetAll();
+            return _moduleConnectionService.GetAllAsync();
         }
     }
 }

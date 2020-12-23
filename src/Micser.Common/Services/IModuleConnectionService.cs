@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using Micser.Common.Modules;
 
 namespace Micser.Common.Services
@@ -13,37 +14,34 @@ namespace Micser.Common.Services
         /// </summary>
         /// <param name="id">The ID of the connection to delete.</param>
         /// <returns>The deleted connection.</returns>
-        ModuleConnectionDto Delete(long id);
+        Task<ModuleConnectionDto?> DeleteAsync(long id);
 
         /// <summary>
         /// Gets all connections.
         /// </summary>
-        IEnumerable<ModuleConnectionDto> GetAll();
+        IAsyncEnumerable<ModuleConnectionDto> GetAllAsync();
 
         /// <summary>
         /// Gets a connection with the specified ID or null if no connection exists with this ID.
         /// </summary>
         /// <param name="id">The ID of the connection.</param>
-        ModuleConnectionDto GetById(long id);
+        Task<ModuleConnectionDto?> GetByIdAsync(long id);
 
         /// <summary>
         /// Inserts a new connection to the DB.
         /// </summary>
         /// <param name="dto">The connection.</param>
-        /// <returns>True if the connection was saved, otherwise false.</returns>
-        bool Insert(ModuleConnectionDto dto);
+        Task InsertAsync(ModuleConnectionDto dto);
 
         /// <summary>
         /// Deletes all connections from the DB.
         /// </summary>
-        /// <returns>True if the connections were deleted, otherwise false.</returns>
-        bool Truncate();
+        Task TruncateAsync();
 
         /// <summary>
         /// Updates an existing connection.
         /// </summary>
         /// <param name="dto">The connection to update.</param>
-        /// <returns>True if the connection was updated, otherwise false.</returns>
-        bool Update(ModuleConnectionDto dto);
+        Task UpdateAsync(ModuleConnectionDto dto);
     }
 }

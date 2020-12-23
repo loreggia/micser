@@ -38,21 +38,25 @@ namespace Micser.Audio
 
         public bool IsRunning { get; private set; }
 
-        public void AddConnection(long id)
+        public async Task AddConnectionAsync(long id)
         {
-            var connectionDto = _moduleConnectionService.GetById(id);
-            var source = _modules.FirstOrDefault(m => m.Id == connectionDto.SourceId);
-            var target = _modules.FirstOrDefault(m => m.Id == connectionDto.TargetId);
+            var connectionDto = await _moduleConnectionService.GetByIdAsync(id).ConfigureAwait(false);
 
-            if (source != null && target != null)
+            if (connectionDto != null)
             {
-                source.AddOutput(target);
+                var source = _modules.FirstOrDefault(m => m.Id == connectionDto.SourceId);
+                var target = _modules.FirstOrDefault(m => m.Id == connectionDto.TargetId);
+
+                if (source != null && target != null)
+                {
+                    source.AddOutput(target);
+                }
             }
         }
 
-        public void AddModule(long id)
+        public async Task AddModuleAsync(long id)
         {
-            var moduleDto = _moduleService.GetById(id);
+            var moduleDto = await _moduleService.GetByIdAsync(id).ConfigureAwait(false);
 
             var type = Type.GetType(moduleDto.ModuleType);
             if (type != null)
@@ -81,14 +85,14 @@ namespace Micser.Audio
                 _endpointVolumeCallback.NotifyRecived -= VolumeNotifyReceived;
             }
 
-            Stop();
+            StopAsync().GetAwaiter().GetResult();
 
             _deviceEnumerator?.Dispose();
         }
 
-        public void RemoveConnection(long id)
+        public async Task RemoveConnectionAsync(long id)
         {
-            var connectionDto = _moduleConnectionService.GetById(id);
+            var connectionDto = await _moduleConnectionService.GetByIdAsync(id).ConfigureAwait(false);
 
             if (connectionDto == null)
             {
@@ -104,7 +108,7 @@ namespace Micser.Audio
             }
         }
 
-        public void RemoveModule(long id)
+        public async Task RemoveModuleAsync(long id)
         {
             var audioModule = _modules.SingleOrDefault(m => m.Id == id);
             if (audioModule != null)
@@ -114,31 +118,31 @@ namespace Micser.Audio
             }
         }
 
-        public void Start()
+        public async Task StartAsync()
         {
             _logger.LogInformation("Starting audio engine");
 
-            Stop();
+            await StopAsync().ConfigureAwait(false);
 
             _deviceEnumerator.DefaultDeviceChanged += DefaultDeviceChanged;
             _endpointVolumeCallback.NotifyRecived += VolumeNotifyReceived;
 
             SetupDefaultEndpoint();
 
-            foreach (var module in _moduleService.GetAll())
+            await foreach (var module in _moduleService.GetAllAsync())
             {
                 try
                 {
-                    AddModule(module.Id);
+                    await AddModuleAsync(module.Id).ConfigureAwait(false);
                 }
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Could not load module. ID: {0}", module.Id);
-                    _moduleService.Delete(module.Id);
+                    await _moduleService.DeleteAsync(module.Id).ConfigureAwait(false);
                 }
             }
 
-            foreach (var connection in _moduleConnectionService.GetAll())
+            await foreach (var connection in _moduleConnectionService.GetAllAsync())
             {
                 var source = _modules.FirstOrDefault(m => m.Id == connection.SourceId);
                 var target = _modules.FirstOrDefault(m => m.Id == connection.TargetId);
@@ -162,7 +166,7 @@ namespace Micser.Audio
             _logger.LogInformation("Audio engine started");
         }
 
-        public void Stop()
+        public async Task StopAsync()
         {
             if (!IsRunning)
             {
@@ -195,19 +199,20 @@ namespace Micser.Audio
             IsRunning = false;
         }
 
-        public void UpdateModule(long id)
+        public async Task UpdateModuleAsync(long id)
         {
             var audioModule = _modules.SingleOrDefault(m => m.Id == id);
             if (audioModule != null)
             {
-                var moduleDto = _moduleService.GetById(id);
+                var moduleDto = await _moduleService.GetByIdAsync(id).ConfigureAwait(false);
 
                 var applySystemVolume = !audioModule.UseSystemVolume && moduleDto.State.UseSystemVolume;
                 if (applySystemVolume && _endpointVolume != null)
                 {
                     moduleDto.State.IsMuted = _endpointVolume.IsMuted;
                     moduleDto.State.Volume = _endpointVolume.MasterVolumeLevelScalar;
-                    _moduleService.Update(moduleDto);
+
+                    await _moduleService.UpdateAsync(moduleDto).ConfigureAwait(false);
                     //todo
                     //_engineEventService.SendMessageAsync(new EngineEvent { Type = "VolumeChanged", Content = moduleDto.Id.ToString(CultureInfo.InvariantCulture) });
                 }
@@ -216,7 +221,7 @@ namespace Micser.Audio
             }
         }
 
-        private async void DefaultDeviceChanged(object sender, DefaultDeviceChangedEventArgs e)
+        private async void DefaultDeviceChanged(object? sender, DefaultDeviceChangedEventArgs e)
         {
             if (!IsRunning)
             {
@@ -246,9 +251,9 @@ namespace Micser.Audio
             }
         }
 
-        private async void VolumeNotifyReceived(object sender, AudioEndpointVolumeCallbackEventArgs e)
+        private async void VolumeNotifyReceived(object? sender, AudioEndpointVolumeCallbackEventArgs e)
         {
-            await Task.Run(() =>
+            await Task.Run(async () =>
             {
                 var modules = _modules.OfType<AudioModule>().Where(m => m.UseSystemVolume).ToArray();
                 foreach (var module in modules)
@@ -256,7 +261,7 @@ namespace Micser.Audio
                     module.Volume = e.MasterVolume;
                     module.IsMuted = e.IsMuted;
 
-                    var moduleDto = _moduleService.GetById(module.Id);
+                    var moduleDto = await _moduleService.GetByIdAsync(module.Id).ConfigureAwait(false);
 
                     if (moduleDto.State == null)
                     {
@@ -267,7 +272,7 @@ namespace Micser.Audio
                     moduleDto.State.IsMuted = e.IsMuted;
                     moduleDto.State.Volume = e.MasterVolume;
 
-                    _moduleService.Update(moduleDto);
+                    await _moduleService.UpdateAsync(moduleDto).ConfigureAwait(false);
                     //todo
                     //_engineEventService.SendMessageAsync(new EngineEvent { Type = "VolumeChanged", Content = moduleDto.Id.ToString(CultureInfo.InvariantCulture) });
                 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace Micser.Common.Audio
 {
@@ -16,40 +17,40 @@ namespace Micser.Common.Audio
         /// Instantiates and adds a saved connection to the currently loaded modules.
         /// </summary>
         /// <param name="id">The connection ID.</param>
-        void AddConnection(long id);
+        Task AddConnectionAsync(long id);
 
         /// <summary>
         /// Instantiates and adds a saved module to the currently loaded modules.
         /// </summary>
         /// <param name="id">The module ID.</param>
-        void AddModule(long id);
+        Task AddModuleAsync(long id);
 
         /// <summary>
         /// Removes a connection from the currently loaded modules.
         /// </summary>
         /// <param name="id">The connection ID.</param>
-        void RemoveConnection(long id);
+        Task RemoveConnectionAsync(long id);
 
         /// <summary>
         /// Removes a module from the currently loaded modules.
         /// </summary>
         /// <param name="id">The module ID.</param>
-        void RemoveModule(long id);
+        Task RemoveModuleAsync(long id);
 
         /// <summary>
         /// Starts the audio engine and instantiates all currently saved modules and connections.
         /// </summary>
-        void Start();
+        Task StartAsync();
 
         /// <summary>
         /// Stops the engine and all loaded modules.
         /// </summary>
-        void Stop();
+        Task StopAsync();
 
         /// <summary>
         /// Updates the state of a currently loaded module.
         /// </summary>
         /// <param name="id">The module ID.</param>
-        void UpdateModule(long id);
+        Task UpdateModuleAsync(long id);
     }
 }

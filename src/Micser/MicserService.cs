@@ -51,7 +51,7 @@ namespace Micser
 
             if (_settingsService.GetSetting<bool>(Globals.SettingKeys.IsEngineRunning))
             {
-                _audioEngine.Start();
+                _audioEngine.StartAsync();
             }
 
             _updateTimer.Start();
@@ -65,7 +65,7 @@ namespace Micser
 
             _updateTimer.Stop();
 
-            _audioEngine.Stop();
+            _audioEngine.StopAsync();
 
             _logger.LogInformation("Service stopped");
 

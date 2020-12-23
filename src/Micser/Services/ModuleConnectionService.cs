@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Micser.Common.Modules;
 using Micser.Common.Services;
 using Micser.DataAccess;
 using Micser.DataAccess.Entities;
+using Micser.UI.Infrastructure;
 
 namespace Micser.Services
 {
@@ -20,10 +21,10 @@ namespace Micser.Services
         }
 
         /// <inheritdoc />
-        public ModuleConnectionDto Delete(long id)
+        public async Task<ModuleConnectionDto?> DeleteAsync(long id)
         {
-            using var dbContext = _dbContextFactory.CreateDbContext();
-            var connection = dbContext.ModuleConnections.Find(id);
+            await using var dbContext = _dbContextFactory.CreateDbContext();
+            var connection = await dbContext.ModuleConnections.FindAsync(id).ConfigureAwait(false);
 
             if (connection == null)
             {
@@ -31,88 +32,85 @@ namespace Micser.Services
             }
 
             dbContext.ModuleConnections.Remove(connection);
-            dbContext.SaveChanges();
+            await dbContext.SaveChangesAsync().ConfigureAwait(false);
 
             return GetModuleConnectionDto(connection);
         }
 
         /// <inheritdoc />
-        public IEnumerable<ModuleConnectionDto> GetAll()
+        public async IAsyncEnumerable<ModuleConnectionDto> GetAllAsync()
         {
-            using var dbContext = _dbContextFactory.CreateDbContext();
-            return dbContext
-                .ModuleConnections
-                .AsEnumerable()
-                .Select(GetModuleConnectionDto)
-                .ToArray();
+            await using var dbContext = _dbContextFactory.CreateDbContext();
+
+            await foreach (var connection in dbContext.ModuleConnections)
+            {
+                yield return GetModuleConnectionDto(connection)!;
+            }
         }
 
         /// <inheritdoc />
-        public ModuleConnectionDto GetById(long id)
+        public async Task<ModuleConnectionDto?> GetByIdAsync(long id)
         {
-            using var dbContext = _dbContextFactory.CreateDbContext();
-            var connection = dbContext.ModuleConnections.Find(id);
-            return GetModuleConnectionDto(connection);
+            await using var dbContext = _dbContextFactory.CreateDbContext();
+            var connection = await dbContext.ModuleConnections.FindAsync(id).ConfigureAwait(false);
+            return connection == null ? null : GetModuleConnectionDto(connection);
         }
 
         /// <inheritdoc />
-        public bool Insert(ModuleConnectionDto dto)
+        public async Task InsertAsync(ModuleConnectionDto dto)
         {
-            using var dbContext = _dbContextFactory.CreateDbContext();
-            var connection = dbContext
+            await using var dbContext = _dbContextFactory.CreateDbContext();
+            var connection = await dbContext
                 .ModuleConnections
-                .SingleOrDefault(c => c.SourceModuleId == dto.SourceId && c.TargetModuleId == dto.TargetId);
+                .SingleOrDefaultAsync(c => c.SourceModuleId == dto.SourceId && c.TargetModuleId == dto.TargetId)
+                .ConfigureAwait(false);
 
             if (connection != null)
             {
-                return false;
+                return;
             }
 
             connection = GetModuleConnection(dto);
-            dbContext.ModuleConnections.Add(connection);
+            await dbContext.ModuleConnections.AddAsync(connection!).ConfigureAwait(false);
 
-            if (dbContext.SaveChanges() > 0)
+            if (await dbContext.SaveChangesAsync().ConfigureAwait(false) > 0)
             {
                 dto.Id = connection.Id;
-                return true;
+            }
+        }
+
+        /// <inheritdoc />
+        public async Task TruncateAsync()
+        {
+            await using var dbContext = _dbContextFactory.CreateDbContext();
+
+            await foreach (var connection in dbContext.ModuleConnections)
+            {
+                dbContext.ModuleConnections.Remove(connection);
             }
 
-            return false;
+            await dbContext.SaveChangesAsync().ConfigureAwait(false);
         }
 
         /// <inheritdoc />
-        public bool Truncate()
+        public async Task UpdateAsync(ModuleConnectionDto dto)
         {
-            using var dbContext = _dbContextFactory.CreateDbContext();
-            var connections = dbContext.ModuleConnections.AsEnumerable();
-            dbContext.ModuleConnections.RemoveRange(connections);
-            return dbContext.SaveChanges() >= 0;
-        }
-
-        /// <inheritdoc />
-        public bool Update(ModuleConnectionDto dto)
-        {
-            using var dbContext = _dbContextFactory.CreateDbContext();
-            var connection = dbContext.ModuleConnections.Find(dto.Id);
+            await using var dbContext = _dbContextFactory.CreateDbContext();
+            var connection = await dbContext.ModuleConnections.FindAsync(dto.Id).ConfigureAwait(false);
 
             if (connection == null)
             {
-                return false;
+                throw new NotFoundApiException();
             }
 
             connection.SourceModuleId = dto.SourceId;
             connection.TargetModuleId = dto.TargetId;
 
-            return dbContext.SaveChanges() > 0;
+            await dbContext.SaveChangesAsync().ConfigureAwait(false);
         }
 
         private static ModuleConnection GetModuleConnection(ModuleConnectionDto dto)
         {
-            if (dto == null)
-            {
-                return null;
-            }
-
             return new ModuleConnection
             {
                 Id = dto.Id,
@@ -125,11 +123,6 @@ namespace Micser.Services
 
         private static ModuleConnectionDto GetModuleConnectionDto(ModuleConnection mc)
         {
-            if (mc == null)
-            {
-                return null;
-            }
-
             return new ModuleConnectionDto
             {
                 Id = mc.Id,

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Micser.Common.Extensions;
 
 namespace Micser.Common.Modules
@@ -6,12 +7,13 @@ namespace Micser.Common.Modules
     /// <summary>
     /// Contains a module's state variables.
     /// </summary>
-    public sealed class ModuleState : Dictionary<string, string>
+    public sealed class ModuleState : Dictionary<string, string?>
     {
         /// <inheritdoc />
         public ModuleState()
         {
             IsEnabled = true;
+            IsMuted = false;
             Volume = 1f;
         }
 
@@ -20,7 +22,7 @@ namespace Micser.Common.Modules
         /// </summary>
         public bool IsEnabled
         {
-            get => !TryGetValue(nameof(IsEnabled), out var value) || value.ToType<bool>();
+            get => GetPropertyValue<bool>();
             set => this[nameof(IsEnabled)] = value.ToType<string>();
         }
 
@@ -29,8 +31,8 @@ namespace Micser.Common.Modules
         /// </summary>
         public bool IsMuted
         {
-            get => !TryGetValue(nameof(IsMuted), out var value) || value.ToType<bool>();
-            set => this[nameof(IsMuted)] = value.ToType<string>();
+            get => GetPropertyValue<bool>();
+            set => SetPropertyValue(value);
         }
 
         /// <summary>
@@ -38,8 +40,8 @@ namespace Micser.Common.Modules
         /// </summary>
         public float Left
         {
-            get => TryGetValue(nameof(Left), out var value) ? value.ToType<float>() : default;
-            set => this[nameof(Left)] = value.ToType<string>();
+            get => GetPropertyValue<float>();
+            set => SetPropertyValue(value);
         }
 
         /// <summary>
@@ -47,8 +49,8 @@ namespace Micser.Common.Modules
         /// </summary>
         public float Top
         {
-            get => TryGetValue(nameof(Top), out var value) ? value.ToType<float>() : default;
-            set => this[nameof(Top)] = value.ToType<string>();
+            get => GetPropertyValue<float>();
+            set => SetPropertyValue(value);
         }
 
         /// <summary>
@@ -56,8 +58,8 @@ namespace Micser.Common.Modules
         /// </summary>
         public bool UseSystemVolume
         {
-            get => !TryGetValue(nameof(UseSystemVolume), out var value) || value.ToType<bool>();
-            set => this[nameof(UseSystemVolume)] = value.ToType<string>();
+            get => GetPropertyValue<bool>();
+            set => SetPropertyValue(value);
         }
 
         /// <summary>
@@ -65,8 +67,8 @@ namespace Micser.Common.Modules
         /// </summary>
         public float Volume
         {
-            get => TryGetValue(nameof(Volume), out var value) ? value.ToType<float>() : default;
-            set => this[nameof(Volume)] = value.ToType<string>();
+            get => GetPropertyValue<float>();
+            set => SetPropertyValue(value);
         }
 
         /// <summary>
@@ -79,6 +81,16 @@ namespace Micser.Common.Modules
             {
                 Add(key, value);
             }
+        }
+
+        private T? GetPropertyValue<T>([CallerMemberName] string propertyName = null!)
+        {
+            return TryGetValue(propertyName, out var value) && value != null ? value.ToType<T>() : default;
+        }
+
+        private void SetPropertyValue<T>(T value, [CallerMemberName] string propertyName = null!)
+        {
+            this[propertyName] = value?.ToType<string>();
         }
     }
 }
