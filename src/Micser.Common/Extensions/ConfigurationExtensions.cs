@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Micser.Common.Audio;
+using Micser.Common.Modules;
 using NLog.Config;
 using NLog.Extensions.Logging;
 using NLog.Targets;
@@ -15,12 +16,11 @@ namespace Micser.Common.Extensions
 {
     public static class ConfigurationExtensions
     {
-        public static IServiceCollection AddAudioModules(this IServiceCollection services, params Type[] types)
+        public static IServiceCollection AddAudioModule<TModule>(this IServiceCollection services, ModuleDescription description)
+            where TModule : class, IAudioModule
         {
-            foreach (var type in types)
-            {
-                services.AddTransient(typeof(IAudioModule), type);
-            }
+            services.AddTransient<IAudioModule, TModule>();
+            services.AddSingleton(description);
 
             return services;
         }

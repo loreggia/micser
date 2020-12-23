@@ -38,6 +38,8 @@ const FixedButton = styled.div`
     }
 `;
 
+const WidgetListCard = styled(Card)``;
+
 const { Text, Title } = Typography;
 
 const Dashboard = () => {
@@ -53,11 +55,13 @@ const Dashboard = () => {
         moduleConnectionsLoaded,
         moduleConnectionsError,
     ] = useApi("ModuleConnections");
+    const [widgets, isLoadingWidgets, refreshWidgets, widgetsLoaded, widgetsError] = useApi("Widgets");
 
     useEffect(() => {
         showError(modulesError);
         showError(moduleConnectionsError);
-    }, [modulesError, moduleConnectionsError]);
+        showError(widgetsError);
+    }, [modulesError, moduleConnectionsError, widgetsError]);
 
     const widgetTypes = useMemo(() => {
         return plugins.reduce((prev, curr) => prev.concat(curr.widgets), []);
@@ -109,7 +113,33 @@ const Dashboard = () => {
 
     const nodeTypes = useMemo(() => ({ Widget: Widget }), []);
 
-    const isLoading = isLoadingModules || isLoadingModuleConnections;
+    const handleDragStart = (e, widget) => {
+        e.dataTransfer.setData("widget", JSON.stringify(widget));
+    };
+
+    const handleDragOver = (e) => {
+        if (e.dataTransfer.types.includes("widget")) {
+            e.preventDefault();
+        }
+    };
+
+    const handleDrop = (e) => {
+        const strWidget = e.dataTransfer.getData("widget");
+        if (strWidget) {
+            const widget = JSON.parse(strWidget);
+            const { clientX, clientY } = e;
+
+            const module = {
+                widgetType: widget.name,
+                state: {
+                    left: clientX,
+                    top: clientY,
+                },
+            };
+        }
+    };
+
+    const isLoading = isLoadingModules || isLoadingModuleConnections || isLoadingWidgets;
 
     return (
         <PageContainer noPadding>
@@ -120,20 +150,30 @@ const Dashboard = () => {
                     nodeTypes={nodeTypes}
                     snapToGrid
                     snapGrid={[10, 10]}
-                    style={{ width: "100%", height: "100vh" }}
+                    style={{ width: "100%", height: "100%" }}
+                    onDragOver={handleDragOver}
+                    onDrop={handleDrop}
                 >
                     <Controls />
                     <Background variant="dots" size={1} gap={10} color="#333" />
                 </ReactFlow>
-                <Drawer visible={isAddDrawerOpen} onClose={() => setIsAddDrawerOpen(false)}>
+                <Drawer visible={isAddDrawerOpen} onClose={() => setIsAddDrawerOpen(false)} width="300px" mask={false}>
                     <Title level={2}>Add Widget</Title>
                     <Text type="secondary">Drag a widget from the list to the dashboard.</Text>
                     <Space direction="vertical" size="middle" style={{ width: "100%" }}>
-                        {widgetTypes.map((widgetType, i) => (
-                            <Card key={i} size="small" title={widgetType.name} hoverable>
-                                {widgetType.description}
-                            </Card>
-                        ))}
+                        {widgets &&
+                            widgets.map((widget) => (
+                                <WidgetListCard
+                                    key={widget.name}
+                                    size="small"
+                                    title={widget.title}
+                                    hoverable
+                                    draggable
+                                    onDragStart={(e) => handleDragStart(e, widget)}
+                                >
+                                    {widget.description}
+                                </WidgetListCard>
+                            ))}
                     </Space>
                 </Drawer>
                 <FixedButton className="primary" onClick={() => setIsAddDrawerOpen(true)} hidden={isAddDrawerOpen}>
