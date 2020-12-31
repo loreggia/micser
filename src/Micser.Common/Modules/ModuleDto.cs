@@ -5,6 +5,11 @@
     /// </summary>
     public class ModuleDto : IIdentifiable
     {
+        public ModuleDto()
+        {
+            State = new ModuleState();
+        }
+
         /// <summary>
         /// Gets or sets the ID of this module.
         /// </summary>
@@ -13,7 +18,7 @@
         /// <summary>
         /// Gets or sets the assembly-qualified type name of the module's class.
         /// </summary>
-        public string ModuleType { get; set; }
+        public string? ModuleType { get; set; }
 
         /// <summary>
         /// Gets or sets the module's current state.
@@ -23,6 +28,6 @@
         /// <summary>
         /// Gets or sets the assembly-qualified type name of the module's UI/widget class.
         /// </summary>
-        public string WidgetType { get; set; }
+        public string? WidgetType { get; set; }
     }
 }

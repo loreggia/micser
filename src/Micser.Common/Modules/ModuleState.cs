@@ -9,7 +9,6 @@ namespace Micser.Common.Modules
     /// </summary>
     public sealed class ModuleState : Dictionary<string, string?>
     {
-        /// <inheritdoc />
         public ModuleState()
         {
             IsEnabled = true;
@@ -23,7 +22,7 @@ namespace Micser.Common.Modules
         public bool IsEnabled
         {
             get => GetPropertyValue<bool>();
-            set => this[nameof(IsEnabled)] = value.ToType<string>();
+            set => SetPropertyValue(value);
         }
 
         /// <summary>
@@ -85,12 +84,12 @@ namespace Micser.Common.Modules
 
         private T? GetPropertyValue<T>([CallerMemberName] string propertyName = null!)
         {
-            return TryGetValue(propertyName, out var value) && value != null ? value.ToType<T>() : default;
+            return TryGetValue(propertyName.ToCamelCase(), out var value) && value != null ? value.ToType<T>() : default;
         }
 
         private void SetPropertyValue<T>(T value, [CallerMemberName] string propertyName = null!)
         {
-            this[propertyName] = value?.ToType<string>();
+            this[propertyName.ToCamelCase()] = value?.ToType<string>();
         }
     }
 }

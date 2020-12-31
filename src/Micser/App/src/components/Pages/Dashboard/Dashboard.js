@@ -1,24 +1,14 @@
 import React, { useContext, useEffect, useMemo, useState } from "react";
+import styled from "styled-components";
 import ReactFlow, { Background, Controls } from "react-flow-renderer";
+import { Card, Drawer, Space, Typography } from "antd";
+import { AppstoreAddOutlined } from "@ant-design/icons";
 import { Loader, useApi } from "micser-common";
 
 import PageContainer from "../../PageContainer";
-
-import { PluginsContext } from "../../../hooks/usePlugins";
 import Widget, { WidgetTypesContext } from "./Widget";
-import { Card, Drawer, Menu, notification, Space, Typography } from "antd";
-import { AppstoreAddOutlined } from "@ant-design/icons";
-import styled from "styled-components";
-
-const showError = (error) => {
-    if (error) {
-        notification.open({
-            message: "Error",
-            description: error.message || error,
-            type: "error",
-        });
-    }
-};
+import { useErrorNotification } from "../../../hooks";
+import { PluginsContext } from "../../../hooks/usePlugins";
 
 const FixedButton = styled.div`
     position: fixed;
@@ -46,6 +36,7 @@ const Dashboard = () => {
     const plugins = useContext(PluginsContext);
     const [elements, setElements] = useState([]);
     const [isAddDrawerOpen, setIsAddDrawerOpen] = useState(false);
+    const [newModule, setNewModule] = useState(null);
 
     const [modules, isLoadingModules, refreshModules, modulesLoaded, modulesError] = useApi("Modules");
     const [
@@ -56,12 +47,13 @@ const Dashboard = () => {
         moduleConnectionsError,
     ] = useApi("ModuleConnections");
     const [widgets, isLoadingWidgets, refreshWidgets, widgetsLoaded, widgetsError] = useApi("Widgets");
+    const [addedModule, isAddingModule, addModule, moduleAdded, addError] = useApi("Modules", {
+        autoLoad: false,
+        method: "post",
+        data: newModule,
+    });
 
-    useEffect(() => {
-        showError(modulesError);
-        showError(moduleConnectionsError);
-        showError(widgetsError);
-    }, [modulesError, moduleConnectionsError, widgetsError]);
+    useErrorNotification([modulesError, moduleConnectionsError, widgetsError, addError]);
 
     const widgetTypes = useMemo(() => {
         return plugins.reduce((prev, curr) => prev.concat(curr.widgets), []);
@@ -85,29 +77,7 @@ const Dashboard = () => {
                 arrowHeadType: "arrow",
             }));
 
-            // setElements(moduleElements.concat(connectionElements));
-            setElements([
-                {
-                    id: "1",
-                    type: "Widget",
-                    position: { x: 10, y: 10 },
-                    data: {
-                        id: 1,
-                        widgetType: "DeviceInput",
-                        state: {},
-                    },
-                },
-                {
-                    id: "2",
-                    type: "Widget",
-                    position: { x: 200, y: 50 },
-                    data: {
-                        id: 2,
-                        widgetType: "DeviceOutput",
-                        state: {},
-                    },
-                },
-            ]);
+            setElements(moduleElements.concat(connectionElements));
         }
     }, [modules, moduleConnections]);
 
@@ -136,10 +106,15 @@ const Dashboard = () => {
                     top: clientY,
                 },
             };
+
+            console.log(module);
+
+            setNewModule(module);
+            addModule();
         }
     };
 
-    const isLoading = isLoadingModules || isLoadingModuleConnections || isLoadingWidgets;
+    const isLoading = isLoadingModules || isLoadingModuleConnections || isLoadingWidgets || isAddingModule;
 
     return (
         <PageContainer noPadding>

@@ -87,7 +87,9 @@ namespace Micser
         {
             services.AddNlog("Micser.Engine.log");
 
-            services.AddControllers();
+            services.AddControllers()
+                .AddNewtonsoftJson();
+
             services.AddSignalR(options =>
             {
                 // increase max message size for spectrum data

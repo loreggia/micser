@@ -17,7 +17,7 @@ namespace Micser.Controllers
         }
 
         [HttpPost("")]
-        public async Task<ModuleDto> CreateAsync(ModuleDto module)
+        public async Task<ModuleDto> CreateAsync([FromBody] ModuleDto module)
         {
             await _moduleService.InsertAsync(module);
             return module;
