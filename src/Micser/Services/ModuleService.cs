@@ -15,59 +15,58 @@ namespace Micser.Services
     {
         private readonly IDbContextFactory<EngineDbContext> _dbContextFactory;
 
-        /// <inheritdoc />
         public ModuleService(IDbContextFactory<EngineDbContext> dbContextFactory)
         {
             _dbContextFactory = dbContextFactory;
         }
 
         /// <inheritdoc />
-        public async Task<ModuleDto?> DeleteAsync(long id)
+        public async Task<Module?> DeleteAsync(long id)
         {
             await using var dbContext = _dbContextFactory.CreateDbContext();
-            var module = await dbContext.Modules.FindAsync(id).ConfigureAwait(false);
+            var entity = await dbContext.Modules.FindAsync(id).ConfigureAwait(false);
 
-            if (module == null)
+            if (entity == null)
             {
                 return null;
             }
 
-            dbContext.Modules.Remove(module);
+            dbContext.Modules.Remove(entity);
             await dbContext.SaveChangesAsync().ConfigureAwait(false);
 
-            return GetModuleDto(module);
+            return ToModel(entity);
         }
 
         /// <inheritdoc />
-        public async IAsyncEnumerable<ModuleDto> GetAllAsync()
+        public async IAsyncEnumerable<Module> GetAllAsync()
         {
             await using var dbContext = _dbContextFactory.CreateDbContext();
-            await foreach (var module in dbContext.Modules)
+            await foreach (var entity in dbContext.Modules)
             {
-                yield return GetModuleDto(module);
+                yield return ToModel(entity);
             }
         }
 
         /// <inheritdoc />
-        public async Task<ModuleDto?> GetByIdAsync(long id)
+        public async Task<Module?> GetByIdAsync(long id)
         {
             await using var dbContext = _dbContextFactory.CreateDbContext();
-            var module = await dbContext.Modules.FindAsync(id).ConfigureAwait(false);
-            return module == null ? null : GetModuleDto(module);
+            var entity = await dbContext.Modules.FindAsync(id).ConfigureAwait(false);
+            return entity == null ? null : ToModel(entity);
         }
 
         /// <inheritdoc />
-        public async Task InsertAsync(ModuleDto moduleDto)
+        public async Task InsertAsync(Module module)
         {
-            var module = GetModule(moduleDto);
+            var entity = ToEntity(module);
 
             await using var dbContext = _dbContextFactory.CreateDbContext();
 
-            await dbContext.Modules.AddAsync(module).ConfigureAwait(false);
+            await dbContext.Modules.AddAsync(entity).ConfigureAwait(false);
 
             if (await dbContext.SaveChangesAsync().ConfigureAwait(false) > 0)
             {
-                moduleDto.Id = module.Id;
+                module.Id = entity.Id;
             }
         }
 
@@ -75,58 +74,56 @@ namespace Micser.Services
         public async Task TruncateAsync()
         {
             await using var dbContext = _dbContextFactory.CreateDbContext();
-            await foreach (var module in dbContext.Modules)
+            await foreach (var entity in dbContext.Modules)
             {
-                dbContext.Modules.Remove(module);
+                dbContext.Modules.Remove(entity);
             }
             await dbContext.SaveChangesAsync().ConfigureAwait(false);
         }
 
         /// <inheritdoc />
-        public async Task UpdateAsync(ModuleDto moduleDto)
+        public async Task UpdateAsync(Module module)
         {
             await using var dbContext = _dbContextFactory.CreateDbContext();
-            var module = await dbContext.Modules.FindAsync(moduleDto.Id).ConfigureAwait(false);
+            var entity = await dbContext.Modules.FindAsync(module.Id).ConfigureAwait(false);
 
-            if (module == null)
+            if (entity == null)
             {
                 throw new NotFoundApiException();
             }
 
-            var state = JsonConvert.DeserializeObject<ModuleState>(module.StateJson);
-            state.IsEnabled = moduleDto.State.IsEnabled;
-            state.IsMuted = moduleDto.State.IsMuted;
-            state.UseSystemVolume = moduleDto.State.UseSystemVolume;
-            state.Volume = moduleDto.State.Volume;
-            foreach (var data in moduleDto.State)
+            var state = JsonConvert.DeserializeObject<ModuleState>(entity.StateJson);
+            state.IsEnabled = module.State.IsEnabled;
+            state.IsMuted = module.State.IsMuted;
+            state.UseSystemVolume = module.State.UseSystemVolume;
+            state.Volume = module.State.Volume;
+            foreach (var data in module.State)
             {
                 state[data.Key] = data.Value;
             }
 
-            module.StateJson = JsonConvert.SerializeObject(state);
+            entity.StateJson = JsonConvert.SerializeObject(state);
 
-            moduleDto.State = state;
+            module.State = state;
 
             await dbContext.SaveChangesAsync().ConfigureAwait(false);
         }
 
-        private static Module GetModule(ModuleDto moduleDto)
+        private static ModuleEntity ToEntity(Module module)
         {
-            return new Module
+            return new ModuleEntity
             {
-                ModuleType = moduleDto.ModuleType,
-                WidgetType = moduleDto.WidgetType,
-                StateJson = JsonConvert.SerializeObject(moduleDto.State)
+                ModuleType = module.ModuleType,
+                StateJson = JsonConvert.SerializeObject(module.State)
             };
         }
 
-        private static ModuleDto GetModuleDto(Module module)
+        private static Module ToModel(ModuleEntity module)
         {
-            return new ModuleDto
+            return new Module
             {
                 Id = module.Id,
                 ModuleType = module.ModuleType,
-                WidgetType = module.WidgetType,
                 State = JsonConvert.DeserializeObject<ModuleState>(module.StateJson)
             };
         }

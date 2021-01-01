@@ -14,24 +14,24 @@ namespace Micser.Common.Services
         /// </summary>
         /// <param name="id">The ID of the module to delete.</param>
         /// <returns>The deleted module.</returns>
-        Task<ModuleDto?> DeleteAsync(long id);
+        Task<Module?> DeleteAsync(long id);
 
         /// <summary>
         /// Gets all modules.
         /// </summary>
-        IAsyncEnumerable<ModuleDto> GetAllAsync();
+        IAsyncEnumerable<Module> GetAllAsync();
 
         /// <summary>
         /// Gets a module with the specified ID or null if no module exists with this ID.
         /// </summary>
         /// <param name="id">The ID of the module.</param>
-        Task<ModuleDto?> GetByIdAsync(long id);
+        Task<Module?> GetByIdAsync(long id);
 
         /// <summary>
         /// Inserts a new module to the DB.
         /// </summary>
         /// <param name="moduleDto">The module.</param>
-        Task InsertAsync(ModuleDto moduleDto);
+        Task InsertAsync(Module module);
 
         /// <summary>
         /// Deletes all modules from the DB.
@@ -42,6 +42,6 @@ namespace Micser.Common.Services
         /// Updates an existing module.
         /// </summary>
         /// <param name="moduleDto">The module to update.</param>
-        Task UpdateAsync(ModuleDto moduleDto);
+        Task UpdateAsync(Module module);
     }
 }

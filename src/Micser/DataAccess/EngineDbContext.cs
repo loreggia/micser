@@ -18,13 +18,13 @@ namespace Micser.DataAccess
         /// <summary>
         /// The module connections store.
         /// </summary>
-        public DbSet<ModuleConnection> ModuleConnections { get; set; }
+        public DbSet<ModuleConnectionEntity> ModuleConnections { get; set; }
 
         // ReSharper disable once UnusedMember.Global
         /// <summary>
         /// The modules store.
         /// </summary>
-        public DbSet<Module> Modules { get; set; }
+        public DbSet<ModuleEntity> Modules { get; set; }
 
         // ReSharper disable once UnusedMember.Global
         /// <summary>
@@ -39,12 +39,11 @@ namespace Micser.DataAccess
                 .HasIndex(x => x.Key)
                 .IsUnique();
 
-            modelBuilder.Entity<Module>()
-                .HasMany(m => m.SourceModuleConnections)
+            var module = modelBuilder.Entity<ModuleEntity>();
+            module.HasMany(m => m.SourceModuleConnections)
                 .WithOne(c => c.SourceModule)
                 .HasForeignKey(c => c.SourceModuleId);
-            modelBuilder.Entity<Module>()
-                .HasMany(m => m.TargetModuleConnections)
+            module.HasMany(m => m.TargetModuleConnections)
                 .WithOne(c => c.TargetModule)
                 .HasForeignKey(c => c.TargetModuleId);
         }

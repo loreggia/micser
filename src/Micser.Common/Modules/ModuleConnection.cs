@@ -3,7 +3,7 @@
     /// <summary>
     /// DTO representing a module connection.
     /// </summary>
-    public class ModuleConnectionDto : IIdentifiable
+    public class ModuleConnection : IIdentifiable
     {
         /// <summary>
         /// Gets or sets the ID of this connection.

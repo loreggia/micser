@@ -1,5 +1,5 @@
 import React from "react";
-import PageContainer from "../../PageContainer";
+import PageContainer from "/components/PageContainer";
 
 const Settings = () => {
     return <PageContainer>Settings</PageContainer>;

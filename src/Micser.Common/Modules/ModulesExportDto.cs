@@ -8,11 +8,11 @@
         /// <summary>
         /// Gets or sets the connections between the modules.
         /// </summary>
-        public ModuleConnectionDto[] Connections { get; set; }
+        public ModuleConnection[] Connections { get; set; }
 
         /// <summary>
         /// Gets or sets the modules.
         /// </summary>
-        public ModuleDto[] Modules { get; set; }
+        public Module[] Modules { get; set; }
     }
 }

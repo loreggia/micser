@@ -14,24 +14,24 @@ namespace Micser.Common.Services
         /// </summary>
         /// <param name="id">The ID of the connection to delete.</param>
         /// <returns>The deleted connection.</returns>
-        Task<ModuleConnectionDto?> DeleteAsync(long id);
+        Task<ModuleConnection?> DeleteAsync(long id);
 
         /// <summary>
         /// Gets all connections.
         /// </summary>
-        IAsyncEnumerable<ModuleConnectionDto> GetAllAsync();
+        IAsyncEnumerable<ModuleConnection> GetAllAsync();
 
         /// <summary>
         /// Gets a connection with the specified ID or null if no connection exists with this ID.
         /// </summary>
         /// <param name="id">The ID of the connection.</param>
-        Task<ModuleConnectionDto?> GetByIdAsync(long id);
+        Task<ModuleConnection?> GetByIdAsync(long id);
 
         /// <summary>
         /// Inserts a new connection to the DB.
         /// </summary>
-        /// <param name="dto">The connection.</param>
-        Task InsertAsync(ModuleConnectionDto dto);
+        /// <param name="mc">The connection.</param>
+        Task InsertAsync(ModuleConnection mc);
 
         /// <summary>
         /// Deletes all connections from the DB.
@@ -41,7 +41,7 @@ namespace Micser.Common.Services
         /// <summary>
         /// Updates an existing connection.
         /// </summary>
-        /// <param name="dto">The connection to update.</param>
-        Task UpdateAsync(ModuleConnectionDto dto);
+        /// <param name="mc">The connection to update.</param>
+        Task UpdateAsync(ModuleConnection mc);
     }
 }

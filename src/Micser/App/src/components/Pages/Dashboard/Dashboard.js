@@ -5,10 +5,11 @@ import { Card, Drawer, Space, Typography } from "antd";
 import { AppstoreAddOutlined } from "@ant-design/icons";
 import { Loader, useApi } from "micser-common";
 
-import PageContainer from "../../PageContainer";
+import PageContainer from "/components/PageContainer";
 import Widget, { WidgetTypesContext } from "./Widget";
-import { useErrorNotification } from "../../../hooks";
-import { PluginsContext } from "../../../hooks/usePlugins";
+
+import { useErrorNotification } from "/hooks";
+import { PluginsContext } from "/hooks/usePlugins";
 
 const FixedButton = styled.div`
     position: fixed;
@@ -32,28 +33,26 @@ const WidgetListCard = styled(Card)``;
 
 const { Text, Title } = Typography;
 
+const DragDropKey = "moduledescription";
+
 const Dashboard = () => {
     const plugins = useContext(PluginsContext);
     const [elements, setElements] = useState([]);
     const [isAddDrawerOpen, setIsAddDrawerOpen] = useState(false);
     const [newModule, setNewModule] = useState(null);
 
-    const [modules, isLoadingModules, refreshModules, modulesLoaded, modulesError] = useApi("Modules");
-    const [
-        moduleConnections,
-        isLoadingModuleConnections,
-        refreshModuleConnections,
-        moduleConnectionsLoaded,
-        moduleConnectionsError,
-    ] = useApi("ModuleConnections");
-    const [widgets, isLoadingWidgets, refreshWidgets, widgetsLoaded, widgetsError] = useApi("Widgets");
-    const [addedModule, isAddingModule, addModule, moduleAdded, addError] = useApi("Modules", {
+    const [modules, isLoadingModules, refreshModules, , modulesError] = useApi("Modules");
+    const [moduleConnections, isLoadingModuleConnections, , , moduleConnectionsError] = useApi("ModuleConnections");
+    const [moduleDescriptions, isLoadingModuleDescriptions, , , moduleDescriptionsError] = useApi(
+        "Modules/Descriptions"
+    );
+    const [addedModule, isAddingModule, addModule, , addError] = useApi("Modules", {
         autoLoad: false,
         method: "post",
         data: newModule,
     });
 
-    useErrorNotification([modulesError, moduleConnectionsError, widgetsError, addError]);
+    useErrorNotification([modulesError, moduleConnectionsError, moduleDescriptionsError, addError]);
 
     const widgetTypes = useMemo(() => {
         return plugins.reduce((prev, curr) => prev.concat(curr.widgets), []);
@@ -64,7 +63,7 @@ const Dashboard = () => {
             const moduleElements = modules.map((dto) => ({
                 id: String(dto.id),
                 type: "Widget",
-                position: { x: dto.state.left, y: dto.state.top },
+                position: { x: Number(dto.state.left), y: Number(dto.state.top) },
                 data: dto,
             }));
             const connectionElements = moduleConnections.map((dto) => ({
@@ -81,26 +80,32 @@ const Dashboard = () => {
         }
     }, [modules, moduleConnections]);
 
+    useEffect(() => {
+        if (addedModule) {
+            refreshModules();
+        }
+    }, [refreshModules, addedModule]);
+
     const nodeTypes = useMemo(() => ({ Widget: Widget }), []);
 
-    const handleDragStart = (e, widget) => {
-        e.dataTransfer.setData("widget", JSON.stringify(widget));
+    const handleDragStart = (e, moduleDescription) => {
+        e.dataTransfer.setData(DragDropKey, JSON.stringify(moduleDescription));
     };
 
     const handleDragOver = (e) => {
-        if (e.dataTransfer.types.includes("widget")) {
+        if (e.dataTransfer.types.includes(DragDropKey)) {
             e.preventDefault();
         }
     };
 
     const handleDrop = (e) => {
-        const strWidget = e.dataTransfer.getData("widget");
-        if (strWidget) {
-            const widget = JSON.parse(strWidget);
+        const data = e.dataTransfer.getData(DragDropKey);
+        if (data) {
+            const moduleDescription = JSON.parse(data);
             const { clientX, clientY } = e;
 
             const module = {
-                widgetType: widget.name,
+                moduleType: moduleDescription.name,
                 state: {
                     left: clientX,
                     top: clientY,
@@ -114,7 +119,9 @@ const Dashboard = () => {
         }
     };
 
-    const isLoading = isLoadingModules || isLoadingModuleConnections || isLoadingWidgets || isAddingModule;
+    const handleNodeDragStop = (e, node) => {};
+
+    const isLoading = isLoadingModules || isLoadingModuleConnections || isLoadingModuleDescriptions || isAddingModule;
 
     return (
         <PageContainer noPadding>
@@ -128,6 +135,7 @@ const Dashboard = () => {
                     style={{ width: "100%", height: "100%" }}
                     onDragOver={handleDragOver}
                     onDrop={handleDrop}
+                    onNodeDragStop={handleNodeDragStop}
                 >
                     <Controls />
                     <Background variant="dots" size={1} gap={10} color="#333" />
@@ -136,17 +144,17 @@ const Dashboard = () => {
                     <Title level={2}>Add Widget</Title>
                     <Text type="secondary">Drag a widget from the list to the dashboard.</Text>
                     <Space direction="vertical" size="middle" style={{ width: "100%" }}>
-                        {widgets &&
-                            widgets.map((widget) => (
+                        {moduleDescriptions &&
+                            moduleDescriptions.map((description) => (
                                 <WidgetListCard
-                                    key={widget.name}
+                                    key={description.name}
                                     size="small"
-                                    title={widget.title}
+                                    title={description.title}
                                     hoverable
                                     draggable
-                                    onDragStart={(e) => handleDragStart(e, widget)}
+                                    onDragStart={(e) => handleDragStart(e, description)}
                                 >
-                                    {widget.description}
+                                    {description.description}
                                 </WidgetListCard>
                             ))}
                     </Space>

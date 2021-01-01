@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Design;
 
 namespace Micser.DataAccess
 {
-    // ReSharper disable once UnusedMember.Global
+    // ReSharper disable once UnusedType.Global
     public class DesignTimeFactory : IDesignTimeDbContextFactory<EngineDbContext>
     {
         public EngineDbContext CreateDbContext(string[] args)

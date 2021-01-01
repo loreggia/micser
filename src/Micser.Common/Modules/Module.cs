@@ -3,10 +3,11 @@
     /// <summary>
     /// DTO representing a module.
     /// </summary>
-    public class ModuleDto : IIdentifiable
+    public class Module : IIdentifiable
     {
-        public ModuleDto()
+        public Module()
         {
+            ModuleType = "Unknown";
             State = new ModuleState();
         }
 
@@ -16,18 +17,13 @@
         public long Id { get; set; }
 
         /// <summary>
-        /// Gets or sets the assembly-qualified type name of the module's class.
+        /// Gets or sets the type/identifier of the module.
         /// </summary>
-        public string? ModuleType { get; set; }
+        public string ModuleType { get; set; }
 
         /// <summary>
         /// Gets or sets the module's current state.
         /// </summary>
         public ModuleState State { get; set; }
-
-        /// <summary>
-        /// Gets or sets the assembly-qualified type name of the module's UI/widget class.
-        /// </summary>
-        public string? WidgetType { get; set; }
     }
 }
