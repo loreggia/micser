@@ -71,7 +71,7 @@ const useApi = (url, { autoLoad, method, data } = { autoLoad: true, method: "get
             }
         };
 
-        if (autoLoad || refreshIndex > 1) {
+        if (autoLoad || refreshIndex > 0) {
             loadAsync();
         }
 
