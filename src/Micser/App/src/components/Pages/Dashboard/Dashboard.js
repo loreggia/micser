@@ -41,12 +41,10 @@ const Dashboard = () => {
     const [isAddDrawerOpen, setIsAddDrawerOpen] = useState(false);
     const [newModule, setNewModule] = useState(null);
 
-    const [modules, isLoadingModules, refreshModules, , modulesError] = useApi("Modules");
-    const [moduleConnections, isLoadingModuleConnections, , , moduleConnectionsError] = useApi("ModuleConnections");
-    const [moduleDescriptions, isLoadingModuleDescriptions, , , moduleDescriptionsError] = useApi(
-        "Modules/Descriptions"
-    );
-    const [addedModule, isAddingModule, addModule, , addError] = useApi("Modules", {
+    const [modules, isLoadingModules, modulesError, refreshModules] = useApi("Modules");
+    const [moduleConnections, isLoadingModuleConnections, moduleConnectionsError] = useApi("ModuleConnections");
+    const [moduleDescriptions, isLoadingModuleDescriptions, moduleDescriptionsError] = useApi("Modules/Descriptions");
+    const [addedModule, isAddingModule, addError, addModule] = useApi("Modules", {
         autoLoad: false,
         method: "post",
         data: newModule,

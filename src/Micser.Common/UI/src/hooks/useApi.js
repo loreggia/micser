@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import AxiosStatic from "axios";
 
 const useApi = (url, { autoLoad, method, data } = { autoLoad: true, method: "get" }) => {
@@ -16,9 +16,9 @@ const useApi = (url, { autoLoad, method, data } = { autoLoad: true, method: "get
     const [error, setError] = useState();
     const [refreshIndex, setRefreshIndex] = useState(0);
 
-    const refresh = () => {
-        setRefreshIndex(refreshIndex + 1);
-    };
+    const refresh = useCallback(() => {
+        setRefreshIndex((i) => i + 1);
+    }, []);
 
     useEffect(() => {
         let isCancelled = false;
@@ -80,7 +80,7 @@ const useApi = (url, { autoLoad, method, data } = { autoLoad: true, method: "get
         };
     }, [axios, url, autoLoad, method, data, refreshIndex]);
 
-    return [result, isLoading, refresh, isLoaded, error];
+    return [result, isLoading, error, refresh, isLoaded];
 };
 
 export default useApi;

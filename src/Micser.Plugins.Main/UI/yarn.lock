@@ -1769,7 +1769,7 @@ merge-stream@^2.0.0:
   integrity sha512-abv/qOcuPfk3URPfDzmZU1LKmuw8kT+0nIHvKrKgFrwifol/doWcdA4ZqsWQ8ENrFKkd67Mfpo/LovbIUsbt3w==
 
 micser-common@../../Micser.Common/UI:
-  version "1.0.14"
+  version "1.0.17"
 
 mime-db@1.45.0:
   version "1.45.0"
