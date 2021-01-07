@@ -101,6 +101,7 @@ const Dashboard = () => {
         if (data) {
             const moduleDescription = JSON.parse(data);
             const { clientX, clientY } = e;
+            console.log(e);
 
             const module = {
                 moduleType: moduleDescription.name,

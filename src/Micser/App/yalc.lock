@@ -1,0 +1,9 @@
+{
+  "version": "v1",
+  "packages": {
+    "micser-common": {
+      "signature": "ef88a1b28c54fce33c5673d48c1283c7",
+      "file": true
+    }
+  }
+}

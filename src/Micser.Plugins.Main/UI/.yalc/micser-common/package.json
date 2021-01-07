@@ -1,0 +1,24 @@
+{
+    "name": "micser-common",
+    "version": "1.0.17+ef88a1b2",
+    "author": "Lucas Loreggia",
+    "license": "MIT",
+    "private": true,
+    "main": "dist/main.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "start": "start-storybook",
+        "build": "webpack --mode production",
+        "publish-local": "yalc publish --private",
+        "postinstall": "yarn run build && yalc publish --private"
+    },
+    "dependencies": {},
+    "peerDependencies": {
+        "antd": ">=4.0.0",
+        "axios": ">=0.21.0",
+        "react": ">=17.0.0",
+        "react-dom": ">=17.0.0",
+        "styled-components": ">=5.0.0"
+    },
+    "yalcSig": "ef88a1b28c54fce33c5673d48c1283c7"
+}
