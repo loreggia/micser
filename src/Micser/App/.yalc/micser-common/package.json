@@ -1,9 +1,9 @@
 {
     "name": "micser-common",
-    "version": "1.0.17+ef88a1b2",
+    "version": "1.0.17+79789a3d",
     "author": "Lucas Loreggia",
     "license": "MIT",
-    "private": true,
+    "private": false,
     "main": "dist/main.js",
     "scripts": {
         "test": "echo \"Error: no test specified\" && exit 1",
@@ -20,5 +20,5 @@
         "react-dom": ">=17.0.0",
         "styled-components": ">=5.0.0"
     },
-    "yalcSig": "ef88a1b28c54fce33c5673d48c1283c7"
+    "yalcSig": "79789a3dc8f94f470248dde70c0a5620"
 }
