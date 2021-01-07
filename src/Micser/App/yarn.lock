@@ -7502,7 +7502,7 @@ micromatch@^4.0.2:
     braces "^3.0.1"
     picomatch "^2.0.5"
 
-"micser-common@file:../../Micser.Common/UI":
+"micser-common@file:.yalc/micser-common":
   version "1.0.17"
 
 miller-rabin@^4.0.0:

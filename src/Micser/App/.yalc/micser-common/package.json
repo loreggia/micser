@@ -1,6 +1,6 @@
 {
     "name": "micser-common",
-    "version": "1.0.17+79789a3d",
+    "version": "1.0.17+a8803f92",
     "author": "Lucas Loreggia",
     "license": "MIT",
     "private": false,
@@ -9,8 +9,7 @@
         "test": "echo \"Error: no test specified\" && exit 1",
         "start": "start-storybook",
         "build": "webpack --mode production",
-        "publish-local": "yalc publish --private",
-        "postinstall": "yarn run build && yalc publish --private"
+        "publish-local": "yarn build && yalc push"
     },
     "dependencies": {},
     "peerDependencies": {
@@ -20,5 +19,5 @@
         "react-dom": ">=17.0.0",
         "styled-components": ">=5.0.0"
     },
-    "yalcSig": "79789a3dc8f94f470248dde70c0a5620"
+    "yalcSig": "a8803f92de9851705e2c9cf39ced867f"
 }
