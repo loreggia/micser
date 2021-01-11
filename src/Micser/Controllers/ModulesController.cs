@@ -25,6 +25,19 @@ namespace Micser.Controllers
             return module;
         }
 
+        [HttpDelete("{id?}")]
+        public async Task DeleteAsync(long? id = null)
+        {
+            if (id == null)
+            {
+                await _moduleService.TruncateAsync();
+            }
+            else
+            {
+                await _moduleService.DeleteAsync(id.Value);
+            }
+        }
+
         [HttpGet("")]
         public IAsyncEnumerable<Module> GetAllAsync()
         {
@@ -35,6 +48,13 @@ namespace Micser.Controllers
         public IEnumerable<ModuleDescription> GetDescriptions()
         {
             return _moduleDescriptions;
+        }
+
+        [HttpPut("")]
+        public async Task<Module> UpdateAsync([FromBody] Module module)
+        {
+            await _moduleService.UpdateAsync(module);
+            return module;
         }
     }
 }

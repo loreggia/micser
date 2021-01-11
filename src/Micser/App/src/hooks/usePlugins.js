@@ -27,7 +27,8 @@ const loadModuleAsync = (fileName, moduleName) => {
 };
 
 const usePlugins = () => {
-    const [pluginDefinitions, isLoading] = useApi("plugins");
+    const pluginsApi = useApi("plugins");
+    const { result: pluginDefinitions, isLoading } = pluginsApi;
     const [plugins, setPlugins] = useState([]);
 
     useEffect(() => {

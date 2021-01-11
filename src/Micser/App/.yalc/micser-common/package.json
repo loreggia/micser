@@ -1,6 +1,6 @@
 {
     "name": "micser-common",
-    "version": "1.0.17+a8803f92",
+    "version": "1.0.17+1601d809",
     "author": "Lucas Loreggia",
     "license": "MIT",
     "private": false,
@@ -19,5 +19,5 @@
         "react-dom": ">=17.0.0",
         "styled-components": ">=5.0.0"
     },
-    "yalcSig": "a8803f92de9851705e2c9cf39ced867f"
+    "yalcSig": "1601d8094c574c38e441f740a4b010c7"
 }

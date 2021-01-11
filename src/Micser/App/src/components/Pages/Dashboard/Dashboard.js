@@ -1,8 +1,8 @@
-import React, { useContext, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useContext, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import ReactFlow, { Background, Controls } from "react-flow-renderer";
-import { Card, Drawer, Dropdown, Menu, Space, Typography } from "antd";
-import { AppstoreAddOutlined } from "@ant-design/icons";
+import { Card, Drawer, Dropdown, Menu, Modal, Space, Typography } from "antd";
+import { AppstoreAddOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
 import { Loader, useApi } from "micser-common";
 
 import PageContainer from "/components/PageContainer";
@@ -37,24 +37,33 @@ const { Text, Title } = Typography;
 const ModuleDescriptionKey = "moduledescription";
 const DragOffsetKey = "dragoffset";
 
+const GridSize = 10;
+
+const ContextMenuActions = {
+    DeleteModule: "DeleteModule",
+    DeleteConnections: "DeleteConnections",
+    DeleteConnectionsIn: "DeleteConnectionsIn",
+    DeleteConnectionsOut: "DeleteConnectionsOut",
+    DeleteAll: "DeleteAll",
+};
+
 const Dashboard = () => {
     const plugins = useContext(PluginsContext);
     const [elements, setElements] = useState([]);
     const [isAddDrawerOpen, setIsAddDrawerOpen] = useState(false);
-    const [newModule, setNewModule] = useState(null);
     const [flowTransform, setFlowTransform] = useState({ x: 0, y: 0, zoom: 1 });
     const [contextMenuTarget, setContextMenuTarget] = useState();
 
-    const [modules, isLoadingModules, modulesError, refreshModules] = useApi("Modules");
-    const [moduleConnections, isLoadingModuleConnections, moduleConnectionsError] = useApi("ModuleConnections");
-    const [moduleDescriptions, isLoadingModuleDescriptions, moduleDescriptionsError] = useApi("Modules/Descriptions");
-    const [addedModule, isAddingModule, addError, addModule] = useApi("Modules", {
-        autoLoad: false,
-        method: "post",
-        data: newModule,
-    });
+    const modulesApi = useApi("Modules");
+    const { result: modules } = modulesApi;
 
-    useErrorNotification([modulesError, moduleConnectionsError, moduleDescriptionsError, addError]);
+    const moduleConnectionsApi = useApi("ModuleConnections");
+    const { result: moduleConnections } = moduleConnectionsApi;
+
+    const moduleDescriptionsApi = useApi("Modules/Descriptions");
+    const { result: moduleDescriptions } = moduleDescriptionsApi;
+
+    useErrorNotification([modulesApi.error, moduleConnectionsApi.error, moduleDescriptionsApi.error]);
 
     const widgetTypes = useMemo(() => {
         return plugins.reduce((prev, curr) => prev.concat(curr.widgets), []);
@@ -82,13 +91,12 @@ const Dashboard = () => {
         }
     }, [modules, moduleConnections]);
 
-    useEffect(() => {
-        if (addedModule) {
-            refreshModules();
-        }
-    }, [refreshModules, addedModule]);
-
     const nodeTypes = useMemo(() => ({ Widget: Widget }), []);
+
+    const deleteAllModules = useCallback(async () => {
+        await modulesApi.load({ method: "delete" });
+        modulesApi.load({ setResult: true });
+    }, [modulesApi]);
 
     const handleDragStart = (e, moduleDescription) => {
         e.dataTransfer.setData(ModuleDescriptionKey, JSON.stringify(moduleDescription));
@@ -102,7 +110,7 @@ const Dashboard = () => {
         }
     };
 
-    const handleDrop = (e) => {
+    const handleDrop = async (e) => {
         const data = e.dataTransfer.getData(ModuleDescriptionKey);
         if (data) {
             const moduleDescription = JSON.parse(data);
@@ -116,6 +124,10 @@ const Dashboard = () => {
                 position.y -= offset.y;
             }
 
+            // snap to grid
+            position.x = position.x - (position.x % GridSize);
+            position.y = position.y - (position.y % GridSize);
+
             const module = {
                 moduleType: moduleDescription.name,
                 state: {
@@ -124,12 +136,19 @@ const Dashboard = () => {
                 },
             };
 
-            setNewModule(module);
-            addModule();
+            await modulesApi.load({ method: "post", data: module });
+            modulesApi.load({ setResult: true });
         }
     };
 
-    const handleNodeDragStop = (e, node) => {};
+    const handleNodeDragStop = (_, node) => {
+        const { data: module } = node;
+        const { x, y } = node.position;
+        module.state.left = x;
+        module.state.top = y;
+
+        modulesApi.load({ method: "put", data: module });
+    };
 
     const handleMoveEnd = (transform) => {
         setFlowTransform(transform);
@@ -139,18 +158,49 @@ const Dashboard = () => {
         setContextMenuTarget(node);
     };
 
-    const isLoading = isLoadingModules || isLoadingModuleConnections || isLoadingModuleDescriptions || isAddingModule;
+    const isLoading = modulesApi.isLoading || moduleConnectionsApi.isLoading || moduleDescriptionsApi.isLoading;
 
-    const contextMenu = useMemo(
-        () => (
-            <Menu>
-                <Menu.Item key="1">{JSON.stringify(contextMenuTarget) || "Pane"}</Menu.Item>
-                <Menu.Item key="2">2nd menu item</Menu.Item>
-                <Menu.Item key="3">3rd menu item</Menu.Item>
+    const contextMenu = useMemo(() => {
+        const handleContextMenuClick = ({ key }) => {
+            switch (key) {
+                case ContextMenuActions.DeleteAll:
+                    Modal.confirm({
+                        title: "Delete All Modules",
+                        icon: <ExclamationCircleOutlined />,
+                        content: "Are you sure you want to delete all modules?",
+                        okText: "Yes",
+                        cancelText: "Cancel",
+                        onOk: () => deleteAllModules(),
+                    });
+                    break;
+                case ContextMenuActions.DeleteModule:
+                    break;
+                case ContextMenuActions.DeleteConnections:
+                    break;
+                case ContextMenuActions.DeleteConnectionsIn:
+                    break;
+                case ContextMenuActions.DeleteConnectionsOut:
+                    break;
+            }
+        };
+
+        return (
+            <Menu onClick={handleContextMenuClick}>
+                {contextMenuTarget ? (
+                    <>
+                        <Menu.Item key="DeleteModule">Delete Module</Menu.Item>
+                        <Menu.Item key="DeleteConnections">Delete Connections</Menu.Item>
+                        <Menu.Item key="DeleteConnectionsIn">Delete Incoming Connections</Menu.Item>
+                        <Menu.Item key="DeleteConnectionsOut">Delete Outgoing Connections</Menu.Item>
+                    </>
+                ) : (
+                    <>
+                        <Menu.Item key="DeleteAll">Delete All</Menu.Item>
+                    </>
+                )}
             </Menu>
-        ),
-        [contextMenuTarget]
-    );
+        );
+    }, [contextMenuTarget, deleteAllModules]);
 
     return (
         <PageContainer noPadding>
@@ -161,7 +211,7 @@ const Dashboard = () => {
                         elements={elements}
                         nodeTypes={nodeTypes}
                         snapToGrid
-                        snapGrid={[10, 10]}
+                        snapGrid={[GridSize, GridSize]}
                         defaultZoom={flowTransform.zoom}
                         defaultPosition={[flowTransform.x, flowTransform.y]}
                         style={{ width: "100%", height: "100%" }}

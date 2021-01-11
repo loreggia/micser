@@ -6,7 +6,7 @@ import { DeviceSelect, WidgetContainer } from "./Common";
 const { Option } = Select;
 
 const DeviceOutputWidget = ({ data }) => {
-    const [devices, isLoading] = useApi("Devices/Output");
+    const { result: devices, isLoading } = useApi("Devices/Output");
 
     return (
         <WidgetContainer>
