@@ -22,11 +22,10 @@ namespace Micser.Common.Audio
         private readonly IList<IAudioModule> _outputs;
 
         private readonly IList<ISampleProcessor> _sampleProcessors;
-        private float[] _channelSamplesBuffer;
+        private float[]? _channelSamplesBuffer;
         private float _volume = 1f;
-        private IWaveBuffer _waveBuffer;
+        private IWaveBuffer? _waveBuffer;
 
-        /// <inheritdoc />
         protected AudioModule(ILogger logger)
         {
             _logger = logger;
@@ -141,11 +140,6 @@ namespace Micser.Common.Audio
         /// <inheritdoc />
         public virtual void SetState(ModuleState state)
         {
-            if (state == null)
-            {
-                return;
-            }
-
             IsEnabled = state.IsEnabled;
             IsMuted = state.IsMuted;
             Volume = state.Volume;
@@ -162,7 +156,7 @@ namespace Micser.Common.Audio
                 return;
             }
 
-            byte[] nextBuffer = null;
+            byte[]? nextBuffer = null;
             int nextOffset;
 
             if (!IsEnabled || Math.Abs(Volume - 1f) < Epsilon && _sampleProcessors.All(p => p is VolumeSampleProcessor))
@@ -181,7 +175,11 @@ namespace Micser.Common.Audio
                 {
                     _waveBuffer = new WaveBuffer(count);
                 }
-                Array.Copy(buffer, offset, _waveBuffer.ByteBuffer, 0, count);
+
+                if (_waveBuffer != null)
+                {
+                    Array.Copy(buffer, offset, _waveBuffer.ByteBuffer, 0, count);
+                }
 
                 if (_channelSamplesBuffer == null || _channelSamplesBuffer.Length != waveFormat.Channels)
                 {
@@ -249,7 +247,7 @@ namespace Micser.Common.Audio
                     {
                         case 4:
                             ProcessIeeeFloat(waveFormat, sampleProcessors, count);
-                            nextBuffer = _waveBuffer.ByteBuffer;
+                            nextBuffer = _waveBuffer?.ByteBuffer;
                             break;
 
                         default:
@@ -283,12 +281,17 @@ namespace Micser.Common.Audio
         {
             if (disposing)
             {
-                _outputs?.Clear();
+                _outputs.Clear();
             }
         }
 
         private void ProcessIeeeFloat(WaveFormat waveFormat, ISampleProcessor[] sampleProcessors, int byteCount)
         {
+            if (_channelSamplesBuffer == null || _waveBuffer == null)
+            {
+                return;
+            }
+
             for (var i = 0; i < byteCount / 4; i += waveFormat.Channels)
             {
                 for (int c = 0; c < waveFormat.Channels; c++)
@@ -310,6 +313,11 @@ namespace Micser.Common.Audio
 
         private void ProcessPcm16(WaveFormat waveFormat, ISampleProcessor[] sampleProcessors, int byteCount)
         {
+            if (_channelSamplesBuffer == null || _waveBuffer == null)
+            {
+                return;
+            }
+
             for (var i = 0; i < byteCount / 2; i += waveFormat.Channels)
             {
                 for (int c = 0; c < waveFormat.Channels; c++)
@@ -331,6 +339,11 @@ namespace Micser.Common.Audio
 
         private void ProcessPcm32(WaveFormat waveFormat, ISampleProcessor[] sampleProcessors, int byteCount)
         {
+            if (_channelSamplesBuffer == null || _waveBuffer == null)
+            {
+                return;
+            }
+
             for (var i = 0; i < byteCount / 4; i += waveFormat.Channels)
             {
                 for (int c = 0; c < waveFormat.Channels; c++)
@@ -352,6 +365,11 @@ namespace Micser.Common.Audio
 
         private void ProcessPcm8(WaveFormat waveFormat, ISampleProcessor[] sampleProcessors, int byteCount)
         {
+            if (_channelSamplesBuffer == null || _waveBuffer == null)
+            {
+                return;
+            }
+
             for (var i = 0; i < byteCount; i += waveFormat.Channels)
             {
                 for (int c = 0; c < waveFormat.Channels; c++)

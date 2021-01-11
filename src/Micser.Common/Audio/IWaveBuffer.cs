@@ -21,7 +21,7 @@
         /// Gets the float buffer.
         /// </summary>
         /// <value>The float buffer.</value>
-        float[] FloatBuffer { get; }
+        float[]? FloatBuffer { get; }
 
         /// <summary>
         /// Gets the float buffer count.
@@ -33,7 +33,7 @@
         /// Gets the int buffer.
         /// </summary>
         /// <value>The int buffer.</value>
-        int[] IntBuffer { get; }
+        int[]? IntBuffer { get; }
 
         /// <summary>
         /// Gets the int buffer count.
@@ -51,7 +51,7 @@
         /// Gets the short buffer.
         /// </summary>
         /// <value>The short buffer.</value>
-        short[] ShortBuffer { get; }
+        short[]? ShortBuffer { get; }
 
         /// <summary>
         /// Gets the short buffer count.

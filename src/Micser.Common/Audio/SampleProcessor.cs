@@ -7,7 +7,6 @@ namespace Micser.Common.Audio
     /// </summary>
     public abstract class SampleProcessor : ISampleProcessor
     {
-        /// <inheritdoc />
         protected SampleProcessor()
         {
             IsEnabled = true;

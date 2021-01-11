@@ -11,9 +11,8 @@ namespace Micser.Common.Audio
     {
         private readonly object _lockObj = new object();
         private readonly List<ISampleSource> _sampleSources = new List<ISampleSource>();
-        private float[] _mixerBuffer;
+        private float[]? _mixerBuffer;
 
-        /// <inheritdoc />
         public MixerSampleSource(int channelCount, int sampleRate)
         {
             if (channelCount < 1)
@@ -69,11 +68,6 @@ namespace Micser.Common.Audio
         /// </summary>
         public void AddSource(ISampleSource source)
         {
-            if (source == null)
-            {
-                throw new ArgumentNullException(nameof(source));
-            }
-
             if (source.WaveFormat.Channels != WaveFormat.Channels ||
                source.WaveFormat.SampleRate != WaveFormat.SampleRate)
             {
@@ -94,7 +88,7 @@ namespace Micser.Common.Audio
         /// </summary>
         public bool Contains(ISampleSource source)
         {
-            return source != null && _sampleSources.Contains(source);
+            return _sampleSources.Contains(source);
         }
 
         /// <inheritdoc />
@@ -205,7 +199,7 @@ namespace Micser.Common.Audio
         /// </summary>
         protected virtual void Dispose(bool disposing)
         {
-            if (disposing && _sampleSources != null && _lockObj != null)
+            if (disposing)
             {
                 lock (_lockObj)
                 {

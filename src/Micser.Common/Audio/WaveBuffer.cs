@@ -13,16 +13,16 @@ namespace Micser.Common.Audio
         private int _byteCount;
 
         [FieldOffset(8)]
-        private byte[] _byteBuffer;
+        private byte[] _byteBuffer = null!;
 
         [FieldOffset(8)]
-        private readonly float[] _floatBuffer;
+        private readonly float[]? _floatBuffer;
 
         [FieldOffset(8)]
-        private readonly short[] _shortBuffer;
+        private readonly short[]? _shortBuffer;
 
         [FieldOffset(8)]
-        private readonly int[] _intBuffer;
+        private readonly int[]? _intBuffer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WaveBuffer"/> class.
@@ -66,7 +66,7 @@ namespace Micser.Common.Audio
         /// </summary>
         /// <param name="waveBuffer">The wave buffer.</param>
         /// <returns>The result of the conversion.</returns>
-        public static implicit operator byte[] (WaveBuffer waveBuffer)
+        public static implicit operator byte[](WaveBuffer waveBuffer)
         {
             return waveBuffer._byteBuffer;
         }
@@ -76,7 +76,7 @@ namespace Micser.Common.Audio
         /// </summary>
         /// <param name="waveBuffer">The wave buffer.</param>
         /// <returns>The result of the conversion.</returns>
-        public static implicit operator float[] (WaveBuffer waveBuffer)
+        public static implicit operator float[]?(WaveBuffer waveBuffer)
         {
             return waveBuffer._floatBuffer;
         }
@@ -86,7 +86,7 @@ namespace Micser.Common.Audio
         /// </summary>
         /// <param name="waveBuffer">The wave buffer.</param>
         /// <returns>The result of the conversion.</returns>
-        public static implicit operator int[] (WaveBuffer waveBuffer)
+        public static implicit operator int[]?(WaveBuffer waveBuffer)
         {
             return waveBuffer._intBuffer;
         }
@@ -96,7 +96,7 @@ namespace Micser.Common.Audio
         /// </summary>
         /// <param name="waveBuffer">The wave buffer.</param>
         /// <returns>The result of the conversion.</returns>
-        public static implicit operator short[] (WaveBuffer waveBuffer)
+        public static implicit operator short[]?(WaveBuffer waveBuffer)
         {
             return waveBuffer._shortBuffer;
         }
@@ -111,19 +111,19 @@ namespace Micser.Common.Audio
         /// Gets the float buffer.
         /// </summary>
         /// <value>The float buffer.</value>
-        public float[] FloatBuffer => _floatBuffer;
+        public float[]? FloatBuffer => _floatBuffer;
 
         /// <summary>
         /// Gets the short buffer.
         /// </summary>
         /// <value>The short buffer.</value>
-        public short[] ShortBuffer => _shortBuffer;
+        public short[]? ShortBuffer => _shortBuffer;
 
         /// <summary>
         /// Gets the int buffer.
         /// </summary>
         /// <value>The int buffer.</value>
-        public int[] IntBuffer => _intBuffer;
+        public int[]? IntBuffer => _intBuffer;
 
         /// <summary>
         /// Gets the max size in bytes of the byte buffer..

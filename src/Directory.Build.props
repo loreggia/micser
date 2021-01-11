@@ -2,6 +2,7 @@
   <PropertyGroup>
     <VersionPrefix>2.1.0</VersionPrefix>
     <LangVersion>latest</LangVersion>
+    <NoWarn>NU1701</NoWarn>
   </PropertyGroup>
   <PropertyGroup>
     <Configurations>Debug;Release;Test</Configurations>

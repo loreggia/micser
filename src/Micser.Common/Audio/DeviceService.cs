@@ -14,15 +14,15 @@ namespace Micser.Common.Audio
         /// <summary>
         /// Gets an internal <see cref="DeviceDescription"/> from a WASAPI <see cref="MMDevice"/> instance.
         /// </summary>
-        public DeviceDescription GetDescription(MMDevice device)
+        public DeviceDescription? GetDescription(MMDevice? device)
         {
             if (device == null)
             {
                 return null;
             }
 
-            string deviceName = null;
-            string deviceDescription = null;
+            string? deviceName = null;
+            string? deviceDescription = null;
 
             try
             {
@@ -51,7 +51,7 @@ namespace Micser.Common.Audio
         /// <summary>
         /// Gets a <see cref="DeviceDescription"/> for the specified hardware device ID.
         /// </summary>
-        public DeviceDescription GetDescription(string id)
+        public DeviceDescription? GetDescription(string id)
         {
             using (var deviceEnumerator = new MMDeviceEnumerator())
             {
@@ -71,18 +71,17 @@ namespace Micser.Common.Audio
         /// <summary>
         /// Enumerates active or unplugged devices of the specified type.
         /// </summary>
-        public IEnumerable<DeviceDescription> GetDevices(DeviceType type)
+        public IEnumerable<DeviceDescription?> GetDevices(DeviceType type)
         {
-            using (var deviceEnumerator = new MMDeviceEnumerator())
-            {
-                return deviceEnumerator.EnumAudioEndpoints(
+            using var deviceEnumerator = new MMDeviceEnumerator();
+
+            return deviceEnumerator.EnumAudioEndpoints(
                     type == DeviceType.Input
                         ? DataFlow.Capture
                         : DataFlow.Render,
                     DeviceState.Active | DeviceState.UnPlugged)
-                    .Select(GetDescription)
-                    .ToArray();
-            }
+                .Select(GetDescription)
+                .ToArray();
         }
     }
 }
