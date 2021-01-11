@@ -55,11 +55,11 @@ namespace Micser.Common.Extensions
                          let a = p.GetCustomAttribute<SaveStateAttribute>()
                          where a != null
                          select new { p, a };
-            return result.ToDictionary(x => x.p, x => x.a);
+            return result.ToDictionary(x => x.p, x => x.a!);
         }
 
         /// <summary>
-        /// Loads/Sets the values saved in the <paramref name="state"/>'s <see cref="ModuleState.Data"/> to the corresponding properties on the object <paramref name="obj"/>.
+        /// Loads/Sets the values saved in the <paramref name="state"/> to the corresponding properties on the object <paramref name="obj"/>.
         /// </summary>
         /// <param name="obj">The object to set the state to.</param>
         /// <param name="state">The state containing the values to set to the object properties.</param>
@@ -68,7 +68,7 @@ namespace Micser.Common.Extensions
             var properties = obj.GetStateProperties();
             foreach (var property in properties)
             {
-                object value;
+                object? value;
                 var propertyType = property.Key.PropertyType;
                 if (state.ContainsKey(property.Key.Name))
                 {

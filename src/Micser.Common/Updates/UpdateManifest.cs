@@ -15,17 +15,17 @@ namespace Micser.Common.Updates
         /// <summary>
         /// Gets or sets the description (i.e. change log).
         /// </summary>
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         /// <summary>
         /// Gets or sets the file name of the update package.
         /// </summary>
-        public string FileName { get; set; }
+        public string? FileName { get; set; }
 
         /// <summary>
         /// Gets or sets the version string.
         /// </summary>
-        public string Version { get; set; }
+        public string? Version { get; set; }
 
         public override string ToString()
         {

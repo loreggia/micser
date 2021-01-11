@@ -13,7 +13,7 @@
         /// <summary>
         /// Gets or sets the name of the connector on the source module.
         /// </summary>
-        public string SourceConnectorName { get; set; }
+        public string? SourceConnectorName { get; set; }
 
         /// <summary>
         /// Gets or sets the source module ID.
@@ -23,7 +23,7 @@
         /// <summary>
         /// Gets or sets the name of the connector on the target module.
         /// </summary>
-        public string TargetConnectorName { get; set; }
+        public string? TargetConnectorName { get; set; }
 
         /// <summary>
         /// Gets or sets the target module ID.

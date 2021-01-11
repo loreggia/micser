@@ -26,8 +26,14 @@ namespace Micser.Common.Updates
         }
 
         /// <inheritdoc />
-        public override async Task<string> DownloadInstallerAsync(UpdateManifest manifest)
+        public override async Task<string?> DownloadInstallerAsync(UpdateManifest manifest)
         {
+            if (manifest.FileName == null)
+            {
+                Logger.LogError($"The update manifest's file name is null.");
+                return null;
+            }
+
             try
             {
                 var path = Path.Combine(Globals.AppDataFolder, Globals.Updates.TempFolder);
@@ -53,15 +59,20 @@ namespace Micser.Common.Updates
         }
 
         /// <inheritdoc />
-        public override async Task<UpdateManifest> GetUpdateManifestAsync()
+        public override async Task<UpdateManifest?> GetUpdateManifestAsync()
         {
+            if (Options.ManifestUrl == null)
+            {
+                Logger.LogError("The manifest URL is not set in the update options.");
+                return null;
+            }
+
             try
             {
-                using (var webClient = new WebClient())
-                {
-                    var json = await webClient.DownloadStringTaskAsync(Options.ManifestUrl).ConfigureAwait(false);
-                    return JsonConvert.DeserializeObject<UpdateManifest>(json);
-                }
+                using var webClient = new WebClient();
+
+                var json = await webClient.DownloadStringTaskAsync(Options.ManifestUrl).ConfigureAwait(false);
+                return JsonConvert.DeserializeObject<UpdateManifest>(json);
             }
             catch (Exception ex)
             {

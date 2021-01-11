@@ -12,7 +12,7 @@ namespace Micser.Common.Updates
         /// </summary>
         /// <param name="manifest">The update manifest.</param>
         /// <returns>The full path to the downloaded installation package.</returns>
-        Task<string> DownloadInstallerAsync(UpdateManifest manifest);
+        Task<string?> DownloadInstallerAsync(UpdateManifest manifest);
 
         /// <summary>
         /// Executes the installer located at the specified path.
@@ -23,7 +23,7 @@ namespace Micser.Common.Updates
         /// <summary>
         /// Gets an update manifest containing information about the most recent release.
         /// </summary>
-        Task<UpdateManifest> GetUpdateManifestAsync();
+        Task<UpdateManifest?> GetUpdateManifestAsync();
 
         /// <summary>
         /// Checks if the specified manifest describes a newer version than the currently running one.

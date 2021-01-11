@@ -35,7 +35,7 @@ namespace Micser.Common
         /// <summary>
         /// Gets the value of the specified argument or null if the argument was not present.
         /// </summary>
-        public string this[string arg]
+        public string? this[string arg]
         {
             get
             {

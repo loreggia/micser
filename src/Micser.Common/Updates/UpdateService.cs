@@ -17,14 +17,13 @@ namespace Micser.Common.Updates
         /// </summary>
         protected readonly ILogger Logger;
 
-        /// <inheritdoc />
         protected UpdateService(ILogger logger)
         {
             Logger = logger;
         }
 
         /// <inheritdoc />
-        public abstract Task<string> DownloadInstallerAsync(UpdateManifest manifest);
+        public abstract Task<string?> DownloadInstallerAsync(UpdateManifest manifest);
 
         /// <summary>
         /// Executes a MSI installer.
@@ -32,11 +31,6 @@ namespace Micser.Common.Updates
         /// <param name="path">The path of the MSI installer.</param>
         public virtual bool ExecuteInstaller(string path)
         {
-            if (path == null)
-            {
-                return false;
-            }
-
             if (!File.Exists(path))
             {
                 Logger.LogError($"The file '{path}' does not exist.");
@@ -65,13 +59,14 @@ namespace Micser.Common.Updates
         }
 
         /// <inheritdoc />
-        public abstract Task<UpdateManifest> GetUpdateManifestAsync();
+        public abstract Task<UpdateManifest?> GetUpdateManifestAsync();
 
         /// <inheritdoc />
         public virtual bool IsUpdateAvailable(UpdateManifest manifest)
         {
-            if (manifest == null)
+            if (manifest.Version == null)
             {
+                Logger.LogError($"The update manifest's version is not set.");
                 return false;
             }
 

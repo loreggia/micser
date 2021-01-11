@@ -8,6 +8,6 @@
         /// <summary>
         /// Gets or sets the URL of the update manifest.
         /// </summary>
-        public string ManifestUrl { get; set; }
+        public string? ManifestUrl { get; set; }
     }
 }

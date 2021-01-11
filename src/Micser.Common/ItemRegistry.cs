@@ -8,7 +8,6 @@ namespace Micser.Common
     {
         private readonly IList<T> _items;
 
-        /// <inheritdoc />
         public ItemRegistry()
         {
             _items = new List<T>();

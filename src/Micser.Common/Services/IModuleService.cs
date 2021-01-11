@@ -30,7 +30,7 @@ namespace Micser.Common.Services
         /// <summary>
         /// Inserts a new module to the DB.
         /// </summary>
-        /// <param name="moduleDto">The module.</param>
+        /// <param name="module">The module.</param>
         Task InsertAsync(Module module);
 
         /// <summary>
@@ -41,7 +41,7 @@ namespace Micser.Common.Services
         /// <summary>
         /// Updates an existing module.
         /// </summary>
-        /// <param name="moduleDto">The module to update.</param>
+        /// <param name="module">The module to update.</param>
         Task UpdateAsync(Module module);
     }
 }

@@ -65,7 +65,6 @@ namespace Micser.Common.Settings
     /// </summary>
     public class SettingDefinition
     {
-        /// <inheritdoc />
         public SettingDefinition()
         {
             IsAppliedInstantly = true;
@@ -76,18 +75,18 @@ namespace Micser.Common.Settings
         /// <summary>
         /// Gets or sets the default setting value.
         /// </summary>
-        public object DefaultValue { get; set; }
+        public object? DefaultValue { get; set; }
 
         /// <summary>
         /// Gets or sets the description content that is shown as a help for this setting in the settings view.
         /// </summary>
-        public object Description { get; set; }
+        public object? Description { get; set; }
 
         /// <summary>
         /// Gets or sets the type of a setting handler that is used to process loading/saving of the setting.
         /// This should be set if the <see cref="StorageType"/> is set to <see cref="SettingStorageType.Custom"/>.
         /// </summary>
-        public Type HandlerType { get; set; }
+        public Type? HandlerType { get; set; }
 
         /// <summary>
         /// Gets or sets whether the setting will be applied and saved instantly when changing it in the UI or the user has to click an Apply button first. Default is true.
@@ -97,7 +96,7 @@ namespace Micser.Common.Settings
         /// <summary>
         /// Gets or sets a function that is used to determine if this setting can be changed by the user.
         /// </summary>
-        public Func<ISettingsService, bool> IsEnabled { get; set; }
+        public Func<ISettingsService, bool>? IsEnabled { get; set; }
 
         /// <summary>
         /// Gets or sets a value that indicates whether this setting will not be shown in the settings view.
@@ -107,17 +106,17 @@ namespace Micser.Common.Settings
         /// <summary>
         /// Gets or sets the key that uniquely identifies this setting.
         /// </summary>
-        public string Key { get; set; }
+        public string? Key { get; set; }
 
         /// <summary>
         /// Gets or sets a list of possible setting values. This is only used when the <see cref="Type"/> is set to <see cref="SettingType.List"/>.
         /// </summary>
-        public IDictionary<object, string> List { get; set; }
+        public IDictionary<object, string>? List { get; set; }
 
         /// <summary>
         /// Gets or sets the name that is displayed for this setting.
         /// </summary>
-        public object Name { get; set; }
+        public object? Name { get; set; }
 
         /// <summary>
         /// Gets or sets the storage type. Default is <see cref="SettingStorageType.Internal"/>.

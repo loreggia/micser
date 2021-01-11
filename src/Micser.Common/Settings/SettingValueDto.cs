@@ -8,11 +8,11 @@
         /// <summary>
         /// The setting key.
         /// </summary>
-        public string Key { get; set; }
+        public string? Key { get; set; }
 
         /// <summary>
         /// The setting value.
         /// </summary>
-        public object Value { get; set; }
+        public object? Value { get; set; }
     }
 }

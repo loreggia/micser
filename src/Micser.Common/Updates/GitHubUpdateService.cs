@@ -23,8 +23,14 @@ namespace Micser.Common.Updates
         }
 
         /// <inheritdoc />
-        public override async Task<string> DownloadInstallerAsync(UpdateManifest manifest)
+        public override async Task<string?> DownloadInstallerAsync(UpdateManifest manifest)
         {
+            if (manifest.FileName == null)
+            {
+                Logger.LogError($"The update manifest's file name is null.");
+                return null;
+            }
+
             try
             {
                 var path = Path.Combine(Globals.AppDataFolder, Globals.Updates.TempFolder);
@@ -48,7 +54,7 @@ namespace Micser.Common.Updates
             }
         }
 
-        public override async Task<UpdateManifest> GetUpdateManifestAsync()
+        public override async Task<UpdateManifest?> GetUpdateManifestAsync()
         {
             using var client = new HttpClient
             {
@@ -79,10 +85,10 @@ namespace Micser.Common.Updates
 
             return new UpdateManifest
             {
-                Date = release.PublishedAt,
-                Description = release.Body,
+                Date = release!.PublishedAt,
+                Description = release!.Body,
                 FileName = asset.DownloadUrl,
-                Version = release.Name
+                Version = release!.Name
             };
         }
     }

@@ -1,10 +1,11 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 
 namespace Micser.Common.Extensions
 {
     public static class DictionaryExtensions
     {
-        public static TValue GetObject<TValue>(this IDictionary dictionary, string key, TValue defaultValue = default)
+        public static TValue? GetObject<TValue>(this IDictionary dictionary, string key, TValue? defaultValue = default)
         {
             return dictionary.GetObject<string, TValue>(key, defaultValue);
         }
@@ -17,8 +18,18 @@ namespace Micser.Common.Extensions
         /// <param name="dictionary">The dictionary.</param>
         /// <param name="key">The key of the value to get.</param>
         /// <param name="defaultValue">The default value that is returned if the key is not found or the stored type is not convertible to the return type <typeparamref name="TValue"/>.</param>
-        public static TValue GetObject<TKey, TValue>(this IDictionary dictionary, TKey key, TValue defaultValue = default)
+        public static TValue? GetObject<TKey, TValue>(this IDictionary dictionary, TKey key, TValue? defaultValue = default)
         {
+            if (dictionary == null)
+            {
+                throw new ArgumentNullException(nameof(dictionary));
+            }
+
+            if (key == null)
+            {
+                throw new ArgumentNullException(nameof(key));
+            }
+
             if (dictionary.Contains(key))
             {
                 var obj = dictionary[key];

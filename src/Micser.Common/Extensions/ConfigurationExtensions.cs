@@ -51,57 +51,6 @@ namespace Micser.Common.Extensions
             return services;
         }
 
-        public static IServiceCollection AddModules<TModule>(this IServiceCollection services, IConfiguration configuration, params Type[] staticModules)
-            where TModule : IPlugin
-        {
-            void AddModule(Type moduleType)
-            {
-                if (Activator.CreateInstance(moduleType) is IPlugin module)
-                {
-                    services.AddSingleton(module);
-                    module.ConfigureServices(services, configuration);
-                }
-                else
-                {
-                    throw new InvalidOperationException($"Failed to activate module. Type: {moduleType}");
-                }
-            }
-
-            foreach (var module in staticModules)
-            {
-                AddModule(module);
-            }
-
-            var executingFile = new FileInfo(Assembly.GetExecutingAssembly().Location);
-
-            foreach (var moduleFile in executingFile.Directory.GetFiles(Globals.PluginSearchPattern))
-            {
-                try
-                {
-                    var assembly = Assembly.LoadFile(moduleFile.FullName);
-                    var moduleTypes = assembly.GetExportedTypes().Where(t => typeof(TModule).IsAssignableFrom(t));
-
-                    foreach (var moduleType in moduleTypes)
-                    {
-                        try
-                        {
-                            AddModule(moduleType);
-                        }
-                        catch (Exception ex)
-                        {
-                            throw new InvalidOperationException($"Error during module activation. Assembly: {moduleFile} Module: {moduleType}", ex);
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    throw new InvalidOperationException($"Error during module registration. Assembly: {moduleFile}.", ex);
-                }
-            }
-
-            return services;
-        }
-
         public static IServiceCollection AddNlog(this IServiceCollection services, string fileName)
         {
             var config = new LoggingConfiguration();
@@ -123,13 +72,70 @@ namespace Micser.Common.Extensions
             return services;
         }
 
-        public static void UseModules(this IServiceProvider services)
+        public static IServiceCollection AddPlugins<TPlugin>(this IServiceCollection services, IConfiguration configuration, params Type[] staticPlugins)
+            where TPlugin : IPlugin
         {
-            var modules = services.GetRequiredService<IEnumerable<IPlugin>>();
-
-            foreach (var module in modules)
+            void AddPlugin(Type pluginType)
             {
-                module.Initialize(services);
+                if (Activator.CreateInstance(pluginType) is IPlugin plugin)
+                {
+                    services.AddSingleton(plugin);
+                    plugin.ConfigureServices(services, configuration);
+                }
+                else
+                {
+                    throw new InvalidOperationException($"Failed to activate plugin. Type: {pluginType}");
+                }
+            }
+
+            foreach (var plugin in staticPlugins)
+            {
+                AddPlugin(plugin);
+            }
+
+            var executingFile = new FileInfo(Assembly.GetExecutingAssembly().Location);
+            var directory = executingFile.Directory;
+
+            if (directory == null)
+            {
+                throw new InvalidOperationException("Could not access plugins directory.");
+            }
+
+            foreach (var pluginFile in directory.GetFiles(Globals.PluginSearchPattern))
+            {
+                try
+                {
+                    var assembly = Assembly.LoadFile(pluginFile.FullName);
+                    var pluginTypes = assembly.GetExportedTypes().Where(t => typeof(TPlugin).IsAssignableFrom(t));
+
+                    foreach (var pluginType in pluginTypes)
+                    {
+                        try
+                        {
+                            AddPlugin(pluginType);
+                        }
+                        catch (Exception ex)
+                        {
+                            throw new InvalidOperationException($"Error during plugin activation. Assembly: {pluginFile} Plugin: {pluginType}", ex);
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    throw new InvalidOperationException($"Error during plugin registration. Assembly: {pluginFile}.", ex);
+                }
+            }
+
+            return services;
+        }
+
+        public static void UsePlugins(this IServiceProvider services)
+        {
+            var plugins = services.GetRequiredService<IEnumerable<IPlugin>>();
+
+            foreach (var plugin in plugins)
+            {
+                plugin.Initialize(services);
             }
         }
     }

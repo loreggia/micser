@@ -13,7 +13,7 @@ namespace Micser.Common.Extensions
         /// <param name="value"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns>An instance of type <typeparamref name="T"/> if the conversion was successful or <c>default(T)</c>.</returns>
-        public static T ToType<T>(this object value)
+        public static T? ToType<T>(this object? value)
         {
             if (value == null)
             {
@@ -31,13 +31,13 @@ namespace Micser.Common.Extensions
             var valueConverter = TypeDescriptor.GetConverter(valueType);
             if (valueConverter.CanConvertTo(resultType))
             {
-                return (T)valueConverter.ConvertTo(value, resultType);
+                return (T?)valueConverter.ConvertTo(value, resultType);
             }
 
             var resultConverter = TypeDescriptor.GetConverter(resultType);
             if (resultConverter.CanConvertFrom(valueType))
             {
-                return (T)resultConverter.ConvertFrom(value);
+                return (T?)resultConverter.ConvertFrom(value);
             }
 
             return default;

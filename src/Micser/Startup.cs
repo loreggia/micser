@@ -39,7 +39,7 @@ namespace Micser
             var lifetime = app.ApplicationServices.GetRequiredService<IHostApplicationLifetime>();
             lifetime.ApplicationStopping.Register(OnStopping);
 
-            app.ApplicationServices.UseModules();
+            app.ApplicationServices.UsePlugins();
 
             if (environment.IsDevelopment())
             {
@@ -101,7 +101,7 @@ namespace Micser
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration => configuration.RootPath = "App/build");
 
-            services.AddModules<IPlugin>(Configuration, typeof(EnginePlugin));
+            services.AddPlugins<IPlugin>(Configuration, typeof(EnginePlugin));
 
             services.AddDbContext<EngineDbContext>(Configuration.GetConnectionString("DefaultConnection"));
 
