@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import ReactFlow, { Background, Controls } from "react-flow-renderer";
-import { Card, Drawer, Space, Typography } from "antd";
+import { Card, Drawer, Dropdown, Menu, Space, Typography } from "antd";
 import { AppstoreAddOutlined } from "@ant-design/icons";
 import { Loader, useApi } from "micser-common";
 
@@ -43,6 +43,7 @@ const Dashboard = () => {
     const [isAddDrawerOpen, setIsAddDrawerOpen] = useState(false);
     const [newModule, setNewModule] = useState(null);
     const [flowTransform, setFlowTransform] = useState({ x: 0, y: 0, zoom: 1 });
+    const [contextMenuTarget, setContextMenuTarget] = useState();
 
     const [modules, isLoadingModules, modulesError, refreshModules] = useApi("Modules");
     const [moduleConnections, isLoadingModuleConnections, moduleConnectionsError] = useApi("ModuleConnections");
@@ -134,34 +135,48 @@ const Dashboard = () => {
         setFlowTransform(transform);
     };
 
-    const handlePaneContextMenu = (e) => {
-        console.log(e);
+    const handleContextMenu = (_, node) => {
+        setContextMenuTarget(node);
     };
 
     const isLoading = isLoadingModules || isLoadingModuleConnections || isLoadingModuleDescriptions || isAddingModule;
+
+    const contextMenu = useMemo(
+        () => (
+            <Menu>
+                <Menu.Item key="1">{JSON.stringify(contextMenuTarget) || "Pane"}</Menu.Item>
+                <Menu.Item key="2">2nd menu item</Menu.Item>
+                <Menu.Item key="3">3rd menu item</Menu.Item>
+            </Menu>
+        ),
+        [contextMenuTarget]
+    );
 
     return (
         <PageContainer noPadding>
             {isLoading && <Loader />}
             <WidgetTypesContext.Provider value={widgetTypes}>
-                <ReactFlow
-                    elements={elements}
-                    nodeTypes={nodeTypes}
-                    snapToGrid
-                    snapGrid={[10, 10]}
-                    defaultZoom={flowTransform.zoom}
-                    defaultPosition={[flowTransform.x, flowTransform.y]}
-                    style={{ width: "100%", height: "100%" }}
-                    onDragOver={handleDragOver}
-                    onDrop={handleDrop}
-                    onNodeDragStop={handleNodeDragStop}
-                    onlyRenderVisibleElements={false}
-                    onMoveEnd={handleMoveEnd}
-                    onPaneContextMenu={handlePaneContextMenu}
-                >
-                    <Controls />
-                    <Background variant="dots" size={1} gap={10} color="#333" />
-                </ReactFlow>
+                <Dropdown overlay={contextMenu} trigger={["contextMenu"]}>
+                    <ReactFlow
+                        elements={elements}
+                        nodeTypes={nodeTypes}
+                        snapToGrid
+                        snapGrid={[10, 10]}
+                        defaultZoom={flowTransform.zoom}
+                        defaultPosition={[flowTransform.x, flowTransform.y]}
+                        style={{ width: "100%", height: "100%" }}
+                        onDragOver={handleDragOver}
+                        onDrop={handleDrop}
+                        onNodeDragStop={handleNodeDragStop}
+                        onlyRenderVisibleElements={false}
+                        onMoveEnd={handleMoveEnd}
+                        onPaneContextMenu={handleContextMenu}
+                        onNodeContextMenu={handleContextMenu}
+                    >
+                        <Controls />
+                        <Background variant="dots" size={1} gap={10} color="#333" />
+                    </ReactFlow>
+                </Dropdown>
                 <Drawer visible={isAddDrawerOpen} onClose={() => setIsAddDrawerOpen(false)} width="300px" mask={false}>
                     <Title level={2}>Add Widget</Title>
                     <Text type="secondary">Drag a widget from the list to the dashboard.</Text>

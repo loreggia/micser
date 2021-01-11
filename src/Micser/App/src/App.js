@@ -24,11 +24,15 @@ window["micser-common"] = MicserCommon;
 const App = () => {
     const [plugins, isLoading] = usePlugins();
 
+    const handleContextMenu = (e) => {
+        e.preventDefault();
+    };
+
     return (
         <PluginsContext.Provider value={plugins}>
             <Suspense fallback={<Loader />}>
                 <Router>
-                    <Layout style={{ minHeight: "100vh" }}>
+                    <Layout style={{ minHeight: "100vh" }} onContextMenu={handleContextMenu}>
                         {isLoading && <Loader />}
 
                         <Navigation />
