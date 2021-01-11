@@ -10,6 +10,7 @@ import Widget, { WidgetTypesContext } from "./Widget";
 
 import { useErrorNotification } from "/hooks";
 import { PluginsContext } from "/hooks/usePlugins";
+import { getRelativeCoordinates } from "/utils";
 
 const FixedButton = styled.div`
     position: fixed;
@@ -33,13 +34,15 @@ const WidgetListCard = styled(Card)``;
 
 const { Text, Title } = Typography;
 
-const DragDropKey = "moduledescription";
+const ModuleDescriptionKey = "moduledescription";
+const DragOffsetKey = "dragoffset";
 
 const Dashboard = () => {
     const plugins = useContext(PluginsContext);
     const [elements, setElements] = useState([]);
     const [isAddDrawerOpen, setIsAddDrawerOpen] = useState(false);
     const [newModule, setNewModule] = useState(null);
+    const [flowTransform, setFlowTransform] = useState({ x: 0, y: 0, zoom: 1 });
 
     const [modules, isLoadingModules, modulesError, refreshModules] = useApi("Modules");
     const [moduleConnections, isLoadingModuleConnections, moduleConnectionsError] = useApi("ModuleConnections");
@@ -87,31 +90,38 @@ const Dashboard = () => {
     const nodeTypes = useMemo(() => ({ Widget: Widget }), []);
 
     const handleDragStart = (e, moduleDescription) => {
-        e.dataTransfer.setData(DragDropKey, JSON.stringify(moduleDescription));
+        e.dataTransfer.setData(ModuleDescriptionKey, JSON.stringify(moduleDescription));
+        const offset = getRelativeCoordinates(e);
+        e.dataTransfer.setData(DragOffsetKey, JSON.stringify(offset));
     };
 
     const handleDragOver = (e) => {
-        if (e.dataTransfer.types.includes(DragDropKey)) {
+        if (e.dataTransfer.types.includes(ModuleDescriptionKey)) {
             e.preventDefault();
         }
     };
 
     const handleDrop = (e) => {
-        const data = e.dataTransfer.getData(DragDropKey);
+        const data = e.dataTransfer.getData(ModuleDescriptionKey);
         if (data) {
             const moduleDescription = JSON.parse(data);
-            const { clientX, clientY } = e;
-            console.log(e);
+
+            const position = getRelativeCoordinates(e);
+
+            const offsetData = e.dataTransfer.getData(DragOffsetKey);
+            if (offsetData) {
+                const offset = JSON.parse(offsetData);
+                position.x -= offset.x;
+                position.y -= offset.y;
+            }
 
             const module = {
                 moduleType: moduleDescription.name,
                 state: {
-                    left: clientX,
-                    top: clientY,
+                    left: position.x - flowTransform.x,
+                    top: position.y - flowTransform.y,
                 },
             };
-
-            console.log(module);
 
             setNewModule(module);
             addModule();
@@ -119,6 +129,14 @@ const Dashboard = () => {
     };
 
     const handleNodeDragStop = (e, node) => {};
+
+    const handleMoveEnd = (transform) => {
+        setFlowTransform(transform);
+    };
+
+    const handlePaneContextMenu = (e) => {
+        console.log(e);
+    };
 
     const isLoading = isLoadingModules || isLoadingModuleConnections || isLoadingModuleDescriptions || isAddingModule;
 
@@ -131,10 +149,15 @@ const Dashboard = () => {
                     nodeTypes={nodeTypes}
                     snapToGrid
                     snapGrid={[10, 10]}
+                    defaultZoom={flowTransform.zoom}
+                    defaultPosition={[flowTransform.x, flowTransform.y]}
                     style={{ width: "100%", height: "100%" }}
                     onDragOver={handleDragOver}
                     onDrop={handleDrop}
                     onNodeDragStop={handleNodeDragStop}
+                    onlyRenderVisibleElements={false}
+                    onMoveEnd={handleMoveEnd}
+                    onPaneContextMenu={handlePaneContextMenu}
                 >
                     <Controls />
                     <Background variant="dots" size={1} gap={10} color="#333" />
