@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <UIRoot Condition="'$(UIRoot)' == ''">$(ProjectDir)UI\</UIRoot>
-    <DefaultItemExcludes>$(DefaultItemExcludes);$(UIRoot)node_modules\**</DefaultItemExcludes>
+    <DefaultItemExcludes>$(DefaultItemExcludes);$(UIRoot)node_modules\**;$(UIRoot).yalc</DefaultItemExcludes>
   </PropertyGroup>
 
   <ItemGroup>
@@ -39,5 +39,4 @@
       </ResolvedFileToPublish>
     </ItemGroup>
   </Target>
-
 </Project>
