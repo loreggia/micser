@@ -25,7 +25,9 @@ const useApi = (baseUrl, { defaultMethod, onError, autoLoad } = { defaultMethod:
     const handleError = useCallback(
         (error) => {
             setError(error);
-            onError(error);
+            if (onError) {
+                onError(error);
+            }
         },
         [onError]
     );
