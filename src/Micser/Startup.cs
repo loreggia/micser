@@ -19,6 +19,7 @@ using Micser.Common.Services;
 using Micser.Common.Settings;
 using Micser.Common.Updates;
 using Micser.DataAccess;
+using Micser.Extensions;
 using Micser.Services;
 using Micser.Settings;
 using Micser.UI.Infrastructure;
