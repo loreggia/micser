@@ -22,9 +22,9 @@ namespace Micser
         private readonly ILogger<MicserService> _logger;
         private readonly IServiceProvider _serviceProvider;
         private readonly Timer _updateTimer;
-        private IAudioEngine _audioEngine;
-        private ISettingsService _settingsService;
-        private IUpdateService _updateService;
+        private IAudioEngine? _audioEngine;
+        private ISettingsService? _settingsService;
+        private IUpdateService? _updateService;
 
         static MicserService()
         {
@@ -51,7 +51,7 @@ namespace Micser
 
             if (_settingsService.GetSetting<bool>(Globals.SettingKeys.IsEngineRunning))
             {
-                _audioEngine.StartAsync();
+                await _audioEngine.StartAsync();
             }
 
             _updateTimer.Start();
@@ -59,17 +59,18 @@ namespace Micser
             _logger.LogInformation("Service started");
         }
 
-        public Task StopAsync(CancellationToken cancellationToken)
+        public async Task StopAsync(CancellationToken cancellationToken)
         {
             _logger.LogInformation("Stopping service");
 
             _updateTimer.Stop();
 
-            _audioEngine.StopAsync();
+            if (_audioEngine != null)
+            {
+                await _audioEngine.StopAsync();
+            }
 
             _logger.LogInformation("Service stopped");
-
-            return Task.CompletedTask;
         }
 
         /*
@@ -113,6 +114,11 @@ namespace Micser
 
         private async void OnUpdateTimerElapsed(object sender, ElapsedEventArgs e)
         {
+            if (_settingsService == null || _updateService == null)
+            {
+                return;
+            }
+
             var interval = TimeSpan.FromHours(24).TotalMilliseconds;
             _updateTimer.Interval = interval;
 
@@ -122,7 +128,7 @@ namespace Micser
             {
                 var updateManifest = await _updateService.GetUpdateManifestAsync().ConfigureAwait(false);
 
-                if (_updateService.IsUpdateAvailable(updateManifest))
+                if (updateManifest != null && _updateService.IsUpdateAvailable(updateManifest))
                 {
                     //ApiResponse result;
 

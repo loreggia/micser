@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using CSCore.CoreAudioAPI;
 using Microsoft.Extensions.Logging;
 using Micser.Common.Audio;
+using Micser.Common.Extensions;
 using Micser.Common.Services;
 
 namespace Micser.Audio
@@ -18,7 +19,7 @@ namespace Micser.Audio
         private readonly IModuleConnectionService _moduleConnectionService;
         private readonly List<IAudioModule> _modules;
         private readonly IModuleService _moduleService;
-        private AudioEndpointVolume _endpointVolume;
+        private AudioEndpointVolume? _endpointVolume;
 
         public AudioEngine(
             // todo create audio module factory
@@ -58,6 +59,12 @@ namespace Micser.Audio
         {
             var moduleDto = await _moduleService.GetByIdAsync(id).ConfigureAwait(false);
 
+            if (moduleDto == null)
+            {
+                _logger.LogWarning($"Module with ID {id} not found.");
+                return;
+            }
+
             var type = Type.GetType(moduleDto.Type);
             if (type != null)
             {
@@ -80,14 +87,11 @@ namespace Micser.Audio
 
         public void Dispose()
         {
-            if (_endpointVolumeCallback != null)
-            {
-                _endpointVolumeCallback.NotifyRecived -= VolumeNotifyReceived;
-            }
+            _endpointVolumeCallback.NotifyRecived -= VolumeNotifyReceived;
 
             StopAsync().GetAwaiter().GetResult();
 
-            _deviceEnumerator?.Dispose();
+            _deviceEnumerator.Dispose();
         }
 
         public async Task RemoveConnectionAsync(long id)
@@ -108,14 +112,17 @@ namespace Micser.Audio
             }
         }
 
-        public async Task RemoveModuleAsync(long id)
+        public Task RemoveModuleAsync(long id)
         {
             var audioModule = _modules.SingleOrDefault(m => m.Id == id);
+
             if (audioModule != null)
             {
                 _modules.Remove(audioModule);
                 audioModule.Dispose();
             }
+
+            return Task.CompletedTask;
         }
 
         public async Task StartAsync()
@@ -166,11 +173,11 @@ namespace Micser.Audio
             _logger.LogInformation("Audio engine started");
         }
 
-        public async Task StopAsync()
+        public Task StopAsync()
         {
             if (!IsRunning)
             {
-                return;
+                return Task.CompletedTask;
             }
 
             _logger.LogInformation("Stopping audio engine");
@@ -181,9 +188,9 @@ namespace Micser.Audio
             _endpointVolume?.UnregisterControlChangeNotify(_endpointVolumeCallback);
             _endpointVolume?.Dispose();
 
-            _logger.LogInformation($"Disposing modules ({_modules?.Count ?? 0})");
+            _logger.LogInformation($"Disposing modules ({_modules.Count})");
 
-            if (_modules?.Count > 0)
+            if (_modules.Count > 0)
             {
                 foreach (var audioModule in _modules)
                 {
@@ -197,6 +204,8 @@ namespace Micser.Audio
             _logger.LogInformation("Audio engine stopped");
 
             IsRunning = false;
+
+            return Task.CompletedTask;
         }
 
         public async Task UpdateModuleAsync(long id)
@@ -205,6 +214,12 @@ namespace Micser.Audio
             if (audioModule != null)
             {
                 var moduleDto = await _moduleService.GetByIdAsync(id).ConfigureAwait(false);
+
+                if (moduleDto == null)
+                {
+                    _logger.LogWarning($"Module with ID {id} not found.");
+                    return;
+                }
 
                 var applySystemVolume = !audioModule.UseSystemVolume && moduleDto.State.UseSystemVolume;
                 if (applySystemVolume && _endpointVolume != null)
@@ -263,11 +278,13 @@ namespace Micser.Audio
 
                     var moduleDto = await _moduleService.GetByIdAsync(module.Id).ConfigureAwait(false);
 
-                    if (moduleDto.State == null)
+                    if (moduleDto == null)
                     {
-                        moduleDto.State = module.GetState();
+                        _logger.LogWarning($"Module with ID {module.Id} not found.");
+                        return;
                     }
 
+                    moduleDto.State.AddRange(module.GetState());
                     moduleDto.State.UseSystemVolume = true;
                     moduleDto.State.IsMuted = e.IsMuted;
                     moduleDto.State.Volume = e.MasterVolume;

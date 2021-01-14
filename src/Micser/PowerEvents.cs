@@ -5,7 +5,7 @@ namespace Micser
     /// <summary>
     /// Event delegate for power state events.
     /// </summary>
-    public delegate void PowerStateEventHandler(object sender, PowerStateEventArgs e);
+    public delegate void PowerStateEventHandler(object? sender, PowerStateEventArgs e);
 
     /// <summary>
     /// Static class providing events for power state changes.
@@ -15,7 +15,7 @@ namespace Micser
         /// <summary>
         /// Fired when the computer suspends or resumes.
         /// </summary>
-        public static event PowerStateEventHandler PowerStateChanged;
+        public static event PowerStateEventHandler? PowerStateChanged;
 
         /// <summary>
         /// Raises the <see cref="PowerStateChanged"/> event.

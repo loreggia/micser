@@ -10,7 +10,7 @@ namespace Micser.Common.Extensions
         {
             foreach (var key in source.Keys)
             {
-                dict.Add(key, source[key]);
+                dict[key] = source[key];
             }
         }
 

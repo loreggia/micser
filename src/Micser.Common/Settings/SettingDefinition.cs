@@ -107,7 +107,7 @@ namespace Micser.Common.Settings
         /// <summary>
         /// Gets or sets the key that uniquely identifies this setting.
         /// </summary>
-        public string Key { get; set; }
+        public string Key { get; }
 
         /// <summary>
         /// Gets or sets a list of possible setting values. This is only used when the <see cref="Type"/> is set to <see cref="SettingType.List"/>.

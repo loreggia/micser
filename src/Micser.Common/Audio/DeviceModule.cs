@@ -86,7 +86,7 @@ namespace Micser.Common.Audio
         {
             base.SetState(state);
 
-            var deviceId = state?.GetObject<string>(Globals.StateKeys.DeviceId);
+            var deviceId = state.GetObject<string>(Globals.StateKeys.DeviceId);
             if (deviceId != null)
             {
                 var deviceService = new DeviceService();
@@ -108,7 +108,7 @@ namespace Micser.Common.Audio
         {
             if (disposing)
             {
-                DeviceEnumerator?.Dispose();
+                DeviceEnumerator.Dispose();
                 DisposeDevice();
             }
 
@@ -159,7 +159,7 @@ namespace Micser.Common.Audio
 
                     if (moduleDto != null)
                     {
-                        moduleDto.State = GetState();
+                        moduleDto.State.AddRange(GetState());
                         await ModuleService.UpdateAsync(moduleDto);
                         // TODO
                         //ApiClient.SendMessageAsync("modules", "refresh", moduleDto);
@@ -191,7 +191,7 @@ namespace Micser.Common.Audio
             if (e.DeviceId == DeviceDescription?.Id ||
                 deviceDescription != null && deviceDescription.Type == DeviceType && deviceDescription.AdapterName == AdapterName)
             {
-                await Task.Run(() => OnDeviceStateChanged(deviceDescription)).ConfigureAwait(false);
+                await Task.Run(() => OnDeviceStateChanged(deviceDescription!)).ConfigureAwait(false);
             }
         }
     }

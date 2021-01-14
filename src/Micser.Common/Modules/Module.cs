@@ -20,7 +20,7 @@
         /// <summary>
         /// Gets or sets the module's current state.
         /// </summary>
-        public ModuleState State { get; set; }
+        public ModuleState State { get; }
 
         /// <summary>
         /// Gets or sets the type/identifier of the module.

@@ -66,10 +66,13 @@ namespace Micser.Settings
                     var serializer = JsonSerializer.CreateDefault();
                     var settings = serializer.Deserialize<Dictionary<string, object>>(jsonReader);
 
-                    foreach (var setting in settings)
+                    if (settings != null)
                     {
-                        // TODO await
-                        _settingsService.SetSettingAsync(setting.Key, setting.Value);
+                        foreach (var setting in settings)
+                        {
+                            // TODO await
+                            _settingsService.SetSettingAsync(setting.Key, setting.Value);
+                        }
                     }
                 }
 

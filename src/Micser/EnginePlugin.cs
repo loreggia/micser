@@ -18,19 +18,16 @@ namespace Micser
         {
             var settingsRegistry = serviceProvider.GetRequiredService<ISettingsRegistry>();
 
-            settingsRegistry.Add(new SettingDefinition
+            settingsRegistry.Add(new SettingDefinition(Globals.SettingKeys.UpdateCheck)
             {
-                Key = Globals.SettingKeys.UpdateCheck,
                 DefaultValue = true
             });
-            settingsRegistry.Add(new SettingDefinition
+            settingsRegistry.Add(new SettingDefinition(Globals.SettingKeys.IsEngineRunning)
             {
-                Key = Globals.SettingKeys.IsEngineRunning,
                 DefaultValue = true
             });
-            settingsRegistry.Add(new SettingDefinition
+            settingsRegistry.Add(new SettingDefinition(Globals.SettingKeys.ResumeDelay)
             {
-                Key = Globals.SettingKeys.ResumeDelay,
                 DefaultValue = 10
             });
         }

@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Micser.Common.Extensions;
 using Micser.Common.Modules;
 using Micser.Common.Services;
 using Micser.DataAccess;
@@ -105,7 +106,7 @@ namespace Micser.Services
 
             entity.StateJson = JsonConvert.SerializeObject(state);
 
-            module.State = state;
+            module.State.AddRange(state);
 
             await dbContext.SaveChangesAsync().ConfigureAwait(false);
         }
@@ -119,12 +120,11 @@ namespace Micser.Services
             };
         }
 
-        private static Module ToModel(ModuleEntity module)
+        private static Module ToModel(ModuleEntity entity)
         {
-            return new Module(module.Id, module.Type)
-            {
-                State = JsonConvert.DeserializeObject<ModuleState>(module.StateJson)
-            };
+            var module = new Module(entity.Id, entity.Type);
+            module.State.AddRange(JsonConvert.DeserializeObject<ModuleState>(entity.StateJson));
+            return module;
         }
     }
 }
