@@ -28,13 +28,16 @@ const loadModuleAsync = (fileName, moduleName) => {
 
 const usePlugins = () => {
     const pluginsApi = useApi("plugins");
-    const { result: pluginDefinitions, isLoading } = pluginsApi;
+    const { result: pluginDefinitions, isLoadingApi } = pluginsApi;
     const [plugins, setPlugins] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         let isMounted = true;
 
         const loadPluginsAsync = async () => {
+            setIsLoading(true);
+
             const result = [];
 
             for (let i = 0; i < pluginDefinitions.length; i++) {
@@ -53,6 +56,7 @@ const usePlugins = () => {
             }
 
             setPlugins(result);
+            setIsLoading(false);
         };
 
         if (pluginDefinitions) {
@@ -64,7 +68,7 @@ const usePlugins = () => {
         };
     }, [pluginDefinitions]);
 
-    return [plugins, isLoading];
+    return [plugins, isLoadingApi || isLoading];
 };
 
 export default usePlugins;

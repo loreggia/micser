@@ -6,7 +6,7 @@ import styled from "styled-components";
 const WidgetTypesContext = createContext([]);
 
 const ErrorContent = ({ data }) => {
-    return <>Widget for module type '{data.moduleType}' not found.</>;
+    return <>Widget for module type '{data.type}' not found.</>;
 };
 
 const WidgetCard = styled(Card)`
@@ -16,11 +16,11 @@ const WidgetCard = styled(Card)`
 
 const Widget = ({ data }) => {
     const widgetTypes = useContext(WidgetTypesContext);
-    const type = useMemo(() => widgetTypes.find((t) => t.name === data.moduleType) || {}, [data, widgetTypes]);
+    const type = useMemo(() => widgetTypes.find((t) => t.name === data.type) || {}, [data, widgetTypes]);
     const Content = type.content || ErrorContent;
 
     return (
-        <WidgetCard size="small" title={data.state.title || data.moduleType} hoverable>
+        <WidgetCard size="small" title={data.state.title || data.type} hoverable>
             <Content data={data} />
             {type.inputHandles &&
                 type.inputHandles.map((name) => <Handle key={name} id={name} type="target" position="left" />)}

@@ -78,7 +78,7 @@ const Dashboard = () => {
                 data: dto,
             }));
             const connectionElements = moduleConnections.map((dto) => ({
-                id: String(dto.id),
+                id: `c${dto.id}`,
                 source: String(dto.sourceId),
                 target: String(dto.targetId),
                 sourceHandle: dto.sourceConnectorName,
@@ -129,7 +129,7 @@ const Dashboard = () => {
             position.y = position.y - (position.y % GridSize);
 
             const module = {
-                moduleType: moduleDescription.name,
+                type: moduleDescription.name,
                 state: {
                     left: position.x - flowTransform.x,
                     top: position.y - flowTransform.y,
@@ -148,6 +148,18 @@ const Dashboard = () => {
         module.state.top = y;
 
         modulesApi.load({ method: "put", data: module });
+    };
+
+    const handleConnect = async ({ source, sourceHandle, target, targetHandle }) => {
+        const connection = {
+            sourceId: Number(source),
+            targetId: Number(target),
+            sourceConnectorName: sourceHandle,
+            targetConnectorName: targetHandle,
+        };
+
+        await moduleConnectionsApi.load({ method: "post", data: connection });
+        moduleConnectionsApi.load({ setResult: true });
     };
 
     const handleMoveEnd = (transform) => {
@@ -218,6 +230,7 @@ const Dashboard = () => {
                         onDragOver={handleDragOver}
                         onDrop={handleDrop}
                         onNodeDragStop={handleNodeDragStop}
+                        onConnect={handleConnect}
                         onlyRenderVisibleElements={false}
                         onMoveEnd={handleMoveEnd}
                         onPaneContextMenu={handleContextMenu}

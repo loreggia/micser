@@ -22,7 +22,7 @@ window["antd"] = antd;
 window["micser-common"] = MicserCommon;
 
 const App = () => {
-    const [plugins, isLoading] = usePlugins();
+    const [plugins, isLoadingPlugins] = usePlugins();
 
     const handleContextMenu = (e) => {
         e.preventDefault();
@@ -33,21 +33,25 @@ const App = () => {
             <Suspense fallback={<Loader />}>
                 <Router>
                     <Layout style={{ minHeight: "100vh" }} onContextMenu={handleContextMenu}>
-                        {isLoading && <Loader />}
+                        {isLoadingPlugins ? (
+                            <Loader />
+                        ) : (
+                            <>
+                                <Navigation />
 
-                        <Navigation />
-
-                        <Layout>
-                            <Switch>
-                                <Route path={Routes.dashboard.index} exact>
-                                    <Dashboard />
-                                </Route>
-                                <Route path={Routes.settings.index}>
-                                    <Settings />
-                                </Route>
-                                <NotFound />
-                            </Switch>
-                        </Layout>
+                                <Layout>
+                                    <Switch>
+                                        <Route path={Routes.dashboard.index} exact>
+                                            <Dashboard />
+                                        </Route>
+                                        <Route path={Routes.settings.index}>
+                                            <Settings />
+                                        </Route>
+                                        <NotFound />
+                                    </Switch>
+                                </Layout>
+                            </>
+                        )}
                     </Layout>
                 </Router>
             </Suspense>
