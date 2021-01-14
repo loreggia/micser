@@ -11,17 +11,17 @@ namespace Micser.Common.Settings
         /// <summary>
         /// Event that is fired when a setting value changes.
         /// </summary>
-        event SettingChangedEventHandler SettingChanged;
+        event SettingChangedEventHandler? SettingChanged;
 
         /// <summary>
         /// Gets the value for the specified setting.
         /// </summary>
-        object GetSetting(string key);
+        object? GetSetting(string key);
 
         /// <summary>
         /// Gets a dictionary of all setting keys/values.
         /// </summary>
-        IReadOnlyDictionary<string, object> GetSettings();
+        IReadOnlyDictionary<string, object?> GetSettings();
 
         /// <summary>
         /// Loads the settings from the database.
@@ -32,6 +32,6 @@ namespace Micser.Common.Settings
         /// Sets a setting value and saves it in the database.
         /// </summary>
         /// <returns>True if the setting was changed, otherwise false.</returns>
-        Task<bool> SetSettingAsync(string key, object value);
+        Task<bool> SetSettingAsync(string key, object? value);
     }
 }

@@ -24,10 +24,9 @@ namespace Micser.Settings
         private readonly ILogger<SettingsService<TDbContext>> _logger;
         private readonly ISettingsRegistry _registry;
         private readonly ISettingHandlerFactory _settingHandlerFactory;
-        private readonly IDictionary<string, object> _settings;
+        private readonly IDictionary<string, object?> _settings;
         private bool _isLoaded;
 
-        /// <inheritdoc />
         public SettingsService(
             IDbContextFactory<TDbContext> dbContextFactory,
             ISettingHandlerFactory settingHandlerFactory,
@@ -35,7 +34,7 @@ namespace Micser.Settings
             //SettingsApiClient apiClient,
             ILogger<SettingsService<TDbContext>> logger)
         {
-            _settings = new ConcurrentDictionary<string, object>();
+            _settings = new ConcurrentDictionary<string, object?>();
             _loadSemaphore = new SemaphoreSlim(1, 1);
 
             _dbContextFactory = dbContextFactory;
@@ -46,7 +45,7 @@ namespace Micser.Settings
         }
 
         /// <inheritdoc />
-        public event SettingChangedEventHandler SettingChanged;
+        public event SettingChangedEventHandler? SettingChanged;
 
         /// <inheritdoc />
         public void Dispose()
@@ -56,7 +55,7 @@ namespace Micser.Settings
         }
 
         /// <inheritdoc />
-        public object GetSetting(string key)
+        public object? GetSetting(string key)
         {
             if (!_settings.TryGetValue(key, out var value))
             {
@@ -68,9 +67,9 @@ namespace Micser.Settings
         }
 
         /// <inheritdoc />
-        public IReadOnlyDictionary<string, object> GetSettings()
+        public IReadOnlyDictionary<string, object?> GetSettings()
         {
-            return new ReadOnlyDictionary<string, object>(_settings);
+            return new ReadOnlyDictionary<string, object?>(_settings);
         }
 
         /// <inheritdoc />
@@ -95,13 +94,13 @@ namespace Micser.Settings
 
                 foreach (var setting in _registry.Items)
                 {
-                    object value = null;
+                    object? value = null;
 
                     if (setting.StorageType == SettingStorageType.Internal)
                     {
                         var settingValue = dbContext.Set<SettingValue>().FirstOrDefault(s => s.Key == setting.Key);
 
-                        if (settingValue?.ValueType != null)
+                        if (settingValue?.ValueJson != null && settingValue.ValueType != null)
                         {
                             var type = Type.GetType(settingValue.ValueType);
 
@@ -160,7 +159,7 @@ namespace Micser.Settings
         }
 
         /// <inheritdoc />
-        public async Task<bool> SetSettingAsync(string key, object value)
+        public async Task<bool> SetSettingAsync(string key, object? value)
         {
             await LoadAsync().ConfigureAwait(false);
 
@@ -174,7 +173,15 @@ namespace Micser.Settings
             if (setting?.HandlerType != null)
             {
                 var handler = _settingHandlerFactory.Create(setting.HandlerType);
-                value = await handler.SaveSettingAsync(value).ConfigureAwait(false);
+
+                if (handler == null)
+                {
+                    _logger.LogWarning($"Setting handler type {setting.HandlerType} not registered.");
+                }
+                else
+                {
+                    value = await handler.SaveSettingAsync(value).ConfigureAwait(false);
+                }
             }
 
             var oldValue = _settings.ContainsKey(key) ? _settings[key] : null;
@@ -204,7 +211,7 @@ namespace Micser.Settings
 
                 if (settingValue.Id <= 0)
                 {
-                    dbSet.Add(settingValue);
+                    await dbSet.AddAsync(settingValue).ConfigureAwait(false);
                 }
 
                 await dbContext.SaveChangesAsync().ConfigureAwait(false);
@@ -237,7 +244,7 @@ namespace Micser.Settings
         {
             if (disposing)
             {
-                _loadSemaphore?.Dispose();
+                _loadSemaphore.Dispose();
             }
         }
 

@@ -24,13 +24,13 @@ namespace Micser.Common.Settings
         /// </summary>
         /// <param name="value">The internally stored setting value (if the corresponding <see cref="SettingDefinition.StorageType"/> is set to <see cref="SettingStorageType.Internal"/>).</param>
         /// <returns>The loaded setting value.</returns>
-        Task<object> LoadSettingAsync(object value);
+        Task<object?> LoadSettingAsync(object? value);
 
         /// <summary>
         /// Handler that is executed when a setting is saved.
         /// </summary>
         /// <param name="value">The value to save.</param>
         /// <returns>The actually saved value.</returns>
-        Task<object> SaveSettingAsync(object value);
+        Task<object?> SaveSettingAsync(object? value);
     }
 }

@@ -115,7 +115,7 @@ namespace Micser
 
             services.AddSingleton<ISettingsRegistry, SettingsRegistry>();
             services.AddSingleton<ISettingsService, SettingsService<EngineDbContext>>();
-            services.AddSingleton<ISettingHandlerFactory>(sp => new SettingHandlerFactory(t => (ISettingHandler)sp.GetService(t)));
+            services.AddSingleton<ISettingHandlerFactory>(sp => new SettingHandlerFactory(t => (ISettingHandler?)sp.GetService(t)));
 
             services.AddSingleton<IUpdateService, HttpUpdateService>();
 
