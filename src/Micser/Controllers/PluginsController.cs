@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Micser.Common;
 using Micser.Common.Controllers;
+using Micser.Models;
 
 namespace Micser.Controllers
 {
@@ -17,22 +18,15 @@ namespace Micser.Controllers
         }
 
         [Route("")]
-        public IEnumerable<PluginDescription> GetPluginNames()
+        public IEnumerable<PluginDescriptionDto> GetPluginNames()
         {
             return _plugins
                 .Where(p => p.UIModuleName != null)
-                .Select(p => new PluginDescription
-                {
-                    AssemblyName = p.GetType().Assembly.GetName().Name ?? throw new InvalidOperationException("Plugin assembly could not be determined."),
-                    ModuleName = p.UIModuleName!
-                })
+                .Select(p => new PluginDescriptionDto(
+                    p.GetType().Assembly.GetName().Name ?? throw new InvalidOperationException("Plugin assembly could not be determined."),
+                    p.UIModuleName!)
+                )
                 .ToArray();
-        }
-
-        public class PluginDescription
-        {
-            public string AssemblyName { get; init; }
-            public string ModuleName { get; init; }
         }
     }
 }

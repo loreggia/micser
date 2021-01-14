@@ -122,14 +122,7 @@ namespace Micser.Services
 
         private static ModuleConnection ToModel(ModuleConnectionEntity mc)
         {
-            return new ModuleConnection
-            {
-                Id = mc.Id,
-                SourceConnectorName = mc.SourceConnectorName,
-                SourceId = mc.SourceModuleId,
-                TargetConnectorName = mc.TargetConnectorName,
-                TargetId = mc.TargetModuleId
-            };
+            return new ModuleConnection(mc.Id, mc.SourceModuleId, mc.SourceConnectorName, mc.TargetModuleId, mc.TargetConnectorName);
         }
     }
 }

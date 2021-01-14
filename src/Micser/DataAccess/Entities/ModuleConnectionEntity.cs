@@ -12,12 +12,12 @@ namespace Micser.DataAccess.Entities
         /// Gets or sets the name of the connector on the source widget.
         /// </summary>
         [Required]
-        public string SourceConnectorName { get; set; }
+        public string SourceConnectorName { get; set; } = null!;
 
         /// <summary>
         /// Gets or set the source module. Navigation property for <see cref="SourceModuleId"/>.
         /// </summary>
-        public virtual ModuleEntity SourceModule { get; set; }
+        public virtual ModuleEntity SourceModule { get; set; } = null!;
 
         /// <summary>
         /// Gets or sets the source module foreign key.
@@ -30,12 +30,12 @@ namespace Micser.DataAccess.Entities
         /// Gets or sets the name of the connector on the target widget.
         /// </summary>
         [Required]
-        public string TargetConnectorName { get; set; }
+        public string TargetConnectorName { get; set; } = null!;
 
         /// <summary>
         /// Gets or sets the target module. Navigation property for <see cref="TargetModuleId"/>.
         /// </summary>
-        public virtual ModuleEntity TargetModule { get; set; }
+        public virtual ModuleEntity TargetModule { get; set; } = null!;
 
         /// <summary>
         /// Gets or sets the target module foreign key.

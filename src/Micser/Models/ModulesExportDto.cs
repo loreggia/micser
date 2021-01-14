@@ -1,4 +1,6 @@
-﻿namespace Micser.Common.Modules
+﻿using Micser.Common.Modules;
+
+namespace Micser.Models
 {
     /// <summary>
     /// DTO used for serializing module data.

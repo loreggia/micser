@@ -5,7 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
-using Micser.UI.Models;
+using Micser.Models;
 
 namespace Micser.UI.Infrastructure
 {

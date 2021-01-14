@@ -1,13 +1,14 @@
 ﻿namespace Micser.Common.Modules
 {
     /// <summary>
-    /// DTO representing a module.
+    /// Module.
     /// </summary>
     public class Module : IIdentifiable
     {
-        public Module()
+        public Module(long id, string type)
         {
-            ModuleType = "Unknown";
+            Id = id;
+            Type = type;
             State = new ModuleState();
         }
 
@@ -17,13 +18,13 @@
         public long Id { get; set; }
 
         /// <summary>
-        /// Gets or sets the type/identifier of the module.
-        /// </summary>
-        public string ModuleType { get; set; }
-
-        /// <summary>
         /// Gets or sets the module's current state.
         /// </summary>
         public ModuleState State { get; set; }
+
+        /// <summary>
+        /// Gets or sets the type/identifier of the module.
+        /// </summary>
+        public string Type { get; set; }
     }
 }

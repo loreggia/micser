@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace Micser.UI.Models
+namespace Micser.Models
 {
     public class ApiError
     {

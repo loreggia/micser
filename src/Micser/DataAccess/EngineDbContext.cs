@@ -18,19 +18,19 @@ namespace Micser.DataAccess
         /// <summary>
         /// The module connections store.
         /// </summary>
-        public DbSet<ModuleConnectionEntity> ModuleConnections { get; set; }
+        public DbSet<ModuleConnectionEntity> ModuleConnections { get; set; } = null!;
 
         // ReSharper disable once UnusedMember.Global
         /// <summary>
         /// The modules store.
         /// </summary>
-        public DbSet<ModuleEntity> Modules { get; set; }
+        public DbSet<ModuleEntity> Modules { get; set; } = null!;
 
         // ReSharper disable once UnusedMember.Global
         /// <summary>
         /// The application setting store.
         /// </summary>
-        public DbSet<SettingValue> Settings { get; set; }
+        public DbSet<SettingValue> Settings { get; set; } = null!;
 
         /// <inheritdoc />
         protected override void OnModelCreating(ModelBuilder modelBuilder)

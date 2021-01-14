@@ -97,9 +97,10 @@ namespace Micser.Services
             state.IsMuted = module.State.IsMuted;
             state.UseSystemVolume = module.State.UseSystemVolume;
             state.Volume = module.State.Volume;
-            foreach (var data in module.State)
+
+            foreach (var (key, value) in module.State)
             {
-                state[data.Key] = data.Value;
+                state[key] = value;
             }
 
             entity.StateJson = JsonConvert.SerializeObject(state);
@@ -113,17 +114,15 @@ namespace Micser.Services
         {
             return new ModuleEntity
             {
-                ModuleType = module.ModuleType,
+                Type = module.Type,
                 StateJson = JsonConvert.SerializeObject(module.State)
             };
         }
 
         private static Module ToModel(ModuleEntity module)
         {
-            return new Module
+            return new Module(module.Id, module.Type)
             {
-                Id = module.Id,
-                ModuleType = module.ModuleType,
                 State = JsonConvert.DeserializeObject<ModuleState>(module.StateJson)
             };
         }

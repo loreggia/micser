@@ -58,7 +58,7 @@ namespace Micser.Audio
         {
             var moduleDto = await _moduleService.GetByIdAsync(id).ConfigureAwait(false);
 
-            var type = Type.GetType(moduleDto.ModuleType);
+            var type = Type.GetType(moduleDto.Type);
             if (type != null)
             {
                 if (_container.GetService(type) is IAudioModule audioModule)
@@ -69,12 +69,12 @@ namespace Micser.Audio
                 }
                 else
                 {
-                    _logger.LogWarning($"Could not create an instance of a module. ID: {moduleDto.Id}, Type: {moduleDto.ModuleType}");
+                    _logger.LogWarning($"Could not create an instance of a module. ID: {moduleDto.Id}, Type: {moduleDto.Type}");
                 }
             }
             else
             {
-                _logger.LogWarning($"Could not find module type. ID: {moduleDto.Id}, Type: {moduleDto.ModuleType}");
+                _logger.LogWarning($"Could not find module type. ID: {moduleDto.Id}, Type: {moduleDto.Type}");
             }
         }
 

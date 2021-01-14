@@ -1,10 +1,19 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Generic;
 
 namespace Micser.Common.Extensions
 {
     public static class DictionaryExtensions
     {
+        public static void AddRange<TKey, TValue>(this IDictionary<TKey, TValue> dict, IDictionary<TKey, TValue> source)
+        {
+            foreach (var key in source.Keys)
+            {
+                dict.Add(key, source[key]);
+            }
+        }
+
         public static TValue? GetObject<TValue>(this IDictionary dictionary, string key, TValue? defaultValue = default)
         {
             return dictionary.GetObject<string, TValue>(key, defaultValue);

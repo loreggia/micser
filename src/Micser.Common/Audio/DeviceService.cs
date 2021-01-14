@@ -53,25 +53,24 @@ namespace Micser.Common.Audio
         /// </summary>
         public DeviceDescription? GetDescription(string id)
         {
-            using (var deviceEnumerator = new MMDeviceEnumerator())
+            using var deviceEnumerator = new MMDeviceEnumerator();
+
+            try
             {
-                try
-                {
-                    var device = deviceEnumerator.GetDevice(id);
-                    return GetDescription(device);
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine(ex);
-                    return null;
-                }
+                var device = deviceEnumerator.GetDevice(id);
+                return GetDescription(device);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine(ex);
+                return null;
             }
         }
 
         /// <summary>
         /// Enumerates active or unplugged devices of the specified type.
         /// </summary>
-        public IEnumerable<DeviceDescription?> GetDevices(DeviceType type)
+        public IEnumerable<DeviceDescription> GetDevices(DeviceType type)
         {
             using var deviceEnumerator = new MMDeviceEnumerator();
 
@@ -81,7 +80,8 @@ namespace Micser.Common.Audio
                         : DataFlow.Render,
                     DeviceState.Active | DeviceState.UnPlugged)
                 .Select(GetDescription)
-                .ToArray();
+                .Where(d => d != null)
+                .ToArray()!;
         }
     }
 }

@@ -70,18 +70,6 @@ namespace Micser.Common.Modules
             set => SetPropertyValue(value);
         }
 
-        /// <summary>
-        /// Adds the specified entries to the state. The keys and values are not automatically cloned.
-        /// </summary>
-        /// <param name="entries">The entries to add to the state.</param>
-        public void Add(IDictionary<string, string> entries)
-        {
-            foreach (var (key, value) in entries)
-            {
-                Add(key, value);
-            }
-        }
-
         private T? GetPropertyValue<T>([CallerMemberName] string propertyName = null!)
         {
             return TryGetValue(propertyName.ToCamelCase(), out var value) && value != null ? value.ToType<T>() : default;

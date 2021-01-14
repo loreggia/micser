@@ -2,8 +2,11 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Micser.Common.Controllers;
+using Micser.Common.Extensions;
 using Micser.Common.Modules;
 using Micser.Common.Services;
+using Micser.Models;
+using Micser.UI.Infrastructure;
 
 namespace Micser.Controllers
 {
@@ -19,10 +22,11 @@ namespace Micser.Controllers
         }
 
         [HttpPost("")]
-        public async Task<Module> CreateAsync([FromBody] Module module)
+        public async Task<ModuleDto> CreateAsync([FromBody] ModuleDto dto)
         {
+            var module = GetModel(dto);
             await _moduleService.InsertAsync(module);
-            return module;
+            return GetDto(module);
         }
 
         [HttpDelete("{id?}")]
@@ -39,9 +43,12 @@ namespace Micser.Controllers
         }
 
         [HttpGet("")]
-        public IAsyncEnumerable<Module> GetAllAsync()
+        public async IAsyncEnumerable<ModuleDto> GetAllAsync()
         {
-            return _moduleService.GetAllAsync();
+            await foreach (var module in _moduleService.GetAllAsync())
+            {
+                yield return GetDto(module);
+            }
         }
 
         [HttpGet("Descriptions")]
@@ -51,9 +58,34 @@ namespace Micser.Controllers
         }
 
         [HttpPut("")]
-        public async Task<Module> UpdateAsync([FromBody] Module module)
+        public async Task<ModuleDto> UpdateAsync([FromBody] ModuleDto dto)
         {
+            if (dto.Id <= 0) throw new BadRequestApiException($"{nameof(ModuleDto.Id)} must be set.");
+
+            var module = GetModel(dto);
             await _moduleService.UpdateAsync(module);
+            return GetDto(module);
+        }
+
+        private static ModuleDto GetDto(Module module)
+        {
+            var dto = new ModuleDto
+            {
+                Id = module.Id,
+                Type = module.Type
+            };
+
+            dto.State.AddRange(module.State);
+
+            return dto;
+        }
+
+        private Module GetModel(ModuleDto dto)
+        {
+            if (string.IsNullOrEmpty(dto.Type)) throw new BadRequestApiException($"{nameof(ModuleDto.Type)} must be set.");
+
+            var module = new Module(dto.Id, dto.Type);
+            module.State.AddRange(dto.State);
             return module;
         }
     }
