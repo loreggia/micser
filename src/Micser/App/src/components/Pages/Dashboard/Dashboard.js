@@ -151,6 +151,8 @@ const Dashboard = () => {
     };
 
     const handleConnect = async ({ source, sourceHandle, target, targetHandle }) => {
+        console.log(target);
+
         const connection = {
             sourceId: Number(source),
             targetId: Number(target),
@@ -162,6 +164,23 @@ const Dashboard = () => {
         moduleConnectionsApi.load({ setResult: true });
     };
 
+    const handleEdgeUpdate = async (oldEdge, newEdge) => {
+        let id = oldEdge.id;
+        id = id.substring(1, id.length);
+        const { source, sourceHandle, target, targetHandle } = newEdge;
+
+        const connection = {
+            id: Number(id),
+            sourceId: Number(source),
+            targetId: Number(target),
+            sourceConnectorName: sourceHandle,
+            targetConnectorName: targetHandle,
+        };
+
+        await moduleConnectionsApi.load({ method: "put", data: connection });
+        moduleConnectionsApi.load({ setResult: true });
+    };
+
     const handleMoveEnd = (transform) => {
         setFlowTransform(transform);
     };
@@ -169,6 +188,8 @@ const Dashboard = () => {
     const handleContextMenu = (_, node) => {
         setContextMenuTarget(node);
     };
+
+    const handleLoad = (reactFlowInstance) => reactFlowInstance.fitView();
 
     const isLoading = modulesApi.isLoading || moduleConnectionsApi.isLoading || moduleDescriptionsApi.isLoading;
 
@@ -214,6 +235,23 @@ const Dashboard = () => {
         );
     }, [contextMenuTarget, deleteAllModules]);
 
+    const handleConnectStart = (...e) => {
+        console.log("handleConnectStart");
+        console.log(e);
+    };
+    const handleConnectStop = (...e) => {
+        console.log("handleConnectStop");
+        console.log(e);
+    };
+    const handleConnectEnd = (...e) => {
+        console.log("handleConnectEnd");
+        console.log(e);
+    };
+    const handleElementsRemove = (...e) => {
+        console.log("handleElementsRemove");
+        console.log(e);
+    };
+
     return (
         <PageContainer noPadding>
             {isLoading && <Loader />}
@@ -227,10 +265,16 @@ const Dashboard = () => {
                         defaultZoom={flowTransform.zoom}
                         defaultPosition={[flowTransform.x, flowTransform.y]}
                         style={{ width: "100%", height: "100%" }}
+                        onLoad={handleLoad}
                         onDragOver={handleDragOver}
                         onDrop={handleDrop}
                         onNodeDragStop={handleNodeDragStop}
+                        onEdgeUpdate={handleEdgeUpdate}
                         onConnect={handleConnect}
+                        onConnectStart={handleConnectStart}
+                        onConnectStop={handleConnectStop}
+                        onConnectEnd={handleConnectEnd}
+                        onElementsRemove={handleElementsRemove}
                         onlyRenderVisibleElements={false}
                         onMoveEnd={handleMoveEnd}
                         onPaneContextMenu={handleContextMenu}
