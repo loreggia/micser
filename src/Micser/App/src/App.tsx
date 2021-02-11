@@ -1,12 +1,12 @@
 import React, { FC, memo, Suspense } from "react";
 import { ApiProvider } from "react-rest-api";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-import { Spin, Layout } from "antd";
+import { Layout } from "antd";
 import styled from "styled-components";
 
 import * as antd from "antd";
 
-import { Dashboard, Navigation, NotFound, Settings } from "components";
+import { Dashboard, Loader, Navigation, NotFound, Settings } from "components";
 
 import { showError } from "./utils";
 import { Routes } from "./utils/constants";
@@ -15,24 +15,12 @@ import { PluginsContext } from "./hooks/usePlugins";
 
 import "./i18n";
 import "./App.less";
-import { useTranslation } from "react-i18next/*";
 
 const wnd = window as any;
 
 wnd["react"] = React;
 wnd["styled-components"] = styled;
 wnd["antd"] = antd;
-
-const LoaderContainer = styled.div``;
-
-const Loader: FC = () => {
-    const { t } = useTranslation();
-    return (
-        <LoaderContainer>
-            <Spin tip={t("global.loading")} />
-        </LoaderContainer>
-    );
-};
 
 const App = ({ isLoading }: { isLoading: boolean }) => {
     const handleContextMenu = (e: React.MouseEvent) => {
@@ -42,25 +30,23 @@ const App = ({ isLoading }: { isLoading: boolean }) => {
     return (
         <Router>
             <Layout style={{ minHeight: "100vh" }} onContextMenu={handleContextMenu}>
-                {isLoading ? (
-                    <Loader />
-                ) : (
-                    <>
-                        <Navigation />
+                <>
+                    <Loader isVisible={isLoading} />
 
-                        <Layout>
-                            <Switch>
-                                <Route path={Routes.dashboard.index} exact>
-                                    <Dashboard />
-                                </Route>
-                                <Route path={Routes.settings.index}>
-                                    <Settings />
-                                </Route>
-                                <NotFound />
-                            </Switch>
-                        </Layout>
-                    </>
-                )}
+                    <Navigation />
+
+                    <Layout>
+                        <Switch>
+                            <Route path={Routes.dashboard.index} exact>
+                                <Dashboard />
+                            </Route>
+                            <Route path={Routes.settings.index}>
+                                <Settings />
+                            </Route>
+                            <NotFound />
+                        </Switch>
+                    </Layout>
+                </>
             </Layout>
         </Router>
     );
@@ -108,7 +94,7 @@ const AppWithApi = () => {
     };
 
     return (
-        <Suspense fallback={<Loader />}>
+        <Suspense fallback={<Loader isVisible={true} />}>
             <ApiProvider
                 url="/api"
                 config={ApiConfig}

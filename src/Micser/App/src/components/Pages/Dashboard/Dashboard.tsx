@@ -1,15 +1,27 @@
-import React, { useCallback, useContext, useEffect, useMemo, useState } from "react";
+import React, { MouseEvent, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
-import ReactFlow, { Background, Controls } from "react-flow-renderer";
+import ReactFlow, {
+    Background,
+    BackgroundVariant,
+    Connection,
+    Controls,
+    Edge,
+    FlowElement,
+    FlowTransform,
+    Node,
+    OnLoadParams,
+} from "react-flow-renderer";
 import { Card, Drawer, Dropdown, Menu, Modal, Space, Typography } from "antd";
 import { AppstoreAddOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
-import { useGet } from "react-rest-api";
+import { useApi, useGet } from "react-rest-api";
 
 import { PageContainer } from "components";
 import { Widget, WidgetType, WidgetTypesContext } from "./Widget";
 
-import { PluginsContext, useErrorNotification } from "hooks";
+import { PluginsContext } from "hooks";
 import { getRelativeCoordinates } from "utils";
+import { Module, ModuleConnection, ModuleDescription } from "./Models";
+import { Loader } from "components/Loader";
 
 const FixedButton = styled.div`
     position: fixed;
@@ -46,18 +58,17 @@ const ContextMenuActions = {
     DeleteAll: "DeleteAll",
 };
 
-interface ModuleDto {}
-
 export const Dashboard = () => {
     const plugins = useContext(PluginsContext);
-    const [elements, setElements] = useState([]);
+    const [elements, setElements] = useState<FlowElement[]>([]);
     const [isAddDrawerOpen, setIsAddDrawerOpen] = useState(false);
-    const [flowTransform, setFlowTransform] = useState({ x: 0, y: 0, zoom: 1 });
-    const [contextMenuTarget, setContextMenuTarget] = useState();
+    const [flowTransform, setFlowTransform] = useState<FlowTransform>({ x: 0, y: 0, zoom: 1 });
+    const [contextMenuTarget, setContextMenuTarget] = useState<Node>();
 
-    const { result: modules } = useGet<ModuleDto>("/Modules");
-    const { result: moduleConnections } = useGet("/ModuleConnections");
-    const { result: moduleDescriptions } = useGet("/Modules/Descriptions");
+    const api = useApi<Module>();
+    const { result: modules } = useGet<Module[]>("/Modules");
+    const { result: moduleConnections } = useGet<ModuleConnection[]>("/ModuleConnections");
+    const { result: moduleDescriptions } = useGet<ModuleDescription[]>("/Modules/Descriptions");
 
     const widgetTypes = useMemo(() => {
         return plugins.reduce<WidgetType[]>((prev, curr) => (curr.widgets ? prev.concat(curr.widgets) : prev), []);
@@ -65,20 +76,20 @@ export const Dashboard = () => {
 
     useEffect(() => {
         if (modules && moduleConnections) {
-            const moduleElements = modules.map((dto) => ({
+            const moduleElements = modules.map<FlowElement>((dto) => ({
                 id: String(dto.id),
                 type: "Widget",
                 position: { x: Number(dto.state.left), y: Number(dto.state.top) },
                 data: dto,
             }));
-            const connectionElements = moduleConnections.map((dto) => ({
+            const connectionElements = moduleConnections.map<FlowElement>((dto) => ({
                 id: `c${dto.id}`,
                 source: String(dto.sourceId),
                 target: String(dto.targetId),
                 sourceHandle: dto.sourceConnectorName,
                 targetHandle: dto.targetConnectorName,
                 animated: true,
-                arrowHeadType: "arrow",
+                // arrowHeadType: "arrow",
             }));
 
             setElements(moduleElements.concat(connectionElements));
@@ -88,23 +99,23 @@ export const Dashboard = () => {
     const nodeTypes = useMemo(() => ({ Widget: Widget }), []);
 
     const deleteAllModules = useCallback(async () => {
-        await modulesApi.load({ method: "delete" });
+        await api.del("/Modules");
         modulesApi.load({ setResult: true });
     }, [modulesApi]);
 
-    const handleDragStart = (e, moduleDescription) => {
+    const handleDragStart = (e: React.DragEvent, moduleDescription: ModuleDescription) => {
         e.dataTransfer.setData(ModuleDescriptionKey, JSON.stringify(moduleDescription));
         const offset = getRelativeCoordinates(e);
         e.dataTransfer.setData(DragOffsetKey, JSON.stringify(offset));
     };
 
-    const handleDragOver = (e) => {
+    const handleDragOver = (e: React.DragEvent) => {
         if (e.dataTransfer.types.includes(ModuleDescriptionKey)) {
             e.preventDefault();
         }
     };
 
-    const handleDrop = async (e) => {
+    const handleDrop = async (e: React.DragEvent) => {
         const data = e.dataTransfer.getData(ModuleDescriptionKey);
         if (data) {
             const moduleDescription = JSON.parse(data);
@@ -135,7 +146,7 @@ export const Dashboard = () => {
         }
     };
 
-    const handleNodeDragStop = (_, node) => {
+    const handleNodeDragStop = (_: MouseEvent, node: Node) => {
         const { data: module } = node;
         const { x, y } = node.position;
         module.state.left = x;
@@ -144,7 +155,7 @@ export const Dashboard = () => {
         modulesApi.load({ method: "put", data: module });
     };
 
-    const handleConnect = async ({ source, sourceHandle, target, targetHandle }) => {
+    const handleConnect = async ({ source, sourceHandle, target, targetHandle }: Edge | Connection) => {
         console.log(target);
 
         const connection = {
@@ -158,10 +169,10 @@ export const Dashboard = () => {
         moduleConnectionsApi.load({ setResult: true });
     };
 
-    const handleEdgeUpdate = async (oldEdge, newEdge) => {
+    const handleEdgeUpdate = async (oldEdge: Edge, newConnection: Connection) => {
         let id = oldEdge.id;
         id = id.substring(1, id.length);
-        const { source, sourceHandle, target, targetHandle } = newEdge;
+        const { source, sourceHandle, target, targetHandle } = newConnection;
 
         const connection = {
             id: Number(id),
@@ -175,15 +186,21 @@ export const Dashboard = () => {
         moduleConnectionsApi.load({ setResult: true });
     };
 
-    const handleMoveEnd = (transform) => {
-        setFlowTransform(transform);
+    const handleMoveEnd = (transform?: FlowTransform) => {
+        if (transform) {
+            setFlowTransform(transform);
+        }
     };
 
-    const handleContextMenu = (_, node) => {
+    const handlePaneContextMenu = (_: React.MouseEvent) => {
+        setContextMenuTarget(undefined);
+    };
+
+    const handleNodeContextMenu = (_: React.MouseEvent, node: Node) => {
         setContextMenuTarget(node);
     };
 
-    const handleLoad = (reactFlowInstance) => reactFlowInstance.fitView();
+    const handleLoad = (reactFlowInstance: OnLoadParams) => reactFlowInstance.fitView();
 
     const isLoading = modulesApi.isLoading || moduleConnectionsApi.isLoading || moduleDescriptionsApi.isLoading;
 
@@ -229,26 +246,26 @@ export const Dashboard = () => {
         );
     }, [contextMenuTarget, deleteAllModules]);
 
-    const handleConnectStart = (...e) => {
+    const handleConnectStart = (...e: any) => {
         console.log("handleConnectStart");
         console.log(e);
     };
-    const handleConnectStop = (...e) => {
+    const handleConnectStop = (...e: any) => {
         console.log("handleConnectStop");
         console.log(e);
     };
-    const handleConnectEnd = (...e) => {
+    const handleConnectEnd = (...e: any) => {
         console.log("handleConnectEnd");
         console.log(e);
     };
-    const handleElementsRemove = (...e) => {
+    const handleElementsRemove = (...e: any) => {
         console.log("handleElementsRemove");
         console.log(e);
     };
 
     return (
         <PageContainer noPadding>
-            {isLoading && <Loader />}
+            <Loader isVisible={isLoading} />
             <WidgetTypesContext.Provider value={widgetTypes}>
                 <Dropdown overlay={contextMenu} trigger={["contextMenu"]}>
                     <ReactFlow
@@ -271,11 +288,11 @@ export const Dashboard = () => {
                         onElementsRemove={handleElementsRemove}
                         onlyRenderVisibleElements={false}
                         onMoveEnd={handleMoveEnd}
-                        onPaneContextMenu={handleContextMenu}
-                        onNodeContextMenu={handleContextMenu}
+                        onPaneContextMenu={handlePaneContextMenu}
+                        onNodeContextMenu={handleNodeContextMenu}
                     >
                         <Controls />
-                        <Background variant="dots" size={1} gap={10} color="#333" />
+                        <Background variant={BackgroundVariant.Dots} size={1} gap={10} color="#333" />
                     </ReactFlow>
                 </Dropdown>
                 <Drawer visible={isAddDrawerOpen} onClose={() => setIsAddDrawerOpen(false)} width="300px" mask={false}>

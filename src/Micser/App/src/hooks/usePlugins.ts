@@ -8,6 +8,10 @@ wnd.process = { env: {} };
 
 export const PluginsContext = createContext<Plugin[]>([]);
 
+interface PluginDefinition {
+    assemblyName: string;
+    moduleName: string;
+}
 interface Plugin {
     name: string;
     widgets?: WidgetType[];
@@ -28,8 +32,8 @@ const loadModuleAsync = (fileName: string, moduleName: string): Promise<Module> 
     });
 };
 
-export const usePlugins = () => {
-    const { result: pluginDefinitions, loading: isLoadingApi } = useGet("/plugins");
+export const usePlugins = (): [Plugin[], boolean] => {
+    const { result: pluginDefinitions, loading: isLoadingApi } = useGet<PluginDefinition[]>("/plugins");
     const [plugins, setPlugins] = useState<Plugin[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 

@@ -19,7 +19,7 @@ export const showError = (error?: ErrorType) => {
     }
 };
 
-export const getRelativeCoordinates = (event: MouseEvent, element: Nullable<HTMLElement> = null) => {
+export const getRelativeCoordinates = (event: React.MouseEvent, element: Nullable<HTMLElement> = null) => {
     if (!element) {
         element = event.target as HTMLElement;
     }
