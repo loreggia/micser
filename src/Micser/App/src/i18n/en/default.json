@@ -1,0 +1,14 @@
+{
+    "global": {
+        "loading": "Loading..."
+    },
+    "error": {
+        "unknown": "Unknown error",
+        "notFound": "Not found",
+        "badRequest": "Bad request"
+    },
+    "notFound": {
+        "title": "Not Found",
+        "message": "The requested content could not be found. :("
+    }
+}

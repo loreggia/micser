@@ -1,14 +1,12 @@
-import React, { memo, Suspense } from "react";
+import React, { FC, memo, Suspense } from "react";
 import { ApiProvider } from "react-rest-api";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
-import { Layout } from "antd";
-import { Loader } from "micser-common";
+import { Spin, Layout } from "antd";
 import styled from "styled-components";
 
 import * as antd from "antd";
-import * as MicserCommon from "micser-common";
 
-import { Dashboard, Navigation, NotFound, Settings } from "./components";
+import { Dashboard, Navigation, NotFound, Settings } from "components";
 
 import { showError } from "./utils";
 import { Routes } from "./utils/constants";
@@ -17,15 +15,27 @@ import { PluginsContext } from "./hooks/usePlugins";
 
 import "./i18n";
 import "./App.less";
-import { useTranslation } from "react-i18next";
+import { useTranslation } from "react-i18next/*";
 
-window["react"] = React;
-window["styled-components"] = styled;
-window["antd"] = antd;
-window["micser-common"] = MicserCommon;
+const wnd = window as any;
 
-const App = ({ isLoading }) => {
-    const handleContextMenu = (e) => {
+wnd["react"] = React;
+wnd["styled-components"] = styled;
+wnd["antd"] = antd;
+
+const LoaderContainer = styled.div``;
+
+const Loader: FC = () => {
+    const { t } = useTranslation();
+    return (
+        <LoaderContainer>
+            <Spin tip={t("global.loading")} />
+        </LoaderContainer>
+    );
+};
+
+const App = ({ isLoading }: { isLoading: boolean }) => {
+    const handleContextMenu = (e: React.MouseEvent) => {
         e.preventDefault();
     };
 
@@ -73,7 +83,7 @@ const ApiConfig = {
 };
 
 const AppWithApi = () => {
-    const resolveCallback = async (response) => {
+    const resolveCallback = async (response: Response) => {
         try {
             const body = await response.json();
 
@@ -88,7 +98,7 @@ const AppWithApi = () => {
         }
     };
 
-    const rejectCallback = async (response) => {
+    const rejectCallback = async (response: Response) => {
         try {
             const body = await response.json();
             showError(body || response);

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { FC } from "react";
 import styled from "styled-components";
 import { NavLink, useLocation } from "react-router-dom";
 import { Layout, Menu } from "antd";
@@ -10,8 +10,9 @@ const Brand = styled.div`
     color: white;
 `;
 
-const Navigation = ({ className }) => {
+export const Navigation: FC<Stylable> = ({ className }) => {
     const location = useLocation();
+
     return (
         <Layout.Sider className={className} collapsible defaultCollapsed>
             <Brand>
@@ -28,5 +29,3 @@ const Navigation = ({ className }) => {
         </Layout.Sider>
     );
 };
-
-export default Navigation;

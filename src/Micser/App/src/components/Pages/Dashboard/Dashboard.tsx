@@ -3,14 +3,13 @@ import styled from "styled-components";
 import ReactFlow, { Background, Controls } from "react-flow-renderer";
 import { Card, Drawer, Dropdown, Menu, Modal, Space, Typography } from "antd";
 import { AppstoreAddOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
-import { Loader, useApi } from "micser-common";
+import { useGet } from "react-rest-api";
 
-import PageContainer from "/components/PageContainer";
-import Widget, { WidgetTypesContext } from "./Widget";
+import { PageContainer } from "components";
+import { Widget, WidgetType, WidgetTypesContext } from "./Widget";
 
-import { useErrorNotification } from "/hooks";
-import { PluginsContext } from "/hooks/usePlugins";
-import { getRelativeCoordinates } from "/utils";
+import { PluginsContext, useErrorNotification } from "hooks";
+import { getRelativeCoordinates } from "utils";
 
 const FixedButton = styled.div`
     position: fixed;
@@ -47,26 +46,21 @@ const ContextMenuActions = {
     DeleteAll: "DeleteAll",
 };
 
-const Dashboard = () => {
+interface ModuleDto {}
+
+export const Dashboard = () => {
     const plugins = useContext(PluginsContext);
     const [elements, setElements] = useState([]);
     const [isAddDrawerOpen, setIsAddDrawerOpen] = useState(false);
     const [flowTransform, setFlowTransform] = useState({ x: 0, y: 0, zoom: 1 });
     const [contextMenuTarget, setContextMenuTarget] = useState();
 
-    const modulesApi = useApi("Modules");
-    const { result: modules } = modulesApi;
-
-    const moduleConnectionsApi = useApi("ModuleConnections");
-    const { result: moduleConnections } = moduleConnectionsApi;
-
-    const moduleDescriptionsApi = useApi("Modules/Descriptions");
-    const { result: moduleDescriptions } = moduleDescriptionsApi;
-
-    useErrorNotification([modulesApi.error, moduleConnectionsApi.error, moduleDescriptionsApi.error]);
+    const { result: modules } = useGet<ModuleDto>("/Modules");
+    const { result: moduleConnections } = useGet("/ModuleConnections");
+    const { result: moduleDescriptions } = useGet("/Modules/Descriptions");
 
     const widgetTypes = useMemo(() => {
-        return plugins.reduce((prev, curr) => prev.concat(curr.widgets), []);
+        return plugins.reduce<WidgetType[]>((prev, curr) => (curr.widgets ? prev.concat(curr.widgets) : prev), []);
     }, [plugins]);
 
     useEffect(() => {
@@ -310,5 +304,3 @@ const Dashboard = () => {
         </PageContainer>
     );
 };
-
-export default Dashboard;

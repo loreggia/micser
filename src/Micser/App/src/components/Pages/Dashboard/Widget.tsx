@@ -1,9 +1,16 @@
-import React, { createContext, useContext, useMemo } from "react";
+import React, { createContext, ReactNode, useContext, useMemo } from "react";
 import { Card } from "antd";
 import { Handle } from "react-flow-renderer";
 import styled from "styled-components";
 
-const WidgetTypesContext = createContext([]);
+export interface WidgetType {
+    name: string;
+    content: ReactNode;
+    inputHandles?: string[];
+    outputHandles?: string[];
+}
+
+export const WidgetTypesContext = createContext<WidgetType[]>([]);
 
 const ErrorContent = ({ data }) => {
     return <>Widget for module type '{data.type}' not found.</>;
@@ -14,7 +21,11 @@ const WidgetCard = styled(Card)`
     box-shadow: inset 0 0 5px 0 rgba(255, 255, 255, 0.5);
 `;
 
-const Widget = ({ data }) => {
+export interface WidgetProps {
+    data: ModuleDto;
+}
+
+export const Widget = ({ data }) => {
     const widgetTypes = useContext(WidgetTypesContext);
     const type = useMemo(() => widgetTypes.find((t) => t.name === data.type) || {}, [data, widgetTypes]);
     const Content = type.content || ErrorContent;
@@ -29,6 +40,3 @@ const Widget = ({ data }) => {
         </WidgetCard>
     );
 };
-
-export { WidgetTypesContext };
-export default Widget;

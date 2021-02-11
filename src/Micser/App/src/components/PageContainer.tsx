@@ -1,7 +1,10 @@
-import PropTypes from "prop-types";
 import styled from "styled-components";
 
-const PageContainer = styled.div`
+export interface PageContainerProps {
+    noPadding?: boolean;
+}
+
+export const PageContainer = styled.div<PageContainerProps>`
     position: relative;
     width: 100%;
     height: 100%;
@@ -11,9 +14,3 @@ const PageContainer = styled.div`
 PageContainer.defaultProps = {
     noPadding: false,
 };
-
-PageContainer.propTypes = {
-    noPadding: PropTypes.bool.isRequired,
-};
-
-export default PageContainer;

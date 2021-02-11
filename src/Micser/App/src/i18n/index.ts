@@ -1,20 +1,25 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
 
-import Backend from "i18next-http-backend";
+import defaultEn from "./en/default.json";
 
-import { Languages } from "./utils/constants";
+import { Languages } from "utils";
 
-i18n.use(Backend)
-    .use(initReactI18next)
+export const resources = {
+    en: {
+        default: defaultEn,
+    },
+} as const;
+
+// .use(Backend)
+i18n.use(initReactI18next)
     // init i18next
     // for all options read: https://www.i18next.com/overview/configuration-options
     .init({
-        lng: "en",
-        ns: "default",
-        defaultNS: "default",
+        resources,
+        fallbackLng: "en",
         fallbackNS: "default",
-        fallbackLng: false,
+        ns: ["default"],
         debug: process.env.NODE_ENV !== "production",
         supportedLngs: Languages,
         interpolation: {

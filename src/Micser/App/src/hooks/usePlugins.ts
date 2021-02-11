@@ -1,34 +1,36 @@
 import { createContext, useEffect, useState } from "react";
-// import ReactDOM from "react-dom";
-// import * as antd from "antd";
-// import styled from "styled-components";
 import load from "little-loader";
-import { useApi, useGet } from "react-rest-api";
+import { useGet } from "react-rest-api";
+import { WidgetType } from "components/Pages/Dashboard/Widget";
 
-// window.React = React;
-// window.ReactDOM = ReactDOM;
-// window.Antd = antd;
-// window.StyledComponents = styled;
-// window.MicserCommon = MicserCommon;
-window.process = { env: {} };
+const wnd = window as any;
+wnd.process = { env: {} };
 
-export const PluginsContext = createContext([]);
+export const PluginsContext = createContext<Plugin[]>([]);
 
-const loadModuleAsync = (fileName, moduleName) => {
+interface Plugin {
+    name: string;
+    widgets?: WidgetType[];
+}
+interface Module {
+    default: () => Plugin;
+}
+
+const loadModuleAsync = (fileName: string, moduleName: string): Promise<Module> => {
     return new Promise((resolve, reject) => {
         load(fileName, (err) => {
             if (err) {
                 reject(err);
             } else {
-                resolve(window[moduleName]);
+                resolve(wnd[moduleName]);
             }
         });
     });
 };
 
-const usePlugins = () => {
+export const usePlugins = () => {
     const { result: pluginDefinitions, loading: isLoadingApi } = useGet("/plugins");
-    const [plugins, setPlugins] = useState([]);
+    const [plugins, setPlugins] = useState<Plugin[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
@@ -37,7 +39,7 @@ const usePlugins = () => {
         const loadPluginsAsync = async () => {
             setIsLoading(true);
 
-            const result = [];
+            const result: Plugin[] = [];
 
             for (let i = 0; i < pluginDefinitions.length; i++) {
                 let { assemblyName, moduleName } = pluginDefinitions[i];
@@ -69,5 +71,3 @@ const usePlugins = () => {
 
     return [plugins, isLoadingApi || isLoading];
 };
-
-export default usePlugins;

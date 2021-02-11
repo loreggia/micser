@@ -1,9 +1,9 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
 import { Alert } from "antd";
-import PageContainer from "/components/PageContainer";
+import { PageContainer } from "components";
 
-const NotFound = () => {
+export const NotFound = () => {
     const { t } = useTranslation();
 
     return (
@@ -12,5 +12,3 @@ const NotFound = () => {
         </PageContainer>
     );
 };
-
-export default NotFound;

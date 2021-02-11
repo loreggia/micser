@@ -1,10 +1,11 @@
 import { notification } from "antd";
-import { Translation } from "react-i18next";
 import { Trans } from "react-i18next";
 
-export const showError = (error) => {
+export type ErrorType = { message?: string; messageId?: string };
+
+export const showError = (error?: ErrorType) => {
     if (error) {
-        let description = error.message;
+        let description: React.ReactNode = error.message;
 
         if (error.messageId) {
             description = <Trans i18nKey={error.messageId}>Unknown error</Trans>;
@@ -18,9 +19,9 @@ export const showError = (error) => {
     }
 };
 
-export const getRelativeCoordinates = (event, element = null) => {
+export const getRelativeCoordinates = (event: MouseEvent, element: Nullable<HTMLElement> = null) => {
     if (!element) {
-        element = event.target;
+        element = event.target as HTMLElement;
     }
 
     const position = {
@@ -33,12 +34,12 @@ export const getRelativeCoordinates = (event, element = null) => {
         top: element.offsetTop,
     };
 
-    let parent = element.offsetParent;
+    let parent = element.offsetParent as HTMLElement;
 
     while (parent) {
         offset.left += parent.offsetLeft;
         offset.top += parent.offsetTop;
-        parent = parent.offsetParent;
+        parent = parent.offsetParent as HTMLElement;
     }
 
     return {

@@ -1,11 +1,9 @@
 import { useEffect } from "react";
-import { showError } from "/utils";
+import { ErrorType, showError } from "utils";
 
-const useErrorNotification = (errors) => {
+export const useErrorNotification = (errors: ErrorType[]) => {
     useEffect(() => {
         errors.forEach(showError);
         // eslint-disable-next-line
     }, errors);
 };
-
-export default useErrorNotification;
