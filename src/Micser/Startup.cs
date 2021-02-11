@@ -20,9 +20,9 @@ using Micser.Common.Settings;
 using Micser.Common.Updates;
 using Micser.DataAccess;
 using Micser.Extensions;
+using Micser.Infrastructure;
 using Micser.Services;
 using Micser.Settings;
-using Micser.UI.Infrastructure;
 
 namespace Micser
 {

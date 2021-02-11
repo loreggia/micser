@@ -11,7 +11,7 @@ const DeviceInputWidget = ({ data }) => {
     return (
         <WidgetContainer>
             {isLoading && <Loader />}
-            <DeviceSelect defaultValue={data.state.deviceId} dropdownMatchSelectWidth={false}>
+            <DeviceSelect defaultValue={data.state.deviceId} dropdownMatchSelectWidth={false} onChange={}>
                 {devices &&
                     devices.map((device) => (
                         <Option key={device.id} value={device.id}>

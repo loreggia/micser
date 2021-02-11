@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace Micser.UI.Infrastructure
+namespace Micser.Infrastructure
 {
 #pragma warning disable RCS1194
 
@@ -8,12 +8,12 @@ namespace Micser.UI.Infrastructure
 #pragma warning restore RCS1194
     {
         public BadRequestApiException()
-            : this("Bad request")
+            : this(null)
         {
         }
 
-        public BadRequestApiException(string message)
-            : base(HttpStatusCode.BadRequest, message)
+        public BadRequestApiException(string? message)
+            : base(HttpStatusCode.BadRequest, "error.badRequest", message)
         {
         }
     }

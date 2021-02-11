@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 using Micser.Models;
 
-namespace Micser.UI.Infrastructure
+namespace Micser.Infrastructure
 {
     public static class ApiExceptionExtensions
     {
@@ -29,7 +29,13 @@ namespace Micser.UI.Infrastructure
                             _ => (int)HttpStatusCode.InternalServerError,
                         };
 
-                        var result = new JsonResult(new ApiError((HttpStatusCode)context.Response.StatusCode, contextFeature.Error.Message));
+                        var messageId = contextFeature.Error switch
+                        {
+                            ApiException apiException => apiException.MessageId,
+                            _ => "error.unknown"
+                        };
+
+                        var result = new JsonResult(new ApiError((HttpStatusCode)context.Response.StatusCode, messageId, contextFeature.Error.Message));
                         var actionContext = new ActionContext(context, context.GetRouteData(), new ActionDescriptor());
                         await result.ExecuteResultAsync(actionContext).ConfigureAwait(false);
                     }

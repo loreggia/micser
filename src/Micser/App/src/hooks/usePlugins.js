@@ -3,7 +3,7 @@ import { createContext, useEffect, useState } from "react";
 // import * as antd from "antd";
 // import styled from "styled-components";
 import load from "little-loader";
-import { useApi } from "micser-common";
+import { useApi, useGet } from "react-rest-api";
 
 // window.React = React;
 // window.ReactDOM = ReactDOM;
@@ -27,8 +27,7 @@ const loadModuleAsync = (fileName, moduleName) => {
 };
 
 const usePlugins = () => {
-    const pluginsApi = useApi("plugins");
-    const { result: pluginDefinitions, isLoadingApi } = pluginsApi;
+    const { result: pluginDefinitions, loading: isLoadingApi } = useGet("/plugins");
     const [plugins, setPlugins] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 

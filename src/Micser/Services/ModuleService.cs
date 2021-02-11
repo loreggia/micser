@@ -6,7 +6,7 @@ using Micser.Common.Modules;
 using Micser.Common.Services;
 using Micser.DataAccess;
 using Micser.DataAccess.Entities;
-using Micser.UI.Infrastructure;
+using Micser.Infrastructure;
 using Newtonsoft.Json;
 
 namespace Micser.Services

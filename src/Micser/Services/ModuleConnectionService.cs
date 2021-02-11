@@ -5,7 +5,7 @@ using Micser.Common.Modules;
 using Micser.Common.Services;
 using Micser.DataAccess;
 using Micser.DataAccess.Entities;
-using Micser.UI.Infrastructure;
+using Micser.Infrastructure;
 
 namespace Micser.Services
 {

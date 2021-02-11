@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 
-namespace Micser.UI.Infrastructure
+namespace Micser.Infrastructure
 {
     public static class SpecificSpaStaticFileMiddlewareExtensions
     {

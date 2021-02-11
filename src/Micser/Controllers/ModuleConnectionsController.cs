@@ -4,8 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 using Micser.Common.Controllers;
 using Micser.Common.Modules;
 using Micser.Common.Services;
+using Micser.Infrastructure;
 using Micser.Models;
-using Micser.UI.Infrastructure;
 
 namespace Micser.Controllers
 {

@@ -1,10 +1,18 @@
 import { notification } from "antd";
+import { Translation } from "react-i18next";
+import { Trans } from "react-i18next";
 
 export const showError = (error) => {
     if (error) {
+        let description = error.message;
+
+        if (error.messageId) {
+            description = <Trans i18nKey={error.messageId}>Unknown error</Trans>;
+        }
+
         notification.open({
             message: "Error",
-            description: error.message || error,
+            description: description || error,
             type: "error",
         });
     }

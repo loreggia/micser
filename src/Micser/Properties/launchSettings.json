@@ -1,6 +1,6 @@
 {
   "profiles": {
-    "Micser.Engine": {
+    "Micser": {
       "commandName": "Project",
       "commandLineArgs": "--console",
       "environmentVariables": {

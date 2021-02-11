@@ -1,1 +1,7 @@
-{}
+{
+    "error": {
+        "unknown": "Unknown error",
+        "notFound": "Not found",
+        "badRequest": "Bad request"
+    }
+}

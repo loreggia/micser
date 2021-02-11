@@ -1,6 +1,6 @@
 ﻿using System.Net;
 
-namespace Micser.UI.Infrastructure
+namespace Micser.Infrastructure
 {
 #pragma warning disable RCS1194
 
@@ -8,12 +8,12 @@ namespace Micser.UI.Infrastructure
 #pragma warning restore RCS1194
     {
         public NotFoundApiException()
-            : this("Not found")
+            : this(null)
         {
         }
 
-        public NotFoundApiException(string message)
-            : base(HttpStatusCode.NotFound, message)
+        public NotFoundApiException(string? message)
+            : base(HttpStatusCode.NotFound, "error.notFound", message)
         {
         }
     }
