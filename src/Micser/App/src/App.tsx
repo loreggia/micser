@@ -4,6 +4,7 @@ import { Layout } from "antd";
 import styled from "styled-components";
 
 import * as antd from "antd";
+import * as micserCommon from "micser-common";
 
 import { Loader, Navigation } from "~/components";
 import { Dashboard, NotFound, Settings } from "~/pages";
@@ -19,6 +20,7 @@ const wnd = window as any;
 wnd["react"] = React;
 wnd["styled-components"] = styled;
 wnd["antd"] = antd;
+wnd["micser-common"] = micserCommon;
 
 const App = () => {
     const [plugins, isLoading] = usePlugins();
