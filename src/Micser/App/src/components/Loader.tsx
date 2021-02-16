@@ -1,7 +1,7 @@
 import React, { FC } from "react";
 import styled from "styled-components";
 import { Spin } from "antd";
-import { useTranslation } from "react-i18next/*";
+import { useTranslation } from "react-i18next";
 
 const Container = styled.div`
     position: absolute;

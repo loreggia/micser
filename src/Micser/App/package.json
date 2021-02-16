@@ -7,6 +7,7 @@
     "dependencies": {
         "@microsoft/signalr": "^5.0.0",
         "antd": "^4.9.2",
+        "axios": "^0.21.1",
         "easy-peasy": "4.0.1",
         "fontsource-roboto": "^3.0.3",
         "i18next": "^19.8.4",
@@ -18,7 +19,6 @@
         "react-dom": "^17.0.1",
         "react-flow-renderer": "^8.2.1",
         "react-i18next": "^11.7.3",
-        "react-rest-api": "^3.1.0",
         "react-router-dom": "^5.2.0",
         "styled-components": "^5.2.1"
     },

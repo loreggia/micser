@@ -3,7 +3,7 @@ import { initReactI18next } from "react-i18next";
 
 import defaultEn from "./en/default.json";
 
-import { Languages } from "utils";
+import { Languages } from "~/constants";
 
 export const resources = {
     en: {

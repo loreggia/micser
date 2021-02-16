@@ -1,7 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 import load from "little-loader";
-import { useGet } from "react-rest-api";
-import { WidgetType } from "components/Pages/Dashboard/Widget";
+import { useGetApi, WidgetType } from "micser-common";
 
 const wnd = window as any;
 wnd.process = { env: {} };
@@ -33,7 +32,8 @@ const loadModuleAsync = (fileName: string, moduleName: string): Promise<Module> 
 };
 
 export const usePlugins = (): [Plugin[], boolean] => {
-    const { result: pluginDefinitions, loading: isLoadingApi } = useGet<PluginDefinition[]>("/plugins");
+    const [pluginDefinitions, { isLoading: isLoadingApi }] = useGetApi<PluginDefinition[]>("plugins");
+
     const [plugins, setPlugins] = useState<Plugin[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -45,19 +45,21 @@ export const usePlugins = (): [Plugin[], boolean] => {
 
             const result: Plugin[] = [];
 
-            for (let i = 0; i < pluginDefinitions.length; i++) {
-                let { assemblyName, moduleName } = pluginDefinitions[i];
-                let fileName = `/_content/${assemblyName}/plugin.js`;
+            if (pluginDefinitions) {
+                for (let i = 0; i < pluginDefinitions.length; i++) {
+                    let { assemblyName, moduleName } = pluginDefinitions[i];
+                    let fileName = `/_content/${assemblyName}/plugin.js`;
 
-                console.log("Loading plugin: " + fileName);
-                let module = await loadModuleAsync(fileName, moduleName);
+                    console.log("Loading plugin: " + fileName);
+                    let module = await loadModuleAsync(fileName, moduleName);
 
-                if (!isMounted) {
-                    return;
+                    if (!isMounted) {
+                        return;
+                    }
+
+                    let plugin = module.default();
+                    result.push(plugin);
                 }
-
-                let plugin = module.default();
-                result.push(plugin);
             }
 
             setPlugins(result);

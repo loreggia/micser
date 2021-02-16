@@ -1,3 +1,4 @@
+const path = require("path");
 const CracoLessPlugin = require("craco-less");
 
 module.exports = {
@@ -20,6 +21,10 @@ module.exports = {
             );
 
             webpackConfig.resolve.plugins.splice(scopePluginIndex, 1);
+
+            const alias = webpackConfig.resolve.alias || {};
+            alias["~"] = path.resolve(__dirname, "src/");
+            webpackConfig.resolve.alias = alias;
 
             return webpackConfig;
         },

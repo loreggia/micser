@@ -1,25 +1,36 @@
 {
-    "compilerOptions": {
-        "jsx": "react-jsx",
-        "target": "es6",
-        "lib": ["dom", "dom.iterable", "esnext"],
-        "allowSyntheticDefaultImports": true,
-        "esModuleInterop": true,
-        "allowJs": true,
-        "experimentalDecorators": true,
-        "skipLibCheck": true,
-        "strict": true,
-        "strictNullChecks": true,
-        "forceConsistentCasingInFileNames": true,
-        "module": "commonjs",
-        "moduleResolution": "node",
-        "resolveJsonModule": true,
-        "isolatedModules": true,
-        "noEmit": true,
-        "noFallthroughCasesInSwitch": true,
-        "baseUrl": "./src",
-        "typeRoots": ["./node_modules/@types", "./@types"]
-    },
-    "include": ["./src"],
-    "exclude": ["./node_modules"]
+  "extends": "./tsconfig.paths.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "target": "es6",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowSyntheticDefaultImports": true,
+    "esModuleInterop": true,
+    "allowJs": true,
+    "experimentalDecorators": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "forceConsistentCasingInFileNames": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
+    "noFallthroughCasesInSwitch": true,
+    "typeRoots": [
+      "./node_modules/@types",
+      "./@types"
+    ]
+  },
+  "include": [
+    "./src"
+  ],
+  "exclude": [
+    "./node_modules"
+  ]
 }

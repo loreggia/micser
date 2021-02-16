@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { ErrorType, showError } from "utils";
+import { ErrorType, showError } from "~/utils";
 
 export const useErrorNotification = (errors: ErrorType[]) => {
     useEffect(() => {
