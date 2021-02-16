@@ -1,6 +1,7 @@
 import React, { MouseEvent, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import ReactFlow, {
+    ArrowHeadType,
     Background,
     BackgroundVariant,
     Connection,
@@ -21,6 +22,7 @@ import { Widget, WidgetTypesContext } from "./Widget";
 import { PluginsContext } from "~/hooks";
 import { getRelativeCoordinates } from "~/utils";
 import { Loader } from "~/components";
+import { CustomEdge } from "./CustomEdge";
 
 const FixedButton = styled.div`
     position: fixed;
@@ -88,21 +90,28 @@ export const Dashboard = () => {
                 position: { x: Number(dto.state.left), y: Number(dto.state.top) },
                 data: dto,
             }));
-            const connectionElements = moduleConnections.map<FlowElement>((dto) => ({
-                id: `c${dto.id}`,
-                source: String(dto.sourceId),
-                target: String(dto.targetId),
-                sourceHandle: dto.sourceConnectorName,
-                targetHandle: dto.targetConnectorName,
-                animated: true,
-                // arrowHeadType: "arrow",
-            }));
+            const connectionElements = moduleConnections.map<FlowElement>((dto) => {
+                const source = modules.find((m) => m.id === dto.sourceId);
+                const target = modules.find((m) => m.id === dto.targetId);
+                return {
+                    id: `c${dto.id}`,
+                    source: String(dto.sourceId),
+                    target: String(dto.targetId),
+                    sourceHandle: dto.sourceConnectorName,
+                    targetHandle: dto.targetConnectorName,
+                    // animated: true,
+                    label: `${source?.state.title || source?.type} -> ${target?.state.title || target?.type}`,
+                    arrowHeadType: ArrowHeadType.ArrowClosed,
+                    type: "Custom",
+                };
+            });
 
             setElements(moduleElements.concat(connectionElements));
         }
     }, [modules, moduleConnections]);
 
     const nodeTypes = useMemo(() => ({ Widget: Widget }), []);
+    const edgeTypes = useMemo(() => ({ Custom: CustomEdge }), []);
 
     const deleteAllModules = useCallback(async () => {
         await modulesApi?.delete("");
@@ -286,6 +295,7 @@ export const Dashboard = () => {
                     <ReactFlow
                         elements={elements}
                         nodeTypes={nodeTypes}
+                        edgeTypes={edgeTypes}
                         snapToGrid
                         snapGrid={[GridSize, GridSize]}
                         defaultZoom={flowTransform.zoom}
