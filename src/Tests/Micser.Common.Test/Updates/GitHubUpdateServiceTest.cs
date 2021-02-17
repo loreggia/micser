@@ -22,6 +22,8 @@ namespace Micser.Common.Test.Updates
 
             var result = await service.GetUpdateManifestAsync().ConfigureAwait(false);
 
+            _testOutputHelper.WriteLine($"{result}");
+
             // TODO currently only for debugging purposes
             //Assert.NotNull(result);
             //Assert.NotNull(result.FileName);

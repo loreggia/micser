@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using CSCore.CoreAudioAPI;
 
@@ -14,6 +15,7 @@ namespace Micser.Common.Audio
         /// <summary>
         /// Gets an internal <see cref="DeviceDescription"/> from a WASAPI <see cref="MMDevice"/> instance.
         /// </summary>
+        [SuppressMessage("Performance", "CA1822")]
         public DeviceDescription? GetDescription(MMDevice? device)
         {
             if (device == null)
