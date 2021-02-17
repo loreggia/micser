@@ -100,7 +100,7 @@ export const Dashboard = () => {
                     sourceHandle: dto.sourceConnectorName,
                     targetHandle: dto.targetConnectorName,
                     // animated: true,
-                    label: `${source?.state.title || source?.type} -> ${target?.state.title || target?.type}`,
+                    label: `${source?.state.title || source?.type} \u2192 ${target?.state.title || target?.type}`,
                     arrowHeadType: ArrowHeadType.ArrowClosed,
                     type: "Custom",
                 };
