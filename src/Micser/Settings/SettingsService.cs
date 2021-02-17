@@ -45,7 +45,7 @@ namespace Micser.Settings
         }
 
         /// <inheritdoc />
-        public event SettingChangedEventHandler? SettingChanged;
+        public event EventHandler<SettingChangedEventArgs>? SettingChanged;
 
         /// <inheritdoc />
         public void Dispose()
