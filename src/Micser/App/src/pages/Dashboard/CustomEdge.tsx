@@ -22,13 +22,8 @@ export const CustomEdge: FC<EdgeProps> = ({
         <>
             <path id={id} style={style} className="react-flow__edge-path" d={edgePath} markerEnd={markerEnd} />
             {label && (
-                <text dy="-3px">
-                    <textPath
-                        href={`#${id}`}
-                        style={{ fill: "white", cursor: "pointer" }}
-                        startOffset="50%"
-                        textAnchor="middle"
-                    >
+                <text dy="-3px" style={{ userSelect: "none" }}>
+                    <textPath href={`#${id}`} style={{ cursor: "pointer" }} startOffset="50%" textAnchor="middle">
                         {label}
                     </textPath>
                 </text>

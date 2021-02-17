@@ -24,4 +24,28 @@
             right: -8px;
         }
     }
+
+    &__edge {
+        &updater {
+            pointer-events: none;
+        }
+
+        text {
+            fill: white;
+        }
+
+        &.selected {
+            fill: @primary-color;
+
+            .react-flow__edge-path {
+                stroke: @primary-color;
+            }
+
+            .react-flow__edgeupdater {
+                fill: rgba(255, 255, 255, 0.5);
+                stroke: rgba(255, 255, 255, 0.8);
+                pointer-events: all;
+            }
+        }
+    }
 }
