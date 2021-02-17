@@ -64,7 +64,7 @@ export const Dashboard = () => {
     const [elements, setElements] = useState<FlowElement[]>([]);
     const [isAddDrawerOpen, setIsAddDrawerOpen] = useState(false);
     const [flowTransform, setFlowTransform] = useState<FlowTransform>({ x: 0, y: 0, zoom: 1 });
-    const [contextMenuTarget, setContextMenuTarget] = useState<Node>();
+    const [contextMenuTarget, setContextMenuTarget] = useState<Node<Module>>();
 
     const [modules, { isLoading: isLoadingModules, refresh: loadModules }] = useGetApi<Module[]>("Modules");
     const [modulesApi, { isLoading: isLoadingModulesApi }] = useApi<Module>("Modules");
@@ -229,7 +229,7 @@ export const Dashboard = () => {
         isLoadingModuleDescriptions;
 
     const contextMenu = useMemo(() => {
-        const handleContextMenuClick = ({ key }: { key: React.Key }) => {
+        const handleContextMenuClick = async ({ key }: { key: React.Key }) => {
             switch (key) {
                 case ContextMenuActions.DeleteAll:
                     Modal.confirm({
@@ -242,6 +242,10 @@ export const Dashboard = () => {
                     });
                     break;
                 case ContextMenuActions.DeleteModule:
+                    if (contextMenuTarget?.data) {
+                        await modulesApi?.delete(contextMenuTarget.data.id);
+                        loadModules();
+                    }
                     break;
                 case ContextMenuActions.DeleteConnections:
                     break;
