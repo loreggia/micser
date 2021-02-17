@@ -17,6 +17,7 @@ export const CustomEdge: FC<EdgeProps> = ({
 }) => {
     const edgePath = getBezierPath({ sourceX, sourceY, sourcePosition, targetX, targetY, targetPosition });
     const markerEnd = getMarkerEnd(arrowHeadType, markerEndId);
+    style.cursor = "pointer";
     return (
         <>
             <path id={id} style={style} className="react-flow__edge-path" d={edgePath} markerEnd={markerEnd} />
