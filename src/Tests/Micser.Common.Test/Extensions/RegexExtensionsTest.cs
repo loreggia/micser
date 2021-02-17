@@ -10,7 +10,7 @@ namespace Micser.Common.Test.Extensions
         public void ReplaceGroup()
         {
             var regex = new Regex(@"Assembly(File)?Version\s*\(\s*""(?<version>[^""]+)""\s*\)");
-            var input = @"
+            const string input = @"
                 [assembly: AssemblyVersion(""1.0.0.0"")]
                 [assembly: AssemblyFileVersion(""1.0.0.0"")]
             ";

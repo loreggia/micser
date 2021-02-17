@@ -131,20 +131,20 @@ namespace Micser.Plugins.Main.Audio
 
             // Ballistics - smoothing of the gain
             float dbEnv;
-            if (_type == CompressorType.Downward && _chunkMaxDbDiff > _envelope ||
-                _type == CompressorType.Upward && _chunkMaxDbDiff < _envelope)
+            if ((_type == CompressorType.Downward && _chunkMaxDbDiff > _envelope) ||
+                (_type == CompressorType.Upward && _chunkMaxDbDiff < _envelope))
             {
-                dbEnv = _alphaAttack * _envelope + (1 - _alphaAttack) * _chunkMaxDbDiff;
+                dbEnv = (_alphaAttack * _envelope) + ((1 - _alphaAttack) * _chunkMaxDbDiff);
             }
             else
             {
-                dbEnv = _alphaRelease * _envelope + (1 - _alphaRelease) * _chunkMaxDbDiff;
+                dbEnv = (_alphaRelease * _envelope) + ((1 - _alphaRelease) * _chunkMaxDbDiff);
             }
             _envelope = dbEnv;
 
             _samplePosition++;
 
-            var dbGain = _makeUpGain * _amount - dbEnv;
+            var dbGain = (_makeUpGain * _amount) - dbEnv;
             return AudioHelper.DbToLinear(dbGain);
         }
     }

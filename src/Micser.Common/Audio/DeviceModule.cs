@@ -155,12 +155,12 @@ namespace Micser.Common.Audio
                     DeviceDescription = deviceDescription;
 
                     // save current state and signal UI refresh
-                    var moduleDto = await ModuleService.GetByIdAsync(Id);
+                    var moduleDto = await ModuleService.GetByIdAsync(Id).ConfigureAwait(false);
 
                     if (moduleDto != null)
                     {
                         moduleDto.State.AddRange(GetState());
-                        await ModuleService.UpdateAsync(moduleDto);
+                        await ModuleService.UpdateAsync(moduleDto).ConfigureAwait(false);
                         // TODO
                         //ApiClient.SendMessageAsync("modules", "refresh", moduleDto);
                     }
@@ -189,7 +189,7 @@ namespace Micser.Common.Audio
             var deviceDescription = deviceService.GetDescription(e.DeviceId);
 
             if (e.DeviceId == DeviceDescription?.Id ||
-                deviceDescription != null && deviceDescription.Type == DeviceType && deviceDescription.AdapterName == AdapterName)
+                (deviceDescription != null && deviceDescription.Type == DeviceType && deviceDescription.AdapterName == AdapterName))
             {
                 await Task.Run(() => OnDeviceStateChanged(deviceDescription!)).ConfigureAwait(false);
             }

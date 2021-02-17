@@ -8,7 +8,7 @@ namespace Micser.Plugins.Main.Modules
 {
     public class DeviceInputModule : DeviceModule
     {
-        private WasapiCapture _capture;
+        private WasapiCapture? _capture;
 
         public DeviceInputModule(IModuleService moduleService, ILogger<DeviceInputModule> logger)
             : base(moduleService, logger)
@@ -59,7 +59,7 @@ namespace Micser.Plugins.Main.Modules
             _capture.Start();
         }
 
-        private void OnCaptureDataAvailable(object sender, DataAvailableEventArgs e)
+        private void OnCaptureDataAvailable(object? sender, DataAvailableEventArgs e)
         {
             if (IsEnabled)
             {

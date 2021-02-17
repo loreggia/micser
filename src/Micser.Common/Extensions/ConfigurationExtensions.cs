@@ -37,10 +37,7 @@ namespace Micser.Common.Extensions
             });
             config.AddRuleForAllLevels("FileTarget");
 
-            services.AddLogging(options =>
-            {
-                options.AddNLog(config);
-            });
+            services.AddLogging(options => options.AddNLog(config));
 
             return services;
         }

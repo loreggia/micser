@@ -11,11 +11,11 @@ using NLog;
 
 namespace Micser.DriverUtility
 {
-    public class DriverController
+    public static class DriverController
     {
         private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
-        public int SetDeviceSettingsAndReload(int deviceCount)
+        public static int SetDeviceSettingsAndReload(int deviceCount)
         {
             if (deviceCount < 1)
             {
@@ -100,12 +100,12 @@ namespace Micser.DriverUtility
             }
         }
 
-        private int GetRegistryValue()
+        private static int GetRegistryValue()
         {
             try
             {
                 var registryKey = Registry.CurrentUser.CreateSubKey(Globals.UserRegistryRoot, false);
-                return (int)registryKey.GetValue(Globals.RegistryValues.VacCount, 1);
+                return (int?)registryKey.GetValue(Globals.RegistryValues.VacCount, 1) ?? 1;
             }
             catch (Exception ex)
             {
@@ -114,7 +114,7 @@ namespace Micser.DriverUtility
             }
         }
 
-        private bool SetRegistryValue(int deviceCount)
+        private static bool SetRegistryValue(int deviceCount)
         {
             try
             {
@@ -132,14 +132,14 @@ namespace Micser.DriverUtility
         [ComVisible(false)]
         [SuppressUnmanagedCodeSecurity]
         [SuppressMessage("ReSharper", "InconsistentNaming")]
-        private class SafeNativeMethods
+        private static class SafeNativeMethods
         {
             public const uint FILE_DEVICE_UNKNOWN = 0x00000022;
             public const uint GENERIC_READ = 0x80000000;
             public const uint GENERIC_WRITE = 0x40000000;
             public const uint METHOD_BUFFERED = 0;
 
-            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Unicode)]
             public static extern SafeFileHandle CreateFile(
                 string lpFileName,
                 [MarshalAs(UnmanagedType.U4)]
@@ -158,7 +158,7 @@ namespace Micser.DriverUtility
                 return (deviceType << 16) | (fileAccess << 14) | (function << 2) | method;
             }
 
-            [DllImport("Kernel32.dll", SetLastError = false, CharSet = CharSet.Auto)]
+            [DllImport("Kernel32.dll", SetLastError = false, CharSet = CharSet.Unicode)]
             public static extern bool DeviceIoControl(
                 SafeFileHandle hDevice,
                 uint IoControlCode,

@@ -20,7 +20,7 @@ namespace Micser.Common.Test.Updates
         {
             var service = new GitHubUpdateService(new TestLogger<GitHubUpdateService>(_testOutputHelper));
 
-            var result = await service.GetUpdateManifestAsync();
+            var result = await service.GetUpdateManifestAsync().ConfigureAwait(false);
 
             // TODO currently only for debugging purposes
             //Assert.NotNull(result);

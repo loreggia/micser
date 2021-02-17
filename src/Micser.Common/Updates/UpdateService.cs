@@ -43,8 +43,10 @@ namespace Micser.Common.Updates
 
                 if (extension == "msi")
                 {
-                    var process = new Process();
-                    process.StartInfo = new ProcessStartInfo("msiexec", $"/i \"{Path.GetFullPath(path)}\"");
+                    var process = new Process
+                    {
+                        StartInfo = new ProcessStartInfo("msiexec", $"/i \"{Path.GetFullPath(path)}\"")
+                    };
                     return process.Start();
                 }
 
@@ -66,7 +68,7 @@ namespace Micser.Common.Updates
         {
             if (manifest.Version == null)
             {
-                Logger.LogError($"The update manifest's version is not set.");
+                Logger.LogError("The update manifest's version is not set.");
                 return false;
             }
 

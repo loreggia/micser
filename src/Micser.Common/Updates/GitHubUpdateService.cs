@@ -27,7 +27,7 @@ namespace Micser.Common.Updates
         {
             if (manifest.FileName == null)
             {
-                Logger.LogError($"The update manifest's file name is null.");
+                Logger.LogError("The update manifest's file name is null.");
                 return null;
             }
 

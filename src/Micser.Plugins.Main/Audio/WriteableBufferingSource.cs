@@ -12,8 +12,8 @@ namespace Micser.Plugins.Main.Audio
     /// </remarks>
     public class WriteableBufferingSource : IWaveSource
     {
-        private readonly object _bufferlock = new object();
-        private FixedSizeBuffer<byte> _buffer;
+        private readonly object _bufferlock = new();
+        private FixedSizeBuffer<byte>? _buffer;
         private bool _disposed;
 
         /// <summary>
@@ -59,7 +59,7 @@ namespace Micser.Plugins.Main.Audio
         {
             lock (_bufferlock)
             {
-                _buffer.Clear();
+                _buffer?.Clear();
             }
         }
 
@@ -98,7 +98,7 @@ namespace Micser.Plugins.Main.Audio
             {
                 EnsureBuffer(count);
 
-                var num = _buffer.Read(buffer, offset, count);
+                var num = _buffer!.Read(buffer, offset, count);
 
                 if (num < count)
                 {
@@ -120,7 +120,7 @@ namespace Micser.Plugins.Main.Audio
             {
                 EnsureBuffer(count);
 
-                return _buffer.Write(buffer, offset, count);
+                return _buffer!.Write(buffer, offset, count);
             }
         }
 

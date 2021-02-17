@@ -9,8 +9,8 @@ namespace Micser.Common.Audio
     /// </summary>
     public class MixerSampleSource : ISampleSource
     {
-        private readonly object _lockObj = new object();
-        private readonly List<ISampleSource> _sampleSources = new List<ISampleSource>();
+        private readonly object _lockObj = new();
+        private readonly List<ISampleSource> _sampleSources = new();
         private float[]? _mixerBuffer;
 
         public MixerSampleSource(int channelCount, int sampleRate)

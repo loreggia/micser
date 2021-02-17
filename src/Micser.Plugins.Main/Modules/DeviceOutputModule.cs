@@ -20,10 +20,10 @@ namespace Micser.Plugins.Main.Modules
         private int _channelCount;
         private bool _isMuted;
         private int _latency;
-        private WasapiOut _output;
-        private MixerSampleSource _outputMixer;
+        private WasapiOut? _output;
+        private MixerSampleSource? _outputMixer;
         private float _volume;
-        private VolumeSource _volumeSource;
+        private VolumeSource? _volumeSource;
 
         public DeviceOutputModule(IModuleService moduleService, ILogger<DeviceOutputModule> logger)
             : base(moduleService, logger)
@@ -157,7 +157,7 @@ namespace Micser.Plugins.Main.Modules
 
         private void SetInputBuffer(long id, WaveFormat format)
         {
-            if (_inputBuffers.ContainsKey(id))
+            if (_outputMixer != null && _inputBuffers.ContainsKey(id))
             {
                 _outputMixer.RemoveSource(_inputSources[id]);
             }
@@ -171,12 +171,12 @@ namespace Micser.Plugins.Main.Modules
 
             if (_inputSources.ContainsKey(id))
             {
-                _outputMixer.RemoveSource(_inputSources[id]);
+                _outputMixer!.RemoveSource(_inputSources[id]);
             }
 
             IWaveSource waveSource = _inputBuffers[id];
 
-            if (waveSource.WaveFormat.SampleRate != _outputMixer.WaveFormat.SampleRate)
+            if (waveSource.WaveFormat.SampleRate != _outputMixer!.WaveFormat.SampleRate)
             {
                 waveSource = waveSource.ChangeSampleRate(_outputMixer.WaveFormat.SampleRate);
             }
@@ -205,21 +205,27 @@ namespace Micser.Plugins.Main.Modules
 
             if (restart)
             {
-                void OnStopped(object sender, PlaybackStoppedEventArgs e)
+                void OnStopped(object? sender, PlaybackStoppedEventArgs e)
                 {
-                    _output.Stopped -= OnStopped;
-
-                    if (Device.DeviceState == DeviceState.Active)
+                    if (_output != null)
                     {
-                        _output.Initialize(_volumeSource.ToWaveSource());
-                        _output.Play();
+                        _output.Stopped -= OnStopped;
+
+                        if (Device?.DeviceState == DeviceState.Active)
+                        {
+                            _output.Initialize(_volumeSource.ToWaveSource());
+                            _output.Play();
+                        }
                     }
                 }
 
-                _output.Stopped += OnStopped;
-                _output.Stop();
+                if (_output != null)
+                {
+                    _output.Stopped += OnStopped;
+                    _output.Stop();
+                }
             }
-            else if (_output != null && Device.DeviceState == DeviceState.Active)
+            else if (_output != null && Device?.DeviceState == DeviceState.Active)
             {
                 _output.Initialize(_volumeSource.ToWaveSource());
                 _output.Play();

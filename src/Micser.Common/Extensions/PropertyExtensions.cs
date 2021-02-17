@@ -21,9 +21,9 @@ namespace Micser.Common.Extensions
         /// <exception cref="ArgumentException"></exception>
         public static string GetName<T>(Expression<Func<T>> property)
         {
-            if (!(property.Body is MemberExpression me))
+            if (property.Body is not MemberExpression me)
             {
-                throw new ArgumentException(nameof(property));
+                throw new ArgumentException(null, nameof(property));
             }
             return me.Member.Name;
         }

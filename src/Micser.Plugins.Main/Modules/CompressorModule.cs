@@ -37,7 +37,7 @@ namespace Micser.Plugins.Main.Modules
         [SaveState(Defaults.Type)]
         public CompressorType Type { get; set; }
 
-        public class Defaults
+        public static class Defaults
         {
             public const float Amount = 0f;
             public const float Attack = 0.01f;

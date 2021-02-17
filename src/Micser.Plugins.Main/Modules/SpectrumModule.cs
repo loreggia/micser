@@ -35,7 +35,7 @@ namespace Micser.Plugins.Main.Modules
             _isDisposed = true;
         }
 
-        private async void OnTimerElapsed(object sender, ElapsedEventArgs e)
+        private void OnTimerElapsed(object sender, ElapsedEventArgs e)
         {
             if (_isDisposed)
             {

@@ -3,7 +3,7 @@ using System.IO;
 
 namespace Micser.Setup.CustomActions
 {
-    public class DriverActions
+    public static class DriverActions
     {
         private const string HardwareId = @"Root\Micser.Vac.Driver";
 

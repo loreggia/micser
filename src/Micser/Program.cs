@@ -10,10 +10,7 @@ namespace Micser
         public static IHostBuilder CreateHostBuilder(string[] args)
         {
             return Host.CreateDefaultBuilder(args)
-                .ConfigureWebHostDefaults(webHostBuilder =>
-                {
-                    webHostBuilder.UseStartup<Startup>();
-                });
+                .ConfigureWebHostDefaults(webHostBuilder => webHostBuilder.UseStartup<Startup>());
         }
 
         /// <summary>

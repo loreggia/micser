@@ -18,7 +18,7 @@ namespace Micser.Setup.CustomActions
         public const uint INSTALLFLAG_FORCE = 1;
         public const uint MAX_CLASS_NAME_LEN = 32;
         public const uint SPDRP_HARDWAREID = 1;
-        public static readonly IntPtr INVALID_HANDLE_VALUE = new IntPtr(-1);
+        public static readonly IntPtr INVALID_HANDLE_VALUE = new(-1);
         public static Action<string> Log = msg => Console.WriteLine(msg);
 
         #region Imports
@@ -112,7 +112,7 @@ namespace Micser.Setup.CustomActions
 
             var classGuid = Guid.Empty;
             var className = new char[MAX_CLASS_NAME_LEN];
-            var description = "";
+            const string description = "";
             uint requiredSize = 0;
             var deviceInfoData = new SP_DEVINFO_DATA();
             deviceInfoData.cbSize = (uint)Marshal.SizeOf(deviceInfoData);

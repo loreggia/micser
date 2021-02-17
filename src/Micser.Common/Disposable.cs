@@ -14,6 +14,7 @@ namespace Micser.Common
         public void Dispose()
         {
             _onDispose();
+            GC.SuppressFinalize(this);
         }
     }
 }

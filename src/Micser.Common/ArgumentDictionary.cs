@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 
@@ -64,7 +65,7 @@ namespace Micser.Common
         {
             for (var i = 0; i < args.Length; i++)
             {
-                var nameChar = _nameChars.FirstOrDefault(c => args[i].StartsWith(c));
+                var nameChar = Array.Find(_nameChars, c => args[i].StartsWith(c));
                 if (nameChar != null)
                 {
                     var name = args[i].Replace(nameChar, "").ToLower(CultureInfo.InvariantCulture);

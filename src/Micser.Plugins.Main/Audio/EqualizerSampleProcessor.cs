@@ -14,6 +14,7 @@ namespace Micser.Plugins.Main.Audio
 
         public EqualizerSampleProcessor(EqualizerModule module)
         {
+            _filters = new List<PeakFilter>();
             _module = module;
         }
 

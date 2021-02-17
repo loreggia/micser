@@ -22,7 +22,7 @@ namespace Micser.Controllers
         public async Task<ModuleConnectionDto> CreateAsync([FromBody] ModuleConnectionDto dto)
         {
             var connection = GetModel(dto);
-            await _moduleConnectionService.InsertAsync(connection);
+            await _moduleConnectionService.InsertAsync(connection).ConfigureAwait(false);
             return GetDto(connection);
         }
 
@@ -42,7 +42,7 @@ namespace Micser.Controllers
 
             dto.Id = id;
             var connection = GetModel(dto);
-            await _moduleConnectionService.UpdateAsync(connection);
+            await _moduleConnectionService.UpdateAsync(connection).ConfigureAwait(false);
             return GetDto(connection);
         }
 

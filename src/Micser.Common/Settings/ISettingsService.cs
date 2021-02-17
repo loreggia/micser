@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Micser.Common.Settings
@@ -11,7 +12,7 @@ namespace Micser.Common.Settings
         /// <summary>
         /// Event that is fired when a setting value changes.
         /// </summary>
-        event SettingChangedEventHandler? SettingChanged;
+        event EventHandler<SettingChangedEventArgs> SettingChanged;
 
         /// <summary>
         /// Gets the value for the specified setting.

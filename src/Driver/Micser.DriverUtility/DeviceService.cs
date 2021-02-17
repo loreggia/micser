@@ -57,7 +57,7 @@ namespace Micser.DriverUtility
                 }
 
                 Logger.Info($"Expected number of devices: {expectedCount}, current number of devices: {renderDevices.Count} (render), {captureDevices.Count} (capture). Retrying ({retries + 1}/{numRetries})...");
-                await Task.Delay(2000);
+                await Task.Delay(2000).ConfigureAwait(false);
 
                 retries++;
             } while (retries < numRetries);
@@ -93,7 +93,7 @@ namespace Micser.DriverUtility
             return result;
         }
 
-        private void RenameDevices(List<MMDevice> devices)
+        private static void RenameDevices(List<MMDevice> devices)
         {
             var rxTopologyName = new Regex(@"\\wave(\d+)$", RegexOptions.Compiled | RegexOptions.IgnoreCase);
 

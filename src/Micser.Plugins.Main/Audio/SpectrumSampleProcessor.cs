@@ -12,14 +12,19 @@ namespace Micser.Plugins.Main.Audio
 
     public class SpectrumData
     {
+        public SpectrumData(SpectrumValue[] values)
+        {
+            Values = values;
+        }
+
         public SpectrumValue[] Values { get; set; }
     }
 
     public class SpectrumSampleProcessor : SampleProcessor
     {
-        private float[] _fftBuffer;
-        private SpectrumFftProvider _fftProvider;
-        private SpectrumValue[] _spectrumValueBuffer;
+        private float[]? _fftBuffer;
+        private SpectrumFftProvider? _fftProvider;
+        private SpectrumValue[]? _spectrumValueBuffer;
 
         public SpectrumSampleProcessor()
         {
@@ -28,9 +33,11 @@ namespace Micser.Plugins.Main.Audio
 
         public FftSize FftSize { get; }
 
-        public SpectrumData GetFftData()
+        public SpectrumData? GetFftData()
         {
-            if (_fftBuffer == null)
+            if (_fftBuffer == null ||
+                _fftProvider == null ||
+                _spectrumValueBuffer == null)
             {
                 return null;
             }
@@ -43,10 +50,7 @@ namespace Micser.Plugins.Main.Audio
                 _spectrumValueBuffer[i].Value = _fftBuffer[i];
             }
 
-            return new SpectrumData
-            {
-                Values = _spectrumValueBuffer
-            };
+            return new SpectrumData(_spectrumValueBuffer);
         }
 
         public override void Process(WaveFormat waveFormat, float[] channelSamples)

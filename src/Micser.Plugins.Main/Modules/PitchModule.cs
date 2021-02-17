@@ -46,7 +46,7 @@ namespace Micser.Plugins.Main.Modules
                 : MathExtensions.Lerp(1f, 2f, pitch);
         }
 
-        public class Defaults
+        public static class Defaults
         {
             public const float Pitch = 1f;
             public const int Quality = 4;

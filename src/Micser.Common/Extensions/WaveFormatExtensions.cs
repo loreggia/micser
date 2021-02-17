@@ -15,17 +15,12 @@ namespace Micser.Common.Extensions
         /// <exception cref="ArgumentNullException"></exception>
         public static bool IsIeeeFloat(this WaveFormat waveFormat)
         {
-            switch (waveFormat)
+            return waveFormat switch
             {
-                case null:
-                    throw new ArgumentNullException(nameof(waveFormat));
-
-                case WaveFormatExtensible waveFormatExtensible:
-                    return waveFormatExtensible.SubFormat == AudioSubTypes.IeeeFloat;
-
-                default:
-                    return waveFormat.WaveFormatTag == AudioEncoding.IeeeFloat;
-            }
+                null => throw new ArgumentNullException(nameof(waveFormat)),
+                WaveFormatExtensible waveFormatExtensible => waveFormatExtensible.SubFormat == AudioSubTypes.IeeeFloat,
+                _ => waveFormat.WaveFormatTag == AudioEncoding.IeeeFloat,
+            };
         }
 
         // ReSharper disable once InconsistentNaming
@@ -35,17 +30,12 @@ namespace Micser.Common.Extensions
         /// <exception cref="ArgumentNullException"></exception>
         public static bool IsPCM(this WaveFormat waveFormat)
         {
-            switch (waveFormat)
+            return waveFormat switch
             {
-                case null:
-                    throw new ArgumentNullException(nameof(waveFormat));
-
-                case WaveFormatExtensible waveFormatExtensible:
-                    return waveFormatExtensible.SubFormat == AudioSubTypes.Pcm;
-
-                default:
-                    return waveFormat.WaveFormatTag == AudioEncoding.Pcm;
-            }
+                null => throw new ArgumentNullException(nameof(waveFormat)),
+                WaveFormatExtensible waveFormatExtensible => waveFormatExtensible.SubFormat == AudioSubTypes.Pcm,
+                _ => waveFormat.WaveFormatTag == AudioEncoding.Pcm,
+            };
         }
     }
 }

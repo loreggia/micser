@@ -45,8 +45,8 @@ namespace Micser.Audio
 
             if (connectionDto != null)
             {
-                var source = _modules.FirstOrDefault(m => m.Id == connectionDto.SourceId);
-                var target = _modules.FirstOrDefault(m => m.Id == connectionDto.TargetId);
+                var source = _modules.Find(m => m.Id == connectionDto.SourceId);
+                var target = _modules.Find(m => m.Id == connectionDto.TargetId);
 
                 if (source != null && target != null)
                 {
@@ -103,8 +103,8 @@ namespace Micser.Audio
                 return;
             }
 
-            var source = _modules.FirstOrDefault(m => m.Id == connectionDto.SourceId);
-            var target = _modules.FirstOrDefault(m => m.Id == connectionDto.TargetId);
+            var source = _modules.Find(m => m.Id == connectionDto.SourceId);
+            var target = _modules.Find(m => m.Id == connectionDto.TargetId);
 
             if (source != null && target != null)
             {
@@ -151,8 +151,8 @@ namespace Micser.Audio
 
             await foreach (var connection in _moduleConnectionService.GetAllAsync())
             {
-                var source = _modules.FirstOrDefault(m => m.Id == connection.SourceId);
-                var target = _modules.FirstOrDefault(m => m.Id == connection.TargetId);
+                var source = _modules.Find(m => m.Id == connection.SourceId);
+                var target = _modules.Find(m => m.Id == connection.TargetId);
 
                 if (source == null)
                 {

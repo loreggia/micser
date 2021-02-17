@@ -65,10 +65,7 @@ namespace Micser
                         : "App/build")
                     .WithRequestPaths("/locales")
             );
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapControllers();
-            });
+            app.UseEndpoints(endpoints => endpoints.MapControllers());
 
             app.UseSpa(spa =>
             {

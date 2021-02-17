@@ -16,7 +16,7 @@ namespace Micser.Common.Audio
         public static float AdaptiveReleaseCurve(float x, float a, float b, float c, float d)
         {
             var x2 = x * x;
-            return a * x2 * x + b * x2 + c * x + d;
+            return (a * x2 * x) + (b * x2) + (c * x) + d;
         }
 
         /// <summary>
@@ -40,7 +40,7 @@ namespace Micser.Common.Audio
             // no knee in curve
             if (knee <= 0f)
             {
-                return db < threshold ? db : threshold + slope * (db - threshold);
+                return db < threshold ? db : threshold + (slope * (db - threshold));
             }
 
             // below knee
@@ -55,7 +55,7 @@ namespace Micser.Common.Audio
                 return KneeCurveDown(db, slope, threshold, knee);
             }
 
-            return threshold + slope * (db - threshold);
+            return threshold + (slope * (db - threshold));
         }
 
         /// <summary>
@@ -66,7 +66,7 @@ namespace Micser.Common.Audio
             // no knee in curve
             if (knee <= 0f)
             {
-                return db > threshold ? db : threshold + slope * (db - threshold);
+                return db > threshold ? db : threshold + (slope * (db - threshold));
             }
 
             // below knee
@@ -81,7 +81,7 @@ namespace Micser.Common.Audio
                 return KneeCurveUp(db, slope, threshold, knee);
             }
 
-            return threshold + slope * (db - threshold);
+            return threshold + (slope * (db - threshold));
         }
 
         /// <summary>
@@ -113,8 +113,8 @@ namespace Micser.Common.Audio
         /// </summary>
         public static float KneeCurveDown(float db, float slope, float threshold, float knee)
         {
-            var a = db - threshold + knee / 2f;
-            return db + (slope - 1f) * a * a / (2f * knee);
+            var a = db - threshold + (knee / 2f);
+            return db + ((slope - 1f) * a * a / (2f * knee));
         }
 
         /// <summary>
@@ -122,8 +122,8 @@ namespace Micser.Common.Audio
         /// </summary>
         public static float KneeCurveUp(float db, float slope, float threshold, float knee)
         {
-            var a = -db + threshold + knee / 2f;
-            return db - (slope - 1f) * a * a / (2f * knee);
+            var a = -db + threshold + (knee / 2f);
+            return db - ((slope - 1f) * a * a / (2f * knee));
         }
 
         /// <summary>

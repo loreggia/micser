@@ -11,7 +11,7 @@
         /// <param name="value">The value to clamp.</param>
         /// <param name="min">The minimum value (inclusive).</param>
         /// <param name="max">The maximum value (inclusive).</param>
-        public static void Clamp(ref float value, float min, float max)
+        public static void Clamp(this ref float value, float min, float max)
         {
             if (value < min)
             {
@@ -29,7 +29,7 @@
         /// <param name="value">The value to clamp.</param>
         /// <param name="min">The minimum value (inclusive).</param>
         /// <param name="max">The maximum value (inclusive).</param>
-        public static void Clamp(ref int value, int min, int max)
+        public static void Clamp(this ref int value, int min, int max)
         {
             if (value < min)
             {
@@ -61,7 +61,7 @@
         /// <param name="amount">The interpolation amount (0..1).</param>
         public static float Lerp(float min, float max, float amount)
         {
-            return min * (1 - amount) + max * amount;
+            return (min * (1 - amount)) + (max * amount);
         }
     }
 }

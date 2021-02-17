@@ -25,7 +25,7 @@ namespace Micser.Controllers
         public async Task<ModuleDto> CreateAsync([FromBody] ModuleDto dto)
         {
             var module = GetModel(dto);
-            await _moduleService.InsertAsync(module);
+            await _moduleService.InsertAsync(module).ConfigureAwait(false);
             return GetDto(module);
         }
 
@@ -34,11 +34,11 @@ namespace Micser.Controllers
         {
             if (id == null)
             {
-                await _moduleService.TruncateAsync();
+                await _moduleService.TruncateAsync().ConfigureAwait(false);
             }
             else
             {
-                await _moduleService.DeleteAsync(id.Value);
+                await _moduleService.DeleteAsync(id.Value).ConfigureAwait(false);
             }
         }
 
@@ -64,7 +64,7 @@ namespace Micser.Controllers
 
             dto.Id = id;
             var module = GetModel(dto);
-            await _moduleService.UpdateAsync(module);
+            await _moduleService.UpdateAsync(module).ConfigureAwait(false);
             return GetDto(module);
         }
 
@@ -81,7 +81,7 @@ namespace Micser.Controllers
             return dto;
         }
 
-        private Module GetModel(ModuleDto dto)
+        private static Module GetModel(ModuleDto dto)
         {
             if (string.IsNullOrEmpty(dto.Type)) throw new BadRequestApiException($"{nameof(ModuleDto.Type)} must be set.");
 

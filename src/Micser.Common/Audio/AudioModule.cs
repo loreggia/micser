@@ -61,7 +61,7 @@ namespace Micser.Common.Audio
             set
             {
                 _volume = value;
-                MathExtensions.Clamp(ref _volume, 0f, 1f);
+                _volume.Clamp(0f, 1f);
             }
         }
 
@@ -159,7 +159,7 @@ namespace Micser.Common.Audio
             byte[]? nextBuffer = null;
             int nextOffset;
 
-            if (!IsEnabled || Math.Abs(Volume - 1f) < Epsilon && _sampleProcessors.All(p => p is VolumeSampleProcessor))
+            if (!IsEnabled || (Math.Abs(Volume - 1f) < Epsilon && _sampleProcessors.All(p => p is VolumeSampleProcessor)))
             {
                 nextBuffer = buffer;
                 nextOffset = offset;

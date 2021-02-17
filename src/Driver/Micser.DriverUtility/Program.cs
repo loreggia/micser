@@ -8,7 +8,7 @@ using NLog.Targets;
 
 namespace Micser.DriverUtility
 {
-    internal class Program
+    internal static class Program
     {
         private static void InitLogging(bool isInstallation)
         {
@@ -85,8 +85,7 @@ namespace Micser.DriverUtility
                     return Globals.DriverUtility.ReturnCodes.InvalidParameter;
                 }
 
-                var controller = new DriverController();
-                var result = controller.SetDeviceSettingsAndReload(deviceCount);
+                var result = DriverController.SetDeviceSettingsAndReload(deviceCount);
 
                 if (result != Globals.DriverUtility.ReturnCodes.Success)
                 {
@@ -94,13 +93,11 @@ namespace Micser.DriverUtility
                     return result;
                 }
 
-                using (var deviceService = new DeviceService())
+                using var deviceService = new DeviceService();
+                var renameResult = deviceService.RenameDevices(deviceCount).GetAwaiter().GetResult();
+                if (!renameResult)
                 {
-                    var renameResult = deviceService.RenameDevices(deviceCount).GetAwaiter().GetResult();
-                    if (!renameResult)
-                    {
-                        logger.Error("Renaming failed.");
-                    }
+                    logger.Error("Renaming failed.");
                 }
             }
             catch (Exception ex)

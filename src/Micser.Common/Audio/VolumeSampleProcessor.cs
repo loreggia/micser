@@ -35,7 +35,7 @@ namespace Micser.Common.Audio
             for (int c = 0; c < waveFormat.Channels; c++)
             {
                 channelSamples[c] *= _module.Volume;
-                MathExtensions.Clamp(ref channelSamples[c], -1f, 1f);
+                channelSamples[c].Clamp(-1f, 1f);
             }
         }
     }

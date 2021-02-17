@@ -15,9 +15,9 @@ namespace Micser.DriverUtility
         private const string UacRegistryValue = "EnableLUA";
         private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
-        private static readonly uint STANDARD_RIGHTS_READ = 0x00020000;
-        private static readonly uint TOKEN_QUERY = 0x0008;
-        private static readonly uint TOKEN_READ = (STANDARD_RIGHTS_READ | TOKEN_QUERY);
+        private const uint STANDARD_RIGHTS_READ = 0x00020000;
+        private const uint TOKEN_QUERY = 0x0008;
+        private const uint TOKEN_READ = STANDARD_RIGHTS_READ | TOKEN_QUERY;
 
         public enum TOKEN_ELEVATION_TYPE
         {
@@ -86,7 +86,7 @@ namespace Micser.DriverUtility
                             }
                             else
                             {
-                                Logger.Error($"GetTokenInformation returned false. Win32 Error Code: " + Marshal.GetLastWin32Error());
+                                Logger.Error("GetTokenInformation returned false. Win32 Error Code: " + Marshal.GetLastWin32Error());
                                 return false;
                             }
                         }
@@ -119,10 +119,8 @@ namespace Micser.DriverUtility
         {
             get
             {
-                using (var uacKey = Registry.LocalMachine.OpenSubKey(UacRegistryKey, false))
-                {
-                    return uacKey != null && uacKey.GetValue(UacRegistryValue).Equals(1);
-                }
+                using var uacKey = Registry.LocalMachine.OpenSubKey(UacRegistryKey, false);
+                return uacKey?.GetValue(UacRegistryValue)?.Equals(1) == true;
             }
         }
 

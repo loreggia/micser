@@ -63,11 +63,11 @@ namespace Micser.Plugins.Main.Audio
         private readonly float[] _anaMagn = new float[MaxFrameLength];
         private readonly float[] _fftWorksp = new float[2 * MaxFrameLength];
         private readonly float[] _inFiFo = new float[MaxFrameLength];
-        private readonly float[] _lastPhase = new float[MaxFrameLength / 2 + 1];
+        private readonly float[] _lastPhase = new float[(MaxFrameLength / 2) + 1];
         private readonly PitchModule _module;
         private readonly float[] _outFiFo = new float[MaxFrameLength];
         private readonly float[] _outputAccum = new float[2 * MaxFrameLength];
-        private readonly float[] _sumPhase = new float[MaxFrameLength / 2 + 1];
+        private readonly float[] _sumPhase = new float[(MaxFrameLength / 2) + 1];
         private readonly float[] _synFreq = new float[MaxFrameLength];
         private readonly float[] _synMagn = new float[MaxFrameLength];
 
@@ -102,7 +102,7 @@ namespace Micser.Plugins.Main.Audio
 
         private static void ShortTimeFourierTransform(float[] fftBuffer, long fftFrameSize, long sign)
         {
-            for (var i = 2; i < 2 * fftFrameSize - 2; i += 2)
+            for (var i = 2; i < (2 * fftFrameSize) - 2; i += 2)
             {
                 long bitm;
                 long j;
@@ -122,7 +122,7 @@ namespace Micser.Plugins.Main.Audio
                 }
             }
 
-            var max = (long)(Math.Log(fftFrameSize) / Math.Log(2.0) + 0.5);
+            var max = (long)((Math.Log(fftFrameSize) / Math.Log(2.0)) + 0.5);
             var le = 2;
             for (var k = 0; k < max; k++)
             {
@@ -139,15 +139,15 @@ namespace Micser.Plugins.Main.Audio
                     float tr;
                     for (var i = j; i < 2 * fftFrameSize; i += le)
                     {
-                        tr = fftBuffer[i + le2] * ur - fftBuffer[i + le2 + 1] * ui;
-                        var ti = fftBuffer[i + le2] * ui + fftBuffer[i + le2 + 1] * ur;
+                        tr = (fftBuffer[i + le2] * ur) - (fftBuffer[i + le2 + 1] * ui);
+                        var ti = (fftBuffer[i + le2] * ui) + (fftBuffer[i + le2 + 1] * ur);
                         fftBuffer[i + le2] = fftBuffer[i] - tr;
                         fftBuffer[i + le2 + 1] = fftBuffer[i + 1] - ti;
                         fftBuffer[i] += tr;
                         fftBuffer[i + 1] += ti;
                     }
-                    tr = ur * wr - ui * wi;
-                    ui = ur * wi + ui * wr;
+                    tr = (ur * wr) - (ui * wi);
+                    ui = (ur * wi) + (ui * wr);
                     ur = tr;
                 }
             }
@@ -213,9 +213,9 @@ namespace Micser.Plugins.Main.Audio
                     long k;
                     for (k = 0; k < fftFrameSize; k++)
                     {
-                        window = -.5 * Math.Cos(2.0 * Math.PI * k / fftFrameSize) + .5;
+                        window = (-0.5 * Math.Cos(2.0 * Math.PI * k / fftFrameSize)) + 0.5;
                         _fftWorksp[2 * k] = (float)(_inFiFo[k] * window);
-                        _fftWorksp[2 * k + 1] = 0.0F;
+                        _fftWorksp[(2 * k) + 1] = 0.0f;
                     }
 
                     /* ***************** ANALYSIS ******************* */
@@ -230,10 +230,10 @@ namespace Micser.Plugins.Main.Audio
                     {
                         /* de-interlace FFT buffer */
                         double real = _fftWorksp[2 * k];
-                        double imag = _fftWorksp[2 * k + 1];
+                        double imag = _fftWorksp[(2 * k) + 1];
 
                         /* compute magnitude and phase */
-                        magn = 2.0 * Math.Sqrt(real * real + imag * imag);
+                        magn = 2.0 * Math.Sqrt((real * real) + (imag * imag));
                         phase = Math.Atan2(imag, real);
 
                         /* compute phase difference */
@@ -253,7 +253,7 @@ namespace Micser.Plugins.Main.Audio
                         tmp = osamp * tmp / (2.0 * Math.PI);
 
                         /* compute the k-th partials' true frequency */
-                        tmp = k * freqPerBin + tmp * freqPerBin;
+                        tmp = (k * freqPerBin) + (tmp * freqPerBin);
 
                         /* store magnitude and true frequency in analysis arrays */
                         _anaMagn[k] = (float)magn;
@@ -305,11 +305,11 @@ namespace Micser.Plugins.Main.Audio
 
                         /* get real and imag part and re-interleave */
                         _fftWorksp[2 * k] = (float)(magn * Math.Cos(phase));
-                        _fftWorksp[2 * k + 1] = (float)(magn * Math.Sin(phase));
+                        _fftWorksp[(2 * k) + 1] = (float)(magn * Math.Sin(phase));
                     }
 
                     /* zero negative frequencies */
-                    for (k = fftFrameSize + 2; k < 2 * fftFrameSize; k++) _fftWorksp[k] = 0.0F;
+                    for (k = fftFrameSize + 2; k < 2 * fftFrameSize; k++) _fftWorksp[k] = 0.0f;
 
                     /* do inverse transform */
                     ShortTimeFourierTransform(_fftWorksp, fftFrameSize, 1);
@@ -317,7 +317,7 @@ namespace Micser.Plugins.Main.Audio
                     /* do windowing and add to output accumulator */
                     for (k = 0; k < fftFrameSize; k++)
                     {
-                        window = -.5 * Math.Cos(2.0 * Math.PI * k / fftFrameSize) + .5;
+                        window = (-0.5 * Math.Cos(2.0 * Math.PI * k / fftFrameSize)) + 0.5;
                         _outputAccum[k] += (float)(2.0 * window * _fftWorksp[2 * k] / (fftFrameSize2 * osamp));
                     }
                     for (k = 0; k < stepSize; k++) _outFiFo[k] = _outputAccum[k];

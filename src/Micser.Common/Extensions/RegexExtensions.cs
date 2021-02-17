@@ -34,13 +34,13 @@ namespace Micser.Common.Extensions
                         var currentCaptureEnd = capture.Index + capture.Length - m.Index;
                         var currentCaptureLength = capture.Index - m.Index - previousCaptureEnd;
 
-                        sb.Append(m.Value.Substring(previousCaptureEnd, currentCaptureLength));
+                        sb.Append(m.Value, previousCaptureEnd, currentCaptureLength);
                         sb.Append(replacement);
 
                         previousCaptureEnd = currentCaptureEnd;
                     }
 
-                    sb.Append(m.Value.Substring(previousCaptureEnd));
+                    sb.Append(m.Value[previousCaptureEnd..]);
 
                     return sb.ToString();
                 });

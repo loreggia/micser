@@ -3,6 +3,7 @@ using System.IO;
 using System.IO.Pipes;
 using System.Threading;
 using System.Threading.Tasks;
+using System;
 
 namespace Micser.Common.Extensions
 {
@@ -24,8 +25,8 @@ namespace Micser.Common.Extensions
             {
                 do
                 {
-                    var count = await pipe.ReadAsync(buffer, 0, buffer.Length, token).ConfigureAwait(false);
-                    await stream.WriteAsync(buffer, 0, count, token).ConfigureAwait(false);
+                    var count = await pipe.ReadAsync(buffer.AsMemory(0, buffer.Length), token).ConfigureAwait(false);
+                    await stream.WriteAsync(buffer.AsMemory(0, count), token).ConfigureAwait(false);
                     totalCount += count;
                 } while (!pipe.IsMessageComplete);
 

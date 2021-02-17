@@ -9,7 +9,7 @@ using Action = WixSharp.Action;
 
 namespace Micser.Setup
 {
-    internal class Program
+    internal static class Program
     {
         private static void Main()
         {
@@ -129,7 +129,7 @@ namespace Micser.Setup
                 };
                 project.DefaultFeature.Children.Add(vacFeature);
 
-                programFilesDir.Dirs[0].AddDir(new Dir(vacFeature, @"Driver",
+                programFilesDir.Dirs[0].AddDir(new Dir(vacFeature, "Driver",
                     new Files(vacFeature, @"Driver\Micser.Vac.Package\*.*")
                 ));
 
@@ -154,7 +154,7 @@ namespace Micser.Setup
                     Return.check,
                     When.After,
                     Step.InstallInitialize,
-                    Condition.BeingUninstalled & vacFeatureCondition | Condition.Create("&VacFeature=2"))
+                    (Condition.BeingUninstalled & vacFeatureCondition) | Condition.Create("&VacFeature=2"))
                 {
                     Rollback = nameof(DriverActions.InstallDriver),
                     Impersonate = false,

@@ -3,11 +3,6 @@
 namespace Micser.Common.Settings
 {
     /// <summary>
-    /// Delegate for a setting changed event.
-    /// </summary>
-    public delegate void SettingChangedEventHandler(object sender, SettingChangedEventArgs e);
-
-    /// <summary>
     /// Event arguments containing data that represents a changed setting.
     /// </summary>
     public class SettingChangedEventArgs : EventArgs
