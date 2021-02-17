@@ -31,9 +31,9 @@ namespace Micser.Plugins.Main.Modules
             base.SetState(state);
 
             var quality = Quality;
-            MathExtensions.Clamp(ref quality, 1, 10);
+            quality.Clamp(1, 10);
             var pitch = Pitch;
-            MathExtensions.Clamp(ref pitch, -1f, 1f);
+            pitch.Clamp(-1f, 1f);
 
             // [256..4096] -> map quality [1..10] to [8..12]
             var qualityFactor = MathExtensions.InverseLerp(1f, 10f, quality);

@@ -1,4 +1,6 @@
-﻿namespace Micser.Common.Extensions
+﻿using System.Diagnostics.CodeAnalysis;
+
+namespace Micser.Common.Extensions
 {
     /// <summary>
     /// Contains math related helper functions.
@@ -48,6 +50,7 @@
         /// <param name="max">The value where the result is 1.</param>
         /// <param name="value">The actual value.</param>
         /// <returns>The interpolation factor.</returns>
+        [SuppressMessage("Design", "RCS1224")]
         public static float InverseLerp(float min, float max, float value)
         {
             return (value - min) / (max - min);
@@ -59,6 +62,7 @@
         /// <param name="min">The minimum value (when <paramref name="amount"/> is 0).</param>
         /// <param name="max">The maximum value (when <paramref name="amount"/> is 1).</param>
         /// <param name="amount">The interpolation amount (0..1).</param>
+        [SuppressMessage("Design", "RCS1224")]
         public static float Lerp(float min, float max, float amount)
         {
             return (min * (1 - amount)) + (max * amount);

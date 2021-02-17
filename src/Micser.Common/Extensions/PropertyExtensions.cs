@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -19,6 +20,7 @@ namespace Micser.Common.Extensions
         /// <param name="property">A property expression.</param>
         /// <typeparam name="T">The property type.</typeparam>
         /// <exception cref="ArgumentException"></exception>
+        [SuppressMessage("Design", "RCS1224")]
         public static string GetName<T>(Expression<Func<T>> property)
         {
             if (property.Body is not MemberExpression me)
