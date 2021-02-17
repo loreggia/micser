@@ -62,11 +62,11 @@ export class Api<TData> implements IApi<TData> {
     }
 
     async post(action: string = "", data: {}): Promise<IApiResultData<TData>> {
-        return this.execute(() => this._axios.post<TData>(action, { data }));
+        return this.execute(() => this._axios.post<TData>(action, data));
     }
 
     async put(action: string | number, data: {}): Promise<IApiResultData<TData>> {
-        return this.execute(() => this._axios.put<TData>(`${action}`, { data }));
+        return this.execute(() => this._axios.put<TData>(`${action}`, data));
     }
 
     async delete(action: string | number, params?: {}): Promise<IApiResultData<TData>> {

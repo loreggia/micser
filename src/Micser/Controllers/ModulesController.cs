@@ -57,11 +57,12 @@ namespace Micser.Controllers
             return _moduleDescriptions;
         }
 
-        [HttpPut("")]
-        public async Task<ModuleDto> UpdateAsync([FromBody] ModuleDto dto)
+        [HttpPut("{id}")]
+        public async Task<ModuleDto> UpdateAsync([FromRoute] long id, [FromBody] ModuleDto dto)
         {
-            if (dto.Id <= 0) throw new BadRequestApiException($"{nameof(ModuleDto.Id)} must be set.");
+            if (id <= 0) throw new BadRequestApiException($"{nameof(id)} must be set.");
 
+            dto.Id = id;
             var module = GetModel(dto);
             await _moduleService.UpdateAsync(module);
             return GetDto(module);

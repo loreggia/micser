@@ -161,7 +161,7 @@ export const Dashboard = () => {
         }
     };
 
-    const handleNodeDragStop = (_: MouseEvent, node: Node<Module>) => {
+    const handleNodeDragStop = async (_: MouseEvent, node: Node<Module>) => {
         const { data: module } = node;
 
         if (module) {
@@ -169,7 +169,7 @@ export const Dashboard = () => {
             module.state.left = x.toString();
             module.state.top = y.toString();
 
-            modulesApi?.put(module.id, module);
+            await modulesApi?.put(module.id, module);
             loadModules();
         }
     };

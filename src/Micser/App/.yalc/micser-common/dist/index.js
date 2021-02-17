@@ -117,7 +117,7 @@ var Api = /** @class */ (function () {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
             return __generator(this, function (_a) {
-                return [2 /*return*/, this.execute(function () { return _this._axios.post(action, { data: data }); })];
+                return [2 /*return*/, this.execute(function () { return _this._axios.post(action, data); })];
             });
         });
     };
@@ -125,7 +125,7 @@ var Api = /** @class */ (function () {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
             return __generator(this, function (_a) {
-                return [2 /*return*/, this.execute(function () { return _this._axios.put("" + action, { data: data }); })];
+                return [2 /*return*/, this.execute(function () { return _this._axios.put("" + action, data); })];
             });
         });
     };

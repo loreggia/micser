@@ -35,11 +35,12 @@ namespace Micser.Controllers
             }
         }
 
-        [HttpPut("")]
-        public async Task<ModuleConnectionDto> UpdateAsync([FromBody] ModuleConnectionDto dto)
+        [HttpPut("{id}")]
+        public async Task<ModuleConnectionDto> UpdateAsync([FromRoute] long id, [FromBody] ModuleConnectionDto dto)
         {
-            if (dto.Id <= 0) throw new BadRequestApiException($"{nameof(ModuleConnectionDto.Id)} must be set.");
+            if (id <= 0) throw new BadRequestApiException($"{nameof(id)} must be set.");
 
+            dto.Id = id;
             var connection = GetModel(dto);
             await _moduleConnectionService.UpdateAsync(connection);
             return GetDto(connection);
