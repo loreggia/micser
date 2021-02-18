@@ -1,5 +1,10 @@
 {
     "deviceInputWidget": {
-        "title": "Device Input"
+        "title": "Device Input",
+        "description": "Captures the audio from an input device (i.e. microphone)."
+    },
+    "deviceOutputWidget": {
+        "title": "Device Output",
+        "description": "Sends audio to an output device (i.e. speakers, headphones)."
     }
 }

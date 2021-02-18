@@ -37,6 +37,31 @@
                 "/consoleloggerparameters:NoSummary"
             ],
             "problemMatcher": "$msCompile"
+        },
+        {
+            "label": "Micser.Common.UI",
+            "type": "shell",
+            "command": "yarn",
+            "args": ["pl"],
+            "options": {
+                "cwd": "${workspaceFolder}/Micser.Common/UI"
+            }
+        },
+        {
+            "label": "Micser.Plugins.Main.UI",
+            "type": "shell",
+            "command": "yarn",
+            "args": ["build"],
+            "options": {
+                "cwd": "${workspaceFolder}/Micser.Plugins.Main/UI"
+            }
+        },
+        {
+            "label": "build-ui",
+            "group": "build",
+            "dependsOn": ["Micser.Common.UI", "Micser.Plugins.Main.UI"],
+            "dependsOrder": "sequence",
+            "problemMatcher": ["$tsc"]
         }
     ]
 }

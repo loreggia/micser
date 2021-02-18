@@ -1,4 +1,3 @@
-/// <reference types="react" />
 export interface DTO {
     id: number;
 }
@@ -17,10 +16,8 @@ export interface ModuleConnection extends DTO {
     sourceConnectorName: string;
     targetConnectorName: string;
 }
-export interface ModuleDescription {
+export interface ModuleDefinition {
     name: string;
-    title: React.ReactNode;
-    description: React.ReactNode;
 }
 export interface PluginDefinition {
     assemblyName: string;

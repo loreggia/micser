@@ -25,7 +25,7 @@ wnd["react-i18next"] = ReactI18Next;
 wnd["micser-common"] = Common;
 
 const App = () => {
-    const [plugins, isLoading] = usePlugins();
+    const [plugins, isLoadingPlugins] = usePlugins();
 
     // load plugin resources
     useEffect(() => {
@@ -34,7 +34,7 @@ const App = () => {
                 for (const lng in plugin.resources) {
                     if (Object.prototype.hasOwnProperty.call(plugin.resources, lng)) {
                         const bundle = plugin.resources[lng];
-                        i18n.addResourceBundle(lng, `plugins.${plugin.name}`, bundle, true, true);
+                        i18n.addResourceBundle(lng, "default", bundle, true, true);
                     }
                 }
             }
@@ -46,29 +46,33 @@ const App = () => {
     };
 
     return (
-        <Suspense fallback={<Common.Loader isVisible={true} />}>
+        <Suspense fallback={<Common.Loader isVisible />}>
             <PluginsContext.Provider value={plugins}>
-                <Router>
-                    <Layout style={{ minHeight: "100vh" }} onContextMenu={handleContextMenu}>
-                        <>
-                            <Common.Loader isVisible={isLoading} />
+                {isLoadingPlugins ? (
+                    <Common.Loader isVisible />
+                ) : (
+                    <Router>
+                        <Layout style={{ minHeight: "100vh" }} onContextMenu={handleContextMenu}>
+                            <>
+                                <Common.Loader isVisible={isLoadingPlugins} />
 
-                            <Navigation />
+                                <Navigation />
 
-                            <Layout>
-                                <Switch>
-                                    <Route path={Routes.dashboard.index} exact>
-                                        <Dashboard />
-                                    </Route>
-                                    <Route path={Routes.settings.index}>
-                                        <Settings />
-                                    </Route>
-                                    <NotFound />
-                                </Switch>
-                            </Layout>
-                        </>
-                    </Layout>
-                </Router>
+                                <Layout>
+                                    <Switch>
+                                        <Route path={Routes.dashboard.index} exact>
+                                            <Dashboard />
+                                        </Route>
+                                        <Route path={Routes.settings.index}>
+                                            <Settings />
+                                        </Route>
+                                        <NotFound />
+                                    </Switch>
+                                </Layout>
+                            </>
+                        </Layout>
+                    </Router>
+                )}
             </PluginsContext.Provider>
         </Suspense>
     );

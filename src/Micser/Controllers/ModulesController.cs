@@ -12,13 +12,13 @@ namespace Micser.Controllers
 {
     public class ModulesController : ApiController
     {
-        private readonly IEnumerable<ModuleDescription> _moduleDescriptions;
+        private readonly IEnumerable<ModuleDefinition> _moduleDefinitions;
         private readonly IModuleService _moduleService;
 
-        public ModulesController(IModuleService moduleService, IEnumerable<ModuleDescription> moduleDescriptions)
+        public ModulesController(IModuleService moduleService, IEnumerable<ModuleDefinition> moduleDefinitions)
         {
             _moduleService = moduleService;
-            _moduleDescriptions = moduleDescriptions;
+            _moduleDefinitions = moduleDefinitions;
         }
 
         [HttpPost("")]
@@ -51,10 +51,10 @@ namespace Micser.Controllers
             }
         }
 
-        [HttpGet("Descriptions")]
-        public IEnumerable<ModuleDescription> GetDescriptions()
+        [HttpGet("Definitions")]
+        public IEnumerable<ModuleDefinition> GetDefinitions()
         {
-            return _moduleDescriptions;
+            return _moduleDefinitions;
         }
 
         [HttpPut("{id}")]

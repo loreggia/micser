@@ -5,13 +5,13 @@ import { DeviceDescription, DeviceSelect, WidgetContainer } from "./Common";
 
 const { Option } = Select;
 
-export const DeviceOutputWidget: WidgetFC = ({ data }) => {
+export const DeviceOutputWidget: WidgetFC = ({ module }) => {
     const [devices, { isLoading }] = useGetApi<DeviceDescription[]>("Devices/Output");
 
     return (
         <WidgetContainer>
             {isLoading && <Loader />}
-            <DeviceSelect defaultValue={data.state.deviceId} dropdownMatchSelectWidth={false}>
+            <DeviceSelect defaultValue={module.state.deviceId} dropdownMatchSelectWidth={false}>
                 {devices &&
                     devices.map((device) => (
                         <Option key={device.id} value={device.id}>

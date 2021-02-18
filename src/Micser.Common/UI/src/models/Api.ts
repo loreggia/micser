@@ -19,10 +19,8 @@ export interface ModuleConnection extends DTO {
     targetConnectorName: string;
 }
 
-export interface ModuleDescription {
+export interface ModuleDefinition {
     name: string;
-    title: React.ReactNode;
-    description: React.ReactNode;
 }
 
 export interface PluginDefinition {

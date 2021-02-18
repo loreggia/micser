@@ -15,11 +15,11 @@ namespace Micser.Common.Extensions
 {
     public static class ConfigurationExtensions
     {
-        public static IServiceCollection AddAudioModule<TModule>(this IServiceCollection services, ModuleDescription description)
+        public static IServiceCollection AddAudioModule<TModule>(this IServiceCollection services, string name)
             where TModule : class, IAudioModule
         {
             services.AddTransient<IAudioModule, TModule>();
-            services.AddSingleton(description);
+            services.AddSingleton(new ModuleDefinition(name));
 
             return services;
         }

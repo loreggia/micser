@@ -1,5 +1,6 @@
 import React, { MouseEvent, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
+import { useTranslation } from "react-i18next";
 import ReactFlow, {
     ArrowHeadType,
     Background,
@@ -18,7 +19,7 @@ import {
     Loader,
     Module,
     ModuleConnection,
-    ModuleDescription,
+    ModuleDefinition,
     useApi,
     useGetApi,
     Widget as WidgetType,
@@ -67,6 +68,8 @@ const ContextMenuActions = {
 };
 
 export const Dashboard = () => {
+    const { t } = useTranslation();
+
     const plugins = useContext(PluginsContext);
     const [elements, setElements] = useState<FlowElement[]>([]);
     const [isAddDrawerOpen, setIsAddDrawerOpen] = useState(false);
@@ -80,9 +83,6 @@ export const Dashboard = () => {
     >("/ModuleConnections");
     const [moduleConnectionsApi, { isLoading: isLoadingModuleConnectionsApi }] = useApi<ModuleConnection>(
         "/ModuleConnections"
-    );
-    const [moduleDescriptions, { isLoading: isLoadingModuleDescriptions }] = useGetApi<ModuleDescription[]>(
-        "/Modules/Descriptions"
     );
 
     const widgetTypes = useMemo(() => {
@@ -106,7 +106,8 @@ export const Dashboard = () => {
                     target: String(dto.targetId),
                     sourceHandle: dto.sourceConnectorName,
                     targetHandle: dto.targetConnectorName,
-                    // animated: true,
+                    animated: true,
+                    // TODO use localized title
                     label: `${source?.state.title || source?.type} \u2192 ${target?.state.title || target?.type}`,
                     arrowHeadType: ArrowHeadType.ArrowClosed,
                     type: "Custom",
@@ -125,7 +126,7 @@ export const Dashboard = () => {
         loadModules();
     }, [modulesApi]);
 
-    const handleDragStart = (e: React.DragEvent, moduleDescription: ModuleDescription) => {
+    const handleDragStart = (e: React.DragEvent, moduleDescription: ModuleDefinition) => {
         e.dataTransfer.setData(ModuleDescriptionKey, JSON.stringify(moduleDescription));
         const offset = getRelativeCoordinates(e);
         e.dataTransfer.setData(DragOffsetKey, JSON.stringify(offset));
@@ -229,11 +230,7 @@ export const Dashboard = () => {
     const handleLoad = (reactFlowInstance: OnLoadParams) => reactFlowInstance.fitView();
 
     const isLoading =
-        isLoadingModules ||
-        isLoadingModulesApi ||
-        isLoadingModuleConnections ||
-        isLoadingModuleConnectionsApi ||
-        isLoadingModuleDescriptions;
+        isLoadingModules || isLoadingModulesApi || isLoadingModuleConnections || isLoadingModuleConnectionsApi;
 
     const contextMenu = useMemo(() => {
         const handleContextMenuClick = async ({ key }: { key: React.Key }) => {
@@ -335,19 +332,22 @@ export const Dashboard = () => {
                     <Title level={2}>Add Widget</Title>
                     <Text type="secondary">Drag a widget from the list to the dashboard.</Text>
                     <Space direction="vertical" size="middle" style={{ width: "100%" }}>
-                        {moduleDescriptions &&
-                            moduleDescriptions.map((description) => (
-                                <WidgetListCard
-                                    key={description.name}
-                                    size="small"
-                                    title={description.title}
-                                    hoverable
-                                    draggable
-                                    onDragStart={(e) => handleDragStart(e, description)}
-                                >
-                                    {description.description}
-                                </WidgetListCard>
-                            ))}
+                        {widgetTypes.map((widgetType) => {
+                            return (
+                                widgetType && (
+                                    <WidgetListCard
+                                        key={widgetType.name}
+                                        size="small"
+                                        title={t(widgetType.titleResource)}
+                                        hoverable
+                                        draggable
+                                        onDragStart={(e) => handleDragStart(e, widgetType)}
+                                    >
+                                        {t(widgetType.descriptionResource)}
+                                    </WidgetListCard>
+                                )
+                            );
+                        })}
                     </Space>
                 </Drawer>
                 <FixedButton className="primary" onClick={() => setIsAddDrawerOpen(true)} hidden={isAddDrawerOpen}>
