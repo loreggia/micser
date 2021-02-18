@@ -1,22 +1,14 @@
 import { createContext, useEffect, useState } from "react";
 import load from "little-loader";
-import { useGetApi, WidgetType } from "micser-common";
+import { Plugin, PluginDefinition, useGetApi } from "micser-common";
 
 const wnd = window as any;
 wnd.process = { env: {} };
 
 export const PluginsContext = createContext<Plugin[]>([]);
 
-interface PluginDefinition {
-    assemblyName: string;
-    moduleName: string;
-}
-interface Plugin {
-    name: string;
-    widgets?: WidgetType[];
-}
 interface Module {
-    default: () => Plugin;
+    default: Plugin;
 }
 
 const loadModuleAsync = (fileName: string, moduleName: string): Promise<Module> => {
@@ -57,8 +49,7 @@ export const usePlugins = (): [Plugin[], boolean] => {
                         return;
                     }
 
-                    let plugin = module.default();
-                    result.push(plugin);
+                    result.push(module.default);
                 }
             }
 

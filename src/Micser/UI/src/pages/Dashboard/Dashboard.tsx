@@ -14,7 +14,15 @@ import ReactFlow, {
 } from "react-flow-renderer";
 import { Card, Drawer, Dropdown, Menu, Modal, Space, Typography } from "antd";
 import { AppstoreAddOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
-import { Loader, Module, ModuleConnection, ModuleDescription, useApi, useGetApi, WidgetType } from "micser-common";
+import {
+    Loader,
+    Module,
+    ModuleConnection,
+    ModuleDescription,
+    useApi,
+    useGetApi,
+    Widget as WidgetType,
+} from "micser-common";
 
 import { PageContainer } from "~/components";
 import { Widget, WidgetTypesContext } from "./Widget";

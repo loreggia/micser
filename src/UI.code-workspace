@@ -22,7 +22,8 @@
         "editor.formatOnSave": true,
         "[javascript]": {
             "editor.defaultFormatter": "esbenp.prettier-vscode"
-        }
+        },
+        "jest.disabledWorkspaceFolders": []
     },
     "launch": {
         "version": "0.2.0",

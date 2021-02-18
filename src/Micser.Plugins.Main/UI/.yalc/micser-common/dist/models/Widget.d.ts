@@ -1,13 +1,8 @@
 import { FC } from "react";
 import { Module } from "./Api";
-export interface WidgetContent {
-    (props: {
-        data: Module;
-    }): JSX.Element;
-}
-export interface WidgetType {
+export interface Widget {
     name: string;
-    content: WidgetContent;
+    content: WidgetFC;
     inputHandles?: string[];
     outputHandles?: string[];
 }

@@ -22,3 +22,7 @@ export interface ModuleDescription {
     title: React.ReactNode;
     description: React.ReactNode;
 }
+export interface PluginDefinition {
+    assemblyName: string;
+    moduleName: string;
+}

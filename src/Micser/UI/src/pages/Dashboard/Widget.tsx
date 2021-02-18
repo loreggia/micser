@@ -2,7 +2,7 @@ import React, { createContext, useContext, useMemo } from "react";
 import { Card } from "antd";
 import { Handle, Position } from "react-flow-renderer";
 import styled from "styled-components";
-import { Module, WidgetContent, WidgetType } from "micser-common";
+import { Module, Widget as WidgetType, WidgetFC } from "micser-common";
 
 export const WidgetTypesContext = createContext<WidgetType[]>([]);
 
@@ -15,13 +15,13 @@ const WidgetCard = styled(Card)`
     box-shadow: inset 0 0 5px 0 rgba(255, 255, 255, 0.5);
 `;
 
-export const Widget = ({ data }: { data: Module }) => {
+export const Widget: WidgetFC = ({ data }) => {
     const widgetTypes = useContext(WidgetTypesContext);
     const type = useMemo<WidgetType | undefined>(() => widgetTypes.find((t) => t.name === data.type), [
         data,
         widgetTypes,
     ]);
-    const Content: WidgetContent = (type && type.content) || ErrorContent;
+    const Content: WidgetFC = (type && type.content) || ErrorContent;
 
     return (
         <WidgetCard size="small" title={data.state.title || data.type} hoverable>
