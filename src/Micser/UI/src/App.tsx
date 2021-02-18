@@ -4,9 +4,9 @@ import { Layout } from "antd";
 import styled from "styled-components";
 
 import * as antd from "antd";
-import * as micserCommon from "micser-common";
+import * as Common from "micser-common";
 
-import { Loader, Navigation } from "~/components";
+import { Navigation } from "~/components";
 import { Dashboard, NotFound, Settings } from "~/pages";
 
 import { Routes } from "~/constants";
@@ -20,7 +20,7 @@ const wnd = window as any;
 wnd["react"] = React;
 wnd["styled-components"] = styled;
 wnd["antd"] = antd;
-wnd["micser-common"] = micserCommon;
+wnd["micser-common"] = Common;
 
 const App = () => {
     const [plugins, isLoading] = usePlugins();
@@ -30,12 +30,12 @@ const App = () => {
     };
 
     return (
-        <Suspense fallback={<Loader isVisible={true} />}>
+        <Suspense fallback={<Common.Loader isVisible={true} />}>
             <PluginsContext.Provider value={plugins}>
                 <Router>
                     <Layout style={{ minHeight: "100vh" }} onContextMenu={handleContextMenu}>
                         <>
-                            <Loader isVisible={isLoading} />
+                            <Common.Loader isVisible={isLoading} />
 
                             <Navigation />
 

@@ -14,14 +14,13 @@ import ReactFlow, {
 } from "react-flow-renderer";
 import { Card, Drawer, Dropdown, Menu, Modal, Space, Typography } from "antd";
 import { AppstoreAddOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
-import { Module, ModuleConnection, ModuleDescription, useApi, useGetApi, WidgetType } from "micser-common";
+import { Loader, Module, ModuleConnection, ModuleDescription, useApi, useGetApi, WidgetType } from "micser-common";
 
 import { PageContainer } from "~/components";
 import { Widget, WidgetTypesContext } from "./Widget";
 
 import { PluginsContext } from "~/hooks";
 import { getRelativeCoordinates } from "~/utils";
-import { Loader } from "~/components";
 import { CustomEdge } from "./CustomEdge";
 
 const FixedButton = styled.div`
