@@ -74,13 +74,31 @@ function __makeTemplateObject(cooked, raw) {
 
 var Container = styled__default['default'].div(templateObject_1 || (templateObject_1 = __makeTemplateObject(["\n    position: absolute;\n    width: 100%;\n    height: 100%;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    background-color: rgba(0, 0, 0, 0.5);\n    z-index: 999;\n"], ["\n    position: absolute;\n    width: 100%;\n    height: 100%;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    background-color: rgba(0, 0, 0, 0.5);\n    z-index: 999;\n"])));
 var Loader = function (_a) {
-    var isVisible = _a.isVisible, tip = _a.tip;
-    return isVisible ? (React__default['default'].createElement(Container, null,
+    var isVisible = _a.isVisible, tip = _a.tip, suspenseTime = _a.suspenseTime;
+    var _b = React.useState(false), isVisibleInternal = _b[0], setIsVisibleInternal = _b[1];
+    React.useEffect(function () {
+        var timeout;
+        if (isVisible) {
+            var handler = function () {
+                setIsVisibleInternal(true);
+            };
+            timeout = setTimeout(handler, suspenseTime);
+        }
+        else {
+            clearTimeout(timeout);
+            setIsVisibleInternal(false);
+        }
+        return function () {
+            clearTimeout(timeout);
+        };
+    }, [isVisible]);
+    return isVisibleInternal ? (React__default['default'].createElement(Container, null,
         React__default['default'].createElement(antd.Spin, { tip: tip }))) : null;
 };
 Loader.defaultProps = {
     isVisible: true,
     tip: "Loading...",
+    suspenseTime: 1000,
 };
 var templateObject_1;
 

@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React, { FC, useEffect, useState } from "react";
 import styled from "styled-components";
 import { Spin } from "antd";
 
@@ -16,10 +16,31 @@ const Container = styled.div`
 export interface LoaderProps {
     isVisible?: boolean;
     tip?: string;
+    suspenseTime?: number;
 }
 
-export const Loader: FC<LoaderProps> = ({ isVisible, tip }) => {
-    return isVisible ? (
+export const Loader: FC<LoaderProps> = ({ isVisible, tip, suspenseTime }) => {
+    const [isVisibleInternal, setIsVisibleInternal] = useState(false);
+
+    useEffect(() => {
+        let timeout: number;
+
+        if (isVisible) {
+            const handler: TimerHandler = () => {
+                setIsVisibleInternal(true);
+            };
+            timeout = setTimeout(handler, suspenseTime);
+        } else {
+            clearTimeout(timeout);
+            setIsVisibleInternal(false);
+        }
+
+        return () => {
+            clearTimeout(timeout);
+        };
+    }, [isVisible]);
+
+    return isVisibleInternal ? (
         <Container>
             <Spin tip={tip} />
         </Container>
@@ -29,4 +50,5 @@ export const Loader: FC<LoaderProps> = ({ isVisible, tip }) => {
 Loader.defaultProps = {
     isVisible: true,
     tip: "Loading...",
+    suspenseTime: 1000,
 };
