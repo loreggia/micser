@@ -4,24 +4,8 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0-windows</TargetFramework>
     <ApplicationIcon>..\..\gfx\logo.ico</ApplicationIcon>
-    <UIRoot>App\</UIRoot>
+    <UIRoot>UI\</UIRoot>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Content Remove="App\jsconfig.json" />
-    <Content Remove="App\package.json" />
-    <Content Remove="App\public\locales\de\default.json" />
-    <Content Remove="App\public\locales\en\default.json" />
-    <Content Remove="App\public\manifest.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="App\jsconfig.json" />
-    <None Include="App\package.json" />
-    <None Include="App\public\locales\de\default.json" />
-    <None Include="App\public\locales\en\default.json" />
-    <None Include="App\public\manifest.json" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.2" />

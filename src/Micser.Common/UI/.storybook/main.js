@@ -1,6 +1,6 @@
 module.exports = {
     stories: ["../src/components/**/*.stories.tsx"],
-    addons: ["@storybook/addon-knobs/register", "@storybook/preset-ant-design", "@storybook/preset-typescript"],
+    addons: ["@storybook/addon-knobs/register", "@storybook/preset-ant-design"],
     typescript: {
         check: false,
         checkOptions: {},

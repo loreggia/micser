@@ -61,15 +61,15 @@ namespace Micser
             app.UseSpecificSpaStaticFiles(options =>
                 options
                     .WithRootPath(environment.IsDevelopment()
-                        ? "App/public"
-                        : "App/build")
+                        ? "UI/public"
+                        : "UI/build")
                     .WithRequestPaths("/locales")
             );
             app.UseEndpoints(endpoints => endpoints.MapControllers());
 
             app.UseSpa(spa =>
             {
-                spa.Options.SourcePath = "App";
+                spa.Options.SourcePath = "UI";
                 if (environment.IsDevelopment())
                 {
                     spa.UseReactDevelopmentServer("start");
@@ -97,7 +97,7 @@ namespace Micser
             services.AddSingleton<IFileProvider>(sp => new PhysicalFileProvider(sp.GetRequiredService<IWebHostEnvironment>().ContentRootPath, ExclusionFilters.Sensitive));
 
             // In production, the React files will be served from this directory
-            services.AddSpaStaticFiles(configuration => configuration.RootPath = "App/build");
+            services.AddSpaStaticFiles(configuration => configuration.RootPath = "UI/build");
 
             services.AddPlugins<IPlugin>(Configuration, typeof(EnginePlugin));
 

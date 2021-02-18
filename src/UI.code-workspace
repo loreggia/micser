@@ -1,0 +1,23 @@
+{
+    "folders": [
+        {
+            "name": "Micser",
+            "path": "Micser/UI"
+        },
+        {
+            "name": "Micser.Plugins.Main",
+            "path": "Micser.Plugins.Main/UI"
+        },
+        {
+            "name": "Micser.Common",
+            "path": "Micser.Common/UI"
+        }
+    ],
+    "settings": {
+        "editor.formatOnPaste": true,
+        "editor.formatOnSave": true,
+        "[javascript]": {
+            "editor.defaultFormatter": "esbenp.prettier-vscode"
+        }
+    }
+}
