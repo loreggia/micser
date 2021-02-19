@@ -1,0 +1,11 @@
+{
+    "recommendations": [
+        "projektanker.code-butler",
+        "esbenp.prettier-vscode",
+        "ms-dotnettools.csharp",
+        "orta.vscode-jest",
+        "patcx.vscode-nuget-gallery",
+        "josefpihrt-vscode.roslynator",
+        "jpoissonnier.vscode-styled-components"
+    ]
+}
