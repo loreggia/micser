@@ -1,5 +1,14 @@
+# Current State
+As the initial version did not meet some of my expectations the project is currently undergoing a major refactoring. The main problems I wish to address are:
+* Using WPF was not an optimal choice. I struggled to create a good user experience, especially for the main dashboard.
+* Communication between the frontend and the service via named pipes caused security problems on some machines.
+Additionally, as I currently work mostly in web development and feel more comfortable there, this led me to start a big refactoring process, which involves:
+* Recreating the UI as a web app based on React and using the React-Flow library
+* Converting the service communications to a REST API
+Because of this, the development of new features will be on hold until I reach feature parity with the old architecture.
+
 # Micser
-Micser is a modular audio routing framework for Microsoft Windows (mostly) written in C#.
+Micser is a modular audio routing application for Microsoft Windows (mostly) written in C#.
 
 The application includes the following parts:
 * WPF application with graphical audio routing using widgets
