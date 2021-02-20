@@ -263,6 +263,14 @@ var useGetApi = function (path, action, params) {
     return [result, { refresh: refresh, isLoading: isLoading, error: error }];
 };
 
+var Contexts = {
+    widgetTypes: React.createContext([]),
+    dashboard: React.createContext({
+        onStateChanged: function () { },
+    }),
+};
+
+exports.Contexts = Contexts;
 exports.Loader = Loader;
 exports.useApi = useApi;
 exports.useGetApi = useGetApi;

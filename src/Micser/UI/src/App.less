@@ -12,6 +12,18 @@
         box-sizing: content-box;
     }
 
+    &__node {
+        &.selected {
+            .ant-card {
+                border: 1px solid @primary-color;
+
+                &-head {
+                    color: @primary-color;
+                }
+            }
+        }
+    }
+
     &__handle {
         width: 16px;
         height: 16px;

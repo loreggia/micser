@@ -8,6 +8,7 @@ import ReactFlow, {
     Connection,
     Controls,
     Edge,
+    Elements,
     FlowElement,
     FlowTransform,
     Node,
@@ -16,17 +17,20 @@ import ReactFlow, {
 import { Card, Drawer, Dropdown, Menu, Modal, Space, Typography } from "antd";
 import { AppstoreAddOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
 import {
+    Contexts,
+    DashboardContext,
     Loader,
     Module,
     ModuleConnection,
     ModuleDefinition,
+    ModuleState,
     useApi,
     useGetApi,
     Widget as WidgetType,
 } from "micser-common";
 
 import { PageContainer } from "~/components";
-import { Widget, WidgetTypesContext } from "./Widget";
+import { Widget } from "./Widget";
 
 import { PluginsContext } from "~/hooks";
 import { getRelativeCoordinates } from "~/utils";
@@ -169,7 +173,7 @@ export const Dashboard = () => {
         }
     };
 
-    const handleNodeDragStop = async (_: MouseEvent, node: Node<Module>) => {
+    const saveNodePosition = async (node: Node<Module>) => {
         const { data: module } = node;
 
         if (module) {
@@ -178,8 +182,18 @@ export const Dashboard = () => {
             module.state.top = y.toString();
 
             await modulesApi?.put(module.id, module);
-            loadModules();
         }
+    };
+
+    const handleNodeDragStop = async (_: MouseEvent, node: Node<Module>) => {
+        await saveNodePosition(node);
+        loadModules();
+    };
+
+    const handleSelectionDragStop = async (_: React.MouseEvent, nodes: Node<Module>[]) => {
+        const promises = nodes.map((node) => saveNodePosition(node));
+        await Promise.all(promises);
+        loadModules();
     };
 
     const handleConnect = async ({ source, sourceHandle, target, targetHandle }: Edge | Connection) => {
@@ -221,10 +235,12 @@ export const Dashboard = () => {
 
     const handlePaneContextMenu = (_: React.MouseEvent) => {
         setContextMenuTarget(undefined);
+        console.log("pane");
     };
 
     const handleNodeContextMenu = (_: React.MouseEvent, node: Node) => {
         setContextMenuTarget(node);
+        console.log("node");
     };
 
     const handleLoad = (reactFlowInstance: OnLoadParams) => reactFlowInstance.fitView();
@@ -295,39 +311,67 @@ export const Dashboard = () => {
         console.log(e);
     };
 
+    const handleStateChanged = useCallback(
+        async (module: Module, state: ModuleState) => {
+            await modulesApi?.put(module.id, { ...module, state });
+            loadModules();
+        },
+        [modulesApi, loadModules]
+    );
+
+    const dashboardContext = useMemo<DashboardContext>(
+        () => ({
+            onStateChanged: handleStateChanged,
+        }),
+        [handleStateChanged]
+    );
+
+    const handleContextMenu = () => {
+        console.log("context");
+    };
+
+    const handleSelectionChange = (elements: Elements<any> | null) => {
+        console.log(elements);
+    };
+
     return (
         <PageContainer noPadding>
             <Loader isVisible={isLoading} />
-            <WidgetTypesContext.Provider value={widgetTypes}>
-                <Dropdown overlay={contextMenu} trigger={["contextMenu"]}>
-                    <ReactFlow
-                        elements={elements}
-                        nodeTypes={nodeTypes}
-                        edgeTypes={edgeTypes}
-                        snapToGrid
-                        snapGrid={[GridSize, GridSize]}
-                        defaultZoom={flowTransform.zoom}
-                        defaultPosition={[flowTransform.x, flowTransform.y]}
-                        style={{ width: "100%", height: "100%" }}
-                        onLoad={handleLoad}
-                        onDragOver={handleDragOver}
-                        onDrop={handleDrop}
-                        onNodeDragStop={handleNodeDragStop}
-                        onEdgeUpdate={handleEdgeUpdate}
-                        onConnect={handleConnect}
-                        onConnectStart={handleConnectStart}
-                        onConnectStop={handleConnectStop}
-                        onConnectEnd={handleConnectEnd}
-                        onElementsRemove={handleElementsRemove}
-                        onlyRenderVisibleElements={false}
-                        onMoveEnd={handleMoveEnd}
-                        onPaneContextMenu={handlePaneContextMenu}
-                        onNodeContextMenu={handleNodeContextMenu}
-                    >
-                        <Controls />
-                        <Background variant={BackgroundVariant.Dots} size={1} gap={10} color="#333" />
-                    </ReactFlow>
-                </Dropdown>
+            <Contexts.widgetTypes.Provider value={widgetTypes}>
+                <Contexts.dashboard.Provider value={dashboardContext}>
+                    <Dropdown overlay={contextMenu} trigger={["contextMenu"]}>
+                        <ReactFlow
+                            elements={elements}
+                            nodeTypes={nodeTypes}
+                            edgeTypes={edgeTypes}
+                            snapToGrid
+                            snapGrid={[GridSize, GridSize]}
+                            defaultZoom={flowTransform.zoom}
+                            defaultPosition={[flowTransform.x, flowTransform.y]}
+                            style={{ width: "100%", height: "100%" }}
+                            onLoad={handleLoad}
+                            onDragOver={handleDragOver}
+                            onDrop={handleDrop}
+                            onNodeDragStop={handleNodeDragStop}
+                            onEdgeUpdate={handleEdgeUpdate}
+                            onConnect={handleConnect}
+                            onConnectStart={handleConnectStart}
+                            onConnectStop={handleConnectStop}
+                            onConnectEnd={handleConnectEnd}
+                            onElementsRemove={handleElementsRemove}
+                            onlyRenderVisibleElements={false}
+                            onMoveEnd={handleMoveEnd}
+                            onContextMenu={handleContextMenu}
+                            onPaneContextMenu={handlePaneContextMenu}
+                            onNodeContextMenu={handleNodeContextMenu}
+                            onSelectionChange={handleSelectionChange}
+                            onSelectionDragStop={handleSelectionDragStop}
+                        >
+                            <Controls />
+                            <Background variant={BackgroundVariant.Dots} size={1} gap={10} color="#333" />
+                        </ReactFlow>
+                    </Dropdown>
+                </Contexts.dashboard.Provider>
                 <Drawer visible={isAddDrawerOpen} onClose={() => setIsAddDrawerOpen(false)} width="300px" mask={false}>
                     <Title level={2}>Add Widget</Title>
                     <Text type="secondary">Drag a widget from the list to the dashboard.</Text>
@@ -353,7 +397,7 @@ export const Dashboard = () => {
                 <FixedButton className="primary" onClick={() => setIsAddDrawerOpen(true)} hidden={isAddDrawerOpen}>
                     <AppstoreAddOutlined style={{ fontSize: "32px" }} />
                 </FixedButton>
-            </WidgetTypesContext.Provider>
+            </Contexts.widgetTypes.Provider>
         </PageContainer>
     );
 };

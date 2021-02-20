@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { Module } from "./Api";
+import { Module, ModuleState } from "./Api";
 
 export interface Widget {
     name: string;
@@ -9,6 +9,8 @@ export interface Widget {
     inputHandles?: string[];
     outputHandles?: string[];
 }
+
+export type StateChangedHandler = (module: Module, state: ModuleState) => void;
 
 export interface WidgetProps {
     module: Module;

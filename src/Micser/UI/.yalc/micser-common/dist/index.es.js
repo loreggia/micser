@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, createContext } from 'react';
 import styled from 'styled-components';
 import { Spin } from 'antd';
 import AxiosStatic from 'axios';
@@ -253,5 +253,12 @@ var useGetApi = function (path, action, params) {
     return [result, { refresh: refresh, isLoading: isLoading, error: error }];
 };
 
-export { Loader, useApi, useGetApi };
+var Contexts = {
+    widgetTypes: createContext([]),
+    dashboard: createContext({
+        onStateChanged: function () { },
+    }),
+};
+
+export { Contexts, Loader, useApi, useGetApi };
 //# sourceMappingURL=index.es.js.map

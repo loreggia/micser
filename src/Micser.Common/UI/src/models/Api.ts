@@ -4,12 +4,14 @@ export interface DTO {
 
 export interface Module extends DTO {
     type: string;
-    state: {
-        title?: string;
-        left: string;
-        top: string;
-        [key: string]: string;
-    };
+    state: ModuleState;
+}
+
+export interface ModuleState {
+    title?: string;
+    left: string;
+    top: string;
+    [key: string]: string | undefined;
 }
 
 export interface ModuleConnection extends DTO {
