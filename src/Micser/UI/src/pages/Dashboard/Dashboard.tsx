@@ -35,6 +35,7 @@ import { Widget } from "./Widget";
 import { PluginsContext } from "~/hooks";
 import { getRelativeCoordinates } from "~/utils";
 import { CustomEdge } from "./CustomEdge";
+import { useGetWidgetType } from "./utils";
 
 const FixedButton = styled.div`
     position: fixed;
@@ -93,6 +94,8 @@ export const Dashboard = () => {
         return plugins.reduce<WidgetType[]>((prev, curr) => (curr.widgets ? prev.concat(curr.widgets) : prev), []);
     }, [plugins]);
 
+    const getWidgetType = useGetWidgetType(widgetTypes);
+
     useEffect(() => {
         if (modules && moduleConnections) {
             const moduleElements = modules.map<FlowElement>((dto) => ({
@@ -103,7 +106,9 @@ export const Dashboard = () => {
             }));
             const connectionElements = moduleConnections.map<FlowElement>((dto) => {
                 const source = modules.find((m) => m.id === dto.sourceId);
+                const { title: sourceTitle } = getWidgetType(source);
                 const target = modules.find((m) => m.id === dto.targetId);
+                const { title: targetTitle } = getWidgetType(target);
                 return {
                     id: `c${dto.id}`,
                     source: String(dto.sourceId),
@@ -111,8 +116,7 @@ export const Dashboard = () => {
                     sourceHandle: dto.sourceConnectorName,
                     targetHandle: dto.targetConnectorName,
                     animated: true,
-                    // TODO use localized title
-                    label: `${source?.state.title || source?.type} \u2192 ${target?.state.title || target?.type}`,
+                    label: `${sourceTitle} \u2192 ${targetTitle}`,
                     arrowHeadType: ArrowHeadType.ArrowClosed,
                     type: "Custom",
                 };
@@ -120,7 +124,7 @@ export const Dashboard = () => {
 
             setElements(moduleElements.concat(connectionElements));
         }
-    }, [modules, moduleConnections]);
+    }, [modules, moduleConnections, getWidgetType]);
 
     const nodeTypes = useMemo(() => ({ Widget: Widget }), []);
     const edgeTypes = useMemo(() => ({ Custom: CustomEdge }), []);
@@ -312,8 +316,8 @@ export const Dashboard = () => {
     };
 
     const handleStateChanged = useCallback(
-        async (module: Module, state: ModuleState) => {
-            await modulesApi?.put(module.id, { ...module, state });
+        async (module: Module, state: Partial<ModuleState>) => {
+            await modulesApi?.put(module.id, { ...module, state: { ...module.state, ...state } });
             loadModules();
         },
         [modulesApi, loadModules]
@@ -349,6 +353,7 @@ export const Dashboard = () => {
                             defaultZoom={flowTransform.zoom}
                             defaultPosition={[flowTransform.x, flowTransform.y]}
                             style={{ width: "100%", height: "100%" }}
+                            selectNodesOnDrag
                             onLoad={handleLoad}
                             onDragOver={handleDragOver}
                             onDrop={handleDrop}

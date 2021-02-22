@@ -10,7 +10,7 @@ export interface Widget {
     outputHandles?: string[];
 }
 
-export type StateChangedHandler = (module: Module, state: ModuleState) => void;
+export type StateChangedHandler = (module: Module, state: Partial<ModuleState>) => void;
 
 export interface WidgetProps {
     module: Module;

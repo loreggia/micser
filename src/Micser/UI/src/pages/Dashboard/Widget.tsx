@@ -1,9 +1,9 @@
-import React, { useContext, useMemo } from "react";
+import React, { useContext } from "react";
 import { Card } from "antd";
-import { useTranslation } from "react-i18next";
 import { Handle, Position } from "react-flow-renderer";
 import styled from "styled-components";
-import { Contexts, Module, Widget as WidgetType, WidgetFC } from "micser-common";
+import { Contexts, Module, WidgetFC } from "micser-common";
+import { useGetWidgetType } from "./utils";
 
 const ErrorContent: WidgetFC = ({ module }) => {
     return <>Widget for module type '{module?.type}' not found.</>;
@@ -16,17 +16,13 @@ const WidgetCard = styled(Card)`
 
 export const Widget = ({ data }: { data: Module }) => {
     const widgetTypes = useContext(Contexts.widgetTypes);
-    const type = useMemo<WidgetType | undefined>(() => widgetTypes.find((t) => t.name === data.type), [
-        data,
-        widgetTypes,
-    ]);
-
-    const { t } = useTranslation();
+    const getWidgetType = useGetWidgetType(widgetTypes);
+    const { type, title } = getWidgetType(data);
 
     const Content: WidgetFC = (type && type.content) || ErrorContent;
 
     return (
-        <WidgetCard size="small" title={(type && t(type.titleResource)) || data.type} hoverable>
+        <WidgetCard size="small" title={title} hoverable>
             <Content module={data} />
             {type?.inputHandles &&
                 type.inputHandles.map((name) => <Handle key={name} id={name} type="target" position={Position.Left} />)}

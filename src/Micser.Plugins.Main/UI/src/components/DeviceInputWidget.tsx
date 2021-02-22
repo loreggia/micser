@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { Select } from "antd";
 import { SelectValue } from "antd/lib/select";
-import { Contexts, Loader, ModuleState, useGetApi, WidgetFC } from "micser-common";
+import { Contexts, Loader, useGetApi, WidgetFC } from "micser-common";
 
 import { DeviceDescription, DeviceSelect, WidgetContainer } from "./Common";
 
@@ -13,11 +13,7 @@ export const DeviceInputWidget: WidgetFC = ({ module }) => {
     const dashboardContext = useContext(Contexts.dashboard);
 
     const handleDeviceChange = (value: SelectValue) => {
-        const state = {
-            ...module.state,
-            deviceId: value?.toString(),
-        } as ModuleState;
-        dashboardContext.onStateChanged(module, state);
+        dashboardContext.onStateChanged(module, { deviceId: value?.toString() });
     };
 
     return (
