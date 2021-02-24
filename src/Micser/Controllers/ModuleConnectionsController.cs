@@ -41,9 +41,24 @@ namespace Micser.Controllers
             if (id <= 0) throw new BadRequestApiException($"{nameof(id)} must be set.");
 
             dto.Id = id;
+
+            if (dto.SourceId == dto.TargetId)
+            {
+                // workaround for the current react-flow -> delete when source and target are the same
+                var deleted = await _moduleConnectionService.DeleteAsync(id).ConfigureAwait(false) ?? throw new NotFoundApiException();
+                return GetDto(deleted);
+            }
+
             var connection = GetModel(dto);
             await _moduleConnectionService.UpdateAsync(connection).ConfigureAwait(false);
             return GetDto(connection);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ModuleConnectionDto> DeleteAsync([FromRoute] long id)
+        {
+            var result = await _moduleConnectionService.DeleteAsync(id).ConfigureAwait(false) ?? throw new NotFoundApiException();
+            return GetDto(result);
         }
 
         private static ModuleConnectionDto GetDto(ModuleConnection connection)

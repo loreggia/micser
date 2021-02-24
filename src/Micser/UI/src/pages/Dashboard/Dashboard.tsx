@@ -6,6 +6,7 @@ import ReactFlow, {
     Background,
     BackgroundVariant,
     Connection,
+    ConnectionMode,
     Controls,
     Edge,
     Elements,
@@ -354,6 +355,7 @@ export const Dashboard = () => {
                             defaultPosition={[flowTransform.x, flowTransform.y]}
                             style={{ width: "100%", height: "100%" }}
                             selectNodesOnDrag
+                            connectionMode={ConnectionMode.Loose}
                             onLoad={handleLoad}
                             onDragOver={handleDragOver}
                             onDrop={handleDrop}
