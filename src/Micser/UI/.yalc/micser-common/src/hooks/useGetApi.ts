@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { IProblem } from "../services";
+import { IProblem } from "services";
 import { useApi } from "./useApi";
 
 export type ApiOptions = {

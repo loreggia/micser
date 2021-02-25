@@ -10,7 +10,11 @@
         "moduleResolution": "node",
         "allowSyntheticDefaultImports": true,
         "esModuleInterop": true,
-        "resolveJsonModule": true
+        "resolveJsonModule": true,
+        "noImplicitAny": true,
+        "paths": {
+            "*": ["./src/*"]
+        }
     },
     "include": ["src/**/*"],
     "exclude": ["node_modules", "dist"]

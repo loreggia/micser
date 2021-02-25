@@ -1,24 +1,7 @@
 import React from "react";
-import { Select } from "antd";
-import { Loader, useGetApi, WidgetFC } from "micser-common";
-import { DeviceDescription, DeviceSelect, WidgetContainer } from "./Common";
-
-const { Option } = Select;
+import { WidgetFC } from "micser-common";
+import { DeviceType, DeviceWidget } from "./DeviceWidget";
 
 export const DeviceOutputWidget: WidgetFC = ({ module }) => {
-    const [devices, { isLoading }] = useGetApi<DeviceDescription[]>("Devices/Output");
-
-    return (
-        <WidgetContainer>
-            {isLoading && <Loader />}
-            <DeviceSelect defaultValue={module.state.deviceId} dropdownMatchSelectWidth={false}>
-                {devices &&
-                    devices.map((device) => (
-                        <Option key={device.id} value={device.id}>
-                            {device.friendlyName}
-                        </Option>
-                    ))}
-            </DeviceSelect>
-        </WidgetContainer>
-    );
+    return <DeviceWidget module={module} type={DeviceType.output} />;
 };

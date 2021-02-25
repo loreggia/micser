@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Api, IProblem } from "../services";
+import { Api, IProblem } from "services";
 
 export function useApi<R>(path: string): [Nullable<Api<R>>, { isLoading: boolean; error?: IProblem }] {
     const [api, setApi] = useState<Nullable<Api<R>>>(null);

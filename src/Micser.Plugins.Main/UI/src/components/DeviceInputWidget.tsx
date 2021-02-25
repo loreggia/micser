@@ -1,32 +1,7 @@
-import React, { useContext } from "react";
-import { Select } from "antd";
-import { SelectValue } from "antd/lib/select";
-import { Contexts, Loader, useGetApi, WidgetFC } from "micser-common";
-
-import { DeviceDescription, DeviceSelect, WidgetContainer } from "./Common";
-
-const { Option } = Select;
+import React from "react";
+import { WidgetFC } from "micser-common";
+import { DeviceType, DeviceWidget } from "./DeviceWidget";
 
 export const DeviceInputWidget: WidgetFC = ({ module }) => {
-    const [devices, { isLoading }] = useGetApi<DeviceDescription[]>("Devices/Input");
-
-    const dashboardContext = useContext(Contexts.dashboard);
-
-    const handleDeviceChange = (value: SelectValue) => {
-        dashboardContext.onStateChanged(module, { deviceId: value?.toString() });
-    };
-
-    return (
-        <WidgetContainer>
-            <Loader isVisible={isLoading} />
-            <DeviceSelect dropdownMatchSelectWidth={false} value={module.state.deviceId} onChange={handleDeviceChange}>
-                {devices &&
-                    devices.map((device) => (
-                        <Option key={device.id} value={device.id}>
-                            {device.friendlyName}
-                        </Option>
-                    ))}
-            </DeviceSelect>
-        </WidgetContainer>
-    );
+    return <DeviceWidget module={module} type={DeviceType.input} />;
 };

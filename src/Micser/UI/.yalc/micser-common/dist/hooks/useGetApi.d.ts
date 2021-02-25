@@ -1,4 +1,4 @@
-import { IProblem } from "../services";
+import { IProblem } from "services";
 export declare type ApiOptions = {
     onError?: (e: any) => void;
     autoLoad?: boolean;

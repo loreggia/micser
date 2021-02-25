@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback, createContext } from 'react';
+import React, { useState, useEffect, createContext, useContext, useCallback } from 'react';
 import styled from 'styled-components';
-import { Spin } from 'antd';
+import { Spin, Collapse, Slider, Checkbox } from 'antd';
 import AxiosStatic from 'axios';
 import { trimStart } from 'lodash';
 
@@ -91,6 +91,58 @@ Loader.defaultProps = {
     suspenseTime: 1000,
 };
 var templateObject_1;
+
+var Contexts = {
+    widgetTypes: createContext([]),
+    dashboard: createContext({
+        onStateChanged: function () { },
+    }),
+};
+
+var parseBool = function (value) {
+    return value && value.toLowerCase() === "true";
+};
+
+var CommonControls = function (_a) {
+    var module = _a.module;
+    var dashboardContext = useContext(Contexts.dashboard);
+    var _b = useState(100), volume = _b[0], setVolume = _b[1];
+    var _c = useState(false), isMuted = _c[0], setIsMuted = _c[1];
+    var _d = useState(false), useSystemVolume = _d[0], setUseSystemVolume = _d[1];
+    useEffect(function () {
+        var parsed = parseInt(module.state.volume);
+        if (!isNaN(parsed)) {
+            setVolume(parsed);
+        }
+    }, [module.state.volume]);
+    useEffect(function () {
+        var parsed = parseBool(module.state.isMuted);
+        setIsMuted(parsed);
+    }, [module.state.isMuted]);
+    useEffect(function () {
+        var parsed = parseBool(module.state.useSystemVolume);
+        setUseSystemVolume(parsed);
+    }, [module.state.useSystemVolume]);
+    var handleVolumeChange = function (value) {
+        setVolume(value);
+        dashboardContext === null || dashboardContext === void 0 ? void 0 : dashboardContext.onStateChanged(module, { volume: value.toString() });
+    };
+    var handleIsMutedChange = function (e) {
+        var value = e.target.checked;
+        setIsMuted(value);
+        dashboardContext === null || dashboardContext === void 0 ? void 0 : dashboardContext.onStateChanged(module, { isMuted: value.toString() });
+    };
+    var handleUseSystemVolumeChange = function (e) {
+        var value = e.target.checked;
+        setUseSystemVolume(e.target.checked);
+        dashboardContext === null || dashboardContext === void 0 ? void 0 : dashboardContext.onStateChanged(module, { useSystemVolume: value.toString() });
+    };
+    return (React.createElement(Collapse, { defaultActiveKey: ["common-controls"] },
+        React.createElement(Collapse.Panel, { header: "Common Controls", key: "common-controls" },
+            React.createElement(Slider, { min: 0, max: 100, value: volume, onChange: handleVolumeChange }),
+            React.createElement(Checkbox, { checked: isMuted, onChange: handleIsMutedChange }, "Mute"),
+            React.createElement(Checkbox, { checked: useSystemVolume, onChange: handleUseSystemVolumeChange }, "Use system volume"))));
+};
 
 var Api = /** @class */ (function () {
     function Api(baseUrl, onBeginRequest, onEndRequest, onError) {
@@ -253,12 +305,5 @@ var useGetApi = function (path, action, params) {
     return [result, { refresh: refresh, isLoading: isLoading, error: error }];
 };
 
-var Contexts = {
-    widgetTypes: createContext([]),
-    dashboard: createContext({
-        onStateChanged: function () { },
-    }),
-};
-
-export { Contexts, Loader, useApi, useGetApi };
+export { CommonControls, Contexts, Loader, useApi, useGetApi };
 //# sourceMappingURL=index.es.js.map
