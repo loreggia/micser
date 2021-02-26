@@ -1,16 +1,19 @@
 import React, { FC, useContext, useEffect, useState } from "react";
-import { Checkbox, Collapse, Slider } from "antd";
+import { Checkbox, Col, InputNumber, Row, Slider } from "antd";
+import { CheckboxChangeEvent } from "antd/lib/checkbox";
+import { useTranslation } from "react-i18next";
 
 import { Module } from "models";
 import { Contexts } from "Contexts";
 import { parseBool } from "utils";
-import { CheckboxChangeEvent } from "antd/lib/checkbox";
 
 export interface CommonControlsProps {
     module: Module;
 }
 
 export const CommonControls: FC<CommonControlsProps> = ({ module }) => {
+    const { t } = useTranslation();
+
     const dashboardContext = useContext(Contexts.dashboard);
 
     const [volume, setVolume] = useState(100);
@@ -18,9 +21,9 @@ export const CommonControls: FC<CommonControlsProps> = ({ module }) => {
     const [useSystemVolume, setUseSystemVolume] = useState(false);
 
     useEffect(() => {
-        const parsed = parseInt(module.state.volume);
+        const parsed = parseFloat(module.state.volume);
         if (!isNaN(parsed)) {
-            setVolume(parsed);
+            setVolume(parsed * 100);
         }
     }, [module.state.volume]);
 
@@ -34,9 +37,11 @@ export const CommonControls: FC<CommonControlsProps> = ({ module }) => {
         setUseSystemVolume(parsed);
     }, [module.state.useSystemVolume]);
 
-    const handleVolumeChange = (value: number) => {
+    const handleVolumeChange = (value: number, skipSaving?: boolean) => {
         setVolume(value);
-        dashboardContext?.onStateChanged(module, { volume: value.toString() });
+        if (!skipSaving) {
+            dashboardContext?.onStateChanged(module, { volume: (value / 100).toString() });
+        }
     };
 
     const handleIsMutedChange = (e: CheckboxChangeEvent) => {
@@ -51,17 +56,47 @@ export const CommonControls: FC<CommonControlsProps> = ({ module }) => {
         dashboardContext?.onStateChanged(module, { useSystemVolume: value.toString() });
     };
 
+    const stopPropagationHandler = (e: React.SyntheticEvent) => {
+        // stop event propagation to enable correct slider inside the draggable widget
+        e.stopPropagation();
+    };
+
     return (
-        <Collapse defaultActiveKey={["common-controls"]}>
-            <Collapse.Panel header="Common Controls" key="common-controls">
-                <Slider min={0} max={100} value={volume} onChange={handleVolumeChange} />
-                <Checkbox checked={isMuted} onChange={handleIsMutedChange}>
-                    Mute
-                </Checkbox>
-                <Checkbox checked={useSystemVolume} onChange={handleUseSystemVolumeChange}>
-                    Use system volume
-                </Checkbox>
-            </Collapse.Panel>
-        </Collapse>
+        <>
+            <Row>
+                <Col span={24}>{t("widgets.commonControls.volume")}</Col>
+                <Col span={16} onMouseDown={stopPropagationHandler} onTouchStart={stopPropagationHandler}>
+                    <Slider
+                        min={0}
+                        max={100}
+                        value={volume}
+                        onChange={(value: number) => handleVolumeChange(value, true)}
+                        onAfterChange={handleVolumeChange}
+                        tipFormatter={(value) => `${value}%`}
+                        step={1}
+                    />
+                </Col>
+                <Col span={8}>
+                    <InputNumber
+                        min={0}
+                        max={100}
+                        value={volume}
+                        onChange={handleVolumeChange}
+                        step={1}
+                        style={{ float: "right" }}
+                    />
+                </Col>
+            </Row>
+            <Row>
+                <Col>
+                    <Checkbox checked={isMuted} onChange={handleIsMutedChange}>
+                        {t("widgets.commonControls.isMuted")}
+                    </Checkbox>
+                    <Checkbox checked={useSystemVolume} onChange={handleUseSystemVolumeChange}>
+                        {t("widgets.commonControls.useSystemVolume")}
+                    </Checkbox>
+                </Col>
+            </Row>
+        </>
     );
 };

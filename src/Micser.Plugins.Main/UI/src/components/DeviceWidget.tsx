@@ -1,9 +1,16 @@
 import React, { FC, useContext } from "react";
-import { Select } from "antd";
+import { useTranslation } from "react-i18next";
+import { Collapse, Select } from "antd";
 import { SelectValue } from "antd/lib/select";
-import { CommonControls, Contexts, Loader, useGetApi, WidgetProps } from "micser-common";
-
-import { DeviceDescription, DeviceSelect, WidgetContainer } from "./Common";
+import {
+    CommonControls,
+    Contexts,
+    DeviceDescription,
+    Loader,
+    useGetApi,
+    WidgetPanel,
+    WidgetProps,
+} from "micser-common";
 
 const { Option } = Select;
 
@@ -17,6 +24,7 @@ export interface DeviceWidgetProps extends WidgetProps {
 }
 
 export const DeviceWidget: FC<DeviceWidgetProps> = ({ module, type }) => {
+    const { t } = useTranslation();
     const [devices, { isLoading }] = useGetApi<DeviceDescription[]>(`Devices/${type}`);
 
     const dashboardContext = useContext(Contexts.dashboard);
@@ -26,17 +34,28 @@ export const DeviceWidget: FC<DeviceWidgetProps> = ({ module, type }) => {
     };
 
     return (
-        <WidgetContainer>
+        <>
             <Loader isVisible={isLoading} />
-            <CommonControls module={module} />
-            <DeviceSelect dropdownMatchSelectWidth={false} value={module.state.deviceId} onChange={handleDeviceChange}>
-                {devices &&
-                    devices.map((device) => (
-                        <Option key={device.id} value={device.id}>
-                            {device.friendlyName}
-                        </Option>
-                    ))}
-            </DeviceSelect>
-        </WidgetContainer>
+            <Collapse defaultActiveKey="common-controls">
+                <WidgetPanel key="common-controls" header={t("widgets.commonControls.title")}>
+                    <CommonControls module={module} />
+                </WidgetPanel>
+                <WidgetPanel key="device" header={t("common.device")}>
+                    <Select
+                        dropdownMatchSelectWidth={false}
+                        value={module.state.deviceId}
+                        onChange={handleDeviceChange}
+                        style={{ width: "100%" }}
+                    >
+                        {devices &&
+                            devices.map((device) => (
+                                <Option key={device.id} value={device.id}>
+                                    {device.friendlyName}
+                                </Option>
+                            ))}
+                    </Select>
+                </WidgetPanel>
+            </Collapse>
+        </>
     );
 };

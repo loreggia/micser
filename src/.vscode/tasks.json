@@ -62,6 +62,18 @@
             "dependsOn": ["Micser.Common.UI", "Micser.Plugins.Main.UI"],
             "dependsOrder": "sequence",
             "problemMatcher": ["$tsc"]
+        },
+        {
+            "label": "build-common-ui",
+            "group": "build",
+            "dependsOn": ["Micser.Common.UI"],
+            "problemMatcher": ["$tsc"]
+        },
+        {
+            "label": "build-plugin-ui",
+            "group": "build",
+            "dependsOn": ["Micser.Plugins.Main.UI"],
+            "problemMatcher": ["$tsc"]
         }
     ]
 }

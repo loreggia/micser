@@ -5,6 +5,7 @@ Object.defineProperty(exports, '__esModule', { value: true });
 var React = require('react');
 var styled = require('styled-components');
 var antd = require('antd');
+var reactI18next = require('react-i18next');
 var AxiosStatic = require('axios');
 var lodash = require('lodash');
 
@@ -115,14 +116,15 @@ var parseBool = function (value) {
 
 var CommonControls = function (_a) {
     var module = _a.module;
+    var t = reactI18next.useTranslation().t;
     var dashboardContext = React.useContext(Contexts.dashboard);
     var _b = React.useState(100), volume = _b[0], setVolume = _b[1];
     var _c = React.useState(false), isMuted = _c[0], setIsMuted = _c[1];
     var _d = React.useState(false), useSystemVolume = _d[0], setUseSystemVolume = _d[1];
     React.useEffect(function () {
-        var parsed = parseInt(module.state.volume);
+        var parsed = parseFloat(module.state.volume);
         if (!isNaN(parsed)) {
-            setVolume(parsed);
+            setVolume(parsed * 100);
         }
     }, [module.state.volume]);
     React.useEffect(function () {
@@ -133,9 +135,11 @@ var CommonControls = function (_a) {
         var parsed = parseBool(module.state.useSystemVolume);
         setUseSystemVolume(parsed);
     }, [module.state.useSystemVolume]);
-    var handleVolumeChange = function (value) {
+    var handleVolumeChange = function (value, skipSaving) {
         setVolume(value);
-        dashboardContext === null || dashboardContext === void 0 ? void 0 : dashboardContext.onStateChanged(module, { volume: value.toString() });
+        if (!skipSaving) {
+            dashboardContext === null || dashboardContext === void 0 ? void 0 : dashboardContext.onStateChanged(module, { volume: (value / 100).toString() });
+        }
     };
     var handleIsMutedChange = function (e) {
         var value = e.target.checked;
@@ -147,12 +151,25 @@ var CommonControls = function (_a) {
         setUseSystemVolume(e.target.checked);
         dashboardContext === null || dashboardContext === void 0 ? void 0 : dashboardContext.onStateChanged(module, { useSystemVolume: value.toString() });
     };
-    return (React__default['default'].createElement(antd.Collapse, { defaultActiveKey: ["common-controls"] },
-        React__default['default'].createElement(antd.Collapse.Panel, { header: "Common Controls", key: "common-controls" },
-            React__default['default'].createElement(antd.Slider, { min: 0, max: 100, value: volume, onChange: handleVolumeChange }),
-            React__default['default'].createElement(antd.Checkbox, { checked: isMuted, onChange: handleIsMutedChange }, "Mute"),
-            React__default['default'].createElement(antd.Checkbox, { checked: useSystemVolume, onChange: handleUseSystemVolumeChange }, "Use system volume"))));
+    var stopPropagationHandler = function (e) {
+        // stop event propagation to enable correct slider inside the draggable widget
+        e.stopPropagation();
+    };
+    return (React__default['default'].createElement(React__default['default'].Fragment, null,
+        React__default['default'].createElement(antd.Row, null,
+            React__default['default'].createElement(antd.Col, { span: 24 }, t("widgets.commonControls.volume")),
+            React__default['default'].createElement(antd.Col, { span: 16, onMouseDown: stopPropagationHandler, onTouchStart: stopPropagationHandler },
+                React__default['default'].createElement(antd.Slider, { min: 0, max: 100, value: volume, onChange: function (value) { return handleVolumeChange(value, true); }, onAfterChange: handleVolumeChange, tipFormatter: function (value) { return value + "%"; }, step: 1 })),
+            React__default['default'].createElement(antd.Col, { span: 8 },
+                React__default['default'].createElement(antd.InputNumber, { min: 0, max: 100, value: volume, onChange: handleVolumeChange, step: 1, style: { float: "right" } }))),
+        React__default['default'].createElement(antd.Row, null,
+            React__default['default'].createElement(antd.Col, null,
+                React__default['default'].createElement(antd.Checkbox, { checked: isMuted, onChange: handleIsMutedChange }, t("widgets.commonControls.isMuted")),
+                React__default['default'].createElement(antd.Checkbox, { checked: useSystemVolume, onChange: handleUseSystemVolumeChange }, t("widgets.commonControls.useSystemVolume"))))));
 };
+
+var WidgetPanel = styled__default['default'](antd.Collapse.Panel)(templateObject_1$1 || (templateObject_1$1 = __makeTemplateObject([""], [""])));
+var templateObject_1$1;
 
 var Api = /** @class */ (function () {
     function Api(baseUrl, onBeginRequest, onEndRequest, onError) {
@@ -315,9 +332,29 @@ var useGetApi = function (path, action, params) {
     return [result, { refresh: refresh, isLoading: isLoading, error: error }];
 };
 
+var widgets = {
+	commonControls: {
+		title: "Common Controls",
+		volume: "Volume",
+		isMuted: "Mute",
+		useSystemVolume: "Use System Volume"
+	}
+};
+var defaultEn = {
+	widgets: widgets
+};
+
+var resources = {
+    en: {
+        default: defaultEn,
+    },
+};
+
 exports.CommonControls = CommonControls;
 exports.Contexts = Contexts;
 exports.Loader = Loader;
+exports.WidgetPanel = WidgetPanel;
+exports.resources = resources;
 exports.useApi = useApi;
 exports.useGetApi = useGetApi;
 //# sourceMappingURL=index.js.map

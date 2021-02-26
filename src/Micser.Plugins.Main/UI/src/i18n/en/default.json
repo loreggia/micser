@@ -1,4 +1,7 @@
 {
+    "common": {
+        "device": "Device"
+    },
     "deviceInputWidget": {
         "title": "Device Input",
         "description": "Captures the audio from an input device (i.e. microphone)."

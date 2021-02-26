@@ -24,3 +24,7 @@ export interface PluginDefinition {
     assemblyName: string;
     moduleName: string;
 }
+export interface DeviceDescription {
+    id: string;
+    friendlyName: string;
+}

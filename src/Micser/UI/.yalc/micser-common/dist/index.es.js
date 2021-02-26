@@ -1,6 +1,7 @@
 import React, { useState, useEffect, createContext, useContext, useCallback } from 'react';
 import styled from 'styled-components';
-import { Spin, Collapse, Slider, Checkbox } from 'antd';
+import { Spin, Row, Col, Slider, InputNumber, Checkbox, Collapse } from 'antd';
+import { useTranslation } from 'react-i18next';
 import AxiosStatic from 'axios';
 import { trimStart } from 'lodash';
 
@@ -105,14 +106,15 @@ var parseBool = function (value) {
 
 var CommonControls = function (_a) {
     var module = _a.module;
+    var t = useTranslation().t;
     var dashboardContext = useContext(Contexts.dashboard);
     var _b = useState(100), volume = _b[0], setVolume = _b[1];
     var _c = useState(false), isMuted = _c[0], setIsMuted = _c[1];
     var _d = useState(false), useSystemVolume = _d[0], setUseSystemVolume = _d[1];
     useEffect(function () {
-        var parsed = parseInt(module.state.volume);
+        var parsed = parseFloat(module.state.volume);
         if (!isNaN(parsed)) {
-            setVolume(parsed);
+            setVolume(parsed * 100);
         }
     }, [module.state.volume]);
     useEffect(function () {
@@ -123,9 +125,11 @@ var CommonControls = function (_a) {
         var parsed = parseBool(module.state.useSystemVolume);
         setUseSystemVolume(parsed);
     }, [module.state.useSystemVolume]);
-    var handleVolumeChange = function (value) {
+    var handleVolumeChange = function (value, skipSaving) {
         setVolume(value);
-        dashboardContext === null || dashboardContext === void 0 ? void 0 : dashboardContext.onStateChanged(module, { volume: value.toString() });
+        if (!skipSaving) {
+            dashboardContext === null || dashboardContext === void 0 ? void 0 : dashboardContext.onStateChanged(module, { volume: (value / 100).toString() });
+        }
     };
     var handleIsMutedChange = function (e) {
         var value = e.target.checked;
@@ -137,12 +141,25 @@ var CommonControls = function (_a) {
         setUseSystemVolume(e.target.checked);
         dashboardContext === null || dashboardContext === void 0 ? void 0 : dashboardContext.onStateChanged(module, { useSystemVolume: value.toString() });
     };
-    return (React.createElement(Collapse, { defaultActiveKey: ["common-controls"] },
-        React.createElement(Collapse.Panel, { header: "Common Controls", key: "common-controls" },
-            React.createElement(Slider, { min: 0, max: 100, value: volume, onChange: handleVolumeChange }),
-            React.createElement(Checkbox, { checked: isMuted, onChange: handleIsMutedChange }, "Mute"),
-            React.createElement(Checkbox, { checked: useSystemVolume, onChange: handleUseSystemVolumeChange }, "Use system volume"))));
+    var stopPropagationHandler = function (e) {
+        // stop event propagation to enable correct slider inside the draggable widget
+        e.stopPropagation();
+    };
+    return (React.createElement(React.Fragment, null,
+        React.createElement(Row, null,
+            React.createElement(Col, { span: 24 }, t("widgets.commonControls.volume")),
+            React.createElement(Col, { span: 16, onMouseDown: stopPropagationHandler, onTouchStart: stopPropagationHandler },
+                React.createElement(Slider, { min: 0, max: 100, value: volume, onChange: function (value) { return handleVolumeChange(value, true); }, onAfterChange: handleVolumeChange, tipFormatter: function (value) { return value + "%"; }, step: 1 })),
+            React.createElement(Col, { span: 8 },
+                React.createElement(InputNumber, { min: 0, max: 100, value: volume, onChange: handleVolumeChange, step: 1, style: { float: "right" } }))),
+        React.createElement(Row, null,
+            React.createElement(Col, null,
+                React.createElement(Checkbox, { checked: isMuted, onChange: handleIsMutedChange }, t("widgets.commonControls.isMuted")),
+                React.createElement(Checkbox, { checked: useSystemVolume, onChange: handleUseSystemVolumeChange }, t("widgets.commonControls.useSystemVolume"))))));
 };
+
+var WidgetPanel = styled(Collapse.Panel)(templateObject_1$1 || (templateObject_1$1 = __makeTemplateObject([""], [""])));
+var templateObject_1$1;
 
 var Api = /** @class */ (function () {
     function Api(baseUrl, onBeginRequest, onEndRequest, onError) {
@@ -305,5 +322,23 @@ var useGetApi = function (path, action, params) {
     return [result, { refresh: refresh, isLoading: isLoading, error: error }];
 };
 
-export { CommonControls, Contexts, Loader, useApi, useGetApi };
+var widgets = {
+	commonControls: {
+		title: "Common Controls",
+		volume: "Volume",
+		isMuted: "Mute",
+		useSystemVolume: "Use System Volume"
+	}
+};
+var defaultEn = {
+	widgets: widgets
+};
+
+var resources = {
+    en: {
+        default: defaultEn,
+    },
+};
+
+export { CommonControls, Contexts, Loader, WidgetPanel, resources, useApi, useGetApi };
 //# sourceMappingURL=index.es.js.map

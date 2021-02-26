@@ -12,6 +12,8 @@ const ErrorContent: WidgetFC = ({ module }) => {
 const WidgetCard = styled(Card)`
     cursor: inherit;
     box-shadow: inset 0 0 5px 0 rgba(255, 255, 255, 0.5);
+    min-width: 340px;
+    max-width: 500px;
 `;
 
 export const Widget = ({ data }: { data: Module }) => {

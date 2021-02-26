@@ -1,15 +1,20 @@
 import i18n from "i18next";
 import { initReactI18next } from "react-i18next";
+import merge from "lodash/merge";
 
+import { resources as commonResources } from "micser-common";
 import defaultEn from "./en/default.json";
 
 import { Languages } from "~/constants";
 
-export const resources = {
-    en: {
-        default: defaultEn,
+export const resources = merge(
+    {
+        en: {
+            default: defaultEn,
+        },
     },
-} as const;
+    commonResources
+);
 
 // .use(Backend)
 i18n.use(initReactI18next)
