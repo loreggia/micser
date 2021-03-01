@@ -10,7 +10,7 @@
         "test": "jest",
         "start": "start-storybook",
         "build": "rollup -c",
-        "pl": "yarn build && yalc push"
+        "pl": "npm run build && yalc push"
     },
     "dependencies": {},
     "devDependencies": {

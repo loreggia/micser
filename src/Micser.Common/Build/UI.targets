@@ -1,42 +1,32 @@
 ﻿<Project>
-
-  <PropertyGroup>
-    <UIRoot Condition="'$(UIRoot)' == ''">$(ProjectDir)UI\</UIRoot>
-    <DefaultItemExcludes>$(DefaultItemExcludes);$(UIRoot)node_modules\**;$(UIRoot).yalc</DefaultItemExcludes>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <!-- Don't publish the SPA source files, but do show them in the project files list -->
-    <Content Remove="$(UIRoot)**" />
-    <None Remove="$(UIRoot)**" />
-    <None Include="$(UIRoot)**" Exclude="$(UIRoot)node_modules\**;$(UIRoot).*\**" />
-  </ItemGroup>
-
-  <Target Name="EnsureNodeEnv" BeforeTargets="Build" Condition="!Exists('$(UIRoot)node_modules')">
-    <!-- Ensure Node.js is installed -->
-    <Exec Command="node --version" ContinueOnError="true">
-      <Output TaskParameter="ExitCode" PropertyName="ErrorCode" />
-    </Exec>
-    <Error Condition="'$(ErrorCode)' != '0'" Text="Node.js is required to build and run this project. To continue, please install Node.js from https://nodejs.org/, and then restart your command prompt or IDE." />
-    <Message Importance="high" Text="Restoring dependencies using 'yarn'. This may take several minutes..." />
-    <Exec Command="npm i -g yarn" />
-    <Exec Command="yarn global add yalc" />
-    <Exec WorkingDirectory="$(UIRoot)" Command="yarn install" />
-  </Target>
-
-  <Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish">
-    <!-- As part of publishing, ensure the JS resources are freshly built in production mode -->
-    <Exec WorkingDirectory="$(UIRoot)" Command="yarn install" />
-    <Exec WorkingDirectory="$(UIRoot)" Command="yarn run build" />
-
-    <!-- Include the newly-built files in the publish output -->
-    <ItemGroup>
-      <DistFiles Include="$(UIRoot)build\**" />
-      <ResolvedFileToPublish Include="@(DistFiles->'%(FullPath)')" Exclude="@(ResolvedFileToPublish)">
-        <RelativePath>%(DistFiles.Identity)</RelativePath>
-        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-        <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      </ResolvedFileToPublish>
+    <PropertyGroup>
+        <UIRoot Condition="&apos;$(UIRoot)&apos; == &apos;&apos;">$(ProjectDir)UI\</UIRoot>
+        <DefaultItemExcludes>$(DefaultItemExcludes);$(UIRoot)node_modules\**;$(UIRoot).yalc</DefaultItemExcludes>
+    </PropertyGroup>
+    <ItemGroup><!-- Don't publish the SPA source files, but do show them in the project files list -->
+        <Content Remove="$(UIRoot)**"/>
+        <None Remove="$(UIRoot)**"/>
+        <None Include="$(UIRoot)**" Exclude="$(UIRoot)node_modules\**;$(UIRoot).*\**"/>
     </ItemGroup>
-  </Target>
+    <Target Name="EnsureNodeEnv" BeforeTargets="Build" Condition="!Exists(&apos;$(UIRoot)node_modules&apos;)"><!-- Ensure Node.js is installed -->
+        <Exec Command="node --version" ContinueOnError="true">
+            <Output TaskParameter="ExitCode" PropertyName="ErrorCode"/>
+        </Exec>
+        <Error Condition="&apos;$(ErrorCode)&apos; != &apos;0&apos;" Text="Node.js is required to build and run this project. To continue, please install Node.js from https://nodejs.org/, and then restart your command prompt or IDE."/>
+        <Message Importance="high" Text="Restoring dependencies using &apos;npm&apos;. This may take several minutes..."/>
+        <Exec Command="npm install -g yalc"/>
+        <Exec WorkingDirectory="$(UIRoot)" Command="npm install"/>
+    </Target>
+    <Target Name="PublishRunWebpack" AfterTargets="ComputeFilesToPublish"><!-- As part of publishing, ensure the JS resources are freshly built in production mode -->
+        <Exec WorkingDirectory="$(UIRoot)" Command="npm install"/>
+        <Exec WorkingDirectory="$(UIRoot)" Command="npm run build"/><!-- Include the newly-built files in the publish output -->
+        <ItemGroup>
+            <DistFiles Include="$(UIRoot)build\**"/>
+            <ResolvedFileToPublish Include="@(DistFiles-&gt;&apos;%(FullPath)&apos;)" Exclude="@(ResolvedFileToPublish)">
+                <RelativePath>%(DistFiles.Identity)</RelativePath>
+                <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+                <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+            </ResolvedFileToPublish>
+        </ItemGroup>
+    </Target>
 </Project>

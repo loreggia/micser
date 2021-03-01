@@ -41,8 +41,8 @@
         {
             "label": "Micser.Common.UI",
             "type": "shell",
-            "command": "yarn",
-            "args": ["pl"],
+            "command": "npm",
+            "args": ["run", "pl"],
             "options": {
                 "cwd": "${workspaceFolder}/Micser.Common/UI"
             }
@@ -50,8 +50,8 @@
         {
             "label": "Micser.Plugins.Main.UI",
             "type": "shell",
-            "command": "yarn",
-            "args": ["build"],
+            "command": "npm",
+            "args": ["run", "build"],
             "options": {
                 "cwd": "${workspaceFolder}/Micser.Plugins.Main/UI"
             }

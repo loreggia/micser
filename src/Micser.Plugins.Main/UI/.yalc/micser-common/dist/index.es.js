@@ -63,7 +63,7 @@ function __makeTemplateObject(cooked, raw) {
     return cooked;
 }
 
-var Container = styled.div(templateObject_1 || (templateObject_1 = __makeTemplateObject(["\n    position: absolute;\n    width: 100%;\n    height: 100%;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    background-color: rgba(0, 0, 0, 0.5);\n    z-index: 999;\n"], ["\n    position: absolute;\n    width: 100%;\n    height: 100%;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    background-color: rgba(0, 0, 0, 0.5);\n    z-index: 999;\n"])));
+var Container = styled.div(templateObject_1$1 || (templateObject_1$1 = __makeTemplateObject(["\n    position: absolute;\n    width: 100%;\n    height: 100%;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    background-color: rgba(0, 0, 0, 0.5);\n    z-index: 999;\n"], ["\n    position: absolute;\n    width: 100%;\n    height: 100%;\n    display: flex;\n    justify-content: center;\n    align-items: center;\n    background-color: rgba(0, 0, 0, 0.5);\n    z-index: 999;\n"])));
 var Loader = function (_a) {
     var isVisible = _a.isVisible, tip = _a.tip, suspenseTime = _a.suspenseTime;
     var _b = useState(false), isVisibleInternal = _b[0], setIsVisibleInternal = _b[1];
@@ -91,7 +91,7 @@ Loader.defaultProps = {
     tip: "Loading...",
     suspenseTime: 1000,
 };
-var templateObject_1;
+var templateObject_1$1;
 
 var Contexts = {
     widgetTypes: createContext([]),
@@ -158,8 +158,8 @@ var CommonControls = function (_a) {
                 React.createElement(Checkbox, { checked: useSystemVolume, onChange: handleUseSystemVolumeChange }, t("widgets.commonControls.useSystemVolume"))))));
 };
 
-var WidgetPanel = styled(Collapse.Panel)(templateObject_1$1 || (templateObject_1$1 = __makeTemplateObject([""], [""])));
-var templateObject_1$1;
+var WidgetPanel = styled(Collapse.Panel)(templateObject_1 || (templateObject_1 = __makeTemplateObject([""], [""])));
+var templateObject_1;
 
 var Api = /** @class */ (function () {
     function Api(baseUrl, onBeginRequest, onEndRequest, onError) {
