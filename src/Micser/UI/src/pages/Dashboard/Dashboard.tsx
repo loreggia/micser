@@ -37,6 +37,7 @@ import { PluginsContext } from "~/hooks";
 import { getRelativeCoordinates } from "~/utils";
 import { CustomEdge } from "./CustomEdge";
 import { useGetWidgetType } from "./utils";
+import { transform } from "lodash";
 
 const FixedButton = styled.div`
     position: fixed;
@@ -232,7 +233,7 @@ export const Dashboard = () => {
         loadModuleConnections();
     };
 
-    const handleMoveEnd = (transform?: FlowTransform) => {
+    const handleMove = (transform?: FlowTransform) => {
         if (transform) {
             setFlowTransform(transform);
         }
@@ -367,7 +368,8 @@ export const Dashboard = () => {
                             onConnectEnd={handleConnectEnd}
                             onElementsRemove={handleElementsRemove}
                             onlyRenderVisibleElements={false}
-                            onMoveEnd={handleMoveEnd}
+                            onMove={handleMove}
+                            onMoveEnd={handleMove}
                             onContextMenu={handleContextMenu}
                             onPaneContextMenu={handlePaneContextMenu}
                             onNodeContextMenu={handleNodeContextMenu}
