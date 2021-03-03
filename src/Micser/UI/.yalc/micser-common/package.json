@@ -1,6 +1,6 @@
 {
     "name": "micser-common",
-    "version": "1.0.18+b8925dd4",
+    "version": "1.0.18+54c4bd7b",
     "author": "Lucas Loreggia",
     "license": "MIT",
     "private": false,
@@ -12,7 +12,6 @@
         "build": "rollup -c",
         "pl": "npm run build && yalc push"
     },
-    "dependencies": {},
     "peerDependencies": {
         "antd": ">=4.0.0",
         "axios": ">=0.21.0",
@@ -22,5 +21,5 @@
         "react-i18next": ">=11.8.8",
         "styled-components": ">=5.0.0"
     },
-    "yalcSig": "b8925dd4ddb54cd1918766808cd6baa3"
+    "yalcSig": "54c4bd7b2c85dd44d7dc472987bd7f9b"
 }

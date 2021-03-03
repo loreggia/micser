@@ -5,7 +5,7 @@
     "license": "MIT",
     "private": true,
     "dependencies": {
-        "@fontsource/roboto": "^4.2.1",
+        "@fontsource/roboto": "^4.2.2",
         "@microsoft/signalr": "^5.0.0",
         "antd": "^4.9.2",
         "axios": "^0.21.1",
