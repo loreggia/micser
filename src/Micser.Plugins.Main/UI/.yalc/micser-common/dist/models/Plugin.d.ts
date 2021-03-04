@@ -3,6 +3,6 @@ export interface Plugin {
     name: string;
     widgets?: Widget[];
     resources: {
-        [key: string]: {};
+        [key: string]: unknown;
     };
 }

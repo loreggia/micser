@@ -106,7 +106,9 @@ var templateObject_1$1;
 var Contexts = {
     widgetTypes: React.createContext([]),
     dashboard: React.createContext({
-        onStateChanged: function () { },
+        onStateChanged: function () {
+            // default value
+        },
     }),
 };
 
@@ -256,7 +258,7 @@ var Api = /** @class */ (function () {
         };
     };
     Api.prototype.handleError = function (error) {
-        console.log(error);
+        // console.log(error);
         var problem = error.response && error.response.data
             ? error.response.data
             : {

@@ -1,9 +1,9 @@
 {
     "name": "micser-common",
-    "version": "1.0.18",
+    "version": "1.0.0",
     "author": "Lucas Loreggia",
     "license": "MIT",
-    "private": false,
+    "private": true,
     "main": "./dist/index.js",
     "module": "./dist/index.es.js",
     "files": [
@@ -13,7 +13,7 @@
         "test": "jest",
         "start": "start-storybook",
         "build": "rollup -c",
-        "publish-local": "npm run build && yalc push",
+        "publish-local": "npm run build && yalc push --private",
         "lint": "eslint .",
         "lint-fix": "eslint . --fix"
     },
