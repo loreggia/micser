@@ -322,6 +322,28 @@ var useGetApi = function (path, action, params) {
     return [result, { refresh: refresh, isLoading: isLoading, error: error }];
 };
 
+var useCollapseState = function (module, defaultActiveKeys) {
+    var dashboardContext = useContext(Contexts.dashboard);
+    var _a = useState(defaultActiveKeys || []), activeKeys = _a[0], setActiveKeys = _a[1];
+    useEffect(function () {
+        if (module.state.activeCollapseKeys) {
+            try {
+                var stateKeys = JSON.parse(module.state.activeCollapseKeys);
+                setActiveKeys(stateKeys);
+            }
+            catch (_a) {
+                // ignored
+            }
+        }
+    }, [module.state.activeCollapseKeys]);
+    var handleChange = useCallback(function (keys) {
+        setActiveKeys(keys);
+        var value = JSON.stringify(keys);
+        dashboardContext.onStateChanged(module, { activeCollapseKeys: value });
+    }, [module, dashboardContext.onStateChanged]);
+    return [activeKeys, handleChange];
+};
+
 var widgets = {
 	commonControls: {
 		title: "Common Controls",
@@ -340,5 +362,5 @@ var resources = {
     },
 };
 
-export { CommonControls, Contexts, Loader, WidgetPanel, resources, useApi, useGetApi };
+export { CommonControls, Contexts, Loader, WidgetPanel, resources, useApi, useCollapseState, useGetApi };
 //# sourceMappingURL=index.es.js.map

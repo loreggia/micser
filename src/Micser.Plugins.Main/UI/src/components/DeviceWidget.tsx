@@ -7,6 +7,7 @@ import {
     Contexts,
     DeviceDescription,
     Loader,
+    useCollapseState,
     useGetApi,
     WidgetPanel,
     WidgetProps,
@@ -27,6 +28,8 @@ export const DeviceWidget: FC<DeviceWidgetProps> = ({ module, type }) => {
     const { t } = useTranslation();
     const [devices, { isLoading }] = useGetApi<DeviceDescription[]>(`Devices/${type}`);
 
+    const [activeCollapseKeys, onCollapseChange] = useCollapseState(module, ["common-controls", "device"]);
+
     const dashboardContext = useContext(Contexts.dashboard);
 
     const handleDeviceChange = (value: SelectValue) => {
@@ -36,7 +39,7 @@ export const DeviceWidget: FC<DeviceWidgetProps> = ({ module, type }) => {
     return (
         <>
             <Loader isVisible={isLoading} />
-            <Collapse defaultActiveKey="common-controls">
+            <Collapse activeKey={activeCollapseKeys} onChange={onCollapseChange}>
                 <WidgetPanel key="common-controls" header={t("widgets.commonControls.title")}>
                     <CommonControls module={module} />
                 </WidgetPanel>

@@ -42,7 +42,7 @@
             "label": "Micser.Common.UI",
             "type": "shell",
             "command": "npm",
-            "args": ["run", "pl"],
+            "args": ["run", "publish-local"],
             "options": {
                 "cwd": "${workspaceFolder}/Micser.Common/UI"
             }

@@ -10,7 +10,7 @@
         "test": "jest",
         "start": "start-storybook",
         "build": "rollup -c",
-        "pl": "npm run build && yalc push"
+        "publish-local": "npm run build && yalc push"
     },
     "devDependencies": {
         "@rollup/plugin-commonjs": "^17.1.0",
