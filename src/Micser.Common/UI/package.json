@@ -6,6 +6,9 @@
     "private": false,
     "main": "./dist/index.js",
     "module": "./dist/index.es.js",
+    "files": [
+        "dist/"
+    ],
     "scripts": {
         "test": "jest",
         "start": "start-storybook",
