@@ -74,6 +74,42 @@
             "group": "build",
             "dependsOn": ["Micser.Plugins.Main.UI"],
             "problemMatcher": ["$tsc"]
+        },
+        {
+            "label": "lint-main",
+            "type": "shell",
+            "command": "npm",
+            "args": ["run", "lint"],
+            "problemMatcher": ["$eslint-stylish"],
+            "options": {
+                "cwd": "${workspaceFolder}/Micser/UI"
+            }
+        },
+        {
+            "label": "lint-common",
+            "type": "shell",
+            "command": "npm",
+            "args": ["run", "lint"],
+            "problemMatcher": ["$eslint-stylish"],
+            "options": {
+                "cwd": "${workspaceFolder}/Micser.Common/UI"
+            }
+        },
+        {
+            "label": "lint-plugin",
+            "type": "shell",
+            "command": "npm",
+            "args": ["run", "lint"],
+            "problemMatcher": ["$eslint-stylish"],
+            "options": {
+                "cwd": "${workspaceFolder}/Micser.Plugins.Main/UI"
+            }
+        },
+        {
+            "label": "lint-ui",
+            "group": "build",
+            "dependsOn": ["lint-main", "lint-common", "lint-plugin"],
+            "problemMatcher": ["$eslint-stylish"]
         }
     ]
 }
