@@ -104,7 +104,7 @@ var parseBool = function (value) {
     return value && value.toLowerCase() === "true";
 };
 
-var CommonControls = function (_a) {
+var VolumeControls = function (_a) {
     var module = _a.module;
     var t = useTranslation().t;
     var dashboardContext = useContext(Contexts.dashboard);
@@ -147,15 +147,15 @@ var CommonControls = function (_a) {
     };
     return (React.createElement(React.Fragment, null,
         React.createElement(Row, null,
-            React.createElement(Col, { span: 24 }, t("widgets.commonControls.volume")),
+            React.createElement(Col, { span: 24 }, t("widgets.volumeControls.volume")),
             React.createElement(Col, { span: 16, onMouseDown: stopPropagationHandler, onTouchStart: stopPropagationHandler },
                 React.createElement(Slider, { min: 0, max: 100, value: volume, onChange: function (value) { return handleVolumeChange(value, true); }, onAfterChange: handleVolumeChange, tipFormatter: function (value) { return value + "%"; }, step: 1 })),
             React.createElement(Col, { span: 8 },
                 React.createElement(InputNumber, { min: 0, max: 100, value: volume, onChange: handleVolumeChange, step: 1, style: { float: "right" } }))),
         React.createElement(Row, null,
             React.createElement(Col, null,
-                React.createElement(Checkbox, { checked: isMuted, onChange: handleIsMutedChange }, t("widgets.commonControls.isMuted")),
-                React.createElement(Checkbox, { checked: useSystemVolume, onChange: handleUseSystemVolumeChange }, t("widgets.commonControls.useSystemVolume"))))));
+                React.createElement(Checkbox, { checked: isMuted, onChange: handleIsMutedChange }, t("widgets.volumeControls.isMuted")),
+                React.createElement(Checkbox, { checked: useSystemVolume, onChange: handleUseSystemVolumeChange }, t("widgets.volumeControls.useSystemVolume"))))));
 };
 
 var WidgetPanel = styled(Collapse.Panel)(templateObject_1 || (templateObject_1 = __makeTemplateObject([""], [""])));
@@ -345,8 +345,8 @@ var useCollapseState = function (module, defaultActiveKeys) {
 };
 
 var widgets = {
-	commonControls: {
-		title: "Common Controls",
+	volumeControls: {
+		title: "Volume",
 		volume: "Volume",
 		isMuted: "Mute",
 		useSystemVolume: "Use System Volume"
@@ -362,5 +362,5 @@ var resources = {
     },
 };
 
-export { CommonControls, Contexts, Loader, WidgetPanel, resources, useApi, useCollapseState, useGetApi };
+export { Contexts, Loader, VolumeControls, WidgetPanel, resources, useApi, useCollapseState, useGetApi };
 //# sourceMappingURL=index.es.js.map

@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { Collapse, Select } from "antd";
 import { SelectValue } from "antd/lib/select";
 import {
-    CommonControls,
+    VolumeControls,
     Contexts,
     DeviceDescription,
     Loader,
@@ -40,8 +40,8 @@ export const DeviceWidget: FC<DeviceWidgetProps> = ({ module, type }) => {
         <>
             <Loader isVisible={isLoading} />
             <Collapse activeKey={activeCollapseKeys} onChange={onCollapseChange}>
-                <WidgetPanel key="common-controls" header={t("widgets.commonControls.title")}>
-                    <CommonControls module={module} />
+                <WidgetPanel key="common-controls" header={t("widgets.volumeControls.title")}>
+                    <VolumeControls module={module} />
                 </WidgetPanel>
                 <WidgetPanel key="device" header={t("common.device")}>
                     <Select

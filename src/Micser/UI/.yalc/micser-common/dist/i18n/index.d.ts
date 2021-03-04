@@ -2,7 +2,7 @@ export declare const resources: {
     en: {
         default: {
             widgets: {
-                commonControls: {
+                volumeControls: {
                     title: string;
                     volume: string;
                     isMuted: string;

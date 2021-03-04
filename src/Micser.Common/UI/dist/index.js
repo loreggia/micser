@@ -114,7 +114,7 @@ var parseBool = function (value) {
     return value && value.toLowerCase() === "true";
 };
 
-var CommonControls = function (_a) {
+var VolumeControls = function (_a) {
     var module = _a.module;
     var t = reactI18next.useTranslation().t;
     var dashboardContext = React.useContext(Contexts.dashboard);
@@ -157,15 +157,15 @@ var CommonControls = function (_a) {
     };
     return (React__default['default'].createElement(React__default['default'].Fragment, null,
         React__default['default'].createElement(antd.Row, null,
-            React__default['default'].createElement(antd.Col, { span: 24 }, t("widgets.commonControls.volume")),
+            React__default['default'].createElement(antd.Col, { span: 24 }, t("widgets.volumeControls.volume")),
             React__default['default'].createElement(antd.Col, { span: 16, onMouseDown: stopPropagationHandler, onTouchStart: stopPropagationHandler },
                 React__default['default'].createElement(antd.Slider, { min: 0, max: 100, value: volume, onChange: function (value) { return handleVolumeChange(value, true); }, onAfterChange: handleVolumeChange, tipFormatter: function (value) { return value + "%"; }, step: 1 })),
             React__default['default'].createElement(antd.Col, { span: 8 },
                 React__default['default'].createElement(antd.InputNumber, { min: 0, max: 100, value: volume, onChange: handleVolumeChange, step: 1, style: { float: "right" } }))),
         React__default['default'].createElement(antd.Row, null,
             React__default['default'].createElement(antd.Col, null,
-                React__default['default'].createElement(antd.Checkbox, { checked: isMuted, onChange: handleIsMutedChange }, t("widgets.commonControls.isMuted")),
-                React__default['default'].createElement(antd.Checkbox, { checked: useSystemVolume, onChange: handleUseSystemVolumeChange }, t("widgets.commonControls.useSystemVolume"))))));
+                React__default['default'].createElement(antd.Checkbox, { checked: isMuted, onChange: handleIsMutedChange }, t("widgets.volumeControls.isMuted")),
+                React__default['default'].createElement(antd.Checkbox, { checked: useSystemVolume, onChange: handleUseSystemVolumeChange }, t("widgets.volumeControls.useSystemVolume"))))));
 };
 
 var WidgetPanel = styled__default['default'](antd.Collapse.Panel)(templateObject_1 || (templateObject_1 = __makeTemplateObject([""], [""])));
@@ -355,8 +355,8 @@ var useCollapseState = function (module, defaultActiveKeys) {
 };
 
 var widgets = {
-	commonControls: {
-		title: "Common Controls",
+	volumeControls: {
+		title: "Volume",
 		volume: "Volume",
 		isMuted: "Mute",
 		useSystemVolume: "Use System Volume"
@@ -372,9 +372,9 @@ var resources = {
     },
 };
 
-exports.CommonControls = CommonControls;
 exports.Contexts = Contexts;
 exports.Loader = Loader;
+exports.VolumeControls = VolumeControls;
 exports.WidgetPanel = WidgetPanel;
 exports.resources = resources;
 exports.useApi = useApi;

@@ -1,2 +1,2 @@
-export * from "./CommonControls";
+export * from "./VolumeControls";
 export * from "./Widget";

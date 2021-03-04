@@ -1,7 +1,7 @@
 {
     "widgets": {
-        "commonControls": {
-            "title": "Common Controls",
+        "volumeControls": {
+            "title": "Volume",
             "volume": "Volume",
             "isMuted": "Mute",
             "useSystemVolume": "Use System Volume"

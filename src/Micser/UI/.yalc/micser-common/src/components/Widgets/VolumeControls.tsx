@@ -7,11 +7,11 @@ import { Module } from "models";
 import { Contexts } from "Contexts";
 import { parseBool } from "utils";
 
-export interface CommonControlsProps {
+export interface VolumeControlsProps {
     module: Module;
 }
 
-export const CommonControls: FC<CommonControlsProps> = ({ module }) => {
+export const VolumeControls: FC<VolumeControlsProps> = ({ module }) => {
     const { t } = useTranslation();
 
     const dashboardContext = useContext(Contexts.dashboard);
@@ -64,7 +64,7 @@ export const CommonControls: FC<CommonControlsProps> = ({ module }) => {
     return (
         <>
             <Row>
-                <Col span={24}>{t("widgets.commonControls.volume")}</Col>
+                <Col span={24}>{t("widgets.volumeControls.volume")}</Col>
                 <Col span={16} onMouseDown={stopPropagationHandler} onTouchStart={stopPropagationHandler}>
                     <Slider
                         min={0}
@@ -90,10 +90,10 @@ export const CommonControls: FC<CommonControlsProps> = ({ module }) => {
             <Row>
                 <Col>
                     <Checkbox checked={isMuted} onChange={handleIsMutedChange}>
-                        {t("widgets.commonControls.isMuted")}
+                        {t("widgets.volumeControls.isMuted")}
                     </Checkbox>
                     <Checkbox checked={useSystemVolume} onChange={handleUseSystemVolumeChange}>
-                        {t("widgets.commonControls.useSystemVolume")}
+                        {t("widgets.volumeControls.useSystemVolume")}
                     </Checkbox>
                 </Col>
             </Row>
