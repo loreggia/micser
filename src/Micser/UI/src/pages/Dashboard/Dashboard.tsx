@@ -9,11 +9,11 @@ import ReactFlow, {
     ConnectionMode,
     Controls,
     Edge,
-    Elements,
     FlowElement,
     FlowTransform,
+    isEdge,
+    isNode,
     Node,
-    OnLoadParams,
 } from "react-flow-renderer";
 import { Card, Drawer, Dropdown, Menu, Modal, Space, Typography } from "antd";
 import { AppstoreAddOutlined, ExclamationCircleOutlined } from "@ant-design/icons";
@@ -37,7 +37,6 @@ import { PluginsContext } from "~/hooks";
 import { getRelativeCoordinates } from "~/utils";
 import { CustomEdge } from "./CustomEdge";
 import { useGetWidgetType } from "./utils";
-import { transform } from "lodash";
 
 const FixedButton = styled.div`
     position: fixed;
@@ -68,11 +67,14 @@ const GridSize = 10;
 
 const ContextMenuActions = {
     DeleteModule: "DeleteModule",
+    DeleteConnection: "DeleteConnection",
     DeleteConnections: "DeleteConnections",
     DeleteConnectionsIn: "DeleteConnectionsIn",
     DeleteConnectionsOut: "DeleteConnectionsOut",
     DeleteAll: "DeleteAll",
 };
+
+type ContextMenuTarget = Node<Module> | Edge<ModuleConnection>;
 
 export const Dashboard = () => {
     const { t } = useTranslation();
@@ -81,7 +83,7 @@ export const Dashboard = () => {
     const [elements, setElements] = useState<FlowElement[]>([]);
     const [isAddDrawerOpen, setIsAddDrawerOpen] = useState(false);
     const [flowTransform, setFlowTransform] = useState<FlowTransform>({ x: 0, y: 0, zoom: 1 });
-    const [contextMenuTarget, setContextMenuTarget] = useState<Node<Module>>();
+    const [contextMenuTarget, setContextMenuTarget] = useState<ContextMenuTarget>();
 
     const [modules, { isLoading: isLoadingModules, refresh: loadModules }] = useGetApi<Module[]>("Modules");
     const [modulesApi, { isLoading: isLoadingModulesApi }] = useApi<Module>("Modules");
@@ -134,7 +136,7 @@ export const Dashboard = () => {
     const deleteAllModules = useCallback(async () => {
         await modulesApi?.delete("");
         loadModules();
-    }, [modulesApi]);
+    }, [modulesApi, loadModules]);
 
     const handleDragStart = (e: React.DragEvent, moduleDescription: ModuleDefinition) => {
         e.dataTransfer.setData(ModuleDescriptionKey, JSON.stringify(moduleDescription));
@@ -241,15 +243,17 @@ export const Dashboard = () => {
 
     const handlePaneContextMenu = (_: React.MouseEvent) => {
         setContextMenuTarget(undefined);
-        console.log("pane");
     };
 
     const handleNodeContextMenu = (_: React.MouseEvent, node: Node) => {
         setContextMenuTarget(node);
-        console.log("node");
     };
 
-    const handleLoad = (reactFlowInstance: OnLoadParams) => reactFlowInstance.fitView();
+    const handleEdgeContextMenu = (_: React.MouseEvent, edge: Edge) => {
+        setContextMenuTarget(edge);
+    };
+
+    // const handleLoad = (reactFlowInstance: OnLoadParams) => reactFlowInstance.fitView();
 
     const isLoading =
         isLoadingModules || isLoadingModulesApi || isLoadingModuleConnections || isLoadingModuleConnectionsApi;
@@ -259,11 +263,11 @@ export const Dashboard = () => {
             switch (key) {
                 case ContextMenuActions.DeleteAll:
                     Modal.confirm({
-                        title: "Delete All Modules",
+                        title: t("dashboard.contextMenuActions.deleteAll"),
                         icon: <ExclamationCircleOutlined />,
-                        content: "Are you sure you want to delete all modules?",
-                        okText: "Yes",
-                        cancelText: "Cancel",
+                        content: t("dashboard.contextMenuActions.deleteAllConfirmation"),
+                        okText: t("global.yes"),
+                        cancelText: t("global.cancel"),
                         onOk: () => deleteAllModules(),
                     });
                     break;
@@ -271,6 +275,11 @@ export const Dashboard = () => {
                     if (contextMenuTarget?.data) {
                         await modulesApi?.delete(contextMenuTarget.data.id);
                         loadModules();
+                    }
+                    break;
+                case ContextMenuActions.DeleteConnection:
+                    if (contextMenuTarget?.data) {
+                        await moduleConnectionsApi?.delete(contextMenuTarget.data.id);
                     }
                     break;
                 case ContextMenuActions.DeleteConnections:
@@ -282,36 +291,47 @@ export const Dashboard = () => {
             }
         };
 
-        return (
-            <Menu onClick={handleContextMenuClick}>
-                {contextMenuTarget ? (
-                    <>
-                        <Menu.Item key="DeleteModule">Delete Module</Menu.Item>
-                        <Menu.Item key="DeleteConnections">Delete Connections</Menu.Item>
-                        <Menu.Item key="DeleteConnectionsIn">Delete Incoming Connections</Menu.Item>
-                        <Menu.Item key="DeleteConnectionsOut">Delete Outgoing Connections</Menu.Item>
-                    </>
-                ) : (
-                    <>
-                        <Menu.Item key="DeleteAll">Delete All</Menu.Item>
-                    </>
-                )}
-            </Menu>
-        );
-    }, [contextMenuTarget, deleteAllModules]);
+        let menuItems: React.ReactNode;
+        if (!contextMenuTarget) {
+            menuItems = (
+                <>
+                    <Menu.Item key={ContextMenuActions.DeleteAll}>
+                        {t("dashboard.contextMenuActions.deleteAll")}
+                    </Menu.Item>
+                </>
+            );
+        } else if (isNode(contextMenuTarget)) {
+            menuItems = (
+                <>
+                    <Menu.Item key={ContextMenuActions.DeleteModule}>
+                        {t("dashboard.contextMenuActions.deleteModule")}
+                    </Menu.Item>
+                    <Menu.Item key={ContextMenuActions.DeleteConnections}>
+                        {t("dashboard.contextMenuActions.deleteConnections")}
+                    </Menu.Item>
+                    <Menu.Item key={ContextMenuActions.DeleteConnectionsIn}>
+                        {t("dashboard.contextMenuActions.deleteIncomingConnections")}
+                    </Menu.Item>
+                    <Menu.Item key={ContextMenuActions.DeleteConnectionsOut}>
+                        {t("dashboard.contextMenuActions.deleteOutgoingConnections")}
+                    </Menu.Item>
+                </>
+            );
+        } else if (isEdge(contextMenuTarget)) {
+            menuItems = (
+                <>
+                    <Menu.Item key={ContextMenuActions.DeleteConnection}>
+                        {t("dashboard.contextMenuActions.deleteConnection")}
+                    </Menu.Item>
+                </>
+            );
+        } else {
+            menuItems = <>Error</>;
+        }
 
-    const handleConnectStart = (...e: any) => {
-        console.log("handleConnectStart");
-        console.log(e);
-    };
-    const handleConnectStop = (...e: any) => {
-        console.log("handleConnectStop");
-        console.log(e);
-    };
-    const handleConnectEnd = (...e: any) => {
-        console.log("handleConnectEnd");
-        console.log(e);
-    };
+        return <Menu onClick={handleContextMenuClick}>{menuItems}</Menu>;
+    }, [contextMenuTarget, deleteAllModules, loadModules, modulesApi, t]);
+
     const handleElementsRemove = (...e: any) => {
         console.log("handleElementsRemove");
         console.log(e);
@@ -332,14 +352,6 @@ export const Dashboard = () => {
         [handleStateChanged]
     );
 
-    const handleContextMenu = () => {
-        console.log("context");
-    };
-
-    const handleSelectionChange = (elements: Elements<any> | null) => {
-        console.log(elements);
-    };
-
     return (
         <PageContainer noPadding>
             <Loader isVisible={isLoading} />
@@ -356,24 +368,20 @@ export const Dashboard = () => {
                             defaultPosition={[flowTransform.x, flowTransform.y]}
                             style={{ width: "100%", height: "100%" }}
                             selectNodesOnDrag
-                            connectionMode={ConnectionMode.Loose}
-                            onLoad={handleLoad}
+                            connectionMode={ConnectionMode.Strict}
+                            // onLoad={handleLoad}
                             onDragOver={handleDragOver}
                             onDrop={handleDrop}
                             onNodeDragStop={handleNodeDragStop}
                             onEdgeUpdate={handleEdgeUpdate}
                             onConnect={handleConnect}
-                            onConnectStart={handleConnectStart}
-                            onConnectStop={handleConnectStop}
-                            onConnectEnd={handleConnectEnd}
                             onElementsRemove={handleElementsRemove}
                             onlyRenderVisibleElements={false}
                             onMove={handleMove}
                             onMoveEnd={handleMove}
-                            onContextMenu={handleContextMenu}
                             onPaneContextMenu={handlePaneContextMenu}
                             onNodeContextMenu={handleNodeContextMenu}
-                            onSelectionChange={handleSelectionChange}
+                            onEdgeContextMenu={handleEdgeContextMenu}
                             onSelectionDragStop={handleSelectionDragStop}
                         >
                             <Controls />
@@ -382,8 +390,8 @@ export const Dashboard = () => {
                     </Dropdown>
                 </Contexts.dashboard.Provider>
                 <Drawer visible={isAddDrawerOpen} onClose={() => setIsAddDrawerOpen(false)} width="300px" mask={false}>
-                    <Title level={2}>Add Widget</Title>
-                    <Text type="secondary">Drag a widget from the list to the dashboard.</Text>
+                    <Title level={2}>{t("dashboard.widgetsDrawer.title")}</Title>
+                    <Text type="secondary">{t("dashboard.widgetsDrawer.info")}</Text>
                     <Space direction="vertical" size="middle" style={{ width: "100%" }}>
                         {widgetTypes.map((widgetType) => {
                             return (

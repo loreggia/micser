@@ -274,7 +274,7 @@ var Api = /** @class */ (function () {
 }());
 
 function useApi(path) {
-    var _a = React.useState(null), api = _a[0], setApi = _a[1];
+    var _a = React.useState(), api = _a[0], setApi = _a[1];
     var _b = React.useState(false), isLoading = _b[0], setIsLoading = _b[1];
     var _c = React.useState(), error = _c[0], setError = _c[1];
     React.useEffect(function () {

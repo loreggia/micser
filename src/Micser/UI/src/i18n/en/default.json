@@ -1,5 +1,8 @@
 {
     "global": {
+        "yes": "Yes",
+        "no": "No",
+        "cancel": "Cancel",
         "loading": "Loading..."
     },
     "error": {
@@ -10,5 +13,20 @@
     "notFound": {
         "title": "Not Found",
         "message": "The requested content could not be found. :("
+    },
+    "dashboard": {
+        "contextMenuActions": {
+            "deleteAll": "Delete All Modules",
+            "deleteAllConfirmation": "Are you sure you want to delete all modules?",
+            "deleteModule": "Delete Module",
+            "deleteConnections": "Delete Connections",
+            "deleteIncomingConnections": "Delete Incoming Connections",
+            "deleteOutgoingConnections": "Delete Outgoing Connections",
+            "deleteConnection": "Delete Connection"
+        },
+        "widgetsDrawer": {
+            "title": "Add Widget",
+            "info": "Drag a widget from the list to the dashboard."
+        }
     }
 }

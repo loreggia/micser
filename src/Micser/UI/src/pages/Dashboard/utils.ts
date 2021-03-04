@@ -15,7 +15,7 @@ export const useGetWidgetType = (widgetTypes: Widget[]) => {
                 title,
             };
         },
-        [widgetTypes]
+        [widgetTypes, t]
     );
 
     return getWidgetType;
