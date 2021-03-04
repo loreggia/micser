@@ -3,7 +3,7 @@ import { Trans } from "react-i18next";
 
 export type ErrorType = { message?: string; messageId?: string };
 
-export const showError = (error?: ErrorType) => {
+export const showError = (error?: ErrorType): void => {
     if (error) {
         let description: React.ReactNode = error.message;
 
@@ -19,7 +19,12 @@ export const showError = (error?: ErrorType) => {
     }
 };
 
-export const getRelativeCoordinates = (event: React.MouseEvent, element: Nullable<HTMLElement> = null) => {
+interface Coordinate {
+    x: number;
+    y: number;
+}
+
+export const getRelativeCoordinates = (event: React.MouseEvent, element: Nullable<HTMLElement> = null): Coordinate => {
     if (!element) {
         element = event.target as HTMLElement;
     }

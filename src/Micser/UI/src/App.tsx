@@ -16,6 +16,7 @@ import { usePlugins, PluginsContext } from "~/hooks";
 import i18n from "./i18n";
 import "./App.less";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const wnd = window as any;
 
 wnd["react"] = React;

@@ -2,16 +2,16 @@ import AxiosStatic, { AxiosError, AxiosInstance, AxiosResponse } from "axios";
 import { trimStart } from "lodash";
 
 export interface ApiOptions {
-    onError?: (e: any) => void;
+    onError?: (e: unknown) => void;
     autoLoad?: boolean;
 }
 
 export interface IApi<TData> {
-    get: (action: string, param?: {}) => Promise<IApiResultData<TData>>;
-    getList: (action: string, param?: {}) => Promise<IApiResultData<TData[]>>;
-    post: (action: string, data: {}) => Promise<IApiResultData<TData>>;
-    put: (action: string | number, data: {}) => Promise<IApiResultData<TData>>;
-    delete: (action: string | number, data?: {}) => Promise<IApiResultData<TData>>;
+    get: (action: string, param?: unknown) => Promise<IApiResultData<TData>>;
+    getList: (action: string, param?: unknown) => Promise<IApiResultData<TData[]>>;
+    post: (action: string, data: unknown) => Promise<IApiResultData<TData>>;
+    put: (action: string | number, data: unknown) => Promise<IApiResultData<TData>>;
+    delete: (action: string | number, data?: unknown) => Promise<IApiResultData<TData>>;
 }
 
 export type ErrorHandler = (error: IProblem) => void;
@@ -25,7 +25,7 @@ export interface IProblem {
     detail?: string;
     instance?: string;
     traceId?: string;
-    errors?: any;
+    errors?: unknown;
 }
 
 export interface IApiResult {
@@ -53,23 +53,23 @@ export class Api<TData> implements IApi<TData> {
         this._onError = onError;
     }
 
-    async get(action: string = "", params?: {}): Promise<IApiResultData<TData>> {
+    async get(action = "", params?: unknown): Promise<IApiResultData<TData>> {
         return this.execute(() => this._axios.get<TData>(action, { params }));
     }
 
-    async getList(action: string = "", params?: {}): Promise<IApiResultData<TData[]>> {
+    async getList(action = "", params?: unknown): Promise<IApiResultData<TData[]>> {
         return this.execute<TData[]>(() => this._axios.get<TData[]>(action, { params }));
     }
 
-    async post(action: string = "", data: {}): Promise<IApiResultData<TData>> {
+    async post(action = "", data: unknown): Promise<IApiResultData<TData>> {
         return this.execute(() => this._axios.post<TData>(action, data));
     }
 
-    async put(action: string | number, data: {}): Promise<IApiResultData<TData>> {
+    async put(action: string | number, data: unknown): Promise<IApiResultData<TData>> {
         return this.execute(() => this._axios.put<TData>(`${action}`, data));
     }
 
-    async delete(action: string | number, params?: {}): Promise<IApiResultData<TData>> {
+    async delete(action: string | number, params?: unknown): Promise<IApiResultData<TData>> {
         return this.execute(() => this._axios.delete<TData>(`${action}`, { params }));
     }
 
@@ -95,7 +95,7 @@ export class Api<TData> implements IApi<TData> {
     }
 
     private handleError<TData>(error: AxiosError): IApiResultData<TData> {
-        console.log(error);
+        // console.log(error);
         const problem: IProblem =
             error.response && error.response.data
                 ? (error.response.data as IProblem)

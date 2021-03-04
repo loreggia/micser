@@ -1,4 +1,4 @@
-import React, { MouseEvent, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import React, { FC, MouseEvent, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import { useTranslation } from "react-i18next";
 import ReactFlow, {
@@ -77,7 +77,7 @@ const ContextMenuActions = {
 
 type ContextMenuTarget = Node<Module> | Edge<ModuleConnection>;
 
-export const Dashboard = () => {
+export const Dashboard: FC = () => {
     const { t } = useTranslation();
 
     const plugins = useContext(PluginsContext);
@@ -202,8 +202,6 @@ export const Dashboard = () => {
     };
 
     const handleConnect = async ({ source, sourceHandle, target, targetHandle }: Edge | Connection) => {
-        console.log(target);
-
         const connection = {
             sourceId: Number(source),
             targetId: Number(target),
@@ -238,7 +236,7 @@ export const Dashboard = () => {
         }
     };
 
-    const handlePaneContextMenu = (_: React.MouseEvent) => {
+    const handlePaneContextMenu = () => {
         setContextMenuTarget(undefined);
     };
 
@@ -349,7 +347,7 @@ export const Dashboard = () => {
         if (elements && modulesApi && moduleConnectionsApi) {
             let reloadModules = false;
             let reloadConnections = false;
-            const tasks: Promise<any>[] = [];
+            const tasks: Promise<unknown>[] = [];
             elements.forEach((element) => {
                 if (element.data) {
                     if (isNode(element)) {

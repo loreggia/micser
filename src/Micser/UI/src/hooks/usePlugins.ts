@@ -2,6 +2,7 @@ import { createContext, useEffect, useState } from "react";
 import load from "little-loader";
 import { Plugin, PluginDefinition, useGetApi } from "micser-common";
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 const wnd = window as any;
 wnd.process = { env: {} };
 
@@ -39,11 +40,11 @@ export const usePlugins = (): [Plugin[], boolean] => {
 
             if (pluginDefinitions) {
                 for (let i = 0; i < pluginDefinitions.length; i++) {
-                    let { assemblyName, moduleName } = pluginDefinitions[i];
-                    let fileName = `/_content/${assemblyName}/plugin.js`;
+                    const { assemblyName, moduleName } = pluginDefinitions[i];
+                    const fileName = `/_content/${assemblyName}/plugin.js`;
 
-                    console.log("Loading plugin: " + fileName);
-                    let module = await loadModuleAsync(fileName, moduleName);
+                    // console.log("Loading plugin: " + fileName);
+                    const module = await loadModuleAsync(fileName, moduleName);
 
                     if (!isMounted) {
                         return;

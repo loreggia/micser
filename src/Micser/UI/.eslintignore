@@ -1,0 +1,5 @@
+.yalc
+build
+node_modules
+public
+*.config.js

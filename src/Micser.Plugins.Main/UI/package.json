@@ -8,7 +8,8 @@
         "test": "echo \"Error: no test specified\" && exit 1",
         "build": "webpack --mode production",
         "build-dev": "webpack --mode development",
-        "watch": "webpack --watch --mode development"
+        "watch": "webpack --watch --mode development",
+        "lint": "eslint ."
     },
     "dependencies": {
         "antd": "^4.9.4",
@@ -24,7 +25,10 @@
         "@babel/preset-react": "^7.12.10",
         "@types/react": "^17.0.2",
         "@types/styled-components": "^5.1.7",
+        "@typescript-eslint/eslint-plugin": "^4.16.1",
+        "@typescript-eslint/parser": "^4.2.0",
         "babel-loader": "^8.2.2",
+        "eslint": "^7.21.0",
         "ts-loader": "^8.0.17",
         "typescript": "^4.1.5",
         "webpack": "^5.10.3",

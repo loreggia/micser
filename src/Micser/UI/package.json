@@ -42,7 +42,8 @@
     "scripts": {
         "start": "craco start",
         "build": "craco build",
-        "test": "craco test"
+        "test": "craco test",
+        "lint": "eslint ."
     },
     "eslintConfig": {
         "extends": "react-app"

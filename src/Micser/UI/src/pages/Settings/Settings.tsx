@@ -1,6 +1,6 @@
-import React from "react";
+import React, { FC } from "react";
 import { PageContainer } from "~/components";
 
-export const Settings = () => {
+export const Settings: FC = () => {
     return <PageContainer>Settings</PageContainer>;
 };

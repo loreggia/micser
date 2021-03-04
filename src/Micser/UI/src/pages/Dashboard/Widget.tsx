@@ -1,4 +1,4 @@
-import React, { useContext } from "react";
+import React, { FC, useContext } from "react";
 import { Card } from "antd";
 import { Handle, Position } from "react-flow-renderer";
 import styled from "styled-components";
@@ -16,7 +16,11 @@ const WidgetCard = styled(Card)`
     max-width: 500px;
 `;
 
-export const Widget = ({ data }: { data: Module }) => {
+interface WidgetProps {
+    data: Module;
+}
+
+export const Widget: FC<WidgetProps> = ({ data }) => {
     const widgetTypes = useContext(Contexts.widgetTypes);
     const getWidgetType = useGetWidgetType(widgetTypes);
     const { type, title } = getWidgetType(data);

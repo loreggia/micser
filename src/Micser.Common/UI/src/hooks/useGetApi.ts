@@ -4,11 +4,11 @@ import { IProblem } from "../services";
 import { useApi } from "./useApi";
 
 export type ApiOptions = {
-    onError?: (e: any) => void;
+    onError?: (e: unknown) => void;
     autoLoad?: boolean;
 };
 
-export const useGetApi = <R, P = any>(
+export const useGetApi = <R, P = unknown>(
     path: string,
     action?: string,
     params?: P
