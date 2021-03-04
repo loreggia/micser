@@ -6,6 +6,7 @@
         "orta.vscode-jest",
         "patcx.vscode-nuget-gallery",
         "josefpihrt-vscode.roslynator",
-        "jpoissonnier.vscode-styled-components"
+        "jpoissonnier.vscode-styled-components",
+        "dbaeumer.vscode-eslint"
     ]
 }
