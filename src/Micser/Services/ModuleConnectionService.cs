@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Micser.Common.Modules;
@@ -53,6 +54,22 @@ namespace Micser.Services
             await using var dbContext = _dbContextFactory.CreateDbContext();
             var entity = await dbContext.ModuleConnections.FindAsync(id).ConfigureAwait(false);
             return entity == null ? null : ToModel(entity);
+        }
+
+        /// <inheritdoc />
+        public async IAsyncEnumerable<ModuleConnection> GetByModuleIdAsync(long id)
+        {
+            await using var dbContext = _dbContextFactory.CreateDbContext();
+
+            var query = dbContext
+                .ModuleConnections
+                .Where(c => c.SourceModuleId == id || c.TargetModuleId == id)
+                .AsAsyncEnumerable();
+
+            await foreach (var entity in query)
+            {
+                yield return ToModel(entity);
+            }
         }
 
         /// <inheritdoc />

@@ -1,6 +1,7 @@
 import React from "react";
-import { Loader } from "./Loader";
 import { withKnobs, text, boolean } from "@storybook/addon-knobs";
+
+import { Loader } from "./Loader";
 
 export default { title: "Loader", decorators: [withKnobs] };
 

@@ -14,11 +14,16 @@ namespace Micser.Controllers
     {
         private readonly IEnumerable<ModuleDefinition> _moduleDefinitions;
         private readonly IModuleService _moduleService;
+        private readonly IModuleConnectionService _moduleConnectionService;
 
-        public ModulesController(IModuleService moduleService, IEnumerable<ModuleDefinition> moduleDefinitions)
+        public ModulesController(
+            IModuleService moduleService,
+            IModuleConnectionService moduleConnectionService,
+            IEnumerable<ModuleDefinition> moduleDefinitions)
         {
             _moduleService = moduleService;
             _moduleDefinitions = moduleDefinitions;
+            _moduleConnectionService = moduleConnectionService;
         }
 
         [HttpPost("")]
@@ -66,6 +71,40 @@ namespace Micser.Controllers
             var module = GetModel(dto);
             await _moduleService.UpdateAsync(module).ConfigureAwait(false);
             return GetDto(module);
+        }
+        public enum ModuleConnectionDirection
+        {
+            In,
+            Out
+        }
+        [HttpDelete("{id}/connections/{direction?}")]
+        public async Task DeleteConnectionsAsync([FromRoute] long id, [FromRoute] ModuleConnectionDirection? direction = null)
+        {
+            if (id <= 0) throw new BadRequestApiException($"{nameof(id)} must be set.");
+
+            var connections = _moduleConnectionService.GetByModuleIdAsync(id);
+
+            await foreach (var connection in connections)
+            {
+                switch (direction)
+                {
+                    case ModuleConnectionDirection.In:
+                        if (connection.TargetId == id)
+                        {
+                            await _moduleConnectionService.DeleteAsync(connection.Id).ConfigureAwait(false);
+                        }
+                        break;
+                    case ModuleConnectionDirection.Out:
+                        if (connection.SourceId == id)
+                        {
+                            await _moduleConnectionService.DeleteAsync(connection.Id).ConfigureAwait(false);
+                        }
+                        break;
+                    default:
+                        await _moduleConnectionService.DeleteAsync(connection.Id).ConfigureAwait(false);
+                        break;
+                }
+            }
         }
 
         private static ModuleDto GetDto(Module module)

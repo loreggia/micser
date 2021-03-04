@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { Api, IApi, IProblem } from "services";
 
-export function useApi<R>(path: string): [IApi<R>, { isLoading: boolean; error?: IProblem }] {
+import { Api, IApi, IProblem } from "../services";
+
+export function useApi<R>(path: string): [IApi<R> | undefined, { isLoading: boolean; error?: IProblem }] {
     const [api, setApi] = useState<IApi<R>>();
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<IProblem>();

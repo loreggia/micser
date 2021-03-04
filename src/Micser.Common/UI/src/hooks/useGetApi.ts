@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
-import { IProblem } from "services";
+
+import { IProblem } from "../services";
 import { useApi } from "./useApi";
 
 export type ApiOptions = {
@@ -9,12 +10,12 @@ export type ApiOptions = {
 
 export const useGetApi = <R, P = any>(
     path: string,
-    action?: Nullable<string>,
+    action?: string,
     params?: P
-): [Nullable<R>, { refresh: () => void; isLoading: boolean; error?: IProblem }] => {
+): [R | undefined, { refresh: () => void; isLoading: boolean; error?: IProblem }] => {
     const [api, { isLoading, error }] = useApi<R>(path);
 
-    const [result, setResult] = useState<Nullable<R>>(null);
+    const [result, setResult] = useState<R>();
     const [refreshIndex, setRefreshIndex] = useState(0);
 
     useEffect(() => {

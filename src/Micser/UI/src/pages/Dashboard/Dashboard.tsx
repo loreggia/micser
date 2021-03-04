@@ -9,6 +9,7 @@ import ReactFlow, {
     ConnectionMode,
     Controls,
     Edge,
+    Elements,
     FlowElement,
     FlowTransform,
     isEdge,
@@ -123,6 +124,7 @@ export const Dashboard = () => {
                     label: `${sourceTitle} \u2192 ${targetTitle}`,
                     arrowHeadType: ArrowHeadType.ArrowClosed,
                     type: "Custom",
+                    data: dto,
                 };
             });
 
@@ -132,11 +134,6 @@ export const Dashboard = () => {
 
     const nodeTypes = useMemo(() => ({ Widget: Widget }), []);
     const edgeTypes = useMemo(() => ({ Custom: CustomEdge }), []);
-
-    const deleteAllModules = useCallback(async () => {
-        await modulesApi?.delete("");
-        loadModules();
-    }, [modulesApi, loadModules]);
 
     const handleDragStart = (e: React.DragEvent, moduleDescription: ModuleDefinition) => {
         e.dataTransfer.setData(ModuleDescriptionKey, JSON.stringify(moduleDescription));
@@ -268,7 +265,10 @@ export const Dashboard = () => {
                         content: t("dashboard.contextMenuActions.deleteAllConfirmation"),
                         okText: t("global.yes"),
                         cancelText: t("global.cancel"),
-                        onOk: () => deleteAllModules(),
+                        onOk: async () => {
+                            await modulesApi?.delete("");
+                            loadModules();
+                        },
                     });
                     break;
                 case ContextMenuActions.DeleteModule:
@@ -280,13 +280,26 @@ export const Dashboard = () => {
                 case ContextMenuActions.DeleteConnection:
                     if (contextMenuTarget?.data) {
                         await moduleConnectionsApi?.delete(contextMenuTarget.data.id);
+                        loadModuleConnections();
                     }
                     break;
                 case ContextMenuActions.DeleteConnections:
+                    if (contextMenuTarget?.data) {
+                        await modulesApi?.delete(`${contextMenuTarget.data.id}/connections`);
+                        loadModuleConnections();
+                    }
                     break;
                 case ContextMenuActions.DeleteConnectionsIn:
+                    if (contextMenuTarget?.data) {
+                        await modulesApi?.delete(`${contextMenuTarget.data.id}/connections/in`);
+                        loadModuleConnections();
+                    }
                     break;
                 case ContextMenuActions.DeleteConnectionsOut:
+                    if (contextMenuTarget?.data) {
+                        await modulesApi?.delete(`${contextMenuTarget.data.id}/connections/out`);
+                        loadModuleConnections();
+                    }
                     break;
             }
         };
@@ -330,11 +343,34 @@ export const Dashboard = () => {
         }
 
         return <Menu onClick={handleContextMenuClick}>{menuItems}</Menu>;
-    }, [contextMenuTarget, deleteAllModules, loadModules, modulesApi, t]);
+    }, [contextMenuTarget, modulesApi, moduleConnectionsApi, loadModules, loadModuleConnections, t]);
 
-    const handleElementsRemove = (...e: any) => {
-        console.log("handleElementsRemove");
-        console.log(e);
+    const handleElementsRemove = async (elements: Elements) => {
+        if (elements && modulesApi && moduleConnectionsApi) {
+            let reloadModules = false;
+            let reloadConnections = false;
+            const tasks: Promise<any>[] = [];
+            elements.forEach((element) => {
+                if (element.data) {
+                    if (isNode(element)) {
+                        tasks.push(modulesApi.delete(element.data.id));
+                        reloadModules = true;
+                    } else if (isEdge(element)) {
+                        tasks.push(moduleConnectionsApi.delete(element.data.id));
+                        reloadConnections = true;
+                    }
+                }
+            });
+
+            await Promise.all(tasks);
+
+            if (reloadModules) {
+                loadModules();
+            }
+            if (reloadConnections) {
+                loadModuleConnections();
+            }
+        }
     };
 
     const handleStateChanged = useCallback(

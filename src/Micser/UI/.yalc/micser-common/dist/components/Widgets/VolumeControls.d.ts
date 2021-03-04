@@ -1,5 +1,5 @@
 import { FC } from "react";
-import { Module } from "models";
+import { Module } from "../../models";
 export interface VolumeControlsProps {
     module: Module;
 }

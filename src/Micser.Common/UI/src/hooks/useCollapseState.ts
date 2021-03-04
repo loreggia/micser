@@ -1,6 +1,7 @@
 import { useCallback, useContext, useEffect, useState } from "react";
-import { Contexts } from "Contexts";
-import { Module } from "models";
+
+import { Contexts } from "../Contexts";
+import { Module } from "../models";
 
 type CollapseKeys = string | string[];
 

@@ -28,6 +28,11 @@ namespace Micser.Common.Services
         Task<ModuleConnection?> GetByIdAsync(long id);
 
         /// <summary>
+        /// Gets all connections from or to the specified module.
+        /// </summary>
+        IAsyncEnumerable<ModuleConnection> GetByModuleIdAsync(long moduleId);
+
+        /// <summary>
         /// Inserts a new connection to the DB.
         /// </summary>
         /// <param name="mc">The connection.</param>

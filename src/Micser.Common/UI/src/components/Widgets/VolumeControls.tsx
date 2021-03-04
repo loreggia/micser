@@ -3,9 +3,9 @@ import { Checkbox, Col, InputNumber, Row, Slider } from "antd";
 import { CheckboxChangeEvent } from "antd/lib/checkbox";
 import { useTranslation } from "react-i18next";
 
-import { Module } from "models";
-import { Contexts } from "Contexts";
-import { parseBool } from "utils";
+import { Module } from "../../models";
+import { Contexts } from "../../Contexts";
+import { parseBool } from "../../utils";
 
 export interface VolumeControlsProps {
     module: Module;
