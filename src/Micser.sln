@@ -35,6 +35,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Build", "Build", "{0375FFB5-1AD8-422F-8D7B-91B8FF152018}"
 	ProjectSection(SolutionItems) = preProject
 		Directory.Build.props = Directory.Build.props
+		Micser.sln.DotSettings = Micser.sln.DotSettings
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Micser.Common", "Micser.Common\Micser.Common.csproj", "{5051C74D-25AB-4F5A-8D0B-DBBD4428C602}"
