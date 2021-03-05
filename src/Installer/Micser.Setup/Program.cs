@@ -1,4 +1,6 @@
-﻿using System;
+﻿//#define VAC
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Micser.Setup.CustomActions;
@@ -13,8 +15,6 @@ namespace Micser.Setup
     {
         private static void Main()
         {
-            const bool enableVac = false;
-
             bool FileFilter(string file)
             {
                 var excludedFiles = new[]
@@ -116,7 +116,7 @@ namespace Micser.Setup
 
             var actions = new List<Action>();
 
-            if (enableVac)
+#if VAC
             {
                 var vacFeature = new Feature("Virtual Audio Cable", "Installs the Micser Virtual Audio Cable driver.", true, true)
                 {
@@ -162,6 +162,7 @@ namespace Micser.Setup
                     UsesProperties = ""
                 });
             }
+#endif
 
             actions.Add(new InstalledFileAction(launchAppAction, appId, "")
             {
