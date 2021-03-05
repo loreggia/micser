@@ -10,31 +10,40 @@ namespace Micser.Plugins.Main.Modules
         public CompressorModule(ILogger<CompressorModule> logger)
             : base(logger)
         {
+            Amount = Defaults.Amount;
+            Attack = Defaults.Attack;
+            Knee = Defaults.Knee;
+            MakeUpGain = Defaults.MakeUpGain;
+            Ratio = Defaults.Ratio;
+            Release = Defaults.Release;
+            Threshold = Defaults.Threshold;
+            Type = Defaults.Type;
+
             AddSampleProcessor(new CompressorSampleProcessor(this));
         }
 
-        [SaveState(Defaults.Amount)]
+        [SaveState]
         public float Amount { get; set; }
 
-        [SaveState(Defaults.Attack)]
+        [SaveState]
         public float Attack { get; set; }
 
-        [SaveState(Defaults.Knee)]
+        [SaveState]
         public float Knee { get; set; }
 
-        [SaveState(Defaults.MakeUpGain)]
+        [SaveState]
         public float MakeUpGain { get; set; }
 
-        [SaveState(Defaults.Ratio)]
+        [SaveState]
         public float Ratio { get; set; }
 
-        [SaveState(Defaults.Release)]
+        [SaveState]
         public float Release { get; set; }
 
-        [SaveState(Defaults.Threshold)]
+        [SaveState]
         public float Threshold { get; set; }
 
-        [SaveState(Defaults.Type)]
+        [SaveState]
         public CompressorType Type { get; set; }
 
         public static class Defaults

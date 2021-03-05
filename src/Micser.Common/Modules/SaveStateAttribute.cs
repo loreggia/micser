@@ -9,17 +9,10 @@ namespace Micser.Common.Modules
     public class SaveStateAttribute : Attribute
     {
         /// <summary>
-        /// Creates an instance of the <see cref="SaveStateAttribute"/> class with the specified default value.
+        /// Creates an instance of the <see cref="SaveStateAttribute"/> class.
         /// </summary>
-        /// <param name="defaultValue">The value to use if the property is not set.</param>
-        public SaveStateAttribute(object defaultValue)
+        public SaveStateAttribute()
         {
-            DefaultValue = defaultValue;
         }
-
-        /// <summary>
-        /// Gets the property's default value.
-        /// </summary>
-        public object DefaultValue { get; }
     }
 }

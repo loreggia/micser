@@ -40,9 +40,9 @@ namespace Micser.Common.Extensions
             var properties = obj.GetStateProperties();
             foreach (var property in properties)
             {
-                var value = property.Key.GetValue(obj) ?? property.Value.DefaultValue;
+                var value = property.Key.GetValue(obj);
 
-                state[property.Key.Name] = value.ToType<string>();
+                state[property.Key.Name] = value?.ToType<string>();
             }
         }
 
@@ -70,15 +70,11 @@ namespace Micser.Common.Extensions
             var properties = obj.GetStateProperties();
             foreach (var property in properties)
             {
-                object? value;
+                object? value = null;
                 var propertyType = property.Key.PropertyType;
                 if (state.ContainsKey(property.Key.Name))
                 {
                     value = state[property.Key.Name];
-                }
-                else
-                {
-                    value = property.Value.DefaultValue;
                 }
 
                 if (value != null && value.GetType() != propertyType)
@@ -102,10 +98,6 @@ namespace Micser.Common.Extensions
                             if (fromConverter.CanConvertTo(propertyType))
                             {
                                 value = fromConverter.ConvertTo(value, propertyType);
-                            }
-                            else
-                            {
-                                value = property.Value.DefaultValue;
                             }
                         }
                     }

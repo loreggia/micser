@@ -12,18 +12,21 @@ namespace Micser.Plugins.Main.Modules
         public PitchModule(ILogger<PitchModule> logger)
             : base(logger)
         {
+            Pitch = Defaults.Pitch;
+            Quality = Defaults.Quality;
+
             AddSampleProcessor(new PitchSampleProcessor(this));
         }
 
         public int FftSize { get; set; }
         public int Oversampling { get; set; }
 
-        [SaveState(Defaults.Pitch)]
+        [SaveState]
         public float Pitch { get; set; }
 
         public float PitchFactor { get; set; }
 
-        [SaveState(Defaults.Quality)]
+        [SaveState]
         public int Quality { get; set; }
 
         public override void SetState(ModuleState state)

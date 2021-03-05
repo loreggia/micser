@@ -21,7 +21,7 @@ namespace Micser.Common.Audio
         private readonly ILogger _logger;
         private readonly IList<IAudioModule> _outputs;
 
-        private readonly IList<ISampleProcessor> _sampleProcessors;
+        private readonly List<ISampleProcessor> _sampleProcessors;
         private float[]? _channelSamplesBuffer;
         private float _volume = 1f;
         private IWaveBuffer? _waveBuffer;
@@ -50,6 +50,8 @@ namespace Micser.Common.Audio
 
         /// <inheritdoc />
         public virtual bool IsMuted { get; set; }
+
+        public IEnumerable<ISampleProcessor> SampleProcessors => _sampleProcessors.AsReadOnly();
 
         /// <inheritdoc />
         public virtual bool UseSystemVolume { get; set; }

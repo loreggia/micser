@@ -10,10 +10,17 @@ namespace Micser.Plugins.Main.Modules
         public GainModule(ILogger<GainModule> logger)
             : base(logger)
         {
+            Gain = Defaults.Gain;
+
             AddSampleProcessor(new GainSampleProcessor(this));
         }
 
-        [SaveState(0f)]
+        [SaveState]
         public float Gain { get; set; }
+
+        public static class Defaults
+        {
+            public const float Gain = 0f;
+        }
     }
 }
