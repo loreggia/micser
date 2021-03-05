@@ -135,13 +135,13 @@ export const Dashboard: FC = () => {
     const nodeTypes = useMemo(() => ({ Widget: Widget }), []);
     const edgeTypes = useMemo(() => ({ Custom: CustomEdge }), []);
 
-    const handleDragStart = (e: React.DragEvent, moduleDescription: ModuleDefinition) => {
+    const handleDragStart = (e: React.DragEvent, moduleDescription: ModuleDefinition): void => {
         e.dataTransfer.setData(ModuleDescriptionKey, JSON.stringify(moduleDescription));
         const offset = getRelativeCoordinates(e);
         e.dataTransfer.setData(DragOffsetKey, JSON.stringify(offset));
     };
 
-    const handleDragOver = (e: React.DragEvent) => {
+    const handleDragOver = (e: React.DragEvent): void => {
         if (e.dataTransfer.types.includes(ModuleDescriptionKey)) {
             e.preventDefault();
         }

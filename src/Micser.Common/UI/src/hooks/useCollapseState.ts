@@ -30,7 +30,7 @@ export const useCollapseState = (
             const value = JSON.stringify(keys);
             dashboardContext.onStateChanged(module, { activeCollapseKeys: value });
         },
-        [module, dashboardContext.onStateChanged]
+        [module, dashboardContext]
     );
 
     return [activeKeys, handleChange];

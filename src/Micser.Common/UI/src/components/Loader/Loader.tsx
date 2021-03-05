@@ -19,7 +19,7 @@ export interface LoaderProps {
     suspenseTime?: number;
 }
 
-export const Loader: FC<LoaderProps> = ({ isVisible, tip, suspenseTime }) => {
+export const Loader: FC<LoaderProps> = ({ isVisible, tip, suspenseTime }: LoaderProps) => {
     const [isVisibleInternal, setIsVisibleInternal] = useState(false);
 
     useEffect(() => {
@@ -38,7 +38,7 @@ export const Loader: FC<LoaderProps> = ({ isVisible, tip, suspenseTime }) => {
         return () => {
             clearTimeout(timeout);
         };
-    }, [isVisible]);
+    }, [isVisible, suspenseTime]);
 
     return isVisibleInternal ? (
         <Container>

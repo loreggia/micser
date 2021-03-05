@@ -1,7 +1,7 @@
 import React from "react";
-import { WidgetFC } from "micser-common";
+import { WidgetFC, WidgetProps } from "micser-common";
 import { DeviceType, DeviceWidget } from "./DeviceWidget";
 
-export const DeviceOutputWidget: WidgetFC = ({ module }) => {
+export const DeviceOutputWidget: WidgetFC = ({ module }: WidgetProps) => {
     return <DeviceWidget module={module} type={DeviceType.output} />;
 };

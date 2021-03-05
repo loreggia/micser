@@ -24,7 +24,7 @@ export interface DeviceWidgetProps extends WidgetProps {
     type: DeviceType;
 }
 
-export const DeviceWidget: FC<DeviceWidgetProps> = ({ module, type }) => {
+export const DeviceWidget: FC<DeviceWidgetProps> = ({ module, type }: DeviceWidgetProps) => {
     const { t } = useTranslation();
     const [devices, { isLoading }] = useGetApi<DeviceDescription[]>(`Devices/${type}`);
 

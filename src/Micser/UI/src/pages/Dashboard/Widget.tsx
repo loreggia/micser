@@ -2,11 +2,11 @@ import React, { FC, useContext } from "react";
 import { Card } from "antd";
 import { Handle, Position } from "react-flow-renderer";
 import styled from "styled-components";
-import { Contexts, Module, WidgetFC } from "micser-common";
+import { Contexts, Module, WidgetFC, WidgetProps } from "micser-common";
 import { useGetWidgetType } from "./utils";
 
-const ErrorContent: WidgetFC = ({ module }) => {
-    return <>Widget for module type '{module?.type}' not found.</>;
+const ErrorContent: WidgetFC = ({ module }: WidgetProps) => {
+    return <>Widget for module type &apos;{module?.type}&apos; not found.</>;
 };
 
 const WidgetCard = styled(Card)`
@@ -16,11 +16,11 @@ const WidgetCard = styled(Card)`
     max-width: 500px;
 `;
 
-interface WidgetProps {
+interface WidgetNodeProps {
     data: Module;
 }
 
-export const Widget: FC<WidgetProps> = ({ data }) => {
+export const Widget: FC<WidgetNodeProps> = ({ data }: WidgetNodeProps) => {
     const widgetTypes = useContext(Contexts.widgetTypes);
     const getWidgetType = useGetWidgetType(widgetTypes);
     const { type, title } = getWidgetType(data);

@@ -10,7 +10,7 @@ const Brand = styled.div`
     color: white;
 `;
 
-export const Navigation: FC<Stylable> = ({ className }) => {
+export const Navigation: FC<Stylable> = ({ className }: Stylable) => {
     const location = useLocation();
 
     return (

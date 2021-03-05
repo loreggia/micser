@@ -13,8 +13,8 @@ export const CustomEdge: FC<EdgeProps> = ({
     label,
     arrowHeadType,
     markerEndId,
-    // selected,
-}) => {
+}: // selected,
+EdgeProps) => {
     const edgePath = getBezierPath({ sourceX, sourceY, sourcePosition, targetX, targetY, targetPosition });
     const markerEnd = getMarkerEnd(arrowHeadType, markerEndId);
     style.cursor = "pointer";

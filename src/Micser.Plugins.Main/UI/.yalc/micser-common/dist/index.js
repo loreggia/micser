@@ -92,7 +92,7 @@ var Loader = function (_a) {
         return function () {
             clearTimeout(timeout);
         };
-    }, [isVisible]);
+    }, [isVisible, suspenseTime]);
     return isVisibleInternal ? (React__default['default'].createElement(Container, null,
         React__default['default'].createElement(antd.Spin, { tip: tip }))) : null;
 };
@@ -296,7 +296,7 @@ function useApi(path) {
         return function () {
             canceled = true;
         };
-    }, []);
+    }, [path]);
     return [api, { isLoading: isLoading, error: error }];
 }
 
@@ -327,7 +327,7 @@ var useGetApi = function (path, action, params) {
         return function () {
             canceled = true;
         };
-    }, [api, params, refreshIndex]);
+    }, [api, action, params, refreshIndex]);
     var refresh = React.useCallback(function () {
         setRefreshIndex(function (i) { return i + 1; });
     }, []);
@@ -352,7 +352,7 @@ var useCollapseState = function (module, defaultActiveKeys) {
         setActiveKeys(keys);
         var value = JSON.stringify(keys);
         dashboardContext.onStateChanged(module, { activeCollapseKeys: value });
-    }, [module, dashboardContext.onStateChanged]);
+    }, [module, dashboardContext]);
     return [activeKeys, handleChange];
 };
 

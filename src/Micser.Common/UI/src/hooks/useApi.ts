@@ -33,7 +33,7 @@ export function useApi<R>(path: string): [IApi<R> | undefined, { isLoading: bool
         return () => {
             canceled = true;
         };
-    }, []);
+    }, [path]);
 
     return [api, { isLoading, error }];
 }

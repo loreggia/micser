@@ -36,7 +36,7 @@ export const useGetApi = <R, P = unknown>(
         return () => {
             canceled = true;
         };
-    }, [api, params, refreshIndex]);
+    }, [api, action, params, refreshIndex]);
 
     const refresh = useCallback(() => {
         setRefreshIndex((i) => i + 1);

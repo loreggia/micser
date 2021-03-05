@@ -1,4 +1,4 @@
-import React, { memo, Suspense, useEffect } from "react";
+import React, { FC, memo, Suspense, useEffect } from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { Layout } from "antd";
 import styled from "styled-components";
@@ -25,7 +25,7 @@ wnd["antd"] = antd;
 wnd["react-i18next"] = ReactI18Next;
 wnd["micser-common"] = Common;
 
-const App = () => {
+const App: FC = () => {
     const [plugins, isLoadingPlugins] = usePlugins();
 
     // load plugin resources
@@ -42,7 +42,7 @@ const App = () => {
         });
     }, [plugins]);
 
-    const handleContextMenu = (e: React.MouseEvent) => {
+    const handleContextMenu = (e: React.MouseEvent): void => {
         e.preventDefault();
     };
 
@@ -52,28 +52,28 @@ const App = () => {
                 {isLoadingPlugins ? (
                     <Common.Loader isVisible />
                 ) : (
-                    <Router>
-                        <Layout style={{ minHeight: "100vh" }} onContextMenu={handleContextMenu}>
-                            <>
-                                <Common.Loader isVisible={isLoadingPlugins} />
+                        <Router>
+                            <Layout style={{ minHeight: "100vh" }} onContextMenu={handleContextMenu}>
+                                <>
+                                    <Common.Loader isVisible={isLoadingPlugins} />
 
-                                <Navigation />
+                                    <Navigation />
 
-                                <Layout>
-                                    <Switch>
-                                        <Route path={Routes.dashboard.index} exact>
-                                            <Dashboard />
-                                        </Route>
-                                        <Route path={Routes.settings.index}>
-                                            <Settings />
-                                        </Route>
-                                        <NotFound />
-                                    </Switch>
-                                </Layout>
-                            </>
-                        </Layout>
-                    </Router>
-                )}
+                                    <Layout>
+                                        <Switch>
+                                            <Route path={Routes.dashboard.index} exact>
+                                                <Dashboard />
+                                            </Route>
+                                            <Route path={Routes.settings.index}>
+                                                <Settings />
+                                            </Route>
+                                            <NotFound />
+                                        </Switch>
+                                    </Layout>
+                                </>
+                            </Layout>
+                        </Router>
+                    )}
             </PluginsContext.Provider>
         </Suspense>
     );

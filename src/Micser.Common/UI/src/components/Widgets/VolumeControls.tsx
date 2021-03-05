@@ -11,7 +11,7 @@ export interface VolumeControlsProps {
     module: Module;
 }
 
-export const VolumeControls: FC<VolumeControlsProps> = ({ module }) => {
+export const VolumeControls: FC<VolumeControlsProps> = ({ module }: VolumeControlsProps) => {
     const { t } = useTranslation();
 
     const dashboardContext = useContext(Contexts.dashboard);
