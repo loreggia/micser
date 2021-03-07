@@ -111,7 +111,6 @@ namespace Micser
             services.AddTransient<IModuleService, ModuleService>();
             services.AddTransient<IModuleConnectionService, ModuleConnectionService>();
 
-            services.AddSingleton<ISettingsRegistry, SettingsRegistry>();
             services.AddSingleton<ISettingsService, SettingsService<EngineDbContext>>();
             services.AddSingleton<ISettingHandlerFactory>(sp => new SettingHandlerFactory(t => (ISettingHandler?)sp.GetService(t)));
 

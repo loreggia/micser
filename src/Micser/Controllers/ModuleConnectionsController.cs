@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Micser.Common.Audio;
 using Micser.Common.Controllers;
 using Micser.Common.Modules;
 using Micser.Common.Services;
@@ -11,11 +12,13 @@ namespace Micser.Controllers
 {
     public class ModuleConnectionsController : ApiController
     {
+        private readonly IAudioEngine _audioEngine;
         private readonly IModuleConnectionService _moduleConnectionService;
 
-        public ModuleConnectionsController(IModuleConnectionService moduleConnectionService)
+        public ModuleConnectionsController(IModuleConnectionService moduleConnectionService, IAudioEngine audioEngine)
         {
             _moduleConnectionService = moduleConnectionService;
+            _audioEngine = audioEngine;
         }
 
         [HttpPost("")]
@@ -23,7 +26,20 @@ namespace Micser.Controllers
         {
             var connection = GetModel(dto);
             await _moduleConnectionService.InsertAsync(connection).ConfigureAwait(false);
+
+            await _audioEngine.AddConnectionAsync(connection.Id).ConfigureAwait(false);
+
             return GetDto(connection);
+        }
+
+        [HttpDelete("{id}")]
+        public async Task<ModuleConnectionDto> DeleteAsync([FromRoute] long id)
+        {
+            var result = await _moduleConnectionService.DeleteAsync(id).ConfigureAwait(false) ?? throw new NotFoundApiException();
+
+            await _audioEngine.RemoveConnectionAsync(id).ConfigureAwait(false);
+
+            return GetDto(result);
         }
 
         [HttpGet("")]
@@ -42,23 +58,14 @@ namespace Micser.Controllers
 
             dto.Id = id;
 
-            if (dto.SourceId == dto.TargetId)
-            {
-                // workaround for the current react-flow -> delete when source and target are the same
-                var deleted = await _moduleConnectionService.DeleteAsync(id).ConfigureAwait(false) ?? throw new NotFoundApiException();
-                return GetDto(deleted);
-            }
+            await _audioEngine.RemoveConnectionAsync(id).ConfigureAwait(false);
 
             var connection = GetModel(dto);
             await _moduleConnectionService.UpdateAsync(connection).ConfigureAwait(false);
-            return GetDto(connection);
-        }
 
-        [HttpDelete("{id}")]
-        public async Task<ModuleConnectionDto> DeleteAsync([FromRoute] long id)
-        {
-            var result = await _moduleConnectionService.DeleteAsync(id).ConfigureAwait(false) ?? throw new NotFoundApiException();
-            return GetDto(result);
+            await _audioEngine.AddConnectionAsync(id).ConfigureAwait(false);
+
+            return GetDto(connection);
         }
 
         private static ModuleConnectionDto GetDto(ModuleConnection connection)

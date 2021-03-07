@@ -86,7 +86,7 @@ namespace Micser.Common.Audio
         {
             base.SetState(state);
 
-            var deviceId = state.GetObject<string>(Globals.StateKeys.DeviceId);
+            var deviceId = state.GetValue<string>(Globals.StateKeys.DeviceId);
             if (deviceId != null)
             {
                 var deviceService = new DeviceService();
@@ -99,7 +99,7 @@ namespace Micser.Common.Audio
 
             if (AdapterName == null)
             {
-                AdapterName = state.GetObject<string>(nameof(AdapterName));
+                AdapterName = state.GetValue<string>(nameof(AdapterName));
             }
         }
 

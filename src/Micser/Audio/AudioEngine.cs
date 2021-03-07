@@ -6,6 +6,7 @@ using CSCore.CoreAudioAPI;
 using Microsoft.Extensions.Logging;
 using Micser.Common.Audio;
 using Micser.Common.Extensions;
+using Micser.Common.Modules;
 using Micser.Common.Services;
 
 namespace Micser.Audio
@@ -17,17 +18,20 @@ namespace Micser.Audio
         private readonly AudioEndpointVolumeCallback _endpointVolumeCallback;
         private readonly ILogger<AudioEngine> _logger;
         private readonly IModuleConnectionService _moduleConnectionService;
+        private readonly IEnumerable<ModuleDefinition> _moduleDefinitions;
         private readonly List<IAudioModule> _modules;
         private readonly IModuleService _moduleService;
         private AudioEndpointVolume? _endpointVolume;
 
         public AudioEngine(
             // todo create audio module factory
+            IEnumerable<ModuleDefinition> moduleDefinitions,
             IServiceProvider container,
             ILogger<AudioEngine> logger,
             IModuleService moduleService,
             IModuleConnectionService moduleConnectionService)
         {
+            _moduleDefinitions = moduleDefinitions;
             _container = container;
             _logger = logger;
             _moduleService = moduleService;
@@ -65,10 +69,11 @@ namespace Micser.Audio
                 return;
             }
 
-            var type = Type.GetType(moduleDto.Type);
-            if (type != null)
+            var definition = _moduleDefinitions.FirstOrDefault(d => d.Name == moduleDto.Type);
+
+            if (definition?.Type != null)
             {
-                if (_container.GetService(type) is IAudioModule audioModule)
+                if (_container.GetService(definition.Type) is IAudioModule audioModule)
                 {
                     audioModule.Id = id;
                     audioModule.SetState(moduleDto.State);
@@ -157,12 +162,14 @@ namespace Micser.Audio
                 if (source == null)
                 {
                     _logger.LogWarning($"Source module for connection not found. ID: {connection.SourceId}");
+                    await _moduleConnectionService.DeleteAsync(connection.Id).ConfigureAwait(false);
                     continue;
                 }
 
                 if (target == null)
                 {
                     _logger.LogWarning($"Target module for connection not found. ID: {connection.TargetId}");
+                    await _moduleConnectionService.DeleteAsync(connection.Id).ConfigureAwait(false);
                     continue;
                 }
 

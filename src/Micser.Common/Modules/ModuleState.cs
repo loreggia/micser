@@ -70,6 +70,11 @@ namespace Micser.Common.Modules
             set => SetPropertyValue(value);
         }
 
+        public T? GetValue<T>(string key, T? defaultValue = default)
+        {
+            return GetPropertyValue<T>(key) ?? defaultValue;
+        }
+
         private T? GetPropertyValue<T>([CallerMemberName] string propertyName = null!)
         {
             return TryGetValue(propertyName.ToCamelCase(), out var value) && value != null ? value.ToType<T>() : default;

@@ -22,7 +22,7 @@ namespace Micser.Settings
 
         private readonly SemaphoreSlim _loadSemaphore;
         private readonly ILogger<SettingsService<TDbContext>> _logger;
-        private readonly ISettingsRegistry _registry;
+        private readonly IEnumerable<SettingDefinition> _settingDefinitions;
         private readonly ISettingHandlerFactory _settingHandlerFactory;
         private readonly IDictionary<string, object?> _settings;
         private bool _isLoaded;
@@ -30,7 +30,7 @@ namespace Micser.Settings
         public SettingsService(
             IDbContextFactory<TDbContext> dbContextFactory,
             ISettingHandlerFactory settingHandlerFactory,
-            ISettingsRegistry registry,
+            IEnumerable<SettingDefinition> settingDefinitions,
             //SettingsApiClient apiClient,
             ILogger<SettingsService<TDbContext>> logger)
         {
@@ -39,7 +39,7 @@ namespace Micser.Settings
 
             _dbContextFactory = dbContextFactory;
             _settingHandlerFactory = settingHandlerFactory;
-            _registry = registry;
+            _settingDefinitions = settingDefinitions;
             //_apiClient = apiClient;
             _logger = logger;
         }
@@ -92,7 +92,7 @@ namespace Micser.Settings
             {
                 await using var dbContext = _dbContextFactory.CreateDbContext();
 
-                foreach (var setting in _registry.Items)
+                foreach (var setting in _settingDefinitions)
                 {
                     object? value = null;
 
@@ -163,7 +163,7 @@ namespace Micser.Settings
         {
             await LoadAsync().ConfigureAwait(false);
 
-            var setting = _registry.Items.FirstOrDefault(i => string.Equals(i.Key, key, StringComparison.InvariantCultureIgnoreCase));
+            var setting = _settingDefinitions.FirstOrDefault(i => string.Equals(i.Key, key, StringComparison.InvariantCultureIgnoreCase));
 
             if (setting == null)
             {

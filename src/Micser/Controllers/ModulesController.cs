@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Micser.Common.Audio;
 using Micser.Common.Controllers;
 using Micser.Common.Extensions;
 using Micser.Common.Modules;
@@ -12,6 +13,7 @@ namespace Micser.Controllers
 {
     public class ModulesController : ApiController
     {
+        private readonly IAudioEngine _audioEngine;
         private readonly IModuleConnectionService _moduleConnectionService;
         private readonly IEnumerable<ModuleDefinition> _moduleDefinitions;
         private readonly IModuleService _moduleService;
@@ -19,10 +21,12 @@ namespace Micser.Controllers
         public ModulesController(
             IModuleService moduleService,
             IModuleConnectionService moduleConnectionService,
-            IEnumerable<ModuleDefinition> moduleDefinitions)
+            IEnumerable<ModuleDefinition> moduleDefinitions,
+            IAudioEngine audioEngine)
         {
             _moduleService = moduleService;
             _moduleDefinitions = moduleDefinitions;
+            _audioEngine = audioEngine;
             _moduleConnectionService = moduleConnectionService;
         }
 
@@ -37,6 +41,7 @@ namespace Micser.Controllers
         {
             var module = GetModel(dto);
             await _moduleService.InsertAsync(module).ConfigureAwait(false);
+            await _audioEngine.AddModuleAsync(module.Id).ConfigureAwait(false);
             return GetDto(module);
         }
 
@@ -46,10 +51,13 @@ namespace Micser.Controllers
             if (id == null)
             {
                 await _moduleService.TruncateAsync().ConfigureAwait(false);
+                await _audioEngine.StopAsync().ConfigureAwait(false);
+                await _audioEngine.StartAsync().ConfigureAwait(false);
             }
             else
             {
                 await _moduleService.DeleteAsync(id.Value).ConfigureAwait(false);
+                await _audioEngine.RemoveModuleAsync(id.Value).ConfigureAwait(false);
             }
         }
 
@@ -99,6 +107,8 @@ namespace Micser.Controllers
             dto.Id = id;
             var module = GetModel(dto);
             await _moduleService.UpdateAsync(module).ConfigureAwait(false);
+
+            await _audioEngine.UpdateModuleAsync(module.Id).ConfigureAwait(false);
 
             return GetDto(module);
         }

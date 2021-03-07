@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Micser.Common.Audio;
 using Micser.Common.Modules;
+using Micser.Common.Settings;
 using NLog.Config;
 using NLog.Extensions.Logging;
 using NLog.Targets;
@@ -18,8 +19,8 @@ namespace Micser.Common.Extensions
         public static IServiceCollection AddAudioModule<TModule>(this IServiceCollection services, string name)
             where TModule : class, IAudioModule
         {
-            services.AddTransient<IAudioModule, TModule>();
-            services.AddSingleton(new ModuleDefinition(name));
+            services.AddTransient<TModule>();
+            services.AddSingleton(new ModuleDefinition(name, typeof(TModule)));
 
             return services;
         }
@@ -96,6 +97,12 @@ namespace Micser.Common.Extensions
                 }
             }
 
+            return services;
+        }
+
+        public static IServiceCollection AddSetting(this IServiceCollection services, SettingDefinition setting)
+        {
+            services.AddSingleton(setting);
             return services;
         }
 
