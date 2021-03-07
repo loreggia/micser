@@ -1,7 +1,7 @@
-﻿using CSCore;
+﻿using System;
+using CSCore;
 using Micser.Common.Audio;
 using Micser.Plugins.Main.Modules;
-using System;
 
 namespace Micser.Plugins.Main.Audio
 {
@@ -40,12 +40,12 @@ namespace Micser.Plugins.Main.Audio
             var typeChanged = _type != _module.Type;
             if (waveFormat.SampleRate != _sampleRate ||
                 waveFormat.Channels != _channelCount ||
-                Math.Abs(_amount - _module.Amount) > AudioModule.Epsilon ||
-                Math.Abs(_attack - _module.Attack) > AudioModule.Epsilon ||
-                Math.Abs(_makeUpGain - _module.MakeUpGain) > AudioModule.Epsilon ||
-                Math.Abs(_release - _module.Release) > AudioModule.Epsilon ||
-                Math.Abs(_ratio - _module.Ratio) > AudioModule.Epsilon ||
-                Math.Abs(_threshold - _module.Threshold) > AudioModule.Epsilon ||
+                Math.Abs(_amount - _module.Amount) > float.Epsilon ||
+                Math.Abs(_attack - _module.Attack) > float.Epsilon ||
+                Math.Abs(_makeUpGain - _module.MakeUpGain) > float.Epsilon ||
+                Math.Abs(_release - _module.Release) > float.Epsilon ||
+                Math.Abs(_ratio - _module.Ratio) > float.Epsilon ||
+                Math.Abs(_threshold - _module.Threshold) > float.Epsilon ||
                 typeChanged)
             {
                 Initialize(waveFormat);

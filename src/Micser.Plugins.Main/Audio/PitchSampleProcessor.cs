@@ -48,10 +48,10 @@
 
 #endregion Copyright
 
-using CSCore;
-using Micser.Plugins.Main.Modules;
 using System;
+using CSCore;
 using Micser.Common.Audio;
+using Micser.Plugins.Main.Modules;
 
 namespace Micser.Plugins.Main.Audio
 {
@@ -84,7 +84,7 @@ namespace Micser.Plugins.Main.Audio
 
         public override void Process(WaveFormat waveFormat, float[] channelSamples)
         {
-            if (Math.Abs(_pitch - _module.PitchFactor) > AudioModule.Epsilon ||
+            if (Math.Abs(_pitch - _module.PitchFactor) > float.Epsilon ||
                 _fftSize != _module.FftSize ||
                 _oversampling != _module.Oversampling ||
                 _sampleRate != waveFormat.SampleRate)
@@ -92,7 +92,7 @@ namespace Micser.Plugins.Main.Audio
                 Init(waveFormat);
             }
 
-            if (Math.Abs(_module.Pitch) < AudioModule.Epsilon)
+            if (Math.Abs(_module.Pitch) < float.Epsilon)
             {
                 return;
             }

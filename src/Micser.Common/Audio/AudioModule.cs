@@ -13,11 +13,6 @@ namespace Micser.Common.Audio
     /// </summary>
     public abstract class AudioModule : IAudioModule
     {
-        /// <summary>
-        /// A small epsilon value for float equality comparison.
-        /// </summary>
-        public static readonly float Epsilon = float.Epsilon;
-
         private readonly ILogger _logger;
         private readonly IList<IAudioModule> _outputs;
 
@@ -153,7 +148,7 @@ namespace Micser.Common.Audio
         /// <inheritdoc />
         public virtual void Write(IAudioModule source, WaveFormat waveFormat, byte[] buffer, int offset, int count)
         {
-            if (IsEnabled && (IsMuted || Math.Abs(Volume) < Epsilon))
+            if (IsEnabled && (IsMuted || Math.Abs(Volume) < float.Epsilon))
             {
                 return;
             }
@@ -161,7 +156,7 @@ namespace Micser.Common.Audio
             byte[]? nextBuffer = null;
             int nextOffset;
 
-            if (!IsEnabled || (Math.Abs(Volume - 1f) < Epsilon && _sampleProcessors.All(p => p is VolumeSampleProcessor)))
+            if (!IsEnabled || (Math.Abs(Volume - 1f) < float.Epsilon && _sampleProcessors.All(p => p is VolumeSampleProcessor)))
             {
                 nextBuffer = buffer;
                 nextOffset = offset;
