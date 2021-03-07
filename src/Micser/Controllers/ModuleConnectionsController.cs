@@ -35,9 +35,9 @@ namespace Micser.Controllers
         [HttpDelete("{id}")]
         public async Task<ModuleConnectionDto> DeleteAsync([FromRoute] long id)
         {
-            var result = await _moduleConnectionService.DeleteAsync(id).ConfigureAwait(false) ?? throw new NotFoundApiException();
-
             await _audioEngine.RemoveConnectionAsync(id).ConfigureAwait(false);
+
+            var result = await _moduleConnectionService.DeleteAsync(id).ConfigureAwait(false) ?? throw new NotFoundApiException();
 
             return GetDto(result);
         }
