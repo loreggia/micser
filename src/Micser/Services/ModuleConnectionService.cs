@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Micser.Common.Audio;
 using Micser.Common.Modules;
 using Micser.Common.Services;
 using Micser.DataAccess;
@@ -13,11 +14,13 @@ namespace Micser.Services
     /// <inheritdoc cref="IModuleConnectionService"/>
     public class ModuleConnectionService : IModuleConnectionService
     {
+        private readonly IAudioEngine _audioEngine;
         private readonly IDbContextFactory<EngineDbContext> _dbContextFactory;
 
-        public ModuleConnectionService(IDbContextFactory<EngineDbContext> dbContextFactory)
+        public ModuleConnectionService(IDbContextFactory<EngineDbContext> dbContextFactory, IAudioEngine audioEngine)
         {
             _dbContextFactory = dbContextFactory;
+            _audioEngine = audioEngine;
         }
 
         /// <inheritdoc />
@@ -33,6 +36,8 @@ namespace Micser.Services
 
             dbContext.ModuleConnections.Remove(entity);
             await dbContext.SaveChangesAsync().ConfigureAwait(false);
+
+            await _audioEngine.RemoveConnectionAsync(id).ConfigureAwait(false);
 
             return ToModel(entity);
         }
@@ -93,6 +98,8 @@ namespace Micser.Services
             {
                 mc.Id = existingEntity.Id;
             }
+
+            await _audioEngine.AddConnectionAsync(mc.Id).ConfigureAwait(false);
         }
 
         /// <inheritdoc />
@@ -106,6 +113,9 @@ namespace Micser.Services
             }
 
             await dbContext.SaveChangesAsync().ConfigureAwait(false);
+
+            await _audioEngine.StopAsync().ConfigureAwait(false);
+            await _audioEngine.StartAsync().ConfigureAwait(false);
         }
 
         /// <inheritdoc />
@@ -119,10 +129,14 @@ namespace Micser.Services
                 throw new NotFoundApiException();
             }
 
+            await _audioEngine.RemoveConnectionAsync(mc.Id).ConfigureAwait(false);
+
             entity.SourceModuleId = mc.SourceId;
             entity.TargetModuleId = mc.TargetId;
 
             await dbContext.SaveChangesAsync().ConfigureAwait(false);
+
+            await _audioEngine.AddConnectionAsync(mc.Id).ConfigureAwait(false);
         }
 
         private static ModuleConnectionEntity ToEntity(ModuleConnection dto)

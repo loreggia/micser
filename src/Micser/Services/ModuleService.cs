@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using Micser.Common.Audio;
 using Micser.Common.Extensions;
 using Micser.Common.Modules;
 using Micser.Common.Services;
@@ -14,11 +15,13 @@ namespace Micser.Services
     /// <inheritdoc cref="IModuleService"/>
     public class ModuleService : IModuleService
     {
+        private readonly IAudioEngine _audioEngine;
         private readonly IDbContextFactory<EngineDbContext> _dbContextFactory;
 
-        public ModuleService(IDbContextFactory<EngineDbContext> dbContextFactory)
+        public ModuleService(IDbContextFactory<EngineDbContext> dbContextFactory, IAudioEngine audioEngine)
         {
             _dbContextFactory = dbContextFactory;
+            _audioEngine = audioEngine;
         }
 
         /// <inheritdoc />
@@ -34,6 +37,8 @@ namespace Micser.Services
 
             dbContext.Modules.Remove(entity);
             await dbContext.SaveChangesAsync().ConfigureAwait(false);
+
+            await _audioEngine.RemoveModuleAsync(id).ConfigureAwait(false);
 
             return ToModel(entity);
         }
@@ -69,6 +74,8 @@ namespace Micser.Services
             {
                 module.Id = entity.Id;
             }
+
+            await _audioEngine.AddModuleAsync(module.Id).ConfigureAwait(false);
         }
 
         /// <inheritdoc />
@@ -80,6 +87,9 @@ namespace Micser.Services
                 dbContext.Modules.Remove(entity);
             }
             await dbContext.SaveChangesAsync().ConfigureAwait(false);
+
+            await _audioEngine.StopAsync().ConfigureAwait(false);
+            await _audioEngine.StartAsync().ConfigureAwait(false);
         }
 
         /// <inheritdoc />
@@ -109,6 +119,8 @@ namespace Micser.Services
             module.State.AddRange(state);
 
             await dbContext.SaveChangesAsync().ConfigureAwait(false);
+
+            await _audioEngine.UpdateModuleAsync(module.Id).ConfigureAwait(false);
         }
 
         private static ModuleEntity ToEntity(Module module)
