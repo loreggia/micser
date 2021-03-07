@@ -42,7 +42,7 @@ namespace Micser.Services
         public async IAsyncEnumerable<Module> GetAllAsync()
         {
             await using var dbContext = _dbContextFactory.CreateDbContext();
-            await foreach (var entity in dbContext.Modules)
+            await foreach (var entity in dbContext.Modules.AsNoTracking().AsAsyncEnumerable())
             {
                 yield return ToModel(entity);
             }
