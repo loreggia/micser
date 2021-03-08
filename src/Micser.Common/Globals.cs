@@ -1,6 +1,9 @@
 ﻿using System;
 using System.IO;
+using System.Runtime.CompilerServices;
 using CSCore.Win32;
+
+[assembly: InternalsVisibleTo("Micser.Common.Test")]
 
 namespace Micser.Common
 {

@@ -63,6 +63,7 @@ namespace Micser.Common.Audio
             }
         }
 
+        protected internal float[]? ChannelSamplesBuffer => _channelSamplesBuffer;
         private bool IsMutedInternal => IsEnabled && (IsMuted || Math.Abs(Volume) < float.Epsilon);
         private bool IsPassThrough => !IsEnabled || Math.Abs(Volume - 1f) < float.Epsilon && _sampleProcessors.TrueForAll(p => p is VolumeSampleProcessor);
 
@@ -229,7 +230,7 @@ namespace Micser.Common.Audio
         }
 
         /// <inheritdoc />
-        public void WriteSample(IAudioModule source, WaveFormat waveFormat, float[] channelSamples)
+        public virtual void WriteSample(IAudioModule source, WaveFormat waveFormat, float[] channelSamples)
         {
             if (IsMutedInternal)
             {
@@ -257,6 +258,22 @@ namespace Micser.Common.Audio
                 }
 
                 WriteSampleInternal(waveFormat, _channelSamplesBuffer);
+            }
+        }
+
+        internal void WriteSampleInternal(WaveFormat waveFormat, float[] channelSamples)
+        {
+            for (var i = 0; i < _sampleProcessors.Count; i++)
+            {
+                if (_sampleProcessors[i].IsEnabled)
+                {
+                    _sampleProcessors[i].Process(waveFormat, channelSamples);
+                }
+            }
+
+            for (var i = 0; i < _outputs.Count; i++)
+            {
+                _outputs[i].WriteSample(this, waveFormat, channelSamples);
             }
         }
 
@@ -360,22 +377,6 @@ namespace Micser.Common.Audio
                 }
 
                 WriteSampleInternal(waveFormat, _channelSamplesBuffer);
-            }
-        }
-
-        private void WriteSampleInternal(WaveFormat waveFormat, float[] channelSamples)
-        {
-            for (var i = 0; i < _sampleProcessors.Count; i++)
-            {
-                if (_sampleProcessors[i].IsEnabled)
-                {
-                    _sampleProcessors[i].Process(waveFormat, channelSamples);
-                }
-            }
-
-            for (var i = 0; i < _outputs.Count; i++)
-            {
-                _outputs[i].WriteSample(this, waveFormat, channelSamples);
             }
         }
     }
