@@ -1,4 +1,4 @@
-import React, { FC, memo, Suspense, useEffect } from "react";
+import React, { FC, memo, Suspense, useCallback, useEffect, useMemo } from "react";
 import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import { Layout } from "antd";
 import styled from "styled-components";
@@ -25,8 +25,36 @@ wnd["antd"] = antd;
 wnd["react-i18next"] = ReactI18Next;
 wnd["micser-common"] = Common;
 
+const { error: ErrorContext } = Common.Contexts;
+
+const useErrorHandler = () => {
+    const { t } = ReactI18Next.useTranslation();
+
+    const errorHandler = useCallback(
+        (error?: Common.Problem) => {
+            if (error) {
+                antd.notification.error({
+                    message: t("error.title"),
+                    description: error.detail || error.title,
+                });
+            }
+        },
+        [t]
+    );
+
+    const result = useMemo(
+        () => ({
+            onError: errorHandler,
+        }),
+        [errorHandler]
+    );
+
+    return result;
+};
+
 const App: FC = () => {
     const [plugins, isLoadingPlugins] = usePlugins();
+    const errorHandler = useErrorHandler();
 
     // load plugin resources
     useEffect(() => {
@@ -48,10 +76,11 @@ const App: FC = () => {
 
     return (
         <Suspense fallback={<Common.Loader isVisible />}>
-            <PluginsContext.Provider value={plugins}>
-                {isLoadingPlugins ? (
-                    <Common.Loader isVisible />
-                ) : (
+            <ErrorContext.Provider value={errorHandler}>
+                <PluginsContext.Provider value={plugins}>
+                    {isLoadingPlugins ? (
+                        <Common.Loader isVisible />
+                    ) : (
                         <Router>
                             <Layout style={{ minHeight: "100vh" }} onContextMenu={handleContextMenu}>
                                 <>
@@ -74,7 +103,8 @@ const App: FC = () => {
                             </Layout>
                         </Router>
                     )}
-            </PluginsContext.Provider>
+                </PluginsContext.Provider>
+            </ErrorContext.Provider>
         </Suspense>
     );
 };

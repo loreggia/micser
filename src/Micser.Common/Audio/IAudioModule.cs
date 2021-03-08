@@ -78,5 +78,13 @@ namespace Micser.Common.Audio
         /// <param name="offset">The offset to start reading from.</param>
         /// <param name="count">The number of bytes to read from the <paramref name="buffer"/>.</param>
         void Write(IAudioModule source, WaveFormat waveFormat, byte[] buffer, int offset, int count);
+
+        /// <summary>
+        /// Writes an audio sample to this module. The sample will be sent through all registered <see cref="ISampleProcessor"/>s before being sent to each registered output module.
+        /// </summary>
+        /// <param name="source">The source audio module. This should be the original module where the data was generated from and not the previous module in the data flow.</param>
+        /// <param name="waveFormat">The input wave format.</param>
+        /// <param name="channelSamples"></param>
+        void WriteSample(IAudioModule source, WaveFormat waveFormat, float[] channelSamples);
     }
 }

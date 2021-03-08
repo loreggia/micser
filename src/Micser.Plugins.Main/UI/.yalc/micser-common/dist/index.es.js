@@ -97,7 +97,12 @@ var Contexts = {
     widgetTypes: createContext([]),
     dashboard: createContext({
         onStateChanged: function () {
-            // default value
+            // nop
+        },
+    }),
+    error: createContext({
+        onError: function () {
+            // nop
         },
     }),
 };
@@ -163,8 +168,8 @@ var VolumeControls = function (_a) {
 var WidgetPanel = styled(Collapse.Panel)(templateObject_1 || (templateObject_1 = __makeTemplateObject([""], [""])));
 var templateObject_1;
 
-var Api = /** @class */ (function () {
-    function Api(baseUrl, onBeginRequest, onEndRequest, onError) {
+var ApiService = /** @class */ (function () {
+    function ApiService(baseUrl, onBeginRequest, onEndRequest, onError) {
         this._axios = AxiosStatic.create({
             withCredentials: true,
             baseURL: "/api/" + trimStart(baseUrl, "/"),
@@ -173,7 +178,7 @@ var Api = /** @class */ (function () {
         this._onEndRequest = onEndRequest;
         this._onError = onError;
     }
-    Api.prototype.get = function (action, params) {
+    ApiService.prototype.get = function (action, params) {
         if (action === void 0) { action = ""; }
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
@@ -182,7 +187,7 @@ var Api = /** @class */ (function () {
             });
         });
     };
-    Api.prototype.getList = function (action, params) {
+    ApiService.prototype.getList = function (action, params) {
         if (action === void 0) { action = ""; }
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
@@ -191,7 +196,7 @@ var Api = /** @class */ (function () {
             });
         });
     };
-    Api.prototype.post = function (action, data) {
+    ApiService.prototype.post = function (action, data) {
         if (action === void 0) { action = ""; }
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
@@ -200,7 +205,7 @@ var Api = /** @class */ (function () {
             });
         });
     };
-    Api.prototype.put = function (action, data) {
+    ApiService.prototype.put = function (action, data) {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
             return __generator(this, function (_a) {
@@ -208,7 +213,7 @@ var Api = /** @class */ (function () {
             });
         });
     };
-    Api.prototype.delete = function (action, params) {
+    ApiService.prototype.delete = function (action, params) {
         return __awaiter(this, void 0, void 0, function () {
             var _this = this;
             return __generator(this, function (_a) {
@@ -216,30 +221,34 @@ var Api = /** @class */ (function () {
             });
         });
     };
-    Api.prototype.execute = function (func) {
+    ApiService.prototype.execute = function (func) {
         return __awaiter(this, void 0, void 0, function () {
-            var result, error_1;
+            var success, result, error_1;
             return __generator(this, function (_a) {
                 switch (_a.label) {
                     case 0:
-                        _a.trys.push([0, 2, 3, 4]);
+                        success = true;
+                        _a.label = 1;
+                    case 1:
+                        _a.trys.push([1, 3, 4, 5]);
                         this._onBeginRequest();
                         return [4 /*yield*/, func()];
-                    case 1:
+                    case 2:
                         result = _a.sent();
                         return [2 /*return*/, this.getResult(result)];
-                    case 2:
-                        error_1 = _a.sent();
-                        return [2 /*return*/, this.handleError(error_1)];
                     case 3:
-                        this._onEndRequest();
+                        error_1 = _a.sent();
+                        success = false;
+                        return [2 /*return*/, this.handleError(error_1)];
+                    case 4:
+                        this._onEndRequest(success);
                         return [7 /*endfinally*/];
-                    case 4: return [2 /*return*/];
+                    case 5: return [2 /*return*/];
                 }
             });
         });
     };
-    Api.prototype.getResult = function (axiosResult) {
+    ApiService.prototype.getResult = function (axiosResult) {
         var isSuccess = axiosResult.status >= 200 && axiosResult.status < 400;
         return {
             isSuccess: isSuccess,
@@ -247,14 +256,14 @@ var Api = /** @class */ (function () {
             data: isSuccess ? axiosResult.data : undefined,
         };
     };
-    Api.prototype.handleError = function (error) {
-        // console.log(error);
+    ApiService.prototype.handleError = function (error) {
+        // eslint-disable-next-line no-console
         var problem = error.response && error.response.data
             ? error.response.data
             : {
                 type: "Internal",
-                status: 500,
-                title: "Unknown error.",
+                status: error.code ? Number(error.code) : 500,
+                title: error.message || "Unknown error.",
             };
         this._onError(problem);
         return {
@@ -262,31 +271,41 @@ var Api = /** @class */ (function () {
             problem: problem,
         };
     };
-    return Api;
+    return ApiService;
 }());
 
 function useApi(path) {
     var _a = useState(), api = _a[0], setApi = _a[1];
     var _b = useState(false), isLoading = _b[0], setIsLoading = _b[1];
     var _c = useState(), error = _c[0], setError = _c[1];
+    var errorContext = useContext(Contexts.error);
     useEffect(function () {
         var canceled = false;
         var onError = function (error) {
             if (!canceled) {
                 setError(error);
             }
+            errorContext.onError(error);
         };
-        var onRequestAction = function (isLoading) {
+        var onBeginRequest = function () {
             if (!canceled) {
-                setIsLoading(isLoading);
+                setIsLoading(true);
             }
         };
-        var api = new Api(path, function () { return onRequestAction(true); }, function () { return onRequestAction(false); }, onError);
+        var onEndRequest = function (success) {
+            if (!canceled) {
+                setIsLoading(false);
+                if (success) {
+                    setError(undefined);
+                }
+            }
+        };
+        var api = new ApiService(path, onBeginRequest, onEndRequest, onError);
         setApi(api);
         return function () {
             canceled = true;
         };
-    }, [path]);
+    }, [path, errorContext]);
     return [api, { isLoading: isLoading, error: error }];
 }
 
@@ -364,5 +383,5 @@ var resources = {
     },
 };
 
-export { Contexts, Loader, VolumeControls, WidgetPanel, resources, useApi, useCollapseState, useGetApi };
+export { ApiService, Contexts, Loader, VolumeControls, WidgetPanel, resources, useApi, useCollapseState, useGetApi };
 //# sourceMappingURL=index.es.js.map

@@ -1,17 +1,14 @@
-export interface ApiOptions {
-    onError?: (e: unknown) => void;
-    autoLoad?: boolean;
+export interface Api<TData> {
+    get: (action: string, param?: unknown) => Promise<ApiResultData<TData>>;
+    getList: (action: string, param?: unknown) => Promise<ApiResultData<TData[]>>;
+    post: (action: string, data: unknown) => Promise<ApiResultData<TData>>;
+    put: (action: string | number, data: unknown) => Promise<ApiResultData<TData>>;
+    delete: (action: string | number, data?: unknown) => Promise<ApiResultData<TData>>;
 }
-export interface IApi<TData> {
-    get: (action: string, param?: unknown) => Promise<IApiResultData<TData>>;
-    getList: (action: string, param?: unknown) => Promise<IApiResultData<TData[]>>;
-    post: (action: string, data: unknown) => Promise<IApiResultData<TData>>;
-    put: (action: string | number, data: unknown) => Promise<IApiResultData<TData>>;
-    delete: (action: string | number, data?: unknown) => Promise<IApiResultData<TData>>;
-}
-export declare type ErrorHandler = (error: IProblem) => void;
-export declare type RequestAction = () => void;
-export interface IProblem {
+export declare type ErrorHandler = (error: Problem) => void;
+export declare type BeginRequestHandler = () => void;
+export declare type EndRequestHandler = (success: boolean) => void;
+export interface Problem {
     type: string;
     status: number;
     title?: string;
@@ -20,24 +17,24 @@ export interface IProblem {
     traceId?: string;
     errors?: unknown;
 }
-export interface IApiResult {
+export interface ApiResult {
     isSuccess: boolean;
-    problem?: IProblem;
+    problem?: Problem;
 }
-export interface IApiResultData<T> extends IApiResult {
+export interface ApiResultData<T> extends ApiResult {
     data?: T;
 }
-export declare class Api<TData> implements IApi<TData> {
+export declare class ApiService<TData> implements Api<TData> {
     private _axios;
     private _onError;
     private _onBeginRequest;
     private _onEndRequest;
-    constructor(baseUrl: string, onBeginRequest: RequestAction, onEndRequest: RequestAction, onError: ErrorHandler);
-    get(action?: string, params?: unknown): Promise<IApiResultData<TData>>;
-    getList(action?: string, params?: unknown): Promise<IApiResultData<TData[]>>;
-    post(action: string, data: unknown): Promise<IApiResultData<TData>>;
-    put(action: string | number, data: unknown): Promise<IApiResultData<TData>>;
-    delete(action: string | number, params?: unknown): Promise<IApiResultData<TData>>;
+    constructor(baseUrl: string, onBeginRequest: BeginRequestHandler, onEndRequest: EndRequestHandler, onError: ErrorHandler);
+    get(action?: string, params?: unknown): Promise<ApiResultData<TData>>;
+    getList(action?: string, params?: unknown): Promise<ApiResultData<TData[]>>;
+    post(action: string, data: unknown): Promise<ApiResultData<TData>>;
+    put(action: string | number, data: unknown): Promise<ApiResultData<TData>>;
+    delete(action: string | number, params?: unknown): Promise<ApiResultData<TData>>;
     private execute;
     private getResult;
     private handleError;

@@ -14,8 +14,7 @@ namespace Micser.Common.Audio
     public abstract class AudioModule : IAudioModule
     {
         private readonly ILogger _logger;
-        private readonly IList<IAudioModule> _outputs;
-
+        private readonly List<IAudioModule> _outputs;
         private readonly List<ISampleProcessor> _sampleProcessors;
         private float[]? _channelSamplesBuffer;
         private float _volume = 1f;
@@ -268,6 +267,14 @@ namespace Micser.Common.Audio
             foreach (var module in _outputs.ToArray())
             {
                 module.Write(source, waveFormat, nextBuffer, nextOffset, count);
+            }
+        }
+
+        public void WriteSample(IAudioModule source, WaveFormat waveFormat, float[] channelSamples)
+        {
+            foreach (var module in _outputs.ToArray())
+            {
+                module.WriteSample(source, waveFormat, channelSamples);
             }
         }
 

@@ -6,6 +6,7 @@
         "loading": "Loading..."
     },
     "error": {
+        "title": "Error",
         "unknown": "Unknown error",
         "notFound": "Not found",
         "badRequest": "Bad request"

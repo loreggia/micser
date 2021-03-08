@@ -1,18 +1,13 @@
 import { useCallback, useEffect, useState } from "react";
 
-import { IProblem } from "../services";
+import { Problem } from "../services";
 import { useApi } from "./useApi";
-
-export type ApiOptions = {
-    onError?: (e: unknown) => void;
-    autoLoad?: boolean;
-};
 
 export const useGetApi = <R, P = unknown>(
     path: string,
     action?: string,
     params?: P
-): [R | undefined, { refresh: () => void; isLoading: boolean; error?: IProblem }] => {
+): [R | undefined, { refresh: () => void; isLoading: boolean; error?: Problem }] => {
     const [api, { isLoading, error }] = useApi<R>(path);
 
     const [result, setResult] = useState<R>();

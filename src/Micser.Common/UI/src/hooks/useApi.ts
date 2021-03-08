@@ -1,39 +1,46 @@
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { Contexts } from "../Contexts";
 
-import { Api, IApi, IProblem } from "../services";
+import { Api, ApiService, Problem } from "../services";
 
-export function useApi<R>(path: string): [IApi<R> | undefined, { isLoading: boolean; error?: IProblem }] {
-    const [api, setApi] = useState<IApi<R>>();
+export function useApi<R>(path: string): [Api<R> | undefined, { isLoading: boolean; error?: Problem }] {
+    const [api, setApi] = useState<Api<R>>();
     const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<IProblem>();
+    const [error, setError] = useState<Problem>();
+    const errorContext = useContext(Contexts.error);
 
     useEffect(() => {
         let canceled = false;
-        const onError = (error: IProblem) => {
+        const onError = (error: Problem) => {
             if (!canceled) {
                 setError(error);
             }
+            errorContext.onError(error);
         };
 
-        const onRequestAction = (isLoading: boolean) => {
+        const onBeginRequest = () => {
             if (!canceled) {
-                setIsLoading(isLoading);
+                setIsLoading(true);
             }
         };
 
-        const api = new Api<R>(
-            path,
-            () => onRequestAction(true),
-            () => onRequestAction(false),
-            onError
-        );
+        const onEndRequest = (success: boolean) => {
+            if (!canceled) {
+                setIsLoading(false);
+                if (success) {
+                    setError(undefined);
+                }
+            }
+        };
+
+        const api = new ApiService<R>(path, onBeginRequest, onEndRequest, onError);
 
         setApi(api);
 
         return () => {
             canceled = true;
         };
-    }, [path]);
+    }, [path, errorContext]);
 
     return [api, { isLoading, error }];
 }
