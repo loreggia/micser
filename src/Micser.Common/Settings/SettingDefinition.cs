@@ -65,9 +65,13 @@ namespace Micser.Common.Settings
     /// </summary>
     public class SettingDefinition
     {
+        /// <summary>
+        /// Creates an instance of the <see cref="SettingDefinition"/> class.
+        /// </summary>
+        /// <param name="key">The setting key.</param>
         public SettingDefinition(string key)
         {
-            Key = key;
+            Key = key ?? throw new ArgumentNullException(nameof(key));
             IsAppliedInstantly = true;
             Type = SettingType.String;
             StorageType = SettingStorageType.Internal;

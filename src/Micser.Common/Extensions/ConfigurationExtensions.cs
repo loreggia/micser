@@ -14,8 +14,17 @@ using NLog.Targets;
 
 namespace Micser.Common.Extensions
 {
+    /// <summary>
+    /// Provides extension methods for service configurations.
+    /// </summary>
     public static class ConfigurationExtensions
     {
+        /// <summary>
+        /// Registers an audio module.
+        /// </summary>
+        /// <param name="services">The service collection.</param>
+        /// <param name="name">The name/type of the module. Corresponds to the name defined for this module's widget.</param>
+        /// <typeparam name="TModule">The module's type.</typeparam>
         public static IServiceCollection AddAudioModule<TModule>(this IServiceCollection services, string name)
             where TModule : class, IAudioModule
         {
@@ -25,6 +34,11 @@ namespace Micser.Common.Extensions
             return services;
         }
 
+        /// <summary>
+        /// Adds default logging via NLog.
+        /// </summary>
+        /// <param name="services">The service collection.</param>
+        /// <param name="fileName">The file name of the log file to write to.</param>
         public static IServiceCollection AddNlog(this IServiceCollection services, string fileName)
         {
             var config = new LoggingConfiguration();
@@ -43,6 +57,14 @@ namespace Micser.Common.Extensions
             return services;
         }
 
+        /// <summary>
+        /// Registers all available plugins. Searches for plugin files using the <see cref="Globals.PluginSearchPattern"/>.
+        /// </summary>
+        /// <param name="services">The service collection.</param>
+        /// <param name="configuration">The app configuration.</param>
+        /// <param name="staticPlugins">An array of known plugin types to load.</param>
+        /// <typeparam name="TPlugin">The type of plugins to add.</typeparam>
+        /// <exception cref="InvalidOperationException">Plugin registration failed.</exception>
         public static IServiceCollection AddPlugins<TPlugin>(this IServiceCollection services, IConfiguration configuration, params Type[] staticPlugins)
             where TPlugin : IPlugin
         {
@@ -100,12 +122,21 @@ namespace Micser.Common.Extensions
             return services;
         }
 
+        /// <summary>
+        /// Registers a setting definition.
+        /// </summary>
+        /// <param name="services">The service collection.</param>
+        /// <param name="setting">The setting definition.</param>
         public static IServiceCollection AddSetting(this IServiceCollection services, SettingDefinition setting)
         {
             services.AddSingleton(setting);
             return services;
         }
 
+        /// <summary>
+        /// Loads the previously registered plugins. Requires a call to <see cref="AddPlugins{TPlugin}"/> during service configuration.
+        /// </summary>
+        /// <param name="services">The service provider.</param>
         public static void UsePlugins(this IServiceProvider services)
         {
             var plugins = services.GetRequiredService<IEnumerable<IPlugin>>();

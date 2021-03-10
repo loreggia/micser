@@ -5,6 +5,14 @@
     /// </summary>
     public class ModuleConnection : IIdentifiable
     {
+        /// <summary>
+        /// Creates an instance of the <see cref="ModuleConnection"/> class.
+        /// </summary>
+        /// <param name="id">The connection ID.</param>
+        /// <param name="sourceId">The source module ID.</param>
+        /// <param name="sourceConnectorName">The source connector name.</param>
+        /// <param name="targetId">The target module ID.</param>
+        /// <param name="targetConnectorName">The target connector name.</param>
         public ModuleConnection(long id, long sourceId, string sourceConnectorName, long targetId, string targetConnectorName)
         {
             Id = id;

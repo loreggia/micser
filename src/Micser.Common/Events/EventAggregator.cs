@@ -3,15 +3,20 @@ using System.Collections.Generic;
 
 namespace Micser.Common.Events
 {
+    /// <inheritdoc />
     public class EventAggregator : IEventAggregator
     {
         private readonly List<Subscription> _subscriptions;
 
+        /// <summary>
+        /// Creates a new instance of the <see cref="EventAggregator"/> class.
+        /// </summary>
         public EventAggregator()
         {
             _subscriptions = new List<Subscription>();
         }
 
+        /// <inheritdoc />
         public void Publish<T>(T message)
         {
             var type = typeof(T);
@@ -24,6 +29,7 @@ namespace Micser.Common.Events
             }
         }
 
+        /// <inheritdoc />
         public IDisposable Subscribe<T>(Action<T> handler)
         {
             var subscription = new Subscription(typeof(T), handler);

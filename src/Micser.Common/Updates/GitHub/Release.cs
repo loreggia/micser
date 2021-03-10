@@ -1,6 +1,8 @@
 ﻿using System;
 using Newtonsoft.Json;
 
+#pragma warning disable 1591
+
 namespace Micser.Common.Updates.GitHub
 {
     public class Release

@@ -4,8 +4,18 @@ using System.Collections.Generic;
 
 namespace Micser.Common.Extensions
 {
+    /// <summary>
+    /// Provides extension methods for dictionary types.
+    /// </summary>
     public static class DictionaryExtensions
     {
+        /// <summary>
+        /// Convenience method that copies all entries from the <paramref name="source"/> dictionary.
+        /// </summary>
+        /// <param name="dict">The target dictionary.</param>
+        /// <param name="source">The source dictionary.</param>
+        /// <typeparam name="TKey">The key type.</typeparam>
+        /// <typeparam name="TValue">The value type.</typeparam>
         public static void AddRange<TKey, TValue>(this IDictionary<TKey, TValue> dict, IDictionary<TKey, TValue> source)
         {
             foreach (var key in source.Keys)
@@ -14,6 +24,13 @@ namespace Micser.Common.Extensions
             }
         }
 
+        /// <summary>
+        /// Gets an object from a string key dictionary.
+        /// </summary>
+        /// <param name="dictionary">The dictionary.</param>
+        /// <param name="key">The key of the value to get.</param>
+        /// <param name="defaultValue">The default value that is returned if the key is not found or the stored type is not convertible to the return type <typeparamref name="TValue"/>.</param>
+        /// <typeparam name="TValue">The value/result type.</typeparam>
         public static TValue? GetObject<TValue>(this IDictionary dictionary, string key, TValue? defaultValue = default)
         {
             return dictionary.GetObject<string, TValue>(key, defaultValue);

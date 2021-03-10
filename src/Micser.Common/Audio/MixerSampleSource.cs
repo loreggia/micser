@@ -13,6 +13,12 @@ namespace Micser.Common.Audio
         private readonly List<ISampleSource> _sampleSources = new();
         private float[]? _mixerBuffer;
 
+        /// <summary>
+        /// Creates an instance of the <see cref="MixerSampleSource"/> class.
+        /// </summary>
+        /// <param name="channelCount">The number of supported channels.</param>
+        /// <param name="sampleRate">The sample rate.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Invalid parameters values.</exception>
         public MixerSampleSource(int channelCount, int sampleRate)
         {
             if (channelCount < 1)

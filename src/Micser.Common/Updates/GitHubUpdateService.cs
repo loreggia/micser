@@ -10,6 +10,9 @@ using Newtonsoft.Json;
 
 namespace Micser.Common.Updates
 {
+    /// <summary>
+    /// An update service implementation for GitHub releases.
+    /// </summary>
     public class GitHubUpdateService : UpdateService
     {
         private const string AcceptHeader = "application/vnd.github.v3+json";
@@ -17,6 +20,10 @@ namespace Micser.Common.Updates
         private const string GetLatestReleaseUrlPath = "/repos/loreggia/micser/releases/latest";
         private const string UserAgentHeader = "micser-update";
 
+        /// <summary>
+        /// Creates an instance of the <see cref="GitHubUpdateService"/> class.
+        /// </summary>
+        /// <param name="logger">A logger.</param>
         public GitHubUpdateService(ILogger<GitHubUpdateService> logger)
             : base(logger)
         {
@@ -54,6 +61,7 @@ namespace Micser.Common.Updates
             }
         }
 
+        /// <inheritdoc />
         public override async Task<UpdateManifest?> GetUpdateManifestAsync()
         {
             using var client = new HttpClient

@@ -17,6 +17,10 @@ namespace Micser.Common.Updates
         /// </summary>
         protected readonly ILogger Logger;
 
+        /// <summary>
+        /// Creates an instance of the <see cref="UpdateService"/> class.
+        /// </summary>
+        /// <param name="logger">A logger.</param>
         protected UpdateService(ILogger logger)
         {
             Logger = logger;

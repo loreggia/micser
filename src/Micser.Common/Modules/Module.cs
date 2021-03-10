@@ -5,6 +5,11 @@
     /// </summary>
     public class Module : IIdentifiable
     {
+        /// <summary>
+        /// Creates an instance of the <see cref="Module"/> type.
+        /// </summary>
+        /// <param name="id">The module ID.</param>
+        /// <param name="type">The module type name.</param>
         public Module(long id, string type)
         {
             Id = id;

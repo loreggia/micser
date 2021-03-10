@@ -27,6 +27,7 @@ namespace Micser.Common.Updates
         /// </summary>
         public string? Version { get; set; }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return $"Version: {Version}, FileName: {FileName}, Date: {Date}";

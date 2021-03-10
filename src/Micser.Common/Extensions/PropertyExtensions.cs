@@ -31,7 +31,7 @@ namespace Micser.Common.Extensions
         }
 
         /// <summary>
-        /// Gets all properties decorated with the <see cref="SaveStateAttribute"/> and saves their values in the <see cref="ModuleState.Data"/> property of the specified <paramref name="state"/>.
+        /// Gets all properties decorated with the <see cref="SaveStateAttribute"/> and saves their values in the <paramref name="state"/>.
         /// </summary>
         /// <param name="obj">The object to get the state properties from.</param>
         /// <param name="state">The state to save the values to.</param>

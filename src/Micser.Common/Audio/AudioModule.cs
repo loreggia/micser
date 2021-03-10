@@ -22,6 +22,10 @@ namespace Micser.Common.Audio
         private float _volume = 1f;
         private IWaveBuffer? _waveBuffer;
 
+        /// <summary>
+        /// Creates an instance of the <see cref="AudioModule"/> class.
+        /// </summary>
+        /// <param name="logger"></param>
         protected AudioModule(ILogger logger)
         {
             _logger = logger;
@@ -47,6 +51,9 @@ namespace Micser.Common.Audio
         /// <inheritdoc />
         public virtual bool IsMuted { get; set; }
 
+        /// <summary>
+        /// Gets the currently registered <see cref="ISampleProcessor"/> instances.
+        /// </summary>
         public IEnumerable<ISampleProcessor> SampleProcessors => _sampleProcessors.AsReadOnly();
 
         /// <inheritdoc />
@@ -63,9 +70,13 @@ namespace Micser.Common.Audio
             }
         }
 
-        protected internal float[]? ChannelSamplesBuffer => _channelSamplesBuffer;
+        /// <summary>
+        /// Gets a buffer containing the current sample values for each channel.
+        /// </summary>
+        protected float[]? ChannelSamplesBuffer => _channelSamplesBuffer;
+
         private bool IsMutedInternal => IsEnabled && (IsMuted || Math.Abs(Volume) < float.Epsilon);
-        private bool IsPassThrough => !IsEnabled || Math.Abs(Volume - 1f) < float.Epsilon && _sampleProcessors.TrueForAll(p => p is VolumeSampleProcessor);
+        private bool IsPassThrough => !IsEnabled || (Math.Abs(Volume - 1f) < float.Epsilon && _sampleProcessors.TrueForAll(p => p is VolumeSampleProcessor));
 
         /// <inheritdoc />
         public virtual void AddOutput(IAudioModule module)
@@ -224,7 +235,7 @@ namespace Micser.Common.Audio
                 }
                 else
                 {
-                    _logger.LogError($"Unsupported audio format '{waveFormat}'. Only PCM or IEEE audio is supported.");
+                    _logger.LogError($"Unsupported audio format '{waveFormat}'. Only PCM or IEEE float audio is supported.");
                 }
             }
         }

@@ -7,6 +7,9 @@ namespace Micser.Common.Audio
     /// </summary>
     public abstract class SampleProcessor : ISampleProcessor
     {
+        /// <summary>
+        /// Creates a new instance of the <see cref="SampleProcessor"/> class.
+        /// </summary>
         protected SampleProcessor()
         {
             IsEnabled = true;
