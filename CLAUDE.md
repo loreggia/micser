@@ -26,6 +26,11 @@ dotnet run --project src/Shell      # tray + WebView2; optional URL argument, de
 
 CI (`.github/workflows/ci.yml`) runs the dotnet build/test and npm format/lint/build as separate jobs.
 
+## Working preferences
+
+- Don't commit unless explicitly told to. Leave changes uncommitted so the user can review them first.
+- Keep code comments short and concise. Describe how the code is, not how it was or why it changed. The exception is when leaving out the history would set a trap for future changes. Comments about concrete future plans are fine.
+
 ## Layout and conventions
 
 - `src/` holds everything that ships, grouped by area with short folder names, e.g. `src/Audio/Micser.Audio.csproj`. `tests/` mirrors `src/`, e.g. `tests/Engine/Micser.Engine.Tests.csproj`.
