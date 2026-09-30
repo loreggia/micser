@@ -1,4 +1,4 @@
-﻿#if NETCOREAPP3_0
+﻿#if NETCOREAPP3_0_OR_GREATER
 using Prism.Properties;
 using System;
 using System.Collections.Generic;
