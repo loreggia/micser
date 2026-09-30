@@ -265,3 +265,7 @@ __pycache__/
 /crt/
 /src/Micser.Setup/wix/Micser.Setup.g.wxs
 /src/Micser.Common/Properties/GlobalAssemblyInfo.cs
+
+# npm
+node_modules/
+dist/

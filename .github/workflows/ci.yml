@@ -1,27 +1,49 @@
 name: micser CI
 
-on: [push]
+on:
+  push:
+  pull_request:
 
 jobs:
-  build:
+  dotnet:
     runs-on: windows-latest
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v7
 
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 3.1.100
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
 
-    - name: Setup Build
-      uses: warrenbuckley/Setup-MSBuild@v1
+      - name: Build
+        run: dotnet build Micser.slnx --configuration Release
 
-    - name: Build
-      working-directory: src
-      run: msbuild Micser.sln /p:Platform=x64 /p:Configuration=Debug /restore
+      - name: Test
+        run: dotnet test --solution Micser.slnx --configuration Release --no-build
 
-    - name: Test
-      working-directory: src
-      run: dotnet test Micser.sln --configuration Test
+  web:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Format
+        run: npm run format:check
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Build
+        run: npm run build

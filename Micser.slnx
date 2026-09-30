@@ -1,0 +1,16 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="global.json" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/Audio/Micser.Audio.csproj" />
+    <Project Path="src/Engine/Micser.Engine.csproj" />
+    <Project Path="src/Plugins/Main/Micser.Plugins.Main.csproj" />
+    <Project Path="src/Shell/Micser.Shell.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Engine/Micser.Engine.Tests.csproj" />
+  </Folder>
+</Solution>

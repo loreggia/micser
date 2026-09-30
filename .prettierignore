@@ -1,0 +1,14 @@
+# Prettier only formats the web workspaces and the web tooling config at the root.
+/*
+!/src
+/src/*
+!/src/Web
+!/src/WebSdk
+!/src/Plugins
+/src/Plugins/*/*
+!/src/Plugins/*/Web
+!/package.json
+!/tsconfig.base.json
+!/eslint.config.js
+**/dist
+**/node_modules
