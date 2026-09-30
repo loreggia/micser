@@ -1,0 +1,11 @@
+<Project>
+  <PropertyGroup>
+    <VersionPrefix>3.0.0</VersionPrefix>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <!-- plugin widget packages (Web/) live inside .NET project folders -->
+    <DefaultItemExcludes>$(DefaultItemExcludes);Web/**;node_modules/**</DefaultItemExcludes>
+  </PropertyGroup>
+</Project>

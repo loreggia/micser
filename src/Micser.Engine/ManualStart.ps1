@@ -1,1 +1,0 @@
-﻿& .\Micser.Engine.exe --console

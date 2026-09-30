@@ -1,46 +1,53 @@
 # Micser
-Micser is a modular audio routing framework for Microsoft Windows (mostly) written in C#.
+Micser is a modular audio routing application for Microsoft Windows.
 
-The application includes the following parts:
-* WPF application with graphical audio routing using widgets
-* Audio engine Windows service
-* Virtual audio cable driver with a configurable number of devices (WIP, will require an extended validation code signing certificate)
+> **Status:** Micser is being rebuilt on .NET 10 with a web-based UI. The target architecture and roadmap are in [docs/Architecture.md](docs/Architecture.md). The previous WPF version is on `master`.
+
+The application consists of:
+* an audio engine that runs as a background process in the user's session and exposes a local HTTP API
+* a web UI (React) for routing audio graphically using widgets, hosted in a small tray application (WebView2)
+* a virtual audio cable driver with a configurable number of devices (WIP, requires an extended validation code signing certificate)
+
+![micser CI](https://github.com/loreggia/micser/workflows/micser%20CI/badge.svg)
 
 ## Building
 ### Requirements
-* Visual Studio 2019
-  * .NET Core SDK 3.1
-  * Windows 10 SDK, version 10.0.18362.0
-  * WDK for Windows 10, version 1903
-  * MSVC v142 build tools & spectre-mitigated libs (v14.21)
-* WiX Toolset 3.11.1
+* .NET SDK 10.0.100 or later (see `global.json`)
+* Node.js 22.12 or later
+* WebView2 Runtime (included in Windows 11)
 
-[![Build Status](https://dev.azure.com/loreggia/micser/_apis/build/status/micser%20CI?branchName=master)](https://dev.azure.com/loreggia/micser/_build/latest?definitionId=4&branchName=master)
-![micser CI](https://github.com/loreggia/micser/workflows/micser%20CI/badge.svg?branch=master)
+### Commands
+```sh
+dotnet build Micser.slnx
+dotnet test --solution Micser.slnx
 
-### Installer
-Building the installer (Micser.Setup project) and the driver (Micser.Vac.* projects) in Release mode requires the presence of a code signing certificate.
-The certificate needs to be named "Certificate.pfx" and placed in the folder "crt" in the repository root.
+npm install
+npm run build          # production build of the web UI
+npm run lint
+npm run format:check
+```
+
+### Running for development
+```sh
+dotnet run --project src/Engine   # engine on http://127.0.0.1:5080
+npm run dev                       # web UI on http://localhost:5173, proxies /api and /hubs to the engine
+dotnet run --project src/Shell    # optional: tray app showing the web UI
+```
+
+### Driver and installer
+The driver (`src/Driver`) and the installer (`src/Installer`) are not part of `Micser.slnx` yet. Building them requires the Windows Driver Kit and the WiX Toolset. Building them in Release mode also requires a code signing certificate named `Certificate.pfx` in a `crt` folder in the repository root.
 
 ## Plugins
-Micser is a modular framework and can easily be extended with plugins.
-
-The main modules (Device In-/Output, Gain, Compressor, ..) are provided in the Micser.Plugins.Main assembly, which serves as an example for how to implement a plugin for Micser.
+Audio modules are provided by plugins. Each plugin consists of a .NET project and a web package with the widgets for its modules. The main modules (device input/output, gain, compressor, ...) are provided by `src/Plugins/Main`, which also serves as an example of how to implement a plugin.
 
 ## Credits
 This project uses the following libraries:
-* [CSCore](https://github.com/filoe/cscore)
-* [Hardcodet.NotifyIcon.Wpf](http://www.hardcodet.net/wpf-notifyicon)
-* [MessagePack-CSharp](https://github.com/neuecc/MessagePack-CSharp)
-* [Microsoft.EntityFrameworkCore](https://docs.microsoft.com/ef/core/)
-* [Microsoft.EntityFrameworkCore.Sqlite](https://docs.microsoft.com/ef/core/)
-* [Microsoft.Xaml.Behaviors.Wpf](https://github.com/Microsoft/XamlBehaviorsWpf)
-* [Moq](https://github.com/moq/moq4)
-* [Newtonsoft.Json](https://www.newtonsoft.com/json)
-* [NLog](https://nlog-project.org/)
-* [Prism](https://github.com/PrismLibrary/Prism)
-* [Unity](https://github.com/unitycontainer/unity)
+* [NAudio](https://github.com/naudio/NAudio)
+* [React](https://react.dev/)
+* [Serilog](https://serilog.net/)
+* [TUnit](https://github.com/thomhurst/TUnit)
+* [NSubstitute](https://nsubstitute.github.io/)
+* [Vite](https://vite.dev/)
+* [WebView2](https://learn.microsoft.com/microsoft-edge/webview2/)
 * [WixSharp](https://github.com/oleg-shilo/wixsharp)
 * [Windows Driver Samples](https://github.com/Microsoft/Windows-driver-samples)
-* [WPF Diagram Designer](https://www.codeproject.com/Articles/22952/WPF-Diagram-Designer-Part-1)
-* [xUnit.net](https://github.com/xunit/xunit)

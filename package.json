@@ -1,0 +1,31 @@
+{
+    "name": "micser",
+    "private": true,
+    "type": "module",
+    "workspaces": [
+        "src/Web",
+        "src/WebSdk",
+        "src/Plugins/*/Web"
+    ],
+    "engines": {
+        "node": ">=22.12"
+    },
+    "scripts": {
+        "dev": "npm run dev -w @micser/web",
+        "build": "npm run build -w @micser/web",
+        "typecheck": "npm run typecheck --workspaces --if-present",
+        "lint": "eslint .",
+        "format": "prettier --write .",
+        "format:check": "prettier --check ."
+    },
+    "devDependencies": {
+        "@eslint/js": "^10.0.1",
+        "eslint": "^10.11.0",
+        "eslint-plugin-react-hooks": "^7.1.1",
+        "eslint-plugin-react-refresh": "^0.5.7",
+        "globals": "^17.12.0",
+        "prettier": "^3.9.9",
+        "typescript": "~6.0.3",
+        "typescript-eslint": "^8.71.0"
+    }
+}

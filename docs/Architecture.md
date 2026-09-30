@@ -23,7 +23,9 @@ Target architecture for the modernization of Micser (decided 2026-09-30). The `m
   - `System.Text.Json` everywhere. Newtonsoft.Json and MessagePack are dropped.
   - Logging goes through `Microsoft.Extensions.Logging`, with Serilog as the provider (`Serilog`, `Serilog.Extensions.Logging`). NLog is dropped.
 - **Tests:** TUnit and NSubstitute. xUnit and Moq are dropped.
-- **Engine host:** `Microsoft.NET.Sdk.Web` (Kestrel). It serves the built SPA as static files. In development, Vite runs separately and proxies `/api` and `/hubs` to the engine.
+- **Engine host:** `Microsoft.NET.Sdk.Web` (Kestrel). It serves the built SPA as static files. In development, Vite runs separately and proxies `/api` and `/hubs` to the engine. Until engine discovery exists (roadmap step 3), the engine listens on the fixed address `http://127.0.0.1:5080`. `AllowedHosts` is limited to `localhost;127.0.0.1` against DNS rebinding.
+- **Shell:** WinForms (native `NotifyIcon`) with the WebView2 WinForms control. It has no app logic, so WPF isn't needed.
+- **Web tooling:** npm workspaces consume the internal packages (`@micser/web-sdk`, `@micser/plugin-main`) as TypeScript source, so they need no build step of their own. TypeScript is pinned to `~6.0` because `typescript-eslint` doesn't support 7.x yet.
 - **Engine discovery and security:**
   - On start, the engine writes `{ port, token }` to `%LocalAppData%\Micser\engine.json` (user-only ACL).
   - The shell reads that file and passes the token to the SPA. The API rejects requests without it.
@@ -52,7 +54,7 @@ src/
   Web/                        @micser/web: Vite + React SPA (graph editor, pages)
   WebSdk/                     @micser/web-sdk: widget contract, shared controls, API client, types
   Shell/                      Micser.Shell: tray + WebView2 window, engine launcher; no app logic
-  DriverUtility/              Micser.DriverUtility: VAC driver install/config CLI
+  DriverUtility/              Micser.DriverUtility: VAC driver install/config CLI (moved as is, not in the solution yet)
   Driver/                     C++ VAC driver (moved as is, not built by default)
   Installer/                  moved as is, not built (see decision 8)
 tests/                        mirrors src/
@@ -73,13 +75,15 @@ docs/
 
 ## Roadmap
 
-1. **Skeleton:**
+1. **Skeleton** (done):
    - Create the new layout on .NET 10 with the props files, the npm workspace root, and a CI workflow (`dotnet build`/`test` plus the npm build and lint).
    - Remove the old WPF/Prism/engine projects. They stay available in git history and on `master`.
    - Move the driver and installer to `src/Driver` and `src/Installer` as they are.
+   - Move `Micser.DriverUtility` to `src/DriverUtility` as it is. It still references the removed `Micser.Common` and CSCore, so it stays outside the solution until step 2 ports it to NAudio.
 2. **Audio (`src/Audio`):**
    - Graph, block processing, format and resampling, and NAudio device enumeration, capture and render.
    - Port the DSP code (gain, compressor, EQ, pitch, spectrum) from `master`'s `Micser.Plugins.Main` into `src/Plugins/Main`, using the `naudio`/`dev-temp` branches for the API mapping.
+   - Port `src/DriverUtility` and add it to the solution.
    - Unit tests, plus a small console harness that routes input → gain → output as a smoke test.
 3. **Engine (`src/Engine`):** hosting, the JSON config store, module definition/module/connection/device/settings APIs, and SignalR hubs for level, spectrum and device-change pushes.
 4. **UI:** `src/Web`, `src/WebSdk` and `src/Plugins/Main/Web`: the Vite app, graph editor and widgets. `dev`'s `Micser/UI` Dashboard serves as a guideline.
