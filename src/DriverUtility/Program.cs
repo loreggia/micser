@@ -1,116 +1,67 @@
-﻿using Micser.Common;
-using NLog;
-using NLog.Config;
-using NLog.Targets;
-using System;
-using System.Diagnostics;
-using System.IO;
+using System.Security.Principal;
+using Micser.DriverUtility;
+using Serilog;
 
-namespace Micser.DriverUtility
+// Usage: Micser.DriverUtility.exe /c <device count> [/s]
+//   /c  number of virtual audio cables (1..8)
+//   /s  silent: no console log and no elevation check (the installer runs it elevated)
+
+var silent = args.Any(a => a.Equals("/s", StringComparison.OrdinalIgnoreCase));
+var countIndex = Array.FindIndex(args, a => a.Equals("/c", StringComparison.OrdinalIgnoreCase));
+var countArgument = countIndex >= 0 && countIndex < args.Length - 1 ? args[countIndex + 1] : null;
+
+var logConfiguration = new LoggerConfiguration()
+    .WriteTo.File(
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Micser", "logs", "driver-utility-.log"),
+        rollingInterval: RollingInterval.Day,
+        retainedFileCountLimit: 7);
+if (!silent)
 {
-    internal class Program
+    logConfiguration.WriteTo.Console();
+}
+
+Log.Logger = logConfiguration.CreateLogger();
+
+try
+{
+    if (silent)
     {
-        private static void InitLogging(bool isInstallation)
-        {
-            var config = new LoggingConfiguration();
-
-            if (!isInstallation)
-            {
-                config.AddTarget(new ColoredConsoleTarget("ConsoleTarget")
-                {
-                    Layout = @"${date:format=HH\:mm\:ss} ${level} ${message} ${exception:format=tostring}",
-                    DetectConsoleAvailable = true
-                });
-                config.AddRuleForAllLevels("ConsoleTarget");
-            }
-
-            config.AddTarget(new FileTarget("FileTarget")
-            {
-                ArchiveNumbering = ArchiveNumberingMode.DateAndSequence,
-                ArchiveOldFileOnStartup = true,
-                Layout = @"${date:format=HH\:mm\:ss} ${level} ${message} ${exception:format=tostring}",
-                MaxArchiveFiles = 10,
-                FileName = Path.Combine(Globals.AppDataFolder, "Micser.DriverUtility.log"),
-                FileNameKind = FilePathKind.Absolute
-            });
-            config.AddRuleForAllLevels("FileTarget");
-
-            LogManager.Configuration = config;
-        }
-
-        private static int Main(string[] args)
-        {
-            var result = MainInternal(args);
-
-            if (Debugger.IsAttached)
-            {
-                Console.ReadLine();
-            }
-
-            return result;
-        }
-
-        private static int MainInternal(string[] args)
-        {
-            var arguments = new ArgumentDictionary(Globals.DriverUtility.ArgumentNameChars, args);
-            var silent = arguments.HasFlag(Globals.DriverUtility.Arguments.Silent);
-            InitLogging(silent);
-
-            if (silent)
-            {
-                // In silent mode the console log is deactivated; only show the following:
-                Console.WriteLine("Configuring virtual audio cable...");
-            }
-
-            var logger = LogManager.GetCurrentClassLogger();
-
-            // TODO the check doesn't work during msi installation..
-            if (!silent && !UacHelper.IsProcessElevated)
-            {
-                logger.Error("The process must have elevated privileges to manage driver installation.");
-                return Globals.DriverUtility.ReturnCodes.RequiresAdminAccess;
-            }
-
-            logger.Info("Starting...");
-
-            try
-            {
-                logger.Info("Arguments: " + arguments);
-
-                var sDeviceCount = arguments[Globals.DriverUtility.Arguments.DeviceCount];
-
-                if (string.IsNullOrEmpty(sDeviceCount) || !int.TryParse(sDeviceCount, out var deviceCount))
-                {
-                    logger.Error($"Invalid or missing device count argument '{Globals.DriverUtility.ArgumentNameChars[0]}{Globals.DriverUtility.Arguments.DeviceCount}' provided: '{sDeviceCount}'.");
-                    return Globals.DriverUtility.ReturnCodes.InvalidParameter;
-                }
-
-                var controller = new DriverController();
-                var result = controller.SetDeviceSettingsAndReload(deviceCount);
-
-                if (result != Globals.DriverUtility.ReturnCodes.Success)
-                {
-                    logger.Error($"{nameof(DriverController.SetDeviceSettingsAndReload)} returned {result}");
-                    return result;
-                }
-
-                using (var deviceService = new DeviceService())
-                {
-                    var renameResult = deviceService.RenameDevices(deviceCount).GetAwaiter().GetResult();
-                    if (!renameResult)
-                    {
-                        logger.Error("Renaming failed.");
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                logger.Error(ex);
-                return Globals.DriverUtility.ReturnCodes.UnknownError;
-            }
-
-            logger.Info("Success");
-            return Globals.DriverUtility.ReturnCodes.Success;
-        }
+        Console.WriteLine("Configuring virtual audio cables...");
     }
+    else if (!new WindowsPrincipal(WindowsIdentity.GetCurrent()).IsInRole(WindowsBuiltInRole.Administrator))
+    {
+        Log.Error("Managing the driver requires elevated privileges.");
+        return ReturnCodes.RequiresAdminAccess;
+    }
+
+    Log.Information("Arguments: {Arguments}", args);
+
+    if (!int.TryParse(countArgument, out var deviceCount))
+    {
+        Log.Error("Invalid or missing device count (/c): {Value}", countArgument);
+        return ReturnCodes.InvalidParameter;
+    }
+
+    var result = DriverController.SetDeviceCountAndReload(deviceCount);
+    if (result != ReturnCodes.Success)
+    {
+        return result;
+    }
+
+    if (!await DeviceRenamer.RenameDevicesAsync(Math.Clamp(deviceCount, 1, DriverGlobals.MaxDeviceCount)))
+    {
+        Log.Error("Renaming the devices failed.");
+    }
+
+    Log.Information("Done.");
+    return ReturnCodes.Success;
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Configuring the driver failed.");
+    return ReturnCodes.UnknownError;
+}
+finally
+{
+    await Log.CloseAndFlushAsync();
 }

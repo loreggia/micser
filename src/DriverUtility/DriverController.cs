@@ -1,174 +1,94 @@
-﻿using Microsoft.Win32;
-using Microsoft.Win32.SafeHandles;
-using Micser.Common;
-using NLog;
-using System;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
 using System.Runtime.InteropServices;
-using System.Security;
-using System.Threading;
+using Microsoft.Win32;
+using Microsoft.Win32.SafeHandles;
+using Serilog;
 
-namespace Micser.DriverUtility
+namespace Micser.DriverUtility;
+
+/// <summary>
+/// Stores the number of virtual devices and tells the driver to reload.
+/// </summary>
+internal static partial class DriverController
 {
-    public class DriverController
+    private const uint FileDeviceUnknown = 0x00000022;
+    private const uint GenericRead = 0x80000000;
+    private const uint GenericWrite = 0x40000000;
+    private const uint MethodBuffered = 0;
+    private const uint OpenExisting = 3;
+
+    public static int SetDeviceCountAndReload(int deviceCount)
     {
-        private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
+        deviceCount = Math.Clamp(deviceCount, 1, DriverGlobals.MaxDeviceCount);
 
-        public int SetDeviceSettingsAndReload(int deviceCount)
+        var previousCount = GetDeviceCount();
+        if (!SetDeviceCount(deviceCount))
         {
-            if (deviceCount < 1)
-            {
-                deviceCount = 1;
-            }
-
-            if (deviceCount > Globals.MaxVacCount)
-            {
-                deviceCount = Globals.MaxVacCount;
-            }
-
-            var currentCount = GetRegistryValue();
-
-            if (!SetRegistryValue(deviceCount))
-            {
-                return Globals.DriverUtility.ReturnCodes.RegistryAccessFailed;
-            }
-
-            try
-            {
-                var result = Globals.DriverUtility.ReturnCodes.Success;
-
-                var hFileHandle = SafeNativeMethods.CreateFile(
-                    DriverGlobals.DeviceSymLink,
-                    FileAccess.ReadWrite,
-                    FileShare.ReadWrite,
-                    IntPtr.Zero,
-                    FileMode.Open,
-                    0,
-                    IntPtr.Zero);
-
-                if (hFileHandle.IsInvalid)
-                {
-                    Logger.Error("Could not open a driver handle.");
-                    hFileHandle.Dispose();
-                    result = Globals.DriverUtility.ReturnCodes.SendControlSignalFailed;
-                }
-                else
-                {
-                    var ioCtlReload = SafeNativeMethods.CtlCode(
-                        SafeNativeMethods.FILE_DEVICE_UNKNOWN,
-                        DriverGlobals.IoControlCodes.Reload,
-                        SafeNativeMethods.METHOD_BUFFERED,
-                        SafeNativeMethods.GENERIC_READ | SafeNativeMethods.GENERIC_WRITE);
-
-                    try
-                    {
-                        Logger.Info($"Sending control code [{DriverGlobals.IoControlCodes.Reload}], encoded: [{ioCtlReload:X}]");
-
-                        uint bytesReturned = 0;
-                        var overlapped = new NativeOverlapped();
-                        var success = SafeNativeMethods.DeviceIoControl(hFileHandle, ioCtlReload, IntPtr.Zero, 0, IntPtr.Zero, 0, ref bytesReturned, ref overlapped);
-
-                        if (!success)
-                        {
-                            Logger.Error("DeviceIoControl failed.");
-                            result = Globals.DriverUtility.ReturnCodes.SendControlSignalFailed;
-                        }
-                    }
-                    finally
-                    {
-                        if (!hFileHandle.IsClosed && !hFileHandle.IsInvalid)
-                        {
-                            hFileHandle.Close();
-                            hFileHandle.Dispose();
-                        }
-                    }
-                }
-
-                if (result != Globals.DriverUtility.ReturnCodes.Success)
-                {
-                    SetRegistryValue(currentCount);
-                }
-
-                return result;
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex, "Error while sending the reload control signal to the driver.");
-                SetRegistryValue(currentCount);
-                return Globals.DriverUtility.ReturnCodes.SendControlSignalFailed;
-            }
+            return ReturnCodes.RegistryAccessFailed;
         }
 
-        private int GetRegistryValue()
+        if (!SendReload())
         {
-            try
-            {
-                var registryKey = Registry.CurrentUser.CreateSubKey(Globals.UserRegistryRoot, false);
-                return (int)registryKey.GetValue(Globals.RegistryValues.VacCount, 1);
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex, "Error while getting the current device count.");
-                return 1;
-            }
+            SetDeviceCount(previousCount);
+            return ReturnCodes.SendControlSignalFailed;
         }
 
-        private bool SetRegistryValue(int deviceCount)
+        return ReturnCodes.Success;
+    }
+
+    [LibraryImport("kernel32.dll", EntryPoint = "CreateFileW", SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
+    private static partial SafeFileHandle CreateFile(string fileName, uint desiredAccess, uint shareMode, nint securityAttributes, uint creationDisposition, uint flagsAndAttributes, nint templateFile);
+
+    [LibraryImport("kernel32.dll", SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static partial bool DeviceIoControl(SafeFileHandle device, uint ioControlCode, nint inBuffer, uint inBufferSize, nint outBuffer, uint outBufferSize, out uint bytesReturned, nint overlapped);
+
+    private static int GetDeviceCount()
+    {
+        try
         {
-            try
-            {
-                var registryKey = Registry.CurrentUser.CreateSubKey(Globals.UserRegistryRoot, true);
-                registryKey.SetValue(Globals.RegistryValues.VacCount, (uint)deviceCount, RegistryValueKind.DWord);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                Logger.Error(ex, "Could not save the settings to the registry.");
-                return false;
-            }
+            using var key = Registry.CurrentUser.CreateSubKey(DriverGlobals.RegistryKey, false);
+            return key.GetValue(DriverGlobals.DeviceCountValue) is int count ? count : 1;
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Could not read the current device count.");
+            return 1;
+        }
+    }
+
+    private static bool SendReload()
+    {
+        using var handle = CreateFile(DriverGlobals.DeviceSymLink, GenericRead | GenericWrite, (uint)(FileShare.ReadWrite), 0, OpenExisting, 0, 0);
+        if (handle.IsInvalid)
+        {
+            Log.Error("Could not open the driver (Win32 error {Error}).", Marshal.GetLastPInvokeError());
+            return false;
         }
 
-        [ComVisible(false)]
-        [SuppressUnmanagedCodeSecurity]
-        [SuppressMessage("ReSharper", "InconsistentNaming")]
-        private class SafeNativeMethods
+        var controlCode = (FileDeviceUnknown << 16) | ((GenericRead | GenericWrite) << 14) | (DriverGlobals.ReloadControlCode << 2) | MethodBuffered;
+        Log.Information("Sending control code {Function:X} ({ControlCode:X}).", DriverGlobals.ReloadControlCode, controlCode);
+
+        if (!DeviceIoControl(handle, controlCode, 0, 0, 0, 0, out _, 0))
         {
-            public const uint FILE_DEVICE_UNKNOWN = 0x00000022;
-            public const uint GENERIC_READ = 0x80000000;
-            public const uint GENERIC_WRITE = 0x40000000;
-            public const uint METHOD_BUFFERED = 0;
+            Log.Error("DeviceIoControl failed (Win32 error {Error}).", Marshal.GetLastPInvokeError());
+            return false;
+        }
 
-            [DllImport("kernel32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-            public static extern SafeFileHandle CreateFile(
-                string lpFileName,
-                [MarshalAs(UnmanagedType.U4)]
-                FileAccess dwDesiredAccess,
-                [MarshalAs(UnmanagedType.U4)]
-                FileShare dwShareMode,
-                IntPtr lpSecurityAttributes,
-                [MarshalAs(UnmanagedType.U4)]
-                FileMode dwCreationDisposition,
-                [MarshalAs(UnmanagedType.U4)]
-                FileAttributes dwFlagsAndAttributes,
-                IntPtr hTemplateFile);
+        return true;
+    }
 
-            public static uint CtlCode(uint deviceType, uint function, uint method, uint fileAccess)
-            {
-                return (deviceType << 16) | (fileAccess << 14) | (function << 2) | method;
-            }
-
-            [DllImport("Kernel32.dll", SetLastError = false, CharSet = CharSet.Auto)]
-            public static extern bool DeviceIoControl(
-                SafeFileHandle hDevice,
-                uint IoControlCode,
-                IntPtr InBuffer,
-                uint nInBufferSize,
-                IntPtr OutBuffer,
-                uint nOutBufferSize,
-                ref uint pBytesReturned,
-                ref NativeOverlapped Overlapped
-            );
+    private static bool SetDeviceCount(int deviceCount)
+    {
+        try
+        {
+            using var key = Registry.CurrentUser.CreateSubKey(DriverGlobals.RegistryKey, true);
+            key.SetValue(DriverGlobals.DeviceCountValue, deviceCount, RegistryValueKind.DWord);
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Could not save the device count to the registry.");
+            return false;
         }
     }
 }
