@@ -1,4 +1,4 @@
-#if NET45 || NETCOREAPP3_0
+#if NET45 || NETCOREAPP3_0_OR_GREATER
 
 using System;
 using System.ComponentModel;
