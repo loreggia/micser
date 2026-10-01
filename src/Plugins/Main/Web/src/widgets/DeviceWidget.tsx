@@ -14,6 +14,7 @@ interface StreamStatistics {
   underruns: number;
   overruns: number;
   targetMilliseconds: number;
+  resyncs: number;
 }
 
 const useStyles = makeStyles({
@@ -54,7 +55,7 @@ export function DeviceWidget({
   const label =
     selected?.name ??
     (state.deviceId ? `Unavailable${state.adapterName ? ` (${state.adapterName})` : ""}` : "No device");
-  const dropouts = statistics ? statistics.underruns + statistics.overruns : 0;
+  const dropouts = statistics ? statistics.underruns + statistics.overruns + statistics.resyncs : 0;
 
   return (
     <div className={styles.root}>
