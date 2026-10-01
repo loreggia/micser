@@ -3,6 +3,15 @@
 ###############################################################################
 * text=auto
 
+# Prettier expects LF, also in Windows checkouts
+*.css text eol=lf
+*.html text eol=lf
+*.js text eol=lf
+*.json text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+.prettierrc text eol=lf
+
 ###############################################################################
 # Set default behavior for command prompt diff.
 #
