@@ -7,6 +7,7 @@
 !/src/Plugins
 /src/Plugins/*/*
 !/src/Plugins/*/Web
+!/.prettierrc
 !/package.json
 !/tsconfig.base.json
 !/eslint.config.js
