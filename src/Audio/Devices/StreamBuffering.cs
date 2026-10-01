@@ -28,19 +28,40 @@ internal static class StreamBuffering
     public const long StartTimeoutMilliseconds = 10000;
 
     /// <summary>
-    /// The fill level in device frames: one device period, because devices deliver and consume whole periods, plus half
-    /// an engine block for timer jitter.
+    /// Dropouts within this time after the target grew count as the same incident.
     /// </summary>
-    public static double GetTargetFill(MMDevice device, ProcessingFormat format, int deviceSampleRate)
-    {
-        TimeSpan devicePeriod;
-        using (var client = device.CreateAudioClient())
-        {
-            // 100 ns units
-            devicePeriod = TimeSpan.FromTicks(client.DefaultDevicePeriod);
-        }
+    private const double HoldOffSeconds = 1;
 
-        return (devicePeriod.TotalSeconds + format.BlockDuration.TotalSeconds / 2) * deviceSampleRate;
+    /// <summary>
+    /// The highest buffer target.
+    /// </summary>
+    private const double MaxTargetSeconds = 0.2;
+
+    /// <summary>
+    /// Time without dropouts before the target shrinks again.
+    /// </summary>
+    private const double StableSeconds = 600;
+
+    /// <summary>
+    /// The buffer target of a capture stream, in device frames. A read takes a whole engine block while the device delivers whole periods
+    /// at any phase, so the fill before a read must cover a block plus half a period; at least one period, plus half a block for timer
+    /// jitter. It grows by half a period per dropout.
+    /// </summary>
+    public static AdaptiveTarget CreateCaptureTarget(MMDevice device, ProcessingFormat format, int deviceSampleRate)
+    {
+        var period = GetDevicePeriod(device);
+        var block = format.BlockDuration.TotalSeconds;
+        return CreateTarget(Math.Max(period, block + period / 2) + block / 2, period, format, deviceSampleRate);
+    }
+
+    /// <summary>
+    /// The buffer target of a render stream, in device frames: one device period, because devices take whole periods, plus half an
+    /// engine block for timer jitter. It grows by half a period per dropout.
+    /// </summary>
+    public static AdaptiveTarget CreateRenderTarget(MMDevice device, ProcessingFormat format, int deviceSampleRate)
+    {
+        var period = GetDevicePeriod(device);
+        return CreateTarget(period + format.BlockDuration.TotalSeconds / 2, period, format, deviceSampleRate);
     }
 
     /// <summary>
@@ -50,5 +71,24 @@ internal static class StreamBuffering
     public static bool IsStalled(long openedAt, long lastActivity, long now)
     {
         return lastActivity == 0 ? now - openedAt > StartTimeoutMilliseconds : now - lastActivity > StallTimeoutMilliseconds;
+    }
+
+    private static AdaptiveTarget CreateTarget(double minimumSeconds, double periodSeconds, ProcessingFormat format, int deviceSampleRate)
+    {
+        var blocksPerSecond = 1 / format.BlockDuration.TotalSeconds;
+        return new AdaptiveTarget(
+            minimumSeconds * deviceSampleRate,
+            periodSeconds / 2 * deviceSampleRate,
+            MaxTargetSeconds * deviceSampleRate,
+            (long)(HoldOffSeconds * blocksPerSecond),
+            (long)(StableSeconds * blocksPerSecond));
+    }
+
+    private static double GetDevicePeriod(MMDevice device)
+    {
+        using var client = device.CreateAudioClient();
+
+        // 100 ns units
+        return TimeSpan.FromTicks(client.DefaultDevicePeriod).TotalSeconds;
     }
 }

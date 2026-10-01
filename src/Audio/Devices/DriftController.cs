@@ -28,7 +28,18 @@ internal sealed class DriftController
 
     public double SmoothedFill => _smoothedFill;
 
-    public double TargetFill { get; }
+    /// <summary>
+    /// The fill level to keep, in frames. Changes are followed gradually through the correction.
+    /// </summary>
+    public double TargetFill
+    {
+        get;
+        set
+        {
+            ArgumentOutOfRangeException.ThrowIfNegativeOrZero(value);
+            field = value;
+        }
+    }
 
     /// <summary>
     /// Restarts from the target fill level, keeping the learned clock offset.

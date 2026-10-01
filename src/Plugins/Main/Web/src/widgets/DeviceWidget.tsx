@@ -13,6 +13,7 @@ interface StreamStatistics {
   correction: number;
   underruns: number;
   overruns: number;
+  targetMilliseconds: number;
 }
 
 const useStyles = makeStyles({
@@ -76,8 +77,7 @@ export function DeviceWidget({
       </Dropdown>
       {statistics ? (
         <Caption1 className={dropouts > 0 ? styles.warning : styles.status}>
-          {dropouts > 0 ? `${dropouts} dropouts` : "Running"} · buffer{" "}
-          {Math.round((statistics.fill / statistics.targetFill) * 100)}%
+          {dropouts > 0 ? `${dropouts} dropouts` : "Running"} · {statistics.targetMilliseconds.toFixed(1)} ms buffer
         </Caption1>
       ) : (
         state.deviceId && <Caption1 className={styles.warning}>Not running</Caption1>
