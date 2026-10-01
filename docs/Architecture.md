@@ -144,6 +144,7 @@ docs/
 - **Widgets:**
   - Plugins export `defineWidget({ moduleType, title, component })` from their `Web` package. The component receives the typed module (`WidgetProps<"Gain">`) and a `setState` function.
   - The graph node around it is generic: title, mute, bypass (if `supportsBypass`), remove, volume, a level meter, and connectors from the engine's module type. Modules without a widget still work.
+  - Double-clicking the title renames the module (Enter or leaving the field saves, Escape cancels, an empty name goes back to the type's title). A named module shows the type's title below its name.
   - The level meter (`useModuleLevels`) is studio-style, per channel on a -60..0 dBFS scale: the RMS as a solid bar, the peak as a lighter bar behind it (instant rise, falling at 20 dB/s), and the highest peak as a marker held for 30 updates (about 1.5 s) that turns red at full scale. While a module isn't processed, its meter stays at zero with its last channel count, so the node doesn't change height.
   - Controls inside nodes need the `nodrag`/`nowheel` classes. `ParameterSlider` is the shared parameter control, with linear or logarithmic scales and integer slider positions, so keyboard steps are exact.
 - **Graph editor (`@xyflow/react`):**
@@ -241,15 +242,14 @@ docs/
 3. **Engine (`src/Engine`)** (done): hosting, the JSON config store, module definition/module/connection/device/settings APIs, and SignalR hubs for change and module data pushes.
    - Stream recovery (watchdog and resume notification) was verified with a real sleep/resume.
 4. **UI** (done): `src/Web`, `src/WebSdk` and `src/Plugins/Main/Web`: the Vite app, graph editor and widgets.
+   - The build splits the libraries into their own chunks (React, Fluent UI, Fluent icons, React Flow, other dependencies), so a release only changes the small app chunk (about 40 kB) and the libraries stay cached. The total is still about 1 MB, which is fine for a UI served by the local engine.
    - Follow-ups:
-     - Renaming modules in the UI (the API supports names).
-     - Code splitting: the bundle is about 1 MB (295 kB gzipped), mostly Fluent UI and React Flow.
      - Automated UI tests. The checks so far were scripted Playwright runs against Edge outside the repo.
 5. **Shell (`src/Shell`)** (done): tray, WebView2 window, engine launch, discovery and supervision, autostart.
-   - Follow-ups:
-     - The tray menu's Close and Exit Micser were only checked by code review. The end-to-end checks covered engine start, UI and token handoff, single instance, and crash restart.
+   - Verified: engine start, UI and token handoff, single instance, crash restart, the tray's Close and Exit Micser, and restarting the engine process from the UI.
 6. **Packaging and updates** (done): Velopack setup and delta updates from GitHub releases, a release workflow, and install, update and uninstall hooks in the shell.
    - Verified with the published releases 0.1.0 and 0.1.1: install, uninstall and reinstall, the release workflow with a delta package, and the tray's "Restart to update" with a graceful engine stop.
    - Follow-ups:
      - Code signing (`vpk pack --signParams`).
+     - The toolbar's "Update to x.y.z" button and "Restart to update" in the settings (from 0.3.0) still need a test with the next release.
 7. **Later:** the VAC driver (needs an EV code-signing cert) and runtime-loaded plugins.

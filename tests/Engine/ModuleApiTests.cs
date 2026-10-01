@@ -121,6 +121,20 @@ public class ModuleApiTests
     }
 
     [Test]
+    public async Task UpdateModule_NameTooLong_IsBadRequest()
+    {
+        await using var factory = new EngineFactory();
+        using var client = factory.CreateAuthorizedClient();
+        var module = await factory.AddModuleAsync(client, "Gain");
+
+        using var response = await client.PutAsJsonAsync($"/api/modules/{module.Id}", module with { Name = new string('x', 101) }, factory.Json);
+        var problem = await response.Content.ReadFromJsonAsync<JsonObject>();
+
+        await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.BadRequest);
+        await Assert.That(problem!["errors"]!.AsObject().Select(e => e.Key)).IsEquivalentTo(["name"]);
+    }
+
+    [Test]
     public async Task UpdateModule_OtherType_IsBadRequest()
     {
         await using var factory = new EngineFactory();

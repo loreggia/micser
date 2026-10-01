@@ -4,6 +4,7 @@ import {
   Caption1,
   Card,
   CardHeader,
+  Input,
   Slider,
   ToggleButton,
   Tooltip,
@@ -14,6 +15,7 @@ import {
 import { DeleteRegular, FlashOffRegular, Speaker2Regular, SpeakerMuteRegular } from "@fluentui/react-icons";
 import { useModuleUpdate, type ModuleDto, type ModuleTypeDto, type WidgetDefinition } from "@micser/web-sdk";
 import { Handle, Position, useReactFlow, type Node, type NodeProps } from "@xyflow/react";
+import { useRef, useState } from "react";
 import { LevelMeter } from "./LevelMeter";
 
 export type ModuleNodeData = {
@@ -36,6 +38,12 @@ const useStyles = makeStyles({
   },
   header: {
     cursor: "grab",
+  },
+  title: {
+    cursor: "text",
+  },
+  titleInput: {
+    width: "100%",
   },
   actions: {
     display: "flex",
@@ -79,13 +87,18 @@ export function ModuleNode({ id, data, selected }: NodeProps<ModuleNodeType>) {
   const { deleteElements } = useReactFlow();
   const { module, moduleType, widget } = data;
   const Widget = widget?.component;
-  const title = module.name || widget?.title || module.type;
 
   return (
     <Card className={mergeClasses(styles.card, selected && styles.selected)} size="small">
       <CardHeader
         className={styles.header}
-        header={<Body1Strong>{title}</Body1Strong>}
+        header={
+          <ModuleTitle
+            name={module.name ?? null}
+            typeTitle={widget?.title || module.type}
+            onRename={(name) => update({ ...module, name } as ModuleDto)}
+          />
+        }
         description={module.name && widget ? <Caption1>{widget.title}</Caption1> : undefined}
         action={
           <div className={mergeClasses(styles.actions, "nodrag")}>
@@ -145,6 +158,86 @@ export function ModuleNode({ id, data, selected }: NodeProps<ModuleNodeType>) {
         <Ports key={port} type="source" port={port} index={index} count={ports.length} />
       ))}
     </Card>
+  );
+}
+
+/** Longest name the engine accepts. */
+const maxNameLength = 100;
+
+/**
+ * The module's title. Double-click to rename: Enter or leaving the field saves, Escape cancels, and an empty name goes back to the
+ * module type's title.
+ */
+function ModuleTitle({
+  name,
+  typeTitle,
+  onRename,
+}: {
+  name: string | null;
+  /** Shown without a name. */
+  typeTitle: string;
+  onRename: (name: string | null) => void;
+}) {
+  const styles = useStyles();
+  const [draft, setDraft] = useState<string>();
+  // the field may also lose focus when it's removed after Enter or Escape
+  const isFinished = useRef(false);
+  const title = name || typeTitle;
+
+  if (draft === undefined) {
+    return (
+      <Tooltip content="Double-click to rename" relationship="description">
+        <Body1Strong
+          className={styles.title}
+          onDoubleClick={() => {
+            isFinished.current = false;
+            setDraft(name ?? "");
+          }}
+        >
+          {title}
+        </Body1Strong>
+      </Tooltip>
+    );
+  }
+
+  const finish = () => {
+    isFinished.current = true;
+    setDraft(undefined);
+  };
+
+  const save = () => {
+    if (isFinished.current) {
+      return;
+    }
+
+    const renamed = draft.trim() || null;
+    finish();
+    if (renamed !== name) {
+      onRename(renamed);
+    }
+  };
+
+  return (
+    <Input
+      className={mergeClasses(styles.titleInput, "nodrag")}
+      size="small"
+      autoFocus
+      value={draft}
+      placeholder={typeTitle}
+      maxLength={maxNameLength}
+      aria-label="Module name"
+      onChange={(_, data) => setDraft(data.value)}
+      onBlur={save}
+      onKeyDown={(event) => {
+        // keep keys like Delete from reaching the graph, which would remove the module
+        event.stopPropagation();
+        if (event.key === "Enter") {
+          save();
+        } else if (event.key === "Escape") {
+          finish();
+        }
+      }}
+    />
   );
 }
 
