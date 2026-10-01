@@ -30,6 +30,10 @@ dotnet run --project tools/AudioHarness -- 1 2 --gain -100         # input 1 -> 
 dotnet run --project tools/AudioHarness -- latency 2               # round-trip latency of output 2 via loopback (plays -40 dB noise bursts)
 ```
 
+```sh
+./eng/pack.ps1 -Version 0.1.0       # Velopack release (Setup.exe, packages) in artifacts/releases; tags vX.Y.Z publish via .github/workflows/release.yml
+```
+
 The harness opens real devices: use a very low gain (as above) unless audible output is intended.
 
 CI (`.github/workflows/ci.yml`) runs the dotnet build/test and npm format/lint/build as separate jobs.
@@ -73,4 +77,4 @@ CI (`.github/workflows/ci.yml`) runs the dotnet build/test and npm format/lint/b
   - A new module type needs its own state record (data annotations on the record's parameters, as in ASP.NET Core), `IStatefulModule<TState>`, and a registration in its plugin's `Add…Plugin()`. The engine, API, config file and OpenAPI pick it up from there.
   - `AudioHost` is the single entry point for graph changes. It persists and broadcasts every change, and throws `EngineRequestException` for problem responses.
   - Engine tests use `EngineFactory` (temp config directory, token required) with a real audio engine and no devices selected.
-- `src/Driver` (C++ WDM driver) and `src/Installer` (WixSharp, .NET Framework) were moved unchanged and aren't in `Micser.slnx`.
+- `src/Driver` (C++ WDM driver) was moved unchanged and isn't in `Micser.slnx`. The old WixSharp installer (driver install custom actions) is in git history before its removal.

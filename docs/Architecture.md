@@ -13,7 +13,7 @@ Target architecture for the modernization of Micser (decided 2026-09-30). The `m
 | 5 | Plugins | **Built-in modules behind a plugin-ready API.** Each plugin is one folder holding its .NET project and its widget package (`Web/`). The engine references plugins at compile time, and their widgets are bundled into the SPA. No runtime DLL/JS loading yet. | Runtime-scanned WPF-dependent plugin assemblies |
 | 6 | Audio model | **Block-based graph with one engine clock and per-connection channel layouts** (see [Audio engine](#audio-engine)). Audio I/O uses **NAudio** (WASAPI). | Per-sample push via CSCore |
 | 7 | Layout | **`src/` = everything that ships, grouped by component** with short area names (the PowerToys/aspnetcore style; see below), plus `tests/` mirroring `src/` and `tools/` for dev-only programs. One `Micser.slnx`, repo-wide `Directory.Build.props`, `Directory.Packages.props` and `global.json`, and a root `package.json` with npm workspaces replacing yalc. | Everything under `src/` |
-| 8 | Packaging | **Deferred.** `src/Installer/` is kept as it is and not built. The custom update check is dropped for now. Decide between Velopack and WiX 5/6 once the app runs end to end. | WixSharp/WiX 3 + custom `HttpUpdateService` |
+| 8 | Packaging | **Velopack** (see [Packaging and updates](#packaging-and-updates)): a per-user install without admin rights, with delta updates from GitHub releases. The old WixSharp installer was removed; it's in git history. | WixSharp/WiX 3 + custom `HttpUpdateService` |
 
 ### Defaults (not discussed separately; change if you disagree)
 
@@ -54,7 +54,6 @@ src/
   ServiceDefaults/            Micser.ServiceDefaults: OpenTelemetry setup, exported only when run from the AppHost
   DriverUtility/              Micser.DriverUtility: VAC driver install/config CLI (standalone)
   Driver/                     C++ VAC driver (moved as is, not built by default)
-  Installer/                  moved as is, not built (see decision 8)
 tests/                        mirrors src/
   Audio/                      Micser.Audio.Tests
   Engine/                     Micser.Engine.Tests
@@ -62,7 +61,7 @@ tests/                        mirrors src/
 tools/                        dev-only programs, in Micser.slnx but never shipped
   AppHost/                    Micser.AppHost: Aspire AppHost that runs engine, Vite and (on demand) shell with a dashboard
   AudioHarness/               routes a real input through a gain module to a real output and prints buffer statistics
-eng/                          CI and build scripts (when needed)
+eng/                          build scripts: pack.ps1 (Velopack release)
 docs/
 ```
 
@@ -171,6 +170,31 @@ docs/
 - Logs, traces and metrics reach the dashboard through `Micser.ServiceDefaults`. Serilog keeps its own sinks and forwards to the OpenTelemetry logger provider (`writeToProviders`). Without `OTEL_EXPORTER_OTLP_ENDPOINT` nothing is exported.
 - The manual workflow (`dotnet run` on port 5080 plus `npm run dev`) still works.
 
+## Packaging and updates
+
+- **Build:** `eng/pack.ps1 -Version x.y.z` builds the web UI, publishes engine and shell self-contained (win-x64) into one folder, and packs it with `vpk` (a local dotnet tool) into `artifacts/releases`.
+  - The output is `Micser-win-Setup.exe`, a portable zip, and full and delta packages.
+  - Both apps use the same runtime, so its files are shared. Setup is about 75 MB.
+  - Nothing is code-signed yet, so SmartScreen warns on the first run.
+- **Release:** pushing a tag `vX.Y.Z` runs `.github/workflows/release.yml`.
+  - It downloads the previous release (the base for deltas), packs, and publishes a GitHub release.
+  - Tags with a suffix (`v0.2.0-beta.1`) become pre-releases, which installed copies ignore.
+- **Install:**
+  - The install goes to `%LocalAppData%\Micser`: the stub `Micser.exe`, `Update.exe`, `current\` (the app) and `packages\`. The shell's local data (logs, `engine.json`, `shell.json`, WebView2) lives in the same folder.
+  - Uninstalling removes the whole folder. The configuration in `%AppData%\Micser` stays.
+  - Shortcuts go to the Start menu and the desktop.
+- **Hooks** (`InstallHooks`; `VelopackApp.Run()` is the first call in the shell):
+  - After install, autostart is enabled; it points to `current\Micser.Shell.exe`, which stays the same across updates.
+  - Before an update, the old shell stops the engine gracefully, so it saves its configuration. Velopack then ends all remaining processes in the app folder.
+  - Before uninstall, autostart is removed. Velopack ends the processes before this hook, so the engine is killed.
+- **Updates** (`Updater`, only in an installed copy):
+  - The shell checks the GitHub releases 30 s after starting and every 12 h, and downloads a newer release in the background.
+  - The tray menu shows "Check for updates", or "Restart to update to x.y.z" once one is downloaded; that stops the engine and restarts into the new version.
+  - A downloaded update is also applied on the next shell start.
+  - `MICSER_UPDATE_SOURCE` points the shell at another feed (a local folder or URL) for testing.
+  - Velopack logs to `%LocalAppData%elopackelopack_Micser.log`.
+- **Driver:** Velopack can't run elevated steps. Installing the VAC driver will need a separate elevated step, e.g. `DriverUtility` started from the app. The removed WixSharp installer's driver custom actions (git history, `src/Installer`) can serve as reference.
+
 ## Roadmap
 
 1. **Skeleton** (done):
@@ -199,4 +223,8 @@ docs/
 5. **Shell (`src/Shell`)** (done): tray, WebView2 window, engine launch, discovery and supervision, autostart.
    - Follow-ups:
      - The tray menu's Close and Exit Micser were only checked by code review. The end-to-end checks covered engine start, UI and token handoff, single instance, and crash restart.
-6. **Later:** packaging and updates, the VAC driver (needs an EV code-signing cert), and runtime-loaded plugins.
+6. **Packaging and updates** (done): Velopack setup and delta updates from GitHub releases, a release workflow, and install, update and uninstall hooks in the shell.
+   - Follow-ups:
+     - Code signing (`vpk pack --signParams`).
+     - The tray's "Restart to update" was only checked by code review. The scripted end-to-end check covered install with autostart, background download, applying the update on start with a graceful engine stop, and uninstall.
+7. **Later:** the VAC driver (needs an EV code-signing cert) and runtime-loaded plugins.

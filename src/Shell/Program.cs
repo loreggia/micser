@@ -1,4 +1,5 @@
 using Serilog;
+using Velopack;
 
 namespace Micser.Shell;
 
@@ -10,6 +11,13 @@ internal static class Program
     [STAThread]
     private static int Main(string[] args)
     {
+        // first, so Velopack's install, update and uninstall runs exit here
+        VelopackApp.Build()
+            .OnAfterInstallFastCallback(InstallHooks.AfterInstall)
+            .OnBeforeUpdateFastCallback(InstallHooks.BeforeUpdate)
+            .OnBeforeUninstallFastCallback(InstallHooks.BeforeUninstall)
+            .Run();
+
         using var activation = new EventWaitHandle(false, EventResetMode.AutoReset, ActivationEventName, out var isFirstInstance);
         if (!isFirstInstance)
         {
@@ -46,7 +54,7 @@ internal static class Program
             var enginePath = options.EnginePath ?? Path.Combine(AppContext.BaseDirectory, "Micser.Engine.exe");
             using var supervisor = new EngineSupervisor(new EngineLocator(EngineLocator.DefaultDiscoveryPath, http), http, enginePath);
 
-            Application.Run(new TrayApplicationContext(options, supervisor, activation));
+            Application.Run(new TrayApplicationContext(options, supervisor, Updater.Create(), activation));
             return 0;
         }
         catch (Exception ex)

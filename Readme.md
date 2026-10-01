@@ -35,8 +35,14 @@ npm run dev                       # web UI on http://localhost:5173, proxies /ap
 dotnet run --project src/Shell -- --ui http://localhost:5173   # optional: the tray app showing the dev UI
 ```
 
-### Driver and installer
-The driver (`src/Driver`) and the installer (`src/Installer`) are not part of `Micser.slnx` yet. Building them requires the Windows Driver Kit and the WiX Toolset. Building them in Release mode also requires a code signing certificate named `Certificate.pfx` in a `crt` folder in the repository root.
+### Packaging
+```powershell
+./eng/pack.ps1 -Version 0.1.0   # Velopack setup and update packages in artifacts/releases
+```
+Pushing a tag `vX.Y.Z` builds the release on GitHub Actions and publishes it as a GitHub release, which installed copies update from.
+
+### Driver
+The driver (`src/Driver`) is not part of `Micser.slnx` yet. Building it requires the Windows Driver Kit. Building it in Release mode also requires a code signing certificate named `Certificate.pfx` in a `crt` folder in the repository root.
 
 ## Plugins
 Audio modules are provided by plugins. Each plugin consists of a .NET project and a web package with the widgets for its modules. The main modules (device input/output, gain, compressor, ...) are provided by `src/Plugins/Main`, which also serves as an example of how to implement a plugin.
@@ -44,6 +50,7 @@ Audio modules are provided by plugins. Each plugin consists of a .NET project an
 ## Credits
 This project uses the following libraries:
 * [Aspire](https://aspire.dev) (development orchestration)
+* [Velopack](https://velopack.io)
 * [NAudio](https://github.com/naudio/NAudio)
 * [React](https://react.dev/)
 * [Serilog](https://serilog.net/)

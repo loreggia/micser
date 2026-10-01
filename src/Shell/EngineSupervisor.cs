@@ -1,5 +1,4 @@
 using System.Diagnostics;
-using System.Net.Http.Headers;
 using Serilog;
 
 namespace Micser.Shell;
@@ -79,18 +78,8 @@ internal sealed class EngineSupervisor : IDisposable
 
         try
         {
-            using var request = new HttpRequestMessage(HttpMethod.Post, new Uri(engine.Url, "/api/engine/shutdown"));
-            if (engine.Token != null)
-            {
-                request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", engine.Token);
-            }
-
-            using var response = await _http.SendAsync(request);
-            response.EnsureSuccessStatusCode();
-
-            using var process = Process.GetProcessById(engine.ProcessId);
             using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
-            await process.WaitForExitAsync(timeout.Token);
+            await EngineControl.ShutdownAsync(_http, engine, timeout.Token);
         }
         catch (Exception ex) when (ex is HttpRequestException or ArgumentException or OperationCanceledException)
         {
