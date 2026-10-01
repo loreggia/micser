@@ -236,7 +236,7 @@ docs/
    - Port `src/DriverUtility` and add it to the solution.
    - Unit tests, plus a small console harness that routes input → gain → output as a smoke test (`tools/AudioHarness`). Its `latency` mode measures the software round trip (render + loopback capture) by cross-correlating a quiet noise burst: about 47–50 ms on a 48 kHz USB interface, from 240 ms with NAudio's default render buffer and 10 ms blocks.
    - Follow-ups:
-     - The drift controller measures the ring fill once per block. The reading depends on the phase between device periods and engine blocks, so after startup it can take ~10 s (at up to ~1500 ppm) to settle. Measuring against the WASAPI QPC timestamps would avoid the phase bias.
+     - Investigated and dropped: measuring the ring fill phase-corrected (from timestamps of the device callbacks) and starting streams exactly at the target. Three runs each against the per-block measurement showed no measurable difference in settling time (7-30 s either way) or swings; the scatter comes from the devices (a wireless headset delivers in irregular bursts). The corrections stay below ~2000 ppm (about 3.5 cents, inaudible), and the adaptive buffers absorb the fill swings.
      - `master`'s "use system volume" option (following the Windows master volume) isn't ported yet.
      - Lower latency needs device periods below 10 ms. `IAudioClient3` low-latency mode (NAudio `WithLowLatency`) wasn't available on the tested devices and made loopback capture fail; exclusive mode would work but takes the device away from other applications.
 3. **Engine (`src/Engine`)** (done): hosting, the JSON config store, module definition/module/connection/device/settings APIs, and SignalR hubs for change and module data pushes.
@@ -249,7 +249,7 @@ docs/
    - Verified: engine start, UI and token handoff, single instance, crash restart, the tray's Close and Exit Micser, and restarting the engine process from the UI.
 6. **Packaging and updates** (done): Velopack setup and delta updates from GitHub releases, a release workflow, and install, update and uninstall hooks in the shell.
    - Verified with the published releases 0.1.0 and 0.1.1: install, uninstall and reinstall, the release workflow with a delta package, and the tray's "Restart to update" with a graceful engine stop.
+   - The UI's "Update to x.y.z" button (from 0.3.0) was verified with the update to 0.4.0.
    - Follow-ups:
      - Code signing (`vpk pack --signParams`).
-     - The toolbar's "Update to x.y.z" button and "Restart to update" in the settings (from 0.3.0) still need a test with the next release.
 7. **Later:** the VAC driver (needs an EV code-signing cert) and runtime-loaded plugins.
