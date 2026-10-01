@@ -20,6 +20,7 @@ npm run lint                 # eslint (flat config at the root)
 npm run format:check         # prettier; .prettierignore limits it to the web workspaces
 npm run generate:api -w @micser/web-sdk   # regenerate the API client after engine API changes (build the engine first)
 
+aspire start                        # AppHost (tools/AppHost): engine + Vite, shell on demand, dashboard; "aspire stop" ends it
 dotnet run --project src/Engine     # http://127.0.0.1:5080
 npm run dev                         # Vite on http://localhost:5173, proxies /api and /hubs to the engine
 dotnet run --project src/Shell -- --ui http://localhost:5173   # tray + WebView2 showing Vite; uses the running dev engine
@@ -50,7 +51,7 @@ CI (`.github/workflows/ci.yml`) runs the dotnet build/test and npm format/lint/b
   - Fluent UI v9 components and `makeStyles` with `tokens`; no hard-coded colors.
   - SignalR `hub.on` handlers must not return a value; SignalR would send it to the server as an invocation result.
 - Dependency direction:
-  - .NET: `Plugins → Audio` and `Engine → Audio, Plugins`. `Shell` references no Micser project and talks to the engine over HTTP only.
+  - .NET: `Plugins → Audio` and `Engine → Audio, Plugins, ServiceDefaults`. `tools/AppHost` references the runnable projects. `Shell` references no Micser project and talks to the engine over HTTP only.
   - npm: `plugin-* → web-sdk` and `web → web-sdk, plugin-*`.
 - Package versions are central in `Directory.Packages.props`, so `PackageReference` items carry no `Version`. `TreatWarningsAsErrors` is on for all projects.
 - Libraries:

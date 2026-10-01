@@ -7,6 +7,7 @@ using Micser.Engine.Hubs;
 using Micser.Engine.Modules;
 using Micser.Engine.Security;
 using Micser.Plugins.Main;
+using Micser.ServiceDefaults;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.SignalR;
 using Serilog;
@@ -27,9 +28,16 @@ if (checkSingleInstance && instance == null)
 }
 
 builder.Services.Configure<EngineOptions>(builder.Configuration.GetSection(EngineOptions.SectionName));
-builder.Services.AddSerilog((services, logger) => logger
-    .ReadFrom.Configuration(builder.Configuration)
-    .ReadFrom.Services(services));
+
+// Serilog writes its own sinks and forwards to the remaining providers (OpenTelemetry)
+builder.Logging.ClearProviders();
+builder.AddServiceDefaults();
+builder.Services.AddSerilog(
+    (services, logger) => logger
+        .ReadFrom.Configuration(builder.Configuration)
+        .ReadFrom.Services(services),
+    writeToProviders: true);
+
 builder.Services.AddProblemDetails();
 builder.Services.AddEngineOpenApi();
 

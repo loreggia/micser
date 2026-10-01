@@ -1,0 +1,6 @@
+{
+  "appHost": {
+    "language": "csharp",
+    "path": "tools/AppHost/Micser.AppHost.csproj"
+  }
+}

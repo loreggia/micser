@@ -21,6 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Audio\Micser.Audio.csproj" />
     <ProjectReference Include="..\Plugins\Main\Micser.Plugins.Main.csproj" />
+    <ProjectReference Include="..\ServiceDefaults\Micser.ServiceDefaults.csproj" />
   </ItemGroup>
 
   <ItemGroup>
