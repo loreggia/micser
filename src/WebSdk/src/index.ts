@@ -1,8 +1,19 @@
 export * from "./api";
 export { ParameterSlider, type ParameterSliderProps } from "./controls/ParameterSlider";
-export { EngineConnection, type EngineConnectionState } from "./engine/EngineConnection";
+export {
+  EngineConnection,
+  type EngineConnectionState,
+  type ModuleLevels,
+  type PortLevels,
+} from "./engine/EngineConnection";
 export { EngineProvider } from "./engine/EngineProvider";
-export { useEngineConnection, useEngineConnectionState, useModuleData, useModuleUpdate } from "./engine/hooks";
+export {
+  useEngineConnection,
+  useEngineConnectionState,
+  useModuleData,
+  useModuleLevels,
+  useModuleUpdate,
+} from "./engine/hooks";
 export {
   defineWidget,
   type ModuleOfType,

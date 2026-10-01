@@ -14,6 +14,7 @@ import {
 import { DeleteRegular, FlashOffRegular, Speaker2Regular, SpeakerMuteRegular } from "@fluentui/react-icons";
 import { useModuleUpdate, type ModuleDto, type ModuleTypeDto, type WidgetDefinition } from "@micser/web-sdk";
 import { Handle, Position, useReactFlow, type Node, type NodeProps } from "@xyflow/react";
+import { LevelMeter } from "./LevelMeter";
 
 export type ModuleNodeData = {
   module: ModuleDto;
@@ -68,7 +69,7 @@ const useStyles = makeStyles({
 });
 
 /**
- * A module on the graph: name, mute, bypass, volume, the module type's widget, and the connectors.
+ * A module on the graph: name, mute, bypass, volume, level meter, the module type's widget, and the connectors.
  */
 export function ModuleNode({ id, data, selected }: NodeProps<ModuleNodeType>) {
   const styles = useStyles();
@@ -129,6 +130,7 @@ export function ModuleNode({ id, data, selected }: NodeProps<ModuleNodeType>) {
         />
         <Caption1 className={styles.volumeValue}>{Math.round(module.volume * 100)}%</Caption1>
       </div>
+      <LevelMeter moduleId={module.id} />
       {Widget && (
         <div className={mergeClasses(styles.body, "nodrag", "nowheel")}>
           <Widget module={module} setState={(state) => update({ ...module, state } as ModuleDto)} />

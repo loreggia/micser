@@ -93,4 +93,9 @@ public sealed class OutputPort : AudioPort
         : base(module, name)
     {
     }
+
+    /// <summary>
+    /// Measures the output after volume and mute. Available once the module is added to a graph.
+    /// </summary>
+    public LevelMeter? Meter { get; internal set; }
 }

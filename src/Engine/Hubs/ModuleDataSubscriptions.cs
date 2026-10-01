@@ -1,12 +1,24 @@
 namespace Micser.Engine.Hubs;
 
 /// <summary>
-/// Which hub connections are subscribed to which modules' live data.
+/// Which hub connections are subscribed to which modules' live data, and to the levels.
 /// </summary>
 public sealed class ModuleDataSubscriptions
 {
+    private readonly HashSet<string> _levelSubscribers = [];
     private readonly Lock _lock = new();
     private readonly Dictionary<Guid, HashSet<string>> _subscribers = [];
+
+    public bool HasLevelSubscribers
+    {
+        get
+        {
+            lock (_lock)
+            {
+                return _levelSubscribers.Count > 0;
+            }
+        }
+    }
 
     public void Add(string connectionId, Guid moduleId)
     {
@@ -18,6 +30,14 @@ public sealed class ModuleDataSubscriptions
             }
 
             connections.Add(connectionId);
+        }
+    }
+
+    public void AddLevels(string connectionId)
+    {
+        lock (_lock)
+        {
+            _levelSubscribers.Add(connectionId);
         }
     }
 
@@ -47,6 +67,7 @@ public sealed class ModuleDataSubscriptions
     {
         lock (_lock)
         {
+            _levelSubscribers.Remove(connectionId);
             foreach (var (moduleId, connections) in _subscribers.ToArray())
             {
                 if (connections.Remove(connectionId) && connections.Count == 0)
@@ -54,6 +75,14 @@ public sealed class ModuleDataSubscriptions
                     _subscribers.Remove(moduleId);
                 }
             }
+        }
+    }
+
+    public void RemoveLevels(string connectionId)
+    {
+        lock (_lock)
+        {
+            _levelSubscribers.Remove(connectionId);
         }
     }
 }
