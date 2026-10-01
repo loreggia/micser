@@ -22,6 +22,7 @@ public sealed class AudioHost : IDisposable
     private readonly IEngineNotifier _notifier;
     private readonly IServiceProvider _services;
     private readonly EngineConfigStore _store;
+    private readonly ISystemVolume _systemVolume;
     private AudioEngine? _engine;
     private AudioGraph? _graph;
     private IReadOnlyList<ModuleTypeDto>? _moduleTypes;
@@ -33,6 +34,7 @@ public sealed class AudioHost : IDisposable
         ModuleCatalog catalog,
         EngineConfigStore store,
         AudioDeviceService devices,
+        ISystemVolume systemVolume,
         IEngineNotifier notifier,
         ILoggerFactory loggerFactory)
     {
@@ -40,10 +42,12 @@ public sealed class AudioHost : IDisposable
         _catalog = catalog;
         _store = store;
         _devices = devices;
+        _systemVolume = systemVolume;
         _notifier = notifier;
         _loggerFactory = loggerFactory;
         _logger = loggerFactory.CreateLogger<AudioHost>();
         _devices.DeviceChanged += OnDeviceChanged;
+        _systemVolume.Changed += OnSystemVolumeChanged;
     }
 
     private AudioEngine Engine => _engine ?? throw new InvalidOperationException("The audio host isn't initialized.");
@@ -57,7 +61,7 @@ public sealed class AudioHost : IDisposable
 
         lock (_lock)
         {
-            var entry = AddModuleCore(Guid.NewGuid(), definition, new ModuleSettings(request.Name, request.Position, 1f, false, false), null);
+            var entry = AddModuleCore(Guid.NewGuid(), definition, new ModuleSettings(request.Name, request.Position, 1f, false, false, false), null);
             Persist();
             var dto = ToDto(entry);
             _notifier.ModuleChanged(dto);
@@ -97,6 +101,7 @@ public sealed class AudioHost : IDisposable
     public void Dispose()
     {
         _devices.DeviceChanged -= OnDeviceChanged;
+        _systemVolume.Changed -= OnSystemVolumeChanged;
         lock (_lock)
         {
             TearDown();
@@ -306,7 +311,7 @@ public sealed class AudioHost : IDisposable
                 throw EngineRequestException.Invalid($"Module {id} is of type '{entry.Definition.Type}'.");
             }
 
-            entry.Settings = ModuleSettings.From(dto) with { IsBypassed = dto.IsBypassed && entry.Module is EffectModule };
+            entry.Settings = WithSystemVolume(ModuleSettings.From(dto) with { IsBypassed = dto.IsBypassed && entry.Module is EffectModule });
             ApplySettings(entry.Module, entry.Settings);
             entry.Definition.SetState(entry.Module, dto.StateObject);
             Persist();
@@ -361,6 +366,7 @@ public sealed class AudioHost : IDisposable
 
     private ModuleEntry AddModuleCore(Guid id, AudioModuleDefinition definition, ModuleSettings settings, object? state)
     {
+        settings = WithSystemVolume(settings);
         var module = definition.CreateModule(_services);
         try
         {
@@ -484,6 +490,33 @@ public sealed class AudioHost : IDisposable
         });
     }
 
+    private void OnSystemVolumeChanged(object? sender, EventArgs e)
+    {
+        lock (_lock)
+        {
+            var changed = new List<ModuleEntry>();
+            foreach (var entry in _modules.Values)
+            {
+                var settings = WithSystemVolume(entry.Settings);
+                if (settings != entry.Settings)
+                {
+                    entry.Settings = settings;
+                    ApplySettings(entry.Module, settings);
+                    changed.Add(entry);
+                }
+            }
+
+            if (changed.Count > 0)
+            {
+                Persist();
+                foreach (var entry in changed)
+                {
+                    _notifier.ModuleChanged(ToDto(entry));
+                }
+            }
+        }
+    }
+
     private void Persist()
     {
         _store.Save(new EngineConfiguration
@@ -534,6 +567,16 @@ public sealed class AudioHost : IDisposable
     private ModuleDto ToDto(ModuleEntry entry)
     {
         return _catalog.CreateDto(entry.Id, entry.Definition, entry.Settings, entry.Definition.GetState(entry.Module));
+    }
+
+    /// <summary>
+    /// Takes volume and mute from the system volume if the module follows it and there is a default output device.
+    /// </summary>
+    private ModuleSettings WithSystemVolume(ModuleSettings settings)
+    {
+        return settings.UseSystemVolume && _systemVolume.Level is { } level
+            ? settings with { Volume = level.Gain, IsMuted = level.IsMuted }
+            : settings;
     }
 
     private sealed record ConnectionEntry(ConnectionDto Dto, OutputPort Source, InputPort Target);
