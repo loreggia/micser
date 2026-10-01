@@ -74,6 +74,12 @@ public static class ApiEndpoints
         engine.MapGet("", (AudioHost host) => TypedResults.Ok(host.GetStatus())).WithName("GetEngineStatus");
         engine.MapPost("/start", (AudioHost host) => TypedResults.Ok(host.Start())).WithName("StartEngine");
         engine.MapPost("/stop", (AudioHost host) => TypedResults.Ok(host.Stop())).WithName("StopEngine");
+        engine.MapPost("/shutdown", (IHostApplicationLifetime lifetime) =>
+        {
+            // after the response: the shutdown stops the server
+            lifetime.StopApplication();
+            return TypedResults.Accepted((string?)null);
+        }).WithName("ShutdownEngine").WithDescription("Stops the engine process gracefully; used by the shell's exit command.");
         engine.MapPut("/settings", (EngineSettingsDto settings, AudioHost host) => TypedResults.Ok(host.UpdateSettings(settings))).WithName("UpdateEngineSettings");
     }
 

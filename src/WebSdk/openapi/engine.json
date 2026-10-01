@@ -375,6 +375,20 @@
         }
       }
     },
+    "/api/engine/shutdown": {
+      "post": {
+        "tags": [
+          "Engine"
+        ],
+        "description": "Stops the engine process gracefully; used by the shell's exit command.",
+        "operationId": "ShutdownEngine",
+        "responses": {
+          "202": {
+            "description": "Accepted"
+          }
+        }
+      }
+    },
     "/api/engine/settings": {
       "put": {
         "tags": [

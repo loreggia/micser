@@ -377,6 +377,76 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getStopEngineMutationOptions(options), queryClient);
     }
+    export const getShutdownEngineUrl = () => {
+
+
+
+
+  return `/api/engine/shutdown`
+}
+
+/**
+ * Stops the engine process gracefully; used by the shell's exit command.
+ */
+export const shutdownEngine = async ( options?: Parameters<typeof engineFetch>[1]): Promise<void> => {
+
+  return engineFetch<void>(getShutdownEngineUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getShutdownEngineMutationKey = () => ['shutdownEngine'] as const;
+
+export const getShutdownEngineMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof shutdownEngine>>, TError,void, TContext>, request?: SecondParameter<typeof engineFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof shutdownEngine>>, TError,void, TContext> => {
+
+const mutationKey = getShutdownEngineMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof shutdownEngine>>, void> = () => {
+
+
+          return  shutdownEngine(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type ShutdownEngineMutationResult = NonNullable<Awaited<ReturnType<typeof shutdownEngine>>>
+
+    export type ShutdownEngineMutationError = unknown
+
+
+    export const useShutdownEngine = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof shutdownEngine>>, TError,void, TContext>, request?: SecondParameter<typeof engineFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof shutdownEngine>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getShutdownEngineMutationOptions(options), queryClient);
+    }
     export const getUpdateEngineSettingsUrl = () => {
 
 

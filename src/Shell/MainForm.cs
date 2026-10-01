@@ -1,30 +1,177 @@
+using System.Diagnostics;
+using System.Net;
+using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.WinForms;
+using Serilog;
 
 namespace Micser.Shell;
 
 /// <summary>
-/// Hosts the web UI. Closing the window only hides the UI; the shell keeps running in the tray.
+/// Shows the web UI of the engine. Closing the window disposes it (and its WebView2 processes); the shell keeps
+/// running in the tray.
 /// </summary>
 internal sealed class MainForm : Form
 {
-    public MainForm(Uri url)
+    private const string WebView2DownloadUrl = "https://go.microsoft.com/fwlink/p/?LinkId=2124703";
+
+    private readonly string _settingsPath;
+    private readonly EngineSupervisor _supervisor;
+    private readonly Uri? _uiUrl;
+    private readonly WebView2 _webView;
+    private Uri? _shownUrl;
+
+    public MainForm(EngineSupervisor supervisor, Uri? uiUrl, string settingsPath)
     {
+        _supervisor = supervisor;
+        _uiUrl = uiUrl;
+        _settingsPath = settingsPath;
+
         Text = "Micser";
         Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath);
-        ClientSize = new Size(1280, 800);
-        StartPosition = FormStartPosition.CenterScreen;
+        MinimumSize = new Size(640, 400);
+        ApplyWindowSettings(WindowSettings.Load(settingsPath));
 
-        var webView = new WebView2
+        _webView = new WebView2 { Dock = DockStyle.Fill, DefaultBackgroundColor = Color.Transparent };
+        Controls.Add(_webView);
+
+        _supervisor.Changed += OnEngineChanged;
+    }
+
+    protected override void Dispose(bool disposing)
+    {
+        if (disposing)
         {
-            Dock = DockStyle.Fill,
-            CreationProperties = new CoreWebView2CreationProperties
+            _supervisor.Changed -= OnEngineChanged;
+        }
+
+        base.Dispose(disposing);
+    }
+
+    protected override void OnFormClosing(FormClosingEventArgs e)
+    {
+        var bounds = WindowState == FormWindowState.Normal ? Bounds : RestoreBounds;
+        new WindowSettings(bounds.X, bounds.Y, bounds.Width, bounds.Height, WindowState == FormWindowState.Maximized).Save(_settingsPath);
+        base.OnFormClosing(e);
+    }
+
+    protected override async void OnLoad(EventArgs e)
+    {
+        base.OnLoad(e);
+
+        try
+        {
+            var userDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Micser", "WebView2");
+            var environment = await CoreWebView2Environment.CreateAsync(userDataFolder: userDataFolder);
+            await _webView.EnsureCoreWebView2Async(environment);
+        }
+        catch (WebView2RuntimeNotFoundException ex)
+        {
+            Log.Error(ex, "The WebView2 runtime is missing.");
+            var answer = MessageBox.Show(
+                this,
+                "Micser needs the Microsoft Edge WebView2 Runtime to show its window. Open the download page?",
+                "Micser",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning);
+            if (answer == DialogResult.Yes)
             {
-                UserDataFolder = Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Micser", "WebView2"),
-            },
-            Source = url,
+                OpenInBrowser(new Uri(WebView2DownloadUrl));
+            }
+
+            Close();
+            return;
+        }
+
+        _webView.CoreWebView2.NewWindowRequested += (_, args) =>
+        {
+            args.Handled = true;
+            if (Uri.TryCreate(args.Uri, UriKind.Absolute, out var uri))
+            {
+                OpenInBrowser(uri);
+            }
         };
 
-        Controls.Add(webView);
+        ShowEngine();
+    }
+
+    private static void OpenInBrowser(Uri uri)
+    {
+        if (uri.Scheme == Uri.UriSchemeHttps || uri.Scheme == Uri.UriSchemeHttp)
+        {
+            Process.Start(new ProcessStartInfo(uri.AbsoluteUri) { UseShellExecute = true })?.Dispose();
+        }
+    }
+
+    private void ApplyWindowSettings(WindowSettings? settings)
+    {
+        if (settings != null && settings.IsVisibleOn(Screen.AllScreens.Select(s => s.WorkingArea)))
+        {
+            StartPosition = FormStartPosition.Manual;
+            Bounds = new Rectangle(settings.X, settings.Y, settings.Width, settings.Height);
+            WindowState = settings.IsMaximized ? FormWindowState.Maximized : FormWindowState.Normal;
+        }
+        else
+        {
+            StartPosition = FormStartPosition.CenterScreen;
+            ClientSize = new Size(1280, 800);
+        }
+    }
+
+    private void OnEngineChanged(object? sender, EventArgs e)
+    {
+        ShowEngine();
+    }
+
+    /// <summary>
+    /// Shows the UI of the current engine with its access token, or a waiting page.
+    /// </summary>
+    private void ShowEngine()
+    {
+        if (_webView.CoreWebView2 == null)
+        {
+            return;
+        }
+
+        var engine = _supervisor.Engine;
+        if (engine == null)
+        {
+            _shownUrl = null;
+            _webView.NavigateToString(StatusPage(_supervisor.State));
+            return;
+        }
+
+        var url = new UriBuilder(_uiUrl ?? engine.Url);
+        if (engine.Token != null)
+        {
+            url.Fragment = "token=" + Uri.EscapeDataString(engine.Token);
+        }
+
+        // the token changes with every engine start, so a changed URL means a new engine
+        if (url.Uri != _shownUrl)
+        {
+            _shownUrl = url.Uri;
+            _webView.CoreWebView2.Navigate(url.Uri.AbsoluteUri);
+        }
+    }
+
+    private static string StatusPage(EngineState state)
+    {
+        var message = state == EngineState.Unavailable
+            ? "The audio engine isn't running and couldn't be started. Its log is in %LOCALAPPDATA%\\Micser\\logs."
+            : "Starting the audio engine…";
+
+        return $$"""
+            <!doctype html>
+            <html>
+            <head>
+            <meta charset="utf-8">
+            <style>
+              :root { color-scheme: light dark; }
+              body { margin: 0; height: 100vh; display: grid; place-items: center; font: 14px "Segoe UI", sans-serif; }
+            </style>
+            </head>
+            <body><p>{{WebUtility.HtmlEncode(message)}}</p></body>
+            </html>
+            """;
     }
 }

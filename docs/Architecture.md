@@ -27,7 +27,7 @@ Target architecture for the modernization of Micser (decided 2026-09-30). The `m
 - **Shell:** WinForms (native `NotifyIcon`) with the WebView2 WinForms control. It has no app logic, so WPF isn't needed.
 - **Web tooling:** npm workspaces consume the internal packages (`@micser/web-sdk`, `@micser/plugin-main`) as TypeScript source, so they need no build step of their own. TypeScript is pinned to `~6.0` because `typescript-eslint` doesn't support 7.x yet.
 - **Engine discovery and security:** see [Engine](#engine).
-- **Autostart:** an `HKCU\...\Run` entry for the shell. The shell launches the engine if it isn't running.
+- **Autostart:** an `HKCU\...\Run` entry for the shell. The shell launches the engine if it isn't running (see [Shell](#shell)).
 - **UI libraries:** Fluent UI React v9 (light/dark following the OS), TanStack Query for engine state, Orval for the API client (see [UI](#ui)).
 
 ## Layout
@@ -101,7 +101,7 @@ docs/
   - It carries the id, name, UI position, volume, mute, bypass (effects only) and the typed `state`.
   - The API, SignalR and the config file all use the same schema. OpenAPI shows it as `anyOf` with a discriminator mapping, so a generated TS client narrows `state` by `type`.
 - **API** (`/api`, see `src/Engine/Endpoints/ApiEndpoints.cs`):
-  - `health`, `module-types` (ports and default state), `modules` (create with defaults, full update with `PUT`, delete), `connections`, `devices`, and `engine` (status, start, stop, settings).
+  - `health`, `module-types` (ports and default state), `modules` (create with defaults, full update with `PUT`, delete), `connections`, `devices`, and `engine` (status, start, stop, settings, shutdown).
   - Errors are problem details: 400 with `errors` keyed by camelCase property path (e.g. `state.bands[1].frequency`), 404, and 409 for cycles and duplicates.
 - **Hub** (`/hubs/engine`):
   - Pushes `ModuleChanged`, `ModuleRemoved`, `ConnectionAdded`, `ConnectionRemoved`, `DevicesChanged` and `StatusChanged` to all clients, in the order they happened.
@@ -141,6 +141,25 @@ docs/
   - `dotnet publish src/Engine` copies `src/Web/dist` into `wwwroot`, so run `npm run build` first.
   - The engine serves the SPA and falls back to `index.html` for client routes, but not for `/api`, `/hubs` or files.
 
+## Shell
+
+- **Engine discovery:** `EngineLocator` reads the discovery file and trusts it only if its process is a running `Micser.Engine` that answers `/api/health`. The file stays behind after a crash.
+- **Supervision:** `EngineSupervisor` polls the engine (every 2 s, or 0.5 s while there is none).
+  - It starts `Micser.Engine.exe` from the shell's folder (or `--engine <path>`) when none is running. The engine is started detached, so it keeps running when the shell exits.
+  - It restarts a crashed engine, at most 3 times per minute.
+  - It reports address and token changes to the window.
+  - Without an engine executable, it only waits for a running engine (development).
+- **Tray:**
+  - The menu has Open, "Start with Windows" (`HKCU\...\Run` value `Micser` = `"<shell>" --minimized`), Close and Exit Micser.
+  - "Close" exits the shell only, and the audio keeps running. "Exit Micser" stops the engine via `POST /api/engine/shutdown` and waits for it to exit.
+  - A second shell start signals the first through a named event (`Local\Micser.Shell`), which shows its window.
+- **Window:**
+  - It's created on demand and disposed on close, which frees the WebView2 processes.
+  - Position, size and maximized state are kept in `%LocalAppData%\Micser\shell.json`.
+  - It shows `{engine url}/#token={token}`, or the `--ui <url>` override with the engine's token (Vite in development), and re-navigates when the engine changes. While no engine is available, a status page is shown.
+  - Links that open new windows go to the default browser. A missing WebView2 runtime leads to a download prompt.
+- **Logs:** `%LocalAppData%\Micser\logs\shell-*.log` (Serilog). Fatal startup errors also show a message box.
+
 ## Roadmap
 
 1. **Skeleton** (done):
@@ -166,5 +185,7 @@ docs/
      - Renaming modules in the UI (the API supports names).
      - Code splitting: the bundle is about 1 MB (295 kB gzipped), mostly Fluent UI and React Flow.
      - Automated UI tests. The checks so far were scripted Playwright runs against Edge outside the repo.
-5. **Shell (`src/Shell`):** tray, WebView2 window, engine launch and discovery, autostart.
+5. **Shell (`src/Shell`)** (done): tray, WebView2 window, engine launch, discovery and supervision, autostart.
+   - Follow-ups:
+     - The tray menu's Close and Exit Micser were only checked by code review. The end-to-end checks covered engine start, UI and token handoff, single instance, and crash restart.
 6. **Later:** packaging and updates, the VAC driver (needs an EV code-signing cert), and runtime-loaded plugins.
