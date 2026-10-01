@@ -1,8 +1,12 @@
+using System.ComponentModel.DataAnnotations;
 using Micser.Audio;
 
 namespace Micser.Plugins.Main.Modules;
 
-public class GainModule : EffectModule
+/// <param name="Gain">Gain in dB.</param>
+public sealed record GainState([Range(-60f, 24f)] float Gain = 0f);
+
+public class GainModule : EffectModule, IStatefulModule<GainState>
 {
     private float _appliedFactor = 1f;
 
@@ -10,6 +14,16 @@ public class GainModule : EffectModule
     /// Gain in dB. Changes are ramped over one block.
     /// </summary>
     public float Gain { get; set; }
+
+    public GainState GetState()
+    {
+        return new GainState(Gain);
+    }
+
+    public void SetState(GainState state)
+    {
+        Gain = state.Gain;
+    }
 
     protected override void Process(AudioBuffer buffer)
     {

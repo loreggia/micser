@@ -163,21 +163,29 @@ public sealed class RenderStream : IDeviceStream
         }
     }
 
-    private sealed class RingBufferWaveProvider(RenderStream stream, WaveFormat waveFormat) : IWaveProvider
+    private sealed class RingBufferWaveProvider : IWaveProvider
     {
-        public WaveFormat WaveFormat { get; } = waveFormat;
+        private readonly RenderStream _stream;
+
+        public RingBufferWaveProvider(RenderStream stream, WaveFormat waveFormat)
+        {
+            _stream = stream;
+            WaveFormat = waveFormat;
+        }
+
+        public WaveFormat WaveFormat { get; }
 
         public int Read(Span<byte> buffer)
         {
             var samples = MemoryMarshal.Cast<byte, float>(buffer);
-            var read = stream._ring.Read(samples);
+            var read = _stream._ring.Read(samples);
             if (read < samples.Length)
             {
                 samples[read..].Clear();
-                Interlocked.Increment(ref stream._underruns);
+                Interlocked.Increment(ref _stream._underruns);
             }
 
-            stream._isConsuming = true;
+            _stream._isConsuming = true;
 
             return buffer.Length;
         }

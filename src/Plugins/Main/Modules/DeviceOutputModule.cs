@@ -4,10 +4,12 @@ using Microsoft.Extensions.Logging;
 
 namespace Micser.Plugins.Main.Modules;
 
+public sealed record DeviceOutputState(string? DeviceId, string? AdapterName) : DeviceModuleState(DeviceId, AdapterName);
+
 /// <summary>
 /// Plays its input on an output device. The input is mixed into the device's channel layout.
 /// </summary>
-public class DeviceOutputModule : DeviceModule<RenderStream>
+public class DeviceOutputModule : DeviceModule<RenderStream>, IStatefulModule<DeviceOutputState>
 {
     public DeviceOutputModule(AudioDeviceService devices, ILogger<DeviceOutputModule> logger)
         : base(devices, logger)
@@ -18,6 +20,16 @@ public class DeviceOutputModule : DeviceModule<RenderStream>
     public InputPort Input { get; }
 
     protected override DeviceDirection Direction => DeviceDirection.Output;
+
+    public DeviceOutputState GetState()
+    {
+        return new DeviceOutputState(DeviceId, AdapterName);
+    }
+
+    public void SetState(DeviceOutputState state)
+    {
+        SelectDevice(state.DeviceId, state.AdapterName);
+    }
 
     protected override void OnStreamChanged(RenderStream? stream)
     {

@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Micser.Audio;
 using NAudio.Dsp;
 
@@ -6,12 +7,17 @@ namespace Micser.Plugins.Main.Modules;
 /// <param name="Frequency">Center frequency in Hz.</param>
 /// <param name="Gain">Gain at the center frequency in dB.</param>
 /// <param name="Q">Quality factor; higher values narrow the band.</param>
-public sealed record EqualizerBand(float Frequency, float Gain, float Q = 1.41f);
+public sealed record EqualizerBand(
+    [Range(20f, 20000f)] float Frequency,
+    [Range(-24f, 24f)] float Gain,
+    [Range(0.1f, 20f)] float Q = 1.41f);
+
+public sealed record EqualizerState([MaxLength(32)] IReadOnlyList<EqualizerBand> Bands);
 
 /// <summary>
 /// Parametric equalizer made of peaking filters.
 /// </summary>
-public class EqualizerModule : EffectModule
+public class EqualizerModule : EffectModule, IStatefulModule<EqualizerState>
 {
     private IReadOnlyList<EqualizerBand>? _appliedBands;
     private BiQuadFilter[][] _filters = [];
@@ -20,6 +26,16 @@ public class EqualizerModule : EffectModule
     /// The bands; replace the list to change them. Filter state is kept when only band values change.
     /// </summary>
     public IReadOnlyList<EqualizerBand> Bands { get; set; } = [];
+
+    public EqualizerState GetState()
+    {
+        return new EqualizerState(Bands);
+    }
+
+    public void SetState(EqualizerState state)
+    {
+        Bands = [.. state.Bands];
+    }
 
     protected override void Process(AudioBuffer buffer)
     {

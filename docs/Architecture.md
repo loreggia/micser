@@ -23,13 +23,10 @@ Target architecture for the modernization of Micser (decided 2026-09-30). The `m
   - `System.Text.Json` everywhere. Newtonsoft.Json and MessagePack are dropped.
   - Logging goes through `Microsoft.Extensions.Logging`, with Serilog as the provider (`Serilog`, `Serilog.Extensions.Logging`). NLog is dropped.
 - **Tests:** TUnit and NSubstitute. xUnit and Moq are dropped.
-- **Engine host:** `Microsoft.NET.Sdk.Web` (Kestrel). It serves the built SPA as static files. In development, Vite runs separately and proxies `/api` and `/hubs` to the engine. Until engine discovery exists (roadmap step 3), the engine listens on the fixed address `http://127.0.0.1:5080`. `AllowedHosts` is limited to `localhost;127.0.0.1` against DNS rebinding.
+- **Engine host:** `Microsoft.NET.Sdk.Web` (Kestrel). It serves the built SPA as static files (roadmap step 4). In development, Vite runs separately and proxies `/api` and `/hubs` to the engine, which then listens on the fixed address `http://127.0.0.1:5080` without requiring the token. `AllowedHosts` is limited to `localhost;127.0.0.1` against DNS rebinding.
 - **Shell:** WinForms (native `NotifyIcon`) with the WebView2 WinForms control. It has no app logic, so WPF isn't needed.
 - **Web tooling:** npm workspaces consume the internal packages (`@micser/web-sdk`, `@micser/plugin-main`) as TypeScript source, so they need no build step of their own. TypeScript is pinned to `~6.0` because `typescript-eslint` doesn't support 7.x yet.
-- **Engine discovery and security:**
-  - On start, the engine writes `{ port, token }` to `%LocalAppData%\Micser\engine.json` (user-only ACL).
-  - The shell reads that file and passes the token to the SPA. The API rejects requests without it.
-  - A per-session named mutex keeps it to one engine per user.
+- **Engine discovery and security:** see [Engine](#engine).
 - **Autostart:** an `HKCU\...\Run` entry for the shell. The shell launches the engine if it isn't running.
 - **Deferred to the UI phase:** the SPA's component library (antd v5 or alternatives) and its state management.
 
@@ -93,6 +90,32 @@ docs/
   - When the fill is far off (e.g. after a pause or at startup), the stream resynchronizes by discarding samples or inserting silence.
 - **Device modules** follow their device's state and, when the device ID disappears, switch to another active device of the same adapter (e.g. a USB device plugged into a different port).
 
+## Engine
+
+- **Plugin API.**
+  - Plugins register module types with `services.AddAudioModule<TModule, TState>("Type")`.
+  - Every module implements `IStatefulModule<TState>`. `TState` is an immutable record with data annotations, and each module type has its own.
+  - Modules raise `StateChanged` when they change their own state (e.g. a device module switching ports), so the engine persists and broadcasts it.
+  - Modules with live data (spectrum, device stream statistics) implement `IModuleDataSource`.
+- **`ModuleDto`** is polymorphic by `type`: `ModuleDto<TState>` per module type, registered at runtime (`ModuleCatalog`, `EngineJson`).
+  - It carries the id, name, UI position, volume, mute, bypass (effects only) and the typed `state`.
+  - The API, SignalR and the config file all use the same schema. OpenAPI shows it as `anyOf` with a discriminator mapping, so a generated TS client narrows `state` by `type`.
+- **API** (`/api`, see `src/Engine/Endpoints/ApiEndpoints.cs`):
+  - `health`, `module-types` (ports and default state), `modules` (create with defaults, full update with `PUT`, delete), `connections`, `devices`, and `engine` (status, start, stop, settings).
+  - Errors are problem details: 400 with `errors` keyed by camelCase property path (e.g. `state.bands[1].frequency`), 404, and 409 for cycles and duplicates.
+- **Hub** (`/hubs/engine`):
+  - Pushes `ModuleChanged`, `ModuleRemoved`, `ConnectionAdded`, `ConnectionRemoved`, `DevicesChanged` and `StatusChanged` to all clients, in the order they happened.
+  - `Subscribe(moduleId)` / `Unsubscribe(moduleId)` start and stop `ModuleData` pushes (20 per second) for modules with live data.
+- **Configuration** (`%AppData%\Micser\config.json`, `Engine:ConfigPath`):
+  - It's versioned, with saves debounced (500 ms) and written atomically.
+  - An unreadable file is moved to `config.json.<timestamp>.bak`, and the engine starts empty.
+  - Modules of unknown type, invalid modules and dangling connections are skipped when loading.
+  - Changing the engine settings rebuilds the graph.
+- **Discovery and security:**
+  - The engine binds to `127.0.0.1` with a random port and writes `{ url, token, processId }` to `%LocalAppData%\Micser\engine.json` (`Engine:DiscoveryPath`). That folder is private to the user. The file is deleted on a clean shutdown; after a crash it stays, so readers must check that the process is alive.
+  - `/api` and `/hubs` (except `/api/health`) require `Authorization: Bearer <token>`, or `access_token` in the query for SignalR from browsers.
+  - A named semaphore (`Local\Micser.Engine`) allows one engine per session. `Engine:RequireToken` and `Engine:SingleInstance` turn these off (development, tests).
+
 ## Roadmap
 
 1. **Skeleton** (done):
@@ -109,7 +132,10 @@ docs/
      - The drift controller measures the ring fill once per block. The reading depends on the phase between device periods and engine blocks, so after startup it can take ~10 s (at up to ~1500 ppm) to settle. Measuring against the WASAPI QPC timestamps would avoid the phase bias.
      - `master`'s "use system volume" option (following the Windows master volume) isn't ported yet.
      - Lower latency needs device periods below 10 ms. `IAudioClient3` low-latency mode (NAudio `WithLowLatency`) wasn't available on the tested devices and made loopback capture fail; exclusive mode would work but takes the device away from other applications.
-3. **Engine (`src/Engine`):** hosting, the JSON config store, module definition/module/connection/device/settings APIs, and SignalR hubs for level, spectrum and device-change pushes.
+3. **Engine (`src/Engine`)** (done): hosting, the JSON config store, module definition/module/connection/device/settings APIs, and SignalR hubs for change and module data pushes.
+   - Follow-ups:
+     - Level meters per module (a module data source in the audio core).
+     - Device streams that fault (e.g. after sleep) are only reopened on device events; a periodic health check could reopen them.
 4. **UI:** `src/Web`, `src/WebSdk` and `src/Plugins/Main/Web`: the Vite app, graph editor and widgets. `dev`'s `Micser/UI` Dashboard serves as a guideline.
 5. **Shell (`src/Shell`):** tray, WebView2 window, engine launch and discovery, autostart.
 6. **Later:** packaging and updates, the VAC driver (needs an EV code-signing cert), and runtime-loaded plugins.

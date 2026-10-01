@@ -1,12 +1,17 @@
+using System.ComponentModel.DataAnnotations;
 using Micser.Audio;
 using NAudio.Dsp;
 
 namespace Micser.Plugins.Main.Modules;
 
+/// <param name="Pitch">-1 (one octave down) .. 0 (unchanged) .. 1 (one octave up).</param>
+/// <param name="Quality">1..10; higher values use larger FFTs and more overlap: better quality, more latency and CPU.</param>
+public sealed record PitchState([Range(-1f, 1f)] float Pitch = 0f, [Range(1, 10)] int Quality = 4);
+
 /// <summary>
 /// Shifts the pitch without changing the duration (STFT-based, one shifter per channel).
 /// </summary>
-public class PitchModule : EffectModule
+public class PitchModule : EffectModule, IStatefulModule<PitchState>
 {
     private (int Channels, int FftSize) _appliedSettings;
     private SmbPitchShifter[] _shifters = [];
@@ -20,6 +25,16 @@ public class PitchModule : EffectModule
     /// 1..10; higher values use larger FFTs and more overlap: better quality, more latency and CPU.
     /// </summary>
     public int Quality { get; set; } = 4;
+
+    public PitchState GetState()
+    {
+        return new PitchState(Pitch, Quality);
+    }
+
+    public void SetState(PitchState state)
+    {
+        (Pitch, Quality) = (state.Pitch, state.Quality);
+    }
 
     /// <summary>
     /// The FFT size (256..4096) and oversampling (4..8) for a quality value.

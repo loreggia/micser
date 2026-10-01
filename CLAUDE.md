@@ -57,8 +57,13 @@ CI (`.github/workflows/ci.yml`) runs the dotnet build/test and npm format/lint/b
   - Within a type group: by access level (public, internal, protected, private), then alphabetically.
   - A blank line before and after single-line properties.
   - Comments wrap at 150 columns.
+- No primary constructors on classes or structs: use explicit constructors that assign `_camelCase` fields or properties. Positional records are fine.
 - Audio code (`src/Audio`, see "Audio engine" in `docs/Architecture.md`):
   - `Process` methods run on the audio thread. Don't allocate, lock (except the existing per-block locks) or log there on the normal path.
   - Module parameters are plain properties written from other threads. A parameter set that must change atomically is replaced as a whole (see `EqualizerModule.Bands`).
   - Tests drive `AudioGraph.Process()` directly with synthetic modules. Nothing in `tests/` opens real devices.
+- Engine code (`src/Engine`, see "Engine" in `docs/Architecture.md`):
+  - A new module type needs its own state record (data annotations on the record's parameters, as in ASP.NET Core), `IStatefulModule<TState>`, and a registration in its plugin's `Add…Plugin()`. The engine, API, config file and OpenAPI pick it up from there.
+  - `AudioHost` is the single entry point for graph changes. It persists and broadcasts every change, and throws `EngineRequestException` for problem responses.
+  - Engine tests use `EngineFactory` (temp config directory, token required) with a real audio engine and no devices selected.
 - `src/Driver` (C++ WDM driver) and `src/Installer` (WixSharp, .NET Framework) were moved unchanged and aren't in `Micser.slnx`.
