@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using NAudio.CoreAudioApi;
@@ -14,6 +15,7 @@ public sealed class AudioDeviceService : IDisposable
     private readonly MMDeviceEnumerator _enumerator;
     private readonly ILogger _logger;
     private readonly MMDeviceNotificationClient _notificationClient;
+    private readonly ResumeNotification? _resumeNotification;
 
     public AudioDeviceService(ILogger<AudioDeviceService>? logger = null)
     {
@@ -24,6 +26,15 @@ public sealed class AudioDeviceService : IDisposable
         _notificationClient.DeviceRemoved += (_, e) => Raise(e.DeviceId, AudioDeviceChange.Removed);
         _notificationClient.DeviceStateChanged += (_, e) => Raise(e.DeviceId, AudioDeviceChange.StateChanged);
         _notificationClient.DefaultDeviceChanged += (_, e) => Raise(e.DeviceId, AudioDeviceChange.DefaultChanged);
+
+        try
+        {
+            _resumeNotification = new ResumeNotification(OnSystemResumed);
+        }
+        catch (Win32Exception ex)
+        {
+            _logger.LogWarning(ex, "Resume notifications are unavailable; streams are reopened only when they stop.");
+        }
     }
 
     /// <summary>
@@ -31,8 +42,15 @@ public sealed class AudioDeviceService : IDisposable
     /// </summary>
     public event EventHandler<AudioDeviceChangedEventArgs>? DeviceChanged;
 
+    /// <summary>
+    /// Raised on a thread pool thread when the system resumed from sleep or hibernation. Device streams may still look healthy then but
+    /// play or capture nothing, so they should be reopened.
+    /// </summary>
+    public event EventHandler? SystemResumed;
+
     public void Dispose()
     {
+        _resumeNotification?.Dispose();
         _notificationClient.Dispose();
         _enumerator.Dispose();
     }
@@ -141,6 +159,19 @@ public sealed class AudioDeviceService : IDisposable
         }
 
         return device;
+    }
+
+    private void OnSystemResumed()
+    {
+        _logger.LogInformation("The system resumed.");
+        try
+        {
+            SystemResumed?.Invoke(this, EventArgs.Empty);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "A resume handler failed.");
+        }
     }
 
     private void Raise(string deviceId, AudioDeviceChange change)

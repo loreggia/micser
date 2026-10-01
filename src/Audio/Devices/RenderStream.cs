@@ -23,11 +23,14 @@ public sealed class RenderStream : IDeviceStream
     private readonly ProcessingFormat _format;
     private readonly float[] _interleaved;
     private readonly ILogger _logger;
+    private readonly long _openedAt = Environment.TickCount64;
     private readonly float[] _output;
     private readonly WasapiPlayer _player;
     private readonly WdlResampler _resampler;
     private readonly SampleRingBuffer _ring;
     private volatile bool _isConsuming;
+    private volatile bool _isStopped;
+    private long _lastRequest;
     private long _overruns;
     private long _underruns;
 
@@ -74,10 +77,7 @@ public sealed class RenderStream : IDeviceStream
 
     public int DeviceSampleRate { get; }
 
-    /// <summary>
-    /// Set when the device stopped playing, e.g. because it was removed.
-    /// </summary>
-    public bool IsFaulted { get; private set; }
+    public bool IsFaulted => _isStopped || StreamBuffering.IsStalled(_openedAt, Interlocked.Read(ref _lastRequest), Environment.TickCount64);
 
     public ChannelLayout Layout { get; }
 
@@ -156,7 +156,7 @@ public sealed class RenderStream : IDeviceStream
 
     private void OnPlaybackStopped(object? sender, StoppedEventArgs e)
     {
-        IsFaulted = true;
+        _isStopped = true;
         if (e.Exception != null)
         {
             _logger.LogWarning(e.Exception, "Playback on {Device} stopped.", _device.FriendlyName);
@@ -177,6 +177,7 @@ public sealed class RenderStream : IDeviceStream
 
         public int Read(Span<byte> buffer)
         {
+            Interlocked.Exchange(ref _stream._lastRequest, Environment.TickCount64);
             var samples = MemoryMarshal.Cast<byte, float>(buffer);
             var read = _stream._ring.Read(samples);
             if (read < samples.Length)

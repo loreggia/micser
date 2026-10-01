@@ -15,15 +15,22 @@ public sealed class CaptureStream : IDeviceStream
     private readonly int _channels;
     private readonly float[] _convertBuffer;
     private readonly SampleConverter _converter;
+
+    // loopback capture gets no data while nothing plays, so it can't detect stalls
+    private readonly bool _detectsStalls;
+
     private readonly MMDevice _device;
     private readonly DriftController _drift;
     private readonly ProcessingFormat _format;
     private readonly float[] _interleaved;
     private readonly ILogger _logger;
+    private readonly long _openedAt = Environment.TickCount64;
     private readonly WasapiRecorder _recorder;
     private readonly WdlResampler _resampler;
     private readonly SampleRingBuffer _ring;
     private bool _isPrefilled;
+    private volatile bool _isStopped;
+    private long _lastData;
     private long _overruns;
     private long _underruns;
 
@@ -32,6 +39,7 @@ public sealed class CaptureStream : IDeviceStream
         _device = device;
         _format = format;
         _logger = logger;
+        _detectsStalls = !loopback;
 
         var builder = new WasapiRecorderBuilder()
             .WithDevice(device)
@@ -69,10 +77,7 @@ public sealed class CaptureStream : IDeviceStream
 
     public int DeviceSampleRate { get; }
 
-    /// <summary>
-    /// Set when the device stopped delivering data, e.g. because it was removed.
-    /// </summary>
-    public bool IsFaulted { get; private set; }
+    public bool IsFaulted => _isStopped || (_detectsStalls && StreamBuffering.IsStalled(_openedAt, Interlocked.Read(ref _lastData), Environment.TickCount64));
 
     public ChannelLayout Layout { get; }
 
@@ -143,6 +148,7 @@ public sealed class CaptureStream : IDeviceStream
 
     private void OnDataAvailable(ReadOnlySpan<byte> data, AudioClientBufferFlags flags, long devicePosition, long qpcPosition)
     {
+        Interlocked.Exchange(ref _lastData, Environment.TickCount64);
         var samples = data.Length / _converter.BytesPerSample;
         int written;
 
@@ -164,7 +170,7 @@ public sealed class CaptureStream : IDeviceStream
 
     private void OnRecordingStopped(object? sender, StoppedEventArgs e)
     {
-        IsFaulted = true;
+        _isStopped = true;
         if (e.Exception != null)
         {
             _logger.LogWarning(e.Exception, "Capture from {Device} stopped.", _device.FriendlyName);
