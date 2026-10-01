@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using Micser.Audio;
 using Micser.Plugins.Main.Dsp;
 
@@ -16,11 +17,27 @@ public enum CompressorType
     Upward,
 }
 
+/// <param name="Amount">Blend of the compression effect, 0..1.</param>
+/// <param name="Attack">Attack time in seconds.</param>
+/// <param name="Release">Release time in seconds.</param>
+/// <param name="Threshold">Threshold in dB.</param>
+/// <param name="Knee">Soft knee width in dB.</param>
+/// <param name="MakeUpGain">Make-up gain in dB, scaled by <paramref name="Amount"/>.</param>
+public sealed record CompressorState(
+    CompressorType Type = CompressorType.Downward,
+    [Range(0f, 1f)] float Amount = 1f,
+    [Range(0.0001f, 1f)] float Attack = 0.01f,
+    [Range(0.001f, 5f)] float Release = 0.1f,
+    [Range(1f, 20f)] float Ratio = 2f,
+    [Range(-80f, 0f)] float Threshold = -10f,
+    [Range(0f, 24f)] float Knee = 5f,
+    [Range(-24f, 24f)] float MakeUpGain = 0f);
+
 /// <summary>
 /// Stereo-linked compressor: the gain is computed from the peak of all channels and applied to all of them.
 /// Based on the compressor in "Audio Effects: Theory, Implementation and Application" (Reiss, McPherson).
 /// </summary>
-public class CompressorModule : EffectModule
+public class CompressorModule : EffectModule, IStatefulModule<CompressorState>
 {
     private const int ChunkFrames = 32;
     private float _alphaAttack;
@@ -65,6 +82,17 @@ public class CompressorModule : EffectModule
     public float Threshold { get; set; } = -10f;
 
     public CompressorType Type { get; set; } = CompressorType.Downward;
+
+    public CompressorState GetState()
+    {
+        return new CompressorState(Type, Amount, Attack, Release, Ratio, Threshold, Knee, MakeUpGain);
+    }
+
+    public void SetState(CompressorState state)
+    {
+        (Type, Amount, Attack, Release, Ratio, Threshold, Knee, MakeUpGain) =
+            (state.Type, state.Amount, state.Attack, state.Release, state.Ratio, state.Threshold, state.Knee, state.MakeUpGain);
+    }
 
     protected override void OnAttached()
     {

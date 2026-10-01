@@ -58,7 +58,7 @@ if (input == null || output == null)
 }
 
 var graph = new AudioGraph(ProcessingFormat.Default, loggerFactory.CreateLogger<AudioGraph>());
-using DeviceInputModule inputModule = loopback
+using CaptureModule inputModule = loopback
     ? new LoopbackInputModule(devices, loggerFactory.CreateLogger<LoopbackInputModule>())
     : new DeviceInputModule(devices, loggerFactory.CreateLogger<DeviceInputModule>());
 using var gainModule = new GainModule { Gain = gain };

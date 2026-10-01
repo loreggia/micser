@@ -6,10 +6,10 @@ namespace Micser.Plugins.Main.Modules;
 
 /// <summary>
 /// A module bound to an audio device. The stream is opened once the module is in a graph and reopened when the device
-/// changes state. If the device disappears, the module switches to the next active device of the same adapter, e.g.
-/// when a USB device is plugged into a different port.
+/// changes state. If the device isn't available, the module switches to an active device of the same adapter, e.g.
+/// when a USB device is plugged into a different port, and raises <see cref="AudioModule.StateChanged"/>.
 /// </summary>
-public abstract class DeviceModule<TStream> : AudioModule
+public abstract class DeviceModule<TStream> : AudioModule, IModuleDataSource
     where TStream : class, IDeviceStream
 {
     private readonly AudioDeviceService _devices;
@@ -54,15 +54,22 @@ public abstract class DeviceModule<TStream> : AudioModule
 
     protected ILogger Logger { get; }
 
+    public object? GetData()
+    {
+        return Statistics;
+    }
+
     /// <summary>
     /// Selects a device, or none. Opens it right away when the module is in a graph.
     /// </summary>
-    public void SelectDevice(string? deviceId)
+    /// <param name="deviceId">The device, or null for none.</param>
+    /// <param name="adapterName">The device's adapter, used when the device isn't available (e.g. a restored configuration).</param>
+    public void SelectDevice(string? deviceId, string? adapterName = null)
     {
         lock (_selectionLock)
         {
             DeviceId = deviceId;
-            AdapterName = deviceId == null ? null : _devices.GetDevice(deviceId)?.AdapterName ?? AdapterName;
+            AdapterName = deviceId == null ? null : _devices.GetDevice(deviceId)?.AdapterName ?? adapterName;
             Reopen();
         }
     }
@@ -128,16 +135,8 @@ public abstract class DeviceModule<TStream> : AudioModule
 
             var hasStream = false;
             UseStream((stream, _) => hasStream = stream != null, 0);
-            if (hasStream || AdapterName == null)
+            if (!hasStream)
             {
-                return;
-            }
-
-            var device = _devices.GetDevice(e.DeviceId);
-            if (device is { IsActive: true } && device.Direction == Direction && device.AdapterName == AdapterName)
-            {
-                Logger.LogInformation("Switching from device {OldDevice} to {NewDevice} of adapter {Adapter}.", DeviceId, device.Id, AdapterName);
-                DeviceId = device.Id;
                 Reopen();
             }
         }
@@ -152,6 +151,18 @@ public abstract class DeviceModule<TStream> : AudioModule
 
         TStream? stream = null;
         var device = DeviceId == null ? null : _devices.GetDevice(DeviceId);
+        if (device is not { IsActive: true } && AdapterName != null)
+        {
+            var replacement = _devices.GetDevices(Direction).FirstOrDefault(d => d.AdapterName == AdapterName);
+            if (replacement != null)
+            {
+                Logger.LogInformation("Switching from device {OldDevice} to {NewDevice} of adapter {Adapter}.", DeviceId, replacement.Id, AdapterName);
+                DeviceId = replacement.Id;
+                device = replacement;
+                OnStateChanged();
+            }
+        }
+
         if (device is { IsActive: true })
         {
             try

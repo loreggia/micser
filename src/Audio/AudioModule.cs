@@ -12,6 +12,12 @@ public abstract class AudioModule : IDisposable
     private float _volume = 1f;
 
     /// <summary>
+    /// Raised when the module changes its own state, e.g. a device module that switched to another device.
+    /// Not raised for changes made through <see cref="IStatefulModule{TState}.SetState"/>.
+    /// </summary>
+    public event EventHandler? StateChanged;
+
+    /// <summary>
     /// Available once the module is added to a graph.
     /// </summary>
     public ProcessingFormat Format => _format ?? throw new InvalidOperationException("The module has not been added to a graph.");
@@ -122,6 +128,11 @@ public abstract class AudioModule : IDisposable
     /// </summary>
     protected virtual void OnAttached()
     {
+    }
+
+    protected void OnStateChanged()
+    {
+        StateChanged?.Invoke(this, EventArgs.Empty);
     }
 
     /// <summary>

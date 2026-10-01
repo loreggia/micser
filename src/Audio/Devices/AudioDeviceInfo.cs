@@ -30,9 +30,15 @@ public sealed record AudioDeviceInfo(
     ChannelLayout? Layout,
     int? SampleRate);
 
-public sealed class AudioDeviceChangedEventArgs(string deviceId, AudioDeviceChange change) : EventArgs
+public sealed class AudioDeviceChangedEventArgs : EventArgs
 {
-    public AudioDeviceChange Change { get; } = change;
+    public AudioDeviceChangedEventArgs(string deviceId, AudioDeviceChange change)
+    {
+        DeviceId = deviceId;
+        Change = change;
+    }
 
-    public string DeviceId { get; } = deviceId;
+    public AudioDeviceChange Change { get; }
+
+    public string DeviceId { get; }
 }

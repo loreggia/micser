@@ -8,9 +8,14 @@ namespace Micser.Plugins.Main.Modules;
 public sealed record Spectrum(float FrequencyResolution, float[] Magnitudes);
 
 /// <summary>
+/// The spectrum module has no parameters yet.
+/// </summary>
+public sealed record SpectrumState;
+
+/// <summary>
 /// Passes audio through unchanged and keeps the latest samples (mixed to mono) for spectrum analysis.
 /// </summary>
-public class SpectrumModule : EffectModule
+public class SpectrumModule : EffectModule, IStatefulModule<SpectrumState>, IModuleDataSource
 {
     public const int FftSize = 4096;
 
@@ -24,6 +29,20 @@ public class SpectrumModule : EffectModule
     /// <summary>
     /// Computes the spectrum of the last <see cref="FftSize"/> samples. Returns null until the module is in a graph.
     /// </summary>
+    public object? GetData()
+    {
+        return GetSpectrum();
+    }
+
+    public SpectrumState GetState()
+    {
+        return new SpectrumState();
+    }
+
+    public void SetState(SpectrumState state)
+    {
+    }
+
     public Spectrum? GetSpectrum()
     {
         if (!IsAttached)
