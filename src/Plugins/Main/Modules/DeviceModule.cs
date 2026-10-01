@@ -6,22 +6,35 @@ namespace Micser.Plugins.Main.Modules;
 
 /// <summary>
 /// A module bound to an audio device. The stream is opened once the module is in a graph and reopened when the device
-/// changes state. If the device isn't available, the module switches to an active device of the same adapter, e.g.
-/// when a USB device is plugged into a different port, and raises <see cref="AudioModule.StateChanged"/>.
+/// changes state, when the system resumed from sleep, and when a watchdog finds it faulted (stopped or stalled). A
+/// device that can't be opened is retried with a growing delay. If the device isn't available, the module switches to
+/// an active device of the same adapter, e.g. when a USB device is plugged into a different port, and raises
+/// <see cref="AudioModule.StateChanged"/>.
 /// </summary>
 public abstract class DeviceModule<TStream> : AudioModule, IModuleDataSource
     where TStream : class, IDeviceStream
 {
+    // a stream that ran this long without faulting resets the retry delay
+    private static readonly TimeSpan HealthyDuration = TimeSpan.FromMinutes(1);
+
+    private static readonly TimeSpan WatchdogInterval = TimeSpan.FromSeconds(1);
+
     private readonly AudioDeviceService _devices;
+    private readonly RetryBackoff _retry = new();
     private readonly Lock _selectionLock = new();
     private readonly Lock _streamLock = new();
+    private readonly Timer _watchdog;
+    private bool _isDisposed;
     private TStream? _stream;
+    private long _streamOpenedAt;
 
     protected DeviceModule(AudioDeviceService devices, ILogger logger)
     {
         _devices = devices;
         Logger = logger;
+        _watchdog = new Timer(_ => CheckStream());
         _devices.DeviceChanged += OnDeviceChanged;
+        _devices.SystemResumed += OnSystemResumed;
     }
 
     /// <summary>
@@ -70,6 +83,7 @@ public abstract class DeviceModule<TStream> : AudioModule, IModuleDataSource
         {
             DeviceId = deviceId;
             AdapterName = deviceId == null ? null : _devices.GetDevice(deviceId)?.AdapterName ?? adapterName;
+            _retry.Reset();
             Reopen();
         }
     }
@@ -79,8 +93,11 @@ public abstract class DeviceModule<TStream> : AudioModule, IModuleDataSource
         if (disposing)
         {
             _devices.DeviceChanged -= OnDeviceChanged;
+            _devices.SystemResumed -= OnSystemResumed;
+            _watchdog.Dispose();
             lock (_selectionLock)
             {
+                _isDisposed = true;
                 SwapStream(null);
             }
         }
@@ -92,8 +109,11 @@ public abstract class DeviceModule<TStream> : AudioModule, IModuleDataSource
     {
         lock (_selectionLock)
         {
+            _retry.Reset();
             Reopen();
         }
+
+        _watchdog.Change(WatchdogInterval, WatchdogInterval);
     }
 
     /// <summary>
@@ -116,6 +136,62 @@ public abstract class DeviceModule<TStream> : AudioModule, IModuleDataSource
         }
     }
 
+    /// <summary>
+    /// Watchdog: reopens a faulted stream, and retries opening a selected device that isn't open.
+    /// </summary>
+    private void CheckStream()
+    {
+        // a reopen in progress (e.g. after a device event) makes this check unnecessary
+        if (!_selectionLock.TryEnter())
+        {
+            return;
+        }
+
+        try
+        {
+            if (_isDisposed || !IsAttached)
+            {
+                return;
+            }
+
+            TStream? stream;
+            lock (_streamLock)
+            {
+                stream = _stream;
+            }
+
+            if (stream is { IsFaulted: true })
+            {
+                if (_retry.IsDue)
+                {
+                    Logger.LogWarning("The stream of device {Device} stopped; reopening it.", DeviceId);
+                    _retry.Attempted();
+                    Reopen();
+                }
+            }
+            else if (stream != null)
+            {
+                if (Environment.TickCount64 - _streamOpenedAt > HealthyDuration.TotalMilliseconds)
+                {
+                    _retry.Reset();
+                }
+            }
+            else if (DeviceId != null && _retry.IsDue)
+            {
+                _retry.Attempted();
+                Reopen();
+            }
+        }
+        catch (Exception ex)
+        {
+            Logger.LogError(ex, "Checking the stream of device {Device} failed.", DeviceId);
+        }
+        finally
+        {
+            _selectionLock.Exit();
+        }
+    }
+
     private void OnDeviceChanged(object? sender, AudioDeviceChangedEventArgs e)
     {
         if (!IsAttached || e.Change == AudioDeviceChange.DefaultChanged)
@@ -129,6 +205,7 @@ public abstract class DeviceModule<TStream> : AudioModule, IModuleDataSource
         {
             if (e.DeviceId == DeviceId)
             {
+                _retry.Reset();
                 Reopen();
                 return;
             }
@@ -139,6 +216,22 @@ public abstract class DeviceModule<TStream> : AudioModule, IModuleDataSource
             {
                 Reopen();
             }
+        }
+    }
+
+    private void OnSystemResumed(object? sender, EventArgs e)
+    {
+        lock (_selectionLock)
+        {
+            if (_isDisposed || !IsAttached || DeviceId == null)
+            {
+                return;
+            }
+
+            // the stream may still look healthy but play or capture nothing
+            Logger.LogInformation("Reopening device {Device} after the system resumed.", DeviceId);
+            _retry.Reset();
+            Reopen();
         }
     }
 
@@ -176,6 +269,7 @@ public abstract class DeviceModule<TStream> : AudioModule, IModuleDataSource
             }
         }
 
+        _streamOpenedAt = Environment.TickCount64;
         SwapStream(stream);
     }
 

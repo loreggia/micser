@@ -91,6 +91,9 @@ docs/
   - A PI controller (`DriftController`) adjusts the resampling ratio by up to ±0.5% to hold the target fill.
   - When the fill is far off (e.g. after a pause or at startup), the stream resynchronizes by discarding samples or inserting silence.
 - **Device modules** follow their device's state and, when the device ID disappears, switch to another active device of the same adapter (e.g. a USB device plugged into a different port).
+- **Stream recovery.** A device stream is faulted when WASAPI stopped it (e.g. the device was invalidated) or when its device delivered or took no data for 2 s (10 s before the first callback, for slow devices like Bluetooth). Loopback capture is exempt from the stall check because it gets no data while nothing plays.
+  - A watchdog in each device module (every second) reopens a faulted stream and retries a selected device that isn't open, with a delay of 1 s doubling up to 30 s. The delay resets after a minute of healthy streaming, on device events and on device selection.
+  - `AudioDeviceService.SystemResumed` (a `PowerRegisterSuspendResumeNotification` callback, no window needed) makes all device modules reopen their streams after sleep or hibernation, since streams can look healthy then but play or capture nothing.
 
 ## Engine
 
@@ -215,8 +218,7 @@ docs/
      - `master`'s "use system volume" option (following the Windows master volume) isn't ported yet.
      - Lower latency needs device periods below 10 ms. `IAudioClient3` low-latency mode (NAudio `WithLowLatency`) wasn't available on the tested devices and made loopback capture fail; exclusive mode would work but takes the device away from other applications.
 3. **Engine (`src/Engine`)** (done): hosting, the JSON config store, module definition/module/connection/device/settings APIs, and SignalR hubs for change and module data pushes.
-   - Follow-ups:
-     - Device streams that fault (e.g. after sleep) are only reopened on device events; a periodic health check could reopen them.
+   - Stream recovery (watchdog and resume notification) was verified with a real sleep/resume.
 4. **UI** (done): `src/Web`, `src/WebSdk` and `src/Plugins/Main/Web`: the Vite app, graph editor and widgets.
    - Follow-ups:
      - Renaming modules in the UI (the API supports names).

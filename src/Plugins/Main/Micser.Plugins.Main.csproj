@@ -8,4 +8,8 @@
     <ProjectReference Include="..\..\Audio\Micser.Audio.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <InternalsVisibleTo Include="Micser.Plugins.Main.Tests" />
+  </ItemGroup>
+
 </Project>
