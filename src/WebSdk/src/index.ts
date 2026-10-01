@@ -13,6 +13,7 @@ export {
   useModuleData,
   useModuleLevels,
   useModuleUpdate,
+  usePreferences,
 } from "./engine/hooks";
 export {
   defineWidget,

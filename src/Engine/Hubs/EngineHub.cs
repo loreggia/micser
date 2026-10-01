@@ -29,6 +29,8 @@ public interface IEngineClient
 
     Task ModuleRemoved(Guid moduleId);
 
+    Task PreferencesChanged(UiPreferencesDto preferences);
+
     Task StatusChanged(EngineStatusDto status);
 }
 

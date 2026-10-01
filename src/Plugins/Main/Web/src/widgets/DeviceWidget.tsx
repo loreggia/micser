@@ -2,6 +2,7 @@ import { Caption1, Dropdown, Option, makeStyles, tokens } from "@fluentui/react-
 import {
   useGetDevices,
   useModuleData,
+  usePreferences,
   type DeviceDirection,
   type ModuleOfType,
   type WidgetProps,
@@ -39,7 +40,7 @@ const none = "none";
 type DeviceModuleType = "DeviceInput" | "LoopbackInput" | "DeviceOutput";
 
 /**
- * Selects the device of a device module and shows the stream health.
+ * Selects the device of a device module and, if enabled in the preferences, shows the stream statistics.
  */
 export function DeviceWidget({
   module,
@@ -48,14 +49,13 @@ export function DeviceWidget({
 }: WidgetProps<DeviceModuleType> & { direction: DeviceDirection }) {
   const styles = useStyles();
   const { data: devices = [] } = useGetDevices({ direction, includeInactive: true });
-  const statistics = useModuleData<StreamStatistics>(module.id);
+  const [preferences] = usePreferences();
   const state = (module as ModuleOfType<DeviceModuleType>).state;
 
   const selected = devices.find((d) => d.id === state.deviceId);
   const label =
     selected?.name ??
     (state.deviceId ? `Unavailable${state.adapterName ? ` (${state.adapterName})` : ""}` : "No device");
-  const dropouts = statistics ? statistics.underruns + statistics.overruns + statistics.resyncs : 0;
 
   return (
     <div className={styles.root}>
@@ -81,13 +81,25 @@ export function DeviceWidget({
           </Option>
         ))}
       </Dropdown>
-      {statistics ? (
-        <Caption1 className={dropouts > 0 ? styles.warning : styles.status}>
-          {dropouts > 0 ? `${dropouts} dropouts` : "Running"} · {statistics.targetMilliseconds.toFixed(1)} ms buffer
-        </Caption1>
-      ) : (
-        state.deviceId && <Caption1 className={styles.warning}>Not running</Caption1>
-      )}
+      {preferences.showStreamStatistics && state.deviceId && <StreamStatus moduleId={module.id} />}
     </div>
+  );
+}
+
+/**
+ * Dropouts and buffer size of the module's stream. Separate, so the statistics are only subscribed to while shown.
+ */
+function StreamStatus({ moduleId }: { moduleId: string }) {
+  const styles = useStyles();
+  const statistics = useModuleData<StreamStatistics>(moduleId);
+  if (!statistics) {
+    return <Caption1 className={styles.warning}>Not running</Caption1>;
+  }
+
+  const dropouts = statistics.underruns + statistics.overruns + statistics.resyncs;
+  return (
+    <Caption1 className={dropouts > 0 ? styles.warning : styles.status}>
+      {dropouts > 0 ? `${dropouts} dropouts` : "Running"} · {statistics.targetMilliseconds.toFixed(1)} ms buffer
+    </Caption1>
   );
 }

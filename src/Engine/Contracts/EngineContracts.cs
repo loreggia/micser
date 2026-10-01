@@ -28,3 +28,11 @@ public sealed record EngineStatusDto(bool IsRunning, EngineSettingsDto Settings,
 /// <param name="Peak">The highest absolute sample value since the previous push.</param>
 /// <param name="Rms">The RMS level, smoothed over about 300 ms.</param>
 public sealed record PortLevelsDto(string? Port, float[] Peak, float[] Rms);
+
+/// <summary>
+/// Preferences of the web UI. Kept in the engine's configuration, because the UI's origin (the engine's random port) changes on every start,
+/// so browser storage wouldn't keep them.
+/// </summary>
+/// <param name="ShowStreamStatistics">Whether device widgets show dropouts and the buffer size.</param>
+/// <param name="SnapToGrid">Whether modules snap to the grid when moved.</param>
+public sealed record UiPreferencesDto(bool ShowStreamStatistics = false, bool SnapToGrid = true);

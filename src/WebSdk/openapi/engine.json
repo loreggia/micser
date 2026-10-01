@@ -375,6 +375,27 @@
         }
       }
     },
+    "/api/engine/restart-audio": {
+      "post": {
+        "tags": [
+          "Engine"
+        ],
+        "description": "Rebuilds the audio graph, which reopens all device streams with fresh buffers.",
+        "operationId": "RestartAudio",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineStatusDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/engine/shutdown": {
       "post": {
         "tags": [
@@ -412,6 +433,54 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/EngineStatusDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/preferences": {
+      "get": {
+        "tags": [
+          "Preferences"
+        ],
+        "operationId": "GetPreferences",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UiPreferencesDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Preferences"
+        ],
+        "operationId": "UpdatePreferences",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UiPreferencesDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UiPreferencesDto"
                 }
               }
             }
@@ -1376,6 +1445,23 @@
       },
       "SpectrumState": {
         "type": "object"
+      },
+      "UiPreferencesDto": {
+        "required": [
+          "showStreamStatistics",
+          "snapToGrid"
+        ],
+        "type": "object",
+        "properties": {
+          "showStreamStatistics": {
+            "type": "boolean",
+            "default": false
+          },
+          "snapToGrid": {
+            "type": "boolean",
+            "default": true
+          }
+        }
       }
     }
   },
@@ -1391,6 +1477,9 @@
     },
     {
       "name": "Connections"
+    },
+    {
+      "name": "Preferences"
     }
   ]
 }

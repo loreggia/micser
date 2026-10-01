@@ -54,12 +54,40 @@ internal sealed class EngineSupervisor : IDisposable
     /// </summary>
     public EngineInfo? Engine { get; private set; }
 
+    /// <summary>
+    /// Whether the shell can start the engine (it can't in development, where the engine runs on its own).
+    /// </summary>
+    public bool CanStartEngine => _enginePath != null;
+
     public EngineState State { get; private set; } = EngineState.Starting;
 
     public void Dispose()
     {
         _cancellation.Cancel();
         _cancellation.Dispose();
+    }
+
+    /// <summary>
+    /// Stops the engine gracefully; supervision then starts a new one. Doesn't count as a crash restart. Call on the UI thread.
+    /// </summary>
+    public async Task RestartEngineAsync()
+    {
+        if (Engine is not { } engine || !CanStartEngine)
+        {
+            return;
+        }
+
+        Log.Information("Restarting the engine.");
+        _launches.Clear();
+        try
+        {
+            using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+            await EngineControl.ShutdownAsync(_http, engine, timeout.Token);
+        }
+        catch (Exception ex) when (ex is HttpRequestException or ArgumentException or OperationCanceledException)
+        {
+            Log.Warning(ex, "Stopping the engine failed.");
+        }
     }
 
     /// <summary>

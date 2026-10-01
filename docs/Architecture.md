@@ -112,7 +112,9 @@ docs/
   - It carries the id, name, UI position, volume, mute, bypass (effects only) and the typed `state`.
   - The API, SignalR and the config file all use the same schema. OpenAPI shows it as `anyOf` with a discriminator mapping, so a generated TS client narrows `state` by `type`.
 - **API** (`/api`, see `src/Engine/Endpoints/ApiEndpoints.cs`):
-  - `health`, `module-types` (ports and default state), `modules` (create with defaults, full update with `PUT`, delete), `connections`, `devices`, and `engine` (status, start, stop, settings, shutdown).
+  - `health`, `module-types` (ports and default state), `modules` (create with defaults, full update with `PUT`, delete), `connections`, `devices`, `engine` (status, start, stop, restart-audio, settings, shutdown), and `preferences`.
+  - `engine/restart-audio` rebuilds the graph with the current settings, which reopens all device streams with fresh buffers.
+  - `preferences` are the web UI's preferences (stream statistics, grid snapping). They live in the engine's configuration because the UI's origin (the engine's random port) changes on every start, so browser storage would lose them. Changes are pushed as `PreferencesChanged`.
   - Errors are problem details: 400 with `errors` keyed by camelCase property path (e.g. `state.bands[1].frequency`), 404, and 409 for cycles and duplicates.
 - **Hub** (`/hubs/engine`):
   - Pushes `ModuleChanged`, `ModuleRemoved`, `ConnectionAdded`, `ConnectionRemoved`, `DevicesChanged` and `StatusChanged` to all clients, in the order they happened.
@@ -147,6 +149,15 @@ docs/
 - **Graph editor (`@xyflow/react`):**
   - Nodes and edges follow the engine.
   - Connecting, deleting (Delete key or the node's remove button) and moving (the position is saved on drop) go through the API. Rejected connections, e.g. cycles, show a notification.
+  - Modules snap to a 20 px grid (the background dots) unless the preference is off.
+  - Dragging a connection's end to another port reroutes it: the new connection is created first and the old one removed only if that succeeded.
+  - Dropping a new connection on empty space opens a menu of module types with a matching port; the chosen module is added there and connected (its first input when the drag started at an output, its first output otherwise).
+  - Node cards don't clip their content, so the ports on their edges are whole and fully clickable.
+- **Toolbar and settings:**
+  - A split button restarts the audio (`engine/restart-audio`); its menu also restarts the engine process when running in the shell.
+  - The settings dialog has the audio settings (applied together, which rebuilds the graph), the display preferences (applied right away), and, in the shell, the version with "Check for updates".
+  - When the shell has downloaded an update, the toolbar shows an "Update to x.y.z" button.
+- **Shell bridge** (`src/Web/src/shell.ts`): inside the shell's WebView2, the UI exchanges web messages with the shell (`chrome.webview`). In a plain browser it's absent, and the shell-only controls are hidden.
 - **Access token:**
   - The SPA reads `#token=...` once, keeps it in `sessionStorage` and removes it from the address. The shell will open `{url}/#token={token}` from the discovery file.
   - In development, Vite proxies to the engine, which doesn't require a token.
@@ -171,6 +182,10 @@ docs/
   - Position, size and maximized state are kept in `%LocalAppData%\Micser\shell.json`.
   - It shows `{engine url}/#token={token}`, or the `--ui <url>` override with the engine's token (Vite in development), and re-navigates when the engine changes. While no engine is available, a status page is shown.
   - Links that open new windows go to the default browser. A missing WebView2 runtime leads to a download prompt.
+  - The browser's default context menu is off.
+  - Web messages from the loaded UI (and only from its origin): `getState`, `checkForUpdates` (answered with `updateCheck`), `installUpdate`, `restartEngine`. The shell sends `state` (version, whether it can update, a running check, the pending update, whether it can restart the engine) on request and whenever it changes.
+- **Restarting the engine process:** `EngineSupervisor.RestartEngineAsync` stops the engine gracefully and lets supervision start a new one; it doesn't count toward the crash restart limit. Only available when the shell can start the engine (not in development).
+- **Updates** are run by `UpdateController` (see [Packaging and updates](#packaging-and-updates)), shared by the tray and the window.
 - **Logs:** `%LocalAppData%\Micser\logs\shell-*.log` (Serilog). Fatal startup errors also show a message box.
 
 ## Development orchestration

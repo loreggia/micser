@@ -7,10 +7,12 @@ import {
   getGetEngineStatusQueryKey,
   getGetModuleQueryKey,
   getGetModulesQueryKey,
+  getGetPreferencesQueryKey,
   updateModule,
   type ConnectionDto,
   type EngineStatusDto,
   type ModuleDto,
+  type UiPreferencesDto,
 } from "../api";
 
 export type EngineConnectionState = "connecting" | "connected" | "reconnecting" | "disconnected";
@@ -82,6 +84,9 @@ export class EngineConnection {
     });
     this.hub.on("StatusChanged", (status: EngineStatusDto) => {
       this.queryClient.setQueryData(getGetEngineStatusQueryKey(), status);
+    });
+    this.hub.on("PreferencesChanged", (preferences: UiPreferencesDto) => {
+      this.queryClient.setQueryData(getGetPreferencesQueryKey(), preferences);
     });
     this.hub.on("ModuleData", (moduleId: string, data: unknown) => {
       this.dataListeners.get(moduleId)?.forEach((listener) => listener(data));

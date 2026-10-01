@@ -61,6 +61,24 @@ public class EngineHubTests
     }
 
     [Test]
+    public async Task RestartAudio_KeepsModulesAndBroadcastsStatus()
+    {
+        await using var factory = new EngineFactory();
+        using var client = factory.CreateAuthorizedClient();
+        var module = await factory.AddModuleAsync(client, "Gain");
+        await using var hub = factory.CreateHubConnection();
+        var status = hub.NextAsync<EngineStatusDto>("StatusChanged");
+        await hub.StartAsync();
+
+        using var response = await client.PostAsync("/api/engine/restart-audio", null);
+        var modules = await client.GetFromJsonAsync<ModuleDto[]>("/api/modules", factory.Json);
+
+        await Assert.That(response.IsSuccessStatusCode).IsTrue();
+        await Assert.That((await status).IsRunning).IsTrue();
+        await Assert.That(modules!.Select(m => m.Id)).IsEquivalentTo([module.Id]);
+    }
+
+    [Test]
     public async Task SubscribeLevels_DeliversLevels()
     {
         await using var factory = new EngineFactory();

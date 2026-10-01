@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Net;
+using System.Text.Json;
 using Microsoft.Web.WebView2.Core;
 using Microsoft.Web.WebView2.WinForms;
 using Serilog;
@@ -8,21 +9,26 @@ namespace Micser.Shell;
 
 /// <summary>
 /// Shows the web UI of the engine. Closing the window disposes it (and its WebView2 processes); the shell keeps
-/// running in the tray.
+/// running in the tray. The UI talks to the shell through WebView2 web messages (see <see cref="OnWebMessageReceived"/>).
 /// </summary>
 internal sealed class MainForm : Form
 {
     private const string WebView2DownloadUrl = "https://go.microsoft.com/fwlink/p/?LinkId=2124703";
 
+    private static readonly JsonSerializerOptions MessageJson = new(JsonSerializerDefaults.Web);
+
     private readonly string _settingsPath;
     private readonly EngineSupervisor _supervisor;
     private readonly Uri? _uiUrl;
+    private readonly UpdateController? _updates;
     private readonly WebView2 _webView;
     private Uri? _shownUrl;
 
-    public MainForm(EngineSupervisor supervisor, Uri? uiUrl, string settingsPath)
+    /// <param name="updates">Null if this copy can't update (development).</param>
+    public MainForm(EngineSupervisor supervisor, UpdateController? updates, Uri? uiUrl, string settingsPath)
     {
         _supervisor = supervisor;
+        _updates = updates;
         _uiUrl = uiUrl;
         _settingsPath = settingsPath;
 
@@ -35,6 +41,10 @@ internal sealed class MainForm : Form
         Controls.Add(_webView);
 
         _supervisor.Changed += OnEngineChanged;
+        if (_updates != null)
+        {
+            _updates.Changed += OnUpdatesChanged;
+        }
     }
 
     protected override void Dispose(bool disposing)
@@ -42,6 +52,10 @@ internal sealed class MainForm : Form
         if (disposing)
         {
             _supervisor.Changed -= OnEngineChanged;
+            if (_updates != null)
+            {
+                _updates.Changed -= OnUpdatesChanged;
+            }
         }
 
         base.Dispose(disposing);
@@ -82,6 +96,8 @@ internal sealed class MainForm : Form
             return;
         }
 
+        _webView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
+        _webView.CoreWebView2.WebMessageReceived += OnWebMessageReceived;
         _webView.CoreWebView2.NewWindowRequested += (_, args) =>
         {
             args.Handled = true;
@@ -120,6 +136,78 @@ internal sealed class MainForm : Form
     private void OnEngineChanged(object? sender, EventArgs e)
     {
         ShowEngine();
+        PostState();
+    }
+
+    private void OnUpdatesChanged(object? sender, EventArgs e)
+    {
+        PostState();
+    }
+
+    /// <summary>
+    /// Handles <c>{ "type": ... }</c> messages from the UI: <c>getState</c>, <c>checkForUpdates</c> (answered with an
+    /// <c>updateCheck</c> message), <c>installUpdate</c> and <c>restartEngine</c>. The shell answers with <c>state</c> messages (see
+    /// <see cref="PostState"/>), also whenever the state changes.
+    /// </summary>
+    private async void OnWebMessageReceived(object? sender, CoreWebView2WebMessageReceivedEventArgs e)
+    {
+        // only the UI the window loaded may control the shell
+        if (_shownUrl == null || !Uri.TryCreate(e.Source, UriKind.Absolute, out var source) || source.GetLeftPart(UriPartial.Authority) != _shownUrl.GetLeftPart(UriPartial.Authority))
+        {
+            return;
+        }
+
+        string? type;
+        try
+        {
+            type = JsonDocument.Parse(e.WebMessageAsJson).RootElement.GetProperty("type").GetString();
+        }
+        catch (Exception ex) when (ex is JsonException or KeyNotFoundException or InvalidOperationException)
+        {
+            Log.Warning(ex, "Ignoring an invalid message from the UI.");
+            return;
+        }
+
+        switch (type)
+        {
+            case "getState":
+                PostState();
+                break;
+            case "checkForUpdates" when _updates != null:
+                var result = await _updates.CheckAsync();
+                PostMessage(new { type = "updateCheck", result = JsonNamingPolicy.CamelCase.ConvertName(result.ToString()) });
+                break;
+            case "installUpdate" when _updates != null:
+                await _updates.InstallAsync(minimized: false);
+                break;
+            case "restartEngine":
+                await _supervisor.RestartEngineAsync();
+                break;
+        }
+    }
+
+    private void PostMessage(object message)
+    {
+        if (_webView.CoreWebView2 != null && _shownUrl != null)
+        {
+            _webView.CoreWebView2.PostWebMessageAsJson(JsonSerializer.Serialize(message, MessageJson));
+        }
+    }
+
+    /// <summary>
+    /// Sends <c>{ type: "state", version, canUpdate, isCheckingForUpdates, pendingUpdate, canRestartEngine }</c> to the UI.
+    /// </summary>
+    private void PostState()
+    {
+        PostMessage(new
+        {
+            type = "state",
+            version = _updates?.CurrentVersion.ToString(),
+            canUpdate = _updates != null,
+            isCheckingForUpdates = _updates?.IsChecking ?? false,
+            pendingUpdate = _updates?.PendingUpdate?.Version.ToString(),
+            canRestartEngine = _supervisor.CanStartEngine,
+        });
     }
 
     /// <summary>
