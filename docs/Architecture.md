@@ -85,7 +85,10 @@ docs/
 - **Volume.** Every module has `Volume` (0..1) and `IsMuted`, applied to its outputs with a ramp over one block. `EffectModule` adds `IsBypassed`. Samples aren't clamped inside the graph, only at device outputs.
 - **Levels.** Each output port has a `LevelMeter` that measures the output after volume and mute: per channel, the peak since the last read and the RMS smoothed over 300 ms. A module without outputs measures what it passes to `ApplyVolume` (a device output: what it plays). The audio thread updates the meters with atomics only; `AudioModule.ReadLevels()` reads and resets the peaks.
 - **Devices.** Each capture and render stream decouples its device clock from the engine clock:
-  - A lock-free single-producer/single-consumer ring buffer sits between them. Its target fill is one device period (devices deliver and consume whole periods, 10 ms in shared mode) plus half an engine block.
+  - A lock-free single-producer/single-consumer ring buffer sits between them. Devices deliver and consume whole periods (10 ms in shared mode), so the initial target fill is:
+    - render: one device period plus half an engine block;
+    - capture: a block plus half a period (a read takes a whole block while periods arrive at any phase), at least one period, plus half a block. At 5 ms blocks both are 12.5 ms; at 20 ms blocks capture needs 35 ms.
+  - The target adapts per stream (`AdaptiveTarget`): each dropout raises it by half a device period (dropouts within 1 s count as one), up to 200 ms. After 10 minutes without dropouts it steps back down, but not below a level that had a dropout within 10 minutes of stepping down to it. Device widgets show the current target in ms.
   - The WASAPI render buffer is requested at 20 ms; NAudio's default of 200 ms dominated the latency before.
   - A windowed-sinc resampler (NAudio's `WdlResampler`) converts between the device and engine rates.
   - A PI controller (`DriftController`) adjusts the resampling ratio by up to ±0.5% to hold the target fill.

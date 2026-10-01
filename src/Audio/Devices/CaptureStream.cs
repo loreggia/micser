@@ -28,6 +28,8 @@ public sealed class CaptureStream : IDeviceStream
     private readonly WasapiRecorder _recorder;
     private readonly WdlResampler _resampler;
     private readonly SampleRingBuffer _ring;
+    private readonly AdaptiveTarget _target;
+    private bool _hadDropout;
     private bool _isPrefilled;
     private volatile bool _isStopped;
     private long _lastData;
@@ -63,7 +65,8 @@ public sealed class CaptureStream : IDeviceStream
         _convertBuffer = new float[deviceFormat.SampleRate * _channels];
         _ring = new SampleRingBuffer(deviceFormat.SampleRate * _channels);
         _interleaved = new float[format.FrameCount * _channels];
-        _drift = new DriftController(StreamBuffering.GetTargetFill(device, format, DeviceSampleRate));
+        _target = StreamBuffering.CreateCaptureTarget(device, format, DeviceSampleRate);
+        _drift = new DriftController(_target.Value);
 
         _resampler = new WdlResampler();
         _resampler.SetMode(true, 0, true);
@@ -81,7 +84,13 @@ public sealed class CaptureStream : IDeviceStream
 
     public ChannelLayout Layout { get; }
 
-    public StreamStatistics Statistics => new(_drift.SmoothedFill, _drift.TargetFill, _drift.Correction, Interlocked.Read(ref _underruns), Interlocked.Read(ref _overruns));
+    public StreamStatistics Statistics => new(
+        _drift.SmoothedFill,
+        _drift.TargetFill,
+        _drift.Correction,
+        Interlocked.Read(ref _underruns),
+        Interlocked.Read(ref _overruns),
+        _drift.TargetFill * 1000 / DeviceSampleRate);
 
     public void Dispose()
     {
@@ -97,6 +106,14 @@ public sealed class CaptureStream : IDeviceStream
     public void Read(AudioBuffer destination)
     {
         destination.SetLayout(Layout);
+
+        // after an underrun the stream refills to the new target before reading again
+        if (_target.Update(_hadDropout))
+        {
+            _drift.TargetFill = _target.Value;
+        }
+
+        _hadDropout = false;
 
         var fill = _ring.Count / _channels;
         if (!_isPrefilled)
@@ -130,6 +147,7 @@ public sealed class CaptureStream : IDeviceStream
         {
             input[read..inputSamples].Clear();
             Interlocked.Increment(ref _underruns);
+            _hadDropout = true;
             _isPrefilled = false;
         }
 

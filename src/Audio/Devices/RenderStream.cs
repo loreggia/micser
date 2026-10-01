@@ -28,10 +28,15 @@ public sealed class RenderStream : IDeviceStream
     private readonly WasapiPlayer _player;
     private readonly WdlResampler _resampler;
     private readonly SampleRingBuffer _ring;
+    private readonly AdaptiveTarget _target;
     private volatile bool _isConsuming;
     private volatile bool _isStopped;
     private long _lastRequest;
     private long _overruns;
+
+    // -1 until the device consumes, so underruns while it starts don't count as dropouts
+    private long _seenUnderruns = -1;
+
     private long _underruns;
 
     internal RenderStream(MMDevice device, ProcessingFormat format, ILogger logger)
@@ -50,10 +55,10 @@ public sealed class RenderStream : IDeviceStream
         DeviceSampleRate = mixFormat.SampleRate;
         _channels = mixFormat.Channels;
 
-        var targetFill = StreamBuffering.GetTargetFill(device, format, DeviceSampleRate);
-        _drift = new DriftController(targetFill);
+        _target = StreamBuffering.CreateRenderTarget(device, format, DeviceSampleRate);
+        _drift = new DriftController(_target.Value);
         _ring = new SampleRingBuffer(DeviceSampleRate * _channels);
-        _ring.WriteSilence((int)targetFill * _channels);
+        _ring.WriteSilence((int)_target.Value * _channels);
         _interleaved = new float[format.FrameCount * _channels];
         _output = new float[(int)Math.Ceiling(format.FrameCount * (double)DeviceSampleRate / format.SampleRate * 1.1 + 64) * _channels];
 
@@ -81,7 +86,13 @@ public sealed class RenderStream : IDeviceStream
 
     public ChannelLayout Layout { get; }
 
-    public StreamStatistics Statistics => new(_drift.SmoothedFill, _drift.TargetFill, _drift.Correction, Interlocked.Read(ref _underruns), Interlocked.Read(ref _overruns));
+    public StreamStatistics Statistics => new(
+        _drift.SmoothedFill,
+        _drift.TargetFill,
+        _drift.Correction,
+        Interlocked.Read(ref _underruns),
+        Interlocked.Read(ref _overruns),
+        _drift.TargetFill * 1000 / DeviceSampleRate);
 
     public void Dispose()
     {
@@ -106,7 +117,22 @@ public sealed class RenderStream : IDeviceStream
             return;
         }
 
+        var underruns = Interlocked.Read(ref _underruns);
+        var hadDropout = _seenUnderruns >= 0 && underruns != _seenUnderruns;
+        _seenUnderruns = underruns;
+
         var fill = _ring.Count / _channels;
+        if (_target.Update(hadDropout))
+        {
+            _drift.TargetFill = _target.Value;
+            if (fill < _target.Value)
+            {
+                // a dropout already happened, so the gap to the larger target is filled right away
+                fill += _ring.WriteSilence(((int)_target.Value - fill) * _channels) / _channels;
+                _drift.Reset();
+            }
+        }
+
         if (fill > _drift.TargetFill * StreamBuffering.MaxFillFactor)
         {
             // the device isn't consuming, e.g. while it's being reinitialized
