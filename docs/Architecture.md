@@ -51,6 +51,7 @@ src/
   Web/                        @micser/web: Vite + React SPA (graph editor, pages)
   WebSdk/                     @micser/web-sdk: widget contract, shared controls, API client, types
   Shell/                      Micser.Shell: tray + WebView2 window, engine launcher; no app logic
+  ServiceDefaults/            Micser.ServiceDefaults: OpenTelemetry setup, exported only when run from the AppHost
   DriverUtility/              Micser.DriverUtility: VAC driver install/config CLI (standalone)
   Driver/                     C++ VAC driver (moved as is, not built by default)
   Installer/                  moved as is, not built (see decision 8)
@@ -59,6 +60,7 @@ tests/                        mirrors src/
   Engine/                     Micser.Engine.Tests
   Plugins/Main/               Micser.Plugins.Main.Tests
 tools/                        dev-only programs, in Micser.slnx but never shipped
+  AppHost/                    Micser.AppHost: Aspire AppHost that runs engine, Vite and (on demand) shell with a dashboard
   AudioHarness/               routes a real input through a gain module to a real output and prints buffer statistics
 eng/                          CI and build scripts (when needed)
 docs/
@@ -69,7 +71,7 @@ docs/
 **Module contract.** The engine exposes module definitions (type name, input/output connectors, state schema) through the API. Widgets are registered by module type name and read connectors from the definition instead of hard-coding them. This avoids the name drift seen on `dev` (`Output` vs. `Output01`).
 
 **Dependencies** go one way:
-- .NET: `Plugins.Main → Audio`, `Engine → Audio, Plugins.Main`, and `Shell → nothing` (it talks to the engine only over HTTP). `DriverUtility` is standalone.
+- .NET: `Plugins.Main → Audio`, `Engine → Audio, Plugins.Main, ServiceDefaults`, and `Shell → nothing` (it talks to the engine only over HTTP). `DriverUtility` is standalone.
 - npm: `plugin-main → web-sdk`, and `web → web-sdk, plugin-main`.
 
 ## Audio engine
@@ -159,6 +161,15 @@ docs/
   - It shows `{engine url}/#token={token}`, or the `--ui <url>` override with the engine's token (Vite in development), and re-navigates when the engine changes. While no engine is available, a status page is shown.
   - Links that open new windows go to the default browser. A missing WebView2 runtime leads to a download prompt.
 - **Logs:** `%LocalAppData%\Micser\logs\shell-*.log` (Serilog). Fatal startup errors also show a message box.
+
+## Development orchestration
+
+- `aspire start` (or `aspire run`) runs `tools/AppHost`; `aspire.config.json` at the root points to it.
+  - `engine` gets an Aspire-assigned port. The endpoint isn't proxied, because the engine's `Urls` setting would override `ASPNETCORE_URLS`, so the AppHost sets `Urls` itself. Its health check is `/api/health`.
+  - `web` is the Vite dev server, with `MICSER_ENGINE_URL` set to the engine's endpoint. Aspire runs `npm install` in `src/Web` first, which installs the workspace at the root.
+  - `shell` is started from the dashboard only, with `--ui` pointing to Vite.
+- Logs, traces and metrics reach the dashboard through `Micser.ServiceDefaults`. Serilog keeps its own sinks and forwards to the OpenTelemetry logger provider (`writeToProviders`). Without `OTEL_EXPORTER_OTLP_ENDPOINT` nothing is exported.
+- The manual workflow (`dotnet run` on port 5080 plus `npm run dev`) still works.
 
 ## Roadmap
 

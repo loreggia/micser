@@ -3,6 +3,7 @@
     <File Path="Directory.Build.props" />
     <File Path="Directory.Build.targets" />
     <File Path="Directory.Packages.props" />
+    <File Path="aspire.config.json" />
     <File Path="global.json" />
   </Folder>
   <Folder Name="/src/">
@@ -10,6 +11,7 @@
     <Project Path="src/DriverUtility/Micser.DriverUtility.csproj" />
     <Project Path="src/Engine/Micser.Engine.csproj" />
     <Project Path="src/Plugins/Main/Micser.Plugins.Main.csproj" />
+    <Project Path="src/ServiceDefaults/Micser.ServiceDefaults.csproj" />
     <Project Path="src/Shell/Micser.Shell.csproj" />
   </Folder>
   <Folder Name="/tests/">
@@ -21,6 +23,7 @@
     <Project Path="tests/Plugins/Main/Micser.Plugins.Main.Tests.csproj" />
   </Folder>
   <Folder Name="/tools/">
+    <Project Path="tools/AppHost/Micser.AppHost.csproj" />
     <Project Path="tools/AudioHarness/Micser.AudioHarness.csproj" />
   </Folder>
 </Solution>

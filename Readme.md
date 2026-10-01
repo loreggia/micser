@@ -28,6 +28,7 @@ npm run format:check
 ```
 
 ### Running for development
+With the [Aspire CLI](https://aspire.dev), `aspire start` runs the engine and the web UI with a dashboard for logs and traces; the shell can be started from the dashboard. Without Aspire:
 ```sh
 dotnet run --project src/Engine   # engine on http://127.0.0.1:5080
 npm run dev                       # web UI on http://localhost:5173, proxies /api and /hubs to the engine
@@ -42,6 +43,7 @@ Audio modules are provided by plugins. Each plugin consists of a .NET project an
 
 ## Credits
 This project uses the following libraries:
+* [Aspire](https://aspire.dev) (development orchestration)
 * [NAudio](https://github.com/naudio/NAudio)
 * [React](https://react.dev/)
 * [Serilog](https://serilog.net/)
