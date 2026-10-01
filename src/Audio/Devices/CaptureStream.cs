@@ -35,6 +35,7 @@ public sealed class CaptureStream : IDeviceStream
     private long _lastData;
     private long _lastRead;
     private long _overruns;
+    private long _resyncs;
     private long _underruns;
 
     internal CaptureStream(MMDevice device, bool loopback, ProcessingFormat format, ILogger logger)
@@ -91,7 +92,8 @@ public sealed class CaptureStream : IDeviceStream
         _drift.Correction,
         Interlocked.Read(ref _underruns),
         Interlocked.Read(ref _overruns),
-        _drift.TargetFill * 1000 / DeviceSampleRate);
+        _drift.TargetFill * 1000 / DeviceSampleRate,
+        Interlocked.Read(ref _resyncs));
 
     public void Dispose()
     {
@@ -106,7 +108,8 @@ public sealed class CaptureStream : IDeviceStream
     /// </summary>
     public void Read(AudioBuffer destination)
     {
-        Interlocked.Exchange(ref _lastRead, Environment.TickCount64);
+        var now = Environment.TickCount64;
+        var wasIdle = StreamBuffering.IsIdle(Interlocked.Exchange(ref _lastRead, now), now);
         destination.SetLayout(Layout);
 
         // after an underrun the stream refills to the new target before reading again
@@ -137,6 +140,11 @@ public sealed class CaptureStream : IDeviceStream
             _ring.Discard(excess * _channels);
             fill -= excess;
             _drift.Reset();
+            if (!wasIdle)
+            {
+                Interlocked.Increment(ref _resyncs);
+                _hadDropout = true;
+            }
         }
 
         var correction = _drift.Update(fill);

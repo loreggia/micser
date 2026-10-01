@@ -93,7 +93,8 @@ public sealed class RenderStream : IDeviceStream
         _drift.Correction,
         Interlocked.Read(ref _underruns),
         Interlocked.Read(ref _overruns),
-        _drift.TargetFill * 1000 / DeviceSampleRate);
+        _drift.TargetFill * 1000 / DeviceSampleRate,
+        0);
 
     public void Dispose()
     {
@@ -122,14 +123,14 @@ public sealed class RenderStream : IDeviceStream
 
         // after a pause (e.g. audio switched off) the ring buffer is empty; the top-up below refills it
         var pendingUnderruns = Interlocked.Exchange(ref _pendingUnderruns, 0);
-        var hadDropout = !wasIdle && pendingUnderruns > 0;
-        if (hadDropout)
+        var hadUnderrun = !wasIdle && pendingUnderruns > 0;
+        if (hadUnderrun)
         {
             Interlocked.Add(ref _underruns, pendingUnderruns);
         }
 
         var fill = _ring.Count / _channels;
-        if (_target.Update(hadDropout))
+        if (_target.Update(hadUnderrun))
         {
             _drift.TargetFill = _target.Value;
             if (fill < _target.Value)
@@ -147,9 +148,10 @@ public sealed class RenderStream : IDeviceStream
             return;
         }
 
-        if (fill < _drift.TargetFill * StreamBuffering.MinFillFactor)
+        // after a pause (or before the first write) the device has drained the ring buffer; while running, a low fill is left to the drift
+        // correction, since topping it up would be a gap even if the device doesn't run dry
+        if (wasIdle && fill < _drift.TargetFill * StreamBuffering.MinFillFactor)
         {
-            // too far behind for the drift correction, e.g. after the device's initial buffer fill
             var missing = (int)_drift.TargetFill - fill;
             fill += _ring.WriteSilence(missing * _channels) / _channels;
             _drift.Reset();
