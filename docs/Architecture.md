@@ -224,7 +224,7 @@ docs/
    - Follow-ups:
      - The tray menu's Close and Exit Micser were only checked by code review. The end-to-end checks covered engine start, UI and token handoff, single instance, and crash restart.
 6. **Packaging and updates** (done): Velopack setup and delta updates from GitHub releases, a release workflow, and install, update and uninstall hooks in the shell.
+   - Verified with the published releases 0.1.0 and 0.1.1: install, uninstall and reinstall, the release workflow with a delta package, and the tray's "Restart to update" with a graceful engine stop.
    - Follow-ups:
      - Code signing (`vpk pack --signParams`).
-     - The tray's "Restart to update" was only checked by code review. The scripted end-to-end check covered install with autostart, background download, applying the update on start with a graceful engine stop, and uninstall.
 7. **Later:** the VAC driver (needs an EV code-signing cert) and runtime-loaded plugins.
