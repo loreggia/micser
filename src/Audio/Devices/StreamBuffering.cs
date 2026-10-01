@@ -8,6 +8,12 @@ namespace Micser.Audio.Devices;
 internal static class StreamBuffering
 {
     /// <summary>
+    /// The engine side of a stream is idle when it hasn't read or written for this long, e.g. while audio is switched off. The device's
+    /// empty reads or full writes then aren't dropouts.
+    /// </summary>
+    public const long IdleMilliseconds = 100;
+
+    /// <summary>
     /// Above <c>target * MaxFillFactor</c> a stream resynchronizes instead of relying on the drift correction.
     /// </summary>
     public const double MaxFillFactor = 3;
@@ -62,6 +68,14 @@ internal static class StreamBuffering
     {
         var period = GetDevicePeriod(device);
         return CreateTarget(period + format.BlockDuration.TotalSeconds / 2, period, format, deviceSampleRate);
+    }
+
+    /// <summary>
+    /// Whether the engine side is idle; <paramref name="lastActivity"/> is a <see cref="Environment.TickCount64"/> value, 0 if there was none.
+    /// </summary>
+    public static bool IsIdle(long lastActivity, long now)
+    {
+        return now - lastActivity > IdleMilliseconds;
     }
 
     /// <summary>

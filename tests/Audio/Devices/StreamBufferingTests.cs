@@ -5,6 +5,16 @@ namespace Micser.Audio.Tests.Devices;
 public class StreamBufferingTests
 {
     [Test]
+    [Arguments(0L, 50L, false)]
+    [Arguments(1_000L, 1_050L, false)]
+    [Arguments(1_000L, 1_200L, true)]
+    [Arguments(0L, 1_000L, true)]
+    public async Task IsIdle_AfterNoActivityFor100Milliseconds(long lastActivity, long now, bool expected)
+    {
+        await Assert.That(StreamBuffering.IsIdle(lastActivity, now)).IsEqualTo(expected);
+    }
+
+    [Test]
     [Arguments(0L, 1_000L, false)]
     [Arguments(0L, 9_000L, false)]
     [Arguments(0L, 11_000L, true)]

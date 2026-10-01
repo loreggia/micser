@@ -33,6 +33,7 @@ public sealed class CaptureStream : IDeviceStream
     private bool _isPrefilled;
     private volatile bool _isStopped;
     private long _lastData;
+    private long _lastRead;
     private long _overruns;
     private long _underruns;
 
@@ -105,6 +106,7 @@ public sealed class CaptureStream : IDeviceStream
     /// </summary>
     public void Read(AudioBuffer destination)
     {
+        Interlocked.Exchange(ref _lastRead, Environment.TickCount64);
         destination.SetLayout(Layout);
 
         // after an underrun the stream refills to the new target before reading again
@@ -180,7 +182,8 @@ public sealed class CaptureStream : IDeviceStream
             written = _ring.Write(_convertBuffer.AsSpan(0, converted));
         }
 
-        if (written < samples)
+        // while the engine doesn't read (e.g. audio switched off) the ring buffer fills up; the reader discards the excess when it resumes
+        if (written < samples && !StreamBuffering.IsIdle(Interlocked.Read(ref _lastRead), Environment.TickCount64))
         {
             Interlocked.Increment(ref _overruns);
         }
