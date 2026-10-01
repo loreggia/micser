@@ -54,7 +54,9 @@ internal static class Program
             var enginePath = options.EnginePath ?? Path.Combine(AppContext.BaseDirectory, "Micser.Engine.exe");
             using var supervisor = new EngineSupervisor(new EngineLocator(EngineLocator.DefaultDiscoveryPath, http), http, enginePath);
 
-            Application.Run(new TrayApplicationContext(options, supervisor, Updater.Create(), activation));
+            using var updates = Updater.Create() is { } updater ? new UpdateController(updater, supervisor) : null;
+
+            Application.Run(new TrayApplicationContext(options, supervisor, updates, activation));
             return 0;
         }
         catch (Exception ex)

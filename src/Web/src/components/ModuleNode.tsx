@@ -28,6 +28,8 @@ const useStyles = makeStyles({
   card: {
     minWidth: "240px",
     boxShadow: tokens.shadow8,
+    // the ports sit on the card's edges and would be cut in half
+    overflow: "visible",
   },
   selected: {
     outline: `${tokens.strokeWidthThick} solid ${tokens.colorBrandStroke1}`,

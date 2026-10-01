@@ -53,6 +53,11 @@ public sealed class HubEngineNotifier : IEngineNotifier, IDisposable
         Send(c => c.ModuleRemoved(moduleId));
     }
 
+    public void PreferencesChanged(UiPreferencesDto preferences)
+    {
+        Send(c => c.PreferencesChanged(preferences));
+    }
+
     public void StatusChanged(EngineStatusDto status)
     {
         Send(c => c.StatusChanged(status));

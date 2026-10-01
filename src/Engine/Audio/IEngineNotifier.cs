@@ -17,5 +17,7 @@ public interface IEngineNotifier
 
     void ModuleRemoved(Guid moduleId);
 
+    void PreferencesChanged(UiPreferencesDto preferences);
+
     void StatusChanged(EngineStatusDto status);
 }

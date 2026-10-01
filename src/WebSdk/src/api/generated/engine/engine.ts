@@ -377,6 +377,76 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getStopEngineMutationOptions(options), queryClient);
     }
+    export const getRestartAudioUrl = () => {
+
+
+
+
+  return `/api/engine/restart-audio`
+}
+
+/**
+ * Rebuilds the audio graph, which reopens all device streams with fresh buffers.
+ */
+export const restartAudio = async ( options?: Parameters<typeof engineFetch>[1]): Promise<EngineStatusDto> => {
+
+  return engineFetch<EngineStatusDto>(getRestartAudioUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getRestartAudioMutationKey = () => ['restartAudio'] as const;
+
+export const getRestartAudioMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof restartAudio>>, TError,void, TContext>, request?: SecondParameter<typeof engineFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof restartAudio>>, TError,void, TContext> => {
+
+const mutationKey = getRestartAudioMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof restartAudio>>, void> = () => {
+
+
+          return  restartAudio(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RestartAudioMutationResult = NonNullable<Awaited<ReturnType<typeof restartAudio>>>
+
+    export type RestartAudioMutationError = unknown
+
+
+    export const useRestartAudio = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof restartAudio>>, TError,void, TContext>, request?: SecondParameter<typeof engineFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof restartAudio>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getRestartAudioMutationOptions(options), queryClient);
+    }
     export const getShutdownEngineUrl = () => {
 
 

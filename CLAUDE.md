@@ -54,6 +54,8 @@ CI (`.github/workflows/ci.yml`) runs the dotnet build/test and npm format/lint/b
   - Engine data comes from the generated query hooks; `EngineConnection` keeps the cache in sync via SignalR, so don't poll or invalidate after mutations. Module edits go through `useModuleUpdate`.
   - Fluent UI v9 components and `makeStyles` with `tokens`; no hard-coded colors.
   - SignalR `hub.on` handlers must not return a value; SignalR would send it to the server as an invocation result.
+  - UI preferences are stored by the engine (`/api/preferences`, `usePreferences`), not in browser storage: the UI's origin changes with the engine's random port.
+  - The UI talks to the desktop shell through WebView2 web messages (`src/Web/src/shell.ts` ↔ `MainForm`); shell-only controls are hidden in a plain browser.
 - Dependency direction:
   - .NET: `Plugins → Audio` and `Engine → Audio, Plugins, ServiceDefaults`. `tools/AppHost` references the runnable projects. `Shell` references no Micser project and talks to the engine over HTTP only.
   - npm: `plugin-* → web-sdk` and `web → web-sdk, plugin-*`.

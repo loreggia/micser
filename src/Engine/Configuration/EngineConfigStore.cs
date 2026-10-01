@@ -16,6 +16,8 @@ public sealed class EngineConfiguration
 
     public List<ModuleDto> Modules { get; init; } = [];
 
+    public UiPreferencesDto Preferences { get; init; } = new();
+
     public EngineSettingsDto Settings { get; init; } = new();
 
     public int Version { get; init; } = CurrentVersion;
@@ -118,6 +120,7 @@ public sealed class EngineConfigStore : IDisposable
             return new EngineConfiguration
             {
                 Settings = file.Settings ?? new EngineSettingsDto(),
+                Preferences = file.Preferences ?? new UiPreferencesDto(),
                 Modules = modules,
                 Connections = file.Connections ?? [],
             };
@@ -175,6 +178,8 @@ public sealed class EngineConfigStore : IDisposable
         public List<ConnectionDto>? Connections { get; init; }
 
         public List<JsonElement> Modules { get; init; } = [];
+
+        public UiPreferencesDto? Preferences { get; init; }
 
         public EngineSettingsDto? Settings { get; init; }
 

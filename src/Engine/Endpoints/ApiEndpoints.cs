@@ -19,6 +19,7 @@ public static class ApiEndpoints
         MapConnections(api);
         MapDevices(api);
         MapEngine(api);
+        MapPreferences(api);
 
         return app;
     }
@@ -74,6 +75,9 @@ public static class ApiEndpoints
         engine.MapGet("", (AudioHost host) => TypedResults.Ok(host.GetStatus())).WithName("GetEngineStatus");
         engine.MapPost("/start", (AudioHost host) => TypedResults.Ok(host.Start())).WithName("StartEngine");
         engine.MapPost("/stop", (AudioHost host) => TypedResults.Ok(host.Stop())).WithName("StopEngine");
+        engine.MapPost("/restart-audio", (AudioHost host) => TypedResults.Ok(host.RestartAudio()))
+            .WithName("RestartAudio")
+            .WithDescription("Rebuilds the audio graph, which reopens all device streams with fresh buffers.");
         engine.MapPost("/shutdown", (IHostApplicationLifetime lifetime) =>
         {
             // after the response: the shutdown stops the server
@@ -114,5 +118,14 @@ public static class ApiEndpoints
     private static void MapModuleTypes(RouteGroupBuilder api)
     {
         api.MapGet("/module-types", (AudioHost host) => TypedResults.Ok(host.GetModuleTypes())).WithName("GetModuleTypes").WithTags("Modules");
+    }
+
+    private static void MapPreferences(RouteGroupBuilder api)
+    {
+        var preferences = api.MapGroup("/preferences").WithTags("Preferences");
+
+        preferences.MapGet("", (AudioHost host) => TypedResults.Ok(host.GetPreferences())).WithName("GetPreferences");
+        preferences.MapPut("", (UiPreferencesDto preferences, AudioHost host) => TypedResults.Ok(host.UpdatePreferences(preferences)))
+            .WithName("UpdatePreferences");
     }
 }

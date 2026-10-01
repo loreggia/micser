@@ -45,3 +45,4 @@ export * from './moduleTypeDto';
 export * from './pitchState';
 export * from './speakers';
 export * from './spectrumState';
+export * from './uiPreferencesDto';

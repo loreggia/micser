@@ -1,5 +1,12 @@
+import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useContext, useEffect, useState, useSyncExternalStore } from "react";
-import type { ModuleDto } from "../api";
+import {
+  getGetPreferencesQueryKey,
+  updatePreferences,
+  useGetPreferences,
+  type ModuleDto,
+  type UiPreferencesDto,
+} from "../api";
 import type { EngineConnectionState, PortLevels } from "./EngineConnection";
 import { EngineConnectionContext } from "./EngineContext";
 
@@ -42,6 +49,26 @@ export function useModuleLevels(moduleId: string): PortLevels[] | undefined {
   const connection = useEngineConnection();
   const subscribe = useCallback((onChange: () => void) => connection.subscribeLevels(onChange), [connection]);
   return useSyncExternalStore(subscribe, () => connection.levels?.[moduleId]);
+}
+
+const defaultPreferences: UiPreferencesDto = { showStreamStatistics: false, snapToGrid: true };
+
+/**
+ * Returns the UI preferences (defaults until loaded) and a function that changes some of them. Changes show immediately; the engine stores
+ * them and pushes them to all clients.
+ */
+export function usePreferences(): [UiPreferencesDto, (changes: Partial<UiPreferencesDto>) => void] {
+  const queryClient = useQueryClient();
+  const { data: preferences = defaultPreferences } = useGetPreferences();
+
+  const update = (changes: Partial<UiPreferencesDto>) => {
+    const updated = { ...preferences, ...changes };
+    queryClient.setQueryData(getGetPreferencesQueryKey(), updated);
+    // on failure the cache is reloaded from the engine
+    updatePreferences(updated).catch(() => queryClient.invalidateQueries({ queryKey: getGetPreferencesQueryKey() }));
+  };
+
+  return [preferences, update];
 }
 
 /**

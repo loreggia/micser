@@ -25,6 +25,7 @@ public sealed class AudioHost : IDisposable
     private AudioEngine? _engine;
     private AudioGraph? _graph;
     private IReadOnlyList<ModuleTypeDto>? _moduleTypes;
+    private UiPreferencesDto _preferences = new();
     private EngineSettingsDto _settings = new();
 
     public AudioHost(
@@ -157,6 +158,14 @@ public sealed class AudioHost : IDisposable
         })];
     }
 
+    public UiPreferencesDto GetPreferences()
+    {
+        lock (_lock)
+        {
+            return _preferences;
+        }
+    }
+
     public EngineStatusDto GetStatus()
     {
         lock (_lock)
@@ -181,6 +190,7 @@ public sealed class AudioHost : IDisposable
             }
 
             _settings = settingsErrors.Count == 0 ? configuration.Settings : new EngineSettingsDto();
+            _preferences = configuration.Preferences;
             Build(configuration.Modules, configuration.Connections);
             Engine.Start();
         }
@@ -243,6 +253,18 @@ public sealed class AudioHost : IDisposable
         }
     }
 
+    /// <summary>
+    /// Rebuilds the graph with the current settings, which reopens all device streams with fresh buffers. The audio pauses briefly.
+    /// </summary>
+    public EngineStatusDto RestartAudio()
+    {
+        lock (_lock)
+        {
+            _logger.LogInformation("Restarting the audio.");
+            return Rebuild(_settings);
+        }
+    }
+
     public EngineStatusDto Start()
     {
         lock (_lock)
@@ -298,28 +320,24 @@ public sealed class AudioHost : IDisposable
     /// <summary>
     /// Changes the processing format. The graph is rebuilt, which briefly interrupts the audio.
     /// </summary>
+    public UiPreferencesDto UpdatePreferences(UiPreferencesDto preferences)
+    {
+        lock (_lock)
+        {
+            _preferences = preferences;
+            Persist();
+            _notifier.PreferencesChanged(preferences);
+            return preferences;
+        }
+    }
+
     public EngineStatusDto UpdateSettings(EngineSettingsDto settings)
     {
         ThrowIfInvalid(StateValidator.Validate(settings));
 
         lock (_lock)
         {
-            var modules = _modules.Values.Select(ToDto).ToArray();
-            var connections = _connections.Values.Select(c => c.Dto).ToArray();
-            var wasRunning = Engine.IsRunning;
-
-            TearDown();
-            _settings = settings;
-            Build(modules, connections);
-            if (wasRunning)
-            {
-                Engine.Start();
-            }
-
-            Persist();
-            var status = CreateStatus();
-            _notifier.StatusChanged(status);
-            return status;
+            return Rebuild(settings);
         }
     }
 
@@ -471,9 +489,33 @@ public sealed class AudioHost : IDisposable
         _store.Save(new EngineConfiguration
         {
             Settings = _settings,
+            Preferences = _preferences,
             Modules = [.. _modules.Values.Select(ToDto)],
             Connections = [.. _connections.Values.Select(c => c.Dto)],
         });
+    }
+
+    /// <summary>
+    /// Tears the graph down and builds it again with <paramref name="settings"/>. Call while holding the lock.
+    /// </summary>
+    private EngineStatusDto Rebuild(EngineSettingsDto settings)
+    {
+        var modules = _modules.Values.Select(ToDto).ToArray();
+        var connections = _connections.Values.Select(c => c.Dto).ToArray();
+        var wasRunning = Engine.IsRunning;
+
+        TearDown();
+        _settings = settings;
+        Build(modules, connections);
+        if (wasRunning)
+        {
+            Engine.Start();
+        }
+
+        Persist();
+        var status = CreateStatus();
+        _notifier.StatusChanged(status);
+        return status;
     }
 
     private void TearDown()
