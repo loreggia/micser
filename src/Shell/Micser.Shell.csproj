@@ -9,13 +9,12 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Web.WebView2" />
+    <PackageReference Include="Serilog" />
+    <PackageReference Include="Serilog.Sinks.File" />
   </ItemGroup>
 
-  <!-- The WebView2 package always references its WPF control, which conflicts with WindowsBase in a WinForms-only app. -->
-  <Target Name="RemoveWebView2WpfReference" BeforeTargets="ResolveAssemblyReferences">
-    <ItemGroup>
-      <Reference Remove="@(Reference)" Condition="'%(Filename)' == 'Microsoft.Web.WebView2.Wpf'" />
-    </ItemGroup>
-  </Target>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Micser.Shell.Tests" />
+  </ItemGroup>
 
 </Project>

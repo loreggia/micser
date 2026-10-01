@@ -31,7 +31,7 @@ npm run format:check
 ```sh
 dotnet run --project src/Engine   # engine on http://127.0.0.1:5080
 npm run dev                       # web UI on http://localhost:5173, proxies /api and /hubs to the engine
-dotnet run --project src/Shell    # optional: tray app showing the web UI
+dotnet run --project src/Shell -- --ui http://localhost:5173   # optional: the tray app showing the dev UI
 ```
 
 ### Driver and installer

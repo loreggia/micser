@@ -22,7 +22,7 @@ npm run generate:api -w @micser/web-sdk   # regenerate the API client after engi
 
 dotnet run --project src/Engine     # http://127.0.0.1:5080
 npm run dev                         # Vite on http://localhost:5173, proxies /api and /hubs to the engine
-dotnet run --project src/Shell      # tray + WebView2; optional URL argument, default is the Vite dev server
+dotnet run --project src/Shell -- --ui http://localhost:5173   # tray + WebView2 showing Vite; uses the running dev engine
 
 dotnet run --project tools/AudioHarness -- list                    # audio devices
 dotnet run --project tools/AudioHarness -- 1 2 --gain -100         # input 1 -> gain -> output 2, prints buffer stats
