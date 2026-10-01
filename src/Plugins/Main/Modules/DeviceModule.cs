@@ -9,7 +9,8 @@ namespace Micser.Plugins.Main.Modules;
 /// changes state, when the system resumed from sleep, and when a watchdog finds it faulted (stopped or stalled). A
 /// device that can't be opened is retried with a growing delay. If the device isn't available, the module switches to
 /// an active device of the same adapter, e.g. when a USB device is plugged into a different port, and raises
-/// <see cref="AudioModule.StateChanged"/>.
+/// <see cref="AudioModule.StateChanged"/>. The buffer the stream learned is kept in <see cref="BufferMilliseconds"/>
+/// (also raising <see cref="AudioModule.StateChanged"/>), so the next stream starts there.
 /// </summary>
 public abstract class DeviceModule<TStream> : AudioModule, IModuleDataSource
     where TStream : class, IDeviceStream
@@ -24,6 +25,7 @@ public abstract class DeviceModule<TStream> : AudioModule, IModuleDataSource
     private readonly Lock _selectionLock = new();
     private readonly Lock _streamLock = new();
     private readonly Timer _watchdog;
+    private double? _bufferMilliseconds;
     private bool _isDisposed;
     private TStream? _stream;
     private long _streamOpenedAt;
@@ -41,6 +43,11 @@ public abstract class DeviceModule<TStream> : AudioModule, IModuleDataSource
     /// The adapter of the selected device, used to find the device again when its ID changes.
     /// </summary>
     public string? AdapterName { get; private set; }
+
+    /// <summary>
+    /// The buffer the stream learned, or null if it hasn't run yet.
+    /// </summary>
+    public double? BufferMilliseconds => _bufferMilliseconds;
 
     public string? DeviceId { get; private set; }
 
@@ -73,18 +80,26 @@ public abstract class DeviceModule<TStream> : AudioModule, IModuleDataSource
     }
 
     /// <summary>
-    /// Selects a device, or none. Opens it right away when the module is in a graph.
+    /// Selects a device, or none. Opens it right away when the module is in a graph, unless it's already open.
     /// </summary>
     /// <param name="deviceId">The device, or null for none.</param>
     /// <param name="adapterName">The device's adapter, used when the device isn't available (e.g. a restored configuration).</param>
-    public void SelectDevice(string? deviceId, string? adapterName = null)
+    /// <param name="bufferMilliseconds">The buffer learned for the device, or null to start at the minimum.</param>
+    public void SelectDevice(string? deviceId, string? adapterName = null, double? bufferMilliseconds = null)
     {
         lock (_selectionLock)
         {
+            var isOpen = deviceId != null && deviceId == DeviceId && HasStream();
             DeviceId = deviceId;
             AdapterName = deviceId == null ? null : _devices.GetDevice(deviceId)?.AdapterName ?? adapterName;
-            _retry.Reset();
-            Reopen();
+            _bufferMilliseconds = bufferMilliseconds;
+
+            // every module update sets the state again, e.g. while dragging the volume slider
+            if (!isOpen)
+            {
+                _retry.Reset();
+                Reopen();
+            }
         }
     }
 
@@ -123,7 +138,8 @@ public abstract class DeviceModule<TStream> : AudioModule, IModuleDataSource
     {
     }
 
-    protected abstract TStream OpenStream(string deviceId);
+    /// <param name="bufferMilliseconds">The buffer to start with, or null for the minimum.</param>
+    protected abstract TStream OpenStream(string deviceId, double? bufferMilliseconds);
 
     /// <summary>
     /// Runs <paramref name="action"/> with the current stream (null if none) while it can't be replaced.
@@ -175,6 +191,13 @@ public abstract class DeviceModule<TStream> : AudioModule, IModuleDataSource
                 {
                     _retry.Reset();
                 }
+
+                var buffer = Math.Round(stream.Statistics.TargetMilliseconds, 1);
+                if (buffer != _bufferMilliseconds)
+                {
+                    _bufferMilliseconds = buffer;
+                    OnStateChanged();
+                }
             }
             else if (DeviceId != null && _retry.IsDue)
             {
@@ -189,6 +212,14 @@ public abstract class DeviceModule<TStream> : AudioModule, IModuleDataSource
         finally
         {
             _selectionLock.Exit();
+        }
+    }
+
+    private bool HasStream()
+    {
+        lock (_streamLock)
+        {
+            return _stream != null;
         }
     }
 
@@ -210,9 +241,7 @@ public abstract class DeviceModule<TStream> : AudioModule, IModuleDataSource
                 return;
             }
 
-            var hasStream = false;
-            UseStream((stream, _) => hasStream = stream != null, 0);
-            if (!hasStream)
+            if (!HasStream())
             {
                 Reopen();
             }
@@ -260,7 +289,7 @@ public abstract class DeviceModule<TStream> : AudioModule, IModuleDataSource
         {
             try
             {
-                stream = OpenStream(device.Id);
+                stream = OpenStream(device.Id, _bufferMilliseconds);
                 Logger.LogInformation("Opened {Device} ({Layout}, {SampleRate} Hz).", device.Name, stream.Layout, stream.DeviceSampleRate);
             }
             catch (Exception ex)

@@ -1,10 +1,12 @@
+using System.ComponentModel.DataAnnotations;
 using Micser.Audio;
 using Micser.Audio.Devices;
 using Microsoft.Extensions.Logging;
 
 namespace Micser.Plugins.Main.Modules;
 
-public sealed record LoopbackInputState(string? DeviceId, string? AdapterName) : DeviceModuleState(DeviceId, AdapterName);
+public sealed record LoopbackInputState(string? DeviceId, string? AdapterName, [Range(0, 1000)] double? BufferMilliseconds = null)
+    : DeviceModuleState(DeviceId, AdapterName, BufferMilliseconds);
 
 /// <summary>
 /// Captures what is played on an output device.
@@ -20,16 +22,16 @@ public class LoopbackInputModule : CaptureModule, IStatefulModule<LoopbackInputS
 
     public LoopbackInputState GetState()
     {
-        return new LoopbackInputState(DeviceId, AdapterName);
+        return new LoopbackInputState(DeviceId, AdapterName, BufferMilliseconds);
     }
 
     public void SetState(LoopbackInputState state)
     {
-        SelectDevice(state.DeviceId, state.AdapterName);
+        SelectDevice(state.DeviceId, state.AdapterName, state.BufferMilliseconds);
     }
 
-    protected override CaptureStream OpenStream(string deviceId)
+    protected override CaptureStream OpenStream(string deviceId, double? bufferMilliseconds)
     {
-        return Devices.OpenLoopback(deviceId, Format);
+        return Devices.OpenLoopback(deviceId, Format, bufferMilliseconds);
     }
 }

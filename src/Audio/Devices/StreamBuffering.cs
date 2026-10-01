@@ -24,6 +24,11 @@ internal static class StreamBuffering
     public const double MinFillFactor = 0.5;
 
     /// <summary>
+    /// Dropouts in this time after a stream opened don't count, since the device may still be settling in.
+    /// </summary>
+    public const long SettleMilliseconds = 1000;
+
+    /// <summary>
     /// A stream whose device hasn't delivered or taken data for this long is stalled, e.g. after the system resumed from sleep.
     /// </summary>
     public const long StallTimeoutMilliseconds = 2000;
@@ -53,21 +58,21 @@ internal static class StreamBuffering
     /// at any phase, so the fill before a read must cover a block plus half a period; at least one period, plus half a block for timer
     /// jitter. It grows by half a period per dropout.
     /// </summary>
-    public static AdaptiveTarget CreateCaptureTarget(MMDevice device, ProcessingFormat format, int deviceSampleRate)
+    public static AdaptiveTarget CreateCaptureTarget(MMDevice device, ProcessingFormat format, int deviceSampleRate, double? initialMilliseconds)
     {
         var period = GetDevicePeriod(device);
         var block = format.BlockDuration.TotalSeconds;
-        return CreateTarget(Math.Max(period, block + period / 2) + block / 2, period, format, deviceSampleRate);
+        return CreateTarget(Math.Max(period, block + period / 2) + block / 2, period, format, deviceSampleRate, initialMilliseconds);
     }
 
     /// <summary>
     /// The buffer target of a render stream, in device frames: one device period, because devices take whole periods, plus half an
     /// engine block for timer jitter. It grows by half a period per dropout.
     /// </summary>
-    public static AdaptiveTarget CreateRenderTarget(MMDevice device, ProcessingFormat format, int deviceSampleRate)
+    public static AdaptiveTarget CreateRenderTarget(MMDevice device, ProcessingFormat format, int deviceSampleRate, double? initialMilliseconds)
     {
         var period = GetDevicePeriod(device);
-        return CreateTarget(period + format.BlockDuration.TotalSeconds / 2, period, format, deviceSampleRate);
+        return CreateTarget(period + format.BlockDuration.TotalSeconds / 2, period, format, deviceSampleRate, initialMilliseconds);
     }
 
     /// <summary>
@@ -79,6 +84,14 @@ internal static class StreamBuffering
     }
 
     /// <summary>
+    /// Whether a stream opened at <paramref name="openedAt"/> is still settling in (see <see cref="SettleMilliseconds"/>).
+    /// </summary>
+    public static bool IsSettling(long openedAt, long now)
+    {
+        return now - openedAt < SettleMilliseconds;
+    }
+
+    /// <summary>
     /// Whether a stream opened at <paramref name="openedAt"/> is stalled. Times are <see cref="Environment.TickCount64"/> values;
     /// <paramref name="lastActivity"/> is 0 before the device's first callback.
     /// </summary>
@@ -87,7 +100,12 @@ internal static class StreamBuffering
         return lastActivity == 0 ? now - openedAt > StartTimeoutMilliseconds : now - lastActivity > StallTimeoutMilliseconds;
     }
 
-    private static AdaptiveTarget CreateTarget(double minimumSeconds, double periodSeconds, ProcessingFormat format, int deviceSampleRate)
+    private static AdaptiveTarget CreateTarget(
+        double minimumSeconds,
+        double periodSeconds,
+        ProcessingFormat format,
+        int deviceSampleRate,
+        double? initialMilliseconds)
     {
         var blocksPerSecond = 1 / format.BlockDuration.TotalSeconds;
         return new AdaptiveTarget(
@@ -95,7 +113,8 @@ internal static class StreamBuffering
             periodSeconds / 2 * deviceSampleRate,
             MaxTargetSeconds * deviceSampleRate,
             (long)(HoldOffSeconds * blocksPerSecond),
-            (long)(StableSeconds * blocksPerSecond));
+            (long)(StableSeconds * blocksPerSecond),
+            initialMilliseconds / 1000 * deviceSampleRate);
     }
 
     private static double GetDevicePeriod(MMDevice device)

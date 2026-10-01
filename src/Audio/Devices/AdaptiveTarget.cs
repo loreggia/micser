@@ -1,7 +1,7 @@
 namespace Micser.Audio.Devices;
 
 /// <summary>
-/// The target fill of a stream's ring buffer, in device frames. Starts at a minimum, grows by a step after a dropout, and shrinks by a step
+/// The target fill of a stream's ring buffer, in device frames. Starts at a minimum (or a learned value), grows by a step after a dropout, and shrinks by a step
 /// after a long time without dropouts, but not below a level that had a dropout soon after shrinking to it. Updated once per block on the
 /// audio thread.
 /// </summary>
@@ -21,7 +21,8 @@ internal sealed class AdaptiveTarget
     /// <param name="maximum">The highest target.</param>
     /// <param name="holdOffBlocks">Dropouts this soon after an increase count as the same incident, since the buffer is still refilling.</param>
     /// <param name="stableBlocks">Blocks without dropouts before the target shrinks.</param>
-    public AdaptiveTarget(double minimum, double step, double maximum, long holdOffBlocks, long stableBlocks)
+    /// <param name="initial">The starting target, e.g. one learned earlier; clamped to the minimum and maximum. Default: the minimum.</param>
+    public AdaptiveTarget(double minimum, double step, double maximum, long holdOffBlocks, long stableBlocks, double? initial = null)
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(minimum);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(step);
@@ -32,7 +33,7 @@ internal sealed class AdaptiveTarget
         _stableBlocks = stableBlocks;
         _blocksSinceDecrease = stableBlocks;
         _blocksSinceIncrease = holdOffBlocks;
-        Value = minimum;
+        Value = Math.Clamp(initial ?? minimum, minimum, _maximum);
     }
 
     public double Value { get; private set; }

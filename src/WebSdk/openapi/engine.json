@@ -659,6 +659,13 @@
               "null",
               "string"
             ]
+          },
+          "bufferMilliseconds": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
           }
         }
       },
@@ -680,6 +687,13 @@
               "null",
               "string"
             ]
+          },
+          "bufferMilliseconds": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
           }
         }
       },
@@ -811,6 +825,13 @@
               "null",
               "string"
             ]
+          },
+          "bufferMilliseconds": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "format": "double"
           }
         }
       },
