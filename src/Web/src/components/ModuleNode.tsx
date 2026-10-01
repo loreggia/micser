@@ -12,7 +12,13 @@ import {
   mergeClasses,
   tokens,
 } from "@fluentui/react-components";
-import { DeleteRegular, FlashOffRegular, Speaker2Regular, SpeakerMuteRegular } from "@fluentui/react-icons";
+import {
+  DeleteRegular,
+  DesktopSpeakerRegular,
+  FlashOffRegular,
+  Speaker2Regular,
+  SpeakerMuteRegular,
+} from "@fluentui/react-icons";
 import { useModuleUpdate, type ModuleDto, type ModuleTypeDto, type WidgetDefinition } from "@micser/web-sdk";
 import { Handle, Position, useReactFlow, type Node, type NodeProps } from "@xyflow/react";
 import { useRef, useState } from "react";
@@ -50,7 +56,7 @@ const useStyles = makeStyles({
   },
   volume: {
     display: "grid",
-    gridTemplateColumns: "auto 1fr auto",
+    gridTemplateColumns: "auto 1fr auto auto",
     alignItems: "center",
     gap: tokens.spacingHorizontalXS,
   },
@@ -79,7 +85,8 @@ const useStyles = makeStyles({
 });
 
 /**
- * A module on the graph: name, mute, bypass, volume, level meter, the module type's widget, and the connectors.
+ * A module on the graph: name, mute, bypass, volume (or the Windows volume), level meter, the module type's widget, and the
+ * connectors.
  */
 export function ModuleNode({ id, data, selected }: NodeProps<ModuleNodeType>) {
   const styles = useStyles();
@@ -113,11 +120,15 @@ export function ModuleNode({ id, data, selected }: NodeProps<ModuleNodeType>) {
                 />
               </Tooltip>
             )}
-            <Tooltip content={module.isMuted ? "Unmute" : "Mute"} relationship="label">
+            <Tooltip
+              content={module.useSystemVolume ? "Muted with Windows" : module.isMuted ? "Unmute" : "Mute"}
+              relationship="label"
+            >
               <ToggleButton
                 size="small"
                 appearance="subtle"
                 checked={module.isMuted}
+                disabled={module.useSystemVolume}
                 icon={module.isMuted ? <SpeakerMuteRegular /> : <Speaker2Regular />}
                 onClick={() => update({ ...module, isMuted: !module.isMuted })}
               />
@@ -141,9 +152,22 @@ export function ModuleNode({ id, data, selected }: NodeProps<ModuleNodeType>) {
           max={100}
           value={Math.round(module.volume * 100)}
           aria-label="Volume"
+          disabled={module.useSystemVolume}
           onChange={(_, value) => update({ ...module, volume: value.value / 100 })}
         />
         <Caption1 className={styles.volumeValue}>{Math.round(module.volume * 100)}%</Caption1>
+        <Tooltip
+          content={module.useSystemVolume ? "Follows the Windows volume" : "Follow the Windows volume"}
+          relationship="label"
+        >
+          <ToggleButton
+            size="small"
+            appearance="subtle"
+            checked={module.useSystemVolume}
+            icon={<DesktopSpeakerRegular />}
+            onClick={() => update({ ...module, useSystemVolume: !module.useSystemVolume })}
+          />
+        </Tooltip>
       </div>
       <LevelMeter moduleId={module.id} />
       {Widget && (

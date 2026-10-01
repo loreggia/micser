@@ -115,6 +115,14 @@ public sealed class AudioDeviceService : IDisposable
         return new RenderStream(GetActiveDevice(deviceId, DataFlow.Render), format, initialTargetMilliseconds, _logger);
     }
 
+    /// <summary>
+    /// The default output device, which the caller disposes, or null if there is none.
+    /// </summary>
+    internal MMDevice? TryGetDefaultRenderDevice()
+    {
+        return _enumerator.TryGetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia, out var device) ? device : null;
+    }
+
     private static DataFlow ToDataFlow(DeviceDirection direction)
     {
         return direction == DeviceDirection.Input ? DataFlow.Capture : DataFlow.Render;

@@ -20,6 +20,7 @@ export interface ModuleDtoPitchModule {
      */
   name?: string | null;
   position?: null | ModulePosition;
+  useSystemVolume: boolean;
   /**
      * @minimum 0
      * @maximum 1

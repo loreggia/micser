@@ -42,6 +42,7 @@ builder.Services.AddProblemDetails();
 builder.Services.AddEngineOpenApi();
 
 builder.Services.AddSingleton<AudioDeviceService>();
+builder.Services.AddSingleton<ISystemVolume, SystemVolume>();
 builder.Services.AddMainPlugin();
 builder.Services.AddSingleton<ModuleCatalog>();
 builder.Services.AddSingleton<EngineConfigStore>();

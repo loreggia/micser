@@ -1,12 +1,14 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
+using Micser.Audio.Devices;
 using Micser.Engine.Contracts;
 using Micser.Engine.Modules;
 using Micser.Engine.Security;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -32,6 +34,11 @@ internal sealed class EngineFactory : WebApplicationFactory<Program>
     public string Directory { get; }
 
     public JsonSerializerOptions Json => EngineJson.CreateOptions(Services.GetRequiredService<ModuleCatalog>());
+
+    /// <summary>
+    /// Replaces the volume of the machine's default output device.
+    /// </summary>
+    public FakeSystemVolume SystemVolume { get; } = new();
 
     public string Token => Services.GetRequiredService<EngineAccess>().Token;
 
@@ -83,6 +90,7 @@ internal sealed class EngineFactory : WebApplicationFactory<Program>
         builder.UseSetting("Engine:DiscoveryPath", Path.Combine(Directory, "engine.json"));
         builder.UseSetting("Engine:SingleInstance", "false");
         builder.UseSetting("Engine:RequireToken", "true");
+        builder.ConfigureTestServices(services => services.AddSingleton<ISystemVolume>(SystemVolume));
     }
 }
 
