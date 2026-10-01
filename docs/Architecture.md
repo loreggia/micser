@@ -83,6 +83,7 @@ docs/
   - positional layouts map matching speakers 1:1 and fold missing ones into their neighbours (center into L/R at -3 dB, sides and backs into each other or into the fronts at -3 dB), dropping LFE;
   - everything else maps by index.
 - **Volume.** Every module has `Volume` (0..1) and `IsMuted`, applied to its outputs with a ramp over one block. `EffectModule` adds `IsBypassed`. Samples aren't clamped inside the graph, only at device outputs.
+- **Levels.** Each output port has a `LevelMeter` that measures the output after volume and mute: per channel, the peak since the last read and the RMS smoothed over 300 ms. A module without outputs measures what it passes to `ApplyVolume` (a device output: what it plays). The audio thread updates the meters with atomics only; `AudioModule.ReadLevels()` reads and resets the peaks.
 - **Devices.** Each capture and render stream decouples its device clock from the engine clock:
   - A lock-free single-producer/single-consumer ring buffer sits between them. Its target fill is one device period (devices deliver and consume whole periods, 10 ms in shared mode) plus half an engine block.
   - The WASAPI render buffer is requested at 20 ms; NAudio's default of 200 ms dominated the latency before.
@@ -107,6 +108,7 @@ docs/
 - **Hub** (`/hubs/engine`):
   - Pushes `ModuleChanged`, `ModuleRemoved`, `ConnectionAdded`, `ConnectionRemoved`, `DevicesChanged` and `StatusChanged` to all clients, in the order they happened.
   - `Subscribe(moduleId)` / `Unsubscribe(moduleId)` start and stop `ModuleData` pushes (20 per second) for modules with live data.
+  - `SubscribeLevels()` / `UnsubscribeLevels()` start and stop `Levels` pushes (20 per second): the levels of all processed modules in one message (`PortLevelsDto` per port, linear amplitude). Hub payloads aren't in the OpenAPI document, so the web SDK declares `PortLevels` itself.
 - **Configuration** (`%AppData%\Micser\config.json`, `Engine:ConfigPath`):
   - It's versioned, with saves debounced (500 ms) and written atomically.
   - An unreadable file is moved to `config.json.<timestamp>.bak`, and the engine starts empty.
@@ -130,7 +132,8 @@ docs/
   - `useModuleData(moduleId)` subscribes to live data (spectrum, stream statistics).
 - **Widgets:**
   - Plugins export `defineWidget({ moduleType, title, component })` from their `Web` package. The component receives the typed module (`WidgetProps<"Gain">`) and a `setState` function.
-  - The graph node around it is generic: title, mute, bypass (if `supportsBypass`), remove, volume, and connectors from the engine's module type. Modules without a widget still work.
+  - The graph node around it is generic: title, mute, bypass (if `supportsBypass`), remove, volume, a level meter, and connectors from the engine's module type. Modules without a widget still work.
+  - The level meter (`useModuleLevels`) shows the RMS as a bar and the peak as a marker per channel, on a -60..0 dBFS scale. The peak is held for 30 updates (about 1.5 s) and turns red at full scale. While a module isn't processed, its meter stays at zero with its last channel count, so the node doesn't change height.
   - Controls inside nodes need the `nodrag`/`nowheel` classes. `ParameterSlider` is the shared parameter control, with linear or logarithmic scales and integer slider positions, so keyboard steps are exact.
 - **Graph editor (`@xyflow/react`):**
   - Nodes and edges follow the engine.
@@ -213,7 +216,6 @@ docs/
      - Lower latency needs device periods below 10 ms. `IAudioClient3` low-latency mode (NAudio `WithLowLatency`) wasn't available on the tested devices and made loopback capture fail; exclusive mode would work but takes the device away from other applications.
 3. **Engine (`src/Engine`)** (done): hosting, the JSON config store, module definition/module/connection/device/settings APIs, and SignalR hubs for change and module data pushes.
    - Follow-ups:
-     - Level meters per module (a module data source in the audio core).
      - Device streams that fault (e.g. after sleep) are only reopened on device events; a periodic health check could reopen them.
 4. **UI** (done): `src/Web`, `src/WebSdk` and `src/Plugins/Main/Web`: the Vite app, graph editor and widgets.
    - Follow-ups:

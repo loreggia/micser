@@ -9,6 +9,7 @@ public abstract class AudioModule : IDisposable
     private readonly List<OutputPort> _outputs = [];
     private float _appliedVolume = 1f;
     private ProcessingFormat? _format;
+    private LevelMeter? _meter;
     private float _volume = 1f;
 
     /// <summary>
@@ -55,6 +56,30 @@ public abstract class AudioModule : IDisposable
         return _outputs.Find(p => p.Name == name) ?? throw new ArgumentException($"{GetType().Name} has no output '{name}'.", nameof(name));
     }
 
+    /// <summary>
+    /// Reads the levels of what the module passes on, after volume and mute: of each output, or for a module without outputs of the signal
+    /// given to <see cref="ApplyVolume"/> (e.g. what a device output plays). Empty until the module is added to a graph. Call from one
+    /// thread only; reading resets the peaks.
+    /// </summary>
+    public PortLevels[] ReadLevels()
+    {
+        if (_meter != null)
+        {
+            return [new PortLevels(null, _meter.Read())];
+        }
+
+        var levels = new List<PortLevels>(_outputs.Count);
+        foreach (var output in _outputs)
+        {
+            if (output.Meter is { } meter)
+            {
+                levels.Add(new PortLevels(output.Name, meter.Read()));
+            }
+        }
+
+        return [.. levels];
+    }
+
     internal void Attach(ProcessingFormat format)
     {
         if (_format != null)
@@ -71,8 +96,10 @@ public abstract class AudioModule : IDisposable
         foreach (var port in _outputs)
         {
             port.Allocate(format.FrameCount);
+            port.Meter = new LevelMeter(format);
         }
 
+        _meter = _outputs.Count == 0 ? new LevelMeter(format) : null;
         OnAttached();
     }
 
@@ -91,6 +118,7 @@ public abstract class AudioModule : IDisposable
             foreach (var output in _outputs)
             {
                 output.Buffer.ApplyGain(start, end);
+                output.Meter?.Measure(output.Buffer);
             }
         }
     }
@@ -110,13 +138,14 @@ public abstract class AudioModule : IDisposable
     }
 
     /// <summary>
-    /// Applies <see cref="Volume"/> and <see cref="IsMuted"/> to a buffer. Only needed by modules without outputs;
-    /// for all others the graph applies them to the outputs.
+    /// Applies <see cref="Volume"/> and <see cref="IsMuted"/> to a buffer and measures its level. Only needed by modules without outputs;
+    /// for all others the graph does this for the outputs.
     /// </summary>
     protected void ApplyVolume(AudioBuffer buffer)
     {
         var (start, end) = NextVolumeRamp();
         buffer.ApplyGain(start, end);
+        _meter?.Measure(buffer);
     }
 
     protected virtual void Dispose(bool disposing)

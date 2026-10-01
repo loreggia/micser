@@ -87,3 +87,21 @@ internal sealed class ThrowingSource : AudioModule
         throw new InvalidOperationException("Test failure");
     }
 }
+
+/// <summary>
+/// Applies its volume to the input, like a device output.
+/// </summary>
+internal sealed class VolumeSink : AudioModule
+{
+    public VolumeSink()
+    {
+        Input = AddInput("Input");
+    }
+
+    public InputPort Input { get; }
+
+    protected override void Process()
+    {
+        ApplyVolume(Input.Buffer);
+    }
+}

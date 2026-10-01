@@ -14,6 +14,12 @@ public interface IEngineClient
 
     Task DevicesChanged();
 
+    /// <summary>
+    /// The levels of all processed modules, about 20 times per second, to clients that subscribed with <see cref="EngineHub.SubscribeLevels"/>.
+    /// Modules without levels (e.g. not processed) are left out.
+    /// </summary>
+    Task Levels(IReadOnlyDictionary<Guid, PortLevelsDto[]> levels);
+
     Task ModuleChanged(ModuleDto module);
 
     /// <summary>
@@ -31,6 +37,8 @@ public interface IEngineClient
 /// </summary>
 public sealed class EngineHub : Hub<IEngineClient>
 {
+    public const string LevelsGroup = "levels";
+
     private readonly ModuleDataSubscriptions _subscriptions;
 
     public EngineHub(ModuleDataSubscriptions subscriptions)
@@ -58,9 +66,24 @@ public sealed class EngineHub : Hub<IEngineClient>
         _subscriptions.Add(Context.ConnectionId, moduleId);
     }
 
+    /// <summary>
+    /// Starts receiving <see cref="IEngineClient.Levels"/>.
+    /// </summary>
+    public async Task SubscribeLevels()
+    {
+        await Groups.AddToGroupAsync(Context.ConnectionId, LevelsGroup);
+        _subscriptions.AddLevels(Context.ConnectionId);
+    }
+
     public async Task Unsubscribe(Guid moduleId)
     {
         _subscriptions.Remove(Context.ConnectionId, moduleId);
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, GetModuleGroup(moduleId));
+    }
+
+    public async Task UnsubscribeLevels()
+    {
+        _subscriptions.RemoveLevels(Context.ConnectionId);
+        await Groups.RemoveFromGroupAsync(Context.ConnectionId, LevelsGroup);
     }
 }

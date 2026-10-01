@@ -1,6 +1,6 @@
-import { useContext, useEffect, useState, useSyncExternalStore } from "react";
+import { useCallback, useContext, useEffect, useState, useSyncExternalStore } from "react";
 import type { ModuleDto } from "../api";
-import type { EngineConnectionState } from "./EngineConnection";
+import type { EngineConnectionState, PortLevels } from "./EngineConnection";
 import { EngineConnectionContext } from "./EngineContext";
 
 export function useEngineConnection() {
@@ -33,6 +33,15 @@ export function useModuleData<T>(moduleId: string): T | undefined {
   );
 
   return latest?.moduleId === moduleId ? latest.data : undefined;
+}
+
+/**
+ * Returns the levels of a module's ports, updated about 20 times per second, or undefined while the module isn't processed.
+ */
+export function useModuleLevels(moduleId: string): PortLevels[] | undefined {
+  const connection = useEngineConnection();
+  const subscribe = useCallback((onChange: () => void) => connection.subscribeLevels(onChange), [connection]);
+  return useSyncExternalStore(subscribe, () => connection.levels?.[moduleId]);
 }
 
 /**

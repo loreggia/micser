@@ -61,6 +61,20 @@ public class EngineHubTests
     }
 
     [Test]
+    public async Task SubscribeLevels_DeliversLevels()
+    {
+        await using var factory = new EngineFactory();
+        await using var hub = factory.CreateHubConnection();
+        var levels = hub.NextAsync<Dictionary<Guid, PortLevelsDto[]>>("Levels");
+        await hub.StartAsync();
+
+        await hub.InvokeAsync("SubscribeLevels");
+
+        // without devices no module produces a signal, so there are no levels to report
+        await Assert.That(await levels.WaitAsync(TimeSpan.FromSeconds(10))).IsEmpty();
+    }
+
+    [Test]
     public async Task UpdateSettings_RebuildsGraphAndBroadcastsStatus()
     {
         await using var factory = new EngineFactory();

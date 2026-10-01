@@ -20,3 +20,11 @@ public sealed record EngineSettingsDto(
 /// <param name="LateBlocks">Times processing fell behind and skipped ahead.</param>
 /// <param name="MaxProcessingMilliseconds">Longest time a block took to process since the engine started.</param>
 public sealed record EngineStatusDto(bool IsRunning, EngineSettingsDto Settings, long Blocks, long LateBlocks, double MaxProcessingMilliseconds);
+
+/// <summary>
+/// The levels of one port of a module, per channel as linear amplitude (1 = full scale). Pushed by the hub, not part of the HTTP API.
+/// </summary>
+/// <param name="Port">The output port, or null for the signal a module without outputs passes on (e.g. what a device output plays).</param>
+/// <param name="Peak">The highest absolute sample value since the previous push.</param>
+/// <param name="Rms">The RMS level, smoothed over about 300 ms.</param>
+public sealed record PortLevelsDto(string? Port, float[] Peak, float[] Rms);

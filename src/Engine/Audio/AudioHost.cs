@@ -186,6 +186,33 @@ public sealed class AudioHost : IDisposable
         }
     }
 
+    /// <summary>
+    /// Reads the levels of all modules (see <see cref="AudioModule.ReadLevels"/>) and resets their peaks. Modules that weren't processed
+    /// since the previous call are left out. Call from one thread only.
+    /// </summary>
+    public Dictionary<Guid, PortLevelsDto[]> ReadLevels()
+    {
+        (Guid Id, AudioModule Module)[] modules;
+        lock (_lock)
+        {
+            modules = [.. _modules.Values.Select(entry => (entry.Id, entry.Module))];
+        }
+
+        var levels = new Dictionary<Guid, PortLevelsDto[]>();
+        foreach (var (id, module) in modules)
+        {
+            PortLevelsDto[] ports = [.. module.ReadLevels()
+                .Where(port => port.Channels.Length > 0)
+                .Select(port => new PortLevelsDto(port.Port, [.. port.Channels.Select(c => c.Peak)], [.. port.Channels.Select(c => c.Rms)]))];
+            if (ports.Length > 0)
+            {
+                levels[id] = ports;
+            }
+        }
+
+        return levels;
+    }
+
     public bool RemoveModule(Guid id)
     {
         lock (_lock)

@@ -15,6 +15,24 @@ import {
 
 export type EngineConnectionState = "connecting" | "connected" | "reconnecting" | "disconnected";
 
+/**
+ * The levels of one port of a module, per channel as linear amplitude (1 = full scale). Mirrors the engine's PortLevelsDto, which is pushed
+ * by the hub and not part of the OpenAPI document.
+ */
+export interface PortLevels {
+  /** The output port, or null for the signal a module without outputs passes on (e.g. what a device output plays). */
+  port: string | null;
+  /** The highest absolute sample value since the previous push. */
+  peak: number[];
+  /** The RMS level, smoothed over about 300 ms. */
+  rms: number[];
+}
+
+/** The levels of all processed modules by module id; modules that aren't processed are missing. */
+export type ModuleLevels = Record<string, PortLevels[]>;
+
+type HubMethod = "Subscribe" | "Unsubscribe" | "SubscribeLevels" | "UnsubscribeLevels";
+
 type Listener<T> = (value: T) => void;
 
 /** Delay before a module update is sent; later updates within it replace earlier ones. */
@@ -28,10 +46,12 @@ export class EngineConnection {
   private readonly dataListeners = new Map<string, Set<Listener<unknown>>>();
   private readonly errorListeners = new Set<Listener<Error>>();
   private readonly hub: HubConnection;
+  private readonly levelListeners = new Set<() => void>();
   private readonly pendingUpdates = new Map<string, { module: ModuleDto; timer?: number; sending: boolean }>();
   private readonly queryClient: QueryClient;
   private readonly stateListeners = new Set<Listener<EngineConnectionState>>();
   private isStopped = true;
+  private latestLevels?: ModuleLevels;
   private retryTimer?: number;
 
   constructor(queryClient: QueryClient) {
@@ -66,6 +86,10 @@ export class EngineConnection {
     this.hub.on("ModuleData", (moduleId: string, data: unknown) => {
       this.dataListeners.get(moduleId)?.forEach((listener) => listener(data));
     });
+    this.hub.on("Levels", (levels: ModuleLevels) => {
+      this.latestLevels = levels;
+      this.levelListeners.forEach((listener) => listener());
+    });
 
     this.hub.onreconnecting(() => this.setState("reconnecting"));
     this.hub.onreconnected(() => this.onConnected());
@@ -73,6 +97,11 @@ export class EngineConnection {
       this.setState("disconnected");
       this.scheduleRetry();
     });
+  }
+
+  /** The latest levels while subscribed with {@link subscribeLevels}. */
+  get levels(): ModuleLevels | undefined {
+    return this.latestLevels;
   }
 
   get state(): EngineConnectionState {
@@ -138,6 +167,24 @@ export class EngineConnection {
   }
 
   /**
+   * Calls the listener whenever {@link levels} changes (about 20 times per second) while subscribed. Returns a function that ends the
+   * subscription.
+   */
+  subscribeLevels(listener: () => void) {
+    this.levelListeners.add(listener);
+    if (this.levelListeners.size === 1) {
+      this.invoke("SubscribeLevels");
+    }
+
+    return () => {
+      if (this.levelListeners.delete(listener) && this.levelListeners.size === 0) {
+        this.latestLevels = undefined;
+        this.invoke("UnsubscribeLevels");
+      }
+    };
+  }
+
+  /**
    * Shows the module in the cache right away and sends it to the engine after a short delay.
    */
   updateModule(module: ModuleDto) {
@@ -170,9 +217,9 @@ export class EngineConnection {
     }
   }
 
-  private invoke(method: "Subscribe" | "Unsubscribe", moduleId: string) {
+  private invoke(method: HubMethod, ...args: unknown[]) {
     if (this.hub.state === HubConnectionState.Connected) {
-      this.hub.invoke(method, moduleId).catch(() => {
+      this.hub.invoke(method, ...args).catch(() => {
         // resubscribed on the next reconnect
       });
     }
@@ -184,6 +231,10 @@ export class EngineConnection {
     void this.queryClient.invalidateQueries();
     for (const moduleId of this.dataListeners.keys()) {
       this.invoke("Subscribe", moduleId);
+    }
+
+    if (this.levelListeners.size > 0) {
+      this.invoke("SubscribeLevels");
     }
   }
 
