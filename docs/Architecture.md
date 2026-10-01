@@ -142,7 +142,7 @@ docs/
 - **Widgets:**
   - Plugins export `defineWidget({ moduleType, title, component })` from their `Web` package. The component receives the typed module (`WidgetProps<"Gain">`) and a `setState` function.
   - The graph node around it is generic: title, mute, bypass (if `supportsBypass`), remove, volume, a level meter, and connectors from the engine's module type. Modules without a widget still work.
-  - The level meter (`useModuleLevels`) shows the RMS as a bar and the peak as a marker per channel, on a -60..0 dBFS scale. The peak is held for 30 updates (about 1.5 s) and turns red at full scale. While a module isn't processed, its meter stays at zero with its last channel count, so the node doesn't change height.
+  - The level meter (`useModuleLevels`) is studio-style, per channel on a -60..0 dBFS scale: the RMS as a solid bar, the peak as a lighter bar behind it (instant rise, falling at 20 dB/s), and the highest peak as a marker held for 30 updates (about 1.5 s) that turns red at full scale. While a module isn't processed, its meter stays at zero with its last channel count, so the node doesn't change height.
   - Controls inside nodes need the `nodrag`/`nowheel` classes. `ParameterSlider` is the shared parameter control, with linear or logarithmic scales and integer slider positions, so keyboard steps are exact.
 - **Graph editor (`@xyflow/react`):**
   - Nodes and edges follow the engine.
