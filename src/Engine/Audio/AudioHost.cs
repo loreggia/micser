@@ -152,7 +152,8 @@ public sealed class AudioHost : IDisposable
                 definition.Type,
                 [.. module.Inputs.Select(p => p.Name)],
                 [.. module.Outputs.Select(p => p.Name)],
-                definition.GetState(module));
+                definition.GetState(module),
+                module is EffectModule);
         })];
     }
 

@@ -2,10 +2,14 @@
 
   <PropertyGroup>
     <TargetFramework>net10.0-windows</TargetFramework>
+    <!-- the OpenAPI document is generated on build; the web SDK generates its API client from it -->
+    <OpenApiDocumentsDirectory>$(MSBuildProjectDirectory)\..\WebSdk\openapi</OpenApiDocumentsDirectory>
+    <OpenApiGenerateDocumentsOptions>--file-name engine</OpenApiGenerateDocumentsOptions>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <PackageReference Include="Microsoft.Extensions.ApiDescription.Server" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />
     <PackageReference Include="Serilog" />
     <PackageReference Include="Serilog.Extensions.Hosting" />
     <PackageReference Include="Serilog.Extensions.Logging" />
@@ -22,5 +26,14 @@
   <ItemGroup>
     <InternalsVisibleTo Include="Micser.Engine.Tests" />
   </ItemGroup>
+
+  <!-- Run "npm run build" first; the engine serves the web UI from wwwroot. -->
+  <Target Name="PublishWebUi" AfterTargets="Publish">
+    <Warning Condition="!Exists('$(MSBuildProjectDirectory)\..\Web\dist\index.html')" Text="The web UI isn't built (src/Web/dist); the published engine won't serve it." />
+    <ItemGroup>
+      <WebUiFile Include="$(MSBuildProjectDirectory)\..\Web\dist\**" />
+    </ItemGroup>
+    <Copy SourceFiles="@(WebUiFile)" DestinationFiles="@(WebUiFile->'$(PublishDir)wwwroot\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+  </Target>
 
 </Project>

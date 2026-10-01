@@ -22,7 +22,7 @@ dotnet build Micser.slnx
 dotnet test --solution Micser.slnx
 
 npm install
-npm run build          # production build of the web UI
+npm run build          # production build of the web UI (before dotnet publish of the engine, which serves it)
 npm run lint
 npm run format:check
 ```

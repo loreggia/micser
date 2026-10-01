@@ -2,22 +2,25 @@ using Micser.Audio.Devices;
 using Micser.Engine;
 using Micser.Engine.Audio;
 using Micser.Engine.Configuration;
-using Micser.Engine.Contracts;
 using Micser.Engine.Endpoints;
 using Micser.Engine.Hubs;
 using Micser.Engine.Modules;
 using Micser.Engine.Security;
 using Micser.Plugins.Main;
 using Microsoft.AspNetCore.Http.Json;
-using Microsoft.AspNetCore.OpenApi;
 using Microsoft.AspNetCore.SignalR;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
 var engineOptions = builder.Configuration.GetSection(EngineOptions.SectionName).Get<EngineOptions>() ?? new EngineOptions();
-using var instance = engineOptions.SingleInstance ? SingleInstance.TryAcquire() : null;
-if (engineOptions.SingleInstance && instance == null)
+
+// the build-time OpenAPI generator runs this code up to Build() while an engine may be running
+var isGeneratingDocument = System.Reflection.Assembly.GetEntryAssembly()?.GetName().Name == "GetDocument.Insider";
+var checkSingleInstance = engineOptions.SingleInstance && !isGeneratingDocument;
+
+using var instance = checkSingleInstance ? SingleInstance.TryAcquire() : null;
+if (checkSingleInstance && instance == null)
 {
     Console.Error.WriteLine("Another engine is already running in this session.");
     return 1;
@@ -28,10 +31,7 @@ builder.Services.AddSerilog((services, logger) => logger
     .ReadFrom.Configuration(builder.Configuration)
     .ReadFrom.Services(services));
 builder.Services.AddProblemDetails();
-builder.Services.AddOpenApi(options => options.CreateSchemaReferenceId = typeInfo =>
-    typeInfo.Type.IsGenericType && typeInfo.Type.GetGenericTypeDefinition() == typeof(ModuleDto<>)
-        ? typeInfo.Type.GenericTypeArguments[0].Name.Replace("State", "Module")
-        : OpenApiOptions.CreateDefaultSchemaReferenceId(typeInfo));
+builder.Services.AddEngineOpenApi();
 
 builder.Services.AddSingleton<AudioDeviceService>();
 builder.Services.AddMainPlugin();
@@ -59,8 +59,13 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseEngineAccess();
+app.UseDefaultFiles();
+app.UseStaticFiles();
 app.MapEngineApi();
 app.MapHub<EngineHub>("/hubs/engine");
+
+// the web UI (copied to wwwroot on publish) handles all other paths
+app.MapFallbackToFile("{*path:nonfile:regex(^(?!api/|hubs/).*$)}", "index.html");
 
 app.Run();
 return 0;

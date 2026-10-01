@@ -13,6 +13,9 @@
     "@micser/web-sdk": "*"
   },
   "peerDependencies": {
+    "@fluentui/react-components": "^9.74.9",
+    "@fluentui/react-icons": "^2.0.343",
+    "@tanstack/react-query": "^5.104.0",
     "react": "^19.3.0"
   },
   "devDependencies": {

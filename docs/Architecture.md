@@ -28,7 +28,7 @@ Target architecture for the modernization of Micser (decided 2026-09-30). The `m
 - **Web tooling:** npm workspaces consume the internal packages (`@micser/web-sdk`, `@micser/plugin-main`) as TypeScript source, so they need no build step of their own. TypeScript is pinned to `~6.0` because `typescript-eslint` doesn't support 7.x yet.
 - **Engine discovery and security:** see [Engine](#engine).
 - **Autostart:** an `HKCU\...\Run` entry for the shell. The shell launches the engine if it isn't running.
-- **Deferred to the UI phase:** the SPA's component library (antd v5 or alternatives) and its state management.
+- **UI libraries:** Fluent UI React v9 (light/dark following the OS), TanStack Query for engine state, Orval for the API client (see [UI](#ui)).
 
 ## Layout
 
@@ -116,6 +116,31 @@ docs/
   - `/api` and `/hubs` (except `/api/health`) require `Authorization: Bearer <token>`, or `access_token` in the query for SignalR from browsers.
   - A named semaphore (`Local\Micser.Engine`) allows one engine per session. `Engine:RequireToken` and `Engine:SingleInstance` turn these off (development, tests).
 
+## UI
+
+- **API client:**
+  - The engine build writes `src/WebSdk/openapi/engine.json` (`Microsoft.Extensions.ApiDescription.Server`).
+  - `npm run generate:api -w @micser/web-sdk` generates the Orval client from it: types, fetch functions and TanStack Query hooks in `src/WebSdk/src/api/generated`.
+  - Both the document and the client are committed. CI fails if either is out of date.
+  - `engineFetch` adds the access token and throws `EngineApiError` with the problem details.
+- **State:**
+  - Engine data lives in the TanStack Query cache, which never goes stale. `EngineConnection` (SignalR) patches it from engine events and refetches everything after a reconnect.
+  - Module updates (`useModuleUpdate`) show immediately and go to the engine debounced (80 ms, last value wins). Engine echoes are ignored while an update is pending, so controls don't jump back.
+  - `useModuleData(moduleId)` subscribes to live data (spectrum, stream statistics).
+- **Widgets:**
+  - Plugins export `defineWidget({ moduleType, title, component })` from their `Web` package. The component receives the typed module (`WidgetProps<"Gain">`) and a `setState` function.
+  - The graph node around it is generic: title, mute, bypass (if `supportsBypass`), remove, volume, and connectors from the engine's module type. Modules without a widget still work.
+  - Controls inside nodes need the `nodrag`/`nowheel` classes. `ParameterSlider` is the shared parameter control, with linear or logarithmic scales and integer slider positions, so keyboard steps are exact.
+- **Graph editor (`@xyflow/react`):**
+  - Nodes and edges follow the engine.
+  - Connecting, deleting (Delete key or the node's remove button) and moving (the position is saved on drop) go through the API. Rejected connections, e.g. cycles, show a notification.
+- **Access token:**
+  - The SPA reads `#token=...` once, keeps it in `sessionStorage` and removes it from the address. The shell will open `{url}/#token={token}` from the discovery file.
+  - In development, Vite proxies to the engine, which doesn't require a token.
+- **Production:**
+  - `dotnet publish src/Engine` copies `src/Web/dist` into `wwwroot`, so run `npm run build` first.
+  - The engine serves the SPA and falls back to `index.html` for client routes, but not for `/api`, `/hubs` or files.
+
 ## Roadmap
 
 1. **Skeleton** (done):
@@ -136,6 +161,10 @@ docs/
    - Follow-ups:
      - Level meters per module (a module data source in the audio core).
      - Device streams that fault (e.g. after sleep) are only reopened on device events; a periodic health check could reopen them.
-4. **UI:** `src/Web`, `src/WebSdk` and `src/Plugins/Main/Web`: the Vite app, graph editor and widgets. `dev`'s `Micser/UI` Dashboard serves as a guideline.
+4. **UI** (done): `src/Web`, `src/WebSdk` and `src/Plugins/Main/Web`: the Vite app, graph editor and widgets.
+   - Follow-ups:
+     - Renaming modules in the UI (the API supports names).
+     - Code splitting: the bundle is about 1 MB (295 kB gzipped), mostly Fluent UI and React Flow.
+     - Automated UI tests. The checks so far were scripted Playwright runs against Edge outside the repo.
 5. **Shell (`src/Shell`):** tray, WebView2 window, engine launch and discovery, autostart.
 6. **Later:** packaging and updates, the VAC driver (needs an EV code-signing cert), and runtime-loaded plugins.

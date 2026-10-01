@@ -1,0 +1,1361 @@
+{
+  "openapi": "3.1.1",
+  "info": {
+    "title": "Micser.Engine | v1",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/health": {
+      "get": {
+        "tags": [
+          "Engine"
+        ],
+        "operationId": "GetHealth",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/module-types": {
+      "get": {
+        "tags": [
+          "Modules"
+        ],
+        "operationId": "GetModuleTypes",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ModuleTypeDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/devices": {
+      "get": {
+        "tags": [
+          "Devices"
+        ],
+        "operationId": "GetDevices",
+        "parameters": [
+          {
+            "name": "direction",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/DeviceDirection"
+            }
+          },
+          {
+            "name": "includeInactive",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AudioDeviceInfo"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/modules": {
+      "get": {
+        "tags": [
+          "Modules"
+        ],
+        "operationId": "GetModules",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ModuleDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Modules"
+        ],
+        "operationId": "CreateModule",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateModuleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModuleDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/modules/{id}": {
+      "get": {
+        "tags": [
+          "Modules"
+        ],
+        "operationId": "GetModule",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModuleDto"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Modules"
+        ],
+        "operationId": "UpdateModule",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ModuleDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ModuleDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Modules"
+        ],
+        "operationId": "DeleteModule",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/connections": {
+      "get": {
+        "tags": [
+          "Connections"
+        ],
+        "operationId": "GetConnections",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ConnectionDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Connections"
+        ],
+        "operationId": "CreateConnection",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateConnectionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConnectionDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/connections/{id}": {
+      "delete": {
+        "tags": [
+          "Connections"
+        ],
+        "operationId": "DeleteConnection",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/engine": {
+      "get": {
+        "tags": [
+          "Engine"
+        ],
+        "operationId": "GetEngineStatus",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineStatusDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/engine/start": {
+      "post": {
+        "tags": [
+          "Engine"
+        ],
+        "operationId": "StartEngine",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineStatusDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/engine/stop": {
+      "post": {
+        "tags": [
+          "Engine"
+        ],
+        "operationId": "StopEngine",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineStatusDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/engine/settings": {
+      "put": {
+        "tags": [
+          "Engine"
+        ],
+        "operationId": "UpdateEngineSettings",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EngineSettingsDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineStatusDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AudioDeviceInfo": {
+        "required": [
+          "id",
+          "name",
+          "description",
+          "adapterName",
+          "direction",
+          "isActive",
+          "layout",
+          "sampleRate"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "adapterName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "direction": {
+            "$ref": "#/components/schemas/DeviceDirection"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "layout": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ChannelLayout"
+              }
+            ]
+          },
+          "sampleRate": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          }
+        }
+      },
+      "ChannelLayout": {
+        "type": "object",
+        "properties": {
+          "channelCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "speakers": {
+            "$ref": "#/components/schemas/Speakers"
+          },
+          "hasSpeakerPositions": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CompressorState": {
+        "required": [
+          "type",
+          "amount",
+          "attack",
+          "release",
+          "ratio",
+          "threshold",
+          "knee",
+          "makeUpGain"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/CompressorType"
+          },
+          "amount": {
+            "type": "number",
+            "format": "float",
+            "default": 1
+          },
+          "attack": {
+            "type": "number",
+            "format": "float",
+            "default": 0.01
+          },
+          "release": {
+            "type": "number",
+            "format": "float",
+            "default": 0.1
+          },
+          "ratio": {
+            "type": "number",
+            "format": "float",
+            "default": 2
+          },
+          "threshold": {
+            "type": "number",
+            "format": "float",
+            "default": -10
+          },
+          "knee": {
+            "type": "number",
+            "format": "float",
+            "default": 5
+          },
+          "makeUpGain": {
+            "type": "number",
+            "format": "float",
+            "default": 0
+          }
+        }
+      },
+      "CompressorType": {
+        "enum": [
+          "Downward",
+          "Upward"
+        ],
+        "default": "Downward"
+      },
+      "ConnectionDto": {
+        "required": [
+          "id",
+          "sourceModuleId",
+          "sourcePort",
+          "targetModuleId",
+          "targetPort"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sourceModuleId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sourcePort": {
+            "type": "string"
+          },
+          "targetModuleId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "targetPort": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateConnectionRequest": {
+        "required": [
+          "sourceModuleId",
+          "sourcePort",
+          "targetModuleId",
+          "targetPort"
+        ],
+        "type": "object",
+        "properties": {
+          "sourceModuleId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sourcePort": {
+            "type": "string"
+          },
+          "targetModuleId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "targetPort": {
+            "type": "string"
+          }
+        }
+      },
+      "CreateModuleRequest": {
+        "required": [
+          "type"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "position": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ModulePosition"
+              }
+            ]
+          }
+        }
+      },
+      "DeviceDirection": {
+        "enum": [
+          "Input",
+          "Output"
+        ]
+      },
+      "DeviceInputState": {
+        "required": [
+          "deviceId",
+          "adapterName"
+        ],
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "adapterName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "DeviceOutputState": {
+        "required": [
+          "deviceId",
+          "adapterName"
+        ],
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "adapterName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "EngineSettingsDto": {
+        "required": [
+          "sampleRate",
+          "frameCount"
+        ],
+        "type": "object",
+        "properties": {
+          "sampleRate": {
+            "type": "integer",
+            "format": "int32",
+            "default": 48000
+          },
+          "frameCount": {
+            "type": "integer",
+            "format": "int32",
+            "default": 240
+          }
+        }
+      },
+      "EngineStatusDto": {
+        "required": [
+          "isRunning",
+          "settings",
+          "blocks",
+          "lateBlocks",
+          "maxProcessingMilliseconds"
+        ],
+        "type": "object",
+        "properties": {
+          "isRunning": {
+            "type": "boolean"
+          },
+          "settings": {
+            "$ref": "#/components/schemas/EngineSettingsDto"
+          },
+          "blocks": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "lateBlocks": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "maxProcessingMilliseconds": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "EqualizerBand": {
+        "required": [
+          "frequency",
+          "gain",
+          "q"
+        ],
+        "type": "object",
+        "properties": {
+          "frequency": {
+            "type": "number",
+            "format": "float"
+          },
+          "gain": {
+            "type": "number",
+            "format": "float"
+          },
+          "q": {
+            "type": "number",
+            "format": "float",
+            "default": 1.41
+          }
+        }
+      },
+      "EqualizerState": {
+        "required": [
+          "bands"
+        ],
+        "type": "object",
+        "properties": {
+          "bands": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EqualizerBand"
+            }
+          }
+        }
+      },
+      "GainState": {
+        "required": [
+          "gain"
+        ],
+        "type": "object",
+        "properties": {
+          "gain": {
+            "type": "number",
+            "format": "float",
+            "default": 0
+          }
+        }
+      },
+      "HealthResponse": {
+        "required": [
+          "status"
+        ],
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          }
+        }
+      },
+      "LoopbackInputState": {
+        "required": [
+          "deviceId",
+          "adapterName"
+        ],
+        "type": "object",
+        "properties": {
+          "deviceId": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "adapterName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "ModuleDto": {
+        "required": [
+          "type"
+        ],
+        "type": "object",
+        "anyOf": [
+          {
+            "$ref": "#/components/schemas/ModuleDtoDeviceInputModule"
+          },
+          {
+            "$ref": "#/components/schemas/ModuleDtoLoopbackInputModule"
+          },
+          {
+            "$ref": "#/components/schemas/ModuleDtoDeviceOutputModule"
+          },
+          {
+            "$ref": "#/components/schemas/ModuleDtoGainModule"
+          },
+          {
+            "$ref": "#/components/schemas/ModuleDtoCompressorModule"
+          },
+          {
+            "$ref": "#/components/schemas/ModuleDtoEqualizerModule"
+          },
+          {
+            "$ref": "#/components/schemas/ModuleDtoPitchModule"
+          },
+          {
+            "$ref": "#/components/schemas/ModuleDtoSpectrumModule"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "type",
+          "mapping": {
+            "DeviceInput": "#/components/schemas/ModuleDtoDeviceInputModule",
+            "LoopbackInput": "#/components/schemas/ModuleDtoLoopbackInputModule",
+            "DeviceOutput": "#/components/schemas/ModuleDtoDeviceOutputModule",
+            "Gain": "#/components/schemas/ModuleDtoGainModule",
+            "Compressor": "#/components/schemas/ModuleDtoCompressorModule",
+            "Equalizer": "#/components/schemas/ModuleDtoEqualizerModule",
+            "Pitch": "#/components/schemas/ModuleDtoPitchModule",
+            "Spectrum": "#/components/schemas/ModuleDtoSpectrumModule"
+          }
+        }
+      },
+      "ModuleDtoCompressorModule": {
+        "required": [
+          "state",
+          "id",
+          "isBypassed",
+          "isMuted",
+          "volume"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "Compressor"
+            ],
+            "type": "string"
+          },
+          "state": {
+            "$ref": "#/components/schemas/CompressorState"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "isBypassed": {
+            "type": "boolean"
+          },
+          "isMuted": {
+            "type": "boolean"
+          },
+          "name": {
+            "maxLength": 100,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "position": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ModulePosition"
+              }
+            ]
+          },
+          "volume": {
+            "maximum": 1,
+            "minimum": 0,
+            "type": "number",
+            "format": "float"
+          }
+        }
+      },
+      "ModuleDtoDeviceInputModule": {
+        "required": [
+          "state",
+          "id",
+          "isBypassed",
+          "isMuted",
+          "volume"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "DeviceInput"
+            ],
+            "type": "string"
+          },
+          "state": {
+            "$ref": "#/components/schemas/DeviceInputState"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "isBypassed": {
+            "type": "boolean"
+          },
+          "isMuted": {
+            "type": "boolean"
+          },
+          "name": {
+            "maxLength": 100,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "position": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ModulePosition"
+              }
+            ]
+          },
+          "volume": {
+            "maximum": 1,
+            "minimum": 0,
+            "type": "number",
+            "format": "float"
+          }
+        }
+      },
+      "ModuleDtoDeviceOutputModule": {
+        "required": [
+          "state",
+          "id",
+          "isBypassed",
+          "isMuted",
+          "volume"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "DeviceOutput"
+            ],
+            "type": "string"
+          },
+          "state": {
+            "$ref": "#/components/schemas/DeviceOutputState"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "isBypassed": {
+            "type": "boolean"
+          },
+          "isMuted": {
+            "type": "boolean"
+          },
+          "name": {
+            "maxLength": 100,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "position": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ModulePosition"
+              }
+            ]
+          },
+          "volume": {
+            "maximum": 1,
+            "minimum": 0,
+            "type": "number",
+            "format": "float"
+          }
+        }
+      },
+      "ModuleDtoEqualizerModule": {
+        "required": [
+          "state",
+          "id",
+          "isBypassed",
+          "isMuted",
+          "volume"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "Equalizer"
+            ],
+            "type": "string"
+          },
+          "state": {
+            "$ref": "#/components/schemas/EqualizerState"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "isBypassed": {
+            "type": "boolean"
+          },
+          "isMuted": {
+            "type": "boolean"
+          },
+          "name": {
+            "maxLength": 100,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "position": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ModulePosition"
+              }
+            ]
+          },
+          "volume": {
+            "maximum": 1,
+            "minimum": 0,
+            "type": "number",
+            "format": "float"
+          }
+        }
+      },
+      "ModuleDtoGainModule": {
+        "required": [
+          "state",
+          "id",
+          "isBypassed",
+          "isMuted",
+          "volume"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "Gain"
+            ],
+            "type": "string"
+          },
+          "state": {
+            "$ref": "#/components/schemas/GainState"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "isBypassed": {
+            "type": "boolean"
+          },
+          "isMuted": {
+            "type": "boolean"
+          },
+          "name": {
+            "maxLength": 100,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "position": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ModulePosition"
+              }
+            ]
+          },
+          "volume": {
+            "maximum": 1,
+            "minimum": 0,
+            "type": "number",
+            "format": "float"
+          }
+        }
+      },
+      "ModuleDtoLoopbackInputModule": {
+        "required": [
+          "state",
+          "id",
+          "isBypassed",
+          "isMuted",
+          "volume"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "LoopbackInput"
+            ],
+            "type": "string"
+          },
+          "state": {
+            "$ref": "#/components/schemas/LoopbackInputState"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "isBypassed": {
+            "type": "boolean"
+          },
+          "isMuted": {
+            "type": "boolean"
+          },
+          "name": {
+            "maxLength": 100,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "position": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ModulePosition"
+              }
+            ]
+          },
+          "volume": {
+            "maximum": 1,
+            "minimum": 0,
+            "type": "number",
+            "format": "float"
+          }
+        }
+      },
+      "ModuleDtoPitchModule": {
+        "required": [
+          "state",
+          "id",
+          "isBypassed",
+          "isMuted",
+          "volume"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "Pitch"
+            ],
+            "type": "string"
+          },
+          "state": {
+            "$ref": "#/components/schemas/PitchState"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "isBypassed": {
+            "type": "boolean"
+          },
+          "isMuted": {
+            "type": "boolean"
+          },
+          "name": {
+            "maxLength": 100,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "position": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ModulePosition"
+              }
+            ]
+          },
+          "volume": {
+            "maximum": 1,
+            "minimum": 0,
+            "type": "number",
+            "format": "float"
+          }
+        }
+      },
+      "ModuleDtoSpectrumModule": {
+        "required": [
+          "state",
+          "id",
+          "isBypassed",
+          "isMuted",
+          "volume"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "Spectrum"
+            ],
+            "type": "string"
+          },
+          "state": {
+            "$ref": "#/components/schemas/SpectrumState"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "isBypassed": {
+            "type": "boolean"
+          },
+          "isMuted": {
+            "type": "boolean"
+          },
+          "name": {
+            "maxLength": 100,
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "position": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ModulePosition"
+              }
+            ]
+          },
+          "volume": {
+            "maximum": 1,
+            "minimum": 0,
+            "type": "number",
+            "format": "float"
+          }
+        }
+      },
+      "ModulePosition": {
+        "required": [
+          "x",
+          "y"
+        ],
+        "type": "object",
+        "properties": {
+          "x": {
+            "type": "number",
+            "format": "double"
+          },
+          "y": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
+      "ModuleTypeDto": {
+        "required": [
+          "type",
+          "inputs",
+          "outputs",
+          "defaultState",
+          "supportsBypass"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "inputs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "outputs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "defaultState": { },
+          "supportsBypass": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PitchState": {
+        "required": [
+          "pitch",
+          "quality"
+        ],
+        "type": "object",
+        "properties": {
+          "pitch": {
+            "type": "number",
+            "format": "float",
+            "default": 0
+          },
+          "quality": {
+            "type": "integer",
+            "format": "int32",
+            "default": 4
+          }
+        }
+      },
+      "Speakers": {
+        "type": "string"
+      },
+      "SpectrumState": {
+        "type": "object"
+      }
+    }
+  },
+  "tags": [
+    {
+      "name": "Engine"
+    },
+    {
+      "name": "Modules"
+    },
+    {
+      "name": "Devices"
+    },
+    {
+      "name": "Connections"
+    }
+  ]
+}

@@ -9,7 +9,10 @@
 !/src/Plugins/*/Web
 !/.prettierrc
 !/package.json
+!/package-lock.json
 !/tsconfig.base.json
 !/eslint.config.js
 **/dist
 **/node_modules
+**/generated
+**/openapi

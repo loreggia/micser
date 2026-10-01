@@ -20,6 +20,9 @@ jobs:
       - name: Build
         run: dotnet build Micser.slnx --configuration Release
 
+      - name: Check OpenAPI document is up to date
+        run: git diff --exit-code -- src/WebSdk/openapi
+
       - name: Test
         run: dotnet test --solution Micser.slnx --configuration Release --no-build
 
@@ -44,6 +47,14 @@ jobs:
 
       - name: Lint
         run: npm run lint
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Check API client is up to date
+        run: |
+          npm run generate:api -w @micser/web-sdk
+          git diff --exit-code -- src/WebSdk/src/api/generated
 
       - name: Build
         run: npm run build

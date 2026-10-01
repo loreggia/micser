@@ -57,4 +57,5 @@ public sealed record CreateModuleRequest([Required] string Type, [MaxLength(100)
 /// <param name="Inputs">Names of the input ports.</param>
 /// <param name="Outputs">Names of the output ports.</param>
 /// <param name="DefaultState">The state of a new module of this type.</param>
-public sealed record ModuleTypeDto(string Type, IReadOnlyList<string> Inputs, IReadOnlyList<string> Outputs, object DefaultState);
+/// <param name="SupportsBypass">Whether <see cref="ModuleDto.IsBypassed"/> has an effect.</param>
+public sealed record ModuleTypeDto(string Type, IReadOnlyList<string> Inputs, IReadOnlyList<string> Outputs, object DefaultState, bool SupportsBypass);

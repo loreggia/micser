@@ -18,6 +18,7 @@ npm run build                # typecheck + vite build of src/Web
 npm run typecheck            # tsc in every workspace
 npm run lint                 # eslint (flat config at the root)
 npm run format:check         # prettier; .prettierignore limits it to the web workspaces
+npm run generate:api -w @micser/web-sdk   # regenerate the API client after engine API changes (build the engine first)
 
 dotnet run --project src/Engine     # http://127.0.0.1:5080
 npm run dev                         # Vite on http://localhost:5173, proxies /api and /hubs to the engine
@@ -43,6 +44,11 @@ CI (`.github/workflows/ci.yml`) runs the dotnet build/test and npm format/lint/b
 - A plugin is one folder containing both halves: `src/Plugins/Main/Micser.Plugins.Main.csproj` plus its widget package `src/Plugins/Main/Web` (`@micser/plugin-main`). `Directory.Build.props` excludes `Web/**` and `node_modules/**` from .NET item globs.
 - npm workspaces (root `package.json`): `src/Web` (Vite SPA), `src/WebSdk` (widget contract and shared code), `src/Plugins/*/Web`. The internal packages export TypeScript source (`"exports": "./src/index.ts"`) and have no build step.
 - Widgets are matched to engine modules by module type name. Connector names come from the engine's module definitions, never hard-coded in widgets.
+- Web UI (see "UI" in `docs/Architecture.md`):
+  - Engine API changes flow through `src/WebSdk/openapi/engine.json` (written on engine build) and the generated Orval client in `src/WebSdk/src/api/generated`. Never edit them by hand, and commit both.
+  - Engine data comes from the generated query hooks; `EngineConnection` keeps the cache in sync via SignalR, so don't poll or invalidate after mutations. Module edits go through `useModuleUpdate`.
+  - Fluent UI v9 components and `makeStyles` with `tokens`; no hard-coded colors.
+  - SignalR `hub.on` handlers must not return a value; SignalR would send it to the server as an invocation result.
 - Dependency direction:
   - .NET: `Plugins → Audio` and `Engine → Audio, Plugins`. `Shell` references no Micser project and talks to the engine over HTTP only.
   - npm: `plugin-* → web-sdk` and `web → web-sdk, plugin-*`.
@@ -51,7 +57,7 @@ CI (`.github/workflows/ci.yml`) runs the dotnet build/test and npm format/lint/b
   - Serilog via `Microsoft.Extensions.Logging` (configured from `appsettings*.json`; the file sink is only enabled in Production).
   - `System.Text.Json`, and TUnit + NSubstitute for tests.
   - NAudio for audio I/O. There's no Newtonsoft, EF Core, Prism/Unity or xUnit.
-- Prettier style: 4 spaces, double quotes, semicolons, print width 120.
+- Prettier style: 2 spaces, double quotes, semicolons, print width 120.
 - C# code is cleaned up with CodeMaid (settings in `CodeMaid.config`). Write new code in its layout so a cleanup run doesn't reshuffle it:
   - Member order by type: fields, constructors, destructors, delegates, events, properties, indexers, methods, nested enums, interfaces, structs, classes.
   - Within a type group: by access level (public, internal, protected, private), then alphabetically.
