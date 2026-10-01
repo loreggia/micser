@@ -5,11 +5,11 @@ import { defineConfig } from "vite";
 const engineUrl = process.env.MICSER_ENGINE_URL ?? "http://127.0.0.1:5080";
 
 export default defineConfig({
-    plugins: [react()],
-    server: {
-        proxy: {
-            "/api": engineUrl,
-            "/hubs": { target: engineUrl, ws: true },
-        },
+  plugins: [react()],
+  server: {
+    proxy: {
+      "/api": engineUrl,
+      "/hubs": { target: engineUrl, ws: true },
     },
+  },
 });
