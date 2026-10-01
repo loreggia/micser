@@ -32,10 +32,11 @@ public sealed class RenderStream : IDeviceStream
     private volatile bool _isConsuming;
     private volatile bool _isStopped;
     private long _lastRequest;
+    private long _lastWrite;
     private long _overruns;
 
-    // -1 until the device consumes, so underruns while it starts don't count as dropouts
-    private long _seenUnderruns = -1;
+    // underruns on the device thread; the audio thread counts them, unless they happened while it was idle
+    private long _pendingUnderruns;
 
     private long _underruns;
 
@@ -111,15 +112,21 @@ public sealed class RenderStream : IDeviceStream
             throw new ArgumentException($"Expected layout {Layout}, got {source.Layout}.", nameof(source));
         }
 
+        var now = Environment.TickCount64;
+        var wasIdle = StreamBuffering.IsIdle(Interlocked.Exchange(ref _lastWrite, now), now);
         if (!_isConsuming)
         {
             // the device hasn't started yet; the ring buffer holds the initial silence until it does
             return;
         }
 
-        var underruns = Interlocked.Read(ref _underruns);
-        var hadDropout = _seenUnderruns >= 0 && underruns != _seenUnderruns;
-        _seenUnderruns = underruns;
+        // after a pause (e.g. audio switched off) the ring buffer is empty; the top-up below refills it
+        var pendingUnderruns = Interlocked.Exchange(ref _pendingUnderruns, 0);
+        var hadDropout = !wasIdle && pendingUnderruns > 0;
+        if (hadDropout)
+        {
+            Interlocked.Add(ref _underruns, pendingUnderruns);
+        }
 
         var fill = _ring.Count / _channels;
         if (_target.Update(hadDropout))
@@ -209,7 +216,7 @@ public sealed class RenderStream : IDeviceStream
             if (read < samples.Length)
             {
                 samples[read..].Clear();
-                Interlocked.Increment(ref _stream._underruns);
+                Interlocked.Increment(ref _stream._pendingUnderruns);
             }
 
             _stream._isConsuming = true;

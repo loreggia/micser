@@ -89,6 +89,7 @@ docs/
     - render: one device period plus half an engine block;
     - capture: a block plus half a period (a read takes a whole block while periods arrive at any phase), at least one period, plus half a block. At 5 ms blocks both are 12.5 ms; at 20 ms blocks capture needs 35 ms.
   - The target adapts per stream (`AdaptiveTarget`): each dropout raises it by half a device period (dropouts within 1 s count as one), up to 200 ms. After 10 minutes without dropouts it steps back down, but not below a level that had a dropout within 10 minutes of stepping down to it. Device widgets show the current target in ms.
+  - Dropouts only count while the engine side is active: when it hasn't read or written for 100 ms (e.g. audio switched off), the device's empty reads and full writes are ignored. Render underruns are recorded on the device thread and counted by the next write, which drops them after a pause. When processing resumes, render tops up with silence and capture discards the backlog.
   - The WASAPI render buffer is requested at 20 ms; NAudio's default of 200 ms dominated the latency before.
   - A windowed-sinc resampler (NAudio's `WdlResampler`) converts between the device and engine rates.
   - A PI controller (`DriftController`) adjusts the resampling ratio by up to ±0.5% to hold the target fill.
