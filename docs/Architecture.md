@@ -204,7 +204,7 @@ docs/
   - The tray menu shows "Check for updates", or "Restart to update to x.y.z" once one is downloaded; that stops the engine and restarts into the new version.
   - A downloaded update is also applied on the next shell start.
   - `MICSER_UPDATE_SOURCE` points the shell at another feed (a local folder or URL) for testing.
-  - Velopack logs to `%LocalAppData%elopackelopack_Micser.log`.
+  - Velopack logs to `%LocalAppData%\velopack\velopack_Micser.log`.
 - **Driver:** Velopack can't run elevated steps. Installing the VAC driver will need a separate elevated step, e.g. `DriverUtility` started from the app. The removed WixSharp installer's driver custom actions (git history, `src/Installer`) can serve as reference.
 
 ## Roadmap
