@@ -1,10 +1,12 @@
+using System.ComponentModel.DataAnnotations;
 using Micser.Audio;
 using Micser.Audio.Devices;
 using Microsoft.Extensions.Logging;
 
 namespace Micser.Plugins.Main.Modules;
 
-public sealed record DeviceInputState(string? DeviceId, string? AdapterName) : DeviceModuleState(DeviceId, AdapterName);
+public sealed record DeviceInputState(string? DeviceId, string? AdapterName, [Range(0, 1000)] double? BufferMilliseconds = null)
+    : DeviceModuleState(DeviceId, AdapterName, BufferMilliseconds);
 
 /// <summary>
 /// Captures an input device.
@@ -20,16 +22,16 @@ public class DeviceInputModule : CaptureModule, IStatefulModule<DeviceInputState
 
     public DeviceInputState GetState()
     {
-        return new DeviceInputState(DeviceId, AdapterName);
+        return new DeviceInputState(DeviceId, AdapterName, BufferMilliseconds);
     }
 
     public void SetState(DeviceInputState state)
     {
-        SelectDevice(state.DeviceId, state.AdapterName);
+        SelectDevice(state.DeviceId, state.AdapterName, state.BufferMilliseconds);
     }
 
-    protected override CaptureStream OpenStream(string deviceId)
+    protected override CaptureStream OpenStream(string deviceId, double? bufferMilliseconds)
     {
-        return Devices.OpenCapture(deviceId, Format);
+        return Devices.OpenCapture(deviceId, Format, bufferMilliseconds);
     }
 }

@@ -66,7 +66,12 @@ export function DeviceWidget({
         selectedOptions={[state.deviceId ?? none]}
         onOptionSelect={(_, data) => {
           const device = devices.find((d) => d.id === data.optionValue);
-          setState({ deviceId: device?.id ?? null, adapterName: device?.adapterName ?? null });
+          // a newly selected device learns its buffer from scratch
+          setState({
+            deviceId: device?.id ?? null,
+            adapterName: device?.adapterName ?? null,
+            bufferMilliseconds: null,
+          });
         }}
       >
         <Option value={none}>No device</Option>

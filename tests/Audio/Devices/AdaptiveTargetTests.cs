@@ -8,6 +8,28 @@ public class AdaptiveTargetTests
     private const long Stable = 100;
 
     [Test]
+    [Arguments(null, 100d)]
+    [Arguments(250d, 250d)]
+    [Arguments(50d, 100d)]
+    [Arguments(5000d, 1000d)]
+    public async Task Value_StartsAtTheInitialValueWithinTheLimits(double? initial, double expected)
+    {
+        var target = new AdaptiveTarget(minimum: 100, step: 50, maximum: 1000, HoldOff, Stable, initial);
+
+        await Assert.That(target.Value).IsEqualTo(expected);
+    }
+
+    [Test]
+    public async Task Update_StartedHigher_ShrinksToTheMinimum()
+    {
+        var target = new AdaptiveTarget(minimum: 100, step: 50, maximum: 1000, HoldOff, Stable, initial: 200);
+
+        Advance(target, 2 * Stable);
+
+        await Assert.That(target.Value).IsEqualTo(100d);
+    }
+
+    [Test]
     public async Task Update_Dropout_GrowsByStepOncePerIncident()
     {
         var target = new AdaptiveTarget(minimum: 100, step: 50, maximum: 1000, HoldOff, Stable);

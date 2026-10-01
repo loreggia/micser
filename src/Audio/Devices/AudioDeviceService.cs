@@ -91,25 +91,28 @@ public sealed class AudioDeviceService : IDisposable
         return result;
     }
 
+    /// <param name="initialTargetMilliseconds">The buffer to start with, e.g. one the stream learned before; null for the minimum.</param>
     /// <exception cref="InvalidOperationException">The device doesn't exist or isn't an active input.</exception>
-    public CaptureStream OpenCapture(string deviceId, ProcessingFormat format)
+    public CaptureStream OpenCapture(string deviceId, ProcessingFormat format, double? initialTargetMilliseconds = null)
     {
-        return new CaptureStream(GetActiveDevice(deviceId, DataFlow.Capture), false, format, _logger);
+        return new CaptureStream(GetActiveDevice(deviceId, DataFlow.Capture), false, format, initialTargetMilliseconds, _logger);
     }
 
     /// <summary>
     /// Captures what is played on an output device.
     /// </summary>
+    /// <param name="initialTargetMilliseconds">The buffer to start with, e.g. one the stream learned before; null for the minimum.</param>
     /// <exception cref="InvalidOperationException">The device doesn't exist or isn't an active output.</exception>
-    public CaptureStream OpenLoopback(string deviceId, ProcessingFormat format)
+    public CaptureStream OpenLoopback(string deviceId, ProcessingFormat format, double? initialTargetMilliseconds = null)
     {
-        return new CaptureStream(GetActiveDevice(deviceId, DataFlow.Render), true, format, _logger);
+        return new CaptureStream(GetActiveDevice(deviceId, DataFlow.Render), true, format, initialTargetMilliseconds, _logger);
     }
 
+    /// <param name="initialTargetMilliseconds">The buffer to start with, e.g. one the stream learned before; null for the minimum.</param>
     /// <exception cref="InvalidOperationException">The device doesn't exist or isn't an active output.</exception>
-    public RenderStream OpenRender(string deviceId, ProcessingFormat format)
+    public RenderStream OpenRender(string deviceId, ProcessingFormat format, double? initialTargetMilliseconds = null)
     {
-        return new RenderStream(GetActiveDevice(deviceId, DataFlow.Render), format, _logger);
+        return new RenderStream(GetActiveDevice(deviceId, DataFlow.Render), format, initialTargetMilliseconds, _logger);
     }
 
     private static DataFlow ToDataFlow(DeviceDirection direction)

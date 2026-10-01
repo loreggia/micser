@@ -40,7 +40,7 @@ public sealed class RenderStream : IDeviceStream
 
     private long _underruns;
 
-    internal RenderStream(MMDevice device, ProcessingFormat format, ILogger logger)
+    internal RenderStream(MMDevice device, ProcessingFormat format, double? initialTargetMilliseconds, ILogger logger)
     {
         _device = device;
         _format = format;
@@ -56,7 +56,7 @@ public sealed class RenderStream : IDeviceStream
         DeviceSampleRate = mixFormat.SampleRate;
         _channels = mixFormat.Channels;
 
-        _target = StreamBuffering.CreateRenderTarget(device, format, DeviceSampleRate);
+        _target = StreamBuffering.CreateRenderTarget(device, format, DeviceSampleRate, initialTargetMilliseconds);
         _drift = new DriftController(_target.Value);
         _ring = new SampleRingBuffer(DeviceSampleRate * _channels);
         _ring.WriteSilence((int)_target.Value * _channels);
@@ -123,7 +123,7 @@ public sealed class RenderStream : IDeviceStream
 
         // after a pause (e.g. audio switched off) the ring buffer is empty; the top-up below refills it
         var pendingUnderruns = Interlocked.Exchange(ref _pendingUnderruns, 0);
-        var hadUnderrun = !wasIdle && pendingUnderruns > 0;
+        var hadUnderrun = !wasIdle && !StreamBuffering.IsSettling(_openedAt, now) && pendingUnderruns > 0;
         if (hadUnderrun)
         {
             Interlocked.Add(ref _underruns, pendingUnderruns);

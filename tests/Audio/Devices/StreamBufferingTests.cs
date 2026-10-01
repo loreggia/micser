@@ -15,6 +15,15 @@ public class StreamBufferingTests
     }
 
     [Test]
+    [Arguments(500L, true)]
+    [Arguments(999L, true)]
+    [Arguments(1_000L, false)]
+    public async Task IsSettling_DuringTheFirstSecond(long now, bool expected)
+    {
+        await Assert.That(StreamBuffering.IsSettling(openedAt: 0, now)).IsEqualTo(expected);
+    }
+
+    [Test]
     [Arguments(0L, 1_000L, false)]
     [Arguments(0L, 9_000L, false)]
     [Arguments(0L, 11_000L, true)]

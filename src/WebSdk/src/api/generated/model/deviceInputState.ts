@@ -10,4 +10,6 @@ export interface DeviceInputState {
   deviceId: string | null;
   /** @nullable */
   adapterName: string | null;
+  /** @nullable */
+  bufferMilliseconds?: number | null;
 }

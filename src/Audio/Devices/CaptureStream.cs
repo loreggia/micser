@@ -38,7 +38,7 @@ public sealed class CaptureStream : IDeviceStream
     private long _resyncs;
     private long _underruns;
 
-    internal CaptureStream(MMDevice device, bool loopback, ProcessingFormat format, ILogger logger)
+    internal CaptureStream(MMDevice device, bool loopback, ProcessingFormat format, double? initialTargetMilliseconds, ILogger logger)
     {
         _device = device;
         _format = format;
@@ -67,7 +67,7 @@ public sealed class CaptureStream : IDeviceStream
         _convertBuffer = new float[deviceFormat.SampleRate * _channels];
         _ring = new SampleRingBuffer(deviceFormat.SampleRate * _channels);
         _interleaved = new float[format.FrameCount * _channels];
-        _target = StreamBuffering.CreateCaptureTarget(device, format, DeviceSampleRate);
+        _target = StreamBuffering.CreateCaptureTarget(device, format, DeviceSampleRate, initialTargetMilliseconds);
         _drift = new DriftController(_target.Value);
 
         _resampler = new WdlResampler();
@@ -140,7 +140,7 @@ public sealed class CaptureStream : IDeviceStream
             _ring.Discard(excess * _channels);
             fill -= excess;
             _drift.Reset();
-            if (!wasIdle)
+            if (!wasIdle && !StreamBuffering.IsSettling(_openedAt, now))
             {
                 Interlocked.Increment(ref _resyncs);
                 _hadDropout = true;
@@ -156,9 +156,12 @@ public sealed class CaptureStream : IDeviceStream
         if (read < inputSamples)
         {
             input[read..inputSamples].Clear();
-            Interlocked.Increment(ref _underruns);
-            _hadDropout = true;
             _isPrefilled = false;
+            if (!StreamBuffering.IsSettling(_openedAt, now))
+            {
+                Interlocked.Increment(ref _underruns);
+                _hadDropout = true;
+            }
         }
 
         var produced = _resampler.ResampleOut(_interleaved, inputFrames, destination.FrameCount, _channels);

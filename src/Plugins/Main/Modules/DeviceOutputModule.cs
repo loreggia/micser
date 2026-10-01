@@ -1,10 +1,12 @@
+using System.ComponentModel.DataAnnotations;
 using Micser.Audio;
 using Micser.Audio.Devices;
 using Microsoft.Extensions.Logging;
 
 namespace Micser.Plugins.Main.Modules;
 
-public sealed record DeviceOutputState(string? DeviceId, string? AdapterName) : DeviceModuleState(DeviceId, AdapterName);
+public sealed record DeviceOutputState(string? DeviceId, string? AdapterName, [Range(0, 1000)] double? BufferMilliseconds = null)
+    : DeviceModuleState(DeviceId, AdapterName, BufferMilliseconds);
 
 /// <summary>
 /// Plays its input on an output device. The input is mixed into the device's channel layout.
@@ -23,12 +25,12 @@ public class DeviceOutputModule : DeviceModule<RenderStream>, IStatefulModule<De
 
     public DeviceOutputState GetState()
     {
-        return new DeviceOutputState(DeviceId, AdapterName);
+        return new DeviceOutputState(DeviceId, AdapterName, BufferMilliseconds);
     }
 
     public void SetState(DeviceOutputState state)
     {
-        SelectDevice(state.DeviceId, state.AdapterName);
+        SelectDevice(state.DeviceId, state.AdapterName, state.BufferMilliseconds);
     }
 
     protected override void OnStreamChanged(RenderStream? stream)
@@ -36,9 +38,9 @@ public class DeviceOutputModule : DeviceModule<RenderStream>, IStatefulModule<De
         Input.Layout = stream?.Layout ?? ChannelLayout.None;
     }
 
-    protected override RenderStream OpenStream(string deviceId)
+    protected override RenderStream OpenStream(string deviceId, double? bufferMilliseconds)
     {
-        return Devices.OpenRender(deviceId, Format);
+        return Devices.OpenRender(deviceId, Format, bufferMilliseconds);
     }
 
     protected override void Process()
