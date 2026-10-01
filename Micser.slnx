@@ -3,6 +3,7 @@
     <File Path="Directory.Build.props" />
     <File Path="Directory.Build.targets" />
     <File Path="Directory.Packages.props" />
+    <File Path="dotnet-tools.json" />
     <File Path="aspire.config.json" />
     <File Path="global.json" />
   </Folder>

@@ -1,0 +1,54 @@
+name: micser release
+
+# Pushing a tag like v0.2.0 builds the Velopack release and publishes it as a GitHub release, which installed copies update from.
+# Versions with a suffix (v0.2.0-beta.1) become pre-releases, which installed copies ignore.
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Version
+        id: version
+        shell: pwsh
+        run: |
+          $version = "${{ github.ref_name }}".TrimStart("v")
+          "version=$version" >> $env:GITHUB_OUTPUT
+          "pre=$(if ($version.Contains('-')) { '--pre' })" >> $env:GITHUB_OUTPUT
+
+      # the previous release is the base for delta packages
+      - name: Download previous release
+        run: |
+          dotnet tool restore
+          dotnet vpk download github --repoUrl ${{ github.server_url }}/${{ github.repository }} --channel win --outputDir artifacts/releases --token ${{ secrets.GITHUB_TOKEN }} ${{ steps.version.outputs.pre }}
+
+      - name: Pack
+        shell: pwsh
+        run: ./eng/pack.ps1 -Version ${{ steps.version.outputs.version }}
+
+      - name: Publish
+        run: dotnet vpk upload github --repoUrl ${{ github.server_url }}/${{ github.repository }} --channel win --outputDir artifacts/releases --token ${{ secrets.GITHUB_TOKEN }} --tag ${{ github.ref_name }} --releaseName "Micser ${{ steps.version.outputs.version }}" --publish ${{ steps.version.outputs.pre }}

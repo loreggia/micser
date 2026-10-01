@@ -7,7 +7,7 @@ public class AutostartTests
     [Test]
     public async Task SetEnabled_AddsAndRemovesTheEntry()
     {
-        var keyPath = $@"Software\Micser.Tests\{Guid.NewGuid():N}";
+        var keyPath = $@"Software\Micser.Tests.{Guid.NewGuid():N}";
         try
         {
             var autostart = new Autostart(@"C:\Program Files\Micser\Micser.Shell.exe", Registry.CurrentUser, keyPath);
@@ -28,14 +28,14 @@ public class AutostartTests
         }
         finally
         {
-            Registry.CurrentUser.DeleteSubKeyTree(@"Software\Micser.Tests", throwOnMissingSubKey: false);
+            Registry.CurrentUser.DeleteSubKeyTree(keyPath, throwOnMissingSubKey: false);
         }
     }
 
     [Test]
     public async Task IsEnabled_EntryOfAnotherInstallation_IsFalse()
     {
-        var keyPath = $@"Software\Micser.Tests\{Guid.NewGuid():N}";
+        var keyPath = $@"Software\Micser.Tests.{Guid.NewGuid():N}";
         try
         {
             new Autostart(@"C:\Old\Micser.Shell.exe", Registry.CurrentUser, keyPath).SetEnabled(true);
@@ -44,7 +44,7 @@ public class AutostartTests
         }
         finally
         {
-            Registry.CurrentUser.DeleteSubKeyTree(@"Software\Micser.Tests", throwOnMissingSubKey: false);
+            Registry.CurrentUser.DeleteSubKeyTree(keyPath, throwOnMissingSubKey: false);
         }
     }
 }
