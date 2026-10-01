@@ -12,6 +12,7 @@ public static class EngineJson
     public static void Configure(JsonSerializerOptions options, ModuleCatalog catalog)
     {
         options.AllowOutOfOrderMetadataProperties = true;
+        options.NumberHandling = JsonNumberHandling.Strict;
         options.Converters.Add(new JsonStringEnumConverter());
         options.TypeInfoResolver = (options.TypeInfoResolver ?? new DefaultJsonTypeInfoResolver()).WithAddedModifier(catalog.AddModuleTypes);
     }

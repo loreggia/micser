@@ -1,19 +1,41 @@
 import type { ComponentType } from "react";
+import type { ModuleDto } from "./api";
+
+export type ModuleType = ModuleDto["type"];
+
+export type ModuleOfType<T extends ModuleType> = Extract<ModuleDto, { type: T }>;
 
 /**
- * Props passed to every widget rendered on the routing graph.
+ * Props of a widget, the UI of one module type inside its node on the graph.
  */
-export interface WidgetProps {
-  moduleId: string;
+export interface WidgetProps<T extends ModuleType = ModuleType> {
+  module: ModuleOfType<T>;
+
+  /**
+   * Replaces the module's state. The change shows immediately and is sent to the engine.
+   */
+  setState: (state: ModuleOfType<T>["state"]) => void;
 }
 
 /**
- * Associates a widget component with an engine module type.
- * Connectors are read from the engine's module definition, not declared here.
+ * The UI of a module type. Connectors come from the engine's module types, not from here.
  */
 export interface WidgetDefinition {
-  moduleType: string;
   component: ComponentType<WidgetProps>;
+  moduleType: ModuleType;
+
+  /**
+   * The display name of the module type, e.g. in the "add module" menu.
+   */
+  title: string;
+}
+
+export function defineWidget<T extends ModuleType>(definition: {
+  component: ComponentType<WidgetProps<T>>;
+  moduleType: T;
+  title: string;
+}): WidgetDefinition {
+  return definition as unknown as WidgetDefinition;
 }
 
 /**

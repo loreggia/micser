@@ -10,8 +10,13 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@fluentui/react-components": "^9.74.9",
+    "@fluentui/react-icons": "^2.0.343",
+    "@microsoft/signalr": "^10.0.11",
     "@micser/plugin-main": "*",
     "@micser/web-sdk": "*",
+    "@tanstack/react-query": "^5.104.0",
+    "@xyflow/react": "^12.12.0",
     "react": "^19.3.0",
     "react-dom": "^19.3.0"
   },

@@ -46,6 +46,8 @@ public class ModuleApiTests
             ["DeviceInput", "LoopbackInput", "DeviceOutput", "Gain", "Compressor", "Equalizer", "Pitch", "Spectrum"]);
         await Assert.That(gain["inputs"]!.AsArray().Select(p => (string)p!)).IsEquivalentTo(["Input"]);
         await Assert.That((float?)gain["defaultState"]!["gain"]).IsEqualTo(0f);
+        await Assert.That((bool?)gain["supportsBypass"]).IsTrue();
+        await Assert.That((bool?)types!.Single(t => (string?)t!["type"] == "DeviceOutput")!["supportsBypass"]).IsFalse();
     }
 
     [Test]
