@@ -1,7 +1,7 @@
 # Micser
 Micser is a modular audio routing application for Microsoft Windows.
 
-> **Status:** Micser is being rebuilt on .NET 10 with a web-based UI. The target architecture and roadmap are in [docs/Architecture.md](docs/Architecture.md). The previous WPF version is on `master`.
+> **Status:** Micser is being rebuilt on .NET 10 with a web-based UI. The target architecture and roadmap are in [docs/Architecture.md](docs/Architecture.md). The previous WPF version is commit `9386ea4` in the history of `main`.
 
 The application consists of:
 * an audio engine that runs as a background process in the user's session and exposes a local HTTP API

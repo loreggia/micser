@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project state
 
-Micser (a Windows audio router) is being rebuilt on the `modernization` branch. It started from `9386ea4` on `master`, the last compiling commit of the old WPF version. `docs/Architecture.md` holds the decisions (process model, UI, IPC, storage, audio model, layout, libraries) and the roadmap; read it before structural changes and keep it updated when a decision changes. The `master`, `dev`, `naudio` and `dev-temp` branches are reference material only. Porting code from them means rewriting it to the new architecture, not merging.
+Micser (a Windows audio router) is being rebuilt on `main`, starting from `9386ea4`, the last compiling commit of the old WPF version. `docs/Architecture.md` holds the decisions (process model, UI, IPC, storage, audio model, layout, libraries) and the roadmap; read it before structural changes and keep it updated when a decision changes. The old WPF code (at `9386ea4`) and the local-only `dev` branch are reference material only. Porting code from them means rewriting it to the new architecture, not merging.
 
 ## Commands
 
