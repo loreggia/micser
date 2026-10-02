@@ -21,6 +21,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { useNotifyError } from "../notifications";
 import { shell, useShellState, type UpdateCheckResult } from "../shell";
+import { VirtualCablesSettings } from "./VirtualCablesSettings";
 
 const sampleRates = [44100, 48000, 96000];
 const frameCounts = [128, 240, 480, 960];
@@ -55,8 +56,8 @@ export interface EngineSettingsDialogProps {
 }
 
 /**
- * Audio settings (applied with Apply, which rebuilds the graph), display preferences (applied right away), and the version and updates
- * when running in the desktop shell.
+ * Audio settings (applied with Apply, which rebuilds the graph), display preferences (applied right away), and, when running in the
+ * desktop shell, the version, updates and virtual audio cables.
  */
 export function EngineSettingsDialog({ open, settings, onClose }: EngineSettingsDialogProps) {
   const styles = useStyles();
@@ -148,6 +149,12 @@ export function EngineSettingsDialog({ open, settings, onClose }: EngineSettings
                     <Caption1 className={styles.hint}>{checkResults[checkResult]}</Caption1>
                   )}
                 </div>
+              </>
+            )}
+            {shellState?.driver && (
+              <>
+                <Divider />
+                <VirtualCablesSettings driver={shellState.driver} />
               </>
             )}
           </DialogContent>

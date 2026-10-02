@@ -17,6 +17,7 @@ internal sealed class MainForm : Form
 
     private static readonly JsonSerializerOptions MessageJson = new(JsonSerializerDefaults.Web);
 
+    private readonly DriverController? _driver;
     private readonly string _settingsPath;
     private readonly EngineSupervisor _supervisor;
     private readonly Uri? _uiUrl;
@@ -25,10 +26,12 @@ internal sealed class MainForm : Form
     private Uri? _shownUrl;
 
     /// <param name="updates">Null if this copy can't update (development).</param>
-    public MainForm(EngineSupervisor supervisor, UpdateController? updates, Uri? uiUrl, string settingsPath)
+    /// <param name="driver">Null if this copy has no driver package.</param>
+    public MainForm(EngineSupervisor supervisor, UpdateController? updates, DriverController? driver, Uri? uiUrl, string settingsPath)
     {
         _supervisor = supervisor;
         _updates = updates;
+        _driver = driver;
         _uiUrl = uiUrl;
         _settingsPath = settingsPath;
 
@@ -45,6 +48,11 @@ internal sealed class MainForm : Form
         {
             _updates.Changed += OnUpdatesChanged;
         }
+
+        if (_driver != null)
+        {
+            _driver.Changed += OnUpdatesChanged;
+        }
     }
 
     protected override void Dispose(bool disposing)
@@ -55,6 +63,11 @@ internal sealed class MainForm : Form
             if (_updates != null)
             {
                 _updates.Changed -= OnUpdatesChanged;
+            }
+
+            if (_driver != null)
+            {
+                _driver.Changed -= OnUpdatesChanged;
             }
         }
 
@@ -146,8 +159,9 @@ internal sealed class MainForm : Form
 
     /// <summary>
     /// Handles <c>{ "type": ... }</c> messages from the UI: <c>getState</c>, <c>checkForUpdates</c> (answered with an
-    /// <c>updateCheck</c> message), <c>installUpdate</c> and <c>restartEngine</c>. The shell answers with <c>state</c> messages (see
-    /// <see cref="PostState"/>), also whenever the state changes.
+    /// <c>updateCheck</c> message), <c>installUpdate</c>, <c>restartEngine</c>, and for the driver <c>installDriver</c> and
+    /// <c>setCableCount</c> (with <c>cableCount</c>), <c>updateDriver</c> and <c>uninstallDriver</c>. The shell answers with
+    /// <c>state</c> messages (see <see cref="PostState"/>), also whenever the state changes.
     /// </summary>
     private async void OnWebMessageReceived(object? sender, CoreWebView2WebMessageReceivedEventArgs e)
     {
@@ -158,9 +172,12 @@ internal sealed class MainForm : Form
         }
 
         string? type;
+        int cableCount;
         try
         {
-            type = JsonDocument.Parse(e.WebMessageAsJson).RootElement.GetProperty("type").GetString();
+            var message = JsonDocument.Parse(e.WebMessageAsJson).RootElement;
+            type = message.GetProperty("type").GetString();
+            cableCount = message.TryGetProperty("cableCount", out var count) && count.TryGetInt32(out var value) ? value : 1;
         }
         catch (Exception ex) when (ex is JsonException or KeyNotFoundException or InvalidOperationException)
         {
@@ -183,6 +200,18 @@ internal sealed class MainForm : Form
             case "restartEngine":
                 await _supervisor.RestartEngineAsync();
                 break;
+            case "installDriver" when _driver != null:
+                ShowDriverResult(await _driver.InstallAsync(cableCount));
+                break;
+            case "setCableCount" when _driver != null:
+                ShowDriverResult(await _driver.SetCableCountAsync(cableCount));
+                break;
+            case "updateDriver" when _driver != null:
+                ShowDriverResult(await _driver.UpdateAsync());
+                break;
+            case "uninstallDriver" when _driver != null:
+                ShowDriverResult(await _driver.UninstallAsync());
+                break;
         }
     }
 
@@ -195,7 +224,8 @@ internal sealed class MainForm : Form
     }
 
     /// <summary>
-    /// Sends <c>{ type: "state", version, canUpdate, isCheckingForUpdates, pendingUpdate, canRestartEngine }</c> to the UI.
+    /// Sends <c>{ type: "state", version, canUpdate, isCheckingForUpdates, pendingUpdate, canRestartEngine, driver }</c> to the UI.
+    /// <c>driver</c> is null without a driver package, else <c>{ isBusy, status }</c> with the utility's status (or null).
     /// </summary>
     private void PostState()
     {
@@ -207,7 +237,23 @@ internal sealed class MainForm : Form
             isCheckingForUpdates = _updates?.IsChecking ?? false,
             pendingUpdate = _updates?.PendingUpdate?.Version.ToString(),
             canRestartEngine = _supervisor.CanStartEngine,
+            driver = _driver == null ? null : new { isBusy = _driver.IsBusy, status = _driver.Status },
         });
+    }
+
+    private void ShowDriverResult(DriverCommandResult result)
+    {
+        var (text, icon) = result switch
+        {
+            DriverCommandResult.RebootRequired => ("Restart Windows to finish changing the virtual audio cables.", MessageBoxIcon.Information),
+            DriverCommandResult.Failed => ("Changing the virtual audio cables failed. The log is in %PROGRAMDATA%\\Micser\\logs\\driver-utility.log.", MessageBoxIcon.Error),
+            _ => ((string?)null, MessageBoxIcon.None),
+        };
+
+        if (text != null)
+        {
+            MessageBox.Show(this, text, "Micser", MessageBoxButtons.OK, icon);
+        }
     }
 
     /// <summary>
@@ -244,9 +290,12 @@ internal sealed class MainForm : Form
 
     private static string StatusPage(EngineState state)
     {
-        var message = state == EngineState.Unavailable
-            ? "The audio engine isn't running and couldn't be started. Its log is in %LOCALAPPDATA%\\Micser\\logs."
-            : "Starting the audio engine…";
+        var message = state switch
+        {
+            EngineState.Unavailable => "The audio engine isn't running and couldn't be started. Its log is in %LOCALAPPDATA%\\Micser\\logs.",
+            EngineState.Paused => "Changing the virtual audio cables…",
+            _ => "Starting the audio engine…",
+        };
 
         return $$"""
             <!doctype html>

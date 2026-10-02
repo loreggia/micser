@@ -12,6 +12,7 @@ internal sealed class TrayApplicationContext : ApplicationContext
     private readonly ToolStripMenuItem _autostartItem;
     private readonly NotifyIcon _notifyIcon;
     private readonly ShellOptions _options;
+    private readonly DriverController? _driver;
     private readonly EngineSupervisor _supervisor;
     private readonly SynchronizationContext _uiContext;
     private readonly UpdateController? _updates;
@@ -20,12 +21,14 @@ internal sealed class TrayApplicationContext : ApplicationContext
     private string? _notifiedVersion;
 
     /// <param name="updates">Null if this copy can't update (development).</param>
+    /// <param name="driver">Null if this copy has no driver package.</param>
     /// <param name="activation">Signaled by another shell instance to show the window.</param>
-    public TrayApplicationContext(ShellOptions options, EngineSupervisor supervisor, UpdateController? updates, EventWaitHandle activation)
+    public TrayApplicationContext(ShellOptions options, EngineSupervisor supervisor, UpdateController? updates, DriverController? driver, EventWaitHandle activation)
     {
         _options = options;
         _supervisor = supervisor;
         _updates = updates;
+        _driver = driver;
         _uiContext = SynchronizationContext.Current ?? throw new InvalidOperationException("Create the tray on the UI thread.");
         _autostart = new Autostart(Application.ExecutablePath);
 
@@ -78,6 +81,7 @@ internal sealed class TrayApplicationContext : ApplicationContext
         }
 
         _updates?.Start();
+        _ = CheckDriverAsync();
     }
 
     protected override void Dispose(bool disposing)
@@ -142,7 +146,7 @@ internal sealed class TrayApplicationContext : ApplicationContext
     {
         if (_mainForm == null || _mainForm.IsDisposed)
         {
-            _mainForm = new MainForm(_supervisor, _updates, _options.UiUrl, WindowSettings.DefaultPath);
+            _mainForm = new MainForm(_supervisor, _updates, _driver, _options.UiUrl, WindowSettings.DefaultPath);
         }
 
         _mainForm.Show();
@@ -168,12 +172,34 @@ internal sealed class TrayApplicationContext : ApplicationContext
         _autostartItem.Checked = _autostart.IsEnabled;
     }
 
+    /// <summary>
+    /// Reads the driver status and points out a newer bundled driver once per start.
+    /// </summary>
+    private async Task CheckDriverAsync()
+    {
+        if (_driver == null)
+        {
+            return;
+        }
+
+        await _driver.RefreshAsync();
+        if (_driver.Status is { UpdateAvailable: true } status)
+        {
+            _notifyIcon.ShowBalloonTip(
+                10000,
+                "Micser",
+                $"A new virtual audio cable driver ({status.BundledVersion}) is available. Install it in Micser's settings.",
+                ToolTipIcon.Info);
+        }
+    }
+
     private void UpdateStatus()
     {
         _notifyIcon.Text = _supervisor.State switch
         {
             EngineState.Running => "Micser",
             EngineState.Starting => "Micser – starting the audio engine",
+            EngineState.Paused => "Micser – changing the virtual audio cables",
             _ => "Micser – the audio engine isn't running",
         };
     }

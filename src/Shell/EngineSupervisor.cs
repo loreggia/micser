@@ -16,6 +16,11 @@ internal enum EngineState
     /// No engine is running and the shell can't start one (no executable, or it keeps stopping).
     /// </summary>
     Unavailable,
+
+    /// <summary>
+    /// The engine is stopped while the shell changes the virtual audio cables (<see cref="EngineSupervisor.RunWithoutEngineAsync"/>).
+    /// </summary>
+    Paused,
 }
 
 /// <summary>
@@ -34,6 +39,7 @@ internal sealed class EngineSupervisor : IDisposable
     private readonly HttpClient _http;
     private readonly Queue<DateTime> _launches = new();
     private readonly EngineLocator _locator;
+    private bool _isPaused;
     private DateTime? _launchedAt;
     private bool _isShuttingDown;
 
@@ -91,6 +97,50 @@ internal sealed class EngineSupervisor : IDisposable
     }
 
     /// <summary>
+    /// Stops the engine, keeps it stopped while <paramref name="action"/> runs and lets supervision start it again afterwards, e.g. so
+    /// it releases the audio devices while their driver changes. Without an engine the shell can start (development), the engine keeps
+    /// running. Call on the UI thread.
+    /// </summary>
+    public async Task<T> RunWithoutEngineAsync<T>(Func<Task<T>> action)
+    {
+        if (!CanStartEngine)
+        {
+            return await action();
+        }
+
+        _isPaused = true;
+        try
+        {
+            if (Engine is { } engine)
+            {
+                Log.Information("Stopping the engine for a driver change.");
+                try
+                {
+                    using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
+                    await EngineControl.ShutdownAsync(_http, engine, timeout.Token);
+                }
+                catch (Exception ex) when (ex is HttpRequestException or ArgumentException or OperationCanceledException)
+                {
+                    Log.Warning(ex, "Stopping the engine failed.");
+                }
+
+                for (var i = 0; i < 40 && await _locator.FindAsync() != null; i++)
+                {
+                    await Task.Delay(250);
+                }
+            }
+
+            Set(null, EngineState.Paused);
+            return await action();
+        }
+        finally
+        {
+            _isPaused = false;
+            _launches.Clear();
+        }
+    }
+
+    /// <summary>
     /// Stops the engine gracefully and waits until its process exits. Supervision ends.
     /// </summary>
     public async Task ShutdownEngineAsync()
@@ -130,7 +180,7 @@ internal sealed class EngineSupervisor : IDisposable
             _launches.Dequeue();
         }
 
-        return _enginePath != null && !_isShuttingDown && _launches.Count < MaxRestarts;
+        return _enginePath != null && !_isShuttingDown && !_isPaused && _launches.Count < MaxRestarts;
     }
 
     private void Launch()
@@ -183,6 +233,10 @@ internal sealed class EngineSupervisor : IDisposable
                 {
                     _launchedAt = null;
                     Set(engine, EngineState.Running);
+                }
+                else if (_isPaused)
+                {
+                    Set(null, EngineState.Paused);
                 }
                 else if (_launchedAt != null && DateTime.UtcNow - _launchedAt < StartTimeout)
                 {
