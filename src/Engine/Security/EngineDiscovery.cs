@@ -45,7 +45,8 @@ public sealed class EngineDiscovery : IHostedService
             {
                 File.Delete(_path);
             }
-            catch (IOException ex)
+            // e.g. a virus scanner still has the file open
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
             {
                 _logger.LogWarning(ex, "Could not delete the discovery file {Path}.", _path);
             }
