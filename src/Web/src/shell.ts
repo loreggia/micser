@@ -1,5 +1,24 @@
 import { useSyncExternalStore } from "react";
 
+/** The virtual audio cable driver, as Micser.DriverUtility reports it. */
+export interface DriverStatus {
+  installed: boolean;
+  /** The device's problem code, or null when it runs. */
+  problem: number | null;
+  installedVersion: string | null;
+  /** The version of the driver that comes with Micser. */
+  bundledVersion: string | null;
+  cableCount: number;
+  updateAvailable: boolean;
+}
+
+export interface DriverState {
+  /** A change is running (the engine is stopped meanwhile). */
+  isBusy: boolean;
+  /** Null until the shell read it, or if reading failed. */
+  status: DriverStatus | null;
+}
+
 /** What the desktop shell reports about itself (see the shell's MainForm.PostState). */
 export interface ShellState {
   /** The installed version, or null in development. */
@@ -10,6 +29,8 @@ export interface ShellState {
   pendingUpdate: string | null;
   /** Whether the shell can restart the engine process (it can't in development). */
   canRestartEngine: boolean;
+  /** Null if this copy of Micser has no driver package (development, or no signed driver yet). */
+  driver: DriverState | null;
 }
 
 export type UpdateCheckResult = "upToDate" | "updateReady" | "failed";
@@ -58,6 +79,26 @@ class Shell {
     this.webView.postMessage({ type: "restartEngine" });
   }
 
+  /**
+   * Driver changes run elevated (a UAC prompt) while the engine is stopped, so the window reloads afterwards. The shell reports a
+   * failure or a needed reboot itself.
+   */
+  installDriver(cableCount: number) {
+    this.webView.postMessage({ type: "installDriver", cableCount });
+  }
+
+  setCableCount(cableCount: number) {
+    this.webView.postMessage({ type: "setCableCount", cableCount });
+  }
+
+  updateDriver() {
+    this.webView.postMessage({ type: "updateDriver" });
+  }
+
+  uninstallDriver() {
+    this.webView.postMessage({ type: "uninstallDriver" });
+  }
+
   subscribe(listener: () => void) {
     this.listeners.add(listener);
     return () => {
@@ -73,6 +114,7 @@ class Shell {
         isCheckingForUpdates: message.isCheckingForUpdates,
         pendingUpdate: message.pendingUpdate,
         canRestartEngine: message.canRestartEngine,
+        driver: message.driver,
       };
       this.listeners.forEach((listener) => listener());
     } else if (message.type === "updateCheck") {

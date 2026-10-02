@@ -44,6 +44,8 @@
     <EnableInf2cat>true</EnableInf2cat>
     <!-- Windows 10 2004 (19041), the INF's minimum: ExAllocatePool2 needs it -->
     <Inf2CatWindowsVersionList>10_VB_$(Platform)</Inf2CatWindowsVersionList>
+    <!-- stampinf writes the local date; checked against UTC, it's in the future after midnight east of Greenwich -->
+    <Inf2CatUseLocalTime>true</Inf2CatUseLocalTime>
     <VacDriverVersion Condition="'$(VacDriverVersion)' == ''">1.0.0.0</VacDriverVersion>
   </PropertyGroup>
   <ItemDefinitionGroup>

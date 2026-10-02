@@ -55,8 +55,9 @@ internal static class Program
             using var supervisor = new EngineSupervisor(new EngineLocator(EngineLocator.DefaultDiscoveryPath, http), http, enginePath);
 
             using var updates = Updater.Create() is { } updater ? new UpdateController(updater, supervisor) : null;
+            var driver = DriverController.Create(supervisor);
 
-            Application.Run(new TrayApplicationContext(options, supervisor, updates, activation));
+            Application.Run(new TrayApplicationContext(options, supervisor, updates, driver, activation));
             return 0;
         }
         catch (Exception ex)

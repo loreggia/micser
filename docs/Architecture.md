@@ -266,6 +266,7 @@ The plan (signing, installation, phases) is in the [driver plan](https://claude.
    - The build splits the libraries into their own chunks (React, Fluent UI, Fluent icons, React Flow, other dependencies), so a release only changes the small app chunk (about 40 kB) and the libraries stay cached. The total is still about 1 MB, which is fine for a UI served by the local engine.
    - Follow-ups:
      - Automated UI tests. The checks so far were scripted Playwright runs against Edge outside the repo.
+     - Sort the devices in the device modules' dropdowns by name. They come in the order Windows enumerates them (e.g. Cable 3, 2, 1).
 5. **Shell (`src/Shell`)** (done): tray, WebView2 window, engine launch, discovery and supervision, autostart.
    - Verified: engine start, UI and token handoff, single instance, crash restart, the tray's Close and Exit Micser, and restarting the engine process from the UI.
 6. **Packaging and updates** (done): Velopack setup and delta updates from GitHub releases, a release workflow, and install, update and uninstall hooks in the shell.
@@ -276,6 +277,6 @@ The plan (signing, installation, phases) is in the [driver plan](https://claude.
 7. **VAC driver** (in progress, see [VAC driver](#vac-driver)):
    - Phase 1, spike (done): one cable from SimpleAudioSample with a ring buffer between its sides. Builds for x64 and ARM64 and passes InfVerif. In the VM, `AudioHarness latency` through the cable found all 1199 bursts in 10 minutes, without a cable underrun or skip; after settling, the round trip (harness render and capture buffering plus the cable) stayed at 93.8 ms.
    - Phase 2 (done): up to 16 cables from the device's hardware key, reload by device restart, endpoint names per cable, Driver Verifier and CodeQL clean, `src/Driver` removed. Verified in the VM with 3 cables: audio through each cable without missed bursts (cables 1 and 3 also under Driver Verifier), nothing from cable 2 on cable 1, count changes by device restart, and install, restart and removal (driver unload) under Driver Verifier without findings.
-   - Phase 3: `DriverUtility install | update | uninstall | status`, the UI action and the version check in the shell.
+   - Phase 3 (done): `DriverUtility status | install | update | set-count | uninstall` (Native AOT exe, SetupAPI; copies itself and the package to `%ProgramFiles%\Micser\Driver` with an "Apps and Features" entry, logs to `%ProgramData%\Micser\logs`). The shell runs it elevated with the engine paused (`EngineSupervisor.RunWithoutEngineAsync`), reads its status at start (tray notice for a newer bundled driver), and the settings dialog has a "Virtual audio cables" section. `eng/pack.ps1 -DriverPackage <dir>` bundles the driver in the release's `driver` folder. Verified in the VM: install, count changes and uninstall through the UI, and an update from 1.0.0.0 to 1.0.1.0.
    - Phase 4: EV certificate, attestation signing and code signing of the Velopack output.
 8. **Later:** runtime-loaded plugins.
