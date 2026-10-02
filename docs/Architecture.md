@@ -1,6 +1,6 @@
 # Architecture
 
-Target architecture for the modernization of Micser (decided 2026-09-30). The `modernization` branch starts from `9386ea4`, the last compiling commit on `master` (WPF + Prism app, Windows-service engine, named-pipe IPC, .NET Core 3.1). The `dev` branch (an abandoned web-UI refactor, see `docs/Inventory.md` on `dev`) and the `naudio`/`dev-temp` branches are references only. None of them is merged.
+Target architecture for the modernization of Micser (decided 2026-09-30). `main` was rebuilt starting from `9386ea4`, the last compiling commit of the old version (WPF + Prism app, Windows-service engine, named-pipe IPC, .NET Core 3.1). The `dev` branch (an abandoned web-UI refactor, see `docs/Inventory.md` on `dev`) and the `naudio`/`dev-temp` branches are references only. None of them is merged.
 
 ## Decisions
 
@@ -83,7 +83,7 @@ docs/
   - positional layouts map matching speakers 1:1 and fold missing ones into their neighbours (center into L/R at -3 dB, sides and backs into each other or into the fronts at -3 dB), dropping LFE;
   - everything else maps by index.
 - **Volume.** Every module has `Volume` (0..1) and `IsMuted`, applied to its outputs with a ramp over one block. `EffectModule` adds `IsBypassed`. Samples aren't clamped inside the graph, only at device outputs.
-- **System volume.** A module can follow the volume and mute of Windows' default output device (`useSystemVolume`, as on `master`), so the volume keys control routes into devices that ignore the Windows volume (e.g. a loopback or virtual cable). `SystemVolume` watches the default device's endpoint volume and switches with the default device; `AudioHost` then sets the modules' volume (the device's level in dB as a linear gain, so loudness matches) and mute, persists and broadcasts them. The UI disables the module's volume and mute controls meanwhile.
+- **System volume.** A module can follow the volume and mute of Windows' default output device (`useSystemVolume`, as in the WPF version), so the volume keys control routes into devices that ignore the Windows volume (e.g. a loopback or virtual cable). `SystemVolume` watches the default device's endpoint volume and switches with the default device; `AudioHost` then sets the modules' volume (the device's level in dB as a linear gain, so loudness matches) and mute, persists and broadcasts them. The UI disables the module's volume and mute controls meanwhile.
 - **Levels.** Each output port has a `LevelMeter` that measures the output after volume and mute: per channel, the peak since the last read and the RMS smoothed over 300 ms. A module without outputs measures what it passes to `ApplyVolume` (a device output: what it plays). The audio thread updates the meters with atomics only; `AudioModule.ReadLevels()` reads and resets the peaks.
 - **Devices.** Each capture and render stream decouples its device clock from the engine clock:
   - A lock-free single-producer/single-consumer ring buffer sits between them. Devices deliver and consume whole periods (10 ms in shared mode), so the initial target fill is:
@@ -249,12 +249,12 @@ The plan (signing, installation, phases) is in the [driver plan](https://claude.
 
 1. **Skeleton** (done):
    - Create the new layout on .NET 10 with the props files, the npm workspace root, and a CI workflow (`dotnet build`/`test` plus the npm build and lint).
-   - Remove the old WPF/Prism/engine projects. They stay available in git history and on `master`.
+   - Remove the old WPF/Prism/engine projects. They stay available in git history (`9386ea4`).
    - Move the driver and installer to `src/Driver` and `src/Installer` as they are.
    - Move `Micser.DriverUtility` to `src/DriverUtility` as it is. It still references the removed `Micser.Common` and CSCore, so it stays outside the solution until step 2 ports it to NAudio.
 2. **Audio (`src/Audio`)** (done):
    - Graph, block processing, format and resampling, and NAudio device enumeration, capture and render.
-   - Port the DSP code (gain, compressor, EQ, pitch, spectrum) from `master`'s `Micser.Plugins.Main` into `src/Plugins/Main`, using the `naudio`/`dev-temp` branches for the API mapping.
+   - Port the DSP code (gain, compressor, EQ, pitch, spectrum) from the WPF version's `Micser.Plugins.Main` into `src/Plugins/Main`, using the `naudio`/`dev-temp` branches for the API mapping.
    - Port `src/DriverUtility` and add it to the solution.
    - Unit tests, plus a small console harness that routes input → gain → output as a smoke test (`tools/AudioHarness`). Its `latency` mode measures the software round trip (render + loopback capture) by cross-correlating a quiet noise burst: about 47–50 ms on a 48 kHz USB interface, from 240 ms with NAudio's default render buffer and 10 ms blocks.
    - Follow-ups:
