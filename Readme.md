@@ -42,7 +42,11 @@ dotnet run --project src/Shell -- --ui http://localhost:5173   # optional: the t
 Pushing a tag `vX.Y.Z` builds the release on GitHub Actions and publishes it as a GitHub release, which installed copies update from.
 
 ### Driver
-The driver (`src/Driver`) is not part of `Micser.slnx` yet. Building it requires the Windows Driver Kit. Building it in Release mode also requires a code signing certificate named `Certificate.pfx` in a `crt` folder in the repository root.
+The virtual audio cable driver (`src/Vac`) is not part of `Micser.slnx`. It needs Visual Studio with the Windows Driver Kit component and the Spectre-mitigated libraries; the WDK itself comes from NuGet.
+```powershell
+./eng/build-vac.ps1 -Platform x64,ARM64   # test-signed driver packages in src/Vac/bin
+./eng/codeql-vac.ps1                      # Microsoft's CodeQL driver checks
+```
 
 ## Plugins
 Audio modules are provided by plugins. Each plugin consists of a .NET project and a web package with the widgets for its modules. The main modules (device input/output, gain, compressor, ...) are provided by `src/Plugins/Main`, which also serves as an example of how to implement a plugin.

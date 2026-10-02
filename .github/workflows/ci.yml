@@ -26,6 +26,33 @@ jobs:
       - name: Test
         run: dotnet test --solution Micser.slnx --configuration Release --no-build
 
+  vac:
+    # the WDK NuGet packages need the WDK component of Visual Studio, which this image has
+    runs-on: windows-2025-vs2026
+
+    strategy:
+      matrix:
+        platform: [x64, ARM64]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Build and verify
+        run: ./eng/build-vac.ps1 -Configuration Release -Platform ${{ matrix.platform }}
+
+      - name: CodeQL driver checks
+        if: matrix.platform == 'x64'
+        run: ./eng/codeql-vac.ps1
+
+      - name: Upload CodeQL results
+        if: matrix.platform == 'x64' && always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: vac-codeql
+          path: artifacts/codeql/vac.sarif
+          if-no-files-found: ignore
+
   web:
     runs-on: windows-latest
 
