@@ -31,12 +31,18 @@ dotnet run --project tools/AudioHarness -- latency 2               # round-trip 
 ```
 
 ```sh
+./eng/build-vac.ps1 -Platform x64,ARM64           # VAC driver: restores the WDK NuGet packages, builds src/Vac, runs InfVerif
+./eng/deploy-vac-vm.ps1 -TestSeconds 600          # installs the test-signed driver in the Hyper-V VM "DriverTesting" and runs the cable latency test
+./eng/codeql-vac.ps1                              # Microsoft CodeQL driver checks (WHCP suites); fails on findings in src/Vac
+```
+
+```sh
 ./eng/pack.ps1 -Version 0.1.0       # Velopack release (Setup.exe, packages) in artifacts/releases; tags vX.Y.Z publish via .github/workflows/release.yml
 ```
 
 The harness opens real devices: use a very low gain (as above) unless audible output is intended.
 
-CI (`.github/workflows/ci.yml`) runs the dotnet build/test and npm format/lint/build as separate jobs.
+CI (`.github/workflows/ci.yml`) runs the dotnet build/test, the driver build and npm format/lint/build as separate jobs.
 
 ## Working preferences
 
@@ -79,4 +85,9 @@ CI (`.github/workflows/ci.yml`) runs the dotnet build/test and npm format/lint/b
   - A new module type needs its own state record (data annotations on the record's parameters, as in ASP.NET Core), `IStatefulModule<TState>`, and a registration in its plugin's `Add…Plugin()`. The engine, API, config file and OpenAPI pick it up from there.
   - `AudioHost` is the single entry point for graph changes. It persists and broadcasts every change, and throws `EngineRequestException` for problem responses.
   - Engine tests use `EngineFactory` (temp config directory, token required) with a real audio engine and no devices selected.
-- `src/Driver` (C++ WDM driver) was moved unchanged and isn't in `Micser.slnx`. The old WixSharp installer (driver install custom actions) is in git history before its removal.
+- Driver code (`src/Vac`, see "VAC driver" in `docs/Architecture.md`):
+  - It isn't in `Micser.slnx`; build it with `eng/build-vac.ps1`. Its `Directory.Build.props` replaces the root one.
+  - Code that runs at DISPATCH_LEVEL (stream position updates, `CCable`) stays in `#pragma code_seg()` and touches only nonpaged memory.
+  - Keep the INX ASCII: as UTF-16 without BOM, inf2cat didn't recognize the stamped INF.
+  - Test it in the VM, never on the dev machine.
+- The old WaveCyclic driver (`src/Driver`) and the WixSharp installer (driver install custom actions) are in git history before their removal.

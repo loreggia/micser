@@ -1,0 +1,139 @@
+[Version]
+Signature   = "$Windows NT$"
+Class       = MEDIA
+Provider    = %ProviderName%
+ClassGUID   = {4d36e96c-e325-11ce-bfc1-08002be10318}
+DriverVer   = 01/01/2026, 1.0.0.0
+CatalogFile = MicserVac.cat
+PnpLockdown = 1
+
+[SourceDisksNames]
+222 = %DiskName%,"",222
+
+[SourceDisksFiles]
+MicserVac.sys = 222
+
+[SignatureAttributes]
+MicserVac.sys = SignatureAttributes.DRM
+
+[SignatureAttributes.DRM]
+DRMLevel = 1300
+
+[SignatureAttributes.PETrust]
+PETrust = true
+
+[Manufacturer]
+%MfgName% = Micser,NT$ARCH$.10.0...19041
+
+[Micser.NT$ARCH$.10.0...19041]
+%Vac.DeviceDesc% = Vac, ROOT\MicserVac
+
+[DestinationDirs]
+Vac.CopyList = 13
+
+[Vac.CopyList]
+MicserVac.sys
+
+[Vac.AddReg]
+HKR,,AssociatedFilters,,"wdmaud,swmidi,redbook"
+HKR,,Driver,,MicserVac.sys
+
+HKR,Drivers,SubClasses,,"wave,midi,mixer"
+
+HKR,Drivers\wave\wdmaud.drv,Driver,,wdmaud.drv
+HKR,Drivers\midi\wdmaud.drv,Driver,,wdmaud.drv
+HKR,Drivers\mixer\wdmaud.drv,Driver,,wdmaud.drv
+
+HKR,Drivers\wave\wdmaud.drv,Description,,%Vac.DeviceDesc%
+HKR,Drivers\mixer\wdmaud.drv,Description,,%Vac.DeviceDesc%
+
+;======================================================
+; Interface templates: the driver creates the filters of cable N with these
+; reference strings plus N (e.g. WaveRender1) and copies the settings below
+; (EP\0 ...) from the template interfaces.
+;======================================================
+[Vac.I.WaveCapture]
+AddReg = Vac.I.Wave.AddReg
+
+[Vac.I.TopologyCapture]
+AddReg = Vac.I.Topology.AddReg
+
+[Vac.I.WaveRender]
+AddReg = Vac.I.Wave.AddReg
+
+[Vac.I.TopologyRender]
+AddReg = Vac.I.Topology.AddReg
+
+[Vac.I.Wave.AddReg]
+HKR,,CLSID,,%Proxy.CLSID%
+
+[Vac.I.Topology.AddReg]
+HKR,,CLSID,,%Proxy.CLSID%
+HKR,EP\0,%PKEY_AudioEndpoint_Association%,,%KSNODETYPE_ANY%
+HKR,EP\0,%PKEY_AudioEndpoint_Supports_EventDriven_Mode%,0x00010001,0x1
+
+;======================================================
+; Device
+;======================================================
+[Vac.NT]
+Include = ks.inf,wdmaudio.inf
+Needs = KS.Registration,WDMAUDIO.Registration
+CopyFiles = Vac.CopyList
+AddReg = Vac.AddReg
+
+[Vac.NT.Interfaces]
+; The driver copies the settings from the KSCATEGORY_AUDIO interfaces.
+AddInterface = %KSCATEGORY_AUDIO%, %KSNAME_WaveRender%,      Vac.I.WaveRender
+AddInterface = %KSCATEGORY_AUDIO%, %KSNAME_TopologyRender%,  Vac.I.TopologyRender
+AddInterface = %KSCATEGORY_AUDIO%, %KSNAME_WaveCapture%,     Vac.I.WaveCapture
+AddInterface = %KSCATEGORY_AUDIO%, %KSNAME_TopologyCapture%, Vac.I.TopologyCapture
+
+[Vac.NT.Services]
+AddService = MicserVac,0x00000002,Vac.Service
+
+[Vac.Service]
+DisplayName   = %Vac.SvcDesc%
+ServiceType   = 1
+StartType     = 3
+ErrorControl  = 1
+ServiceBinary = %13%\MicserVac.sys
+
+[Vac.NT.HW]
+AddReg = Vac.HW.AddReg
+
+[Vac.HW.AddReg]
+; number of cables (1-16), read when the device starts; 0x00010003 = DWORD, keep an existing value
+HKR,,CableCount,0x00010003,1
+; FILE_DEVICE_SOUND
+HKR,,DeviceType,0x10001,0x0000001D
+; SDDL_DEVOBJ_SYS_ALL_ADM_RWX_WORLD_RWX_RES_RWX
+HKR,,Security,,"D:P(A;;GA;;;SY)(A;;GRGWGX;;;BA)(A;;GRGWGX;;;WD)(A;;GRGWGX;;;RC)"
+
+[Vac.NT.Wdf]
+KmdfService = MicserVac,Vac.WdfSect
+
+[Vac.WdfSect]
+KmdfLibraryVersion = $KMDFVERSION$
+
+[Strings]
+; Non-localizable
+KSNAME_WaveRender      = "WaveRender"
+KSNAME_TopologyRender  = "TopologyRender"
+KSNAME_WaveCapture     = "WaveCapture"
+KSNAME_TopologyCapture = "TopologyCapture"
+
+Proxy.CLSID         = "{17CCA71B-ECD7-11D0-B908-00A0C9223196}"
+KSCATEGORY_AUDIO    = "{6994AD04-93EF-11D0-A3CC-00A0C9223196}"
+
+KSNODETYPE_ANY = "{00000000-0000-0000-0000-000000000000}"
+
+PKEY_AudioEndpoint_Association               = "{1DA5D803-D492-4EDD-8C23-E0C0FFEE7F0E},2"
+PKEY_AudioEndpoint_Supports_EventDriven_Mode = "{1DA5D803-D492-4EDD-8C23-E0C0FFEE7F0E},7"
+
+; Localizable
+ProviderName = "Micser"
+MfgName      = "Micser"
+DiskName     = "Micser Virtual Audio Cable Disk"
+
+Vac.DeviceDesc = "Micser Virtual Audio Cable"
+Vac.SvcDesc    = "Micser Virtual Audio Cable Driver"

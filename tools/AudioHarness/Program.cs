@@ -10,13 +10,15 @@ using Serilog.Extensions.Logging;
 //
 //   Micser.AudioHarness list
 //   Micser.AudioHarness <input> <output> [--gain <dB>] [--loopback]
-//   Micser.AudioHarness latency <output>
+//   Micser.AudioHarness latency <output> [<input>] [--seconds <n>]
 //
-// <input>/<output> are a device number from "list", a device ID or "default". With --loopback, <input> is an output
+// <input>/<output> are a device number from "list", a device ID, part of a device name or "default". With --loopback, <input> is an output
 // device whose playback is captured.
 //
 // "latency" plays a quiet noise burst (-40 dB) on <output> twice per second, captures it again through the loopback of
 // the same device and prints the round trip: render buffering + capture buffering, without any hardware latency.
+// With <input>, it captures from that input instead, e.g. the output side of a virtual cable whose input is <output>.
+// --seconds stops the measurement after that time instead of at Ctrl+C.
 // The environment variable MICSER_BLOCK overrides the engine block size (frames) for this measurement.
 
 Log.Logger = new LoggerConfiguration().MinimumLevel.Debug().WriteTo.Console().CreateLogger();
@@ -42,7 +44,14 @@ Console.CancelKeyPress += (_, e) =>
 
 if (args[0] == "latency")
 {
-    return await MeasureLatencyAsync(args.Length > 1 ? args[1] : "default");
+    var secondsIndex = Array.IndexOf(args, "--seconds");
+    if (secondsIndex >= 0 && secondsIndex < args.Length - 1)
+    {
+        cancellation.CancelAfter(TimeSpan.FromSeconds(int.Parse(args[secondsIndex + 1])));
+    }
+
+    var positional = secondsIndex < 0 ? args : args.Where((_, i) => i != secondsIndex && i != secondsIndex + 1).ToArray();
+    return await MeasureLatencyAsync(positional.Length > 1 ? positional[1] : "default", positional.Length > 2 ? positional[2] : null);
 }
 
 var loopback = args.Contains("--loopback");
@@ -115,10 +124,11 @@ static void PrintDevices(string title, IReadOnlyList<AudioDeviceInfo> devices)
     }
 }
 
-async Task<int> MeasureLatencyAsync(string outputArgument)
+async Task<int> MeasureLatencyAsync(string outputArgument, string? inputArgument)
 {
     var device = ResolveDevice(outputArgument, DeviceDirection.Output, outputs);
-    if (device == null)
+    var inputDevice = inputArgument != null ? ResolveDevice(inputArgument, DeviceDirection.Input, inputs) : null;
+    if (device == null || (inputArgument != null && inputDevice == null))
     {
         Console.Error.WriteLine("Unknown device. Run with \"list\" to see the available devices.");
         return 1;
@@ -129,9 +139,11 @@ async Task<int> MeasureLatencyAsync(string outputArgument)
     using var source = new NoiseBurstSource(format.SampleRate / 2);
     using var detector = new NoiseBurstDetector(source, format.SampleRate * 2 / 5);
     using var render = new DeviceOutputModule(devices, loggerFactory.CreateLogger<DeviceOutputModule>());
-    using var capture = new LoopbackInputModule(devices, loggerFactory.CreateLogger<LoopbackInputModule>());
+    using CaptureModule capture = inputDevice != null
+        ? new DeviceInputModule(devices, loggerFactory.CreateLogger<DeviceInputModule>())
+        : new LoopbackInputModule(devices, loggerFactory.CreateLogger<LoopbackInputModule>());
     render.SelectDevice(device.Id);
-    capture.SelectDevice(device.Id);
+    capture.SelectDevice(inputDevice?.Id ?? device.Id);
     latencyGraph.Add(source);
     latencyGraph.Add(render);
     latencyGraph.Add(capture);
@@ -141,9 +153,12 @@ async Task<int> MeasureLatencyAsync(string outputArgument)
 
     using var latencyEngine = new AudioEngine(latencyGraph, loggerFactory.CreateLogger<AudioEngine>());
     latencyEngine.Start();
-    Console.WriteLine($"Measuring {device.Name} ({device.Layout}, {device.SampleRate} Hz). Press Ctrl+C to stop.");
+    Console.WriteLine(inputDevice != null
+        ? $"Measuring {device.Name} -> {inputDevice.Name} ({inputDevice.Layout}, {inputDevice.SampleRate} Hz). Press Ctrl+C to stop."
+        : $"Measuring {device.Name} ({device.Layout}, {device.SampleRate} Hz). Press Ctrl+C to stop.");
 
     var all = new List<double>();
+    var missed = 0;
     try
     {
         while (!cancellation.IsCancellationRequested)
@@ -151,6 +166,7 @@ async Task<int> MeasureLatencyAsync(string outputArgument)
             await Task.Delay(TimeSpan.FromSeconds(1), cancellation.Token);
             var measured = detector.TakeLatencies().Select(l => l * 1000d / format.SampleRate).ToArray();
             all.AddRange(measured.OfType<double>());
+            missed += measured.Count(m => m == null);
             Console.WriteLine($"round trip {string.Join(", ", measured.Select(m => m is { } ms ? $"{ms,6:0.0} ms" : "  none   "))} | in {Format(capture.Statistics)} | out {Format(render.Statistics)}");
         }
     }
@@ -162,7 +178,7 @@ async Task<int> MeasureLatencyAsync(string outputArgument)
     if (all.Count > 0)
     {
         all.Sort();
-        Console.WriteLine($"min {all[0]:0.0} ms, median {all[all.Count / 2]:0.0} ms, max {all[^1]:0.0} ms ({all.Count} bursts)");
+        Console.WriteLine($"min {all[0]:0.0} ms, median {all[all.Count / 2]:0.0} ms, max {all[^1]:0.0} ms ({all.Count} bursts, {missed} missed)");
     }
 
     return 0;
@@ -180,5 +196,6 @@ AudioDeviceInfo? ResolveDevice(string value, DeviceDirection direction, IReadOnl
         return candidates[number - 1];
     }
 
-    return candidates.FirstOrDefault(d => d.Id == value);
+    return candidates.FirstOrDefault(d => d.Id == value)
+        ?? candidates.FirstOrDefault(d => d.Name.Contains(value, StringComparison.OrdinalIgnoreCase));
 }

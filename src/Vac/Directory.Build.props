@@ -1,0 +1,13 @@
+<Project>
+  <!-- Doesn't import the root Directory.Build.props: its settings are for .NET projects. -->
+  <PropertyGroup>
+    <WdkVersion>10.0.28000.2526</WdkVersion>
+    <WdkPackages>$(MSBuildThisFileDirectory)packages\</WdkPackages>
+  </PropertyGroup>
+  <!-- WDK and SDK from NuGet (packages.config, restored by eng/build-vac.ps1) -->
+  <Import Project="$(WdkPackages)Microsoft.Windows.WDK.x64.$(WdkVersion)\build\native\Microsoft.Windows.WDK.x64.props" Condition="'$(Platform)' == 'x64'" />
+  <Import Project="$(WdkPackages)Microsoft.Windows.WDK.arm64.$(WdkVersion)\build\native\Microsoft.Windows.WDK.arm64.props" Condition="'$(Platform)' == 'ARM64'" />
+  <Import Project="$(WdkPackages)Microsoft.Windows.SDK.CPP.x64.$(WdkVersion)\build\native\Microsoft.Windows.SDK.cpp.x64.props" Condition="'$(Platform)' == 'x64'" />
+  <Import Project="$(WdkPackages)Microsoft.Windows.SDK.CPP.arm64.$(WdkVersion)\build\native\Microsoft.Windows.SDK.cpp.arm64.props" Condition="'$(Platform)' == 'ARM64'" />
+  <Import Project="$(WdkPackages)Microsoft.Windows.SDK.CPP.$(WdkVersion)\build\native\Microsoft.Windows.SDK.cpp.props" />
+</Project>

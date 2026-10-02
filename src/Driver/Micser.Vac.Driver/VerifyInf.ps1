@@ -1,1 +1,0 @@
-& "C:\Program Files (x86)\Windows Kits\10\Tools\x64\infverif.exe" Micser.Vac.Driver.inf /stampinf

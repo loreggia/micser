@@ -53,7 +53,7 @@ src/
   Shell/                      Micser.Shell: tray + WebView2 window, engine launcher; no app logic
   ServiceDefaults/            Micser.ServiceDefaults: OpenTelemetry setup, exported only when run from the AppHost
   DriverUtility/              Micser.DriverUtility: VAC driver install/config CLI (standalone)
-  Driver/                     C++ VAC driver (moved as is, not built by default)
+  Vac/                        Micser.Vac: VAC driver (PortCls WaveRT, C++), built by eng/build-vac.ps1, not in Micser.slnx
 tests/                        mirrors src/
   Audio/                      Micser.Audio.Tests
   Engine/                     Micser.Engine.Tests
@@ -61,7 +61,7 @@ tests/                        mirrors src/
 tools/                        dev-only programs, in Micser.slnx but never shipped
   AppHost/                    Micser.AppHost: Aspire AppHost that runs engine, Vite and (on demand) shell with a dashboard
   AudioHarness/               routes a real input through a gain module to a real output and prints buffer statistics
-eng/                          build scripts: pack.ps1 (Velopack release)
+eng/                          scripts: pack.ps1 (Velopack release), build-vac.ps1 (driver), deploy-vac-vm.ps1 (driver into a test VM)
 docs/
 ```
 
@@ -224,6 +224,27 @@ docs/
   - Velopack logs to `%LocalAppData%\velopack\velopack_Micser.log`.
 - **Driver:** Velopack can't run elevated steps. Installing the VAC driver will need a separate elevated step, e.g. `DriverUtility` started from the app. The removed WixSharp installer's driver custom actions (git history, `src/Installer`) can serve as reference.
 
+## VAC driver
+
+The plan (signing, installation, phases) is in the [driver plan](https://claude.ai/code/artifact/384fcc8a-3a37-43ab-bdbd-3f1f9b15c48e).
+
+- **Base.** `src/Vac` starts from Microsoft's SimpleAudioSample (SysVAD cut down to one speaker and one microphone, PortCls WaveRT, KMDF for the adapter). The old WaveCyclic driver (`src/Driver`) is in git history.
+- **Cables.** One device with up to 16 cables. The count is the `CableCount` value in the device's hardware key (`Device Parameters`; the INF sets 1 without overwriting an existing value) and is read when the device starts. Changing it takes a device restart (PnP), which DriverUtility will do; there is no control device or IOCTL. `CAdapterCommon::InstallCables` creates the filters of each side from the template pairs in `minipairs.h`, with reference strings like `WaveRender2`; their interface settings (`EP\0 ...`) are copied from the INF's template interfaces (`WaveRender`, `TopologyRender`, `WaveCapture`, `TopologyCapture`).
+- **Names.** Endpoints are named "Cable N Input" (render) and "Cable N Output" (capture), shown as e.g. "Cable 1 Input (Micser Virtual Audio Cable)". The topology bridge pins have a name GUID, and the topology miniports implement `IPinName` to return the name per cable. Windows ignores the pin name for `KSNODETYPE_SPEAKER`, so the render bridge pin is a `KSNODETYPE_LINE_CONNECTOR`. Windows keeps an endpoint's name once it exists.
+- **Cable.** A cable is one render endpoint and one capture endpoint. `CCable` is a lock-free single-producer/single-consumer ring between the render stream (writes what the client played) and the capture stream (reads it into the client's buffer). Both streams advance their positions on the same QPC clock, so there is no drift to correct: the fill only varies with timer jitter. Capture outputs silence until 10 ms are buffered and again after an underrun, and skips the oldest data above 30 ms. The render side drops data while no capture stream runs.
+- **Formats.** Both sides only offer 48 kHz stereo 32-bit PCM, so the cable copies bytes; each pin's data range intersection returns that one format. Float would avoid a conversion, but Windows marks endpoints with a float device format "not present". 32-bit PCM keeps a float signal in [-1, 1] at least as precisely as float itself. Converting between different formats is an open decision.
+- **DRM.** Render streams with `CopyProtect` rights don't write into the cable.
+- **Build.** The WDK and SDK come from NuGet (`src/Vac/packages.config`, restored by `eng/build-vac.ps1`); the build also needs the WDK component of Visual Studio (`Microsoft.Windows.DriverKit`) and the Spectre-mitigated libraries, and the 64-bit MSBuild because the WDK packages only ship 64-bit host tools. x64 and ARM64, warnings as errors, Spectre mitigation, InfVerif `/w` after each build. Minimum Windows 10 2004 (19041) because of `ExAllocatePool2`. CI builds it on the `windows-2025-vs2026` image.
+- **Device.** One root-enumerated device, hardware ID `ROOT\MicserVac`, driver `MicserVac.sys` (the old driver's `ROOT\Micser.Vac.Driver` isn't kept).
+- **Testing.** Builds are test-signed with the WDK test certificate. `eng/deploy-vac-vm.ps1` installs them in a Hyper-V VM with test signing on (PowerShell Direct, `devcon`), and with `-TestSeconds` runs `AudioHarness latency` from cable input to cable output there.
+  - Every dev build has the same `DriverVer`, so PnP keeps using an older package from the driver store and `devcon update` still reports success. The script therefore removes the device and all Micser packages before each install.
+  - In an enhanced (RDP) session the VM only shows "Remote Audio", not the cable endpoints. PowerShell Direct and the basic console session see them.
+  - A user must be signed in at the console (basic session): otherwise the audio engine renders silence for the PowerShell Direct session's streams, also into the loopback. The VM signs in automatically (Winlogon `AutoAdminLogon`, with `DevicePasswordLessBuildVersion` = 0), so this survives reboots.
+  - In Debug builds, a second adapter (e.g. when a removed device still waits for a reboot) hits a breakpoint in `NewAdapterCommon` and bugchecks without a debugger; the script reboots the VM when `devcon remove` asks for it.
+  - Kernel debug output can be captured with Sysinternals `dbgviewcli64 -k -v --duration <s> -l <file>` in the VM.
+  - Driver Verifier (standard checks) is enabled for `MicserVac.sys` in the VM, so every test runs under it.
+- **Static analysis.** `eng/codeql-vac.ps1` runs Microsoft's CodeQL driver suites (`microsoft/windows-drivers`, the WHCP `mustfix` and `recommended` suites) and fails on findings in the driver's code; CI runs it for x64. Findings in the WDK headers and `cpp/drivers/init-not-cleared` (PortCls creates the FDO) are excluded.
+
 ## Roadmap
 
 1. **Skeleton** (done):
@@ -252,4 +273,9 @@ docs/
    - The UI's "Update to x.y.z" button (from 0.3.0) was verified with the update to 0.4.0.
    - Follow-ups:
      - Code signing (`vpk pack --signParams`).
-7. **Later:** the VAC driver (needs an EV code-signing cert) and runtime-loaded plugins.
+7. **VAC driver** (in progress, see [VAC driver](#vac-driver)):
+   - Phase 1, spike (done): one cable from SimpleAudioSample with a ring buffer between its sides. Builds for x64 and ARM64 and passes InfVerif. In the VM, `AudioHarness latency` through the cable found all 1199 bursts in 10 minutes, without a cable underrun or skip; after settling, the round trip (harness render and capture buffering plus the cable) stayed at 93.8 ms.
+   - Phase 2 (done): up to 16 cables from the device's hardware key, reload by device restart, endpoint names per cable, Driver Verifier and CodeQL clean, `src/Driver` removed. Verified in the VM with 3 cables: audio through each cable without missed bursts (cables 1 and 3 also under Driver Verifier), nothing from cable 2 on cable 1, count changes by device restart, and install, restart and removal (driver unload) under Driver Verifier without findings.
+   - Phase 3: `DriverUtility install | update | uninstall | status`, the UI action and the version check in the shell.
+   - Phase 4: EV certificate, attestation signing and code signing of the Velopack output.
+8. **Later:** runtime-loaded plugins.
