@@ -15,6 +15,7 @@ export {
   useModuleUpdate,
   usePreferences,
 } from "./engine/hooks";
+export { decibels, hertz, milliseconds } from "./lib/labels";
 export {
   defineWidget,
   type ModuleOfType,
@@ -23,3 +24,4 @@ export {
   type WidgetDefinition,
   type WidgetProps,
 } from "./plugin";
+export { useDefaultStyles } from "./styles/defaultStyles";
