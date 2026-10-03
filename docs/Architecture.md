@@ -264,9 +264,7 @@ The plan (signing, installation, phases) is in the [driver plan](https://claude.
    - Stream recovery (watchdog and resume notification) was verified with a real sleep/resume.
 4. **UI** (done): `src/Web`, `src/WebSdk` and `src/Plugins/Main/Web`: the Vite app, graph editor and widgets.
    - The build splits the libraries into their own chunks (React, Fluent UI, Fluent icons, React Flow, other dependencies), so a release only changes the small app chunk (about 40 kB) and the libraries stay cached. The total is still about 1 MB, which is fine for a UI served by the local engine.
-   - Follow-ups:
-     - Automated UI tests. The checks so far were scripted Playwright runs against Edge outside the repo.
-     - Sort the devices in the device modules' dropdowns by name. They come in the order Windows enumerates them (e.g. Cable 3, 2, 1).
+   - Follow-up: automated UI tests. The checks so far were scripted Playwright runs against Edge outside the repo.
 5. **Shell (`src/Shell`)** (done): tray, WebView2 window, engine launch, discovery and supervision, autostart.
    - Verified: engine start, UI and token handoff, single instance, crash restart, the tray's Close and Exit Micser, and restarting the engine process from the UI.
 6. **Packaging and updates** (done): Velopack setup and delta updates from GitHub releases, a release workflow, and install, update and uninstall hooks in the shell.

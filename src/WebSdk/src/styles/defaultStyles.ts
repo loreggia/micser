@@ -10,17 +10,4 @@ export const useDefaultStyles = makeStyles({
     gap: tokens.spacingVerticalS,
     width: "220px",
   },
-  band: {
-    display: "flex",
-    flexDirection: "column",
-    gap: tokens.spacingVerticalXS,
-    paddingBottom: tokens.spacingVerticalS,
-    borderBottom: `${tokens.strokeWidthThin} solid ${tokens.colorNeutralStroke2}`,
-  },
-  bandHeader: {
-    display: "flex",
-    justifyContent: "space-between",
-    alignItems: "center",
-    color: tokens.colorNeutralForeground2,
-  },
 });

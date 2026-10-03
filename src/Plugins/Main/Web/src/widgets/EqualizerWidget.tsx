@@ -1,4 +1,4 @@
-import { Button } from "@fluentui/react-components";
+import { Button, makeStyles, tokens } from "@fluentui/react-components";
 import { AddRegular, DeleteRegular } from "@fluentui/react-icons";
 import {
   decibels,
@@ -9,15 +9,32 @@ import {
   type WidgetProps,
 } from "@micser/web-sdk";
 
+const useStyles = makeStyles({
+  band: {
+    display: "flex",
+    flexDirection: "column",
+    gap: tokens.spacingVerticalXS,
+    paddingBottom: tokens.spacingVerticalS,
+    borderBottom: `${tokens.strokeWidthThin} solid ${tokens.colorNeutralStroke2}`,
+  },
+  bandHeader: {
+    display: "flex",
+    justifyContent: "space-between",
+    alignItems: "center",
+    color: tokens.colorNeutralForeground2,
+  },
+});
+
 const maxBands = 32;
 
 export function EqualizerWidget({ module, setState }: WidgetProps<"Equalizer">) {
-  const styles = useDefaultStyles();
+  const defaultStyles = useDefaultStyles();
+  const styles = useStyles();
   const bands = module.state.bands;
   const setBand = (index: number, band: EqualizerBand) => setState({ bands: bands.with(index, band) });
 
   return (
-    <div className={styles.column}>
+    <div className={defaultStyles.column}>
       {bands.map((band, index) => (
         <div key={index} className={styles.band}>
           <div className={styles.bandHeader}>

@@ -1,11 +1,11 @@
 import { defineWidget, type Plugin } from "@micser/web-sdk";
 import { createElement } from "react";
-import { DeviceWidget } from "./widgets/DeviceWidget";
-import { SpectrumWidget } from "./widgets/SpectrumWidget";
-import { GainWidget } from "./widgets/GainWidget";
 import { CompressorWidget } from "./widgets/CompressorWidget";
+import { DeviceWidget } from "./widgets/DeviceWidget";
 import { EqualizerWidget } from "./widgets/EqualizerWidget";
+import { GainWidget } from "./widgets/GainWidget";
 import { PitchWidget } from "./widgets/PitchWidget";
+import { SpectrumWidget } from "./widgets/SpectrumWidget";
 
 export const mainPlugin: Plugin = {
   name: "Main",

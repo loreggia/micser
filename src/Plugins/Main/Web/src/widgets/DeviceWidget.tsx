@@ -59,7 +59,7 @@ export function DeviceWidget({
 
   const availableDevices = devices
     .filter((d) => d.isActive || d.id === state.deviceId)
-    .toSorted((a, b) => a.name.localeCompare(b.name));
+    .toSorted((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
 
   return (
     <div className={styles.root}>
