@@ -22,7 +22,7 @@ using Serilog.Extensions.Logging;
 // --seconds stops the measurement after that time instead of at Ctrl+C.
 // "formats" lists which stream formats <output> and <input> accept (shared mode with and without the audio engine's conversion, and
 // exclusive mode), then plays a 1 kHz tone at -20 dBFS into <output> in a few formats and measures it at <input>, e.g. the two sides of a
-// virtual cable.
+// virtual cable. Finally it plays a different tone per channel and prints where each one arrives at which level (channel maps).
 // The environment variable MICSER_BLOCK overrides the engine block size (frames) for this measurement.
 
 Log.Logger = new LoggerConfiguration().MinimumLevel.Debug().WriteTo.Console().CreateLogger();
