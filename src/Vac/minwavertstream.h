@@ -114,8 +114,9 @@ protected:
     KSPIN_LOCK                  m_PositionSpinLock;
     PCABLE                      m_pCable;
     volatile LONG               m_lCopyProtect;
-    ULONG                       m_ulCableTargetLatency;
-    ULONG                       m_ulCableMaxLatency;
+    ULONG                       m_ulCableBytesPerSample;
+    ULONG                       m_ulCableTargetLatency;     // samples
+    ULONG                       m_ulCableMaxLatency;        // samples
 
 public:
 

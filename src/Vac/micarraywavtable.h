@@ -20,7 +20,8 @@ Abstract:-
 //
 #define MICARRAY_RAW_CHANNELS                   8       // Max channels of the data range; the pin's format has the cable's channels
 #define MICARRAY_DEVICE_MAX_CHANNELS            2       // Max channels overall; set per cable
-#define MICARRAY_32_BITS_PER_SAMPLE_PCM         32      // 32-bit PCM, the same format as the render side
+#define MICARRAY_MIN_BITS_PER_SAMPLE_PCM        16      // the same sample formats as the render side
+#define MICARRAY_32_BITS_PER_SAMPLE_PCM         32
 #define MICARRAY_RAW_SAMPLE_RATE                48000   // Raw sample rate
 
 //
@@ -114,7 +115,7 @@ KSDATARANGE_AUDIO MicArrayPinDataRangesRawStream[] =
             STATICGUIDOF(KSDATAFORMAT_SPECIFIER_WAVEFORMATEX)
         },
         MICARRAY_RAW_CHANNELS,
-        MICARRAY_32_BITS_PER_SAMPLE_PCM,
+        MICARRAY_MIN_BITS_PER_SAMPLE_PCM,
         MICARRAY_32_BITS_PER_SAMPLE_PCM,
         MICARRAY_RAW_SAMPLE_RATE,
         MICARRAY_RAW_SAMPLE_RATE
