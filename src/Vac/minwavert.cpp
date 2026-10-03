@@ -179,8 +179,8 @@ Routine Description:
   The DataRangeIntersection function determines the highest quality 
   intersection of two data ranges.
 
-  Each streaming pin supports one format, which is returned if the
-  client's data range allows it.
+  Returns the streaming pin's first format (32-bit first) that the
+  client's data range allows.
 
 Arguments:
 
@@ -217,39 +217,52 @@ Arguments:
         return STATUS_NOT_IMPLEMENTED;
     }
 
-    // Each streaming pin supports exactly one format, which is the result whenever the client's range allows it. PortCls's default
-    // intersection doesn't produce float formats.
+    // The result is the pin's first format (32-bit first) that the client's range allows. PortCls's default intersection doesn't
+    // produce float formats.
     if (PinId >= m_DeviceFormatsAndModesCount || m_DeviceFormatsAndModes[PinId].WaveFormatsCount == 0)
     {
         return STATUS_NO_MATCH;
     }
 
+    KSDATAFORMAT_WAVEFORMATEXTENSIBLE* formats = NULL;
+    ULONG formatCount = GetPinSupportedDeviceFormats(PinId, &formats);
     KSDATAFORMAT_WAVEFORMATEXTENSIBLE* format = NULL;
-    GetPinSupportedDeviceFormats(PinId, &format);
 
-    if (!IsEqualGUIDAligned(ClientDataRange->MajorFormat, KSDATAFORMAT_TYPE_WILDCARD) &&
-        !IsEqualGUIDAligned(ClientDataRange->MajorFormat, format->DataFormat.MajorFormat))
+    for (ULONG i = 0; i < formatCount && format == NULL; i++)
     {
-        return STATUS_NO_MATCH;
-    }
+        KSDATAFORMAT_WAVEFORMATEXTENSIBLE* candidate = &formats[i];
 
-    if (!IsEqualGUIDAligned(ClientDataRange->SubFormat, KSDATAFORMAT_SUBTYPE_WILDCARD) &&
-        !IsEqualGUIDAligned(ClientDataRange->SubFormat, format->DataFormat.SubFormat))
-    {
-        return STATUS_NO_MATCH;
-    }
-
-    if (ClientDataRange->FormatSize >= sizeof(KSDATARANGE_AUDIO))
-    {
-        PKSDATARANGE_AUDIO clientRange = (PKSDATARANGE_AUDIO)ClientDataRange;
-        const WAVEFORMATEX& wfx = format->WaveFormatExt.Format;
-
-        if ((clientRange->MaximumChannels != (ULONG)-1 && clientRange->MaximumChannels < wfx.nChannels) ||
-            clientRange->MinimumBitsPerSample > wfx.wBitsPerSample || clientRange->MaximumBitsPerSample < wfx.wBitsPerSample ||
-            clientRange->MinimumSampleFrequency > wfx.nSamplesPerSec || clientRange->MaximumSampleFrequency < wfx.nSamplesPerSec)
+        if (!IsEqualGUIDAligned(ClientDataRange->MajorFormat, KSDATAFORMAT_TYPE_WILDCARD) &&
+            !IsEqualGUIDAligned(ClientDataRange->MajorFormat, candidate->DataFormat.MajorFormat))
         {
-            return STATUS_NO_MATCH;
+            continue;
         }
+
+        if (!IsEqualGUIDAligned(ClientDataRange->SubFormat, KSDATAFORMAT_SUBTYPE_WILDCARD) &&
+            !IsEqualGUIDAligned(ClientDataRange->SubFormat, candidate->DataFormat.SubFormat))
+        {
+            continue;
+        }
+
+        if (ClientDataRange->FormatSize >= sizeof(KSDATARANGE_AUDIO))
+        {
+            PKSDATARANGE_AUDIO clientRange = (PKSDATARANGE_AUDIO)ClientDataRange;
+            const WAVEFORMATEX& wfx = candidate->WaveFormatExt.Format;
+
+            if ((clientRange->MaximumChannels != (ULONG)-1 && clientRange->MaximumChannels < wfx.nChannels) ||
+                clientRange->MinimumBitsPerSample > wfx.wBitsPerSample || clientRange->MaximumBitsPerSample < wfx.wBitsPerSample ||
+                clientRange->MinimumSampleFrequency > wfx.nSamplesPerSec || clientRange->MaximumSampleFrequency < wfx.nSamplesPerSec)
+            {
+                continue;
+            }
+        }
+
+        format = candidate;
+    }
+
+    if (format == NULL)
+    {
+        return STATUS_NO_MATCH;
     }
 
     UNREFERENCED_PARAMETER(MyDataRange);

@@ -249,8 +249,10 @@ Return Value:
         return STATUS_INVALID_DEVICE_STATE;
     }
 
-    m_ulCableTargetLatency = m_ulDmaMovementRate / 1000 * CABLE_TARGET_LATENCY_MS;
-    m_ulCableMaxLatency = m_ulDmaMovementRate / 1000 * CABLE_MAX_LATENCY_MS;
+    // the cable counts samples; its sides can have different sample sizes
+    m_ulCableBytesPerSample = m_pWfExt->Format.wBitsPerSample / 8;
+    m_ulCableTargetLatency = m_pWfExt->Format.nSamplesPerSec / 1000 * CABLE_TARGET_LATENCY_MS * m_pWfExt->Format.nChannels;
+    m_ulCableMaxLatency = m_pWfExt->Format.nSamplesPerSec / 1000 * CABLE_MAX_LATENCY_MS * m_pWfExt->Format.nChannels;
 
     //
     // Register this stream.
@@ -1274,7 +1276,7 @@ ByteDisplacement - # of bytes to process.
     {
         ULONG runWrite = min(ByteDisplacement, m_ulDmaBufferSize - bufferOffset);
         
-        m_pCable->Read(m_pDmaBuffer + bufferOffset, runWrite, m_ulCableTargetLatency, m_ulCableMaxLatency, m_pWfExt->Format.nBlockAlign);
+        m_pCable->Read(m_pDmaBuffer + bufferOffset, runWrite, m_ulCableBytesPerSample, m_ulCableTargetLatency, m_ulCableMaxLatency, m_pWfExt->Format.nChannels);
         bufferOffset = (bufferOffset + runWrite) % m_ulDmaBufferSize;
         ByteDisplacement -= runWrite;
     }
@@ -1310,7 +1312,7 @@ ByteDisplacement - # of bytes to process.
     while (ByteDisplacement > 0)
     {
         ULONG runWrite = min(ByteDisplacement, m_ulDmaBufferSize - bufferOffset);
-        m_pCable->Write(m_pDmaBuffer + bufferOffset, runWrite);
+        m_pCable->Write(m_pDmaBuffer + bufferOffset, runWrite, m_ulCableBytesPerSample, m_pWfExt->Format.nChannels);
         bufferOffset = (bufferOffset + runWrite) % m_ulDmaBufferSize;
         ByteDisplacement -= runWrite;
     }

@@ -21,13 +21,16 @@ Abstract:
 
 #define CABLE_MAX_PINS 4
 
-// Endpoint pair of one side of a cable, created from a template pair in minipairs.h. The streaming pin's format and mode are copies with
+// 32-bit (the default, which Windows mixes into), 24 valid bits in 32, packed 24-bit and 16-bit integer, as container and valid bits
+static const USHORT CableFormatBits[][2] = { { 32, 32 }, { 32, 24 }, { 24, 24 }, { 16, 16 } };
+
+// Endpoint pair of one side of a cable, created from a template pair in minipairs.h. The streaming pin's formats and mode are copies with
 // the cable's channel layout.
 typedef struct _CABLE_ENDPOINT
 {
     ENDPOINT_MINIPAIR                   Pair;
     PIN_DEVICE_FORMATS_AND_MODES        PinFormats[CABLE_MAX_PINS];
-    KSDATAFORMAT_WAVEFORMATEXTENSIBLE   Format;
+    KSDATAFORMAT_WAVEFORMATEXTENSIBLE   Formats[ARRAYSIZE(CableFormatBits)];
     MODE_AND_DEFAULT_FORMAT             Mode;
     WCHAR                               TopoName[32];
     WCHAR                               WaveName[32];
@@ -2869,7 +2872,8 @@ CAdapterCommon::InstallCableEndpoint
 Routine Description:
 
   Installs one side of a cable. The filters' reference strings are the INF's template names plus the cable number, so the INF
-  settings of the template interfaces (EP\0 ...) apply to every cable. The streaming pin's one format gets the cable's channels.
+  settings of the template interfaces (EP\0 ...) apply to every cable. The streaming pin offers the cable's channels at 32, 24 (in 32
+  and packed) and 16 bits, with 32-bit as the default; the cable converts between its sides.
 
 --*/
 {
@@ -2895,23 +2899,29 @@ Routine Description:
             continue;
         }
 
-        // the templates have one streaming pin with one format and one mode
+        // the templates have one streaming pin with one format (copied for each bit depth) and one mode
         if (hasStreamingPin || formats->WaveFormatsCount != 1 || formats->ModeAndDefaultFormatCount != 1)
         {
             return STATUS_INVALID_PARAMETER;
         }
 
         hasStreamingPin = TRUE;
-        Endpoint->Format = formats->WaveFormats[0];
-        Endpoint->Format.WaveFormatExt.Format.nChannels = (WORD)Channels;
-        Endpoint->Format.WaveFormatExt.Format.nBlockAlign = (WORD)(Channels * Endpoint->Format.WaveFormatExt.Format.wBitsPerSample / 8);
-        Endpoint->Format.WaveFormatExt.Format.nAvgBytesPerSec =
-            Endpoint->Format.WaveFormatExt.Format.nSamplesPerSec * Endpoint->Format.WaveFormatExt.Format.nBlockAlign;
-        Endpoint->Format.WaveFormatExt.dwChannelMask = mask;
+        for (ULONG f = 0; f < ARRAYSIZE(CableFormatBits); f++)
+        {
+            WAVEFORMATEXTENSIBLE* format = &Endpoint->Formats[f].WaveFormatExt;
+            Endpoint->Formats[f] = formats->WaveFormats[0];
+            format->Format.nChannels = (WORD)Channels;
+            format->Format.wBitsPerSample = CableFormatBits[f][0];
+            format->Format.nBlockAlign = (WORD)(Channels * format->Format.wBitsPerSample / 8);
+            format->Format.nAvgBytesPerSec = format->Format.nSamplesPerSec * format->Format.nBlockAlign;
+            format->Samples.wValidBitsPerSample = CableFormatBits[f][1];
+            format->dwChannelMask = mask;
+        }
 
         Endpoint->Mode = formats->ModeAndDefaultFormat[0];
-        Endpoint->Mode.DefaultFormat = &Endpoint->Format.DataFormat;
-        formats->WaveFormats = &Endpoint->Format;
+        Endpoint->Mode.DefaultFormat = &Endpoint->Formats[0].DataFormat;
+        formats->WaveFormats = Endpoint->Formats;
+        formats->WaveFormatsCount = ARRAYSIZE(Endpoint->Formats);
         formats->ModeAndDefaultFormat = &Endpoint->Mode;
     }
 
