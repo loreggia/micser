@@ -18,8 +18,8 @@ Abstract:-
 //
 // Mic array range.
 //
-#define MICARRAY_RAW_CHANNELS                   2       // Channels for raw mode
-#define MICARRAY_DEVICE_MAX_CHANNELS            2       // Max channels overall
+#define MICARRAY_RAW_CHANNELS                   8       // Max channels of the data range; the pin's format has the cable's channels
+#define MICARRAY_DEVICE_MAX_CHANNELS            2       // Max channels overall; set per cable
 #define MICARRAY_32_BITS_PER_SAMPLE_PCM         32      // 32-bit PCM, the same format as the render side
 #define MICARRAY_RAW_SAMPLE_RATE                48000   // Raw sample rate
 

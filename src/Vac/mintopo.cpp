@@ -398,6 +398,13 @@ Return Value:
                         pMI->Count = 1;
 
                         RtlCopyMemory(pDesc, JackDescriptions[nPinId], sizeof(KSJACK_DESCRIPTION));
+
+                        // the cable's layout instead of the template's stereo mapping
+                        if (pDesc->ChannelMapping != 0 && m_MiniportPair->ChannelMask != 0)
+                        {
+                            pDesc->ChannelMapping = m_MiniportPair->ChannelMask;
+                        }
+
                         ntStatus = STATUS_SUCCESS;
                     }
                 }

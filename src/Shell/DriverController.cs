@@ -8,7 +8,14 @@ namespace Micser.Shell;
 /// <summary>
 /// What <c>Micser.DriverUtility status</c> reports (see its DriverStatus).
 /// </summary>
-internal sealed record DriverStatus(bool Installed, uint? Problem, string? InstalledVersion, string? BundledVersion, int CableCount, bool UpdateAvailable);
+internal sealed record DriverStatus(bool Installed, uint? Problem, string? InstalledVersion, string? BundledVersion, int CableCount, bool UpdateAvailable)
+{
+    public IReadOnlyList<CableStatus> Cables { get; init; } = [];
+}
+
+/// <param name="Layout">"stereo", "5.1" or "7.1".</param>
+/// <param name="FormatsMatch">Whether the cable's endpoints have its layout's format.</param>
+internal sealed record CableStatus(string Layout, bool FormatsMatch);
 
 internal enum DriverCommandResult
 {
@@ -73,27 +80,22 @@ internal sealed class DriverController
     }
 
     /// <summary>
-    /// Reads the driver status (no elevation needed).
+    /// Reads the driver status (no elevation needed). When a cable's endpoints don't have its layout's format (e.g. a layout change that
+    /// needed a reboot), sets them with <c>sync-formats</c>, which needs no elevation either.
     /// </summary>
     public async Task RefreshAsync()
     {
-        try
+        Status = await ReadStatusAsync();
+        if (Status is { Installed: true, Problem: null } && Status.Cables.Any(c => !c.FormatsMatch))
         {
-            using var process = Process.Start(new ProcessStartInfo(_utilityPath, "status")
+            Log.Information("Setting the formats of the virtual audio cables' endpoints.");
+            var (exitCode, error) = await RunUtilityAsync("sync-formats");
+            if (exitCode != ExitSuccess)
             {
-                UseShellExecute = false,
-                CreateNoWindow = true,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-            })!;
-            var output = await process.StandardOutput.ReadToEndAsync();
-            await process.WaitForExitAsync();
-            Status = JsonSerializer.Deserialize<DriverStatus>(output, StatusJson);
-        }
-        catch (Exception ex) when (ex is Win32Exception or JsonException or InvalidOperationException)
-        {
-            Log.Warning(ex, "Reading the driver status failed.");
-            Status = null;
+                Log.Warning("Setting the cables' formats failed ({ExitCode}): {Error}", exitCode, error);
+            }
+
+            Status = await ReadStatusAsync();
         }
 
         Changed?.Invoke(this, EventArgs.Empty);
@@ -102,6 +104,12 @@ internal sealed class DriverController
     public Task<DriverCommandResult> SetCableCountAsync(int cableCount)
     {
         return RunAsync("set-count", cableCount.ToString(System.Globalization.CultureInfo.InvariantCulture));
+    }
+
+    /// <param name="layout">"stereo", "5.1" or "7.1".</param>
+    public Task<DriverCommandResult> SetCableLayoutAsync(int cable, string layout)
+    {
+        return RunAsync("set-layout", cable.ToString(System.Globalization.CultureInfo.InvariantCulture), layout);
     }
 
     public Task<DriverCommandResult> UninstallAsync()
@@ -133,6 +141,47 @@ internal sealed class DriverController
         {
             IsBusy = false;
             await RefreshAsync();
+        }
+    }
+
+    private async Task<DriverStatus?> ReadStatusAsync()
+    {
+        var (exitCode, output) = await RunUtilityAsync("status", readOutput: true);
+        try
+        {
+            return exitCode == ExitSuccess ? JsonSerializer.Deserialize<DriverStatus>(output, StatusJson) : null;
+        }
+        catch (JsonException ex)
+        {
+            Log.Warning(ex, "Reading the driver status failed.");
+            return null;
+        }
+    }
+
+    /// <summary>
+    /// Runs the utility without elevation. Returns its exit code (-1 if it didn't start) and its standard output, or its standard error
+    /// unless <paramref name="readOutput"/>.
+    /// </summary>
+    private async Task<(int ExitCode, string Text)> RunUtilityAsync(string command, bool readOutput = false)
+    {
+        try
+        {
+            using var process = Process.Start(new ProcessStartInfo(_utilityPath, command)
+            {
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+            })!;
+            var output = process.StandardOutput.ReadToEndAsync();
+            var error = process.StandardError.ReadToEndAsync();
+            await process.WaitForExitAsync();
+            return (process.ExitCode, readOutput ? await output : await error);
+        }
+        catch (Exception ex) when (ex is Win32Exception or InvalidOperationException)
+        {
+            Log.Warning(ex, "Running the driver utility ({Command}) failed.", command);
+            return (-1, "");
         }
     }
 

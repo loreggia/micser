@@ -160,7 +160,8 @@ internal sealed class MainForm : Form
     /// <summary>
     /// Handles <c>{ "type": ... }</c> messages from the UI: <c>getState</c>, <c>checkForUpdates</c> (answered with an
     /// <c>updateCheck</c> message), <c>installUpdate</c>, <c>restartEngine</c>, and for the driver <c>installDriver</c> and
-    /// <c>setCableCount</c> (with <c>cableCount</c>), <c>updateDriver</c> and <c>uninstallDriver</c>. The shell answers with
+    /// <c>setCableCount</c> (with <c>cableCount</c>), <c>setCableLayout</c> (with <c>cable</c> and <c>layout</c>), <c>updateDriver</c> and
+    /// <c>uninstallDriver</c>. The shell answers with
     /// <c>state</c> messages (see <see cref="PostState"/>), also whenever the state changes.
     /// </summary>
     private async void OnWebMessageReceived(object? sender, CoreWebView2WebMessageReceivedEventArgs e)
@@ -173,11 +174,15 @@ internal sealed class MainForm : Form
 
         string? type;
         int cableCount;
+        int cable;
+        string? layout;
         try
         {
             var message = JsonDocument.Parse(e.WebMessageAsJson).RootElement;
             type = message.GetProperty("type").GetString();
             cableCount = message.TryGetProperty("cableCount", out var count) && count.TryGetInt32(out var value) ? value : 1;
+            cable = message.TryGetProperty("cable", out var cableValue) && cableValue.TryGetInt32(out var number) ? number : 0;
+            layout = message.TryGetProperty("layout", out var layoutValue) && layoutValue.ValueKind == JsonValueKind.String ? layoutValue.GetString() : null;
         }
         catch (Exception ex) when (ex is JsonException or KeyNotFoundException or InvalidOperationException)
         {
@@ -205,6 +210,9 @@ internal sealed class MainForm : Form
                 break;
             case "setCableCount" when _driver != null:
                 ShowDriverResult(await _driver.SetCableCountAsync(cableCount));
+                break;
+            case "setCableLayout" when _driver != null && cable > 0 && layout != null:
+                ShowDriverResult(await _driver.SetCableLayoutAsync(cable, layout));
                 break;
             case "updateDriver" when _driver != null:
                 ShowDriverResult(await _driver.UpdateAsync());
