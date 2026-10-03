@@ -19,6 +19,7 @@
     <Project Path="tests/Audio/Micser.Audio.Tests.csproj" />
     <Project Path="tests/DriverUtility/Micser.DriverUtility.Tests.csproj" />
     <Project Path="tests/Engine/Micser.Engine.Tests.csproj" />
+    <Project Path="tests/Engine/TestPlugin/Micser.Engine.TestPlugin.csproj" />
     <Project Path="tests/Shell/Micser.Shell.Tests.csproj" />
   </Folder>
   <Folder Name="/tests/Plugins/">

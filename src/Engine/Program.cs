@@ -5,8 +5,8 @@ using Micser.Engine.Configuration;
 using Micser.Engine.Endpoints;
 using Micser.Engine.Hubs;
 using Micser.Engine.Modules;
+using Micser.Engine.Plugins;
 using Micser.Engine.Security;
-using Micser.Plugins.Main;
 using Micser.ServiceDefaults;
 using Microsoft.AspNetCore.Http.Json;
 using Microsoft.AspNetCore.SignalR;
@@ -43,7 +43,12 @@ builder.Services.AddEngineOpenApi();
 
 builder.Services.AddSingleton<AudioDeviceService>();
 builder.Services.AddSingleton<ISystemVolume, SystemVolume>();
-builder.Services.AddMainPlugin();
+// the engine's folder also while the build-time OpenAPI generator runs it; the document only describes the built-in plugins
+var engineDirectory = Path.GetDirectoryName(typeof(EngineOptions).Assembly.Location) ?? AppContext.BaseDirectory;
+var plugins = PluginLoader.Load(builder.Services, Path.Combine(engineDirectory, engineOptions.BuiltInPluginsPath), isGeneratingDocument ? null : engineOptions.PluginsPath);
+builder.Services.AddSingleton(plugins);
+builder.Services.AddSingleton(new PluginInstaller(engineOptions.PluginsPath, plugins));
+builder.Services.AddSingleton<PluginService>();
 builder.Services.AddSingleton<ModuleCatalog>();
 builder.Services.AddSingleton<EngineConfigStore>();
 builder.Services.AddSingleton<AudioHost>();
@@ -65,6 +70,8 @@ builder.Services.AddOptions<JsonHubProtocolOptions>().Configure<ModuleCatalog>((
 
 var app = builder.Build();
 
+plugins.LogResults(app.Services.GetRequiredService<ILoggerFactory>().CreateLogger(typeof(PluginLoader)));
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -73,11 +80,12 @@ if (app.Environment.IsDevelopment())
 app.UseEngineAccess();
 app.UseDefaultFiles();
 app.UseStaticFiles();
+app.UsePluginFiles(plugins);
 app.MapEngineApi();
 app.MapHub<EngineHub>("/hubs/engine");
 
 // the web UI (copied to wwwroot on publish) handles all other paths
-app.MapFallbackToFile("{*path:nonfile:regex(^(?!api/|hubs/).*$)}", "index.html");
+app.MapFallbackToFile("{*path:nonfile:regex(^(?!api/|hubs/|plugins/).*$)}", "index.html");
 
 app.Run();
 return 0;

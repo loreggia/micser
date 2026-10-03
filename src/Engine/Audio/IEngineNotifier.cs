@@ -17,6 +17,8 @@ public interface IEngineNotifier
 
     void ModuleRemoved(Guid moduleId);
 
+    void PluginsChanged(IReadOnlyList<PluginDto> plugins);
+
     void PreferencesChanged(UiPreferencesDto preferences);
 
     void StatusChanged(EngineStatusDto status);

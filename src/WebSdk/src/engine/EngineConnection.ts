@@ -7,11 +7,13 @@ import {
   getGetEngineStatusQueryKey,
   getGetModuleQueryKey,
   getGetModulesQueryKey,
+  getGetPluginsQueryKey,
   getGetPreferencesQueryKey,
   updateModule,
   type ConnectionDto,
   type EngineStatusDto,
   type ModuleDto,
+  type PluginDto,
   type UiPreferencesDto,
 } from "../api";
 
@@ -87,6 +89,9 @@ export class EngineConnection {
     });
     this.hub.on("PreferencesChanged", (preferences: UiPreferencesDto) => {
       this.queryClient.setQueryData(getGetPreferencesQueryKey(), preferences);
+    });
+    this.hub.on("PluginsChanged", (plugins: PluginDto[]) => {
+      this.queryClient.setQueryData(getGetPluginsQueryKey(), plugins);
     });
     this.hub.on("ModuleData", (moduleId: string, data: unknown) => {
       this.dataListeners.get(moduleId)?.forEach((listener) => listener(data));

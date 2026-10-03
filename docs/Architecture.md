@@ -10,7 +10,7 @@ Target architecture for the modernization of Micser (decided 2026-09-30). `main`
 | 2 | UI | **Vite + React + TypeScript SPA** with `@xyflow/react` for the routing graph, hosted in a **thin .NET desktop shell** (tray icon + WebView2 window). | WPF + vendored Prism + Unity |
 | 3 | UI ↔ engine | **ASP.NET Core minimal APIs + SignalR on loopback** (127.0.0.1, random port, per-session token). OpenAPI spec → generated TS client. | Named pipes + MessagePack |
 | 4 | Storage | **One versioned JSON config file** (System.Text.Json) under `%AppData%\Micser`: modules, connections, module state, settings. No backwards compatibility with old data. | EF Core + SQLite (in both processes) |
-| 5 | Plugins | **Built-in modules behind a plugin-ready API.** Each plugin is one folder holding its .NET project and its widget package (`Web/`). The engine references plugins at compile time, and their widgets are bundled into the SPA. No runtime DLL/JS loading yet. | Runtime-scanned WPF-dependent plugin assemblies |
+| 5 | Plugins | **Runtime-loaded plugins** (see [Plugins](#plugins)). Each plugin is one folder holding its .NET project and its widget package (`Web/`). The engine loads plugin assemblies from a plugins folder at startup, each in its own `AssemblyLoadContext`, and the SPA imports their widget bundles (ES modules) from the engine. The built-in Main plugin is loaded the same way. Plugins are installed and removed from the UI and take effect when the engine restarts. | Runtime-scanned WPF-dependent plugin assemblies |
 | 6 | Audio model | **Block-based graph with one engine clock and per-connection channel layouts** (see [Audio engine](#audio-engine)). Audio I/O uses **NAudio** (WASAPI). | Per-sample push via CSCore |
 | 7 | Layout | **`src/` = everything that ships, grouped by component** with short area names (the PowerToys/aspnetcore style; see below), plus `tests/` mirroring `src/` and `tools/` for dev-only programs. One `Micser.slnx`, repo-wide `Directory.Build.props`, `Directory.Packages.props` and `global.json`, and a root `package.json` with npm workspaces replacing yalc. | Everything under `src/` |
 | 8 | Packaging | **Velopack** (see [Packaging and updates](#packaging-and-updates)): a per-user install without admin rights, with delta updates from GitHub releases. The old WixSharp installer was removed; it's in git history. | WixSharp/WiX 3 + custom `HttpUpdateService` |
@@ -25,7 +25,7 @@ Target architecture for the modernization of Micser (decided 2026-09-30). `main`
 - **Tests:** TUnit and NSubstitute. xUnit and Moq are dropped.
 - **Engine host:** `Microsoft.NET.Sdk.Web` (Kestrel). It serves the built SPA as static files (roadmap step 4). In development, Vite runs separately and proxies `/api` and `/hubs` to the engine, which then listens on the fixed address `http://127.0.0.1:5080` without requiring the token. `AllowedHosts` is limited to `localhost;127.0.0.1` against DNS rebinding.
 - **Shell:** WinForms (native `NotifyIcon`) with the WebView2 WinForms control. It has no app logic, so WPF isn't needed.
-- **Web tooling:** npm workspaces consume the internal packages (`@micser/web-sdk`, `@micser/plugin-main`) as TypeScript source, so they need no build step of their own. TypeScript is pinned to `~6.0` because `typescript-eslint` doesn't support 7.x yet.
+- **Web tooling:** npm workspaces consume the internal packages (`@micser/web-sdk`, `@micser/plugin-main`) as TypeScript source. Only the SPA and the plugins' widget bundles are built (`npm run build` builds every workspace with a `build` script). TypeScript is pinned to `~6.0` because `typescript-eslint` doesn't support 7.x yet.
 - **Engine discovery and security:** see [Engine](#engine).
 - **Autostart:** an `HKCU\...\Run` entry for the shell. The shell launches the engine if it isn't running (see [Shell](#shell)).
 - **UI libraries:** Fluent UI React v9 (light/dark following the OS), TanStack Query for engine state, Orval for the API client (see [UI](#ui)).
@@ -44,10 +44,11 @@ src/
   Audio/                      Micser.Audio: graph, module/processor abstractions, NAudio device I/O
   Engine/                     Micser.Engine: host, HTTP API, SignalR hubs, config store, lifecycle
   Plugins/
-    Main/                     Micser.Plugins.Main: built-in modules
+    Main/                     Micser.Plugins.Main: built-in modules, loaded at runtime like any plugin
+      plugin.json               the plugin's manifest
       Modules/                  device in/out, loopback, gain, compressor, EQ, pitch, spectrum
       Dsp/                      DSP helpers not covered by NAudio
-      Web/                      @micser/plugin-main: widgets for these modules
+      Web/                      @micser/plugin-main: widgets for these modules, built to Web/dist
   Web/                        @micser/web: Vite + React SPA (graph editor, pages)
   WebSdk/                     @micser/web-sdk: widget contract, shared controls, API client, types
   Shell/                      Micser.Shell: tray + WebView2 window, engine launcher; no app logic
@@ -57,6 +58,7 @@ src/
 tests/                        mirrors src/
   Audio/                      Micser.Audio.Tests
   Engine/                     Micser.Engine.Tests
+    TestPlugin/                 a plugin for the plugin loader tests
   Plugins/Main/               Micser.Plugins.Main.Tests
 tools/                        dev-only programs, in Micser.slnx but never shipped
   AppHost/                    Micser.AppHost: Aspire AppHost that runs engine, Vite and (on demand) shell with a dashboard
@@ -65,13 +67,13 @@ eng/                          scripts: pack.ps1 (Velopack release), build-vac.ps
 docs/
 ```
 
-**Plugin layout.** A plugin is one folder containing both halves: the .NET project and its `Web/` npm package. Adding or changing a module touches one folder, and the folder is already the unit that runtime-loaded plugins will ship as later. Widget tests sit next to the widgets (`*.test.tsx`).
+**Plugin layout.** A plugin is one folder containing both halves: the .NET project (with its `plugin.json`) and its `Web/` npm package. Adding or changing a module touches one folder. Widget tests sit next to the widgets (`*.test.tsx`).
 
 **Module contract.** The engine exposes module definitions (type name, input/output connectors, state schema) through the API. Widgets are registered by module type name and read connectors from the definition instead of hard-coding them. This avoids the name drift seen on `dev` (`Output` vs. `Output01`).
 
 **Dependencies** go one way:
-- .NET: `Plugins.Main → Audio`, `Engine → Audio, Plugins.Main, ServiceDefaults`, and `Shell → nothing` (it talks to the engine only over HTTP). `DriverUtility` is standalone.
-- npm: `plugin-main → web-sdk`, and `web → web-sdk, plugin-main`.
+- .NET: `Plugins.Main → Audio`, `Engine → Audio, ServiceDefaults`, and `Shell → nothing` (it talks to the engine only over HTTP). `DriverUtility` is standalone. The engine has a build-only reference to `Plugins.Main` (`ReferenceOutputAssembly="false"`) that copies it to `plugins/Main` without compiling against it.
+- npm: `plugin-main → web-sdk`, and `web → web-sdk`. The SPA loads plugin widgets at runtime.
 
 ## Audio engine
 
@@ -105,7 +107,7 @@ docs/
 ## Engine
 
 - **Plugin API.**
-  - Plugins register module types with `services.AddAudioModule<TModule, TState>("Type")`.
+  - A plugin assembly has exactly one public `IAudioPlugin` (in `Micser.Audio`), whose `ConfigureServices` registers module types with `services.AddAudioModule<TModule, TState>("Type")`.
   - Every module implements `IStatefulModule<TState>`. `TState` is an immutable record with data annotations, and each module type has its own.
   - Modules raise `StateChanged` when they change their own state (e.g. a device module switching ports), so the engine persists and broadcasts it.
   - Modules with live data (spectrum, device stream statistics) implement `IModuleDataSource`.
@@ -113,18 +115,18 @@ docs/
   - It carries the id, name, UI position, volume, mute, bypass (effects only) and the typed `state`.
   - The API, SignalR and the config file all use the same schema. OpenAPI shows it as `anyOf` with a discriminator mapping, so a generated TS client narrows `state` by `type`.
 - **API** (`/api`, see `src/Engine/Endpoints/ApiEndpoints.cs`):
-  - `health`, `module-types` (ports and default state), `modules` (create with defaults, full update with `PUT`, delete), `connections`, `devices`, `engine` (status, start, stop, restart-audio, settings, shutdown), and `preferences`.
+  - `health`, `module-types` (ports and default state), `modules` (create with defaults, full update with `PUT`, delete), `connections`, `devices`, `engine` (status, start, stop, restart-audio, settings, shutdown), `plugins` (list, install a zip package, remove; see [Plugins](#plugins)), and `preferences`.
   - `engine/restart-audio` rebuilds the graph with the current settings, which reopens all device streams with fresh buffers.
   - `preferences` are the web UI's preferences (stream statistics, grid snapping). They live in the engine's configuration because the UI's origin (the engine's random port) changes on every start, so browser storage would lose them. Changes are pushed as `PreferencesChanged`.
   - Errors are problem details: 400 with `errors` keyed by camelCase property path (e.g. `state.bands[1].frequency`), 404, and 409 for cycles and duplicates.
 - **Hub** (`/hubs/engine`):
-  - Pushes `ModuleChanged`, `ModuleRemoved`, `ConnectionAdded`, `ConnectionRemoved`, `DevicesChanged` and `StatusChanged` to all clients, in the order they happened.
+  - Pushes `ModuleChanged`, `ModuleRemoved`, `ConnectionAdded`, `ConnectionRemoved`, `DevicesChanged`, `PluginsChanged`, `PreferencesChanged` and `StatusChanged` to all clients, in the order they happened.
   - `Subscribe(moduleId)` / `Unsubscribe(moduleId)` start and stop `ModuleData` pushes (20 per second) for modules with live data.
   - `SubscribeLevels()` / `UnsubscribeLevels()` start and stop `Levels` pushes (20 per second): the levels of all processed modules in one message (`PortLevelsDto` per port, linear amplitude). Hub payloads aren't in the OpenAPI document, so the web SDK declares `PortLevels` itself.
 - **Configuration** (`%AppData%\Micser\config.json`, `Engine:ConfigPath`):
   - It's versioned, with saves debounced (500 ms) and written atomically.
   - An unreadable file is moved to `config.json.<timestamp>.bak`, and the engine starts empty.
-  - Modules of unknown type, invalid modules and dangling connections are skipped when loading.
+  - Modules of unknown type (their plugin isn't loaded) are kept in the file as they are, with their connections, but stay out of the graph and the API; they come back with their plugin. Invalid modules and dangling connections are skipped.
   - Changing the engine settings rebuilds the graph.
 - **Discovery and security:**
   - The engine binds to `127.0.0.1` with a random port and writes `{ url, token, processId }` to `%LocalAppData%\Micser\engine.json` (`Engine:DiscoveryPath`). That folder is private to the user. The file is deleted on a clean shutdown; after a crash it stays, so readers must check that the process is alive.
@@ -143,7 +145,8 @@ docs/
   - Module updates (`useModuleUpdate`) show immediately and go to the engine debounced (80 ms, last value wins). Engine echoes are ignored while an update is pending, so controls don't jump back.
   - `useModuleData(moduleId)` subscribes to live data (spectrum, stream statistics).
 - **Widgets:**
-  - Plugins export `defineWidget({ moduleType, title, component })` from their `Web` package. The component receives the typed module (`WidgetProps<"Gain">`) and a `setState` function.
+  - A plugin's `Web` package default-exports `definePlugin({ name, widgets })` with `defineWidget({ moduleType, title, component })` entries. The component receives the typed module (`WidgetProps<"Gain">`) and a `setState` function. Module types of plugins outside this repository aren't in the generated API types.
+  - `PluginsProvider` imports the widget bundles of the loaded plugins (`webUrl` from `GET /api/plugins`) before the graph is shown. A bundle that fails to load shows a notification, and its modules render without a widget.
   - The graph node around it is generic: title, mute, bypass (if `supportsBypass`), remove, volume, a level meter, and connectors from the engine's module type. Modules without a widget still work.
   - Double-clicking the title renames the module (Enter or leaving the field saves, Escape cancels, an empty name goes back to the type's title). A named module shows the type's title below its name.
   - The level meter (`useModuleLevels`) is studio-style, per channel on a -60..0 dBFS scale: the RMS as a solid bar, the peak as a lighter bar behind it (instant rise, falling at 20 dB/s), and the highest peak as a marker held for 30 updates (about 1.5 s) that turns red at full scale. While a module isn't processed, its meter stays at zero with its last channel count, so the node doesn't change height.
@@ -157,15 +160,34 @@ docs/
   - Node cards don't clip their content, so the ports on their edges are whole and fully clickable.
 - **Toolbar and settings:**
   - A split button restarts the audio (`engine/restart-audio`); its menu also restarts the engine process when running in the shell.
-  - The settings dialog has the audio settings (applied together, which rebuilds the graph), the display preferences (applied right away), and, in the shell, the version with "Check for updates".
+  - The settings dialog has the audio settings (applied together, which rebuilds the graph), the display preferences (applied right away), the plugins (install from a .zip, remove, and "Restart engine to apply" in the shell), and, in the shell, the version with "Check for updates".
   - When the shell has downloaded an update, the toolbar shows an "Update to x.y.z" button.
 - **Shell bridge** (`src/Web/src/shell.ts`): inside the shell's WebView2, the UI exchanges web messages with the shell (`chrome.webview`). In a plain browser it's absent, and the shell-only controls are hidden.
 - **Access token:**
   - The SPA reads `#token=...` once, keeps it in `sessionStorage` and removes it from the address. The shell will open `{url}/#token={token}` from the discovery file.
   - In development, Vite proxies to the engine, which doesn't require a token.
 - **Production:**
-  - `dotnet publish src/Engine` copies `src/Web/dist` into `wwwroot`, so run `npm run build` first.
-  - The engine serves the SPA and falls back to `index.html` for client routes, but not for `/api`, `/hubs` or files.
+  - `dotnet publish src/Engine` copies `src/Web/dist` into `wwwroot` and the built-in plugins' `Web/dist` into `plugins/<id>/web`, so run `npm run build` first.
+  - The engine serves the SPA and falls back to `index.html` for client routes, but not for `/api`, `/hubs`, `/plugins` or files.
+
+## Plugins
+
+- **Package.** A plugin is a folder named by its id, which is also the root of its zip package:
+  - `plugin.json`: `{ "id", "name", "version", "assembly", "web" }`. `assembly` is a file name in the folder; `web` (optional) is the widget bundle's entry, e.g. `web/index.js`.
+  - The assembly with its private dependencies and `.deps.json`, and the widget bundle.
+- **Locations.** Built-in plugins are in the engine's `plugins` folder (`Engine:BuiltInPluginsPath`): shipped with the app and replaced by updates. User plugins are in `%LocalAppData%\Micser\plugins` (`Engine:PluginsPath`): kept across updates and removed on uninstall. A user plugin can't replace a built-in one; a duplicate id fails to load.
+- **Loading** (`PluginLoader`, before the host is built):
+  - Each plugin gets a non-collectible `PluginLoadContext`. Assemblies the engine has (its trusted platform assemblies: Micser.Audio, NAudio, Microsoft.Extensions.*, the framework) come from the default context, so plugins share the contract types. Everything else resolves from the plugin folder through its `.deps.json`. Plugin projects reference `Micser.Audio` with `Private="false"`, so it isn't copied.
+  - `ConfigureServices` runs against a separate service collection that's copied over only if it succeeds, so a failing plugin registers nothing. Failures are listed with their error (`GET /api/plugins`, the log), and the engine starts without the plugin.
+  - Plugins are fully trusted, in-process code; the install section in the UI says so. A plugin can't be unloaded, so changes take an engine restart.
+  - The build-time OpenAPI document only includes the built-in plugins, so the generated client knows Main's module types.
+- **Install and remove** (`PluginInstaller`): a loaded plugin's files are in use. So `POST /api/plugins` (multipart `package`, up to 100 MB) validates the zip and extracts it to `.pending/<id>` in the user plugin folder, and `DELETE /api/plugins/{id}` writes `.pending/<id>.remove` (or cancels a staged install). The next start applies them before loading. Changes are pushed as `PluginsChanged`.
+- **Widget bundles.**
+  - The engine serves each loaded plugin's widget folder at `/plugins/<id>/...` without the token (the browser imports them as modules) and with `Cache-Control: no-cache`. The browser loads a module URL once per page, so a changed bundle needs a reload.
+  - A bundle is an ES module built in Vite library mode (`definePluginBuild()` from `@micser/web-sdk/vite`). It keeps the shared modules external: `react`, `react/jsx-runtime`, `@fluentui/react-components`, `@tanstack/react-query` and `@micser/web-sdk`. So plugins use the UI's React, theme, query cache and engine connection. Everything else, e.g. icons, is bundled.
+  - The SPA's build (`src/Web/vite/sharedModules.ts`) adds one entry chunk per shared module that re-exports the UI's instance, and an import map in `index.html` that maps the module names to these chunks. Fluent UI is therefore shipped whole instead of tree-shaken (about 1.2 MB instead of 0.5 MB minified), which is fine for a UI served locally.
+  - In development, the import map points to modules served by Vite. The dev server serves the widget bundles of this repository's plugins (`src/Plugins/*/plugin.json`) from their source (`src/Web/vite/workspacePlugins.ts`), so they get hot reloading; other plugins' bundles are proxied to the engine.
+- **Build.** `src/Engine/BuiltInPlugins.targets` copies project references marked `OutputItemType="BuiltInPlugin"` (with `PluginId`) to `plugins/<id>` of the build and publish output, plus their `Web/dist` as `web/`. The engine tests import it too and also reference Main directly; the loader then shares the referenced assembly.
 
 ## Shell
 
@@ -277,4 +299,6 @@ The plan (signing, installation, phases) is in the [driver plan](https://claude.
    - Phase 2 (done): up to 16 cables from the device's hardware key, reload by device restart, endpoint names per cable, Driver Verifier and CodeQL clean, `src/Driver` removed. Verified in the VM with 3 cables: audio through each cable without missed bursts (cables 1 and 3 also under Driver Verifier), nothing from cable 2 on cable 1, count changes by device restart, and install, restart and removal (driver unload) under Driver Verifier without findings.
    - Phase 3 (done): `DriverUtility status | install | update | set-count | uninstall` (Native AOT exe, SetupAPI; copies itself and the package to `%ProgramFiles%\Micser\Driver` with an "Apps and Features" entry, logs to `%ProgramData%\Micser\logs`). The shell runs it elevated with the engine paused (`EngineSupervisor.RunWithoutEngineAsync`), reads its status at start (tray notice for a newer bundled driver), and the settings dialog has a "Virtual audio cables" section. `eng/pack.ps1 -DriverPackage <dir>` bundles the driver in the release's `driver` folder. Verified in the VM: install, count changes and uninstall through the UI, and an update from 1.0.0.0 to 1.0.1.0.
    - Phase 4: EV certificate, attestation signing and code signing of the Velopack output.
-8. **Later:** runtime-loaded plugins.
+8. **Runtime-loaded plugins** (done, see [Plugins](#plugins)): the plugin loader, Main loaded from `plugins/Main`, widget bundles sharing modules through an import map, install and removal from the UI, and modules of missing plugins kept in the configuration.
+   - Verified with a published engine in Edge: Main's widgets from its bundle, with edits reaching the engine; a zip plugin with its own module and widget (a Fluent badge in the UI's theme) installed through the settings dialog and loaded after a restart; its removal, which kept its module in the configuration; and the dev server serving Main from source.
+   - Follow-ups: published SDK packages (NuGet for `Micser.Audio`, npm for `@micser/web-sdk`), TypeScript types for other plugins' module states, and version compatibility checks between plugins and the engine.

@@ -21,6 +21,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { useNotifyError } from "../notifications";
 import { shell, useShellState, type UpdateCheckResult } from "../shell";
+import { PluginsSettings } from "./PluginsSettings";
 import { VirtualCablesSettings } from "./VirtualCablesSettings";
 
 const sampleRates = [44100, 48000, 96000];
@@ -56,8 +57,8 @@ export interface EngineSettingsDialogProps {
 }
 
 /**
- * Audio settings (applied with Apply, which rebuilds the graph), display preferences (applied right away), and, when running in the
- * desktop shell, the version, updates and virtual audio cables.
+ * Audio settings (applied with Apply, which rebuilds the graph), display preferences (applied right away), plugins (applied when the
+ * engine restarts), and, when running in the desktop shell, the version, updates and virtual audio cables.
  */
 export function EngineSettingsDialog({ open, settings, onClose }: EngineSettingsDialogProps) {
   const styles = useStyles();
@@ -128,6 +129,8 @@ export function EngineSettingsDialog({ open, settings, onClose }: EngineSettings
               checked={preferences.snapToGrid}
               onChange={(_, data) => setPreferences({ snapToGrid: data.checked })}
             />
+            <Divider />
+            <PluginsSettings />
             {shellState?.canUpdate && (
               <>
                 <Divider />

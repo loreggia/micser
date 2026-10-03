@@ -22,7 +22,11 @@ export interface WidgetProps<T extends ModuleType = ModuleType> {
  */
 export interface WidgetDefinition {
   component: ComponentType<WidgetProps>;
-  moduleType: ModuleType;
+
+  /**
+   * The engine's module type name. Module types of plugins outside this repository aren't in the generated API types.
+   */
+  moduleType: string;
 
   /**
    * The display name of the module type, e.g. in the "add module" menu.
@@ -39,9 +43,22 @@ export function defineWidget<T extends ModuleType>(definition: {
 }
 
 /**
- * The UI half of a plugin: the widgets for the modules the plugin's .NET project provides.
+ * The UI half of a plugin: the widgets for the modules the plugin's .NET project provides. A plugin's widget bundle default-exports it
+ * (`export default definePlugin({ ... })`); the UI loads the bundle from the URL the engine reports.
  */
 export interface Plugin {
   name: string;
   widgets: WidgetDefinition[];
+}
+
+export function definePlugin(plugin: Plugin): Plugin {
+  return plugin;
+}
+
+/**
+ * Whether a widget bundle's default export is a {@link Plugin}.
+ */
+export function isPlugin(value: unknown): value is Plugin {
+  const plugin = value as Partial<Plugin> | undefined;
+  return typeof plugin?.name === "string" && Array.isArray(plugin.widgets);
 }

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using Micser.Engine.Plugins;
 
 namespace Micser.Engine.Contracts;
 
@@ -36,3 +37,13 @@ public sealed record PortLevelsDto(string? Port, float[] Peak, float[] Rms);
 /// <param name="ShowStreamStatistics">Whether device widgets show dropouts and the buffer size.</param>
 /// <param name="SnapToGrid">Whether modules snap to the grid when moved.</param>
 public sealed record UiPreferencesDto(bool ShowStreamStatistics = false, bool SnapToGrid = true);
+
+/// <summary>
+/// A plugin: loaded at the engine's start, failed to load, or staged for installation.
+/// </summary>
+/// <param name="Name">Null if the plugin's manifest can't be read.</param>
+/// <param name="IsBuiltIn">Whether the plugin ships with the engine; built-in plugins can't be removed.</param>
+/// <param name="Error">Why the plugin isn't loaded; null if it's loaded or only staged.</param>
+/// <param name="WebUrl">The URL of the plugin's widget bundle (an ES module), if it's loaded and has widgets.</param>
+/// <param name="PendingChange">A change that's applied when the engine restarts.</param>
+public sealed record PluginDto(string Id, string? Name, string? Version, bool IsBuiltIn, bool IsLoaded, string? Error, string? WebUrl, PluginChange PendingChange);

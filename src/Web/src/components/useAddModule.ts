@@ -2,7 +2,7 @@ import { getCreateModuleMutationOptions, useGetModuleTypes, type ModuleDto, type
 import { useMutation } from "@tanstack/react-query";
 import { useReactFlow, type XYPosition } from "@xyflow/react";
 import { useNotifyError } from "../notifications";
-import { widgets } from "../plugins";
+import { usePluginWidgets } from "../plugins";
 
 /**
  * Returns a function that adds a module of a type, at a graph position or near the center of the visible graph, and resolves to the new
@@ -37,6 +37,7 @@ export function useAddModule() {
  */
 export function useModuleTypeChoices(): (ModuleTypeDto & { title: string })[] {
   const { data: moduleTypes = [] } = useGetModuleTypes();
+  const { widgets } = usePluginWidgets();
   return moduleTypes
     .map((type) => ({ ...type, title: widgets.get(type.type)?.title ?? type.type }))
     .sort((a, b) => a.title.localeCompare(b.title));

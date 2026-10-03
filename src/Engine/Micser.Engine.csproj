@@ -20,7 +20,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Audio\Micser.Audio.csproj" />
-    <ProjectReference Include="..\Plugins\Main\Micser.Plugins.Main.csproj" />
+    <ProjectReference Include="..\Plugins\Main\Micser.Plugins.Main.csproj" ReferenceOutputAssembly="false" OutputItemType="BuiltInPlugin" PluginId="Main" />
     <ProjectReference Include="..\ServiceDefaults\Micser.ServiceDefaults.csproj" />
   </ItemGroup>
 
@@ -36,5 +36,7 @@
     </ItemGroup>
     <Copy SourceFiles="@(WebUiFile)" DestinationFiles="@(WebUiFile->'$(PublishDir)wwwroot\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
   </Target>
+
+  <Import Project="BuiltInPlugins.targets" />
 
 </Project>

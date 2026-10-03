@@ -63,12 +63,13 @@ public class ConfigurationTests
     }
 
     [Test]
-    public async Task Configuration_SkipsUnknownModulesAndTheirConnections()
+    public async Task Configuration_KeepsUnknownModulesAndTheirConnectionsOutOfTheGraph()
     {
         var directory = EngineFactory.CreateTemporaryDirectory();
         Directory.CreateDirectory(directory);
         var known = Guid.NewGuid();
         var unknown = Guid.NewGuid();
+        var connection = Guid.NewGuid();
         await File.WriteAllTextAsync(Path.Combine(directory, "config.json"), $$"""
             {
               "version": 1,
@@ -77,20 +78,32 @@ public class ConfigurationTests
                 { "type": "Gain", "id": "{{known}}", "state": { "gain": 3 } }
               ],
               "connections": [
-                { "id": "{{Guid.NewGuid()}}", "sourceModuleId": "{{unknown}}", "sourcePort": "Output", "targetModuleId": "{{known}}", "targetPort": "Input" }
+                { "id": "{{connection}}", "sourceModuleId": "{{unknown}}", "sourcePort": "Output", "targetModuleId": "{{known}}", "targetPort": "Input" }
               ]
             }
             """);
         try
         {
-            await using var factory = new EngineFactory(directory);
-            using var client = factory.CreateAuthorizedClient();
+            await using (var factory = new EngineFactory(directory))
+            {
+                using var client = factory.CreateAuthorizedClient();
 
-            var modules = await client.GetFromJsonAsync<ModuleDto[]>("/api/modules", factory.Json);
-            var connections = await client.GetFromJsonAsync<ConnectionDto[]>("/api/connections");
+                var modules = await client.GetFromJsonAsync<ModuleDto[]>("/api/modules", factory.Json);
+                var connections = await client.GetFromJsonAsync<ConnectionDto[]>("/api/connections");
 
-            await Assert.That(modules!.Select(m => m.Id)).IsEquivalentTo([known]);
-            await Assert.That(connections).IsEmpty();
+                await Assert.That(modules!.Select(m => m.Id)).IsEquivalentTo([known]);
+                await Assert.That(connections).IsEmpty();
+
+                // saves the configuration
+                var gain = (ModuleDto<GainState>)modules![0];
+                (await client.PutAsJsonAsync<ModuleDto>($"/api/modules/{known}", gain with { State = new GainState(-3f) }, factory.Json)).EnsureSuccessStatusCode();
+            }
+
+            var saved = System.Text.Json.Nodes.JsonNode.Parse(await File.ReadAllTextAsync(Path.Combine(directory, "config.json")))!;
+            var savedModules = saved["modules"]!.AsArray();
+
+            await Assert.That(savedModules.Select(m => (string)m!["type"]!)).IsEquivalentTo(["Gain", "Removed"]);
+            await Assert.That(saved["connections"]!.AsArray().Select(c => (string)c!["id"]!)).IsEquivalentTo([connection.ToString()]);
         }
         finally
         {
