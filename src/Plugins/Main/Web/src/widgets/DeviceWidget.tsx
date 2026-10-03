@@ -57,6 +57,10 @@ export function DeviceWidget({
     selected?.name ??
     (state.deviceId ? `Unavailable${state.adapterName ? ` (${state.adapterName})` : ""}` : "No device");
 
+  const availableDevices = devices
+    .filter((d) => d.isActive || d.id === state.deviceId)
+    .toSorted((a, b) => a.name.localeCompare(b.name));
+
   return (
     <div className={styles.root}>
       <Dropdown
@@ -75,7 +79,7 @@ export function DeviceWidget({
         }}
       >
         <Option value={none}>No device</Option>
-        {devices.map((device) => (
+        {availableDevices.map((device) => (
           <Option key={device.id} value={device.id} disabled={!device.isActive}>
             {device.isActive ? device.name : `${device.name} (unavailable)`}
           </Option>
