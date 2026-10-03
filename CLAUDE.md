@@ -28,7 +28,7 @@ dotnet run --project src/Shell -- --ui http://localhost:5173   # tray + WebView2
 dotnet run --project tools/AudioHarness -- list                    # audio devices
 dotnet run --project tools/AudioHarness -- 1 2 --gain -100         # input 1 -> gain -> output 2, prints buffer stats
 dotnet run --project tools/AudioHarness -- latency 2               # round-trip latency of output 2 via loopback (plays -40 dB noise bursts)
-dotnet run --project tools/AudioHarness -- formats 2 1             # formats output 2 and input 1 accept, then a -20 dB 1 kHz tone from 2 to 1 (run in the VM)
+dotnet run --project tools/AudioHarness -- formats 2 1             # formats output 2 and input 1 accept, then -20 dB tones from 2 to 1, per channel too (run in the VM)
 ```
 
 ```sh

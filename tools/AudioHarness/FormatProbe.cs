@@ -8,6 +8,7 @@ namespace Micser.AudioHarness;
 /// <summary>
 /// Checks which stream formats a render and a capture endpoint accept, in shared mode with and without the audio engine's format conversion
 /// and in exclusive mode, and sends a 1 kHz tone from the render to the capture endpoint (e.g. through a virtual cable) in a few format pairs.
+/// Then it plays a different tone per channel and shows where each one arrives, between the mix formats and stereo, 5.1 and the mix formats.
 /// </summary>
 internal static class FormatProbe
 {
@@ -48,6 +49,62 @@ internal static class FormatProbe
         Transfer(render, Pcm(48000, 32, 2), AudioClientShareMode.Exclusive, capture, Pcm(48000, 32, 2), AudioClientShareMode.Exclusive);
         Transfer(render, Pcm(48000, 32, 2), AudioClientShareMode.Exclusive, capture, Pcm(16000, 16, 1), AudioClientShareMode.Shared);
         Transfer(render, Pcm(44100, 16, 2), AudioClientShareMode.Exclusive, capture, Float(48000, 2), AudioClientShareMode.Shared);
+        Console.WriteLine();
+
+        WaveFormat renderMix;
+        WaveFormat captureMix;
+        using (var client = render.CreateAudioClient())
+        {
+            renderMix = client.MixFormat;
+        }
+
+        using (var client = capture.CreateAudioClient())
+        {
+            captureMix = client.MixFormat;
+        }
+
+        (WaveFormat Render, WaveFormat Capture)[] maps =
+        [
+            (renderMix, captureMix),
+            (Float(48000, 2), Float(48000, 2)),
+            (Float(48000, 6), captureMix),
+            (Float(48000, 2), captureMix),
+            (renderMix, Float(48000, 2)),
+        ];
+
+        // on a stereo endpoint several of them are the same
+        foreach (var (renderFormat, captureFormat) in maps.DistinctBy(m => (Describe(m.Render), Describe(m.Capture))))
+        {
+            ChannelMap(render, renderFormat, capture, captureFormat);
+        }
+    }
+
+    /// <summary>
+    /// Plays a different tone on each channel (500 Hz on channel 1, 700 Hz on channel 2, ...) and shows, per captured channel, the level of
+    /// each tone.
+    /// </summary>
+    private static void ChannelMap(MMDevice render, WaveFormat renderFormat, MMDevice capture, WaveFormat captureFormat)
+    {
+        static double Frequency(int channel) => 500 + 200 * channel;
+
+        Console.WriteLine($"Channel map, {Describe(renderFormat)} shared -> {Describe(captureFormat)} shared (dBFS RMS of each render channel's tone; -23 = unchanged):");
+        using var renderClient = Initialize(render, renderFormat, AudioClientShareMode.Shared, ConvertFlags);
+        using var captureClient = Initialize(capture, captureFormat, AudioClientShareMode.Shared, ConvertFlags);
+        var captured = Stream(renderClient, renderFormat, captureClient, captureFormat, Frequency);
+
+        Console.WriteLine("  " + "captured".PadRight(10) + string.Concat(Enumerable.Range(0, renderFormat.Channels).Select(c => $"out {c + 1} ({Frequency(c)} Hz)".PadLeft(18))));
+        for (var channel = 0; channel < captureFormat.Channels; channel++)
+        {
+            var samples = captured[channel].Skip(captureFormat.SampleRate / 2).ToArray();
+            var levels = Enumerable.Range(0, renderFormat.Channels).Select(c =>
+            {
+                var power = samples.Length > 0 ? TonePower(samples, captureFormat.SampleRate, Frequency(c)) : 0;
+                return power > 1e-9 ? $"{10 * Math.Log10(power),18:0.0}" : "-".PadLeft(18);
+            });
+            Console.WriteLine("  " + $"in {channel + 1}".PadRight(10) + string.Concat(levels));
+        }
+
+        Console.WriteLine();
     }
 
     private static string Describe(WaveFormat format)
@@ -195,7 +252,7 @@ internal static class FormatProbe
 
             using (captureClient)
             {
-                var captured = Stream(renderClient, renderFormat, captureClient, captureFormat);
+                var captured = Stream(renderClient, renderFormat, captureClient, captureFormat, _ => ToneFrequency)[0];
                 var skip = captureFormat.SampleRate / 2;
                 if (captured.Count <= skip)
                 {
@@ -206,7 +263,7 @@ internal static class FormatProbe
                 var samples = captured.Skip(skip).ToArray();
                 var power = samples.Average(s => s * s);
                 var rmsDb = power > 0 ? 10 * Math.Log10(power) : double.NegativeInfinity;
-                var tonePower = TonePower(samples, captureFormat.SampleRate);
+                var tonePower = TonePower(samples, captureFormat.SampleRate, ToneFrequency);
                 var crossings = samples.Skip(1).Where((sample, i) => samples[i] < 0 && sample >= 0).Count();
                 var frequency = crossings * (double)captureFormat.SampleRate / samples.Length;
                 Console.WriteLine($"{label}: level {rmsDb,6:0.0} dBFS RMS, tone {(power > 0 ? tonePower / power * 100 : 0),5:0.0}% of the signal, " +
@@ -215,12 +272,12 @@ internal static class FormatProbe
         }
     }
 
-    private static List<double> Stream(AudioClient renderClient, WaveFormat renderFormat, AudioClient captureClient, WaveFormat captureFormat)
+    private static List<double>[] Stream(AudioClient renderClient, WaveFormat renderFormat, AudioClient captureClient, WaveFormat captureFormat, Func<int, double> frequency)
     {
         var renderOut = renderClient.AudioRenderClient;
         var captureIn = captureClient.AudioCaptureClient;
         var renderBufferFrames = renderClient.BufferSize;
-        var captured = new List<double>();
+        var captured = Enumerable.Range(0, captureFormat.Channels).Select(_ => new List<double>()).ToArray();
         long renderedFrames = 0;
 
         // Sleep(2) takes about 15 ms at the default timer resolution
@@ -236,9 +293,9 @@ internal static class FormatProbe
                 var bytes = new byte[free * renderFormat.BlockAlign];
                 for (var frame = 0; frame < free; frame++)
                 {
-                    var value = ToneAmplitude * Math.Sin(2 * Math.PI * ToneFrequency * (renderedFrames + frame) / renderFormat.SampleRate);
                     for (var channel = 0; channel < renderFormat.Channels; channel++)
                     {
+                        var value = ToneAmplitude * Math.Sin(2 * Math.PI * frequency(channel) * (renderedFrames + frame) / renderFormat.SampleRate);
                         WriteSample(bytes, frame * renderFormat.BlockAlign + channel * renderFormat.BitsPerSample / 8, renderFormat, value);
                     }
                 }
@@ -256,7 +313,11 @@ internal static class FormatProbe
                 captureIn.ReleaseBuffer(frames);
                 for (var frame = 0; frame < frames; frame++)
                 {
-                    captured.Add(flags.HasFlag(AudioClientBufferFlags.Silent) ? 0 : ReadSample(bytes, frame * captureFormat.BlockAlign, captureFormat));
+                    for (var channel = 0; channel < captureFormat.Channels; channel++)
+                    {
+                        var offset = frame * captureFormat.BlockAlign + channel * captureFormat.BitsPerSample / 8;
+                        captured[channel].Add(flags.HasFlag(AudioClientBufferFlags.Silent) ? 0 : ReadSample(bytes, offset, captureFormat));
+                    }
                 }
             }
 
@@ -270,11 +331,11 @@ internal static class FormatProbe
     }
 
     /// <summary>
-    /// The power of the 1 kHz component (Goertzel), comparable to the mean square of the signal.
+    /// The power of one frequency component (Goertzel), comparable to the mean square of the signal.
     /// </summary>
-    private static double TonePower(double[] samples, int sampleRate)
+    private static double TonePower(double[] samples, int sampleRate, double frequency)
     {
-        var coefficient = 2 * Math.Cos(2 * Math.PI * ToneFrequency / sampleRate);
+        var coefficient = 2 * Math.Cos(2 * Math.PI * frequency / sampleRate);
         double s1 = 0, s2 = 0;
         foreach (var sample in samples)
         {
