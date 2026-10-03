@@ -11,6 +11,7 @@ using Serilog.Extensions.Logging;
 //   Micser.AudioHarness list
 //   Micser.AudioHarness <input> <output> [--gain <dB>] [--loopback]
 //   Micser.AudioHarness latency <output> [<input>] [--seconds <n>]
+//   Micser.AudioHarness formats <output> <input>
 //
 // <input>/<output> are a device number from "list", a device ID, part of a device name or "default". With --loopback, <input> is an output
 // device whose playback is captured.
@@ -19,6 +20,9 @@ using Serilog.Extensions.Logging;
 // the same device and prints the round trip: render buffering + capture buffering, without any hardware latency.
 // With <input>, it captures from that input instead, e.g. the output side of a virtual cable whose input is <output>.
 // --seconds stops the measurement after that time instead of at Ctrl+C.
+// "formats" lists which stream formats <output> and <input> accept (shared mode with and without the audio engine's conversion, and
+// exclusive mode), then plays a 1 kHz tone at -20 dBFS into <output> in a few formats and measures it at <input>, e.g. the two sides of a
+// virtual cable.
 // The environment variable MICSER_BLOCK overrides the engine block size (frames) for this measurement.
 
 Log.Logger = new LoggerConfiguration().MinimumLevel.Debug().WriteTo.Console().CreateLogger();
@@ -52,6 +56,20 @@ if (args[0] == "latency")
 
     var positional = secondsIndex < 0 ? args : args.Where((_, i) => i != secondsIndex && i != secondsIndex + 1).ToArray();
     return await MeasureLatencyAsync(positional.Length > 1 ? positional[1] : "default", positional.Length > 2 ? positional[2] : null);
+}
+
+if (args[0] == "formats")
+{
+    var render = ResolveDevice(args.Length > 1 ? args[1] : "default", DeviceDirection.Output, outputs);
+    var capture = ResolveDevice(args.Length > 2 ? args[2] : "default", DeviceDirection.Input, inputs);
+    if (render == null || capture == null)
+    {
+        Console.Error.WriteLine("Unknown device. Run with \"list\" to see the available devices.");
+        return 1;
+    }
+
+    FormatProbe.Run(render.Id, capture.Id);
+    return 0;
 }
 
 var loopback = args.Contains("--loopback");
