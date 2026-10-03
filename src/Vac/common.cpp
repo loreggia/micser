@@ -19,13 +19,19 @@ Abstract:
 #include "endpoints.h"
 #include "minipairs.h"
 
-// Endpoint pair of one side of a cable, created from a template pair in minipairs.h.
+#define CABLE_MAX_PINS 4
+
+// Endpoint pair of one side of a cable, created from a template pair in minipairs.h. The streaming pin's format and mode are copies with
+// the cable's channel layout.
 typedef struct _CABLE_ENDPOINT
 {
-    ENDPOINT_MINIPAIR   Pair;
-    WCHAR               TopoName[32];
-    WCHAR               WaveName[32];
-    WCHAR               EndpointName[32];
+    ENDPOINT_MINIPAIR                   Pair;
+    PIN_DEVICE_FORMATS_AND_MODES        PinFormats[CABLE_MAX_PINS];
+    KSDATAFORMAT_WAVEFORMATEXTENSIBLE   Format;
+    MODE_AND_DEFAULT_FORMAT             Mode;
+    WCHAR                               TopoName[32];
+    WCHAR                               WaveName[32];
+    WCHAR                               EndpointName[32];
 } CABLE_ENDPOINT, *PCABLE_ENDPOINT;
 
 //=============================================================================
@@ -255,10 +261,13 @@ class CAdapterCommon :
             _In_        PWSTR               TopoTemplateName,
             _In_        PWSTR               WaveTemplateName,
             _In_        PCWSTR              EndpointNameFormat,
+            _In_        ULONG               Channels,
             _Out_       PCABLE_ENDPOINT     Endpoint
         );
 
+        ULONG ReadCableChannels(_In_ ULONG CableIndex);
         ULONG ReadCableCount();
+        ULONG ReadDeviceValue(_In_ PCWSTR Name, _In_ ULONG Default);
 
     public:
 
@@ -2823,16 +2832,17 @@ Routine Description:
 
     for (ULONG i = 0; i < cableCount; i++)
     {
-        ntStatus = m_Cables[i].Init(CABLE_BUFFER_SIZE);
+        ULONG channels = ReadCableChannels(i);
+        ntStatus = m_Cables[i].Init(channels > 2 ? CABLE_SURROUND_BUFFER_SIZE : CABLE_BUFFER_SIZE);
         IF_FAILED_JUMP(ntStatus, Done);
 
         m_CableCount = i + 1;
 
         // Apps play into the render endpoint ("Input" of the cable) and record from the capture endpoint ("Output").
-        ntStatus = InstallCableEndpoint(Irp, i, &SpeakerMiniports, L"TopologyRender", L"WaveRender", L"Cable %u Input", &m_CableEndpoints[i * 2]);
+        ntStatus = InstallCableEndpoint(Irp, i, &SpeakerMiniports, L"TopologyRender", L"WaveRender", L"Cable %u Input", channels, &m_CableEndpoints[i * 2]);
         IF_FAILED_JUMP(ntStatus, Done);
 
-        ntStatus = InstallCableEndpoint(Irp, i, &MicArray1Miniports, L"TopologyCapture", L"WaveCapture", L"Cable %u Output", &m_CableEndpoints[i * 2 + 1]);
+        ntStatus = InstallCableEndpoint(Irp, i, &MicArray1Miniports, L"TopologyCapture", L"WaveCapture", L"Cable %u Output", channels, &m_CableEndpoints[i * 2 + 1]);
         IF_FAILED_JUMP(ntStatus, Done);
     }
 
@@ -2851,6 +2861,7 @@ CAdapterCommon::InstallCableEndpoint
     _In_        PWSTR               TopoTemplateName,
     _In_        PWSTR               WaveTemplateName,
     _In_        PCWSTR              EndpointNameFormat,
+    _In_        ULONG               Channels,
     _Out_       PCABLE_ENDPOINT     Endpoint
 )
 /*++
@@ -2858,15 +2869,55 @@ CAdapterCommon::InstallCableEndpoint
 Routine Description:
 
   Installs one side of a cable. The filters' reference strings are the INF's template names plus the cable number, so the INF
-  settings of the template interfaces (EP\0 ...) apply to every cable.
+  settings of the template interfaces (EP\0 ...) apply to every cable. The streaming pin's one format gets the cable's channels.
 
 --*/
 {
     PAGED_CODE();
 
     NTSTATUS ntStatus;
+    ULONG mask = CableChannelMask(Channels);
+    BOOLEAN hasStreamingPin = FALSE;
+
+    if (Template->PinDeviceFormatsAndModesCount > ARRAYSIZE(Endpoint->PinFormats))
+    {
+        return STATUS_INVALID_PARAMETER;
+    }
 
     RtlCopyMemory(&Endpoint->Pair, Template, sizeof(ENDPOINT_MINIPAIR));
+    RtlCopyMemory(Endpoint->PinFormats, Template->PinDeviceFormatsAndModes, Template->PinDeviceFormatsAndModesCount * sizeof(PIN_DEVICE_FORMATS_AND_MODES));
+
+    for (ULONG pin = 0; pin < Template->PinDeviceFormatsAndModesCount; pin++)
+    {
+        PPIN_DEVICE_FORMATS_AND_MODES formats = &Endpoint->PinFormats[pin];
+        if (formats->WaveFormatsCount == 0)
+        {
+            continue;
+        }
+
+        // the templates have one streaming pin with one format and one mode
+        if (hasStreamingPin || formats->WaveFormatsCount != 1 || formats->ModeAndDefaultFormatCount != 1)
+        {
+            return STATUS_INVALID_PARAMETER;
+        }
+
+        hasStreamingPin = TRUE;
+        Endpoint->Format = formats->WaveFormats[0];
+        Endpoint->Format.WaveFormatExt.Format.nChannels = (WORD)Channels;
+        Endpoint->Format.WaveFormatExt.Format.nBlockAlign = (WORD)(Channels * Endpoint->Format.WaveFormatExt.Format.wBitsPerSample / 8);
+        Endpoint->Format.WaveFormatExt.Format.nAvgBytesPerSec =
+            Endpoint->Format.WaveFormatExt.Format.nSamplesPerSec * Endpoint->Format.WaveFormatExt.Format.nBlockAlign;
+        Endpoint->Format.WaveFormatExt.dwChannelMask = mask;
+
+        Endpoint->Mode = formats->ModeAndDefaultFormat[0];
+        Endpoint->Mode.DefaultFormat = &Endpoint->Format.DataFormat;
+        formats->WaveFormats = &Endpoint->Format;
+        formats->ModeAndDefaultFormat = &Endpoint->Mode;
+    }
+
+    Endpoint->Pair.PinDeviceFormatsAndModes = Endpoint->PinFormats;
+    Endpoint->Pair.DeviceMaxChannels = (USHORT)Channels;
+    Endpoint->Pair.ChannelMask = mask;
 
     ntStatus = RtlStringCchPrintfW(Endpoint->TopoName, ARRAYSIZE(Endpoint->TopoName), L"%s%u", TopoTemplateName, CableIndex + 1);
     IF_FAILED_JUMP(ntStatus, Done);
@@ -2894,6 +2945,33 @@ Done:
 //=============================================================================
 #pragma code_seg("PAGE")
 ULONG
+CAdapterCommon::ReadCableChannels
+(
+    _In_        ULONG               CableIndex
+)
+/*++
+
+Routine Description:
+
+  Reads a cable's channel count from the device's hardware key, which DriverUtility writes. Stereo unless it's 6 or 8.
+
+--*/
+{
+    PAGED_CODE();
+
+    WCHAR name[32];
+    if (!NT_SUCCESS(RtlStringCchPrintfW(name, ARRAYSIZE(name), CABLE_CHANNELS_VALUE, CableIndex + 1)))
+    {
+        return 2;
+    }
+
+    ULONG channels = ReadDeviceValue(name, 2);
+    return channels == 6 || channels == 8 ? channels : 2;
+}
+
+//=============================================================================
+#pragma code_seg("PAGE")
+ULONG
 CAdapterCommon::ReadCableCount()
 /*++
 
@@ -2905,7 +2983,28 @@ Routine Description:
 {
     PAGED_CODE();
 
-    ULONG count = 1;
+    return MIN(MAX(ReadDeviceValue(CABLE_COUNT_VALUE, 1), 1), MAX_CABLES);
+}
+
+//=============================================================================
+#pragma code_seg("PAGE")
+ULONG
+CAdapterCommon::ReadDeviceValue
+(
+    _In_        PCWSTR              Name,
+    _In_        ULONG               Default
+)
+/*++
+
+Routine Description:
+
+  Reads a DWORD from the device's hardware key ("Device Parameters"), or returns Default.
+
+--*/
+{
+    PAGED_CODE();
+
+    ULONG value = Default;
     HANDLE key = NULL;
 
     if (NT_SUCCESS(IoOpenDeviceRegistryKey(m_pPhysicalDeviceObject, PLUGPLAY_REGKEY_DEVICE, KEY_READ, &key)))
@@ -2913,17 +3012,17 @@ Routine Description:
         RTL_QUERY_REGISTRY_TABLE table[2];
         RtlZeroMemory(table, sizeof(table));
         table[0].Flags = RTL_QUERY_REGISTRY_DIRECT | RTL_QUERY_REGISTRY_TYPECHECK;
-        table[0].Name = const_cast<PWSTR>(CABLE_COUNT_VALUE);
-        table[0].EntryContext = &count;
+        table[0].Name = const_cast<PWSTR>(Name);
+        table[0].EntryContext = &value;
         table[0].DefaultType = (REG_DWORD << RTL_QUERY_REGISTRY_TYPECHECK_SHIFT) | REG_DWORD;
-        table[0].DefaultData = &count;
-        table[0].DefaultLength = sizeof(count);
+        table[0].DefaultData = &value;
+        table[0].DefaultLength = sizeof(value);
 
         RtlQueryRegistryValues(RTL_REGISTRY_HANDLE, (PCWSTR)key, table, NULL, NULL);
         ZwClose(key);
     }
 
-    return MIN(MAX(count, 1), MAX_CABLES);
+    return value;
 }
 
 //=============================================================================

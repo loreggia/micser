@@ -90,6 +90,7 @@ CI (`.github/workflows/ci.yml`) runs the dotnet build/test, the driver build and
 - Driver code (`src/Vac`, see "VAC driver" in `docs/Architecture.md`):
   - It isn't in `Micser.slnx`; build it with `eng/build-vac.ps1`. Its `Directory.Build.props` replaces the root one.
   - Code that runs at DISPATCH_LEVEL (stream position updates, `CCable`) stays in `#pragma code_seg()` and touches only nonpaged memory.
+  - Cable settings (`CableCount`, `Cable<N>Channels`) live in the device's hardware key and apply at the next device start. A change to a cable's format also needs the endpoints' stored device format set again (`DriverUtility`, `CableEndpoints`).
   - Keep the INX ASCII: as UTF-16 without BOM, inf2cat didn't recognize the stamped INF.
   - Test it in the VM, never on the dev machine.
 - The old WaveCyclic driver (`src/Driver`) and the WixSharp installer (driver install custom actions) are in git history before their removal.

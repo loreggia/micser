@@ -1,17 +1,26 @@
 import {
   Button,
   Caption1,
+  Dropdown,
   Field,
+  Option,
   SpinButton,
   Spinner,
   Subtitle2,
+  Text,
   makeStyles,
   tokens,
 } from "@fluentui/react-components";
 import { useState } from "react";
-import { shell, type DriverState } from "../shell";
+import { shell, type CableLayout, type DriverState } from "../shell";
 
 const maxCables = 16;
+
+const layoutNames: Record<CableLayout, string> = {
+  stereo: "Stereo",
+  "5.1": "5.1 surround",
+  "7.1": "7.1 surround",
+};
 
 const useStyles = makeStyles({
   row: {
@@ -22,6 +31,16 @@ const useStyles = makeStyles({
   },
   count: {
     width: "120px",
+  },
+  layouts: {
+    display: "grid",
+    gridTemplateColumns: "auto 160px minmax(0, 1fr)",
+    alignItems: "center",
+    columnGap: tokens.spacingHorizontalM,
+    rowGap: tokens.spacingVerticalXS,
+  },
+  layout: {
+    minWidth: "160px",
   },
   hint: {
     color: tokens.colorNeutralForeground3,
@@ -39,6 +58,46 @@ export interface VirtualCablesSettingsProps {
  * Installs, updates and removes the virtual audio cable driver and sets the number of cables, through the desktop shell. Each change
  * asks for administrator rights and stops the audio engine meanwhile.
  */
+function CableLayoutRow({
+  number,
+  layout,
+  formatsMatch,
+}: {
+  number: number;
+  layout: CableLayout;
+  formatsMatch: boolean;
+}) {
+  const styles = useStyles();
+
+  return (
+    <>
+      <Text>Cable {number}</Text>
+      <Dropdown
+        className={styles.layout}
+        aria-label={`Channel layout of cable ${number}`}
+        value={layoutNames[layout]}
+        selectedOptions={[layout]}
+        onOptionSelect={(_, data) => {
+          if (data.optionValue && data.optionValue !== layout) {
+            shell?.setCableLayout(number, data.optionValue as CableLayout);
+          }
+        }}
+      >
+        {(Object.keys(layoutNames) as CableLayout[]).map((value) => (
+          <Option key={value} value={value}>
+            {layoutNames[value]}
+          </Option>
+        ))}
+      </Dropdown>
+      {formatsMatch ? (
+        <span />
+      ) : (
+        <Caption1 className={styles.warning}>Not applied yet; restart Windows if it asked for it.</Caption1>
+      )}
+    </>
+  );
+}
+
 export function VirtualCablesSettings({ driver }: VirtualCablesSettingsProps) {
   const styles = useStyles();
   const status = driver.status;
@@ -109,6 +168,24 @@ export function VirtualCablesSettings({ driver }: VirtualCablesSettingsProps) {
               Uninstall
             </Button>
           </div>
+          {status.cables.length > 0 && (
+            <>
+              <div className={styles.layouts}>
+                {status.cables.map((cable, index) => (
+                  <CableLayoutRow
+                    key={index}
+                    number={index + 1}
+                    layout={cable.layout}
+                    formatsMatch={cable.formatsMatch}
+                  />
+                ))}
+              </div>
+              <Caption1 className={styles.hint}>
+                Surround cables pass all channels to Micser. Apps that record a surround cable in stereo get Windows'
+                downmix, which is much quieter, so use stereo for cables that such apps record.
+              </Caption1>
+            </>
+          )}
         </>
       )}
     </>

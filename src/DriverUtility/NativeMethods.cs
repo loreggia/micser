@@ -35,6 +35,11 @@ internal static unsafe partial class NativeMethods
     public static readonly DEVPROPKEY DriverInfPathKey = new(new Guid("a8b865dd-2e3d-4094-ad97-e593a70c75d6"), 5);
 
     /// <summary>
+    /// DEVPKEY_Device_InstanceId, e.g. ROOT\MEDIA\0000.
+    /// </summary>
+    public static readonly DEVPROPKEY InstanceIdKey = new(new Guid("78c34fc8-104a-4aca-9ea4-524d52996e57"), 256);
+
+    /// <summary>
     /// DEVPKEY_Device_DriverVersion
     /// </summary>
     public static readonly DEVPROPKEY DriverVersionKey = new(new Guid("a8b865dd-2e3d-4094-ad97-e593a70c75d6"), 3);

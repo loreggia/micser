@@ -14,12 +14,13 @@ Abstract:
 #ifndef _MICSERVAC_SPEAKERWAVTABLE_H_
 #define _MICSERVAC_SPEAKERWAVTABLE_H_
 
-// The capture side copies render data byte for byte, so both sides support only 48 kHz, 32-bit PCM, stereo.
-// Windows doesn't accept float as the device format of these pins (the endpoints stay "not present").
+// The capture side copies render data byte for byte, so both sides support only 48 kHz, 32-bit PCM, in the cable's channel layout
+// (stereo here; CAdapterCommon::InstallCableEndpoint sets it per cable). Windows doesn't accept float as the device format of these pins
+// (the endpoints stay "not present").
 
-#define SPEAKER_DEVICE_MAX_CHANNELS                 2       // Max Channels.
+#define SPEAKER_DEVICE_MAX_CHANNELS                 2       // Max Channels; set per cable.
 
-#define SPEAKER_HOST_MAX_CHANNELS                   2       // Max Channels.
+#define SPEAKER_HOST_MAX_CHANNELS                   8       // Max Channels of the data range; the pin's format has the cable's channels.
 #define SPEAKER_HOST_MIN_BITS_PER_SAMPLE            32      // Min Bits Per Sample
 #define SPEAKER_HOST_MAX_BITS_PER_SAMPLE            32      // Max Bits Per Sample
 #define SPEAKER_HOST_MIN_SAMPLE_RATE                48000   // Min Sample Rate

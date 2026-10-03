@@ -13,6 +13,7 @@ namespace Micser.DriverUtility;
 internal sealed unsafe class VacDevice : IDisposable
 {
     public const string CableCountValue = "CableCount";
+    public const string CableLayoutValueFormat = "Cable{0}Channels";
     public const string HardwareId = @"ROOT\MicserVac";
     public const int MaxCableCount = 16;
 
@@ -153,15 +154,23 @@ internal sealed unsafe class VacDevice : IDisposable
 
     public int GetCableCount()
     {
-        var key = SetupDiOpenDevRegKey(_deviceInfoSet, ref _deviceInfoData, DICS_FLAG_GLOBAL, 0, DIREG_DEV, KEY_READ);
-        if (key == InvalidHandle)
-        {
-            return 1;
-        }
+        return ReadValue(CableCountValue) is int count ? Math.Clamp(count, 1, MaxCableCount) : 1;
+    }
 
-        using var handle = new SafeRegistryHandle(key, true);
-        using var registryKey = RegistryKey.FromHandle(handle);
-        return registryKey.GetValue(CableCountValue) is int count ? Math.Clamp(count, 1, MaxCableCount) : 1;
+    /// <summary>
+    /// The layout of each cable (index 0 is cable 1), as the driver reads it when the device starts.
+    /// </summary>
+    public IReadOnlyList<CableLayout> GetCableLayouts()
+    {
+        return [.. Enumerable.Range(1, GetCableCount()).Select(cable => CableLayouts.FromChannels(ReadValue(GetCableLayoutValue(cable))))];
+    }
+
+    /// <summary>
+    /// The device instance ID, e.g. ROOT\MEDIA\0000; the cables' audio endpoints refer to it.
+    /// </summary>
+    public string GetInstanceId()
+    {
+        return GetStringProperty(InstanceIdKey) ?? throw new InvalidOperationException("The device has no instance ID.");
     }
 
     /// <summary>
@@ -216,6 +225,27 @@ internal sealed unsafe class VacDevice : IDisposable
         WriteCableCount(key, count);
     }
 
+    /// <summary>
+    /// Sets a cable's layout, which the driver reads when the device starts. The value stays when the cable count goes down.
+    /// </summary>
+    public void SetCableLayout(int cable, CableLayout layout)
+    {
+        var key = SetupDiOpenDevRegKey(_deviceInfoSet, ref _deviceInfoData, DICS_FLAG_GLOBAL, 0, DIREG_DEV, KEY_SET_VALUE);
+        if (key == InvalidHandle)
+        {
+            throw LastError(nameof(SetupDiOpenDevRegKey));
+        }
+
+        using var handle = new SafeRegistryHandle(key, true);
+        using var registryKey = RegistryKey.FromHandle(handle);
+        registryKey.SetValue(GetCableLayoutValue(cable), (int)layout, RegistryValueKind.DWord);
+    }
+
+    private static string GetCableLayoutValue(int cable)
+    {
+        return string.Format(System.Globalization.CultureInfo.InvariantCulture, CableLayoutValueFormat, cable);
+    }
+
     private static void ForEach(Action<VacDevice> action, out nint deviceInfoSet)
     {
         deviceInfoSet = SetupDiGetClassDevs(0, "ROOT", 0, DIGCF_ALLCLASSES);
@@ -246,6 +276,19 @@ internal sealed unsafe class VacDevice : IDisposable
         using var handle = new SafeRegistryHandle(key, true);
         using var registryKey = RegistryKey.FromHandle(handle);
         registryKey.SetValue(CableCountValue, Math.Clamp(count, 1, MaxCableCount), RegistryValueKind.DWord);
+    }
+
+    private object? ReadValue(string name)
+    {
+        var key = SetupDiOpenDevRegKey(_deviceInfoSet, ref _deviceInfoData, DICS_FLAG_GLOBAL, 0, DIREG_DEV, KEY_READ);
+        if (key == InvalidHandle)
+        {
+            return null;
+        }
+
+        using var handle = new SafeRegistryHandle(key, true);
+        using var registryKey = RegistryKey.FromHandle(handle);
+        return registryKey.GetValue(name);
     }
 
     private string? GetStringProperty(in DEVPROPKEY propertyKey)

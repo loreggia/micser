@@ -230,9 +230,11 @@ typedef struct _ENDPOINT_MINIPAIR
     // General endpoint flags (one of more ENDPOINT_<flag-type>, see above)
     ULONG                           DeviceFlags;
 
-    // Cable this endpoint belongs to and the endpoint's name (KSPROPERTY_PIN_NAME of the topology bridge pin).
+    // Cable this endpoint belongs to, the endpoint's name (KSPROPERTY_PIN_NAME of the topology bridge pin) and the cable's channel mask
+    // (the jack's channel mapping).
     ULONG                           CableIndex;
     PCWSTR                          EndpointName;
+    ULONG                           ChannelMask;
 } ENDPOINT_MINIPAIR;
 
 //=============================================================================

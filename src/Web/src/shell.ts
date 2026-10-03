@@ -1,5 +1,14 @@
 import { useSyncExternalStore } from "react";
 
+/** A cable's channel layout; both sides of the cable use it. */
+export type CableLayout = "stereo" | "5.1" | "7.1";
+
+export interface CableStatus {
+  layout: CableLayout;
+  /** Whether Windows has set the cable's endpoints to the layout's format (the shell fixes them when it reads the status). */
+  formatsMatch: boolean;
+}
+
 /** The virtual audio cable driver, as Micser.DriverUtility reports it. */
 export interface DriverStatus {
   installed: boolean;
@@ -10,6 +19,8 @@ export interface DriverStatus {
   bundledVersion: string | null;
   cableCount: number;
   updateAvailable: boolean;
+  /** The cables in order (cable 1 first); empty while the driver isn't installed. */
+  cables: CableStatus[];
 }
 
 export interface DriverState {
@@ -89,6 +100,11 @@ class Shell {
 
   setCableCount(cableCount: number) {
     this.webView.postMessage({ type: "setCableCount", cableCount });
+  }
+
+  /** Changes a cable's layout (cable 1 is the first); like the other driver changes, it restarts the cables. */
+  setCableLayout(cable: number, layout: CableLayout) {
+    this.webView.postMessage({ type: "setCableLayout", cable, layout });
   }
 
   updateDriver() {
