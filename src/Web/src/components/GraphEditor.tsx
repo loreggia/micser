@@ -28,7 +28,7 @@ import {
 import "@xyflow/react/dist/style.css";
 import { useEffect, useMemo, useState } from "react";
 import { useNotifyError } from "../notifications";
-import { widgets } from "../plugins";
+import { usePluginWidgets } from "../plugins";
 import { ModuleNode, type ModuleNodeType } from "./ModuleNode";
 import { useAddModule, useModuleTypeChoices } from "./useAddModule";
 
@@ -73,6 +73,7 @@ export function GraphEditor() {
   const { data: connections } = useGetConnections();
   const { data: moduleTypes } = useGetModuleTypes();
   const moduleTypeChoices = useModuleTypeChoices();
+  const { widgets, isLoading: isLoadingWidgets } = usePluginWidgets();
   const [preferences] = usePreferences();
   const [nodes, setNodes, onNodesChange] = useNodesState<ModuleNodeType>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
@@ -113,7 +114,7 @@ export function GraphEditor() {
           : { id: module.id, type: "module" as const, position, data };
       })
     );
-  }, [modules, typesByName, setNodes]);
+  }, [modules, typesByName, widgets, setNodes]);
 
   useEffect(() => {
     if (!connections) {
@@ -132,7 +133,7 @@ export function GraphEditor() {
     );
   }, [connections, setEdges]);
 
-  if (!modules || !connections || !moduleTypes) {
+  if (!modules || !connections || !moduleTypes || isLoadingWidgets) {
     return (
       <div className={styles.loading}>
         <Spinner label="Connecting to the engine" />

@@ -33,6 +33,11 @@ internal sealed class EngineFactory : WebApplicationFactory<Program>
 
     public string Directory { get; }
 
+    /// <summary>
+    /// The user plugin folder. The built-in Main plugin comes from the test's output folder.
+    /// </summary>
+    public string PluginsPath => Path.Combine(Directory, "plugins");
+
     public JsonSerializerOptions Json => EngineJson.CreateOptions(Services.GetRequiredService<ModuleCatalog>());
 
     /// <summary>
@@ -79,7 +84,14 @@ internal sealed class EngineFactory : WebApplicationFactory<Program>
         await base.DisposeAsync();
         if (_ownsDirectory)
         {
-            System.IO.Directory.Delete(Directory, recursive: true);
+            try
+            {
+                System.IO.Directory.Delete(Directory, recursive: true);
+            }
+            catch (UnauthorizedAccessException)
+            {
+                // loaded user plugin assemblies stay locked until the process exits
+            }
         }
     }
 
@@ -88,6 +100,7 @@ internal sealed class EngineFactory : WebApplicationFactory<Program>
         builder.UseEnvironment("Testing");
         builder.UseSetting("Engine:ConfigPath", ConfigPath);
         builder.UseSetting("Engine:DiscoveryPath", Path.Combine(Directory, "engine.json"));
+        builder.UseSetting("Engine:PluginsPath", PluginsPath);
         builder.UseSetting("Engine:SingleInstance", "false");
         builder.UseSetting("Engine:RequireToken", "true");
         builder.ConfigureTestServices(services => services.AddSingleton<ISystemVolume>(SystemVolume));

@@ -14,7 +14,7 @@ dotnet test --solution Micser.slnx                      # TUnit on Microsoft.Tes
 dotnet test --project tests/Engine/Micser.Engine.Tests.csproj --treenode-filter "/*/*/HealthEndpointTests/*"
 
 npm install                  # root; installs all workspaces
-npm run build                # typecheck + vite build of src/Web
+npm run build                # typecheck + vite build of src/Web and the plugins' widget bundles (src/Plugins/*/Web/dist)
 npm run typecheck            # tsc in every workspace
 npm run lint                 # eslint (flat config at the root)
 npm run format:check         # prettier; .prettierignore limits it to the web workspaces
@@ -52,7 +52,8 @@ CI (`.github/workflows/ci.yml`) runs the dotnet build/test, the driver build and
 ## Layout and conventions
 
 - `src/` holds everything that ships, grouped by area with short folder names, e.g. `src/Audio/Micser.Audio.csproj`. `tests/` mirrors `src/`, e.g. `tests/Engine/Micser.Engine.Tests.csproj`. `tools/` holds dev-only programs.
-- A plugin is one folder containing both halves: `src/Plugins/Main/Micser.Plugins.Main.csproj` plus its widget package `src/Plugins/Main/Web` (`@micser/plugin-main`). `Directory.Build.props` excludes `Web/**` and `node_modules/**` from .NET item globs.
+- A plugin is one folder containing both halves: `src/Plugins/Main/Micser.Plugins.Main.csproj` with its `plugin.json`, plus its widget package `src/Plugins/Main/Web` (`@micser/plugin-main`). `Directory.Build.props` excludes `Web/**` and `node_modules/**` from .NET item globs.
+- Plugins are loaded at runtime (see "Plugins" in `docs/Architecture.md`), Main included: nothing in `src/` compiles against a plugin. A plugin assembly has one public `IAudioPlugin`; its project references `Micser.Audio` with `Private="false"`. Its widget package default-exports `definePlugin({ ... })` and builds with `definePluginBuild()` from `@micser/web-sdk/vite`; the modules shared with the UI (`sharedModules` there) must stay in sync with what plugins may import from the host.
 - npm workspaces (root `package.json`): `src/Web` (Vite SPA), `src/WebSdk` (widget contract and shared code), `src/Plugins/*/Web`. The internal packages export TypeScript source (`"exports": "./src/index.ts"`) and have no build step.
 - Widgets are matched to engine modules by module type name. Connector names come from the engine's module definitions, never hard-coded in widgets.
 - Web UI (see "UI" in `docs/Architecture.md`):
@@ -63,8 +64,8 @@ CI (`.github/workflows/ci.yml`) runs the dotnet build/test, the driver build and
   - UI preferences are stored by the engine (`/api/preferences`, `usePreferences`), not in browser storage: the UI's origin changes with the engine's random port.
   - The UI talks to the desktop shell through WebView2 web messages (`src/Web/src/shell.ts` ↔ `MainForm`); shell-only controls are hidden in a plain browser.
 - Dependency direction:
-  - .NET: `Plugins → Audio` and `Engine → Audio, Plugins, ServiceDefaults`. `tools/AppHost` references the runnable projects. `Shell` references no Micser project and talks to the engine over HTTP only.
-  - npm: `plugin-* → web-sdk` and `web → web-sdk, plugin-*`.
+  - .NET: `Plugins → Audio` and `Engine → Audio, ServiceDefaults`. The engine's reference to a built-in plugin is build-only (`ReferenceOutputAssembly="false"`, `OutputItemType="BuiltInPlugin"`), which copies it to `plugins/<id>` (`src/Engine/BuiltInPlugins.targets`). `tools/AppHost` references the runnable projects. `Shell` references no Micser project and talks to the engine over HTTP only.
+  - npm: `plugin-* → web-sdk` and `web → web-sdk`. The SPA imports plugin widgets at runtime from the URLs the engine reports.
 - Package versions are central in `Directory.Packages.props`, so `PackageReference` items carry no `Version`. `TreatWarningsAsErrors` is on for all projects.
 - Libraries:
   - Serilog via `Microsoft.Extensions.Logging` (configured from `appsettings*.json`; the file sink is only enabled in Production).
@@ -84,7 +85,7 @@ CI (`.github/workflows/ci.yml`) runs the dotnet build/test, the driver build and
 - Engine code (`src/Engine`, see "Engine" in `docs/Architecture.md`):
   - A new module type needs its own state record (data annotations on the record's parameters, as in ASP.NET Core), `IStatefulModule<TState>`, and a registration in its plugin's `Add…Plugin()`. The engine, API, config file and OpenAPI pick it up from there.
   - `AudioHost` is the single entry point for graph changes. It persists and broadcasts every change, and throws `EngineRequestException` for problem responses.
-  - Engine tests use `EngineFactory` (temp config directory, token required) with a real audio engine and no devices selected.
+  - Engine tests use `EngineFactory` (temp config and user plugin directory, token required) with a real audio engine and no devices selected. Main is loaded from `plugins/Main` in the test output; `tests/Engine/TestPlugin` is a plugin for the loader tests that the tests don't reference.
 - Driver code (`src/Vac`, see "VAC driver" in `docs/Architecture.md`):
   - It isn't in `Micser.slnx`; build it with `eng/build-vac.ps1`. Its `Directory.Build.props` replaces the root one.
   - Code that runs at DISPATCH_LEVEL (stream position updates, `CCable`) stays in `#pragma code_seg()` and touches only nonpaged memory.

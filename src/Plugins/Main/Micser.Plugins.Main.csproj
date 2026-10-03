@@ -5,7 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Audio\Micser.Audio.csproj" />
+    <!-- the engine provides Micser.Audio; the plugin folder only holds the plugin's own files -->
+    <ProjectReference Include="..\..\Audio\Micser.Audio.csproj" Private="false" />
   </ItemGroup>
 
   <ItemGroup>

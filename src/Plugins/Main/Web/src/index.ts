@@ -1,4 +1,4 @@
-import { defineWidget, type Plugin } from "@micser/web-sdk";
+import { definePlugin, defineWidget } from "@micser/web-sdk";
 import { createElement } from "react";
 import { CompressorWidget } from "./widgets/CompressorWidget";
 import { DeviceWidget } from "./widgets/DeviceWidget";
@@ -7,7 +7,7 @@ import { GainWidget } from "./widgets/GainWidget";
 import { PitchWidget } from "./widgets/PitchWidget";
 import { SpectrumWidget } from "./widgets/SpectrumWidget";
 
-export const mainPlugin: Plugin = {
+export default definePlugin({
   name: "Main",
   widgets: [
     defineWidget({
@@ -31,4 +31,4 @@ export const mainPlugin: Plugin = {
     defineWidget({ moduleType: "Pitch", title: "Pitch", component: PitchWidget }),
     defineWidget({ moduleType: "Spectrum", title: "Spectrum", component: SpectrumWidget }),
   ],
-};
+});

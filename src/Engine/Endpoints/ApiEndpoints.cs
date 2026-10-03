@@ -1,7 +1,9 @@
 using Micser.Audio.Devices;
 using Micser.Engine.Audio;
 using Micser.Engine.Contracts;
+using Micser.Engine.Plugins;
 using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Micser.Engine.Endpoints;
 
@@ -9,6 +11,11 @@ public sealed record HealthResponse(string Status);
 
 public static class ApiEndpoints
 {
+    /// <summary>
+    /// The largest plugin package the API accepts.
+    /// </summary>
+    public const long MaxPluginUploadBytes = 100L * 1024 * 1024;
+
     public static IEndpointRouteBuilder MapEngineApi(this IEndpointRouteBuilder app)
     {
         var api = app.MapGroup("/api").AddEndpointFilter(HandleEngineRequestException);
@@ -19,6 +26,7 @@ public static class ApiEndpoints
         MapConnections(api);
         MapDevices(api);
         MapEngine(api);
+        MapPlugins(api);
         MapPreferences(api);
 
         return app;
@@ -118,6 +126,31 @@ public static class ApiEndpoints
     private static void MapModuleTypes(RouteGroupBuilder api)
     {
         api.MapGet("/module-types", (AudioHost host) => TypedResults.Ok(host.GetModuleTypes())).WithName("GetModuleTypes").WithTags("Modules");
+    }
+
+    private static void MapPlugins(RouteGroupBuilder api)
+    {
+        var plugins = api.MapGroup("/plugins").WithTags("Plugins");
+
+        plugins.MapGet("", (PluginService service) => TypedResults.Ok(service.GetPlugins())).WithName("GetPlugins");
+
+        // the token protects the API, so there's no antiforgery token for the upload
+        plugins.MapPost("", async (IFormFile package, PluginService service) =>
+        {
+            await using var stream = new MemoryStream();
+            await package.CopyToAsync(stream);
+            stream.Position = 0;
+            return TypedResults.Ok(service.Install(stream));
+        })
+            .WithName("InstallPlugin")
+            .WithDescription("Stages a plugin package (a zip with plugin.json at its root) for installation when the engine restarts.")
+            .DisableAntiforgery()
+            .WithMetadata(new RequestSizeLimitAttribute(MaxPluginUploadBytes));
+
+        plugins.MapDelete("/{id}", Results<NoContent, NotFound> (string id, PluginService service) =>
+            service.Remove(id) ? TypedResults.NoContent() : TypedResults.NotFound())
+            .WithName("RemovePlugin")
+            .WithDescription("Stages a user plugin for removal when the engine restarts, or cancels its staged installation.");
     }
 
     private static void MapPreferences(RouteGroupBuilder api)

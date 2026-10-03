@@ -17,7 +17,9 @@ export {
 } from "./engine/hooks";
 export { decibels, hertz, milliseconds } from "./lib/labels";
 export {
+  definePlugin,
   defineWidget,
+  isPlugin,
   type ModuleOfType,
   type ModuleType,
   type Plugin,

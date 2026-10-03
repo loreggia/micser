@@ -29,6 +29,11 @@ public interface IEngineClient
 
     Task ModuleRemoved(Guid moduleId);
 
+    /// <summary>
+    /// The plugins after a plugin was staged for installation or removal.
+    /// </summary>
+    Task PluginsChanged(IReadOnlyList<PluginDto> plugins);
+
     Task PreferencesChanged(UiPreferencesDto preferences);
 
     Task StatusChanged(EngineStatusDto status);

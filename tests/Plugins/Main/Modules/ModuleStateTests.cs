@@ -8,7 +8,8 @@ public class ModuleStateTests
     [Test]
     public async Task Definitions_HaveUniqueTypesAndStates()
     {
-        var services = new Microsoft.Extensions.DependencyInjection.ServiceCollection().AddMainPlugin();
+        var services = new Microsoft.Extensions.DependencyInjection.ServiceCollection();
+        new MainPlugin().ConfigureServices(services);
         var definitions = services.Select(d => d.ImplementationInstance).OfType<AudioModuleDefinition>().ToArray();
 
         await Assert.That(definitions).Count().IsEqualTo(8);

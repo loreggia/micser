@@ -15,6 +15,25 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Engine\Micser.Engine.csproj" />
+    <!-- referenced for its types; also copied to plugins/Main, where the engine loads it from (sharing the referenced assembly) -->
+    <ProjectReference Include="..\..\src\Plugins\Main\Micser.Plugins.Main.csproj" OutputItemType="BuiltInPlugin" PluginId="Main" />
+    <ProjectReference Include="TestPlugin\Micser.Engine.TestPlugin.csproj" ReferenceOutputAssembly="false" OutputItemType="TestPlugin" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="TestPlugin/**" />
+    <None Remove="TestPlugin/**" />
+  </ItemGroup>
+
+  <Import Project="..\..\src\Engine\BuiltInPlugins.targets" />
+
+  <!-- the test plugin goes to TestPlugin/, not plugins/, so only the loader tests load it -->
+  <Target Name="CopyTestPlugin" AfterTargets="CopyFilesToOutputDirectory">
+    <ItemGroup>
+      <_TestPluginFile Include="%(TestPlugin.RootDir)%(TestPlugin.Directory)**" />
+      <_TestPluginFile Include="$([System.IO.Path]::GetDirectoryName('%(TestPlugin.MSBuildSourceProjectFile)'))\plugin.json" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_TestPluginFile)" DestinationFiles="@(_TestPluginFile->'$(OutDir)TestPlugin\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+  </Target>
 
 </Project>

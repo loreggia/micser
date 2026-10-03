@@ -23,6 +23,8 @@ public sealed class AudioHost : IDisposable
     private readonly IServiceProvider _services;
     private readonly EngineConfigStore _store;
     private readonly ISystemVolume _systemVolume;
+    private readonly List<ConnectionDto> _unavailableConnections = [];
+    private readonly List<UnavailableModule> _unavailableModules = [];
     private AudioEngine? _engine;
     private AudioGraph? _graph;
     private IReadOnlyList<ModuleTypeDto>? _moduleTypes;
@@ -196,7 +198,13 @@ public sealed class AudioHost : IDisposable
 
             _settings = settingsErrors.Count == 0 ? configuration.Settings : new EngineSettingsDto();
             _preferences = configuration.Preferences;
-            Build(configuration.Modules, configuration.Connections);
+
+            // modules whose plugin isn't loaded and their connections stay in the configuration only
+            var unavailableIds = configuration.UnavailableModules.Select(m => m.Id).ToHashSet();
+            _unavailableModules.AddRange(configuration.UnavailableModules);
+            _unavailableConnections.AddRange(configuration.Connections.Where(c => unavailableIds.Contains(c.SourceModuleId) || unavailableIds.Contains(c.TargetModuleId)));
+
+            Build(configuration.Modules, configuration.Connections.Except(_unavailableConnections));
             Engine.Start();
         }
     }
@@ -243,6 +251,7 @@ public sealed class AudioHost : IDisposable
                 _connections.Remove(connection.Dto.Id);
             }
 
+            _unavailableConnections.RemoveAll(c => c.SourceModuleId == id || c.TargetModuleId == id);
             Graph.Remove(entry.Module);
             entry.Module.StateChanged -= OnModuleStateChanged;
             entry.Module.Dispose();
@@ -524,7 +533,8 @@ public sealed class AudioHost : IDisposable
             Settings = _settings,
             Preferences = _preferences,
             Modules = [.. _modules.Values.Select(ToDto)],
-            Connections = [.. _connections.Values.Select(c => c.Dto)],
+            UnavailableModules = [.. _unavailableModules],
+            Connections = [.. _connections.Values.Select(c => c.Dto), .. _unavailableConnections],
         });
     }
 

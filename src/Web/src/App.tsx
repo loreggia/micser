@@ -6,6 +6,7 @@ import { useState, useSyncExternalStore } from "react";
 import { EngineToolbar } from "./components/EngineToolbar";
 import { GraphEditor } from "./components/GraphEditor";
 import { toasterId, useErrorNotifications } from "./notifications";
+import { PluginsProvider } from "./PluginsProvider";
 
 const useStyles = makeStyles({
   root: {
@@ -53,11 +54,13 @@ function Shell() {
   useErrorNotifications();
 
   return (
-    <ReactFlowProvider>
-      <div className={styles.root}>
-        <EngineToolbar />
-        <GraphEditor />
-      </div>
-    </ReactFlowProvider>
+    <PluginsProvider>
+      <ReactFlowProvider>
+        <div className={styles.root}>
+          <EngineToolbar />
+          <GraphEditor />
+        </div>
+      </ReactFlowProvider>
+    </PluginsProvider>
   );
 }

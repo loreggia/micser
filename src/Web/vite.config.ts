@@ -1,11 +1,14 @@
 import react from "@vitejs/plugin-react";
+import { resolve } from "node:path";
 import { defineConfig } from "vite";
+import { sharedModulesPlugin } from "./vite/sharedModules.ts";
+import { workspacePluginsPlugin } from "./vite/workspacePlugins.ts";
 
 // In development the engine runs separately (see src/Engine/appsettings.json for its address).
 const engineUrl = process.env.MICSER_ENGINE_URL ?? "http://127.0.0.1:5080";
 
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), sharedModulesPlugin(), workspacePluginsPlugin(resolve(import.meta.dirname, "../Plugins"))],
   build: {
     rolldownOptions: {
       output: {
@@ -30,6 +33,8 @@ export default defineConfig({
     proxy: {
       "/api": engineUrl,
       "/hubs": { target: engineUrl, ws: true },
+      // widget bundles of plugins outside this repository
+      "/plugins": engineUrl,
     },
   },
 });

@@ -1,0 +1,31 @@
+<Project>
+
+  <!--
+    Copies built-in plugins into plugins/<id>/ of the output and publish folders: the plugin project's output (its assembly and private
+    dependencies), its plugin.json, and its widget bundle (Web/dist, built by "npm run build") as web/. plugin.json comes from the project
+    folder rather than the plugin's output, since output items would also be copied into every referencing project.
+    A plugin is a project reference with OutputItemType="BuiltInPlugin" and PluginId metadata; ReferenceOutputAssembly="false" keeps it out of
+    the compilation and deps.json, so it's only loaded through the plugin loader.
+  -->
+
+  <Target Name="_CollectBuiltInPluginFiles">
+    <ItemGroup>
+      <_BuiltInPluginFile Include="%(BuiltInPlugin.RootDir)%(BuiltInPlugin.Directory)**" PluginId="%(BuiltInPlugin.PluginId)" />
+      <_BuiltInPluginFile Include="$([System.IO.Path]::GetDirectoryName('%(BuiltInPlugin.MSBuildSourceProjectFile)'))\plugin.json" PluginId="%(BuiltInPlugin.PluginId)" />
+      <_BuiltInPluginWebFile Include="$([System.IO.Path]::GetDirectoryName('%(BuiltInPlugin.MSBuildSourceProjectFile)'))\Web\dist\**" PluginId="%(BuiltInPlugin.PluginId)" />
+    </ItemGroup>
+    <Error Condition="'@(BuiltInPlugin)' != '' and '%(BuiltInPlugin.PluginId)' == ''" Text="Built-in plugin %(BuiltInPlugin.Identity) has no PluginId." />
+  </Target>
+
+  <Target Name="CopyBuiltInPlugins" AfterTargets="CopyFilesToOutputDirectory" DependsOnTargets="_CollectBuiltInPluginFiles">
+    <Copy SourceFiles="@(_BuiltInPluginFile)" DestinationFiles="@(_BuiltInPluginFile->'$(OutDir)plugins\%(PluginId)\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(_BuiltInPluginWebFile)" DestinationFiles="@(_BuiltInPluginWebFile->'$(OutDir)plugins\%(PluginId)\web\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+  </Target>
+
+  <Target Name="PublishBuiltInPlugins" AfterTargets="Publish" DependsOnTargets="_CollectBuiltInPluginFiles">
+    <Warning Condition="'@(BuiltInPlugin)' != '' and '@(_BuiltInPluginWebFile)' == ''" Text="The built-in plugins' widgets aren't built (Web/dist); run &quot;npm run build&quot; first." />
+    <Copy SourceFiles="@(_BuiltInPluginFile)" DestinationFiles="@(_BuiltInPluginFile->'$(PublishDir)plugins\%(PluginId)\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+    <Copy SourceFiles="@(_BuiltInPluginWebFile)" DestinationFiles="@(_BuiltInPluginWebFile->'$(PublishDir)plugins\%(PluginId)\web\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+  </Target>
+
+</Project>

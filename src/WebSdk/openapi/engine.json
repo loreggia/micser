@@ -440,6 +440,93 @@
         }
       }
     },
+    "/api/plugins": {
+      "get": {
+        "tags": [
+          "Plugins"
+        ],
+        "operationId": "GetPlugins",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PluginDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Plugins"
+        ],
+        "description": "Stages a plugin package (a zip with plugin.json at its root) for installation when the engine restarts.",
+        "operationId": "InstallPlugin",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "package"
+                ],
+                "type": "object",
+                "properties": {
+                  "package": {
+                    "$ref": "#/components/schemas/IFormFile"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PluginDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/plugins/{id}": {
+      "delete": {
+        "tags": [
+          "Plugins"
+        ],
+        "description": "Stages a user plugin for removal when the engine restarts, or cancels its staged installation.",
+        "operationId": "RemovePlugin",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
     "/api/preferences": {
       "get": {
         "tags": [
@@ -875,6 +962,10 @@
             "type": "string"
           }
         }
+      },
+      "IFormFile": {
+        "type": "string",
+        "format": "binary"
       },
       "LoopbackInputState": {
         "required": [
@@ -1472,6 +1563,64 @@
           }
         }
       },
+      "PluginChange": {
+        "enum": [
+          "None",
+          "Install",
+          "Remove"
+        ]
+      },
+      "PluginDto": {
+        "required": [
+          "id",
+          "name",
+          "version",
+          "isBuiltIn",
+          "isLoaded",
+          "error",
+          "webUrl",
+          "pendingChange"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "version": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "isBuiltIn": {
+            "type": "boolean"
+          },
+          "isLoaded": {
+            "type": "boolean"
+          },
+          "error": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "webUrl": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "pendingChange": {
+            "$ref": "#/components/schemas/PluginChange"
+          }
+        }
+      },
       "Speakers": {
         "type": "string"
       },
@@ -1509,6 +1658,9 @@
     },
     {
       "name": "Connections"
+    },
+    {
+      "name": "Plugins"
     },
     {
       "name": "Preferences"

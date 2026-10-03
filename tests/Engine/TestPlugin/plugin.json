@@ -1,0 +1,6 @@
+{
+  "id": "Test",
+  "name": "Test plugin",
+  "version": "1.2.3",
+  "assembly": "Micser.Engine.TestPlugin.dll"
+}

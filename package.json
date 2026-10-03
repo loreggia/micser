@@ -12,7 +12,7 @@
   },
   "scripts": {
     "dev": "npm run dev -w @micser/web",
-    "build": "npm run build -w @micser/web",
+    "build": "npm run build --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "lint": "eslint .",
     "format": "prettier --write .",
