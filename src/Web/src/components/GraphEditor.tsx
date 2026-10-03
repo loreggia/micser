@@ -52,20 +52,23 @@ function defaultPosition(index: number): XYPosition {
   return { x: 40 + (index % 4) * 320, y: 40 + Math.floor(index / 4) * 280 };
 }
 
-/** A connection dropped on empty space: the menu for a new module opens there. */
-interface PendingConnection {
-  /** Screen position of the drop. */
+/** The menu for adding a module, opened by a right click on empty space or by dropping a connection there. */
+interface AddModuleMenu {
+  /** Screen position of the click or drop, where the new module goes. */
   point: XYPosition;
-  moduleId: string;
-  port: string;
-  /** Whether the drag started at an output, so the new module connects with its input. */
-  fromOutput: boolean;
+  /** The dropped connection, which the new module completes. */
+  connection?: {
+    moduleId: string;
+    port: string;
+    /** Whether the drag started at an output, so the new module connects with its input. */
+    fromOutput: boolean;
+  };
 }
 
 /**
  * The routing graph: modules as nodes, connections as edges. Changes go to the engine; the graph follows the engine's
- * notifications, except for positions while a node is being dragged. Connections can be dragged to other ports, and a
- * connection dropped on empty space offers to add a module there, connected to it.
+ * notifications, except for positions while a node is being dragged. Connections can be dragged to other ports. A right
+ * click on empty space offers to add a module there, and so does a connection dropped there, connecting the new module.
  */
 export function GraphEditor() {
   const styles = useStyles();
@@ -77,7 +80,7 @@ export function GraphEditor() {
   const [preferences] = usePreferences();
   const [nodes, setNodes, onNodesChange] = useNodesState<ModuleNodeType>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
-  const [pending, setPending] = useState<PendingConnection>();
+  const [menu, setMenu] = useState<AddModuleMenu>();
   const { screenToFlowPosition } = useReactFlow();
   const update = useModuleUpdate();
   const addModule = useAddModule();
@@ -181,36 +184,56 @@ export function GraphEditor() {
     }
 
     const point = "changedTouches" in event ? event.changedTouches[0] : event;
-    const connection = {
+    openMenu({
       point: { x: point.clientX, y: point.clientY },
-      moduleId: state.fromNode.id,
-      port: state.fromHandle.id,
-      fromOutput: state.fromHandle.type === "source",
-    };
-
-    // after the click that follows the drop, which would close the menu again as a click outside of it
-    window.setTimeout(() => setPending(connection));
+      connection: {
+        moduleId: state.fromNode.id,
+        port: state.fromHandle.id,
+        fromOutput: state.fromHandle.type === "source",
+      },
+    });
   };
 
-  const addConnected = async (type: string) => {
-    if (!pending) {
+  // after the event that opens it, which the menu would otherwise take as a click outside of it and close again
+  const openMenu = (request: AddModuleMenu) => window.setTimeout(() => setMenu(request));
+
+  const addFromMenu = async (type: string) => {
+    if (!menu) {
       return;
     }
 
-    setPending(undefined);
+    setMenu(undefined);
+    const point = screenToFlowPosition(menu.point);
+    const connection = menu.connection;
+    if (!connection) {
+      await addModule(type, point);
+      return;
+    }
+
     const moduleType = typesByName.get(type);
-    const drop = screenToFlowPosition(pending.point);
-    const position = pending.fromOutput ? { x: drop.x, y: drop.y - 40 } : { x: drop.x - moduleWidth, y: drop.y - 40 };
+    const position = connection.fromOutput
+      ? { x: point.x, y: point.y - 40 }
+      : { x: point.x - moduleWidth, y: point.y - 40 };
     const module = await addModule(type, position);
-    const port = pending.fromOutput ? moduleType?.inputs[0] : moduleType?.outputs[0];
+    const port = connection.fromOutput ? moduleType?.inputs[0] : moduleType?.outputs[0];
     if (!module || !port) {
       return;
     }
 
     connect.mutate({
-      data: pending.fromOutput
-        ? { sourceModuleId: pending.moduleId, sourcePort: pending.port, targetModuleId: module.id, targetPort: port }
-        : { sourceModuleId: module.id, sourcePort: port, targetModuleId: pending.moduleId, targetPort: pending.port },
+      data: connection.fromOutput
+        ? {
+            sourceModuleId: connection.moduleId,
+            sourcePort: connection.port,
+            targetModuleId: module.id,
+            targetPort: port,
+          }
+        : {
+            sourceModuleId: module.id,
+            sourcePort: port,
+            targetModuleId: connection.moduleId,
+            targetPort: connection.port,
+          },
     });
   };
 
@@ -225,6 +248,10 @@ export function GraphEditor() {
         onNodeDragStop={(_, __, dragged) => dragged.forEach(moveModule)}
         onConnect={(connection) => connect.mutate({ data: toRequest(connection) })}
         onConnectEnd={onConnectEnd}
+        onPaneContextMenu={(event) => {
+          event.preventDefault();
+          openMenu({ point: { x: event.clientX, y: event.clientY } });
+        }}
         onReconnect={(oldEdge, connection) => void reconnect(oldEdge, connection)}
         isValidConnection={(connection) => connection.source !== connection.target}
         onNodesDelete={(deleted) => deleted.forEach((node) => remove.mutate({ id: node.id }))}
@@ -240,16 +267,19 @@ export function GraphEditor() {
         <Controls />
       </ReactFlow>
       <Menu
-        open={pending !== undefined}
-        onOpenChange={(_, data) => !data.open && setPending(undefined)}
-        positioning={{ target: pending && pointTarget(pending.point), position: "below", align: "start" }}
+        open={menu !== undefined}
+        onOpenChange={(_, data) => !data.open && setMenu(undefined)}
+        positioning={{ target: menu && pointTarget(menu.point), position: "below", align: "start" }}
       >
         <MenuPopover>
           <MenuList>
             {moduleTypeChoices
-              .filter((type) => (pending?.fromOutput ? type.inputs.length > 0 : type.outputs.length > 0))
+              .filter(
+                (type) =>
+                  !menu?.connection || (menu.connection.fromOutput ? type.inputs.length > 0 : type.outputs.length > 0)
+              )
               .map((type) => (
-                <MenuItem key={type.type} onClick={() => void addConnected(type.type)}>
+                <MenuItem key={type.type} onClick={() => void addFromMenu(type.type)}>
                   {type.title}
                 </MenuItem>
               ))}

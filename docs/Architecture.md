@@ -157,6 +157,7 @@ docs/
   - Modules snap to a 20 px grid (the background dots) unless the preference is off.
   - Dragging a connection's end to another port reroutes it: the new connection is created first and the old one removed only if that succeeded.
   - Dropping a new connection on empty space opens a menu of module types with a matching port; the chosen module is added there and connected (its first input when the drag started at an output, its first output otherwise).
+  - Right-clicking empty space opens the same menu with all module types; the chosen module is added at the click. The browser's context menu is suppressed on the graph, but not on nodes.
   - Node cards don't clip their content, so the ports on their edges are whole and fully clickable.
 - **Toolbar and settings:**
   - A split button restarts the audio (`engine/restart-audio`); its menu also restarts the engine process when running in the shell.
