@@ -155,13 +155,12 @@ docs/
   - Nodes and edges follow the engine.
   - Connecting, deleting (Delete key or the node's remove button) and moving (the position is saved on drop) go through the API. Rejected connections, e.g. cycles, show a notification.
   - Modules snap to a 20 px grid (the background dots) unless the preference is off.
-  - Dragging a connection's end to another port reroutes it: the new connection is created first and the old one removed only if that succeeded.
+  - Dragging a selected connection's end to another port reroutes it: the new connection is created first and the old one removed only if that succeeded. Only selected connections have handles at their ends, drawn above the other connections, so a drag at a port with several connections can't take the wrong one.
   - Dropping a new connection on empty space opens a menu of module types with a matching port; the chosen module is added there and connected (its first input when the drag started at an output, its first output otherwise).
   - Right-clicking empty space opens the same menu with all module types; the chosen module is added at the click. The browser's context menu is suppressed on the graph, but not on nodes.
   - Node cards don't clip their content, so the ports on their edges are whole and fully clickable.
 - **Toolbar and settings:**
-  - A split button restarts the audio (`engine/restart-audio`); its menu also restarts the engine process when running in the shell.
-  - The settings dialog has the audio settings (applied together, which rebuilds the graph), the display preferences (applied right away), the plugins (install from a .zip, remove, and "Restart engine to apply" in the shell), and, in the shell, the version with "Check for updates".
+  - The settings dialog has the audio settings (applied together, which rebuilds the graph) with "Restart audio" (`engine/restart-audio`) and, in the shell, "Restart engine process", the display preferences (applied right away), the plugins (install from a .zip, remove, and "Restart engine to apply" in the shell), and, in the shell, the version with "Check for updates".
   - When the shell has downloaded an update, the toolbar shows an "Update to x.y.z" button.
 - **Shell bridge** (`src/Web/src/shell.ts`): inside the shell's WebView2, the UI exchanges web messages with the shell (`chrome.webview`). In a plain browser it's absent, and the shell-only controls are hidden.
 - **Access token:**

@@ -16,7 +16,13 @@ import {
   makeStyles,
   tokens,
 } from "@fluentui/react-components";
-import { getUpdateEngineSettingsMutationOptions, usePreferences, type EngineSettingsDto } from "@micser/web-sdk";
+import { ArrowSyncRegular } from "@fluentui/react-icons";
+import {
+  getRestartAudioMutationOptions,
+  getUpdateEngineSettingsMutationOptions,
+  usePreferences,
+  type EngineSettingsDto,
+} from "@micser/web-sdk";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
 import { useNotifyError } from "../notifications";
@@ -39,7 +45,7 @@ const useStyles = makeStyles({
     flexDirection: "column",
     gap: tokens.spacingVerticalM,
   },
-  updates: {
+  actions: {
     display: "flex",
     alignItems: "center",
     flexWrap: "wrap",
@@ -57,8 +63,9 @@ export interface EngineSettingsDialogProps {
 }
 
 /**
- * Audio settings (applied with Apply, which rebuilds the graph), display preferences (applied right away), plugins (applied when the
- * engine restarts), and, when running in the desktop shell, the version, updates and virtual audio cables.
+ * Audio settings (applied with Apply, which rebuilds the graph) and restarts, display preferences (applied right away),
+ * plugins (applied when the engine restarts), and, when running in the desktop shell, the version, updates and virtual
+ * audio cables.
  */
 export function EngineSettingsDialog({ open, settings, onClose }: EngineSettingsDialogProps) {
   const styles = useStyles();
@@ -71,6 +78,10 @@ export function EngineSettingsDialog({ open, settings, onClose }: EngineSettings
     ...getUpdateEngineSettingsMutationOptions(),
     onSuccess: onClose,
     onError: (error) => notifyError("Changing the engine settings failed", error),
+  });
+  const restartAudio = useMutation({
+    ...getRestartAudioMutationOptions(),
+    onError: (error) => notifyError("Restarting the audio failed", error),
   });
 
   const blockDuration = (frames: number) => `${frames} frames (${((frames / draft.sampleRate) * 1000).toFixed(1)} ms)`;
@@ -117,6 +128,20 @@ export function EngineSettingsDialog({ open, settings, onClose }: EngineSettings
                 ))}
               </Dropdown>
             </Field>
+            <Field hint="Restarting the audio reopens all devices with fresh buffers.">
+              <div className={styles.actions}>
+                <Button
+                  icon={<ArrowSyncRegular />}
+                  disabled={restartAudio.isPending}
+                  onClick={() => restartAudio.mutate()}
+                >
+                  Restart audio
+                </Button>
+                {shellState?.canRestartEngine && (
+                  <Button onClick={() => shell?.restartEngine()}>Restart engine process</Button>
+                )}
+              </div>
+            </Field>
             <Divider />
             <Subtitle2>Display</Subtitle2>
             <Switch
@@ -135,7 +160,7 @@ export function EngineSettingsDialog({ open, settings, onClose }: EngineSettings
               <>
                 <Divider />
                 <Subtitle2>Micser {shellState.version}</Subtitle2>
-                <div className={styles.updates}>
+                <div className={styles.actions}>
                   {shellState.pendingUpdate ? (
                     <Button appearance="primary" onClick={() => shell?.installUpdate()}>
                       Restart to update to {shellState.pendingUpdate}

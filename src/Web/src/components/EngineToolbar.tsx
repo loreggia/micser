@@ -7,18 +7,15 @@ import {
   MenuList,
   MenuPopover,
   MenuTrigger,
-  SplitButton,
   Switch,
   Toolbar,
   ToolbarDivider,
   Tooltip,
   makeStyles,
   tokens,
-  type MenuButtonProps,
 } from "@fluentui/react-components";
-import { AddRegular, ArrowDownloadRegular, ArrowSyncRegular, SettingsRegular } from "@fluentui/react-icons";
+import { AddRegular, ArrowDownloadRegular, SettingsRegular } from "@fluentui/react-icons";
 import {
-  getRestartAudioMutationOptions,
   getStartEngineMutationOptions,
   getStopEngineMutationOptions,
   useEngineConnectionState,
@@ -76,10 +73,6 @@ export function EngineToolbar() {
     ...getStopEngineMutationOptions(),
     onError: (error) => notifyError("Stopping the engine failed", error),
   });
-  const restartAudio = useMutation({
-    ...getRestartAudioMutationOptions(),
-    onError: (error) => notifyError("Restarting the audio failed", error),
-  });
   const badge = connectionBadges[connectionState];
   const isConnected = connectionState === "connected";
 
@@ -123,32 +116,6 @@ export function EngineToolbar() {
         disabled={!status || start.isPending || stop.isPending}
         onChange={(_, data) => (data.checked ? start.mutate() : stop.mutate())}
       />
-      <Menu positioning="below-end">
-        <MenuTrigger disableButtonEnhancement>
-          {(triggerProps: MenuButtonProps) => (
-            <SplitButton
-              appearance="subtle"
-              icon={<ArrowSyncRegular />}
-              disabled={!isConnected || restartAudio.isPending}
-              menuButton={triggerProps}
-              primaryActionButton={{
-                onClick: () => restartAudio.mutate(),
-                title: "Restart the audio: reopens all devices with fresh buffers",
-              }}
-            >
-              Restart
-            </SplitButton>
-          )}
-        </MenuTrigger>
-        <MenuPopover>
-          <MenuList>
-            <MenuItem onClick={() => restartAudio.mutate()}>Restart audio</MenuItem>
-            <MenuItem disabled={!shellState?.canRestartEngine} onClick={() => shell?.restartEngine()}>
-              Restart engine process
-            </MenuItem>
-          </MenuList>
-        </MenuPopover>
-      </Menu>
       <ToolbarDivider />
       <Badge appearance="tint" color={badge.color}>
         {badge.text}
