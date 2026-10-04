@@ -28,6 +28,7 @@ public static class ApiEndpoints
         MapEngine(api);
         MapPlugins(api);
         MapPreferences(api);
+        MapSubgraphs(api);
 
         return app;
     }
@@ -160,5 +161,26 @@ public static class ApiEndpoints
         preferences.MapGet("", (AudioHost host) => TypedResults.Ok(host.GetPreferences())).WithName("GetPreferences");
         preferences.MapPut("", (UiPreferencesDto preferences, AudioHost host) => TypedResults.Ok(host.UpdatePreferences(preferences)))
             .WithName("UpdatePreferences");
+    }
+
+    private static void MapSubgraphs(RouteGroupBuilder api)
+    {
+        var subgraphs = api.MapGroup("/subgraphs").WithTags("Subgraphs");
+
+        subgraphs.MapGet("", (AudioHost host) => TypedResults.Ok(host.GetSubgraphs())).WithName("GetSubgraphs");
+
+        subgraphs.MapPost("", (CreateSubgraphRequest request, AudioHost host) =>
+        {
+            var subgraph = host.AddSubgraph(request);
+            return TypedResults.Created($"/api/subgraphs/{subgraph.Id}", subgraph);
+        }).WithName("CreateSubgraph").WithDescription("Creates a subgraph and moves the modules into it.");
+
+        subgraphs.MapPut("/{id:guid}", (Guid id, SubgraphDto subgraph, AudioHost host) => TypedResults.Ok(host.UpdateSubgraph(id, subgraph)))
+            .WithName("UpdateSubgraph");
+
+        subgraphs.MapDelete("/{id:guid}", Results<NoContent, NotFound> (Guid id, AudioHost host) =>
+            host.RemoveSubgraph(id) ? TypedResults.NoContent() : TypedResults.NotFound())
+            .WithName("DeleteSubgraph")
+            .WithDescription("Removes a subgraph; its modules stay in the graph.");
     }
 }

@@ -87,6 +87,7 @@ public sealed class ModuleCatalog
             Id = id,
             Name = settings.Name,
             Position = settings.Position,
+            SubgraphId = settings.SubgraphId,
             Volume = settings.Volume,
             IsMuted = settings.IsMuted,
             UseSystemVolume = settings.UseSystemVolume,
@@ -100,10 +101,10 @@ public sealed class ModuleCatalog
 /// <summary>
 /// The settings every module has, besides its state.
 /// </summary>
-public sealed record ModuleSettings(string? Name, ModulePosition? Position, float Volume, bool IsMuted, bool IsBypassed, bool UseSystemVolume, bool IsCollapsed)
+public sealed record ModuleSettings(string? Name, ModulePosition? Position, float Volume, bool IsMuted, bool IsBypassed, bool UseSystemVolume, bool IsCollapsed, Guid? SubgraphId)
 {
     public static ModuleSettings From(ModuleDto dto)
     {
-        return new ModuleSettings(dto.Name, dto.Position, dto.Volume, dto.IsMuted, dto.IsBypassed, dto.UseSystemVolume, dto.IsCollapsed);
+        return new ModuleSettings(dto.Name, dto.Position, dto.Volume, dto.IsMuted, dto.IsBypassed, dto.UseSystemVolume, dto.IsCollapsed, dto.SubgraphId);
     }
 }

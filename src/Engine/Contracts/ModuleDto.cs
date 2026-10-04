@@ -34,7 +34,15 @@ public abstract record ModuleDto
     [MaxLength(100)]
     public string? Name { get; init; }
 
+    /// <summary>
+    /// Relative to the subgraph's position if <see cref="SubgraphId"/> is set.
+    /// </summary>
     public ModulePosition? Position { get; init; }
+
+    /// <summary>
+    /// The subgraph the module belongs to, from <c>GET /api/subgraphs</c>.
+    /// </summary>
+    public Guid? SubgraphId { get; init; }
 
     /// <summary>
     /// Follows the volume and mute of Windows' default output device (its volume slider and keys). The engine then sets
@@ -62,7 +70,9 @@ public sealed record ModuleDto<TState> : ModuleDto
 }
 
 /// <param name="Type">A module type from <c>GET /api/module-types</c>.</param>
-public sealed record CreateModuleRequest([Required] string Type, [MaxLength(100)] string? Name = null, ModulePosition? Position = null);
+/// <param name="Position">Relative to the subgraph's position if <paramref name="SubgraphId"/> is set.</param>
+/// <param name="SubgraphId">The subgraph to add the module to.</param>
+public sealed record CreateModuleRequest([Required] string Type, [MaxLength(100)] string? Name = null, ModulePosition? Position = null, Guid? SubgraphId = null);
 
 /// <param name="Type">The name identifying the module type, e.g. "Gain".</param>
 /// <param name="Inputs">Names of the input ports.</param>

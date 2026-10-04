@@ -21,6 +21,8 @@ export interface ModuleDtoSpectrumModule {
      */
   name?: string | null;
   position?: null | ModulePosition;
+  /** @nullable */
+  subgraphId?: string | null;
   useSystemVolume: boolean;
   /**
      * @minimum 0

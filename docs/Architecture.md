@@ -112,21 +112,26 @@ docs/
   - Modules raise `StateChanged` when they change their own state (e.g. a device module switching ports), so the engine persists and broadcasts it.
   - Modules with live data (spectrum, device stream statistics) implement `IModuleDataSource`.
 - **`ModuleDto`** is polymorphic by `type`: `ModuleDto<TState>` per module type, registered at runtime (`ModuleCatalog`, `EngineJson`).
-  - It carries the id, name, UI position, volume, mute, bypass (effects only) and the typed `state`.
+  - It carries the id, name, UI position, subgraph, volume, mute, bypass (effects only) and the typed `state`.
   - The API, SignalR and the config file all use the same schema. OpenAPI shows it as `anyOf` with a discriminator mapping, so a generated TS client narrows `state` by `type`.
 - **API** (`/api`, see `src/Engine/Endpoints/ApiEndpoints.cs`):
-  - `health`, `module-types` (ports and default state), `modules` (create with defaults, full update with `PUT`, delete), `connections`, `devices`, `engine` (status, start, stop, restart-audio, settings, shutdown), `plugins` (list, install a zip package, remove; see [Plugins](#plugins)), and `preferences`.
+  - `health`, `module-types` (ports and default state), `modules` (create with defaults, full update with `PUT`, delete), `connections`, `subgraphs` (see below), `devices`, `engine` (status, start, stop, restart-audio, settings, shutdown), `plugins` (list, install a zip package, remove; see [Plugins](#plugins)), and `preferences`.
   - `engine/restart-audio` rebuilds the graph with the current settings, which reopens all device streams with fresh buffers.
   - `preferences` are the web UI's preferences (stream statistics, grid snapping). They live in the engine's configuration because the UI's origin (the engine's random port) changes on every start, so browser storage would lose them. Changes are pushed as `PreferencesChanged`.
   - Errors are problem details: 400 with `errors` keyed by camelCase property path (e.g. `state.bands[1].frequency`), 404, and 409 for cycles and duplicates.
+- **Subgraphs** (`SubgraphDto`) group modules in the UI: name, position, size, color, collapsed, mute and bypass. A module refers to its subgraph with `subgraphId`.
+  - A member's position is relative to the subgraph, so moving a subgraph is one update. Creating a subgraph from modules (`POST /api/subgraphs`, also from another subgraph) and deleting one (its modules stay) convert the positions. The UI converts them when it moves a module in or out with a module `PUT`.
+  - The subgraph's mute and bypass combine with each member's own (`module || subgraph`, bypass for effects only). `ModuleDto` keeps the module's own flags, so turning the subgraph's off restores them.
+  - There's one level; subgraphs don't nest.
 - **Hub** (`/hubs/engine`):
-  - Pushes `ModuleChanged`, `ModuleRemoved`, `ConnectionAdded`, `ConnectionRemoved`, `DevicesChanged`, `PluginsChanged`, `PreferencesChanged` and `StatusChanged` to all clients, in the order they happened.
+  - Pushes `ModuleChanged`, `ModuleRemoved`, `ConnectionAdded`, `ConnectionRemoved`, `SubgraphChanged`, `SubgraphRemoved`, `DevicesChanged`, `PluginsChanged`, `PreferencesChanged` and `StatusChanged` to all clients, in the order they happened.
   - `Subscribe(moduleId)` / `Unsubscribe(moduleId)` start and stop `ModuleData` pushes (20 per second) for modules with live data.
   - `SubscribeLevels()` / `UnsubscribeLevels()` start and stop `Levels` pushes (20 per second): the levels of all processed modules in one message (`PortLevelsDto` per port, linear amplitude). Hub payloads aren't in the OpenAPI document, so the web SDK declares `PortLevels` itself.
 - **Configuration** (`%AppData%\Micser\config.json`, `Engine:ConfigPath`):
   - It's versioned, with saves debounced (500 ms) and written atomically.
   - An unreadable file is moved to `config.json.<timestamp>.bak`, and the engine starts empty.
   - Modules of unknown type (their plugin isn't loaded) are kept in the file as they are, with their connections, but stay out of the graph and the API; they come back with their plugin. Invalid modules and dangling connections are skipped.
+  - Subgraphs are kept with the modules. A module whose subgraph is missing loses its `subgraphId`; deleting a subgraph also takes the unknown-type modules out of it.
   - Changing the engine settings rebuilds the graph.
 - **Discovery and security:**
   - The engine binds to `127.0.0.1` with a random port and writes `{ url, token, processId }` to `%LocalAppData%\Micser\engine.json` (`Engine:DiscoveryPath`). That folder is private to the user. The file is deleted on a clean shutdown; after a crash it stays, so readers must check that the process is alive.
@@ -142,7 +147,7 @@ docs/
   - `engineFetch` adds the access token and throws `EngineApiError` with the problem details.
 - **State:**
   - Engine data lives in the TanStack Query cache, which never goes stale. `EngineConnection` (SignalR) patches it from engine events and refetches everything after a reconnect.
-  - Module updates (`useModuleUpdate`) show immediately and go to the engine debounced (80 ms, last value wins). Engine echoes are ignored while an update is pending, so controls don't jump back.
+  - Module and subgraph updates (`useModuleUpdate`, `useSubgraphUpdate`) show immediately and go to the engine debounced (80 ms, last value wins). Engine echoes are ignored while an update is pending, so controls don't jump back.
   - `useModuleData(moduleId)` subscribes to live data (spectrum, stream statistics).
 - **Widgets:**
   - A plugin's `Web` package default-exports `definePlugin({ name, widgets })` with `defineWidget({ moduleType, title, component })` entries. The component receives the typed module (`WidgetProps<"Gain">`) and a `setState` function. Module types of plugins outside this repository aren't in the generated API types.
@@ -160,6 +165,14 @@ docs/
   - Dropping a new connection on empty space opens a menu of module types with a matching port; the chosen module is added there and connected (its first input when the drag started at an output, its first output otherwise).
   - Right-clicking empty space opens the same menu with all module types; the chosen module is added at the click. The browser's context menu is suppressed on the graph, but not on nodes.
   - Node cards don't clip their content, so the ports on their edges are whole and fully clickable.
+  - Selected nodes aren't raised, so a selected subgraph's frame doesn't cover modules that overlap it.
+- **Subgraphs** in the graph editor:
+  - Ctrl+G or "Group" in a module's or the selection's context menu wraps the selected modules in a new subgraph, on the grid with room for the header.
+  - Expanded, a subgraph is a frame in its color (Fluent palette tokens) behind its modules (React Flow parent nodes). Its header has the name (double-click to rename), color, fit to modules, mute, bypass, ungroup and collapse, and the corner at the bottom right resizes it. Frames grow to contain their modules, e.g. after one was added or expanded; "Fit to modules" puts the frame tightly around them (as when grouping), moving the modules' relative positions so they stay in place.
+  - A module stays in its subgraph while it overlaps the frame and leaves it once it is dropped completely outside. Dropping a module with its center on another expanded frame moves it into that subgraph. "Remove from subgraph" in the context menu places it below the frame. Right-clicking a frame adds a module in it.
+  - A module muted or bypassed by its subgraph shows it with its own switch disabled.
+  - Collapsed, a subgraph is a node with a row per port that connections from or to the outside use (handle ids `in:<moduleId>:<port>` / `out:<moduleId>:<port>`, mapped back for connecting). Its modules and the connections between them are hidden.
+  - Deleting a subgraph (Delete key or ungroup) keeps its modules unless they were selected too. The engine removes the connections of removed modules, so the editor only deletes selected connections itself.
 - **Toolbar and settings:**
   - The settings dialog has the audio settings (applied together, which rebuilds the graph) with "Restart audio" (`engine/restart-audio`) and, in the shell, "Restart engine process", the display preferences (applied right away), the plugins (install from a .zip, remove, and "Restart engine to apply" in the shell), and, in the shell, the version with "Check for updates".
   - When the shell has downloaded an update, the toolbar shows an "Update to x.y.z" button.
@@ -329,3 +342,6 @@ The plan (signing, installation, phases) is in the [driver plan](https://claude.
 8. **Runtime-loaded plugins** (done, see [Plugins](#plugins)): the plugin loader, Main loaded from `plugins/Main`, widget bundles sharing modules through an import map, install and removal from the UI, and modules of missing plugins kept in the configuration.
    - Verified with a published engine in Edge: Main's widgets from its bundle, with edits reaching the engine; a zip plugin with its own module and widget (a Fluent badge in the UI's theme) installed through the settings dialog and loaded after a restart; its removal, which kept its module in the configuration; and the dev server serving Main from source.
    - Follow-ups: published SDK packages (NuGet for `Micser.Audio`, npm for `@micser/web-sdk`), TypeScript types for other plugins' module states, and version compatibility checks between plugins and the engine.
+9. **Subgraphs** (phase 1 done): grouping modules into named, colored, collapsible subgraphs with their own mute and bypass (see [Engine](#engine) and [UI](#ui)).
+   - Verified in headless Chrome against a dev engine: grouping with Ctrl+G, rename, color, mute (members show it), collapse with proxy ports, moving modules in and out by drag and the context menu, adding a module in a frame, moving and resizing, and ungrouping with Delete.
+   - Phase 2: subgraph templates. A subgraph can be saved as a template and instantiated from the add menus. Subgraphs keep a reference to their template and are updated from it only on request. A dialog manages the templates.

@@ -37,6 +37,10 @@ public interface IEngineClient
     Task PreferencesChanged(UiPreferencesDto preferences);
 
     Task StatusChanged(EngineStatusDto status);
+
+    Task SubgraphChanged(SubgraphDto subgraph);
+
+    Task SubgraphRemoved(Guid subgraphId);
 }
 
 /// <summary>

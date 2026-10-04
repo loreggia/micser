@@ -22,4 +22,8 @@ public interface IEngineNotifier
     void PreferencesChanged(UiPreferencesDto preferences);
 
     void StatusChanged(EngineStatusDto status);
+
+    void SubgraphChanged(SubgraphDto subgraph);
+
+    void SubgraphRemoved(Guid subgraphId);
 }

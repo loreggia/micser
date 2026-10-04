@@ -1,3 +1,5 @@
+using System.Text.Json;
+using System.Text.Json.Nodes;
 using Micser.Audio;
 using Micser.Audio.Devices;
 using Micser.Engine.Configuration;
@@ -22,6 +24,7 @@ public sealed class AudioHost : IDisposable
     private readonly IEngineNotifier _notifier;
     private readonly IServiceProvider _services;
     private readonly EngineConfigStore _store;
+    private readonly OrderedDictionary<Guid, SubgraphDto> _subgraphs = [];
     private readonly ISystemVolume _systemVolume;
     private readonly List<ConnectionDto> _unavailableConnections = [];
     private readonly List<UnavailableModule> _unavailableModules = [];
@@ -63,11 +66,45 @@ public sealed class AudioHost : IDisposable
 
         lock (_lock)
         {
-            var entry = AddModuleCore(Guid.NewGuid(), definition, new ModuleSettings(request.Name, request.Position, 1f, false, false, false, false), null);
+            ThrowIfUnknownSubgraph(request.SubgraphId);
+            var entry = AddModuleCore(Guid.NewGuid(), definition, new ModuleSettings(request.Name, request.Position, 1f, false, false, false, false, request.SubgraphId), null);
             Persist();
             var dto = ToDto(entry);
             _notifier.ModuleChanged(dto);
             return dto;
+        }
+    }
+
+    /// <summary>
+    /// Creates a subgraph and moves the modules into it, converting their positions to be relative to it.
+    /// </summary>
+    public SubgraphDto AddSubgraph(CreateSubgraphRequest request)
+    {
+        ThrowIfInvalid(StateValidator.Validate(request));
+
+        lock (_lock)
+        {
+            var members = request.ModuleIds.Distinct().Select(id => _modules.TryGetValue(id, out var entry)
+                ? entry
+                : throw EngineRequestException.Invalid($"Module {id} not found.")).ToArray();
+
+            var subgraph = new SubgraphDto(Guid.NewGuid(), request.Name, request.Position, request.Size, request.Color);
+            var positions = members.Select(m => Offset(GetAbsolutePosition(m.Settings), -subgraph.Position.X, -subgraph.Position.Y)).ToArray();
+            _subgraphs.Add(subgraph.Id, subgraph);
+            for (var i = 0; i < members.Length; i++)
+            {
+                members[i].Settings = members[i].Settings with { SubgraphId = subgraph.Id, Position = positions[i] };
+                ApplySettings(members[i].Module, members[i].Settings);
+            }
+
+            Persist();
+            _notifier.SubgraphChanged(subgraph);
+            foreach (var entry in members)
+            {
+                _notifier.ModuleChanged(ToDto(entry));
+            }
+
+            return subgraph;
         }
     }
 
@@ -181,6 +218,14 @@ public sealed class AudioHost : IDisposable
         }
     }
 
+    public IReadOnlyList<SubgraphDto> GetSubgraphs()
+    {
+        lock (_lock)
+        {
+            return [.. _subgraphs.Values];
+        }
+    }
+
     /// <summary>
     /// Loads the configuration, builds the graph and starts processing.
     /// </summary>
@@ -198,13 +243,22 @@ public sealed class AudioHost : IDisposable
 
             _settings = settingsErrors.Count == 0 ? configuration.Settings : new EngineSettingsDto();
             _preferences = configuration.Preferences;
+            foreach (var subgraph in configuration.Subgraphs)
+            {
+                var errors = StateValidator.Validate(subgraph);
+                if (errors.Count > 0 || !_subgraphs.TryAdd(subgraph.Id, subgraph))
+                {
+                    _logger.LogWarning("Skipping invalid subgraph {Id}: {Errors}", subgraph.Id, errors);
+                }
+            }
 
             // modules whose plugin isn't loaded and their connections stay in the configuration only
             var unavailableIds = configuration.UnavailableModules.Select(m => m.Id).ToHashSet();
             _unavailableModules.AddRange(configuration.UnavailableModules);
             _unavailableConnections.AddRange(configuration.Connections.Where(c => unavailableIds.Contains(c.SourceModuleId) || unavailableIds.Contains(c.TargetModuleId)));
 
-            Build(configuration.Modules, configuration.Connections.Except(_unavailableConnections));
+            var modules = configuration.Modules.Select(m => m.SubgraphId is { } id && !_subgraphs.ContainsKey(id) ? m with { SubgraphId = null } : m);
+            Build(modules, configuration.Connections.Except(_unavailableConnections));
             Engine.Start();
         }
     }
@@ -268,6 +322,41 @@ public sealed class AudioHost : IDisposable
     }
 
     /// <summary>
+    /// Removes a subgraph. Its modules stay, with their positions converted back to absolute ones.
+    /// </summary>
+    public bool RemoveSubgraph(Guid id)
+    {
+        lock (_lock)
+        {
+            if (!_subgraphs.Remove(id, out var subgraph))
+            {
+                return false;
+            }
+
+            var members = _modules.Values.Where(m => m.Settings.SubgraphId == id).ToArray();
+            foreach (var entry in members)
+            {
+                entry.Settings = entry.Settings with { SubgraphId = null, Position = Offset(entry.Settings.Position, subgraph.Position.X, subgraph.Position.Y) };
+                ApplySettings(entry.Module, entry.Settings);
+            }
+
+            for (var i = 0; i < _unavailableModules.Count; i++)
+            {
+                _unavailableModules[i] = WithoutSubgraph(_unavailableModules[i], subgraph);
+            }
+
+            Persist();
+            foreach (var entry in members)
+            {
+                _notifier.ModuleChanged(ToDto(entry));
+            }
+
+            _notifier.SubgraphRemoved(id);
+            return true;
+        }
+    }
+
+    /// <summary>
     /// Rebuilds the graph with the current settings, which reopens all device streams with fresh buffers. The audio pauses briefly.
     /// </summary>
     public EngineStatusDto RestartAudio()
@@ -320,6 +409,8 @@ public sealed class AudioHost : IDisposable
                 throw EngineRequestException.Invalid($"Module {id} is of type '{entry.Definition.Type}'.");
             }
 
+            ThrowIfUnknownSubgraph(dto.SubgraphId);
+
             entry.Settings = WithSystemVolume(ModuleSettings.From(dto) with { IsBypassed = dto.IsBypassed && entry.Module is EffectModule });
             ApplySettings(entry.Module, entry.Settings);
             entry.Definition.SetState(entry.Module, dto.StateObject);
@@ -355,14 +446,47 @@ public sealed class AudioHost : IDisposable
         }
     }
 
-    private static void ApplySettings(AudioModule module, ModuleSettings settings)
+    /// <summary>
+    /// Replaces a subgraph's settings. Its modules are kept; a change of mute or bypass applies to them.
+    /// </summary>
+    public SubgraphDto UpdateSubgraph(Guid id, SubgraphDto dto)
     {
-        module.Volume = settings.Volume;
-        module.IsMuted = settings.IsMuted;
-        if (module is EffectModule effect)
+        ThrowIfInvalid(StateValidator.Validate(dto));
+
+        lock (_lock)
         {
-            effect.IsBypassed = settings.IsBypassed;
+            if (!_subgraphs.ContainsKey(id))
+            {
+                throw EngineRequestException.NotFound($"Subgraph {id} not found.");
+            }
+
+            var subgraph = dto with { Id = id };
+            _subgraphs[id] = subgraph;
+            foreach (var entry in _modules.Values.Where(m => m.Settings.SubgraphId == id))
+            {
+                ApplySettings(entry.Module, entry.Settings);
+            }
+
+            Persist();
+            _notifier.SubgraphChanged(subgraph);
+            return subgraph;
         }
+    }
+
+    /// <summary>
+    /// The audio module of a module, for tests.
+    /// </summary>
+    internal AudioModule? GetAudioModule(Guid id)
+    {
+        lock (_lock)
+        {
+            return _modules.TryGetValue(id, out var entry) ? entry.Module : null;
+        }
+    }
+
+    private static ModulePosition? Offset(ModulePosition? position, double x, double y)
+    {
+        return position == null ? null : new ModulePosition(position.X + x, position.Y + y);
     }
 
     private static void ThrowIfInvalid(Dictionary<string, string[]> errors)
@@ -371,6 +495,27 @@ public sealed class AudioHost : IDisposable
         {
             throw EngineRequestException.Invalid(errors);
         }
+    }
+
+    /// <summary>
+    /// Takes an unavailable module out of the subgraph, converting its position back to an absolute one.
+    /// </summary>
+    private static UnavailableModule WithoutSubgraph(UnavailableModule module, SubgraphDto subgraph)
+    {
+        if (!module.Element.TryGetProperty("subgraphId", out var id) || !id.TryGetGuid(out var subgraphId) || subgraphId != subgraph.Id)
+        {
+            return module;
+        }
+
+        var node = JsonNode.Parse(module.Element.GetRawText())!.AsObject();
+        node.Remove("subgraphId");
+        if (node["position"] is JsonObject position)
+        {
+            position["x"] = (double?)position["x"] + subgraph.Position.X;
+            position["y"] = (double?)position["y"] + subgraph.Position.Y;
+        }
+
+        return module with { Element = JsonSerializer.SerializeToElement(node) };
     }
 
     private ModuleEntry AddModuleCore(Guid id, AudioModuleDefinition definition, ModuleSettings settings, object? state)
@@ -397,6 +542,20 @@ public sealed class AudioHost : IDisposable
         var entry = new ModuleEntry(id, definition, module, settings with { IsBypassed = settings.IsBypassed && module is EffectModule });
         _modules.Add(id, entry);
         return entry;
+    }
+
+    /// <summary>
+    /// Sets the module's volume, mute and bypass, combining mute and bypass with its subgraph's.
+    /// </summary>
+    private void ApplySettings(AudioModule module, ModuleSettings settings)
+    {
+        var subgraph = settings.SubgraphId is { } id && _subgraphs.TryGetValue(id, out var s) ? s : null;
+        module.Volume = settings.Volume;
+        module.IsMuted = settings.IsMuted || subgraph?.IsMuted == true;
+        if (module is EffectModule effect)
+        {
+            effect.IsBypassed = settings.IsBypassed || subgraph?.IsBypassed == true;
+        }
     }
 
     /// <summary>
@@ -477,6 +636,16 @@ public sealed class AudioHost : IDisposable
         return new EngineStatusDto(Engine.IsRunning, _settings, statistics.Blocks, statistics.LateBlocks, statistics.MaxProcessingTime.TotalMilliseconds);
     }
 
+    /// <summary>
+    /// The module's position in the graph, not relative to its subgraph.
+    /// </summary>
+    private ModulePosition? GetAbsolutePosition(ModuleSettings settings)
+    {
+        return settings.SubgraphId is { } id && _subgraphs.TryGetValue(id, out var subgraph)
+            ? Offset(settings.Position, subgraph.Position.X, subgraph.Position.Y)
+            : settings.Position;
+    }
+
     private void OnDeviceChanged(object? sender, AudioDeviceChangedEventArgs e)
     {
         _notifier.DevicesChanged();
@@ -533,6 +702,7 @@ public sealed class AudioHost : IDisposable
             Settings = _settings,
             Preferences = _preferences,
             Modules = [.. _modules.Values.Select(ToDto)],
+            Subgraphs = [.. _subgraphs.Values],
             UnavailableModules = [.. _unavailableModules],
             Connections = [.. _connections.Values.Select(c => c.Dto), .. _unavailableConnections],
         });
@@ -572,6 +742,14 @@ public sealed class AudioHost : IDisposable
 
         _modules.Clear();
         _connections.Clear();
+    }
+
+    private void ThrowIfUnknownSubgraph(Guid? id)
+    {
+        if (id is { } subgraphId && !_subgraphs.ContainsKey(subgraphId))
+        {
+            throw EngineRequestException.Invalid($"Subgraph {subgraphId} not found.");
+        }
     }
 
     private ModuleDto ToDto(ModuleEntry entry)
