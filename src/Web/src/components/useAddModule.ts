@@ -9,6 +9,12 @@ import { useMutation } from "@tanstack/react-query";
 import { useReactFlow, type XYPosition } from "@xyflow/react";
 import { useNotifyError } from "../notifications";
 import { usePluginWidgets } from "../plugins";
+import type { ModuleNodeType } from "./ModuleNode";
+import { pendingPlacement, pendingSelection } from "./newModules";
+import { findFreePosition, placementMinimum, placementObstacles } from "./placement";
+
+/** The size assumed for a new module of a type that isn't on the graph yet. */
+const defaultModuleSize = { width: 260, height: 140 };
 
 /**
  * Returns a function that gives a graph position near the center of the visible graph, for things added without a position.
@@ -25,12 +31,37 @@ function useVisibleCenter() {
 }
 
 /**
+ * Returns a function that moves a position for a new module of a type to the nearest one where it doesn't overlap other nodes. In a
+ * subgraph, the position is relative to it, only the subgraph's modules count, and the module stays below the frame's header; otherwise
+ * the modules and subgraphs outside of subgraphs count. The new module's size is taken from a module of the same type on the graph, preferably an expanded one.
+ */
+function useFreeModulePosition() {
+  const { getNodes } = useReactFlow();
+
+  return (type: string, wanted: XYPosition, subgraphId?: string): XYPosition => {
+    const nodes = getNodes();
+    const sameType = nodes.filter(
+      (node) => node.type === "module" && (node as ModuleNodeType).data.module.type === type && node.measured?.width
+    ) as ModuleNodeType[];
+    const sample = sameType.find((node) => !node.data.module.isCollapsed) ?? sameType[0];
+    const size =
+      sample?.measured?.width && sample.measured.height
+        ? { width: sample.measured.width, height: sample.measured.height }
+        : defaultModuleSize;
+
+    return findFreePosition(wanted, size, placementObstacles(nodes, subgraphId), placementMinimum(subgraphId));
+  };
+}
+
+/**
  * Returns a function that adds a module of a type, at a graph position (relative to the subgraph if given) or near the center of the
- * visible graph, and resolves to the new module (undefined if adding failed). The module also appears through the engine's change
- * notification.
+ * visible graph, moved to where it doesn't overlap other nodes, and resolves to the new module (undefined if adding failed). The module
+ * also appears through the engine's change notification, and becomes the only selected element on the graph.
  */
 export function useAddModule() {
+  const { getNode, setEdges, setNodes } = useReactFlow();
   const visibleCenter = useVisibleCenter();
+  const freePosition = useFreeModulePosition();
   const notifyError = useNotifyError();
   const create = useMutation({
     ...getCreateModuleMutationOptions(),
@@ -39,7 +70,19 @@ export function useAddModule() {
 
   return async (type: string, position?: XYPosition, subgraphId?: string): Promise<ModuleDto | undefined> => {
     try {
-      return await create.mutateAsync({ data: { type, position: position ?? visibleCenter(), subgraphId } });
+      const wanted = position ?? visibleCenter();
+      const module = await create.mutateAsync({
+        data: { type, position: freePosition(type, wanted, subgraphId), subgraphId },
+      });
+      pendingPlacement.set(module.id, wanted);
+      if (getNode(module.id)) {
+        setNodes((nodes) => nodes.map((node) => ({ ...node, selected: node.id === module.id })));
+        setEdges((edges) => edges.map((edge) => (edge.selected ? { ...edge, selected: false } : edge)));
+      } else {
+        pendingSelection.add(module.id);
+      }
+
+      return module;
     } catch {
       return undefined;
     }
