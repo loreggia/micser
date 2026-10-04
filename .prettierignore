@@ -12,6 +12,7 @@
 !/package-lock.json
 !/tsconfig.base.json
 !/eslint.config.js
+!/vitest.config.ts
 **/dist
 **/node_modules
 **/generated
