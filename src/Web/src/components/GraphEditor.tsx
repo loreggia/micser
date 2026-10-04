@@ -44,6 +44,8 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useNotifyError } from "../notifications";
 import { usePluginWidgets } from "../plugins";
 import { ModuleNode, type ModuleNodeType } from "./ModuleNode";
+import { pendingPlacement, pendingSelection } from "./newModules";
+import { findFreePosition, placementMinimum, placementObstacles } from "./placement";
 import { SubgraphNode, type SubgraphNodeType } from "./SubgraphNode";
 import { frameAround, gridSize, proxyHandleId, resolveHandle, subgraphPadding, type ProxyPort } from "./subgraphs";
 import { TemplatesSubmenu } from "./TemplatesSubmenu";
@@ -240,6 +242,13 @@ export function GraphEditor() {
     }
 
     const subgraphsById = new Map(subgraphs.map((s) => [s.id, s]));
+    // a new module that was added here becomes the only selected element
+    const selectedId = modules.find((module) => pendingSelection.has(module.id))?.id;
+    if (selectedId) {
+      pendingSelection.delete(selectedId);
+      setEdges((current) => current.map((edge) => (edge.selected ? { ...edge, selected: false } : edge)));
+    }
+
     setNodes((current) => {
       const existing = new Map(current.map((node) => [node.id, node]));
 
@@ -271,9 +280,10 @@ export function GraphEditor() {
           : { id: module.id, type: "module" as const, position, data, ...placement };
       });
 
-      return [...subgraphNodes, ...moduleNodes];
+      const all = [...subgraphNodes, ...moduleNodes];
+      return selectedId ? all.map((node) => ({ ...node, selected: node.id === selectedId })) : all;
     });
-  }, [modules, subgraphs, typesByName, widgets, proxyPorts, setNodes]);
+  }, [modules, subgraphs, typesByName, widgets, proxyPorts, setNodes, setEdges]);
 
   useEffect(() => {
     if (!connections) {
@@ -304,6 +314,24 @@ export function GraphEditor() {
       })
     );
   }, [connections, collapsedSubgraphs, setEdges]);
+
+  // a new module is placed again once measured, since its size was only estimated
+  useEffect(() => {
+    for (const [id, wanted] of pendingPlacement) {
+      const node = nodes.find((n): n is ModuleNodeType => n.id === id && n.type === "module");
+      if (!node?.measured?.width || !node.measured.height) {
+        continue;
+      }
+
+      pendingPlacement.delete(id);
+      const size = { width: node.measured.width, height: node.measured.height };
+      const obstacles = placementObstacles(nodes, node.parentId, id);
+      const free = findFreePosition(wanted, size, obstacles, placementMinimum(node.parentId));
+      if (free.x !== node.position.x || free.y !== node.position.y) {
+        update({ ...node.data.module, position: free } as ModuleDto);
+      }
+    }
+  }, [nodes, update]);
 
   // expanded frames grow to contain their modules, e.g. after a module was added, moved in or expanded. Membership and positions
   // come from the engine's data: a dropped node still has its old parent until the module update reaches the cache.
