@@ -46,7 +46,7 @@ export interface ShellState {
 
 export type UpdateCheckResult = "upToDate" | "updateReady" | "failed";
 
-interface WebView {
+export interface WebView {
   postMessage(message: unknown): void;
   addEventListener(type: "message", listener: (event: MessageEvent) => void): void;
 }
@@ -56,7 +56,7 @@ type ShellMessage = ({ type: "state" } & ShellState) | { type: "updateCheck"; re
 /**
  * The desktop shell, when the UI runs in its WebView2 window. Messages go both ways through WebView2 web messages.
  */
-class Shell {
+export class Shell {
   private readonly listeners = new Set<() => void>();
   private readonly pendingChecks: ((result: UpdateCheckResult) => void)[] = [];
   private readonly webView: WebView;

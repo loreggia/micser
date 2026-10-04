@@ -2,7 +2,7 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { resolve } from "node:path";
 import type { Plugin } from "vite";
 
-interface WorkspacePlugin {
+export interface WorkspacePlugin {
   /** The URL the engine reports for the plugin's widget bundle, e.g. `/plugins/Main/web/index.js`. */
   url: string;
   /** The widget package's source entry. */
@@ -12,7 +12,7 @@ interface WorkspacePlugin {
 /**
  * The plugins in this repository (`src/Plugins/<name>/plugin.json` with a `Web` package).
  */
-function findWorkspacePlugins(pluginsDirectory: string): WorkspacePlugin[] {
+export function findWorkspacePlugins(pluginsDirectory: string): WorkspacePlugin[] {
   if (!existsSync(pluginsDirectory)) {
     return [];
   }
