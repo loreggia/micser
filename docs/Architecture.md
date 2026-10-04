@@ -158,22 +158,23 @@ docs/
 - **Widgets:**
   - A plugin's `Web` package default-exports `definePlugin({ name, widgets })` with `defineWidget({ moduleType, title, component })` entries. The component receives the typed module (`WidgetProps<"Gain">`) and a `setState` function. Module types of plugins outside this repository aren't in the generated API types.
   - `PluginsProvider` imports the widget bundles of the loaded plugins (`webUrl` from `GET /api/plugins`) before the graph is shown. A bundle that fails to load shows a notification, and its modules render without a widget.
-  - The graph node around it is generic: title, mute, bypass (if `supportsBypass`), remove, volume, a level meter, and connectors from the engine's module type. Modules without a widget still work.
+  - The graph node around it is generic: title, mute, bypass (if `supportsBypass`), collapse, a "More" menu with "Delete" (also when collapsed), volume, a level meter, and connectors from the engine's module type. Modules without a widget still work.
   - The collapse button shrinks a node to its title, mute, bypass and connectors (`isCollapsed`, saved with the module like its position). Collapsed nodes with several ports keep enough height for them and their labels.
   - Double-clicking the title renames the module (Enter or leaving the field saves, Escape cancels, an empty name goes back to the type's title). A named module shows the type's title below its name.
   - The level meter (`useModuleLevels`) is studio-style, per channel on a -60..0 dBFS scale: the RMS as a solid bar, the peak as a lighter bar behind it (instant rise, falling at 20 dB/s), and the highest peak as a marker held for 30 updates (about 1.5 s) that turns red at full scale. While a module isn't processed, its meter stays at zero with its last channel count, so the node doesn't change height.
   - Controls inside nodes need the `nodrag`/`nowheel` classes. `ParameterSlider` is the shared parameter control, with linear or logarithmic scales and integer slider positions, so keyboard steps are exact.
 - **Graph editor (`@xyflow/react`):**
   - Nodes and edges follow the engine.
-  - Connecting, deleting (Delete key or the node's remove button) and moving (the position is saved on drop) go through the API. Rejected connections, e.g. cycles, show a notification.
+  - Connecting, deleting (Delete key or "Delete" in the node's "More" menu) and moving (the position is saved on drop) go through the API. Rejected connections, e.g. cycles, show a notification.
   - Modules snap to a 20 px grid (the background dots) unless the preference is off.
   - Dragging a selected connection's end to another port reroutes it: the new connection is created first and the old one removed only if that succeeded. Only selected connections have handles at their ends, drawn above the other connections, so a drag at a port with several connections can't take the wrong one.
   - Dropping a new connection on empty space opens a menu of module types with a matching port; the chosen module is added there and connected (its first input when the drag started at an output, its first output otherwise).
-  - Right-clicking empty space opens the same menu with all module types; the chosen module is added at the click. The browser's context menu is suppressed on the graph, but not on nodes.
+  - Right-clicking empty space opens the same menu with all module types; the chosen module is added at the click. The browser's context menu is suppressed on the graph, except in text fields.
+  - Right-clicking a module or the selection opens a menu with "Group" (for modules not in a subgraph), "Remove from subgraph" (for modules in one) and "Delete", which deletes the right-clicked module, or the selected modules if it is one of them.
   - Node cards don't clip their content, so the ports on their edges are whole and fully clickable.
   - Selected nodes aren't raised, so a selected subgraph's frame doesn't cover modules that overlap it.
 - **Subgraphs** in the graph editor:
-  - Ctrl+G or "Group" in a module's or the selection's context menu wraps the selected modules in a new subgraph, on the grid with room for the header.
+  - Ctrl+G or "Group" in a module's or the selection's context menu wraps the selected modules in a new subgraph, on the grid with room for the header. Modules already in a subgraph can't be grouped, also not together with others: the menu then has no "Group", and Ctrl+G does nothing.
   - Expanded, a subgraph is a frame in its color (Fluent palette tokens) behind its modules (React Flow parent nodes). Its header has the name (double-click to rename), fit to modules, mute, bypass, collapse and the "More" menu, and the corner at the bottom right resizes it. Frames grow to contain their modules, e.g. after one was added or expanded; "Fit to modules" puts the frame tightly around them (as when grouping), moving the modules' relative positions so they stay in place.
   - A module stays in its subgraph while it overlaps the frame and leaves it once it is dropped completely outside. Dropping a module with its center on another expanded frame moves it into that subgraph. "Remove from subgraph" in the context menu places it below the frame. Right-clicking a frame adds a module in it.
   - A module muted or bypassed by its subgraph shows it with its own switch disabled.

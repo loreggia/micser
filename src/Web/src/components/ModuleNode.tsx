@@ -3,6 +3,11 @@ import {
   Caption1,
   Card,
   CardHeader,
+  Menu,
+  MenuItem,
+  MenuList,
+  MenuPopover,
+  MenuTrigger,
   Slider,
   ToggleButton,
   Tooltip,
@@ -16,6 +21,7 @@ import {
   DeleteRegular,
   DesktopSpeakerRegular,
   FlashOffRegular,
+  MoreHorizontalRegular,
   Speaker2Regular,
   SpeakerMuteRegular,
 } from "@fluentui/react-icons";
@@ -87,8 +93,8 @@ const useStyles = makeStyles({
 });
 
 /**
- * A module on the graph: name, mute, bypass, volume (or the Windows volume), level meter, the module type's widget, and the
- * connectors. Collapsed, it shows only the name, mute, bypass and the connectors. While its subgraph is muted or bypassed, the module's
+ * A module on the graph: name, mute, bypass, collapse and a menu (delete), volume (or the Windows volume), level meter, the module type's
+ * widget, and the connectors. Collapsed, it shows only the name, mute, bypass and the connectors. While its subgraph is muted or bypassed, the module's
  * own switch shows that and is disabled.
  */
 export function ModuleNode({ id, data, selected }: NodeProps<ModuleNodeType>) {
@@ -158,16 +164,6 @@ export function ModuleNode({ id, data, selected }: NodeProps<ModuleNodeType>) {
                 onClick={() => update({ ...module, isMuted: !module.isMuted })}
               />
             </Tooltip>
-            {!collapsed && (
-              <Tooltip content="Remove" relationship="label">
-                <Button
-                  size="small"
-                  appearance="subtle"
-                  icon={<DeleteRegular />}
-                  onClick={() => void deleteElements({ nodes: [{ id }] })}
-                />
-              </Tooltip>
-            )}
             <Tooltip content={collapsed ? "Expand" : "Collapse"} relationship="label">
               <Button
                 size="small"
@@ -176,6 +172,20 @@ export function ModuleNode({ id, data, selected }: NodeProps<ModuleNodeType>) {
                 onClick={() => update({ ...module, isCollapsed: !collapsed })}
               />
             </Tooltip>
+            <Menu>
+              <MenuTrigger disableButtonEnhancement>
+                <Tooltip content="More" relationship="label">
+                  <Button size="small" appearance="subtle" icon={<MoreHorizontalRegular />} />
+                </Tooltip>
+              </MenuTrigger>
+              <MenuPopover>
+                <MenuList>
+                  <MenuItem icon={<DeleteRegular />} onClick={() => void deleteElements({ nodes: [{ id }] })}>
+                    Delete
+                  </MenuItem>
+                </MenuList>
+              </MenuPopover>
+            </Menu>
           </div>
         }
       />
