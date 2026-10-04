@@ -21,6 +21,11 @@ public abstract record ModuleDto
     /// </summary>
     public bool IsBypassed { get; init; }
 
+    /// <summary>
+    /// Shows only the name, mute and connectors in the UI's graph editor.
+    /// </summary>
+    public bool IsCollapsed { get; init; }
+
     public bool IsMuted { get; init; }
 
     /// <summary>

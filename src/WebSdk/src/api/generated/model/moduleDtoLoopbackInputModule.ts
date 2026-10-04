@@ -13,6 +13,7 @@ export interface ModuleDtoLoopbackInputModule {
   state: LoopbackInputState;
   id: string;
   isBypassed: boolean;
+  isCollapsed: boolean;
   isMuted: boolean;
   /**
      * @maxLength 100

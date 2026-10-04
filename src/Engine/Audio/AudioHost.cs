@@ -63,7 +63,7 @@ public sealed class AudioHost : IDisposable
 
         lock (_lock)
         {
-            var entry = AddModuleCore(Guid.NewGuid(), definition, new ModuleSettings(request.Name, request.Position, 1f, false, false, false), null);
+            var entry = AddModuleCore(Guid.NewGuid(), definition, new ModuleSettings(request.Name, request.Position, 1f, false, false, false, false), null);
             Persist();
             var dto = ToDto(entry);
             _notifier.ModuleChanged(dto);

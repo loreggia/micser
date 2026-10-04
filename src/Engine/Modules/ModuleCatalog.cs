@@ -91,6 +91,7 @@ public sealed class ModuleCatalog
             IsMuted = settings.IsMuted,
             UseSystemVolume = settings.UseSystemVolume,
             IsBypassed = settings.IsBypassed,
+            IsCollapsed = settings.IsCollapsed,
             State = (TState)state,
         };
     }
@@ -99,10 +100,10 @@ public sealed class ModuleCatalog
 /// <summary>
 /// The settings every module has, besides its state.
 /// </summary>
-public sealed record ModuleSettings(string? Name, ModulePosition? Position, float Volume, bool IsMuted, bool IsBypassed, bool UseSystemVolume)
+public sealed record ModuleSettings(string? Name, ModulePosition? Position, float Volume, bool IsMuted, bool IsBypassed, bool UseSystemVolume, bool IsCollapsed)
 {
     public static ModuleSettings From(ModuleDto dto)
     {
-        return new ModuleSettings(dto.Name, dto.Position, dto.Volume, dto.IsMuted, dto.IsBypassed, dto.UseSystemVolume);
+        return new ModuleSettings(dto.Name, dto.Position, dto.Volume, dto.IsMuted, dto.IsBypassed, dto.UseSystemVolume, dto.IsCollapsed);
     }
 }

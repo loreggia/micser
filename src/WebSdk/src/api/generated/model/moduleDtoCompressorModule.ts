@@ -13,6 +13,7 @@ export interface ModuleDtoCompressorModule {
   state: CompressorState;
   id: string;
   isBypassed: boolean;
+  isCollapsed: boolean;
   isMuted: boolean;
   /**
      * @maxLength 100

@@ -13,6 +13,7 @@ export interface ModuleDtoGainModule {
   state: GainState;
   id: string;
   isBypassed: boolean;
+  isCollapsed: boolean;
   isMuted: boolean;
   /**
      * @maxLength 100
