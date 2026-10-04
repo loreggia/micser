@@ -41,6 +41,11 @@ public interface IEngineClient
     Task SubgraphChanged(SubgraphDto subgraph);
 
     Task SubgraphRemoved(Guid subgraphId);
+
+    /// <summary>
+    /// The subgraph templates after one was saved, renamed or removed.
+    /// </summary>
+    Task TemplatesChanged(IReadOnlyList<SubgraphTemplateDto> templates);
 }
 
 /// <summary>

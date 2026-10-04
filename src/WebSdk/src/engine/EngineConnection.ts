@@ -10,6 +10,7 @@ import {
   getGetPluginsQueryKey,
   getGetPreferencesQueryKey,
   getGetSubgraphsQueryKey,
+  getGetSubgraphTemplatesQueryKey,
   updateModule,
   updateSubgraph,
   type ConnectionDto,
@@ -17,6 +18,7 @@ import {
   type ModuleDto,
   type PluginDto,
   type SubgraphDto,
+  type SubgraphTemplateDto,
   type UiPreferencesDto,
 } from "../api";
 
@@ -173,6 +175,9 @@ export class EngineConnection {
       this.queryClient.setQueryData<SubgraphDto[]>(getGetSubgraphsQueryKey(), (subgraphs) =>
         subgraphs?.filter((s) => s.id !== subgraphId)
       );
+    });
+    this.hub.on("TemplatesChanged", (templates: SubgraphTemplateDto[]) => {
+      this.queryClient.setQueryData(getGetSubgraphTemplatesQueryKey(), templates);
     });
     this.hub.on("DevicesChanged", () => {
       void this.queryClient.invalidateQueries({ queryKey: getGetDevicesQueryKey().slice(0, 1) });

@@ -18,4 +18,8 @@ export interface SubgraphDto {
   isCollapsed: boolean;
   isMuted: boolean;
   isBypassed: boolean;
+  /** @nullable */
+  templateId?: string | null;
+  /** @nullable */
+  templateRevision?: number | null;
 }

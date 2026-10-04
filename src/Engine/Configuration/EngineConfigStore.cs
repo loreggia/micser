@@ -22,6 +22,8 @@ public sealed class EngineConfiguration
 
     public List<SubgraphDto> Subgraphs { get; init; } = [];
 
+    public List<SubgraphTemplate> Templates { get; init; } = [];
+
     /// <summary>
     /// Modules whose plugin isn't loaded. They're kept as they are, so they come back when the plugin does.
     /// </summary>
@@ -34,6 +36,20 @@ public sealed class EngineConfiguration
 /// A module in the configuration whose type no loaded plugin provides.
 /// </summary>
 public sealed record UnavailableModule(Guid Id, string Type, JsonElement Element);
+
+/// <summary>
+/// A subgraph template. Like the graph's, its modules of unknown types are kept as they are.
+/// </summary>
+/// <param name="Modules">The modules with template-local ids and positions relative to the subgraph.</param>
+public sealed record SubgraphTemplate(
+    Guid Id,
+    string Name,
+    int Revision,
+    SubgraphColor Color,
+    SubgraphSize Size,
+    IReadOnlyList<ModuleDto> Modules,
+    IReadOnlyList<UnavailableModule> UnavailableModules,
+    IReadOnlyList<TemplateConnectionDto> Connections);
 
 /// <summary>
 /// Loads and saves <see cref="EngineConfiguration"/> as JSON. Saves are debounced and written atomically.
@@ -118,25 +134,13 @@ public sealed class EngineConfigStore : IDisposable
                 throw new JsonException($"Unsupported version {file.Version}.");
             }
 
-            var modules = new List<ModuleDto>();
-            var unavailableModules = new List<UnavailableModule>();
-            foreach (var element in file.Modules)
+            var (modules, unavailableModules) = ReadModules(file.Modules);
+            var templates = new List<SubgraphTemplate>();
+            foreach (var template in file.Templates ?? [])
             {
-                if (TryReadUnavailable(element) is { } unavailable)
-                {
-                    _logger.LogWarning("Keeping module {Id} of the unknown type {Type}; its plugin isn't loaded.", unavailable.Id, unavailable.Type);
-                    unavailableModules.Add(unavailable);
-                    continue;
-                }
-
-                try
-                {
-                    modules.Add(element.Deserialize<ModuleDto>(_json) ?? throw new JsonException("Empty module."));
-                }
-                catch (JsonException ex)
-                {
-                    _logger.LogWarning(ex, "Skipping a module in the configuration: {Module}", element.GetRawText());
-                }
+                var (templateModules, templateUnavailableModules) = ReadModules(template.Modules);
+                templates.Add(new SubgraphTemplate(
+                    template.Id, template.Name, template.Revision, template.Color, template.Size, templateModules, templateUnavailableModules, template.Connections));
             }
 
             return new EngineConfiguration
@@ -145,6 +149,7 @@ public sealed class EngineConfigStore : IDisposable
                 Preferences = file.Preferences ?? new UiPreferencesDto(),
                 Modules = modules,
                 Subgraphs = file.Subgraphs ?? [],
+                Templates = templates,
                 UnavailableModules = unavailableModules,
                 Connections = file.Connections ?? [],
             };
@@ -179,6 +184,40 @@ public sealed class EngineConfigStore : IDisposable
     }
 
     /// <summary>
+    /// Reads modules, keeping those of unknown types as they are and skipping invalid ones.
+    /// </summary>
+    private (List<ModuleDto> Modules, List<UnavailableModule> UnavailableModules) ReadModules(IEnumerable<JsonElement> elements)
+    {
+        var modules = new List<ModuleDto>();
+        var unavailableModules = new List<UnavailableModule>();
+        foreach (var element in elements)
+        {
+            if (TryReadUnavailable(element) is { } unavailable)
+            {
+                _logger.LogWarning("Keeping module {Id} of the unknown type {Type}; its plugin isn't loaded.", unavailable.Id, unavailable.Type);
+                unavailableModules.Add(unavailable);
+                continue;
+            }
+
+            try
+            {
+                modules.Add(element.Deserialize<ModuleDto>(_json) ?? throw new JsonException("Empty module."));
+            }
+            catch (JsonException ex)
+            {
+                _logger.LogWarning(ex, "Skipping a module in the configuration: {Module}", element.GetRawText());
+            }
+        }
+
+        return (modules, unavailableModules);
+    }
+
+    private List<JsonElement> SerializeModules(IEnumerable<ModuleDto> modules, IEnumerable<UnavailableModule> unavailableModules)
+    {
+        return [.. modules.Select(m => JsonSerializer.SerializeToElement(m, _json)), .. unavailableModules.Select(m => m.Element)];
+    }
+
+    /// <summary>
     /// Returns the module if it has an id and a type that no plugin provides.
     /// </summary>
     private UnavailableModule? TryReadUnavailable(JsonElement element)
@@ -200,10 +239,20 @@ public sealed class EngineConfigStore : IDisposable
             var file = new ConfigurationFile
             {
                 Connections = configuration.Connections,
-                Modules = [.. configuration.Modules.Select(m => JsonSerializer.SerializeToElement(m, _json)), .. configuration.UnavailableModules.Select(m => m.Element)],
+                Modules = SerializeModules(configuration.Modules, configuration.UnavailableModules),
                 Preferences = configuration.Preferences,
                 Settings = configuration.Settings,
                 Subgraphs = configuration.Subgraphs,
+                Templates = [.. configuration.Templates.Select(t => new TemplateFile
+                {
+                    Id = t.Id,
+                    Name = t.Name,
+                    Revision = t.Revision,
+                    Color = t.Color,
+                    Size = t.Size,
+                    Modules = SerializeModules(t.Modules, t.UnavailableModules),
+                    Connections = [.. t.Connections],
+                })],
                 Version = configuration.Version,
             };
 
@@ -232,6 +281,25 @@ public sealed class EngineConfigStore : IDisposable
 
         public List<SubgraphDto>? Subgraphs { get; init; }
 
+        public List<TemplateFile>? Templates { get; init; }
+
         public int Version { get; init; }
+    }
+
+    private sealed class TemplateFile
+    {
+        public SubgraphColor Color { get; init; }
+
+        public List<TemplateConnectionDto> Connections { get; init; } = [];
+
+        public Guid Id { get; init; }
+
+        public List<JsonElement> Modules { get; init; } = [];
+
+        public string Name { get; init; } = "";
+
+        public int Revision { get; init; }
+
+        public SubgraphSize Size { get; init; } = new(400, 300);
     }
 }

@@ -1,4 +1,13 @@
-import { Menu, MenuItem, MenuList, MenuPopover, Spinner, makeStyles, tokens } from "@fluentui/react-components";
+import {
+  Menu,
+  MenuDivider,
+  MenuItem,
+  MenuList,
+  MenuPopover,
+  Spinner,
+  makeStyles,
+  tokens,
+} from "@fluentui/react-components";
 import {
   getCreateConnectionMutationOptions,
   getCreateSubgraphMutationOptions,
@@ -37,7 +46,8 @@ import { usePluginWidgets } from "../plugins";
 import { ModuleNode, type ModuleNodeType } from "./ModuleNode";
 import { SubgraphNode, type SubgraphNodeType } from "./SubgraphNode";
 import { frameAround, gridSize, proxyHandleId, resolveHandle, subgraphPadding, type ProxyPort } from "./subgraphs";
-import { useAddModule, useModuleTypeChoices } from "./useAddModule";
+import { TemplatesSubmenu } from "./TemplatesSubmenu";
+import { useAddModule, useInstantiateTemplate, useModuleTypeChoices } from "./useAddModule";
 
 type GraphNode = ModuleNodeType | SubgraphNodeType;
 
@@ -149,6 +159,7 @@ export function GraphEditor() {
   const update = useModuleUpdate();
   const updateSubgraph = useSubgraphUpdate();
   const addModule = useAddModule();
+  const instantiateTemplate = useInstantiateTemplate();
   const notifyError = useNotifyError();
 
   const connect = useMutation({
@@ -167,9 +178,9 @@ export function GraphEditor() {
     ...getCreateSubgraphMutationOptions(),
     onError: (error) => notifyError("Grouping failed", error),
   });
-  const ungroup = useMutation({
+  const removeSubgraph = useMutation({
     ...getDeleteSubgraphMutationOptions(),
-    onError: (error) => notifyError("Ungrouping failed", error),
+    onError: (error) => notifyError("Deleting the subgraph failed", error),
   });
 
   const typesByName = useMemo(() => new Map(moduleTypes?.map((type) => [type.type, type])), [moduleTypes]);
@@ -570,16 +581,20 @@ export function GraphEditor() {
           resolveHandle(connection.source, connection.sourceHandle).moduleId !==
           resolveHandle(connection.target, connection.targetHandle).moduleId
         }
-        // a removed subgraph is ungrouped: its modules stay unless they were selected too; the engine removes the
-        // connections of removed modules
+        // the engine removes a deleted subgraph with its modules, and the connections of removed modules, so the editor
+        // only deletes the other modules and the selected connections that remain
         onBeforeDelete={({ nodes: deleted, edges: deletedEdges }) => {
           const subgraphIds = new Set(deleted.filter((node) => node.type === "subgraph").map((node) => node.id));
-          subgraphIds.forEach((id) => ungroup.mutate({ id }));
+          subgraphIds.forEach((id) => removeSubgraph.mutate({ id, params: { deleteModules: true } }));
+          const removedByEngine = new Set([
+            ...subgraphIds,
+            ...nodes.filter((node) => node.parentId && subgraphIds.has(node.parentId)).map((node) => node.id),
+          ]);
           return Promise.resolve({
-            nodes: deleted.filter(
-              (node) => node.type === "module" && (node.selected || !node.parentId || !subgraphIds.has(node.parentId))
+            nodes: deleted.filter((node) => node.type === "module" && !removedByEngine.has(node.id)),
+            edges: deletedEdges.filter(
+              (edge) => edge.selected && !removedByEngine.has(edge.source) && !removedByEngine.has(edge.target)
             ),
-            edges: deletedEdges.filter((edge) => edge.selected),
           });
         }}
         onNodesDelete={(deleted) => deleted.forEach((node) => remove.mutate({ id: node.id }))}
@@ -611,6 +626,17 @@ export function GraphEditor() {
                   {type.title}
                 </MenuItem>
               ))}
+            {menu && !menu.connection && !menu.subgraph && (
+              <>
+                <MenuDivider />
+                <TemplatesSubmenu
+                  onInstantiate={(templateId) => {
+                    setMenu(undefined);
+                    instantiateTemplate(templateId, round(screenToFlowPosition(menu.point)));
+                  }}
+                />
+              </>
+            )}
           </MenuList>
         </MenuPopover>
       </Menu>

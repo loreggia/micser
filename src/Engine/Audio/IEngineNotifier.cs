@@ -26,4 +26,6 @@ public interface IEngineNotifier
     void SubgraphChanged(SubgraphDto subgraph);
 
     void SubgraphRemoved(Guid subgraphId);
+
+    void TemplatesChanged(IReadOnlyList<SubgraphTemplateDto> templates);
 }
