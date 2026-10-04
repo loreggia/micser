@@ -16,6 +16,9 @@ dotnet test --project tests/Engine/Micser.Engine.Tests.csproj --treenode-filter 
 npm install                  # root; installs all workspaces
 npm run build                # typecheck + vite build of src/Web and the plugins' widget bundles (src/Plugins/*/Web/dist)
 npm run typecheck            # tsc in every workspace
+npx playwright install chromium   # once, for the Vitest browser tests
+npm test                     # Vitest: unit project (Node) and browser project (headless Chromium); "npm run test:watch" to watch
+npx vitest run src/Plugins/Main/Web/src/widgets/GainWidget.test.tsx
 npm run lint                 # eslint (flat config at the root)
 npm run format:check         # prettier; .prettierignore limits it to the web workspaces
 npm run generate:api -w @micser/web-sdk   # regenerate the API client after engine API changes (build the engine first)
@@ -43,7 +46,7 @@ dotnet run --project tools/AudioHarness -- formats 2 1             # formats out
 
 The harness opens real devices: use a very low gain (as above) unless audible output is intended.
 
-CI (`.github/workflows/ci.yml`) runs the dotnet build/test, the driver build and npm format/lint/build as separate jobs.
+CI (`.github/workflows/ci.yml`) runs the dotnet build/test, the driver build and npm format/lint/typecheck/test/build as separate jobs.
 
 ## Working preferences
 
@@ -64,13 +67,14 @@ CI (`.github/workflows/ci.yml`) runs the dotnet build/test, the driver build and
   - SignalR `hub.on` handlers must not return a value; SignalR would send it to the server as an invocation result.
   - UI preferences are stored by the engine (`/api/preferences`, `usePreferences`), not in browser storage: the UI's origin changes with the engine's random port.
   - The UI talks to the desktop shell through WebView2 web messages (`src/Web/src/shell.ts` ↔ `MainForm`); shell-only controls are hidden in a plain browser.
+  - Tests sit next to the code. `*.test.ts` runs in Node. `*.test.tsx` and `*.browser.test.ts` (DOM, storage, module imports) run in Vitest browser mode (Chromium), with `render` from `vitest-browser-react` and locators/`expect.element` from `vitest/browser`. Render widgets inside `TestProviders` from `@micser/web-sdk/testing` and seed the query client instead of fetching. A dependency that a browser test newly imports goes into `optimizeDeps.include` in `vitest.config.ts`: a second optimizer pass reloads the tests and can load React twice.
 - Dependency direction:
   - .NET: `Plugins → Audio` and `Engine → Audio, ServiceDefaults`. The engine's reference to a built-in plugin is build-only (`ReferenceOutputAssembly="false"`, `OutputItemType="BuiltInPlugin"`), which copies it to `plugins/<id>` (`src/Engine/BuiltInPlugins.targets`). `tools/AppHost` references the runnable projects. `Shell` references no Micser project and talks to the engine over HTTP only.
   - npm: `plugin-* → web-sdk` and `web → web-sdk`. The SPA imports plugin widgets at runtime from the URLs the engine reports.
 - Package versions are central in `Directory.Packages.props`, so `PackageReference` items carry no `Version`. `TreatWarningsAsErrors` is on for all projects.
 - Libraries:
   - Serilog via `Microsoft.Extensions.Logging` (configured from `appsettings*.json`; the file sink is only enabled in Production).
-  - `System.Text.Json`, and TUnit + NSubstitute for tests.
+  - `System.Text.Json`, and TUnit + NSubstitute for tests. Vitest (browser mode with Playwright's Chromium) for the web tests.
   - NAudio for audio I/O. There's no Newtonsoft, EF Core, Prism/Unity or xUnit.
 - Prettier style: 2 spaces, double quotes, semicolons, print width 120.
 - C# code is cleaned up with CodeMaid (settings in `CodeMaid.config`). Write new code in its layout so a cleanup run doesn't reshuffle it:
