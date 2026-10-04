@@ -1,4 +1,4 @@
-import { Menu, MenuItem, MenuList, MenuPopover, Spinner, makeStyles } from "@fluentui/react-components";
+import { Menu, MenuItem, MenuList, MenuPopover, Spinner, makeStyles, tokens } from "@fluentui/react-components";
 import {
   getCreateConnectionMutationOptions,
   getDeleteConnectionMutationOptions,
@@ -45,6 +45,13 @@ const useStyles = makeStyles({
     display: "grid",
     placeItems: "center",
   },
+  flow: {
+    "& .react-flow__edge.selected .react-flow__edgeupdater": {
+      fill: tokens.colorNeutralBackground1,
+      stroke: tokens.colorBrandStroke1,
+      strokeWidth: tokens.strokeWidthThick,
+    },
+  },
 });
 
 /** Position of a module without a stored position: a grid by index. */
@@ -67,8 +74,10 @@ interface AddModuleMenu {
 
 /**
  * The routing graph: modules as nodes, connections as edges. Changes go to the engine; the graph follows the engine's
- * notifications, except for positions while a node is being dragged. Connections can be dragged to other ports. A right
- * click on empty space offers to add a module there, and so does a connection dropped there, connecting the new module.
+ * notifications, except for positions while a node is being dragged. A selected connection has handles at its ends that
+ * drag it to other ports; unselected ones have none, so a drag at a port with several connections can't take the wrong
+ * one. A right click on empty space offers to add a module there, and so does a connection dropped there, connecting the
+ * new module.
  */
 export function GraphEditor() {
   const styles = useStyles();
@@ -135,6 +144,11 @@ export function GraphEditor() {
       }))
     );
   }, [connections, setEdges]);
+
+  const shownEdges = useMemo(
+    () => edges.map((edge) => (edge.selected ? { ...edge, reconnectable: true } : edge)),
+    [edges]
+  );
 
   if (!modules || !connections || !moduleTypes || isLoadingWidgets) {
     return (
@@ -241,7 +255,8 @@ export function GraphEditor() {
     <>
       <ReactFlow<ModuleNodeType, Edge>
         nodes={nodes}
-        edges={edges}
+        className={styles.flow}
+        edges={shownEdges}
         nodeTypes={nodeTypes}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
@@ -253,6 +268,8 @@ export function GraphEditor() {
           openMenu({ point: { x: event.clientX, y: event.clientY } });
         }}
         onReconnect={(oldEdge, connection) => void reconnect(oldEdge, connection)}
+        edgesReconnectable={false}
+        elevateEdgesOnSelect
         isValidConnection={(connection) => connection.source !== connection.target}
         onNodesDelete={(deleted) => deleted.forEach((node) => remove.mutate({ id: node.id }))}
         onEdgesDelete={(deleted) => deleted.forEach((edge) => disconnect.mutate({ id: edge.id }))}
