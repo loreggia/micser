@@ -4,3 +4,4 @@ export * from './engine/engine';
 export * from './modules/modules';
 export * from './plugins/plugins';
 export * from './preferences/preferences';
+export * from './subgraphs/subgraphs';

@@ -68,6 +68,16 @@ public sealed class HubEngineNotifier : IEngineNotifier, IDisposable
         Send(c => c.StatusChanged(status));
     }
 
+    public void SubgraphChanged(SubgraphDto subgraph)
+    {
+        Send(c => c.SubgraphChanged(subgraph));
+    }
+
+    public void SubgraphRemoved(Guid subgraphId)
+    {
+        Send(c => c.SubgraphRemoved(subgraphId));
+    }
+
     private void Send(Func<IEngineClient, Task> send)
     {
         _queue.Writer.TryWrite(send);

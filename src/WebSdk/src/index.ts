@@ -14,6 +14,7 @@ export {
   useModuleLevels,
   useModuleUpdate,
   usePreferences,
+  useSubgraphUpdate,
 } from "./engine/hooks";
 export { decibels, hertz, milliseconds } from "./lib/labels";
 export {

@@ -1,10 +1,8 @@
 import {
-  Body1Strong,
   Button,
   Caption1,
   Card,
   CardHeader,
-  Input,
   Slider,
   ToggleButton,
   Tooltip,
@@ -21,15 +19,23 @@ import {
   Speaker2Regular,
   SpeakerMuteRegular,
 } from "@fluentui/react-icons";
-import { useModuleUpdate, type ModuleDto, type ModuleTypeDto, type WidgetDefinition } from "@micser/web-sdk";
+import {
+  useModuleUpdate,
+  type ModuleDto,
+  type ModuleTypeDto,
+  type SubgraphDto,
+  type WidgetDefinition,
+} from "@micser/web-sdk";
 import { Handle, Position, useReactFlow, type Node, type NodeProps } from "@xyflow/react";
-import { useRef, useState } from "react";
 import { LevelMeter } from "./LevelMeter";
+import { ModuleTitle } from "./ModuleTitle";
 
 export type ModuleNodeData = {
   module: ModuleDto;
   moduleType?: ModuleTypeDto;
   widget?: WidgetDefinition;
+  /** The subgraph the module belongs to, whose mute and bypass apply to it too. */
+  subgraph?: SubgraphDto;
 };
 
 export type ModuleNodeType = Node<ModuleNodeData, "module">;
@@ -46,12 +52,6 @@ const useStyles = makeStyles({
   },
   header: {
     cursor: "grab",
-  },
-  title: {
-    cursor: "text",
-  },
-  titleInput: {
-    width: "100%",
   },
   actions: {
     display: "flex",
@@ -88,13 +88,16 @@ const useStyles = makeStyles({
 
 /**
  * A module on the graph: name, mute, bypass, volume (or the Windows volume), level meter, the module type's widget, and the
- * connectors. Collapsed, it shows only the name, mute, bypass and the connectors.
+ * connectors. Collapsed, it shows only the name, mute, bypass and the connectors. While its subgraph is muted or bypassed, the module's
+ * own switch shows that and is disabled.
  */
 export function ModuleNode({ id, data, selected }: NodeProps<ModuleNodeType>) {
   const styles = useStyles();
   const update = useModuleUpdate();
   const { deleteElements } = useReactFlow();
-  const { module, moduleType, widget } = data;
+  const { module, moduleType, widget, subgraph } = data;
+  const mutedBySubgraph = subgraph?.isMuted === true;
+  const bypassedBySubgraph = subgraph?.isBypassed === true;
   const Widget = widget?.component;
   const collapsed = module.isCollapsed;
   // collapsed, the card is only as high as its header, which would crowd several ports and their labels
@@ -111,7 +114,8 @@ export function ModuleNode({ id, data, selected }: NodeProps<ModuleNodeType>) {
         header={
           <ModuleTitle
             name={module.name ?? null}
-            typeTitle={widget?.title || module.type}
+            fallback={widget?.title || module.type}
+            label="Module name"
             onRename={(name) => update({ ...module, name } as ModuleDto)}
           />
         }
@@ -119,26 +123,38 @@ export function ModuleNode({ id, data, selected }: NodeProps<ModuleNodeType>) {
         action={
           <div className={mergeClasses(styles.actions, "nodrag")}>
             {moduleType?.supportsBypass && (
-              <Tooltip content={module.isBypassed ? "Bypassed" : "Bypass"} relationship="label">
+              <Tooltip
+                content={bypassedBySubgraph ? "Bypassed by subgraph" : module.isBypassed ? "Bypassed" : "Bypass"}
+                relationship="label"
+              >
                 <ToggleButton
                   size="small"
                   appearance="subtle"
-                  checked={module.isBypassed}
+                  checked={module.isBypassed || bypassedBySubgraph}
+                  disabled={bypassedBySubgraph}
                   icon={<FlashOffRegular />}
                   onClick={() => update({ ...module, isBypassed: !module.isBypassed })}
                 />
               </Tooltip>
             )}
             <Tooltip
-              content={module.useSystemVolume ? "Muted with Windows" : module.isMuted ? "Unmute" : "Mute"}
+              content={
+                mutedBySubgraph
+                  ? "Muted by subgraph"
+                  : module.useSystemVolume
+                    ? "Muted with Windows"
+                    : module.isMuted
+                      ? "Unmute"
+                      : "Mute"
+              }
               relationship="label"
             >
               <ToggleButton
                 size="small"
                 appearance="subtle"
-                checked={module.isMuted}
-                disabled={module.useSystemVolume}
-                icon={module.isMuted ? <SpeakerMuteRegular /> : <Speaker2Regular />}
+                checked={module.isMuted || mutedBySubgraph}
+                disabled={module.useSystemVolume || mutedBySubgraph}
+                icon={module.isMuted || mutedBySubgraph ? <SpeakerMuteRegular /> : <Speaker2Regular />}
                 onClick={() => update({ ...module, isMuted: !module.isMuted })}
               />
             </Tooltip>
@@ -199,103 +215,40 @@ export function ModuleNode({ id, data, selected }: NodeProps<ModuleNodeType>) {
         </>
       )}
       {moduleType?.inputs.map((port, index, ports) => (
-        <Ports key={port} type="target" port={port} index={index} count={ports.length} />
+        <Port
+          key={port}
+          type="target"
+          id={port}
+          label={ports.length > 1 ? port : undefined}
+          index={index}
+          count={ports.length}
+        />
       ))}
       {moduleType?.outputs.map((port, index, ports) => (
-        <Ports key={port} type="source" port={port} index={index} count={ports.length} />
+        <Port
+          key={port}
+          type="source"
+          id={port}
+          label={ports.length > 1 ? port : undefined}
+          index={index}
+          count={ports.length}
+        />
       ))}
     </Card>
   );
 }
 
-/** Longest name the engine accepts. */
-const maxNameLength = 100;
-
-/**
- * The module's title. Double-click to rename: Enter or leaving the field saves, Escape cancels, and an empty name goes back to the
- * module type's title.
- */
-function ModuleTitle({
-  name,
-  typeTitle,
-  onRename,
-}: {
-  name: string | null;
-  /** Shown without a name. */
-  typeTitle: string;
-  onRename: (name: string | null) => void;
-}) {
-  const styles = useStyles();
-  const [draft, setDraft] = useState<string>();
-  // the field may also lose focus when it's removed after Enter or Escape
-  const isFinished = useRef(false);
-  const title = name || typeTitle;
-
-  if (draft === undefined) {
-    return (
-      <Tooltip content="Double-click to rename" relationship="description">
-        <Body1Strong
-          className={styles.title}
-          onDoubleClick={() => {
-            isFinished.current = false;
-            setDraft(name ?? "");
-          }}
-        >
-          {title}
-        </Body1Strong>
-      </Tooltip>
-    );
-  }
-
-  const finish = () => {
-    isFinished.current = true;
-    setDraft(undefined);
-  };
-
-  const save = () => {
-    if (isFinished.current) {
-      return;
-    }
-
-    const renamed = draft.trim() || null;
-    finish();
-    if (renamed !== name) {
-      onRename(renamed);
-    }
-  };
-
-  return (
-    <Input
-      className={mergeClasses(styles.titleInput, "nodrag")}
-      size="small"
-      autoFocus
-      value={draft}
-      placeholder={typeTitle}
-      maxLength={maxNameLength}
-      aria-label="Module name"
-      onChange={(_, data) => setDraft(data.value)}
-      onBlur={save}
-      onKeyDown={(event) => {
-        // keep keys like Delete from reaching the graph, which would remove the module
-        event.stopPropagation();
-        if (event.key === "Enter") {
-          save();
-        } else if (event.key === "Escape") {
-          finish();
-        }
-      }}
-    />
-  );
-}
-
-function Ports({
+/** A connector on the edge of a node, spread evenly with the others on the same side. */
+export function Port({
   type,
-  port,
+  id,
+  label,
   index,
   count,
 }: {
   type: "source" | "target";
-  port: string;
+  id: string;
+  label?: string;
   index: number;
   count: number;
 }) {
@@ -304,15 +257,15 @@ function Ports({
 
   return (
     <Handle
-      id={port}
+      id={id}
       type={type}
       position={type === "target" ? Position.Left : Position.Right}
       className={styles.port}
       style={{ top }}
     >
-      {count > 1 && (
+      {label && (
         <span className={styles.portLabel} style={type === "target" ? { left: 0 } : { right: 0 }}>
-          {port}
+          {label}
         </span>
       )}
     </Handle>

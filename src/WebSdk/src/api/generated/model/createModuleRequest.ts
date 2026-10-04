@@ -11,4 +11,6 @@ export interface CreateModuleRequest {
   /** @nullable */
   name?: string | null;
   position?: null | ModulePosition;
+  /** @nullable */
+  subgraphId?: string | null;
 }

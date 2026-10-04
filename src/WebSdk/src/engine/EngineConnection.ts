@@ -9,11 +9,14 @@ import {
   getGetModulesQueryKey,
   getGetPluginsQueryKey,
   getGetPreferencesQueryKey,
+  getGetSubgraphsQueryKey,
   updateModule,
+  updateSubgraph,
   type ConnectionDto,
   type EngineStatusDto,
   type ModuleDto,
   type PluginDto,
+  type SubgraphDto,
   type UiPreferencesDto,
 } from "../api";
 
@@ -39,8 +42,76 @@ type HubMethod = "Subscribe" | "Unsubscribe" | "SubscribeLevels" | "UnsubscribeL
 
 type Listener<T> = (value: T) => void;
 
-/** Delay before a module update is sent; later updates within it replace earlier ones. */
+/** Delay before an update is sent; later updates within it replace earlier ones. */
 const updateDelay = 80;
+
+/**
+ * Updates of one kind of engine resource: applied to the cache right away and sent to the engine debounced, the last value
+ * winning. The engine's answer to the last update is applied when it arrives.
+ */
+class PendingUpdates<T extends { id: string }> {
+  private readonly onFailed: (error: unknown) => void;
+  private readonly pending = new Map<string, { value: T; timer?: number; sending: boolean }>();
+  private readonly send: (value: T) => Promise<T>;
+  private readonly setInCache: (value: T) => void;
+
+  constructor(send: (value: T) => Promise<T>, setInCache: (value: T) => void, onFailed: (error: unknown) => void) {
+    this.send = send;
+    this.setInCache = setInCache;
+    this.onFailed = onFailed;
+  }
+
+  delete(id: string) {
+    this.pending.delete(id);
+  }
+
+  has(id: string) {
+    return this.pending.has(id);
+  }
+
+  update(value: T) {
+    this.setInCache(value);
+
+    const pending = this.pending.get(value.id) ?? { value, sending: false };
+    pending.value = value;
+    window.clearTimeout(pending.timer);
+    pending.timer = window.setTimeout(() => {
+      pending.timer = undefined;
+      void this.sendPending(value.id);
+    }, updateDelay);
+    this.pending.set(value.id, pending);
+  }
+
+  private async sendPending(id: string) {
+    const pending = this.pending.get(id);
+    if (!pending || pending.sending) {
+      return;
+    }
+
+    const value = pending.value;
+    pending.sending = true;
+
+    try {
+      const updated = await this.send(value);
+      if (pending.value === value) {
+        this.pending.delete(id);
+        this.setInCache(updated);
+      }
+    } catch (error) {
+      if (pending.value === value) {
+        this.pending.delete(id);
+      }
+
+      this.onFailed(error);
+    } finally {
+      pending.sending = false;
+      if (this.pending.get(id) === pending && pending.value !== value && pending.timer === undefined) {
+        // changed while sending and the delay has passed already
+        void this.sendPending(id);
+      }
+    }
+  }
+}
 
 /**
  * The SignalR connection to the engine. Engine events patch the query cache, so all clients stay in sync; module
@@ -51,15 +122,26 @@ export class EngineConnection {
   private readonly errorListeners = new Set<Listener<Error>>();
   private readonly hub: HubConnection;
   private readonly levelListeners = new Set<() => void>();
-  private readonly pendingUpdates = new Map<string, { module: ModuleDto; timer?: number; sending: boolean }>();
+  private readonly moduleUpdates: PendingUpdates<ModuleDto>;
   private readonly queryClient: QueryClient;
   private readonly stateListeners = new Set<Listener<EngineConnectionState>>();
+  private readonly subgraphUpdates: PendingUpdates<SubgraphDto>;
   private isStopped = true;
   private latestLevels?: ModuleLevels;
   private retryTimer?: number;
 
   constructor(queryClient: QueryClient) {
     this.queryClient = queryClient;
+    this.moduleUpdates = new PendingUpdates(
+      (module) => updateModule(module.id, module),
+      (module) => this.setModuleInCache(module),
+      (error) => this.onUpdateFailed(getGetModulesQueryKey(), error)
+    );
+    this.subgraphUpdates = new PendingUpdates(
+      (subgraph) => updateSubgraph(subgraph.id, subgraph),
+      (subgraph) => this.setSubgraphInCache(subgraph),
+      (error) => this.onUpdateFailed(getGetSubgraphsQueryKey(), error)
+    );
     this.hub = new HubConnectionBuilder()
       .withUrl("/hubs/engine", { accessTokenFactory: () => getAccessToken() ?? "" })
       .withAutomaticReconnect({
@@ -79,6 +161,17 @@ export class EngineConnection {
     this.hub.on("ConnectionRemoved", (connectionId: string) => {
       this.queryClient.setQueryData<ConnectionDto[]>(getGetConnectionsQueryKey(), (connections) =>
         connections?.filter((c) => c.id !== connectionId)
+      );
+    });
+    this.hub.on("SubgraphChanged", (subgraph: SubgraphDto) => {
+      if (!this.subgraphUpdates.has(subgraph.id)) {
+        this.setSubgraphInCache(subgraph);
+      }
+    });
+    this.hub.on("SubgraphRemoved", (subgraphId: string) => {
+      this.subgraphUpdates.delete(subgraphId);
+      this.queryClient.setQueryData<SubgraphDto[]>(getGetSubgraphsQueryKey(), (subgraphs) =>
+        subgraphs?.filter((s) => s.id !== subgraphId)
       );
     });
     this.hub.on("DevicesChanged", () => {
@@ -128,7 +221,7 @@ export class EngineConnection {
   }
 
   /**
-   * Called with errors of module updates, e.g. for a notification. Returns a function that removes the listener.
+   * Called with errors of module and subgraph updates, e.g. for a notification. Returns a function that removes the listener.
    */
   onError(listener: Listener<Error>) {
     this.errorListeners.add(listener);
@@ -198,16 +291,14 @@ export class EngineConnection {
    * Shows the module in the cache right away and sends it to the engine after a short delay.
    */
   updateModule(module: ModuleDto) {
-    this.setModuleInCache(module);
+    this.moduleUpdates.update(module);
+  }
 
-    const pending = this.pendingUpdates.get(module.id) ?? { module, sending: false };
-    pending.module = module;
-    window.clearTimeout(pending.timer);
-    pending.timer = window.setTimeout(() => {
-      pending.timer = undefined;
-      void this.sendUpdate(module.id);
-    }, updateDelay);
-    this.pendingUpdates.set(module.id, pending);
+  /**
+   * Shows the subgraph in the cache right away and sends it to the engine after a short delay.
+   */
+  updateSubgraph(subgraph: SubgraphDto) {
+    this.subgraphUpdates.update(subgraph);
   }
 
   private async connect() {
@@ -250,13 +341,13 @@ export class EngineConnection {
 
   private onModuleChanged(module: ModuleDto) {
     // local edits win until they are sent; the engine's answer to the last one is applied then
-    if (!this.pendingUpdates.has(module.id)) {
+    if (!this.moduleUpdates.has(module.id)) {
       this.setModuleInCache(module);
     }
   }
 
   private onModuleRemoved(moduleId: string) {
-    this.pendingUpdates.delete(moduleId);
+    this.moduleUpdates.delete(moduleId);
     this.queryClient.setQueryData<ModuleDto[]>(getGetModulesQueryKey(), (modules) =>
       modules?.filter((m) => m.id !== moduleId)
     );
@@ -270,35 +361,9 @@ export class EngineConnection {
     }
   }
 
-  private async sendUpdate(moduleId: string) {
-    const pending = this.pendingUpdates.get(moduleId);
-    if (!pending || pending.sending) {
-      return;
-    }
-
-    const module = pending.module;
-    pending.sending = true;
-
-    try {
-      const updated = await updateModule(moduleId, module);
-      if (pending.module === module) {
-        this.pendingUpdates.delete(moduleId);
-        this.setModuleInCache(updated);
-      }
-    } catch (error) {
-      if (pending.module === module) {
-        this.pendingUpdates.delete(moduleId);
-        void this.queryClient.invalidateQueries({ queryKey: getGetModulesQueryKey() });
-      }
-
-      this.errorListeners.forEach((listener) => listener(error instanceof Error ? error : new Error(String(error))));
-    } finally {
-      pending.sending = false;
-      if (this.pendingUpdates.get(moduleId) === pending && pending.module !== module && pending.timer === undefined) {
-        // changed while sending and the delay has passed already
-        void this.sendUpdate(moduleId);
-      }
-    }
+  private onUpdateFailed(queryKey: readonly unknown[], error: unknown) {
+    void this.queryClient.invalidateQueries({ queryKey });
+    this.errorListeners.forEach((listener) => listener(error instanceof Error ? error : new Error(String(error))));
   }
 
   private setModuleInCache(module: ModuleDto) {
@@ -311,6 +376,17 @@ export class EngineConnection {
       return index < 0 ? [...modules, module] : modules.with(index, module);
     });
     this.queryClient.setQueryData(getGetModuleQueryKey(module.id), module);
+  }
+
+  private setSubgraphInCache(subgraph: SubgraphDto) {
+    this.queryClient.setQueryData<SubgraphDto[]>(getGetSubgraphsQueryKey(), (subgraphs) => {
+      if (!subgraphs) {
+        return subgraphs;
+      }
+
+      const index = subgraphs.findIndex((s) => s.id === subgraph.id);
+      return index < 0 ? [...subgraphs, subgraph] : subgraphs.with(index, subgraph);
+    });
   }
 
   private setState(state: EngineConnectionState) {

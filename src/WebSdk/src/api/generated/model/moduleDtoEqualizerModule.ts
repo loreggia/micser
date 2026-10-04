@@ -21,6 +21,8 @@ export interface ModuleDtoEqualizerModule {
      */
   name?: string | null;
   position?: null | ModulePosition;
+  /** @nullable */
+  subgraphId?: string | null;
   useSystemVolume: boolean;
   /**
      * @minimum 0

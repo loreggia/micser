@@ -5,5 +5,6 @@ export * from "./generated/model";
 export * from "./generated/modules/modules";
 export * from "./generated/plugins/plugins";
 export * from "./generated/preferences/preferences";
+export * from "./generated/subgraphs/subgraphs";
 export { initializeAccessToken } from "./accessToken";
 export { EngineApiError, engineFetch, getAccessToken, setAccessToken } from "./engineFetch";

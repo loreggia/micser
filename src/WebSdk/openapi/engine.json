@@ -574,6 +574,125 @@
           }
         }
       }
+    },
+    "/api/subgraphs": {
+      "get": {
+        "tags": [
+          "Subgraphs"
+        ],
+        "operationId": "GetSubgraphs",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SubgraphDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Subgraphs"
+        ],
+        "description": "Creates a subgraph and moves the modules into it.",
+        "operationId": "CreateSubgraph",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSubgraphRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubgraphDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/subgraphs/{id}": {
+      "put": {
+        "tags": [
+          "Subgraphs"
+        ],
+        "operationId": "UpdateSubgraph",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubgraphDto"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubgraphDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Subgraphs"
+        ],
+        "description": "Removes a subgraph; its modules stay in the graph.",
+        "operationId": "DeleteSubgraph",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
     }
   },
   "components": {
@@ -788,6 +907,47 @@
                 "$ref": "#/components/schemas/ModulePosition"
               }
             ]
+          },
+          "subgraphId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          }
+        }
+      },
+      "CreateSubgraphRequest": {
+        "required": [
+          "name",
+          "position",
+          "size",
+          "moduleIds",
+          "color"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "position": {
+            "$ref": "#/components/schemas/ModulePosition"
+          },
+          "size": {
+            "$ref": "#/components/schemas/SubgraphSize"
+          },
+          "moduleIds": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "color": {
+            "$ref": "#/components/schemas/SubgraphColor"
           }
         }
       },
@@ -1090,6 +1250,13 @@
               }
             ]
           },
+          "subgraphId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
           "useSystemVolume": {
             "type": "boolean"
           },
@@ -1150,6 +1317,13 @@
                 "$ref": "#/components/schemas/ModulePosition"
               }
             ]
+          },
+          "subgraphId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
           },
           "useSystemVolume": {
             "type": "boolean"
@@ -1212,6 +1386,13 @@
               }
             ]
           },
+          "subgraphId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
           "useSystemVolume": {
             "type": "boolean"
           },
@@ -1272,6 +1453,13 @@
                 "$ref": "#/components/schemas/ModulePosition"
               }
             ]
+          },
+          "subgraphId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
           },
           "useSystemVolume": {
             "type": "boolean"
@@ -1334,6 +1522,13 @@
               }
             ]
           },
+          "subgraphId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
           "useSystemVolume": {
             "type": "boolean"
           },
@@ -1394,6 +1589,13 @@
                 "$ref": "#/components/schemas/ModulePosition"
               }
             ]
+          },
+          "subgraphId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
           },
           "useSystemVolume": {
             "type": "boolean"
@@ -1456,6 +1658,13 @@
               }
             ]
           },
+          "subgraphId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
           "useSystemVolume": {
             "type": "boolean"
           },
@@ -1516,6 +1725,13 @@
                 "$ref": "#/components/schemas/ModulePosition"
               }
             ]
+          },
+          "subgraphId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
           },
           "useSystemVolume": {
             "type": "boolean"
@@ -1659,6 +1875,82 @@
       "SpectrumState": {
         "type": "object"
       },
+      "SubgraphColor": {
+        "enum": [
+          "Neutral",
+          "Blue",
+          "Green",
+          "Yellow",
+          "Orange",
+          "Red",
+          "Purple",
+          "Teal"
+        ],
+        "default": "Blue"
+      },
+      "SubgraphDto": {
+        "required": [
+          "id",
+          "name",
+          "position",
+          "size",
+          "color",
+          "isCollapsed",
+          "isMuted",
+          "isBypassed"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "position": {
+            "$ref": "#/components/schemas/ModulePosition"
+          },
+          "size": {
+            "$ref": "#/components/schemas/SubgraphSize"
+          },
+          "color": {
+            "$ref": "#/components/schemas/SubgraphColor"
+          },
+          "isCollapsed": {
+            "type": "boolean",
+            "default": false
+          },
+          "isMuted": {
+            "type": "boolean",
+            "default": false
+          },
+          "isBypassed": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      },
+      "SubgraphSize": {
+        "required": [
+          "width",
+          "height"
+        ],
+        "type": "object",
+        "properties": {
+          "width": {
+            "type": "number",
+            "format": "double"
+          },
+          "height": {
+            "type": "number",
+            "format": "double"
+          }
+        }
+      },
       "UiPreferencesDto": {
         "required": [
           "showStreamStatistics",
@@ -1696,6 +1988,9 @@
     },
     {
       "name": "Preferences"
+    },
+    {
+      "name": "Subgraphs"
     }
   ]
 }

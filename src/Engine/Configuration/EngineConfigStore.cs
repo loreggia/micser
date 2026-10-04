@@ -20,6 +20,8 @@ public sealed class EngineConfiguration
 
     public EngineSettingsDto Settings { get; init; } = new();
 
+    public List<SubgraphDto> Subgraphs { get; init; } = [];
+
     /// <summary>
     /// Modules whose plugin isn't loaded. They're kept as they are, so they come back when the plugin does.
     /// </summary>
@@ -142,6 +144,7 @@ public sealed class EngineConfigStore : IDisposable
                 Settings = file.Settings ?? new EngineSettingsDto(),
                 Preferences = file.Preferences ?? new UiPreferencesDto(),
                 Modules = modules,
+                Subgraphs = file.Subgraphs ?? [],
                 UnavailableModules = unavailableModules,
                 Connections = file.Connections ?? [],
             };
@@ -200,6 +203,7 @@ public sealed class EngineConfigStore : IDisposable
                 Modules = [.. configuration.Modules.Select(m => JsonSerializer.SerializeToElement(m, _json)), .. configuration.UnavailableModules.Select(m => m.Element)],
                 Preferences = configuration.Preferences,
                 Settings = configuration.Settings,
+                Subgraphs = configuration.Subgraphs,
                 Version = configuration.Version,
             };
 
@@ -225,6 +229,8 @@ public sealed class EngineConfigStore : IDisposable
         public UiPreferencesDto? Preferences { get; init; }
 
         public EngineSettingsDto? Settings { get; init; }
+
+        public List<SubgraphDto>? Subgraphs { get; init; }
 
         public int Version { get; init; }
     }

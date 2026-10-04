@@ -5,6 +5,7 @@ import {
   updatePreferences,
   useGetPreferences,
   type ModuleDto,
+  type SubgraphDto,
   type UiPreferencesDto,
 } from "../api";
 import type { EngineConnectionState, PortLevels } from "./EngineConnection";
@@ -77,4 +78,12 @@ export function usePreferences(): [UiPreferencesDto, (changes: Partial<UiPrefere
 export function useModuleUpdate(): (module: ModuleDto) => void {
   const connection = useEngineConnection();
   return (module) => connection.updateModule(module);
+}
+
+/**
+ * Returns a function that replaces a subgraph: applied immediately, sent to the engine debounced.
+ */
+export function useSubgraphUpdate(): (subgraph: SubgraphDto) => void {
+  const connection = useEngineConnection();
+  return (subgraph) => connection.updateSubgraph(subgraph);
 }
