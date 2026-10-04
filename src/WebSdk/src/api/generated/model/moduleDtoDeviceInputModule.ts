@@ -13,6 +13,7 @@ export interface ModuleDtoDeviceInputModule {
   state: DeviceInputState;
   id: string;
   isBypassed: boolean;
+  isCollapsed: boolean;
   isMuted: boolean;
   /**
      * @maxLength 100

@@ -13,6 +13,7 @@ export interface ModuleDtoEqualizerModule {
   state: EqualizerState;
   id: string;
   isBypassed: boolean;
+  isCollapsed: boolean;
   isMuted: boolean;
   /**
      * @maxLength 100

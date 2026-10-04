@@ -1045,6 +1045,7 @@
           "state",
           "id",
           "isBypassed",
+          "isCollapsed",
           "isMuted",
           "useSystemVolume",
           "volume"
@@ -1064,6 +1065,9 @@
             "format": "uuid"
           },
           "isBypassed": {
+            "type": "boolean"
+          },
+          "isCollapsed": {
             "type": "boolean"
           },
           "isMuted": {
@@ -1102,6 +1106,7 @@
           "state",
           "id",
           "isBypassed",
+          "isCollapsed",
           "isMuted",
           "useSystemVolume",
           "volume"
@@ -1121,6 +1126,9 @@
             "format": "uuid"
           },
           "isBypassed": {
+            "type": "boolean"
+          },
+          "isCollapsed": {
             "type": "boolean"
           },
           "isMuted": {
@@ -1159,6 +1167,7 @@
           "state",
           "id",
           "isBypassed",
+          "isCollapsed",
           "isMuted",
           "useSystemVolume",
           "volume"
@@ -1178,6 +1187,9 @@
             "format": "uuid"
           },
           "isBypassed": {
+            "type": "boolean"
+          },
+          "isCollapsed": {
             "type": "boolean"
           },
           "isMuted": {
@@ -1216,6 +1228,7 @@
           "state",
           "id",
           "isBypassed",
+          "isCollapsed",
           "isMuted",
           "useSystemVolume",
           "volume"
@@ -1235,6 +1248,9 @@
             "format": "uuid"
           },
           "isBypassed": {
+            "type": "boolean"
+          },
+          "isCollapsed": {
             "type": "boolean"
           },
           "isMuted": {
@@ -1273,6 +1289,7 @@
           "state",
           "id",
           "isBypassed",
+          "isCollapsed",
           "isMuted",
           "useSystemVolume",
           "volume"
@@ -1292,6 +1309,9 @@
             "format": "uuid"
           },
           "isBypassed": {
+            "type": "boolean"
+          },
+          "isCollapsed": {
             "type": "boolean"
           },
           "isMuted": {
@@ -1330,6 +1350,7 @@
           "state",
           "id",
           "isBypassed",
+          "isCollapsed",
           "isMuted",
           "useSystemVolume",
           "volume"
@@ -1349,6 +1370,9 @@
             "format": "uuid"
           },
           "isBypassed": {
+            "type": "boolean"
+          },
+          "isCollapsed": {
             "type": "boolean"
           },
           "isMuted": {
@@ -1387,6 +1411,7 @@
           "state",
           "id",
           "isBypassed",
+          "isCollapsed",
           "isMuted",
           "useSystemVolume",
           "volume"
@@ -1406,6 +1431,9 @@
             "format": "uuid"
           },
           "isBypassed": {
+            "type": "boolean"
+          },
+          "isCollapsed": {
             "type": "boolean"
           },
           "isMuted": {
@@ -1444,6 +1472,7 @@
           "state",
           "id",
           "isBypassed",
+          "isCollapsed",
           "isMuted",
           "useSystemVolume",
           "volume"
@@ -1463,6 +1492,9 @@
             "format": "uuid"
           },
           "isBypassed": {
+            "type": "boolean"
+          },
+          "isCollapsed": {
             "type": "boolean"
           },
           "isMuted": {

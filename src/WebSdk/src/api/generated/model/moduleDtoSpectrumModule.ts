@@ -13,6 +13,7 @@ export interface ModuleDtoSpectrumModule {
   state: SpectrumState;
   id: string;
   isBypassed: boolean;
+  isCollapsed: boolean;
   isMuted: boolean;
   /**
      * @maxLength 100

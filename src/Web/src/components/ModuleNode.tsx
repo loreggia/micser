@@ -13,6 +13,8 @@ import {
   tokens,
 } from "@fluentui/react-components";
 import {
+  ChevronDownRegular,
+  ChevronUpRegular,
   DeleteRegular,
   DesktopSpeakerRegular,
   FlashOffRegular,
@@ -86,7 +88,7 @@ const useStyles = makeStyles({
 
 /**
  * A module on the graph: name, mute, bypass, volume (or the Windows volume), level meter, the module type's widget, and the
- * connectors.
+ * connectors. Collapsed, it shows only the name, mute, bypass and the connectors.
  */
 export function ModuleNode({ id, data, selected }: NodeProps<ModuleNodeType>) {
   const styles = useStyles();
@@ -94,9 +96,16 @@ export function ModuleNode({ id, data, selected }: NodeProps<ModuleNodeType>) {
   const { deleteElements } = useReactFlow();
   const { module, moduleType, widget } = data;
   const Widget = widget?.component;
+  const collapsed = module.isCollapsed;
+  // collapsed, the card is only as high as its header, which would crowd several ports and their labels
+  const portCount = Math.max(moduleType?.inputs.length ?? 0, moduleType?.outputs.length ?? 0);
 
   return (
-    <Card className={mergeClasses(styles.card, selected && styles.selected)} size="small">
+    <Card
+      className={mergeClasses(styles.card, selected && styles.selected)}
+      style={collapsed && portCount > 1 ? { minHeight: `${(portCount + 1) * 24}px` } : undefined}
+      size="small"
+    >
       <CardHeader
         className={styles.header}
         header={
@@ -106,7 +115,7 @@ export function ModuleNode({ id, data, selected }: NodeProps<ModuleNodeType>) {
             onRename={(name) => update({ ...module, name } as ModuleDto)}
           />
         }
-        description={module.name && widget ? <Caption1>{widget.title}</Caption1> : undefined}
+        description={module.name && widget && !collapsed ? <Caption1>{widget.title}</Caption1> : undefined}
         action={
           <div className={mergeClasses(styles.actions, "nodrag")}>
             {moduleType?.supportsBypass && (
@@ -133,47 +142,61 @@ export function ModuleNode({ id, data, selected }: NodeProps<ModuleNodeType>) {
                 onClick={() => update({ ...module, isMuted: !module.isMuted })}
               />
             </Tooltip>
-            <Tooltip content="Remove" relationship="label">
+            {!collapsed && (
+              <Tooltip content="Remove" relationship="label">
+                <Button
+                  size="small"
+                  appearance="subtle"
+                  icon={<DeleteRegular />}
+                  onClick={() => void deleteElements({ nodes: [{ id }] })}
+                />
+              </Tooltip>
+            )}
+            <Tooltip content={collapsed ? "Expand" : "Collapse"} relationship="label">
               <Button
                 size="small"
                 appearance="subtle"
-                icon={<DeleteRegular />}
-                onClick={() => void deleteElements({ nodes: [{ id }] })}
+                icon={collapsed ? <ChevronDownRegular /> : <ChevronUpRegular />}
+                onClick={() => update({ ...module, isCollapsed: !collapsed })}
               />
             </Tooltip>
           </div>
         }
       />
-      <div className={mergeClasses(styles.volume, "nodrag", "nowheel")}>
-        <Caption1>Volume</Caption1>
-        <Slider
-          size="small"
-          min={0}
-          max={100}
-          value={Math.round(module.volume * 100)}
-          aria-label="Volume"
-          disabled={module.useSystemVolume}
-          onChange={(_, value) => update({ ...module, volume: value.value / 100 })}
-        />
-        <Caption1 className={styles.volumeValue}>{Math.round(module.volume * 100)}%</Caption1>
-        <Tooltip
-          content={module.useSystemVolume ? "Follows the Windows volume" : "Follow the Windows volume"}
-          relationship="label"
-        >
-          <ToggleButton
-            size="small"
-            appearance="subtle"
-            checked={module.useSystemVolume}
-            icon={<DesktopSpeakerRegular />}
-            onClick={() => update({ ...module, useSystemVolume: !module.useSystemVolume })}
-          />
-        </Tooltip>
-      </div>
-      <LevelMeter moduleId={module.id} />
-      {Widget && (
-        <div className={mergeClasses(styles.body, "nodrag", "nowheel")}>
-          <Widget module={module} setState={(state) => update({ ...module, state } as ModuleDto)} />
-        </div>
+      {!collapsed && (
+        <>
+          <div className={mergeClasses(styles.volume, "nodrag", "nowheel")}>
+            <Caption1>Volume</Caption1>
+            <Slider
+              size="small"
+              min={0}
+              max={100}
+              value={Math.round(module.volume * 100)}
+              aria-label="Volume"
+              disabled={module.useSystemVolume}
+              onChange={(_, value) => update({ ...module, volume: value.value / 100 })}
+            />
+            <Caption1 className={styles.volumeValue}>{Math.round(module.volume * 100)}%</Caption1>
+            <Tooltip
+              content={module.useSystemVolume ? "Follows the Windows volume" : "Follow the Windows volume"}
+              relationship="label"
+            >
+              <ToggleButton
+                size="small"
+                appearance="subtle"
+                checked={module.useSystemVolume}
+                icon={<DesktopSpeakerRegular />}
+                onClick={() => update({ ...module, useSystemVolume: !module.useSystemVolume })}
+              />
+            </Tooltip>
+          </div>
+          <LevelMeter moduleId={module.id} />
+          {Widget && (
+            <div className={mergeClasses(styles.body, "nodrag", "nowheel")}>
+              <Widget module={module} setState={(state) => update({ ...module, state } as ModuleDto)} />
+            </div>
+          )}
+        </>
       )}
       {moduleType?.inputs.map((port, index, ports) => (
         <Ports key={port} type="target" port={port} index={index} count={ports.length} />

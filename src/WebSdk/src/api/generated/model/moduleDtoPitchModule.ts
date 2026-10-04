@@ -13,6 +13,7 @@ export interface ModuleDtoPitchModule {
   state: PitchState;
   id: string;
   isBypassed: boolean;
+  isCollapsed: boolean;
   isMuted: boolean;
   /**
      * @maxLength 100

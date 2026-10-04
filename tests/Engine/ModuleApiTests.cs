@@ -77,7 +77,7 @@ public class ModuleApiTests
 
         using var response = await client.PutAsJsonAsync<ModuleDto>(
             $"/api/modules/{module.Id}",
-            module with { Name = "Boost", Volume = 0.5f, IsBypassed = true, State = new GainState(6f), Position = new ModulePosition(10, 20) },
+            module with { Name = "Boost", Volume = 0.5f, IsBypassed = true, IsCollapsed = true, State = new GainState(6f), Position = new ModulePosition(10, 20) },
             factory.Json);
         var updated = (ModuleDto<GainState>)(await client.GetFromJsonAsync<ModuleDto>($"/api/modules/{module.Id}", factory.Json))!;
 
@@ -85,6 +85,7 @@ public class ModuleApiTests
         await Assert.That(updated.State.Gain).IsEqualTo(6f);
         await Assert.That(updated.Volume).IsEqualTo(0.5f);
         await Assert.That(updated.IsBypassed).IsTrue();
+        await Assert.That(updated.IsCollapsed).IsTrue();
         await Assert.That(updated.Name).IsEqualTo("Boost");
         await Assert.That(updated.Position).IsEqualTo(new ModulePosition(10, 20));
     }
