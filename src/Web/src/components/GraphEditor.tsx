@@ -155,7 +155,10 @@ export function GraphEditor() {
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const [menu, setMenu] = useState<AddModuleMenu>();
   const [moduleMenu, setModuleMenu] = useState<ModuleMenu>();
-  const { screenToFlowPosition, getInternalNode, getNodes, getNodesBounds } = useReactFlow<GraphNode, Edge>();
+  const { deleteElements, screenToFlowPosition, getInternalNode, getNodes, getNodesBounds } = useReactFlow<
+    GraphNode,
+    Edge
+  >();
   const update = useModuleUpdate();
   const updateSubgraph = useSubgraphUpdate();
   const addModule = useAddModule();
@@ -336,8 +339,9 @@ export function GraphEditor() {
 
   const groupModules = useCallback(
     (moduleIds: string[]) => {
+      // modules already in a subgraph can't be grouped, also not together with others
       const members = getNodes().filter((node) => node.type === "module" && moduleIds.includes(node.id));
-      if (members.length === 0) {
+      if (members.length === 0 || members.some((node) => node.parentId)) {
         return;
       }
 
@@ -647,14 +651,23 @@ export function GraphEditor() {
       >
         <MenuPopover>
           <MenuList>
-            <MenuItem secondaryContent="Ctrl+G" onClick={() => moduleMenu && groupModules(moduleMenu.moduleIds)}>
-              Group
-            </MenuItem>
+            {!moduleMenuInSubgraph && (
+              <MenuItem secondaryContent="Ctrl+G" onClick={() => moduleMenu && groupModules(moduleMenu.moduleIds)}>
+                Group
+              </MenuItem>
+            )}
             {moduleMenuInSubgraph && (
               <MenuItem onClick={() => moduleMenu && removeFromSubgraph(moduleMenu.moduleIds)}>
                 Remove from subgraph
               </MenuItem>
             )}
+            <MenuDivider />
+            <MenuItem
+              secondaryContent="Del"
+              onClick={() => moduleMenu && void deleteElements({ nodes: moduleMenu.moduleIds.map((id) => ({ id })) })}
+            >
+              Delete
+            </MenuItem>
           </MenuList>
         </MenuPopover>
       </Menu>
