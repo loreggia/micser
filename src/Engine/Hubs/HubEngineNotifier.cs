@@ -78,6 +78,11 @@ public sealed class HubEngineNotifier : IEngineNotifier, IDisposable
         Send(c => c.SubgraphRemoved(subgraphId));
     }
 
+    public void TemplatesChanged(IReadOnlyList<SubgraphTemplateDto> templates)
+    {
+        Send(c => c.TemplatesChanged(templates));
+    }
+
     private void Send(Func<IEngineClient, Task> send)
     {
         _queue.Writer.TryWrite(send);

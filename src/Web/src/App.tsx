@@ -5,6 +5,7 @@ import { ReactFlowProvider } from "@xyflow/react";
 import { useState, useSyncExternalStore } from "react";
 import { EngineToolbar } from "./components/EngineToolbar";
 import { GraphEditor } from "./components/GraphEditor";
+import { SubgraphActionsProvider } from "./components/SubgraphActionsProvider";
 import { toasterId, useErrorNotifications } from "./notifications";
 import { PluginsProvider } from "./PluginsProvider";
 
@@ -56,10 +57,12 @@ function Shell() {
   return (
     <PluginsProvider>
       <ReactFlowProvider>
-        <div className={styles.root}>
-          <EngineToolbar />
-          <GraphEditor />
-        </div>
+        <SubgraphActionsProvider>
+          <div className={styles.root}>
+            <EngineToolbar />
+            <GraphEditor />
+          </div>
+        </SubgraphActionsProvider>
       </ReactFlowProvider>
     </PluginsProvider>
   );

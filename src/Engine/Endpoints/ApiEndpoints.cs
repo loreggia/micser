@@ -29,6 +29,7 @@ public static class ApiEndpoints
         MapPlugins(api);
         MapPreferences(api);
         MapSubgraphs(api);
+        MapSubgraphTemplates(api);
 
         return app;
     }
@@ -178,9 +179,38 @@ public static class ApiEndpoints
         subgraphs.MapPut("/{id:guid}", (Guid id, SubgraphDto subgraph, AudioHost host) => TypedResults.Ok(host.UpdateSubgraph(id, subgraph)))
             .WithName("UpdateSubgraph");
 
-        subgraphs.MapDelete("/{id:guid}", Results<NoContent, NotFound> (Guid id, AudioHost host) =>
-            host.RemoveSubgraph(id) ? TypedResults.NoContent() : TypedResults.NotFound())
+        subgraphs.MapDelete("/{id:guid}", Results<NoContent, NotFound> (Guid id, AudioHost host, bool deleteModules = false) =>
+            host.RemoveSubgraph(id, deleteModules) ? TypedResults.NoContent() : TypedResults.NotFound())
             .WithName("DeleteSubgraph")
-            .WithDescription("Removes a subgraph; its modules stay in the graph.");
+            .WithDescription("Removes a subgraph. Its modules stay in the graph, or are removed with their connections if deleteModules is true.");
+
+        subgraphs.MapPost("/{id:guid}/update-from-template", (Guid id, AudioHost host) => TypedResults.Ok(host.UpdateSubgraphFromTemplate(id)))
+            .WithName("UpdateSubgraphFromTemplate")
+            .WithDescription("Makes the subgraph match its template's current revision.");
+    }
+
+    private static void MapSubgraphTemplates(RouteGroupBuilder api)
+    {
+        var templates = api.MapGroup("/subgraph-templates").WithTags("Subgraph templates");
+
+        templates.MapGet("", (AudioHost host) => TypedResults.Ok(host.GetTemplates())).WithName("GetSubgraphTemplates");
+
+        templates.MapPost("", (SaveSubgraphTemplateRequest request, AudioHost host) => TypedResults.Ok(host.SaveTemplate(request)))
+            .WithName("SaveSubgraphTemplate")
+            .WithDescription("Saves a subgraph as a new template, or over the template with the given id.");
+
+        templates.MapPut("/{id:guid}/name", (Guid id, RenameSubgraphTemplateRequest request, AudioHost host) => TypedResults.Ok(host.RenameTemplate(id, request)))
+            .WithName("RenameSubgraphTemplate");
+
+        templates.MapDelete("/{id:guid}", Results<NoContent, NotFound> (Guid id, AudioHost host) =>
+            host.RemoveTemplate(id) ? TypedResults.NoContent() : TypedResults.NotFound())
+            .WithName("DeleteSubgraphTemplate")
+            .WithDescription("Removes a template; the subgraphs created from it stay.");
+
+        templates.MapPost("/{id:guid}/instantiate", (Guid id, InstantiateSubgraphTemplateRequest request, AudioHost host) =>
+        {
+            var subgraph = host.InstantiateTemplate(id, request);
+            return TypedResults.Created($"/api/subgraphs/{subgraph.Id}", subgraph);
+        }).WithName("InstantiateSubgraphTemplate").WithDescription("Creates a subgraph with the template's modules and connections.");
     }
 }

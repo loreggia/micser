@@ -3,6 +3,7 @@ import {
   Button,
   Caption1,
   Menu,
+  MenuDivider,
   MenuItem,
   MenuList,
   MenuPopover,
@@ -26,7 +27,8 @@ import { useState } from "react";
 import { useNotifyError } from "../notifications";
 import { shell, useShellState } from "../shell";
 import { EngineSettingsDialog } from "./EngineSettingsDialog";
-import { useAddModule, useModuleTypeChoices } from "./useAddModule";
+import { TemplatesSubmenu } from "./TemplatesSubmenu";
+import { useAddModule, useInstantiateTemplate, useModuleTypeChoices } from "./useAddModule";
 
 const useStyles = makeStyles({
   root: {
@@ -64,6 +66,7 @@ export function EngineToolbar() {
   const shellState = useShellState();
   const notifyError = useNotifyError();
   const addModule = useAddModule();
+  const instantiateTemplate = useInstantiateTemplate();
   const [settingsOpen, setSettingsOpen] = useState(false);
   const start = useMutation({
     ...getStartEngineMutationOptions(),
@@ -92,6 +95,8 @@ export function EngineToolbar() {
                 {type.title}
               </MenuItem>
             ))}
+            <MenuDivider />
+            <TemplatesSubmenu onInstantiate={(templateId) => instantiateTemplate(templateId)} />
           </MenuList>
         </MenuPopover>
       </Menu>

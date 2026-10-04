@@ -30,6 +30,10 @@ public sealed record SubgraphSize([Range(1, 100000)] double Width, [Range(1, 100
 /// <param name="IsCollapsed">Shows the subgraph as one node with the ports of the connections that cross its border.</param>
 /// <param name="IsMuted">Mutes all its modules, in addition to their own mute.</param>
 /// <param name="IsBypassed">Bypasses all its effect modules, in addition to their own bypass.</param>
+/// <param name="TemplateId">
+/// The template the subgraph was created from or last saved as. It's set by the engine; an update can only clear it.
+/// </param>
+/// <param name="TemplateRevision">The template's revision the subgraph matches; it's outdated when the template's is higher.</param>
 public sealed record SubgraphDto(
     Guid Id,
     [MaxLength(100)] string? Name,
@@ -38,7 +42,9 @@ public sealed record SubgraphDto(
     SubgraphColor Color = SubgraphColor.Blue,
     bool IsCollapsed = false,
     bool IsMuted = false,
-    bool IsBypassed = false);
+    bool IsBypassed = false,
+    Guid? TemplateId = null,
+    int? TemplateRevision = null);
 
 /// <param name="Position">The frame's position; the modules' positions are converted to be relative to it.</param>
 /// <param name="ModuleIds">The modules to move into the subgraph, also from other subgraphs.</param>

@@ -23,6 +23,8 @@ export interface ModuleDtoLoopbackInputModule {
   position?: null | ModulePosition;
   /** @nullable */
   subgraphId?: string | null;
+  /** @nullable */
+  templateModuleId?: string | null;
   useSystemVolume: boolean;
   /**
      * @minimum 0

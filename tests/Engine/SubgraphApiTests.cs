@@ -94,6 +94,31 @@ public class SubgraphApiTests
     }
 
     [Test]
+    public async Task DeleteSubgraph_WithModules_RemovesThemAndTheirConnections()
+    {
+        await using var factory = new EngineFactory();
+        using var client = factory.CreateAuthorizedClient();
+        var member = await AddModuleAtAsync(factory, client, "Gain", new ModulePosition(100, 200));
+        var outside = await AddModuleAtAsync(factory, client, "Gain", new ModulePosition(600, 200));
+        (await client.PostAsJsonAsync("/api/connections", new CreateConnectionRequest(member.Id, "Output", outside.Id, "Input"))).EnsureSuccessStatusCode();
+        var subgraph = await CreateSubgraphAsync(factory, client, new ModulePosition(80, 150), member.Id);
+        await using var hub = factory.CreateHubConnection();
+        var moduleRemoved = hub.NextAsync<Guid>("ModuleRemoved");
+        await hub.StartAsync();
+
+        using var response = await client.DeleteAsync($"/api/subgraphs/{subgraph.Id}?deleteModules=true");
+        var modules = await client.GetFromJsonAsync<ModuleDto[]>("/api/modules", factory.Json);
+        var connections = await client.GetFromJsonAsync<ConnectionDto[]>("/api/connections");
+        var subgraphs = await client.GetFromJsonAsync<SubgraphDto[]>("/api/subgraphs", factory.Json);
+
+        await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.NoContent);
+        await Assert.That(await moduleRemoved).IsEqualTo(member.Id);
+        await Assert.That(modules!.Select(m => m.Id)).IsEquivalentTo([outside.Id]);
+        await Assert.That(connections).IsEmpty();
+        await Assert.That(subgraphs).IsEmpty();
+    }
+
+    [Test]
     public async Task Subgraphs_AreRestoredAfterRestart()
     {
         var directory = EngineFactory.CreateTemporaryDirectory();

@@ -26,6 +26,7 @@ public sealed class AudioHost : IDisposable
     private readonly EngineConfigStore _store;
     private readonly OrderedDictionary<Guid, SubgraphDto> _subgraphs = [];
     private readonly ISystemVolume _systemVolume;
+    private readonly OrderedDictionary<Guid, SubgraphTemplate> _templates = [];
     private readonly List<ConnectionDto> _unavailableConnections = [];
     private readonly List<UnavailableModule> _unavailableModules = [];
     private AudioEngine? _engine;
@@ -93,7 +94,7 @@ public sealed class AudioHost : IDisposable
             _subgraphs.Add(subgraph.Id, subgraph);
             for (var i = 0; i < members.Length; i++)
             {
-                members[i].Settings = members[i].Settings with { SubgraphId = subgraph.Id, Position = positions[i] };
+                members[i].Settings = members[i].Settings with { SubgraphId = subgraph.Id, Position = positions[i], TemplateModuleId = null };
                 ApplySettings(members[i].Module, members[i].Settings);
             }
 
@@ -226,6 +227,14 @@ public sealed class AudioHost : IDisposable
         }
     }
 
+    public IReadOnlyList<SubgraphTemplateDto> GetTemplates()
+    {
+        lock (_lock)
+        {
+            return [.. _templates.Values.Select(ToDto)];
+        }
+    }
+
     /// <summary>
     /// Loads the configuration, builds the graph and starts processing.
     /// </summary>
@@ -243,10 +252,21 @@ public sealed class AudioHost : IDisposable
 
             _settings = settingsErrors.Count == 0 ? configuration.Settings : new EngineSettingsDto();
             _preferences = configuration.Preferences;
+            foreach (var template in configuration.Templates)
+            {
+                if (string.IsNullOrWhiteSpace(template.Name) || !_templates.TryAdd(template.Id, template))
+                {
+                    _logger.LogWarning("Skipping invalid subgraph template {Id}.", template.Id);
+                }
+            }
+
             foreach (var subgraph in configuration.Subgraphs)
             {
                 var errors = StateValidator.Validate(subgraph);
-                if (errors.Count > 0 || !_subgraphs.TryAdd(subgraph.Id, subgraph))
+                var valid = subgraph.TemplateId is { } templateId && !_templates.ContainsKey(templateId)
+                    ? subgraph with { TemplateId = null, TemplateRevision = null }
+                    : subgraph;
+                if (errors.Count > 0 || !_subgraphs.TryAdd(valid.Id, valid))
                 {
                     _logger.LogWarning("Skipping invalid subgraph {Id}: {Errors}", subgraph.Id, errors);
                 }
@@ -260,6 +280,48 @@ public sealed class AudioHost : IDisposable
             var modules = configuration.Modules.Select(m => m.SubgraphId is { } id && !_subgraphs.ContainsKey(id) ? m with { SubgraphId = null } : m);
             Build(modules, configuration.Connections.Except(_unavailableConnections));
             Engine.Start();
+        }
+    }
+
+    /// <summary>
+    /// Creates a subgraph from a template, with new modules and the connections between them.
+    /// </summary>
+    public SubgraphDto InstantiateTemplate(Guid templateId, InstantiateSubgraphTemplateRequest request)
+    {
+        ThrowIfInvalid(StateValidator.Validate(request));
+
+        lock (_lock)
+        {
+            var template = GetUsableTemplate(templateId);
+            var subgraph = new SubgraphDto(
+                Guid.NewGuid(), template.Name, request.Position, template.Size, template.Color, TemplateId: template.Id, TemplateRevision: template.Revision);
+            _subgraphs.Add(subgraph.Id, subgraph);
+
+            var moduleIds = new Dictionary<Guid, Guid>();
+            var modules = new List<ModuleEntry>();
+            foreach (var dto in template.Modules)
+            {
+                var settings = ModuleSettings.From(dto) with { SubgraphId = subgraph.Id, TemplateModuleId = dto.Id };
+                var entry = AddModuleCore(Guid.NewGuid(), _catalog.GetDefinition(dto), settings, dto.StateObject);
+                moduleIds[dto.Id] = entry.Id;
+                modules.Add(entry);
+            }
+
+            var connections = ConnectTemplate(template.Connections, moduleIds);
+            Persist();
+
+            _notifier.SubgraphChanged(subgraph);
+            foreach (var entry in modules)
+            {
+                _notifier.ModuleChanged(ToDto(entry));
+            }
+
+            foreach (var connection in connections)
+            {
+                _notifier.ConnectionAdded(connection.Dto);
+            }
+
+            return subgraph;
         }
     }
 
@@ -294,21 +356,12 @@ public sealed class AudioHost : IDisposable
     {
         lock (_lock)
         {
-            if (!_modules.Remove(id, out var entry))
+            if (!_modules.TryGetValue(id, out var entry))
             {
                 return false;
             }
 
-            var removedConnections = _connections.Values.Where(c => c.Dto.SourceModuleId == id || c.Dto.TargetModuleId == id).ToArray();
-            foreach (var connection in removedConnections)
-            {
-                _connections.Remove(connection.Dto.Id);
-            }
-
-            _unavailableConnections.RemoveAll(c => c.SourceModuleId == id || c.TargetModuleId == id);
-            Graph.Remove(entry.Module);
-            entry.Module.StateChanged -= OnModuleStateChanged;
-            entry.Module.Dispose();
+            var removedConnections = RemoveModuleCore(entry);
             Persist();
 
             foreach (var connection in removedConnections)
@@ -322,9 +375,9 @@ public sealed class AudioHost : IDisposable
     }
 
     /// <summary>
-    /// Removes a subgraph. Its modules stay, with their positions converted back to absolute ones.
+    /// Removes a subgraph. Its modules stay, with their positions converted back to absolute ones, or are removed too.
     /// </summary>
-    public bool RemoveSubgraph(Guid id)
+    public bool RemoveSubgraph(Guid id, bool removeModules = false)
     {
         lock (_lock)
         {
@@ -334,25 +387,105 @@ public sealed class AudioHost : IDisposable
             }
 
             var members = _modules.Values.Where(m => m.Settings.SubgraphId == id).ToArray();
-            foreach (var entry in members)
+            var removedConnections = new List<ConnectionEntry>();
+            if (removeModules)
             {
-                entry.Settings = entry.Settings with { SubgraphId = null, Position = Offset(entry.Settings.Position, subgraph.Position.X, subgraph.Position.Y) };
-                ApplySettings(entry.Module, entry.Settings);
-            }
+                foreach (var entry in members)
+                {
+                    removedConnections.AddRange(RemoveModuleCore(entry));
+                }
 
-            for (var i = 0; i < _unavailableModules.Count; i++)
+                var unavailableIds = _unavailableModules.Where(m => IsInSubgraph(m, id)).Select(m => m.Id).ToHashSet();
+                _unavailableModules.RemoveAll(m => unavailableIds.Contains(m.Id));
+                _unavailableConnections.RemoveAll(c => unavailableIds.Contains(c.SourceModuleId) || unavailableIds.Contains(c.TargetModuleId));
+            }
+            else
             {
-                _unavailableModules[i] = WithoutSubgraph(_unavailableModules[i], subgraph);
+                foreach (var entry in members)
+                {
+                    entry.Settings = entry.Settings with
+                    {
+                        SubgraphId = null,
+                        Position = Offset(entry.Settings.Position, subgraph.Position.X, subgraph.Position.Y),
+                        TemplateModuleId = null,
+                    };
+                    ApplySettings(entry.Module, entry.Settings);
+                }
+
+                for (var i = 0; i < _unavailableModules.Count; i++)
+                {
+                    _unavailableModules[i] = WithoutSubgraph(_unavailableModules[i], subgraph);
+                }
             }
 
             Persist();
+            foreach (var connection in removedConnections)
+            {
+                _notifier.ConnectionRemoved(connection.Dto.Id);
+            }
+
             foreach (var entry in members)
             {
-                _notifier.ModuleChanged(ToDto(entry));
+                if (removeModules)
+                {
+                    _notifier.ModuleRemoved(entry.Id);
+                }
+                else
+                {
+                    _notifier.ModuleChanged(ToDto(entry));
+                }
             }
 
             _notifier.SubgraphRemoved(id);
             return true;
+        }
+    }
+
+    /// <summary>
+    /// Removes a template. The subgraphs created from it stay, without the reference.
+    /// </summary>
+    public bool RemoveTemplate(Guid id)
+    {
+        lock (_lock)
+        {
+            if (!_templates.Remove(id))
+            {
+                return false;
+            }
+
+            var detached = _subgraphs.Values.Where(s => s.TemplateId == id).Select(s => s with { TemplateId = null, TemplateRevision = null }).ToArray();
+            foreach (var subgraph in detached)
+            {
+                _subgraphs[subgraph.Id] = subgraph;
+            }
+
+            Persist();
+            foreach (var subgraph in detached)
+            {
+                _notifier.SubgraphChanged(subgraph);
+            }
+
+            _notifier.TemplatesChanged([.. _templates.Values.Select(ToDto)]);
+            return true;
+        }
+    }
+
+    public SubgraphTemplateDto RenameTemplate(Guid id, RenameSubgraphTemplateRequest request)
+    {
+        ThrowIfInvalid(StateValidator.Validate(request));
+
+        lock (_lock)
+        {
+            if (!_templates.TryGetValue(id, out var template))
+            {
+                throw EngineRequestException.NotFound($"Subgraph template {id} not found.");
+            }
+
+            template = template with { Name = GetTemplateName(request.Name, id) };
+            _templates[id] = template;
+            Persist();
+            _notifier.TemplatesChanged([.. _templates.Values.Select(ToDto)]);
+            return ToDto(template);
         }
     }
 
@@ -365,6 +498,73 @@ public sealed class AudioHost : IDisposable
         {
             _logger.LogInformation("Restarting the audio.");
             return Rebuild(_settings);
+        }
+    }
+
+    /// <summary>
+    /// Saves a subgraph as a new template or over an existing one, which increases its revision. The subgraph refers to the template
+    /// afterwards, and its modules get template-local ids.
+    /// </summary>
+    public SubgraphTemplateDto SaveTemplate(SaveSubgraphTemplateRequest request)
+    {
+        ThrowIfInvalid(StateValidator.Validate(request));
+
+        lock (_lock)
+        {
+            if (!_subgraphs.TryGetValue(request.SubgraphId, out var subgraph))
+            {
+                throw EngineRequestException.Invalid($"Subgraph {request.SubgraphId} not found.");
+            }
+
+            SubgraphTemplate? existing = null;
+            if (request.TemplateId is { } existingId && !_templates.TryGetValue(existingId, out existing))
+            {
+                throw EngineRequestException.Invalid($"Subgraph template {existingId} not found.");
+            }
+
+            var name = GetTemplateName(request.Name, existing?.Id);
+
+            // template-local ids are kept, so subgraphs created from an earlier revision still match their modules
+            var members = _modules.Values.Where(m => m.Settings.SubgraphId == subgraph.Id).ToArray();
+            var usedIds = new HashSet<Guid>();
+            var renumbered = new List<ModuleEntry>();
+            foreach (var entry in members)
+            {
+                if (entry.Settings.TemplateModuleId is not { } localId || !usedIds.Add(localId))
+                {
+                    localId = Guid.NewGuid();
+                    usedIds.Add(localId);
+                    entry.Settings = entry.Settings with { TemplateModuleId = localId };
+                    renumbered.Add(entry);
+                }
+            }
+
+            var localIds = members.ToDictionary(m => m.Id, m => m.Settings.TemplateModuleId!.Value);
+            var template = new SubgraphTemplate(
+                existing?.Id ?? Guid.NewGuid(),
+                name,
+                (existing?.Revision ?? 0) + 1,
+                subgraph.Color,
+                subgraph.Size,
+                [.. members.Select(m => ToDto(m) with { Id = localIds[m.Id], SubgraphId = null, TemplateModuleId = null })],
+                [],
+                [.. _connections.Values
+                    .Select(c => c.Dto)
+                    .Where(c => localIds.ContainsKey(c.SourceModuleId) && localIds.ContainsKey(c.TargetModuleId))
+                    .Select(c => new TemplateConnectionDto(localIds[c.SourceModuleId], c.SourcePort, localIds[c.TargetModuleId], c.TargetPort))]);
+            _templates[template.Id] = template;
+            subgraph = subgraph with { TemplateId = template.Id, TemplateRevision = template.Revision };
+            _subgraphs[subgraph.Id] = subgraph;
+            Persist();
+
+            foreach (var entry in renumbered)
+            {
+                _notifier.ModuleChanged(ToDto(entry));
+            }
+
+            _notifier.SubgraphChanged(subgraph);
+            _notifier.TemplatesChanged([.. _templates.Values.Select(ToDto)]);
+            return ToDto(template);
         }
     }
 
@@ -411,7 +611,11 @@ public sealed class AudioHost : IDisposable
 
             ThrowIfUnknownSubgraph(dto.SubgraphId);
 
-            entry.Settings = WithSystemVolume(ModuleSettings.From(dto) with { IsBypassed = dto.IsBypassed && entry.Module is EffectModule });
+            entry.Settings = WithSystemVolume(ModuleSettings.From(dto) with
+            {
+                IsBypassed = dto.IsBypassed && entry.Module is EffectModule,
+                TemplateModuleId = dto.SubgraphId == entry.Settings.SubgraphId ? entry.Settings.TemplateModuleId : null,
+            });
             ApplySettings(entry.Module, entry.Settings);
             entry.Definition.SetState(entry.Module, dto.StateObject);
             Persist();
@@ -455,12 +659,15 @@ public sealed class AudioHost : IDisposable
 
         lock (_lock)
         {
-            if (!_subgraphs.ContainsKey(id))
+            if (!_subgraphs.TryGetValue(id, out var current))
             {
                 throw EngineRequestException.NotFound($"Subgraph {id} not found.");
             }
 
-            var subgraph = dto with { Id = id };
+            // only the engine sets the template reference; clearing it detaches the subgraph
+            var subgraph = dto.TemplateId == null
+                ? dto with { Id = id, TemplateRevision = null }
+                : dto with { Id = id, TemplateId = current.TemplateId, TemplateRevision = current.TemplateRevision };
             _subgraphs[id] = subgraph;
             foreach (var entry in _modules.Values.Where(m => m.Settings.SubgraphId == id))
             {
@@ -469,6 +676,102 @@ public sealed class AudioHost : IDisposable
 
             Persist();
             _notifier.SubgraphChanged(subgraph);
+            return subgraph;
+        }
+    }
+
+    /// <summary>
+    /// Makes a subgraph match its template's current revision. Modules created from the template keep their ids and outside connections and
+    /// take the template's settings and state, the others are removed, missing ones are added, and the connections between the modules
+    /// become the template's. The subgraph keeps its name, position, collapse, mute and bypass, and takes the template's color and size.
+    /// </summary>
+    public SubgraphDto UpdateSubgraphFromTemplate(Guid id)
+    {
+        lock (_lock)
+        {
+            if (!_subgraphs.TryGetValue(id, out var subgraph))
+            {
+                throw EngineRequestException.NotFound($"Subgraph {id} not found.");
+            }
+
+            if (subgraph.TemplateId is not { } templateId)
+            {
+                throw EngineRequestException.Invalid($"Subgraph {id} has no template.");
+            }
+
+            var template = GetUsableTemplate(templateId);
+            var members = _modules.Values.Where(m => m.Settings.SubgraphId == id).ToList();
+            var moduleIds = new Dictionary<Guid, Guid>();
+            var changed = new List<ModuleEntry>();
+            foreach (var dto in template.Modules)
+            {
+                var definition = _catalog.GetDefinition(dto);
+                var settings = ModuleSettings.From(dto) with { SubgraphId = id, TemplateModuleId = dto.Id };
+                var entry = members.FirstOrDefault(m => m.Settings.TemplateModuleId == dto.Id && m.Definition == definition);
+                if (entry == null)
+                {
+                    entry = AddModuleCore(Guid.NewGuid(), definition, settings, dto.StateObject);
+                }
+                else
+                {
+                    members.Remove(entry);
+                    entry.Settings = WithSystemVolume(settings with { IsBypassed = settings.IsBypassed && entry.Module is EffectModule });
+                    ApplySettings(entry.Module, entry.Settings);
+                    definition.SetState(entry.Module, dto.StateObject);
+                }
+
+                moduleIds[dto.Id] = entry.Id;
+                changed.Add(entry);
+            }
+
+            var removedConnections = new List<ConnectionEntry>();
+            foreach (var entry in members)
+            {
+                removedConnections.AddRange(RemoveModuleCore(entry));
+            }
+
+            // connections between the modules that the template has stay; the others are replaced
+            var memberIds = moduleIds.Values.ToHashSet();
+            var wanted = template.Connections
+                .Select(c => new TemplateConnectionDto(moduleIds[c.SourceModuleId], c.SourcePort, moduleIds[c.TargetModuleId], c.TargetPort))
+                .ToHashSet();
+            foreach (var connection in _connections.Values.Where(c => memberIds.Contains(c.Dto.SourceModuleId) && memberIds.Contains(c.Dto.TargetModuleId)).ToArray())
+            {
+                var dto = connection.Dto;
+                if (!wanted.Remove(new TemplateConnectionDto(dto.SourceModuleId, dto.SourcePort, dto.TargetModuleId, dto.TargetPort)))
+                {
+                    _connections.Remove(dto.Id);
+                    Graph.Disconnect(connection.Source, connection.Target);
+                    removedConnections.Add(connection);
+                }
+            }
+
+            var addedConnections = ConnectTemplate([.. wanted], memberIds.ToDictionary(m => m));
+            subgraph = subgraph with { Color = template.Color, Size = template.Size, TemplateRevision = template.Revision };
+            _subgraphs[id] = subgraph;
+            Persist();
+
+            foreach (var connection in removedConnections)
+            {
+                _notifier.ConnectionRemoved(connection.Dto.Id);
+            }
+
+            foreach (var entry in members)
+            {
+                _notifier.ModuleRemoved(entry.Id);
+            }
+
+            _notifier.SubgraphChanged(subgraph);
+            foreach (var entry in changed)
+            {
+                _notifier.ModuleChanged(ToDto(entry));
+            }
+
+            foreach (var connection in addedConnections)
+            {
+                _notifier.ConnectionAdded(connection.Dto);
+            }
+
             return subgraph;
         }
     }
@@ -484,6 +787,11 @@ public sealed class AudioHost : IDisposable
         }
     }
 
+    private static bool IsInSubgraph(UnavailableModule module, Guid subgraphId)
+    {
+        return module.Element.TryGetProperty("subgraphId", out var id) && id.TryGetGuid(out var guid) && guid == subgraphId;
+    }
+
     private static ModulePosition? Offset(ModulePosition? position, double x, double y)
     {
         return position == null ? null : new ModulePosition(position.X + x, position.Y + y);
@@ -497,12 +805,25 @@ public sealed class AudioHost : IDisposable
         }
     }
 
+    private static SubgraphTemplateDto ToDto(SubgraphTemplate template)
+    {
+        return new SubgraphTemplateDto(
+            template.Id,
+            template.Name,
+            template.Revision,
+            template.Color,
+            template.Size,
+            template.Modules,
+            template.Connections,
+            [.. template.UnavailableModules.Select(m => m.Type)]);
+    }
+
     /// <summary>
     /// Takes an unavailable module out of the subgraph, converting its position back to an absolute one.
     /// </summary>
     private static UnavailableModule WithoutSubgraph(UnavailableModule module, SubgraphDto subgraph)
     {
-        if (!module.Element.TryGetProperty("subgraphId", out var id) || !id.TryGetGuid(out var subgraphId) || subgraphId != subgraph.Id)
+        if (!IsInSubgraph(module, subgraph.Id))
         {
             return module;
         }
@@ -630,6 +951,29 @@ public sealed class AudioHost : IDisposable
         return entry;
     }
 
+    /// <summary>
+    /// Creates template connections between the modules the ids map to. Connections the graph rejects (e.g. a cycle through modules outside
+    /// the subgraph) are skipped.
+    /// </summary>
+    private List<ConnectionEntry> ConnectTemplate(IReadOnlyList<TemplateConnectionDto> connections, Dictionary<Guid, Guid> moduleIds)
+    {
+        var created = new List<ConnectionEntry>();
+        foreach (var connection in connections)
+        {
+            try
+            {
+                created.Add(ConnectCore(new ConnectionDto(
+                    Guid.NewGuid(), moduleIds[connection.SourceModuleId], connection.SourcePort, moduleIds[connection.TargetModuleId], connection.TargetPort)));
+            }
+            catch (EngineRequestException ex)
+            {
+                _logger.LogWarning("Skipping a template connection: {Reason}", ex.Message);
+            }
+        }
+
+        return created;
+    }
+
     private EngineStatusDto CreateStatus()
     {
         var statistics = Engine.Statistics;
@@ -644,6 +988,49 @@ public sealed class AudioHost : IDisposable
         return settings.SubgraphId is { } id && _subgraphs.TryGetValue(id, out var subgraph)
             ? Offset(settings.Position, subgraph.Position.X, subgraph.Position.Y)
             : settings.Position;
+    }
+
+    /// <summary>
+    /// The trimmed name, which no other template may have (ignoring case).
+    /// </summary>
+    private string GetTemplateName(string name, Guid? templateId)
+    {
+        name = name.Trim();
+        if (name.Length == 0)
+        {
+            throw EngineRequestException.Invalid("The template name is empty.");
+        }
+
+        if (_templates.Values.Any(t => t.Id != templateId && string.Equals(t.Name, name, StringComparison.OrdinalIgnoreCase)))
+        {
+            throw EngineRequestException.Conflict($"A subgraph template named '{name}' exists.");
+        }
+
+        return name;
+    }
+
+    /// <summary>
+    /// A template whose modules can all be created.
+    /// </summary>
+    private SubgraphTemplate GetUsableTemplate(Guid id)
+    {
+        if (!_templates.TryGetValue(id, out var template))
+        {
+            throw EngineRequestException.NotFound($"Subgraph template {id} not found.");
+        }
+
+        if (template.UnavailableModules.Count > 0)
+        {
+            var types = string.Join(", ", template.UnavailableModules.Select(m => m.Type).Distinct());
+            throw EngineRequestException.Invalid($"The template '{template.Name}' has modules whose plugin isn't loaded: {types}.");
+        }
+
+        foreach (var module in template.Modules)
+        {
+            ThrowIfInvalid(StateValidator.Validate(module, "modules"));
+        }
+
+        return template;
     }
 
     private void OnDeviceChanged(object? sender, AudioDeviceChangedEventArgs e)
@@ -703,6 +1090,7 @@ public sealed class AudioHost : IDisposable
             Preferences = _preferences,
             Modules = [.. _modules.Values.Select(ToDto)],
             Subgraphs = [.. _subgraphs.Values],
+            Templates = [.. _templates.Values],
             UnavailableModules = [.. _unavailableModules],
             Connections = [.. _connections.Values.Select(c => c.Dto), .. _unavailableConnections],
         });
@@ -729,6 +1117,25 @@ public sealed class AudioHost : IDisposable
         var status = CreateStatus();
         _notifier.StatusChanged(status);
         return status;
+    }
+
+    /// <summary>
+    /// Removes a module and its connections from the graph, and returns the connections.
+    /// </summary>
+    private ConnectionEntry[] RemoveModuleCore(ModuleEntry entry)
+    {
+        _modules.Remove(entry.Id);
+        var connections = _connections.Values.Where(c => c.Dto.SourceModuleId == entry.Id || c.Dto.TargetModuleId == entry.Id).ToArray();
+        foreach (var connection in connections)
+        {
+            _connections.Remove(connection.Dto.Id);
+        }
+
+        _unavailableConnections.RemoveAll(c => c.SourceModuleId == entry.Id || c.TargetModuleId == entry.Id);
+        Graph.Remove(entry.Module);
+        entry.Module.StateChanged -= OnModuleStateChanged;
+        entry.Module.Dispose();
+        return connections;
     }
 
     private void TearDown()

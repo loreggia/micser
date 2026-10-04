@@ -45,6 +45,12 @@ public abstract record ModuleDto
     public Guid? SubgraphId { get; init; }
 
     /// <summary>
+    /// The module of the subgraph's template that this module was created from or saved as, so an update from the template keeps it.
+    /// It's set by the engine and cleared when the module changes subgraphs; the value sent with an update is ignored.
+    /// </summary>
+    public Guid? TemplateModuleId { get; init; }
+
+    /// <summary>
     /// Follows the volume and mute of Windows' default output device (its volume slider and keys). The engine then sets
     /// <see cref="Volume"/> and <see cref="IsMuted"/>, and the values sent with an update are ignored.
     /// </summary>

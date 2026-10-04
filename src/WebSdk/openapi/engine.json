@@ -671,8 +671,169 @@
         "tags": [
           "Subgraphs"
         ],
-        "description": "Removes a subgraph; its modules stay in the graph.",
+        "description": "Removes a subgraph. Its modules stay in the graph, or are removed with their connections if deleteModules is true.",
         "operationId": "DeleteSubgraph",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "deleteModules",
+            "in": "query",
+            "schema": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/subgraphs/{id}/update-from-template": {
+      "post": {
+        "tags": [
+          "Subgraphs"
+        ],
+        "description": "Makes the subgraph match its template's current revision.",
+        "operationId": "UpdateSubgraphFromTemplate",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubgraphDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/subgraph-templates": {
+      "get": {
+        "tags": [
+          "Subgraph templates"
+        ],
+        "operationId": "GetSubgraphTemplates",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SubgraphTemplateDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Subgraph templates"
+        ],
+        "description": "Saves a subgraph as a new template, or over the template with the given id.",
+        "operationId": "SaveSubgraphTemplate",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveSubgraphTemplateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubgraphTemplateDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/subgraph-templates/{id}/name": {
+      "put": {
+        "tags": [
+          "Subgraph templates"
+        ],
+        "operationId": "RenameSubgraphTemplate",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RenameSubgraphTemplateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubgraphTemplateDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/subgraph-templates/{id}": {
+      "delete": {
+        "tags": [
+          "Subgraph templates"
+        ],
+        "description": "Removes a template; the subgraphs created from it stay.",
+        "operationId": "DeleteSubgraphTemplate",
         "parameters": [
           {
             "name": "id",
@@ -690,6 +851,48 @@
           },
           "404": {
             "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/subgraph-templates/{id}/instantiate": {
+      "post": {
+        "tags": [
+          "Subgraph templates"
+        ],
+        "description": "Creates a subgraph with the template's modules and connections.",
+        "operationId": "InstantiateSubgraphTemplate",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InstantiateSubgraphTemplateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SubgraphDto"
+                }
+              }
+            }
           }
         }
       }
@@ -1127,6 +1330,17 @@
         "type": "string",
         "format": "binary"
       },
+      "InstantiateSubgraphTemplateRequest": {
+        "required": [
+          "position"
+        ],
+        "type": "object",
+        "properties": {
+          "position": {
+            "$ref": "#/components/schemas/ModulePosition"
+          }
+        }
+      },
       "LoopbackInputState": {
         "required": [
           "deviceId",
@@ -1257,6 +1471,13 @@
             ],
             "format": "uuid"
           },
+          "templateModuleId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
           "useSystemVolume": {
             "type": "boolean"
           },
@@ -1319,6 +1540,13 @@
             ]
           },
           "subgraphId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "templateModuleId": {
             "type": [
               "null",
               "string"
@@ -1393,6 +1621,13 @@
             ],
             "format": "uuid"
           },
+          "templateModuleId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
           "useSystemVolume": {
             "type": "boolean"
           },
@@ -1455,6 +1690,13 @@
             ]
           },
           "subgraphId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "templateModuleId": {
             "type": [
               "null",
               "string"
@@ -1529,6 +1771,13 @@
             ],
             "format": "uuid"
           },
+          "templateModuleId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
           "useSystemVolume": {
             "type": "boolean"
           },
@@ -1591,6 +1840,13 @@
             ]
           },
           "subgraphId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "templateModuleId": {
             "type": [
               "null",
               "string"
@@ -1665,6 +1921,13 @@
             ],
             "format": "uuid"
           },
+          "templateModuleId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
           "useSystemVolume": {
             "type": "boolean"
           },
@@ -1727,6 +1990,13 @@
             ]
           },
           "subgraphId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "templateModuleId": {
             "type": [
               "null",
               "string"
@@ -1869,6 +2139,40 @@
           }
         }
       },
+      "RenameSubgraphTemplateRequest": {
+        "required": [
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "SaveSubgraphTemplateRequest": {
+        "required": [
+          "subgraphId",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "subgraphId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "templateId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          }
+        }
+      },
       "Speakers": {
         "type": "string"
       },
@@ -1931,6 +2235,20 @@
           "isBypassed": {
             "type": "boolean",
             "default": false
+          },
+          "templateId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "templateRevision": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
           }
         }
       },
@@ -1948,6 +2266,81 @@
           "height": {
             "type": "number",
             "format": "double"
+          }
+        }
+      },
+      "SubgraphTemplateDto": {
+        "required": [
+          "id",
+          "name",
+          "revision",
+          "color",
+          "size",
+          "modules",
+          "connections",
+          "unavailableTypes"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "revision": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "color": {
+            "$ref": "#/components/schemas/SubgraphColor"
+          },
+          "size": {
+            "$ref": "#/components/schemas/SubgraphSize"
+          },
+          "modules": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModuleDto"
+            }
+          },
+          "connections": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TemplateConnectionDto"
+            }
+          },
+          "unavailableTypes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "TemplateConnectionDto": {
+        "required": [
+          "sourceModuleId",
+          "sourcePort",
+          "targetModuleId",
+          "targetPort"
+        ],
+        "type": "object",
+        "properties": {
+          "sourceModuleId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "sourcePort": {
+            "type": "string"
+          },
+          "targetModuleId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "targetPort": {
+            "type": "string"
           }
         }
       },
@@ -1991,6 +2384,9 @@
     },
     {
       "name": "Subgraphs"
+    },
+    {
+      "name": "Subgraph templates"
     }
   ]
 }

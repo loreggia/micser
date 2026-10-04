@@ -25,6 +25,7 @@ import type {
 
 import type {
   CreateSubgraphRequest,
+  DeleteSubgraphParams,
   SubgraphDto
 } from '../model';
 
@@ -314,20 +315,29 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getUpdateSubgraphMutationOptions(options), queryClient);
     }
-    export const getDeleteSubgraphUrl = (id: string,) => {
+    export const getDeleteSubgraphUrl = (id: string,
+    params?: DeleteSubgraphParams,) => {
+  const normalizedParams = new URLSearchParams();
 
+  Object.entries(params || {}).forEach(([key, value]) => {
 
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
 
+  const stringifiedParams = normalizedParams.toString();
 
-  return `/api/subgraphs/${id}`
+  return stringifiedParams.length > 0 ? `/api/subgraphs/${id}?${stringifiedParams}` : `/api/subgraphs/${id}`
 }
 
 /**
- * Removes a subgraph; its modules stay in the graph.
+ * Removes a subgraph. Its modules stay in the graph, or are removed with their connections if deleteModules is true.
  */
-export const deleteSubgraph = async (id: string, options?: Parameters<typeof engineFetch>[1]): Promise<void> => {
+export const deleteSubgraph = async (id: string,
+    params?: DeleteSubgraphParams, options?: Parameters<typeof engineFetch>[1]): Promise<void> => {
 
-  return engineFetch<void>(getDeleteSubgraphUrl(id),
+  return engineFetch<void>(getDeleteSubgraphUrl(id,params),
   {
     ...options,
     method: 'DELETE'
@@ -357,9 +367,9 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
 
 
       const mutationFn: MutationFunction<Awaited<ReturnType<typeof deleteSubgraph>>, DeleteSubgraphMutationVariables> = (props) => {
-          const {id} = props ?? {};
+          const {id,params} = props ?? {};
 
-          return  deleteSubgraph(id,requestOptions)
+          return  deleteSubgraph(id,params,requestOptions)
         }
 
 
@@ -372,7 +382,7 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type DeleteSubgraphMutationResult = NonNullable<Awaited<ReturnType<typeof deleteSubgraph>>>
 
     export type DeleteSubgraphMutationError = void
-    export type DeleteSubgraphMutationVariables = {id: string}
+    export type DeleteSubgraphMutationVariables = {id: string;params?: DeleteSubgraphParams}
 
     export const useDeleteSubgraph = <TError = void,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteSubgraph>>, TError,DeleteSubgraphMutationVariables, TContext>, request?: SecondParameter<typeof engineFetch>}
@@ -383,4 +393,74 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
         TContext
       > => {
       return useMutation(getDeleteSubgraphMutationOptions(options), queryClient);
+    }
+    export const getUpdateSubgraphFromTemplateUrl = (id: string,) => {
+
+
+
+
+  return `/api/subgraphs/${id}/update-from-template`
+}
+
+/**
+ * Makes the subgraph match its template's current revision.
+ */
+export const updateSubgraphFromTemplate = async (id: string, options?: Parameters<typeof engineFetch>[1]): Promise<SubgraphDto> => {
+
+  return engineFetch<SubgraphDto>(getUpdateSubgraphFromTemplateUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getUpdateSubgraphFromTemplateMutationKey = () => ['updateSubgraphFromTemplate'] as const;
+
+export const getUpdateSubgraphFromTemplateMutationOptions = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSubgraphFromTemplate>>, TError,UpdateSubgraphFromTemplateMutationVariables, TContext>, request?: SecondParameter<typeof engineFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof updateSubgraphFromTemplate>>, TError,UpdateSubgraphFromTemplateMutationVariables, TContext> => {
+
+const mutationKey = getUpdateSubgraphFromTemplateMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof updateSubgraphFromTemplate>>, UpdateSubgraphFromTemplateMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  updateSubgraphFromTemplate(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type UpdateSubgraphFromTemplateMutationResult = NonNullable<Awaited<ReturnType<typeof updateSubgraphFromTemplate>>>
+
+    export type UpdateSubgraphFromTemplateMutationError = unknown
+    export type UpdateSubgraphFromTemplateMutationVariables = {id: string}
+
+    export const useUpdateSubgraphFromTemplate = <TError = unknown,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSubgraphFromTemplate>>, TError,UpdateSubgraphFromTemplateMutationVariables, TContext>, request?: SecondParameter<typeof engineFetch>}
+ , queryClient?: QueryClient): UseMutationResult<
+        Awaited<ReturnType<typeof updateSubgraphFromTemplate>>,
+        TError,
+        UpdateSubgraphFromTemplateMutationVariables,
+        TContext
+      > => {
+      return useMutation(getUpdateSubgraphFromTemplateMutationOptions(options), queryClient);
     }
