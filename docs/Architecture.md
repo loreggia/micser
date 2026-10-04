@@ -335,7 +335,11 @@ The plan (signing, installation, phases) is in the [driver plan](https://claude.
    - Stream recovery (watchdog and resume notification) was verified with a real sleep/resume.
 4. **UI** (done): `src/Web`, `src/WebSdk` and `src/Plugins/Main/Web`: the Vite app, graph editor and widgets.
    - The build splits the libraries into their own chunks (React, Fluent UI, Fluent icons, React Flow, other dependencies), so a release only changes the small app chunk (about 40 kB) and the libraries stay cached. The total is still about 1 MB, which is fine for a UI served by the local engine.
-   - Unit and component tests with Vitest (see Defaults): placement and subgraph geometry, the API fetch and access token, the debounced updates of `EngineConnection`, plugin bundle loading, `ParameterSlider`, `ModuleTitle` and Main's widgets.
+   - Unit and component tests with Vitest (see Defaults):
+     - Logic: placement and subgraph geometry, the level meter's peaks and holds (`meterState.ts`), and the API fetch and access token.
+     - `EngineConnection`, against a fake SignalR hub: debounced updates, the engine events' cache patches, live data and level subscriptions, and reconnecting.
+     - The engine hooks, the shell bridge, plugin bundle loading and `PluginsProvider`, `useAddModule`, and the SPA's Vite plugins.
+     - Components: `ParameterSlider`, `ModuleTitle`, `LevelMeter` and Main's widgets.
    - Follow-up: end-to-end tests (Playwright against the engine and Vite), including the graph editor, which needs a running engine. The checks so far were scripted Playwright runs against Edge outside the repo.
 5. **Shell (`src/Shell`)** (done): tray, WebView2 window, engine launch, discovery and supervision, autostart.
    - Verified: engine start, UI and token handoff, single instance, crash restart, the tray's Close and Exit Micser, and restarting the engine process from the UI.
