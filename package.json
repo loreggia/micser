@@ -9,7 +9,7 @@
     "tests/E2E"
   ],
   "engines": {
-    "node": ">=22.12"
+    "node": ">=24"
   },
   "scripts": {
     "setup": "npm install && npm run allow-scripts:run",
@@ -52,5 +52,8 @@
       "@lavamoat/preinstall-always-fail#3.0.0": false,
       "vitest>vite>esbuild#0.28.2": true
     }
+  },
+  "volta": {
+    "node": "24.21.0"
   }
 }
