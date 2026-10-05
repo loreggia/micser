@@ -12,7 +12,9 @@ test("display preferences apply right away and are kept by the engine", async ({
   await dialog.getByRole("switch", { name: "Snap modules to the grid" }).click();
   await dialog.getByRole("switch", { name: /Show stream statistics/ }).click();
 
-  await expect.poll(() => engine.preferences()).toEqual({ showStreamStatistics: true, snapToGrid: false });
+  await expect
+    .poll(() => engine.preferences())
+    .toEqual({ showStreamStatistics: true, snapToGrid: false, language: null });
 
   await graph.page.reload();
   await graph.page.getByRole("button", { name: "Settings" }).click();

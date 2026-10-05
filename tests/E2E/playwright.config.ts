@@ -12,6 +12,8 @@ export default defineConfig({
   reporter: isCI ? [["list"], ["html", { open: "never" }]] : "list",
   use: {
     trace: "retain-on-failure",
+    // the UI follows the browser's language; tests that need another one set it
+    locale: "en-US",
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"], viewport: { width: 1600, height: 900 } } }],
 });

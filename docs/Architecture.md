@@ -39,7 +39,7 @@ Target architecture for the modernization of Micser (decided 2026-09-30). `main`
 - **Web tooling:** npm workspaces consume the internal packages (`@micser/web-sdk`, `@micser/plugin-main`) as TypeScript source. Only the SPA and the plugins' widget bundles are built (`npm run build` builds every workspace with a `build` script). TypeScript is pinned to `~6.0` because `typescript-eslint` doesn't support 7.x yet.
 - **Engine discovery and security:** see [Engine](#engine).
 - **Autostart:** an `HKCU\...\Run` entry for the shell. The shell launches the engine if it isn't running (see [Shell](#shell)).
-- **UI libraries:** Fluent UI React v9 (light/dark following the OS), TanStack Query for engine state, Orval for the API client (see [UI](#ui)).
+- **UI libraries:** Fluent UI React v9 (light/dark following the OS), TanStack Query for engine state, Orval for the API client, i18next with react-i18next for translations (see [UI](#ui)).
 
 ## Layout
 
@@ -210,6 +210,14 @@ docs/
 - **Toolbar and settings:**
   - The settings dialog has the audio settings (applied together, which rebuilds the graph) with "Restart audio" (`engine/restart-audio`) and, in the shell, "Restart engine process", the display preferences (applied right away), the plugins (install from a .zip, remove, and "Restart engine to apply" in the shell), and, in the shell, the version with "Check for updates".
   - When the shell has downloaded an update, the toolbar shows an "Update to x.y.z" button.
+- **Languages:** English (the default and fallback) and German.
+  - The language is the `language` preference (`/api/preferences`, null follows the system), set in the settings' "Display" section and applied right away. Without a preference, or with one the UI doesn't have, the first of the browser's languages that the UI has counts (in WebView2 that's the Windows display language), otherwise English (`resolveLanguage`). `useLanguagePreference()` at the root of the UI applies it; `<html lang>` follows.
+  - `@micser/web-sdk` has the one i18next instance, which plugins get through the shared `@micser/web-sdk` module; they don't import i18next themselves. `defineTranslations(namespace, { en, de })` adds a namespace (`web` for the SPA, the plugin's name for a plugin, e.g. `main`) and returns a typed `t` and `useTranslation()`. The keys come from the English object; the German one is typed `Translations<typeof en>`, so a missing key fails the typecheck. Plural forms use i18next's `_one`/`_other` suffixes and `count`.
+  - The resources are TypeScript objects next to the code: `src/Web/src/locales/{en,de}.ts` and each plugin's `Web/src/locales`.
+  - A widget's `title` and `portLabels` are `LocalizedText`: a string or a function that translates it (`() => t("modules.gain")`), resolved with `localize()` when shown. Port labels default to the engine's port names.
+  - Numbers follow the language (`formatNumber`, and the `decibels`, `hertz` and `milliseconds` labels), e.g. with a decimal comma in German. `ParameterSlider` re-renders when the language changes.
+  - Text from the engine stays as it is: problem details, built-in template names and the names of their modules, device names.
+  - Component tests render in English unless they pass `language` to `TestProviders`; the end-to-end tests run with the browser locale `en-US`.
 - **Shell bridge** (`src/Web/src/shell.ts`): inside the shell's WebView2, the UI exchanges web messages with the shell (`chrome.webview`). In a plain browser it's absent, and the shell-only controls are hidden.
 - **Access token:**
   - The SPA reads `#token=...` once, keeps it in `sessionStorage` and removes it from the address. The shell will open `{url}/#token={token}` from the discovery file.
@@ -247,6 +255,7 @@ docs/
   - Without an engine executable, it only waits for a running engine (development).
 - **Tray:**
   - The menu has Open, "Start with Windows" (`HKCU\...\Run` value `Micser` = `"<shell>" --minimized`), Close and Exit Micser.
+  - Its texts, the notifications and the window's message boxes and status page come from `Strings.resx` and `Strings.de.resx` (the `Strings` class is generated at build time; German is a satellite assembly in `de/`). `ShellLanguage` picks the language like the UI: the UI's language preference, which the UI passes on with a `setLanguage` message and the shell keeps in `%LocalAppData%\Micser\language.json` for the next start, otherwise the Windows display language if the shell has it, otherwise English. The tray menu changes right away.
   - "Close" exits the shell only, and the audio keeps running. "Exit Micser" stops the engine via `POST /api/engine/shutdown` and waits for it to exit.
   - A second shell start signals the first through a named event (`Local\Micser.Shell`), which shows its window.
 - **Window:**
@@ -255,7 +264,7 @@ docs/
   - It shows `{engine url}/#token={token}`, or the `--ui <url>` override with the engine's token (Vite in development), and re-navigates when the engine changes. While no engine is available, a status page is shown.
   - Links that open new windows go to the default browser. A missing WebView2 runtime leads to a download prompt.
   - The browser's default context menu is off.
-  - Web messages from the loaded UI (and only from its origin): `getState`, `checkForUpdates` (answered with `updateCheck`), `installUpdate`, `restartEngine`, and for the driver `installDriver`, `setCableCount`, `setCableLayout`, `updateDriver` and `uninstallDriver`. The shell sends `state` (version, whether it can update, a running check, the pending update, whether it can restart the engine, the driver's status) on request and whenever it changes.
+  - Web messages from the loaded UI (and only from its origin): `getState`, `checkForUpdates` (answered with `updateCheck`), `installUpdate`, `restartEngine`, and for the driver `installDriver`, `setCableCount`, `setCableLayout`, `updateDriver` and `uninstallDriver`, and `setLanguage`. The shell sends `state` (version, whether it can update, a running check, the pending update, whether it can restart the engine, the driver's status) on request and whenever it changes.
 - **Restarting the engine process:** `EngineSupervisor.RestartEngineAsync` stops the engine gracefully and lets supervision start a new one; it doesn't count toward the crash restart limit. Only available when the shell can start the engine (not in development).
 - **Updates** are run by `UpdateController` (see [Packaging and updates](#packaging-and-updates)), shared by the tray and the window.
 - **Logs:** `%LocalAppData%\Micser\logs\shell-*.log` (Serilog). Fatal startup errors also show a message box.
@@ -353,17 +362,18 @@ The plan (signing, installation, phases) is in the [driver plan](https://claude.
 3. **Engine (`src/Engine`)** (done): hosting, the JSON config store, module definition/module/connection/device/settings APIs, and SignalR hubs for change and module data pushes.
    - Stream recovery (watchdog and resume notification) was verified with a real sleep/resume.
 4. **UI** (done): `src/Web`, `src/WebSdk` and `src/Plugins/Main/Web`: the Vite app, graph editor and widgets.
-   - The build splits the libraries into their own chunks (React, Fluent UI, Fluent icons, React Flow, other dependencies), so a release only changes the small app chunk (about 40 kB) and the libraries stay cached. The total is still about 1 MB, which is fine for a UI served by the local engine.
+   - The build splits the libraries into their own chunks (React, Fluent UI, Fluent icons, React Flow, other dependencies), so a release only changes the small app chunk (about 65 kB, with the translations) and the libraries stay cached. The total is still about 1 MB, which is fine for a UI served by the local engine.
    - Unit and component tests with Vitest (see Defaults):
      - Logic: placement and subgraph geometry, the level meter's peaks and holds (`meterState.ts`), and the API fetch and access token.
      - `EngineConnection`, against a fake SignalR hub: debounced updates, the engine events' cache patches, live data and level subscriptions, and reconnecting.
      - The engine hooks, the shell bridge, plugin bundle loading and `PluginsProvider`, `useAddModule`, and the SPA's Vite plugins.
      - Components: `ParameterSlider`, `ModuleTitle`, `LevelMeter` and Main's widgets.
-   - End-to-end tests with Playwright against the engine and Vite (see Defaults), 53 tests in about 1.2 min:
+   - End-to-end tests with Playwright against the engine and Vite (see Defaults), 59 tests in about 1.3 min:
      - The app: the toolbar's module menu, adding and selecting, changes from the API and a second window shown live.
      - Modules: widget edits, mute, volume, collapse, rename, moving on and off the grid, deleting by menu and key.
      - Connections: connecting by drag, a rejected cycle, deleting, and dropping on empty space to add a connected module.
      - Context menus, subgraphs (grouping, collapse with proxy ports, mute, rename, ungroup, delete), templates (save, replace, add, the templates dialog) and the settings (preferences, plugins).
+     - The language: from the preference, changed in the settings, from the browser's language, and passed to the shell.
      - Plugins: installing a package through the settings, the restart, the plugin's module with its widget (through the import map), removing it with another restart, the shell's "Restart engine to apply", and a rejected file.
      - The shell-only controls against `FakeShell`: hidden in a browser, the toolbar's and the settings' update controls, the update check, restarting the engine process, and the virtual cable settings (install, count, layouts, update, uninstall, problem, busy and unreadable states).
    - Not covered: the shell's side of the web messages (`MainForm`), which needs WebView2 and the WinForms window.

@@ -2362,6 +2362,12 @@
           "snapToGrid": {
             "type": "boolean",
             "default": true
+          },
+          "language": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       }

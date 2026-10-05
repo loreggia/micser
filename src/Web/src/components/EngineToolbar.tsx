@@ -17,6 +17,7 @@ import {
 } from "@fluentui/react-components";
 import { AddRegular, ArrowDownloadRegular, SettingsRegular } from "@fluentui/react-icons";
 import {
+  formatNumber,
   getStartEngineMutationOptions,
   getStopEngineMutationOptions,
   useEngineConnectionState,
@@ -24,6 +25,7 @@ import {
 } from "@micser/web-sdk";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
+import { useTranslation } from "../i18n";
 import { useNotifyError } from "../notifications";
 import { shell, useShellState } from "../shell";
 import { EngineSettingsDialog } from "./EngineSettingsDialog";
@@ -51,15 +53,16 @@ const useStyles = makeStyles({
   },
 });
 
-const connectionBadges = {
-  connected: { color: "success", text: "Connected" },
-  connecting: { color: "informative", text: "Connecting" },
-  reconnecting: { color: "warning", text: "Reconnecting" },
-  disconnected: { color: "danger", text: "Disconnected" },
+const connectionColors = {
+  connected: "success",
+  connecting: "informative",
+  reconnecting: "warning",
+  disconnected: "danger",
 } as const;
 
 export function EngineToolbar() {
   const styles = useStyles();
+  const { t } = useTranslation();
   const connectionState = useEngineConnectionState();
   const moduleTypes = useModuleTypeChoices();
   const { data: status } = useGetEngineStatus({ query: { refetchInterval: 2000 } });
@@ -70,13 +73,12 @@ export function EngineToolbar() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const start = useMutation({
     ...getStartEngineMutationOptions(),
-    onError: (error) => notifyError("Starting the engine failed", error),
+    onError: (error) => notifyError(t("toolbar.startFailed"), error),
   });
   const stop = useMutation({
     ...getStopEngineMutationOptions(),
-    onError: (error) => notifyError("Stopping the engine failed", error),
+    onError: (error) => notifyError(t("toolbar.stopFailed"), error),
   });
-  const badge = connectionBadges[connectionState];
   const isConnected = connectionState === "connected";
 
   return (
@@ -85,7 +87,7 @@ export function EngineToolbar() {
       <Menu>
         <MenuTrigger disableButtonEnhancement>
           <Button appearance="primary" icon={<AddRegular />} disabled={!isConnected}>
-            Add module
+            {t("toolbar.addModule")}
           </Button>
         </MenuTrigger>
         <MenuPopover>
@@ -102,30 +104,35 @@ export function EngineToolbar() {
       </Menu>
       <div className={styles.spacer} />
       {shellState?.pendingUpdate && (
-        <Tooltip content="Restarts Micser to install the update" relationship="description">
+        <Tooltip content={t("toolbar.updateHint")} relationship="description">
           <Button appearance="primary" icon={<ArrowDownloadRegular />} onClick={() => shell?.installUpdate()}>
-            Update to {shellState.pendingUpdate}
+            {t("toolbar.updateTo", { version: shellState.pendingUpdate })}
           </Button>
         </Tooltip>
       )}
       {status && (
         <Caption1 className={styles.status}>
-          {status.settings.sampleRate / 1000} kHz ·{" "}
-          {((status.settings.frameCount / status.settings.sampleRate) * 1000).toFixed(1)} ms blocks
-          {status.lateBlocks > 0 && ` · ${status.lateBlocks} late`}
+          {t("toolbar.status", {
+            sampleRate: formatNumber(status.settings.sampleRate / 1000),
+            blockDuration: formatNumber((status.settings.frameCount / status.settings.sampleRate) * 1000, {
+              minimumFractionDigits: 1,
+              maximumFractionDigits: 1,
+            }),
+          })}
+          {status.lateBlocks > 0 && t("toolbar.lateBlocks", { count: status.lateBlocks })}
         </Caption1>
       )}
       <Switch
-        label="Audio"
+        label={t("toolbar.audio")}
         checked={status?.isRunning ?? false}
         disabled={!status || start.isPending || stop.isPending}
         onChange={(_, data) => (data.checked ? start.mutate() : stop.mutate())}
       />
       <ToolbarDivider />
-      <Badge appearance="tint" color={badge.color}>
-        {badge.text}
+      <Badge appearance="tint" color={connectionColors[connectionState]}>
+        {t(`toolbar.connection.${connectionState}`)}
       </Badge>
-      <Tooltip content="Settings" relationship="label">
+      <Tooltip content={t("toolbar.settings")} relationship="label">
         <Button
           appearance="subtle"
           icon={<SettingsRegular />}

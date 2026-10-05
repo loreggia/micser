@@ -26,6 +26,8 @@ import {
   SpeakerMuteRegular,
 } from "@fluentui/react-icons";
 import {
+  formatNumber,
+  localize,
   useModuleUpdate,
   type ModuleDto,
   type ModuleTypeDto,
@@ -33,6 +35,8 @@ import {
   type WidgetDefinition,
 } from "@micser/web-sdk";
 import { Handle, Position, useReactFlow, type Node, type NodeProps } from "@xyflow/react";
+import { useTranslation } from "../i18n";
+import { portName } from "../plugins";
 import { LevelMeter } from "./LevelMeter";
 import { ModuleTitle } from "./ModuleTitle";
 
@@ -69,7 +73,7 @@ const useStyles = makeStyles({
     gap: tokens.spacingHorizontalXS,
   },
   volumeValue: {
-    width: "3em",
+    width: "3.5em",
     textAlign: "right",
     color: tokens.colorNeutralForeground3,
     fontVariantNumeric: "tabular-nums",
@@ -99,6 +103,7 @@ const useStyles = makeStyles({
  */
 export function ModuleNode({ id, data, selected }: NodeProps<ModuleNodeType>) {
   const styles = useStyles();
+  const { t } = useTranslation();
   const update = useModuleUpdate();
   const { deleteElements } = useReactFlow();
   const { module, moduleType, widget, subgraph } = data;
@@ -108,6 +113,8 @@ export function ModuleNode({ id, data, selected }: NodeProps<ModuleNodeType>) {
   const collapsed = module.isCollapsed;
   // collapsed, the card is only as high as its header, which would crowd several ports and their labels
   const portCount = Math.max(moduleType?.inputs.length ?? 0, moduleType?.outputs.length ?? 0);
+  const widgetTitle = widget && localize(widget.title);
+  const portLabel = (port: string, ports: string[]) => (ports.length > 1 ? portName(widget, port) : undefined);
 
   return (
     <Card
@@ -120,17 +127,23 @@ export function ModuleNode({ id, data, selected }: NodeProps<ModuleNodeType>) {
         header={
           <ModuleTitle
             name={module.name ?? null}
-            fallback={widget?.title || module.type}
-            label="Module name"
+            fallback={widgetTitle || module.type}
+            label={t("module.name")}
             onRename={(name) => update({ ...module, name } as ModuleDto)}
           />
         }
-        description={module.name && widget && !collapsed ? <Caption1>{widget.title}</Caption1> : undefined}
+        description={module.name && widget && !collapsed ? <Caption1>{widgetTitle}</Caption1> : undefined}
         action={
           <div className={mergeClasses(styles.actions, "nodrag")}>
             {moduleType?.supportsBypass && (
               <Tooltip
-                content={bypassedBySubgraph ? "Bypassed by subgraph" : module.isBypassed ? "Bypassed" : "Bypass"}
+                content={
+                  bypassedBySubgraph
+                    ? t("module.bypassedBySubgraph")
+                    : module.isBypassed
+                      ? t("common.bypassed")
+                      : t("common.bypass")
+                }
                 relationship="label"
               >
                 <ToggleButton
@@ -146,12 +159,12 @@ export function ModuleNode({ id, data, selected }: NodeProps<ModuleNodeType>) {
             <Tooltip
               content={
                 mutedBySubgraph
-                  ? "Muted by subgraph"
+                  ? t("module.mutedBySubgraph")
                   : module.useSystemVolume
-                    ? "Muted with Windows"
+                    ? t("module.mutedWithWindows")
                     : module.isMuted
-                      ? "Unmute"
-                      : "Mute"
+                      ? t("common.unmute")
+                      : t("common.mute")
               }
               relationship="label"
             >
@@ -164,7 +177,7 @@ export function ModuleNode({ id, data, selected }: NodeProps<ModuleNodeType>) {
                 onClick={() => update({ ...module, isMuted: !module.isMuted })}
               />
             </Tooltip>
-            <Tooltip content={collapsed ? "Expand" : "Collapse"} relationship="label">
+            <Tooltip content={collapsed ? t("common.expand") : t("common.collapse")} relationship="label">
               <Button
                 size="small"
                 appearance="subtle"
@@ -174,14 +187,14 @@ export function ModuleNode({ id, data, selected }: NodeProps<ModuleNodeType>) {
             </Tooltip>
             <Menu>
               <MenuTrigger disableButtonEnhancement>
-                <Tooltip content="More" relationship="label">
+                <Tooltip content={t("common.more")} relationship="label">
                   <Button size="small" appearance="subtle" icon={<MoreHorizontalRegular />} />
                 </Tooltip>
               </MenuTrigger>
               <MenuPopover>
                 <MenuList>
                   <MenuItem icon={<DeleteRegular />} onClick={() => void deleteElements({ nodes: [{ id }] })}>
-                    Delete
+                    {t("common.delete")}
                   </MenuItem>
                 </MenuList>
               </MenuPopover>
@@ -192,19 +205,21 @@ export function ModuleNode({ id, data, selected }: NodeProps<ModuleNodeType>) {
       {!collapsed && (
         <>
           <div className={mergeClasses(styles.volume, "nodrag", "nowheel")}>
-            <Caption1>Volume</Caption1>
+            <Caption1>{t("module.volume")}</Caption1>
             <Slider
               size="small"
               min={0}
               max={100}
               value={Math.round(module.volume * 100)}
-              aria-label="Volume"
+              aria-label={t("module.volume")}
               disabled={module.useSystemVolume}
               onChange={(_, value) => update({ ...module, volume: value.value / 100 })}
             />
-            <Caption1 className={styles.volumeValue}>{Math.round(module.volume * 100)}%</Caption1>
+            <Caption1 className={styles.volumeValue}>
+              {formatNumber(Math.round(module.volume * 100) / 100, { style: "percent" })}
+            </Caption1>
             <Tooltip
-              content={module.useSystemVolume ? "Follows the Windows volume" : "Follow the Windows volume"}
+              content={module.useSystemVolume ? t("module.followsWindowsVolume") : t("module.followWindowsVolume")}
               relationship="label"
             >
               <ToggleButton
@@ -225,24 +240,10 @@ export function ModuleNode({ id, data, selected }: NodeProps<ModuleNodeType>) {
         </>
       )}
       {moduleType?.inputs.map((port, index, ports) => (
-        <Port
-          key={port}
-          type="target"
-          id={port}
-          label={ports.length > 1 ? port : undefined}
-          index={index}
-          count={ports.length}
-        />
+        <Port key={port} type="target" id={port} label={portLabel(port, ports)} index={index} count={ports.length} />
       ))}
       {moduleType?.outputs.map((port, index, ports) => (
-        <Port
-          key={port}
-          type="source"
-          id={port}
-          label={ports.length > 1 ? port : undefined}
-          index={index}
-          count={ports.length}
-        />
+        <Port key={port} type="source" id={port} label={portLabel(port, ports)} index={index} count={ports.length} />
       ))}
     </Card>
   );

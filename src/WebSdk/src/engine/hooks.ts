@@ -1,5 +1,6 @@
 import { useQueryClient } from "@tanstack/react-query";
 import { useCallback, useContext, useEffect, useState, useSyncExternalStore } from "react";
+import { i18n, resolveLanguage } from "../i18n/i18n";
 import {
   getGetPreferencesQueryKey,
   updatePreferences,
@@ -52,7 +53,7 @@ export function useModuleLevels(moduleId: string): PortLevels[] | undefined {
   return useSyncExternalStore(subscribe, () => connection.levels?.[moduleId]);
 }
 
-const defaultPreferences: UiPreferencesDto = { showStreamStatistics: false, snapToGrid: true };
+const defaultPreferences: UiPreferencesDto = { showStreamStatistics: false, snapToGrid: true, language: null };
 
 /**
  * Returns the UI preferences (defaults until loaded) and a function that changes some of them. Changes show immediately; the engine stores
@@ -70,6 +71,18 @@ export function usePreferences(): [UiPreferencesDto, (changes: Partial<UiPrefere
   };
 
   return [preferences, update];
+}
+
+/**
+ * Shows the UI in the language of the preferences (see `resolveLanguage`). Used once, at the root of the UI.
+ */
+export function useLanguagePreference() {
+  const [preferences] = usePreferences();
+  const language = resolveLanguage(preferences.language);
+
+  useEffect(() => {
+    void i18n.changeLanguage(language);
+  }, [language]);
 }
 
 /**

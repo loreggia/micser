@@ -18,7 +18,7 @@ import { startEngine, startWeb } from "./servers";
 
 export { expect };
 
-const defaultPreferences: UiPreferencesDto = { showStreamStatistics: false, snapToGrid: true };
+const defaultPreferences: UiPreferencesDto = { showStreamStatistics: false, snapToGrid: true, language: null };
 
 /**
  * The engine's API, for setting up and checking what the UI did.
@@ -75,6 +75,10 @@ export class EngineApi {
 
   preferences() {
     return this.send<UiPreferencesDto>("get", "/api/preferences");
+  }
+
+  async setPreferences(changes: Partial<UiPreferencesDto>) {
+    return this.send<UiPreferencesDto>("put", "/api/preferences", { ...(await this.preferences()), ...changes });
   }
 
   /** Removes everything the tests create and restores the default preferences. */
@@ -175,7 +179,8 @@ export class Graph {
   /** Opens the UI and waits until it shows the engine's graph. */
   async open() {
     await this.page.goto("/");
-    await expect(this.page.getByText("Connected", { exact: true })).toBeVisible();
+    // "Connected" in the UI's languages
+    await expect(this.page.getByText(/^(Connected|Verbunden)$/)).toBeVisible();
     await expect(this.pane).toBeVisible();
   }
 
@@ -235,12 +240,16 @@ export class FakeShell {
     return new FakeShell(page);
   }
 
-  /** The messages the UI posted, except the state requests. */
+  /** The messages the UI posted, except the state requests and the language preference, which the UI sends on its own. */
   async messages() {
-    const sent = await this.page.evaluate(
-      () => (window as unknown as { micserShell: { sent: { type: string }[] } }).micserShell.sent
-    );
-    return sent.filter((message) => message.type !== "getState");
+    return (await this.sent()).filter((message) => message.type !== "getState" && message.type !== "setLanguage");
+  }
+
+  /** The language preferences the UI passed to the shell, in order. */
+  async languages() {
+    return (await this.sent())
+      .filter((message) => message.type === "setLanguage")
+      .map((message) => message.language as string | null);
   }
 
   /** Posts a message to the UI, as the shell does. */
@@ -253,6 +262,14 @@ export class FakeShell {
 
   async setState(state: ShellState) {
     await this.send({ type: "state", ...state });
+  }
+
+  private sent() {
+    return this.page.evaluate(
+      () =>
+        (window as unknown as { micserShell: { sent: ({ type: string } & Record<string, unknown>)[] } }).micserShell
+          .sent
+    );
   }
 }
 

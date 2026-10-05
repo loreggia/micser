@@ -1,6 +1,7 @@
 import { Toast, ToastBody, ToastTitle, useToastController } from "@fluentui/react-components";
 import { EngineApiError, useEngineConnection } from "@micser/web-sdk";
 import { useCallback, useEffect } from "react";
+import { useTranslation } from "./i18n";
 
 export const toasterId = "notifications";
 
@@ -39,9 +40,10 @@ export function useNotifyError() {
 export function useErrorNotifications() {
   const connection = useEngineConnection();
   const notifyError = useNotifyError();
+  const { t } = useTranslation();
 
   useEffect(
-    () => connection.onError((error) => notifyError("Updating a module failed", error)),
-    [connection, notifyError]
+    () => connection.onError((error) => notifyError(t("module.updateFailed"), error)),
+    [connection, notifyError, t]
   );
 }

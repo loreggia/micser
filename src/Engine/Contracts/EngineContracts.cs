@@ -36,7 +36,8 @@ public sealed record PortLevelsDto(string? Port, float[] Peak, float[] Rms);
 /// </summary>
 /// <param name="ShowStreamStatistics">Whether device widgets show dropouts and the buffer size.</param>
 /// <param name="SnapToGrid">Whether modules snap to the grid when moved.</param>
-public sealed record UiPreferencesDto(bool ShowStreamStatistics = false, bool SnapToGrid = true);
+/// <param name="Language">The UI's language, e.g. "de"; null follows the system. Languages the UI doesn't have also follow the system.</param>
+public sealed record UiPreferencesDto(bool ShowStreamStatistics = false, bool SnapToGrid = true, string? Language = null);
 
 /// <summary>
 /// A plugin: loaded at the engine's start, failed to load, or staged for installation.

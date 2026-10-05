@@ -1,4 +1,6 @@
 import { Label, Slider, makeStyles, tokens, useId } from "@fluentui/react-components";
+import { useLanguage } from "../i18n/i18n";
+import { formatNumber } from "../lib/labels";
 
 const useStyles = makeStyles({
   root: {
@@ -65,7 +67,9 @@ export function ParameterSlider({
 }: ParameterSliderProps) {
   const styles = useStyles();
   const id = useId("parameter");
-  const text = format ? format(value) : `${Number(value.toFixed(2))}${unit ? ` ${unit}` : ""}`;
+  // formats change with the language
+  useLanguage();
+  const text = format ? format(value) : `${formatNumber(value, { maximumFractionDigits: 2 })}${unit ? ` ${unit}` : ""}`;
 
   // The slider works in integer positions: fractional steps like 1/12 aren't exact as floats, and the native range
   // input would snap values to slightly different ones.

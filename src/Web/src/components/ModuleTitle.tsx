@@ -1,5 +1,6 @@
 import { Body1Strong, Input, Tooltip, makeStyles, mergeClasses } from "@fluentui/react-components";
 import { useRef, useState } from "react";
+import { useTranslation } from "../i18n";
 
 /** Longest name the engine accepts. */
 const maxNameLength = 100;
@@ -31,6 +32,7 @@ export function ModuleTitle({
   onRename: (name: string | null) => void;
 }) {
   const styles = useStyles();
+  const { t } = useTranslation();
   const [draft, setDraft] = useState<string>();
   // the field may also lose focus when it's removed after Enter or Escape
   const isFinished = useRef(false);
@@ -38,7 +40,7 @@ export function ModuleTitle({
 
   if (draft === undefined) {
     return (
-      <Tooltip content="Double-click to rename" relationship="description">
+      <Tooltip content={t("common.doubleClickToRename")} relationship="description">
         <Body1Strong
           className={styles.title}
           onDoubleClick={() => {

@@ -8,6 +8,7 @@ import {
 } from "@micser/web-sdk";
 import { useMutation } from "@tanstack/react-query";
 import { useRef } from "react";
+import { useTranslation } from "../i18n";
 import { useNotifyError } from "../notifications";
 import { shell, useShellState } from "../shell";
 
@@ -43,12 +44,12 @@ const useStyles = makeStyles({
   },
 });
 
-function pluginStatus(plugin: PluginDto) {
+function pluginStatus(plugin: PluginDto, t: ReturnType<typeof useTranslation>["t"]) {
   switch (plugin.pendingChange) {
     case "Install":
-      return plugin.isLoaded ? "Updated when the engine restarts" : "Installed when the engine restarts";
+      return plugin.isLoaded ? t("plugins.updatedOnRestart") : t("plugins.installedOnRestart");
     case "Remove":
-      return "Removed when the engine restarts";
+      return t("plugins.removedOnRestart");
     default:
       return undefined;
   }
@@ -59,24 +60,25 @@ function pluginStatus(plugin: PluginDto) {
  */
 export function PluginsSettings() {
   const styles = useStyles();
+  const { t } = useTranslation();
   const { data: plugins = [] } = useGetPlugins();
   const shellState = useShellState();
   const notifyError = useNotifyError();
   const fileInput = useRef<HTMLInputElement>(null);
   const install = useMutation({
     ...getInstallPluginMutationOptions(),
-    onError: (error) => notifyError("Installing the plugin failed", error),
+    onError: (error) => notifyError(t("plugins.installFailed"), error),
   });
   const remove = useMutation({
     ...getRemovePluginMutationOptions(),
-    onError: (error) => notifyError("Removing the plugin failed", error),
+    onError: (error) => notifyError(t("plugins.removeFailed"), error),
   });
 
   const hasPendingChanges = plugins.some((plugin) => plugin.pendingChange !== "None");
 
   return (
     <>
-      <Subtitle2>Plugins</Subtitle2>
+      <Subtitle2>{t("plugins.title")}</Subtitle2>
       <div className={styles.list}>
         {plugins.map((plugin) => (
           <div key={`${plugin.id}-${plugin.isBuiltIn}`} className={styles.plugin}>
@@ -86,18 +88,20 @@ export function PluginsSettings() {
                 {plugin.version && <Caption1 className={styles.hint}>{plugin.version}</Caption1>}
                 {plugin.isBuiltIn && (
                   <Badge appearance="tint" color="informative" size="small">
-                    built in
+                    {t("plugins.builtIn")}
                   </Badge>
                 )}
               </div>
-              {plugin.error && <Caption1 className={styles.error}>Not loaded: {plugin.error}</Caption1>}
-              {pluginStatus(plugin) && <Caption1 className={styles.hint}>{pluginStatus(plugin)}</Caption1>}
+              {plugin.error && (
+                <Caption1 className={styles.error}>{t("plugins.notLoaded", { error: plugin.error })}</Caption1>
+              )}
+              {pluginStatus(plugin, t) && <Caption1 className={styles.hint}>{pluginStatus(plugin, t)}</Caption1>}
             </div>
             {!plugin.isBuiltIn && plugin.pendingChange !== "Remove" && (
               <Button
                 appearance="subtle"
                 icon={<DeleteRegular />}
-                aria-label={`Remove ${plugin.name ?? plugin.id}`}
+                aria-label={t("plugins.remove", { name: plugin.name ?? plugin.id })}
                 disabled={remove.isPending}
                 onClick={() => remove.mutate({ id: plugin.id })}
               />
@@ -105,20 +109,18 @@ export function PluginsSettings() {
           </div>
         ))}
       </div>
-      <Caption1 className={styles.hint}>
-        Plugins run inside the engine with full access to your computer; only install plugins you trust.
-      </Caption1>
+      <Caption1 className={styles.hint}>{t("plugins.trustHint")}</Caption1>
       <div className={styles.row}>
         <Button disabled={install.isPending} onClick={() => fileInput.current?.click()}>
-          {install.isPending ? "Installing…" : "Install plugin…"}
+          {install.isPending ? t("plugins.installing") : t("plugins.install")}
         </Button>
         {hasPendingChanges &&
           (shellState?.canRestartEngine ? (
             <Button appearance="primary" onClick={() => shell?.restartEngine()}>
-              Restart engine to apply
+              {t("plugins.restartToApply")}
             </Button>
           ) : (
-            <Caption1 className={styles.hint}>Restart the engine to apply the changes.</Caption1>
+            <Caption1 className={styles.hint}>{t("plugins.restartHint")}</Caption1>
           ))}
         <input
           ref={fileInput}

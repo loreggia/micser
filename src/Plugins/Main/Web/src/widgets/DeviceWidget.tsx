@@ -1,5 +1,6 @@
 import { Caption1, Dropdown, Option, makeStyles, tokens } from "@fluentui/react-components";
 import {
+  formatNumber,
   useGetDevices,
   useModuleData,
   usePreferences,
@@ -7,6 +8,7 @@ import {
   type ModuleOfType,
   type WidgetProps,
 } from "@micser/web-sdk";
+import { useTranslation } from "../i18n";
 
 interface StreamStatistics {
   fill: number;
@@ -48,6 +50,7 @@ export function DeviceWidget({
   direction,
 }: WidgetProps<DeviceModuleType> & { direction: DeviceDirection }) {
   const styles = useStyles();
+  const { t, language } = useTranslation();
   const { data: devices = [] } = useGetDevices({ direction, includeInactive: true });
   const [preferences] = usePreferences();
   const state = (module as ModuleOfType<DeviceModuleType>).state;
@@ -55,11 +58,15 @@ export function DeviceWidget({
   const selected = devices.find((d) => d.id === state.deviceId);
   const label =
     selected?.name ??
-    (state.deviceId ? `Unavailable${state.adapterName ? ` (${state.adapterName})` : ""}` : "No device");
+    (state.deviceId
+      ? state.adapterName
+        ? t("device.unavailableAdapter", { adapter: state.adapterName })
+        : t("device.unavailable")
+      : t("device.none"));
 
   const availableDevices = devices
     .filter((d) => d.isActive || d.id === state.deviceId)
-    .toSorted((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+    .toSorted((a, b) => a.name.localeCompare(b.name, language, { numeric: true }));
 
   return (
     <div className={styles.root}>
@@ -78,10 +85,10 @@ export function DeviceWidget({
           });
         }}
       >
-        <Option value={none}>No device</Option>
+        <Option value={none}>{t("device.none")}</Option>
         {availableDevices.map((device) => (
           <Option key={device.id} value={device.id} disabled={!device.isActive}>
-            {device.isActive ? device.name : `${device.name} (unavailable)`}
+            {device.isActive ? device.name : t("device.deviceUnavailable", { name: device.name })}
           </Option>
         ))}
       </Dropdown>
@@ -95,15 +102,22 @@ export function DeviceWidget({
  */
 function StreamStatus({ moduleId }: { moduleId: string }) {
   const styles = useStyles();
+  const { t } = useTranslation();
   const statistics = useModuleData<StreamStatistics>(moduleId);
   if (!statistics) {
-    return <Caption1 className={styles.warning}>Not running</Caption1>;
+    return <Caption1 className={styles.warning}>{t("device.notRunning")}</Caption1>;
   }
 
   const dropouts = statistics.underruns + statistics.overruns + statistics.resyncs;
   return (
     <Caption1 className={dropouts > 0 ? styles.warning : styles.status}>
-      {dropouts > 0 ? `${dropouts} dropouts` : "Running"} · {statistics.targetMilliseconds.toFixed(1)} ms buffer
+      {t("device.buffer", {
+        status: dropouts > 0 ? t("device.dropouts", { count: dropouts }) : t("device.running"),
+        milliseconds: formatNumber(statistics.targetMilliseconds, {
+          minimumFractionDigits: 1,
+          maximumFractionDigits: 1,
+        }),
+      })}
     </Caption1>
   );
 }

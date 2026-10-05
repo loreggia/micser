@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="TrayOpen" xml:space="preserve">
+    <value>Open</value>
+  </data>
+  <data name="TrayStartWithWindows" xml:space="preserve">
+    <value>Start with Windows</value>
+  </data>
+  <data name="TrayClose" xml:space="preserve">
+    <value>Close</value>
+  </data>
+  <data name="TrayCloseHint" xml:space="preserve">
+    <value>Closes the window and the tray icon. Audio keeps running.</value>
+  </data>
+  <data name="TrayExit" xml:space="preserve">
+    <value>Exit Micser</value>
+  </data>
+  <data name="TrayExitHint" xml:space="preserve">
+    <value>Stops the audio engine and closes Micser.</value>
+  </data>
+  <data name="TrayInstalledVersion" xml:space="preserve">
+    <value>Installed version: {0}</value>
+  </data>
+  <data name="TrayCheckingForUpdates" xml:space="preserve">
+    <value>Checking for updates…</value>
+  </data>
+  <data name="TrayRestartToUpdate" xml:space="preserve">
+    <value>Restart to update to {0}</value>
+  </data>
+  <data name="TrayCheckForUpdates" xml:space="preserve">
+    <value>Check for updates</value>
+  </data>
+  <data name="StatusRunning" xml:space="preserve">
+    <value>Micser</value>
+  </data>
+  <data name="StatusStarting" xml:space="preserve">
+    <value>Micser – starting the audio engine</value>
+  </data>
+  <data name="StatusPaused" xml:space="preserve">
+    <value>Micser – changing the virtual audio cables</value>
+  </data>
+  <data name="StatusNotRunning" xml:space="preserve">
+    <value>Micser – the audio engine isn't running</value>
+  </data>
+  <data name="StatusUpdating" xml:space="preserve">
+    <value>Micser – updating</value>
+  </data>
+  <data name="StatusStopping" xml:space="preserve">
+    <value>Micser – stopping</value>
+  </data>
+  <data name="UpToDate" xml:space="preserve">
+    <value>Micser {0} is up to date.</value>
+  </data>
+  <data name="UpdateCheckFailed" xml:space="preserve">
+    <value>Checking for updates failed.</value>
+  </data>
+  <data name="UpdateReadyTitle" xml:space="preserve">
+    <value>Micser {0} is ready</value>
+  </data>
+  <data name="UpdateReadyText" xml:space="preserve">
+    <value>Choose "Restart to update" in the tray menu to install it.</value>
+  </data>
+  <data name="DriverUpdateAvailable" xml:space="preserve">
+    <value>A new virtual audio cable driver ({0}) is available. Install it in Micser's settings.</value>
+  </data>
+  <data name="DriverRebootRequired" xml:space="preserve">
+    <value>Restart Windows to finish changing the virtual audio cables.</value>
+  </data>
+  <data name="DriverFailed" xml:space="preserve">
+    <value>Changing the virtual audio cables failed. The log is in %PROGRAMDATA%\Micser\logs\driver-utility.log.</value>
+  </data>
+  <data name="WebView2Missing" xml:space="preserve">
+    <value>Micser needs the Microsoft Edge WebView2 Runtime to show its window. Open the download page?</value>
+  </data>
+  <data name="PageEngineUnavailable" xml:space="preserve">
+    <value>The audio engine isn't running and couldn't be started. Its log is in %LOCALAPPDATA%\Micser\logs.</value>
+  </data>
+  <data name="PageChangingCables" xml:space="preserve">
+    <value>Changing the virtual audio cables…</value>
+  </data>
+  <data name="PageStarting" xml:space="preserve">
+    <value>Starting the audio engine…</value>
+  </data>
+  <data name="FatalError" xml:space="preserve">
+    <value>Micser stopped because of an error: {0}
+
+The log is in %LOCALAPPDATA%\Micser\logs.</value>
+  </data>
+</root>

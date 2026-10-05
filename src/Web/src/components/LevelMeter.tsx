@@ -1,6 +1,7 @@
 import { Caption2, makeStyles, mergeClasses, tokens } from "@fluentui/react-components";
 import { useModuleLevels } from "@micser/web-sdk";
 import { useState } from "react";
+import { useTranslation } from "../i18n";
 import { advanceMeter, floorDb, initialMeterState, toDecibels, toPosition } from "./meterState";
 
 const useStyles = makeStyles({
@@ -58,6 +59,7 @@ const useStyles = makeStyles({
  */
 export function LevelMeter({ moduleId }: { moduleId: string }) {
   const styles = useStyles();
+  const { t } = useTranslation();
   const levels = useModuleLevels(moduleId);
   const [state, setState] = useState(initialMeterState);
 
@@ -83,7 +85,7 @@ export function LevelMeter({ moduleId }: { moduleId: string }) {
                   key={c}
                   className={styles.bar}
                   role="meter"
-                  aria-label={`Channel ${c + 1} level`}
+                  aria-label={t("module.channelLevel", { number: c + 1 })}
                   aria-valuemin={floorDb}
                   aria-valuemax={0}
                   aria-valuenow={Math.round(toDecibels(port.peak[c]))}

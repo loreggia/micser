@@ -1,4 +1,4 @@
-import { isPlugin, type Plugin, type PluginDto, type WidgetDefinition } from "@micser/web-sdk";
+import { isPlugin, localize, type Plugin, type PluginDto, type WidgetDefinition } from "@micser/web-sdk";
 import { createContext, useContext } from "react";
 
 export interface PluginWidgets {
@@ -12,6 +12,12 @@ export const PluginWidgetsContext = createContext<PluginWidgets>({ widgets: new 
 
 export function usePluginWidgets() {
   return useContext(PluginWidgetsContext);
+}
+
+/** The label of a module's port in the current language: the widget's, or the engine's port name. */
+export function portName(widget: WidgetDefinition | undefined, port: string) {
+  const label = widget?.portLabels?.[port];
+  return label ? localize(label) : port;
 }
 
 /** The widget bundles by URL. The browser loads a module once, so a changed bundle takes a reload. */
