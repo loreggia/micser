@@ -116,10 +116,7 @@ jobs:
       - name: Install Chromium
         run: npx playwright install chromium
 
-      # the tests run it with --no-build
-      - name: Build the engine
-        run: dotnet build src/Engine --configuration Release
-
+      # builds the engine in Release first (globalSetup.ts)
       - name: End-to-end tests
         run: npm run test:e2e
 

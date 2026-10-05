@@ -9,7 +9,10 @@ import type {
   UiPreferencesDto,
 } from "@micser/web-sdk";
 import { test as base, expect, type APIRequestContext, type Locator, type Page } from "@playwright/test";
-import { engineUrl } from "./environment";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { startEngine, startWeb } from "./servers";
 
 export { expect };
 
@@ -20,9 +23,11 @@ const defaultPreferences: UiPreferencesDto = { showStreamStatistics: false, snap
  */
 export class EngineApi {
   private readonly request: APIRequestContext;
+  private readonly url: string;
 
-  constructor(request: APIRequestContext) {
+  constructor(request: APIRequestContext, url: string) {
     this.request = request;
+    this.url = url;
   }
 
   addModule(type: string, position: ModulePosition, properties: { name?: string; subgraphId?: string } = {}) {
@@ -96,7 +101,7 @@ export class EngineApi {
   }
 
   private async send<T>(method: "get" | "post" | "put" | "delete", path: string, data?: unknown): Promise<T> {
-    const response = await this.request.fetch(engineUrl + path, { method, data });
+    const response = await this.request.fetch(this.url + path, { method, data });
     if (!response.ok()) {
       throw new Error(`${method.toUpperCase()} ${path} failed with ${response.status()}: ${await response.text()}`);
     }
@@ -184,9 +189,42 @@ export class Graph {
   }
 }
 
-export const test = base.extend<{ engine: EngineApi; graph: Graph }>({
-  engine: async ({ request }, use) => {
-    const engine = new EngineApi(request);
+interface Servers {
+  engineUrl: string;
+  webUrl: string;
+}
+
+export const test = base.extend<{ engine: EngineApi; graph: Graph }, { servers: Servers }>({
+  // an engine and a Vite server per worker, so workers don't share the graph
+  servers: [
+    async ({ browser }, use) => {
+      const directory = mkdtempSync(join(tmpdir(), "micser-e2e-"));
+      const engine = await startEngine(process.env.MICSER_E2E_ENGINE!, directory);
+      try {
+        const web = await startWeb(engine.url, join(directory, "vite"));
+        try {
+          // the first load compiles the UI, which takes long while the other workers do the same
+          const page = await browser.newPage();
+          await page.goto(web.url);
+          await expect(page.getByText("Connected", { exact: true })).toBeVisible({ timeout: 60_000 });
+          await page.close();
+
+          await use({ engineUrl: engine.url, webUrl: web.url });
+        } finally {
+          await web.stop();
+        }
+      } finally {
+        await engine.stop();
+        rmSync(directory, { recursive: true, force: true, maxRetries: 5 });
+      }
+    },
+    { scope: "worker", timeout: 120_000 },
+  ],
+  baseURL: async ({ servers }, use) => {
+    await use(servers.webUrl);
+  },
+  engine: async ({ request, servers }, use) => {
+    const engine = new EngineApi(request, servers.engineUrl);
     await engine.reset();
     await use(engine);
   },
