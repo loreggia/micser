@@ -1,6 +1,7 @@
 import { FluentProvider, webLightTheme } from "@fluentui/react-components";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState, type ReactNode } from "react";
+import { i18n, type Language } from "../src/i18n/i18n";
 import { EngineConnection } from "../src/engine/EngineConnection";
 import { EngineConnectionContext } from "../src/engine/EngineContext";
 import type { ModuleOfType, ModuleType } from "../src/plugin";
@@ -15,18 +16,24 @@ export function createTestQueryClient() {
 
 /**
  * The providers widgets need: the Fluent UI theme, the query client and an engine connection. The default connection is never started,
- * so nothing is sent to an engine.
+ * so nothing is sent to an engine. The UI is shown in the language, English by default.
  */
 export function TestProviders({
   queryClient,
   connection,
+  language = "en",
   children,
 }: {
   queryClient: QueryClient;
   connection?: EngineConnection;
+  language?: Language;
   children: ReactNode;
 }) {
   const [defaultConnection] = useState(() => connection ?? new EngineConnection(queryClient));
+  if (i18n.language !== language) {
+    // the resources are loaded, so this changes the language synchronously
+    void i18n.changeLanguage(language);
+  }
 
   return (
     <FluentProvider theme={webLightTheme}>

@@ -13,10 +13,26 @@ export {
   useModuleData,
   useModuleLevels,
   useModuleUpdate,
+  useLanguagePreference,
   usePreferences,
   useSubgraphUpdate,
 } from "./engine/hooks";
-export { decibels, hertz, milliseconds } from "./lib/labels";
+export {
+  currentLanguage,
+  defineTranslations,
+  i18n,
+  languages,
+  localize,
+  resolveLanguage,
+  useLanguage,
+  type Language,
+  type LocalizedText,
+  type Translate,
+  type TranslationKey,
+  type Translations,
+  type TranslationValues,
+} from "./i18n/i18n";
+export { decibels, formatNumber, hertz, milliseconds } from "./lib/labels";
 export {
   definePlugin,
   defineWidget,

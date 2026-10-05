@@ -1,5 +1,5 @@
 import { FluentProvider, Toaster, makeStyles, tokens, webDarkTheme, webLightTheme } from "@fluentui/react-components";
-import { EngineProvider } from "@micser/web-sdk";
+import { EngineProvider, useLanguagePreference } from "@micser/web-sdk";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactFlowProvider } from "@xyflow/react";
 import { useState, useSyncExternalStore } from "react";
@@ -8,6 +8,7 @@ import { GraphEditor } from "./components/GraphEditor";
 import { SubgraphActionsProvider } from "./components/SubgraphActionsProvider";
 import { toasterId, useErrorNotifications } from "./notifications";
 import { PluginsProvider } from "./PluginsProvider";
+import { useShellLanguage } from "./shell";
 
 const useStyles = makeStyles({
   root: {
@@ -53,6 +54,8 @@ export function App() {
 function Shell() {
   const styles = useStyles();
   useErrorNotifications();
+  useLanguagePreference();
+  useShellLanguage();
 
   return (
     <PluginsProvider>

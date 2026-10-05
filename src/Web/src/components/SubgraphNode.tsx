@@ -41,6 +41,7 @@ import {
 } from "@micser/web-sdk";
 import { useMutation } from "@tanstack/react-query";
 import { NodeResizeControl, useReactFlow, type Node, type NodeProps } from "@xyflow/react";
+import { useTranslation } from "../i18n";
 import { useNotifyError } from "../notifications";
 import { Port } from "./ModuleNode";
 import { ModuleTitle } from "./ModuleTitle";
@@ -148,6 +149,7 @@ const resizeHandleStyle = {
  */
 export function SubgraphNode({ data, selected }: NodeProps<SubgraphNodeType>) {
   const styles = useStyles();
+  const { t } = useTranslation();
   const update = useSubgraphUpdate();
   const updateModule = useModuleUpdate();
   const { data: modules } = useGetModules();
@@ -157,11 +159,11 @@ export function SubgraphNode({ data, selected }: NodeProps<SubgraphNodeType>) {
   const notifyError = useNotifyError();
   const ungroup = useMutation({
     ...getDeleteSubgraphMutationOptions(),
-    onError: (error) => notifyError("Ungrouping failed", error),
+    onError: (error) => notifyError(t("subgraph.ungroupFailed"), error),
   });
   const remove = useMutation({
     ...getDeleteSubgraphMutationOptions(),
-    onError: (error) => notifyError("Deleting the subgraph failed", error),
+    onError: (error) => notifyError(t("subgraph.deleteFailed"), error),
   });
   const { subgraph, inputs, outputs } = data;
   const colors = palette[subgraph.color];
@@ -207,25 +209,25 @@ export function SubgraphNode({ data, selected }: NodeProps<SubgraphNodeType>) {
   const title = (
     <ModuleTitle
       name={subgraph.name}
-      fallback="Subgraph"
-      label="Subgraph name"
+      fallback={t("subgraph.fallbackName")}
+      label={t("subgraph.name")}
       onRename={(name) => update({ ...subgraph, name })}
     />
   );
 
   const templateName = template ? (
-    <Tooltip content={isOutdated ? "Template; it changed since" : "Template"} relationship="description">
+    <Tooltip content={isOutdated ? t("subgraph.templateChanged") : t("subgraph.template")} relationship="description">
       <Caption1 className={styles.template}>
         {template.name}
-        {isOutdated && " · changed"}
+        {isOutdated && t("subgraph.changed")}
       </Caption1>
     </Tooltip>
   ) : (
     // e.g. a built-in template whose plugin isn't loaded; the subgraph is linked again when it is
     templates &&
     subgraph.templateId && (
-      <Tooltip content="The template isn't available, e.g. because its plugin isn't loaded" relationship="description">
-        <Caption1 className={styles.template}>Template unavailable</Caption1>
+      <Tooltip content={t("subgraph.templateUnavailableHint")} relationship="description">
+        <Caption1 className={styles.template}>{t("subgraph.templateUnavailable")}</Caption1>
       </Tooltip>
     )
   );
@@ -233,7 +235,7 @@ export function SubgraphNode({ data, selected }: NodeProps<SubgraphNodeType>) {
   const actions = (
     <div className={mergeClasses(styles.actions, "nodrag")}>
       {!subgraph.isCollapsed && (
-        <Tooltip content="Fit to modules" relationship="label">
+        <Tooltip content={t("subgraph.fitToModules")} relationship="label">
           <Button
             size="small"
             appearance="subtle"
@@ -243,7 +245,7 @@ export function SubgraphNode({ data, selected }: NodeProps<SubgraphNodeType>) {
           />
         </Tooltip>
       )}
-      <Tooltip content={subgraph.isBypassed ? "Bypassed" : "Bypass all"} relationship="label">
+      <Tooltip content={subgraph.isBypassed ? t("common.bypassed") : t("subgraph.bypassAll")} relationship="label">
         <ToggleButton
           size="small"
           appearance="subtle"
@@ -252,7 +254,7 @@ export function SubgraphNode({ data, selected }: NodeProps<SubgraphNodeType>) {
           onClick={() => update({ ...subgraph, isBypassed: !subgraph.isBypassed })}
         />
       </Tooltip>
-      <Tooltip content={subgraph.isMuted ? "Unmute" : "Mute all"} relationship="label">
+      <Tooltip content={subgraph.isMuted ? t("common.unmute") : t("subgraph.muteAll")} relationship="label">
         <ToggleButton
           size="small"
           appearance="subtle"
@@ -261,7 +263,7 @@ export function SubgraphNode({ data, selected }: NodeProps<SubgraphNodeType>) {
           onClick={() => update({ ...subgraph, isMuted: !subgraph.isMuted })}
         />
       </Tooltip>
-      <Tooltip content={subgraph.isCollapsed ? "Expand" : "Collapse"} relationship="label">
+      <Tooltip content={subgraph.isCollapsed ? t("common.expand") : t("common.collapse")} relationship="label">
         <Button
           size="small"
           appearance="subtle"
@@ -270,7 +272,7 @@ export function SubgraphNode({ data, selected }: NodeProps<SubgraphNodeType>) {
         />
       </Tooltip>
       {isOutdated && canUpdate && (
-        <Tooltip content="The template changed. Update from template" relationship="label">
+        <Tooltip content={t("subgraph.updateHint")} relationship="label">
           <Button
             size="small"
             appearance="subtle"
@@ -281,7 +283,7 @@ export function SubgraphNode({ data, selected }: NodeProps<SubgraphNodeType>) {
       )}
       <Menu>
         <MenuTrigger disableButtonEnhancement>
-          <Tooltip content="More" relationship="label">
+          <Tooltip content={t("common.more")} relationship="label">
             <Button size="small" appearance="subtle" icon={<MoreHorizontalRegular />} />
           </Tooltip>
         </MenuTrigger>
@@ -294,7 +296,7 @@ export function SubgraphNode({ data, selected }: NodeProps<SubgraphNodeType>) {
               }
             >
               <MenuTrigger disableButtonEnhancement>
-                <MenuItem icon={<CircleFilled style={{ color: colors.border }} />}>Color</MenuItem>
+                <MenuItem icon={<CircleFilled style={{ color: colors.border }} />}>{t("subgraph.color")}</MenuItem>
               </MenuTrigger>
               <MenuPopover>
                 <MenuList>
@@ -305,29 +307,29 @@ export function SubgraphNode({ data, selected }: NodeProps<SubgraphNodeType>) {
                       value={color}
                       icon={<CircleFilled style={{ color: palette[color].border }} />}
                     >
-                      {color}
+                      {t(`subgraph.colors.${color}`)}
                     </MenuItemRadio>
                   ))}
                 </MenuList>
               </MenuPopover>
             </Menu>
             <MenuDivider />
-            <MenuItem onClick={() => saveAsTemplate(subgraph)}>Save as template…</MenuItem>
+            <MenuItem onClick={() => saveAsTemplate(subgraph)}>{t("subgraph.saveAsTemplate")}</MenuItem>
             <MenuItem disabled={!canUpdate} onClick={() => updateFromTemplate(subgraph)}>
-              Update from template…
+              {t("subgraph.updateFromTemplate")}
             </MenuItem>
             <MenuItem disabled={!subgraph.templateId} onClick={() => update({ ...subgraph, templateId: null })}>
-              Detach from template
+              {t("subgraph.detach")}
             </MenuItem>
             <MenuDivider />
             <MenuItem icon={<GroupDismissRegular />} onClick={() => ungroup.mutate({ id: subgraph.id })}>
-              Ungroup
+              {t("subgraph.ungroup")}
             </MenuItem>
             <MenuItem
               icon={<DeleteRegular />}
               onClick={() => remove.mutate({ id: subgraph.id, params: { deleteModules: true } })}
             >
-              Delete
+              {t("common.delete")}
             </MenuItem>
           </MenuList>
         </MenuPopover>

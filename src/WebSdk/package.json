@@ -16,7 +16,9 @@
     "@fluentui/react-components": "^9.74.9",
     "@microsoft/signalr": "^10.0.11",
     "@tanstack/react-query": "^5.104.0",
-    "react": "^19.3.0"
+    "i18next": "^26.4.2",
+    "react": "^19.3.0",
+    "react-i18next": "^17.0.15"
   },
   "devDependencies": {
     "@types/react": "^19.3.0",

@@ -18,6 +18,7 @@ internal sealed class MainForm : Form
     private static readonly JsonSerializerOptions MessageJson = new(JsonSerializerDefaults.Web);
 
     private readonly DriverController? _driver;
+    private readonly ShellLanguage _language;
     private readonly string _settingsPath;
     private readonly EngineSupervisor _supervisor;
     private readonly Uri? _uiUrl;
@@ -27,11 +28,12 @@ internal sealed class MainForm : Form
 
     /// <param name="updates">Null if this copy can't update (development).</param>
     /// <param name="driver">Null if this copy has no driver package.</param>
-    public MainForm(EngineSupervisor supervisor, UpdateController? updates, DriverController? driver, Uri? uiUrl, string settingsPath)
+    public MainForm(EngineSupervisor supervisor, UpdateController? updates, DriverController? driver, ShellLanguage language, Uri? uiUrl, string settingsPath)
     {
         _supervisor = supervisor;
         _updates = updates;
         _driver = driver;
+        _language = language;
         _uiUrl = uiUrl;
         _settingsPath = settingsPath;
 
@@ -96,7 +98,7 @@ internal sealed class MainForm : Form
             Log.Error(ex, "The WebView2 runtime is missing.");
             var answer = MessageBox.Show(
                 this,
-                "Micser needs the Microsoft Edge WebView2 Runtime to show its window. Open the download page?",
+                Strings.WebView2Missing,
                 "Micser",
                 MessageBoxButtons.YesNo,
                 MessageBoxIcon.Warning);
@@ -161,7 +163,7 @@ internal sealed class MainForm : Form
     /// Handles <c>{ "type": ... }</c> messages from the UI: <c>getState</c>, <c>checkForUpdates</c> (answered with an
     /// <c>updateCheck</c> message), <c>installUpdate</c>, <c>restartEngine</c>, and for the driver <c>installDriver</c> and
     /// <c>setCableCount</c> (with <c>cableCount</c>), <c>setCableLayout</c> (with <c>cable</c> and <c>layout</c>), <c>updateDriver</c> and
-    /// <c>uninstallDriver</c>. The shell answers with
+    /// <c>uninstallDriver</c>, and <c>setLanguage</c> (with the UI's <c>language</c> preference, or null). The shell answers with
     /// <c>state</c> messages (see <see cref="PostState"/>), also whenever the state changes.
     /// </summary>
     private async void OnWebMessageReceived(object? sender, CoreWebView2WebMessageReceivedEventArgs e)
@@ -176,6 +178,7 @@ internal sealed class MainForm : Form
         int cableCount;
         int cable;
         string? layout;
+        string? language;
         try
         {
             var message = JsonDocument.Parse(e.WebMessageAsJson).RootElement;
@@ -183,6 +186,7 @@ internal sealed class MainForm : Form
             cableCount = message.TryGetProperty("cableCount", out var count) && count.TryGetInt32(out var value) ? value : 1;
             cable = message.TryGetProperty("cable", out var cableValue) && cableValue.TryGetInt32(out var number) ? number : 0;
             layout = message.TryGetProperty("layout", out var layoutValue) && layoutValue.ValueKind == JsonValueKind.String ? layoutValue.GetString() : null;
+            language = message.TryGetProperty("language", out var languageValue) && languageValue.ValueKind == JsonValueKind.String ? languageValue.GetString() : null;
         }
         catch (Exception ex) when (ex is JsonException or KeyNotFoundException or InvalidOperationException)
         {
@@ -220,6 +224,9 @@ internal sealed class MainForm : Form
             case "uninstallDriver" when _driver != null:
                 ShowDriverResult(await _driver.UninstallAsync());
                 break;
+            case "setLanguage":
+                _language.SetPreference(language);
+                break;
         }
     }
 
@@ -253,8 +260,8 @@ internal sealed class MainForm : Form
     {
         var (text, icon) = result switch
         {
-            DriverCommandResult.RebootRequired => ("Restart Windows to finish changing the virtual audio cables.", MessageBoxIcon.Information),
-            DriverCommandResult.Failed => ("Changing the virtual audio cables failed. The log is in %PROGRAMDATA%\\Micser\\logs\\driver-utility.log.", MessageBoxIcon.Error),
+            DriverCommandResult.RebootRequired => (Strings.DriverRebootRequired, MessageBoxIcon.Information),
+            DriverCommandResult.Failed => (Strings.DriverFailed, MessageBoxIcon.Error),
             _ => ((string?)null, MessageBoxIcon.None),
         };
 
@@ -300,14 +307,14 @@ internal sealed class MainForm : Form
     {
         var message = state switch
         {
-            EngineState.Unavailable => "The audio engine isn't running and couldn't be started. Its log is in %LOCALAPPDATA%\\Micser\\logs.",
-            EngineState.Paused => "Changing the virtual audio cables…",
-            _ => "Starting the audio engine…",
+            EngineState.Unavailable => Strings.PageEngineUnavailable,
+            EngineState.Paused => Strings.PageChangingCables,
+            _ => Strings.PageStarting,
         };
 
         return $$"""
             <!doctype html>
-            <html>
+            <html lang="{{Strings.Culture?.TwoLetterISOLanguageName ?? "en"}}">
             <head>
             <meta charset="utf-8">
             <style>

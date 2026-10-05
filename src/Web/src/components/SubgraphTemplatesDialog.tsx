@@ -24,6 +24,7 @@ import {
 } from "@micser/web-sdk";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
+import { useTranslation } from "../i18n";
 import { useNotifyError } from "../notifications";
 import { ModuleTitle } from "./ModuleTitle";
 
@@ -64,27 +65,26 @@ const useStyles = makeStyles({
  */
 export function SubgraphTemplatesDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const styles = useStyles();
+  const { t, language } = useTranslation();
   const { data: templates = [] } = useGetSubgraphTemplates();
 
   return (
     <Dialog open={open} onOpenChange={(_, data) => !data.open && onClose()}>
       <DialogSurface>
         <DialogBody>
-          <DialogTitle>Subgraph templates</DialogTitle>
+          <DialogTitle>{t("templates.title")}</DialogTitle>
           <DialogContent className={styles.list}>
             {templates.length === 0 ? (
-              <Body1 className={styles.empty}>
-                No templates yet. Save a subgraph as a template from the menu in its header.
-              </Body1>
+              <Body1 className={styles.empty}>{t("templates.empty")}</Body1>
             ) : (
               [...templates]
-                .sort((a, b) => a.name.localeCompare(b.name))
+                .sort((a, b) => a.name.localeCompare(b.name, language))
                 .map((template) => <TemplateRow key={template.id} template={template} />)
             )}
           </DialogContent>
           <DialogActions>
             <Button appearance="primary" onClick={onClose}>
-              Close
+              {t("common.close")}
             </Button>
           </DialogActions>
         </DialogBody>
@@ -95,16 +95,17 @@ export function SubgraphTemplatesDialog({ open, onClose }: { open: boolean; onCl
 
 function TemplateRow({ template }: { template: SubgraphTemplateDto }) {
   const styles = useStyles();
+  const { t } = useTranslation();
   const { data: subgraphs = [] } = useGetSubgraphs();
   const notifyError = useNotifyError();
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const rename = useMutation({
     ...getRenameSubgraphTemplateMutationOptions(),
-    onError: (error) => notifyError("Renaming the template failed", error),
+    onError: (error) => notifyError(t("templates.renameFailed"), error),
   });
   const remove = useMutation({
     ...getDeleteSubgraphTemplateMutationOptions(),
-    onError: (error) => notifyError("Removing the template failed", error),
+    onError: (error) => notifyError(t("templates.removeFailed"), error),
   });
 
   const moduleCount = template.modules.length + template.unavailableTypes.length;
@@ -120,27 +121,27 @@ function TemplateRow({ template }: { template: SubgraphTemplateDto }) {
           <ModuleTitle
             name={template.name}
             fallback={template.name}
-            label="Template name"
+            label={t("templates.name")}
             onRename={(name) => name && rename.mutate({ id: template.id, data: { name } })}
           />
         )}
         <div className={styles.details}>
           <Caption1>
-            {moduleCount === 1 ? "1 module" : `${moduleCount} modules`} ·{" "}
-            {usedBy === 0 ? "not used" : usedBy === 1 ? "used by 1 subgraph" : `used by ${usedBy} subgraphs`}
+            {t("templates.modules", { count: moduleCount })} ·{" "}
+            {usedBy === 0 ? t("templates.notUsed") : t("templates.usedBy", { count: usedBy })}
           </Caption1>
           {template.isBuiltIn && (
-            <Tooltip
-              content="Comes with a plugin. Save a subgraph under another name to change it."
-              relationship="description"
-            >
-              <Badge appearance="tint">Built-in</Badge>
+            <Tooltip content={t("templates.builtInHint")} relationship="description">
+              <Badge appearance="tint">{t("templates.builtIn")}</Badge>
             </Tooltip>
           )}
           {missingTypes.length > 0 && (
-            <Tooltip content={`Plugins not loaded for: ${missingTypes.join(", ")}`} relationship="description">
+            <Tooltip
+              content={t("common.pluginsNotLoaded", { types: missingTypes.join(", ") })}
+              relationship="description"
+            >
               <Badge appearance="tint" color="warning">
-                Unavailable
+                {t("templates.unavailable")}
               </Badge>
             </Tooltip>
           )}
@@ -149,9 +150,9 @@ function TemplateRow({ template }: { template: SubgraphTemplateDto }) {
       <div className={styles.actions}>
         {template.isBuiltIn ? null : confirmingDelete ? (
           <>
-            <Caption1>Remove?</Caption1>
+            <Caption1>{t("templates.confirmRemove")}</Caption1>
             <Button size="small" onClick={() => setConfirmingDelete(false)}>
-              Cancel
+              {t("common.cancel")}
             </Button>
             <Button
               size="small"
@@ -159,11 +160,11 @@ function TemplateRow({ template }: { template: SubgraphTemplateDto }) {
               disabled={remove.isPending}
               onClick={() => remove.mutate({ id: template.id })}
             >
-              Remove
+              {t("templates.remove")}
             </Button>
           </>
         ) : (
-          <Tooltip content="Remove (subgraphs created from it stay)" relationship="label">
+          <Tooltip content={t("templates.removeHint")} relationship="label">
             <Button
               size="small"
               appearance="subtle"

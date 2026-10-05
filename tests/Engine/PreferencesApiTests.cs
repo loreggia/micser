@@ -20,7 +20,7 @@ public class PreferencesApiTests
     public async Task UpdatePreferences_BroadcastsAndPersists()
     {
         var directory = EngineFactory.CreateTemporaryDirectory();
-        var updated = new UiPreferencesDto(ShowStreamStatistics: true, SnapToGrid: false);
+        var updated = new UiPreferencesDto(ShowStreamStatistics: true, SnapToGrid: false, Language: "de");
         try
         {
             await using (var factory = new EngineFactory(directory))

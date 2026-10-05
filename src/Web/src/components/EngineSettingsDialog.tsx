@@ -18,13 +18,17 @@ import {
 } from "@fluentui/react-components";
 import { ArrowSyncRegular } from "@fluentui/react-icons";
 import {
+  formatNumber,
   getRestartAudioMutationOptions,
   getUpdateEngineSettingsMutationOptions,
+  languages,
+  resolveLanguage,
   usePreferences,
   type EngineSettingsDto,
 } from "@micser/web-sdk";
 import { useMutation } from "@tanstack/react-query";
 import { useState } from "react";
+import { useTranslation } from "../i18n";
 import { useNotifyError } from "../notifications";
 import { shell, useShellState, type UpdateCheckResult } from "../shell";
 import { PluginsSettings } from "./PluginsSettings";
@@ -32,12 +36,6 @@ import { VirtualCablesSettings } from "./VirtualCablesSettings";
 
 const sampleRates = [44100, 48000, 96000];
 const frameCounts = [128, 240, 480, 960];
-
-const checkResults: Record<UpdateCheckResult, string> = {
-  upToDate: "Micser is up to date.",
-  updateReady: "An update is ready to install.",
-  failed: "Checking for updates failed.",
-};
 
 const useStyles = makeStyles({
   content: {
@@ -62,13 +60,17 @@ export interface EngineSettingsDialogProps {
   onClose: () => void;
 }
 
+/** The language preference's value that follows the system. */
+const systemLanguage = "system";
+
 /**
- * Audio settings (applied with Apply, which rebuilds the graph) and restarts, display preferences (applied right away),
+ * Audio settings (applied with Apply, which rebuilds the graph) and restarts, display preferences and the language (applied right away),
  * plugins (applied when the engine restarts), and, when running in the desktop shell, the version, updates and virtual
  * audio cables.
  */
 export function EngineSettingsDialog({ open, settings, onClose }: EngineSettingsDialogProps) {
   const styles = useStyles();
+  const { t } = useTranslation();
   const [draft, setDraft] = useState(settings);
   const [preferences, setPreferences] = usePreferences();
   const shellState = useShellState();
@@ -77,14 +79,28 @@ export function EngineSettingsDialog({ open, settings, onClose }: EngineSettings
   const update = useMutation({
     ...getUpdateEngineSettingsMutationOptions(),
     onSuccess: onClose,
-    onError: (error) => notifyError("Changing the engine settings failed", error),
+    onError: (error) => notifyError(t("settings.changeFailed"), error),
   });
   const restartAudio = useMutation({
     ...getRestartAudioMutationOptions(),
-    onError: (error) => notifyError("Restarting the audio failed", error),
+    onError: (error) => notifyError(t("settings.restartAudioFailed"), error),
   });
 
-  const blockDuration = (frames: number) => `${frames} frames (${((frames / draft.sampleRate) * 1000).toFixed(1)} ms)`;
+  const blockDuration = (frames: number) =>
+    t("settings.blockDuration", {
+      frames,
+      duration: formatNumber((frames / draft.sampleRate) * 1000, {
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1,
+      }),
+    });
+  const sampleRate = (rate: number) => `${formatNumber(rate / 1000)} kHz`;
+  const languageName = (code: string) => languages.find((language) => language.code === code)?.name ?? code;
+  const systemLanguageName = t("settings.systemLanguage", { language: languageName(resolveLanguage(null)) });
+  const languageValue =
+    preferences.language && languages.some((language) => language.code === preferences.language)
+      ? preferences.language
+      : systemLanguage;
   const isChanged = draft.sampleRate !== settings.sampleRate || draft.frameCount !== settings.frameCount;
 
   return (
@@ -101,21 +117,23 @@ export function EngineSettingsDialog({ open, settings, onClose }: EngineSettings
     >
       <DialogSurface>
         <DialogBody>
-          <DialogTitle>Settings</DialogTitle>
+          <DialogTitle>{t("settings.title")}</DialogTitle>
           <DialogContent className={styles.content}>
-            <Subtitle2>Audio</Subtitle2>
-            <Field label="Sample rate">
+            <Subtitle2>{t("settings.audio")}</Subtitle2>
+            <Field label={t("settings.sampleRate")}>
               <Dropdown
-                value={`${draft.sampleRate / 1000} kHz`}
+                value={sampleRate(draft.sampleRate)}
                 selectedOptions={[String(draft.sampleRate)]}
                 onOptionSelect={(_, data) => setDraft({ ...draft, sampleRate: Number(data.optionValue) })}
               >
                 {sampleRates.map((rate) => (
-                  <Option key={rate} value={String(rate)}>{`${rate / 1000} kHz`}</Option>
+                  <Option key={rate} value={String(rate)}>
+                    {sampleRate(rate)}
+                  </Option>
                 ))}
               </Dropdown>
             </Field>
-            <Field label="Block size" hint="Smaller blocks lower the latency and raise the CPU load.">
+            <Field label={t("settings.blockSize")} hint={t("settings.blockSizeHint")}>
               <Dropdown
                 value={blockDuration(draft.frameCount)}
                 selectedOptions={[String(draft.frameCount)]}
@@ -128,29 +146,45 @@ export function EngineSettingsDialog({ open, settings, onClose }: EngineSettings
                 ))}
               </Dropdown>
             </Field>
-            <Field hint="Restarting the audio reopens all devices with fresh buffers.">
+            <Field hint={t("settings.restartAudioHint")}>
               <div className={styles.actions}>
                 <Button
                   icon={<ArrowSyncRegular />}
                   disabled={restartAudio.isPending}
                   onClick={() => restartAudio.mutate()}
                 >
-                  Restart audio
+                  {t("settings.restartAudio")}
                 </Button>
                 {shellState?.canRestartEngine && (
-                  <Button onClick={() => shell?.restartEngine()}>Restart engine process</Button>
+                  <Button onClick={() => shell?.restartEngine()}>{t("settings.restartEngine")}</Button>
                 )}
               </div>
             </Field>
             <Divider />
-            <Subtitle2>Display</Subtitle2>
+            <Subtitle2>{t("settings.display")}</Subtitle2>
+            <Field label={t("settings.language")}>
+              <Dropdown
+                value={languageValue === systemLanguage ? systemLanguageName : languageName(languageValue)}
+                selectedOptions={[languageValue]}
+                onOptionSelect={(_, data) =>
+                  setPreferences({ language: data.optionValue === systemLanguage ? null : data.optionValue })
+                }
+              >
+                <Option value={systemLanguage}>{systemLanguageName}</Option>
+                {languages.map((language) => (
+                  <Option key={language.code} value={language.code}>
+                    {language.name}
+                  </Option>
+                ))}
+              </Dropdown>
+            </Field>
             <Switch
-              label="Show stream statistics (dropouts and buffer size of device modules)"
+              label={t("settings.showStreamStatistics")}
               checked={preferences.showStreamStatistics}
               onChange={(_, data) => setPreferences({ showStreamStatistics: data.checked })}
             />
             <Switch
-              label="Snap modules to the grid"
+              label={t("settings.snapToGrid")}
               checked={preferences.snapToGrid}
               onChange={(_, data) => setPreferences({ snapToGrid: data.checked })}
             />
@@ -163,18 +197,20 @@ export function EngineSettingsDialog({ open, settings, onClose }: EngineSettings
                 <div className={styles.actions}>
                   {shellState.pendingUpdate ? (
                     <Button appearance="primary" onClick={() => shell?.installUpdate()}>
-                      Restart to update to {shellState.pendingUpdate}
+                      {t("settings.restartToUpdate", { version: shellState.pendingUpdate })}
                     </Button>
                   ) : (
                     <Button
                       disabled={shellState.isCheckingForUpdates}
                       onClick={() => void shell?.checkForUpdates().then(setCheckResult)}
                     >
-                      {shellState.isCheckingForUpdates ? "Checking for updates…" : "Check for updates"}
+                      {shellState.isCheckingForUpdates
+                        ? t("settings.checkingForUpdates")
+                        : t("settings.checkForUpdates")}
                     </Button>
                   )}
                   {checkResult && !shellState.isCheckingForUpdates && (
-                    <Caption1 className={styles.hint}>{checkResults[checkResult]}</Caption1>
+                    <Caption1 className={styles.hint}>{t(`settings.checkResults.${checkResult}`)}</Caption1>
                   )}
                 </div>
               </>
@@ -188,14 +224,14 @@ export function EngineSettingsDialog({ open, settings, onClose }: EngineSettings
           </DialogContent>
           <DialogActions>
             <Button appearance="secondary" onClick={onClose}>
-              Close
+              {t("common.close")}
             </Button>
             <Button
               appearance="primary"
               disabled={!isChanged || update.isPending}
               onClick={() => update.mutate({ data: draft })}
             >
-              Apply audio settings
+              {t("settings.applyAudioSettings")}
             </Button>
           </DialogActions>
         </DialogBody>

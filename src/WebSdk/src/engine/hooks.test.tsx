@@ -4,12 +4,14 @@ import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { renderHook } from "vitest-browser-react";
 import { createTestQueryClient, testModule, TestProviders } from "../../testing";
 import { getGetPreferencesQueryKey, updatePreferences, type UiPreferencesDto } from "../api";
+import { i18n } from "../i18n/i18n";
 import { EngineConnection, type ModuleLevels } from "./EngineConnection";
 import {
   useEngineConnection,
   useEngineConnectionState,
   useModuleData,
   useModuleLevels,
+  useLanguagePreference,
   useModuleUpdate,
   usePreferences,
 } from "./hooks";
@@ -71,7 +73,7 @@ describe("usePreferences", () => {
 
     const { result } = await renderHook(() => usePreferences(), { wrapper });
 
-    expect(result.current[0]).toEqual({ showStreamStatistics: false, snapToGrid: true });
+    expect(result.current[0]).toEqual({ showStreamStatistics: false, snapToGrid: true, language: null });
   });
 
   test("shows a change right away and saves all preferences", async () => {
@@ -94,6 +96,29 @@ describe("usePreferences", () => {
     await act(() => result.current[1]({ snapToGrid: false }));
 
     await expect.poll(() => invalidate).toHaveBeenCalledWith({ queryKey: getGetPreferencesQueryKey() });
+  });
+});
+
+describe("useLanguagePreference", () => {
+  const stored: UiPreferencesDto = { showStreamStatistics: false, snapToGrid: true };
+  afterEach(() => i18n.changeLanguage("en"));
+
+  test("shows the preferred language", async () => {
+    queryClient.setQueryData(getGetPreferencesQueryKey(), { ...stored, language: "de" });
+
+    await renderHook(() => useLanguagePreference(), { wrapper });
+
+    await expect.poll(() => i18n.language).toBe("de");
+    expect(document.documentElement.lang).toBe("de");
+  });
+
+  test("follows the browser for a language the UI doesn't have", async () => {
+    vi.stubGlobal("navigator", { ...navigator, languages: ["de-DE"], language: "de-DE" });
+    queryClient.setQueryData(getGetPreferencesQueryKey(), { ...stored, language: "xx" });
+
+    await renderHook(() => useLanguagePreference(), { wrapper });
+
+    await expect.poll(() => i18n.language).toBe("de");
   });
 });
 

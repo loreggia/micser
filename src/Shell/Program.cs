@@ -56,15 +56,16 @@ internal static class Program
 
             using var updates = Updater.Create() is { } updater ? new UpdateController(updater, supervisor) : null;
             var driver = DriverController.Create(supervisor);
+            var language = new ShellLanguage(ShellLanguage.DefaultPath);
 
-            Application.Run(new TrayApplicationContext(options, supervisor, updates, driver, activation));
+            Application.Run(new TrayApplicationContext(options, supervisor, updates, driver, language, activation));
             return 0;
         }
         catch (Exception ex)
         {
             Log.Fatal(ex, "The shell failed.");
             MessageBox.Show(
-                $"Micser stopped because of an error: {ex.Message}\n\nThe log is in %LOCALAPPDATA%\\Micser\\logs.",
+                string.Format(Strings.Culture, Strings.FatalError, ex.Message),
                 "Micser",
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Error);

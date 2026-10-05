@@ -1,5 +1,6 @@
 import type { ComponentType } from "react";
 import type { ModuleDto } from "./api";
+import type { LocalizedText } from "./i18n/i18n";
 
 export type ModuleType = ModuleDto["type"];
 
@@ -29,15 +30,22 @@ export interface WidgetDefinition {
   moduleType: string;
 
   /**
-   * The display name of the module type, e.g. in the "add module" menu.
+   * Labels of the module type's ports by their engine name, e.g. `{ Sidechain: () => t("sidechain") }`. Ports without one show their
+   * engine name.
    */
-  title: string;
+  portLabels?: Record<string, LocalizedText>;
+
+  /**
+   * The display name of the module type, e.g. in the "add module" menu. A function translates it (see `defineTranslations`).
+   */
+  title: LocalizedText;
 }
 
 export function defineWidget<T extends ModuleType>(definition: {
   component: ComponentType<WidgetProps<T>>;
   moduleType: T;
-  title: string;
+  portLabels?: Record<string, LocalizedText>;
+  title: LocalizedText;
 }): WidgetDefinition {
   return definition as unknown as WidgetDefinition;
 }

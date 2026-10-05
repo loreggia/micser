@@ -12,15 +12,12 @@ import {
   tokens,
 } from "@fluentui/react-components";
 import { useState } from "react";
+import { useTranslation } from "../i18n";
 import { shell, type CableLayout, type DriverState } from "../shell";
 
 const maxCables = 16;
 
-const layoutNames: Record<CableLayout, string> = {
-  stereo: "Stereo",
-  "5.1": "5.1 surround",
-  "7.1": "7.1 surround",
-};
+const layouts: CableLayout[] = ["stereo", "5.1", "7.1"];
 
 const useStyles = makeStyles({
   row: {
@@ -68,14 +65,15 @@ function CableLayoutRow({
   formatsMatch: boolean;
 }) {
   const styles = useStyles();
+  const { t } = useTranslation();
 
   return (
     <>
-      <Text>Cable {number}</Text>
+      <Text>{t("cables.cable", { number })}</Text>
       <Dropdown
         className={styles.layout}
-        aria-label={`Channel layout of cable ${number}`}
-        value={layoutNames[layout]}
+        aria-label={t("cables.layoutOf", { number })}
+        value={t(`cables.layouts.${layout}`)}
         selectedOptions={[layout]}
         onOptionSelect={(_, data) => {
           if (data.optionValue && data.optionValue !== layout) {
@@ -83,23 +81,20 @@ function CableLayoutRow({
           }
         }}
       >
-        {(Object.keys(layoutNames) as CableLayout[]).map((value) => (
+        {layouts.map((value) => (
           <Option key={value} value={value}>
-            {layoutNames[value]}
+            {t(`cables.layouts.${value}`)}
           </Option>
         ))}
       </Dropdown>
-      {formatsMatch ? (
-        <span />
-      ) : (
-        <Caption1 className={styles.warning}>Not applied yet; restart Windows if it asked for it.</Caption1>
-      )}
+      {formatsMatch ? <span /> : <Caption1 className={styles.warning}>{t("cables.notApplied")}</Caption1>}
     </>
   );
 }
 
 export function VirtualCablesSettings({ driver }: VirtualCablesSettingsProps) {
   const styles = useStyles();
+  const { t } = useTranslation();
   const status = driver.status;
   const [count, setCount] = useState(status?.cableCount ?? 1);
   const [reportedCount, setReportedCount] = useState(status?.cableCount);
@@ -111,7 +106,7 @@ export function VirtualCablesSettings({ driver }: VirtualCablesSettingsProps) {
   }
 
   const countField = (
-    <Field label="Number of cables" className={styles.count}>
+    <Field label={t("cables.count")} className={styles.count}>
       <SpinButton
         min={1}
         max={maxCables}
@@ -129,43 +124,39 @@ export function VirtualCablesSettings({ driver }: VirtualCablesSettingsProps) {
 
   return (
     <>
-      <Subtitle2>Virtual audio cables</Subtitle2>
-      <Caption1 className={styles.hint}>
-        Each cable is a playback device ("Cable N Input") whose sound comes out of a recording device ("Cable N
-        Output"), e.g. to use Micser's output as a microphone in other apps. Changes ask for administrator rights and
-        briefly stop the audio.
-      </Caption1>
+      <Subtitle2>{t("cables.title")}</Subtitle2>
+      <Caption1 className={styles.hint}>{t("cables.description")}</Caption1>
       {driver.isBusy ? (
-        <Spinner size="tiny" labelPosition="after" label="Changing the virtual audio cables…" />
+        <Spinner size="tiny" labelPosition="after" label={t("cables.changing")} />
       ) : !status ? (
-        <Caption1 className={styles.warning}>The driver status couldn't be read.</Caption1>
+        <Caption1 className={styles.warning}>{t("cables.statusUnreadable")}</Caption1>
       ) : !status.installed ? (
         <div className={styles.row}>
           {countField}
           <Button appearance="primary" onClick={() => shell?.installDriver(count)}>
-            Install
+            {t("cables.install")}
           </Button>
         </div>
       ) : (
         <>
           <Caption1>
-            Driver {status.installedVersion}
+            {t("cables.driver", { version: status.installedVersion })}
             {status.problem !== null && (
-              <span className={styles.warning}> doesn't run (problem code {status.problem}); try reinstalling it.</span>
+              <span className={styles.warning}>{t("cables.problem", { problem: status.problem })}</span>
             )}
           </Caption1>
           <div className={styles.row}>
             {countField}
             <Button disabled={count === status.cableCount} onClick={() => shell?.setCableCount(count)}>
-              Apply
+              {t("cables.apply")}
             </Button>
             {status.updateAvailable && (
               <Button appearance="primary" onClick={() => shell?.updateDriver()}>
-                Update to {status.bundledVersion}
+                {t("cables.updateTo", { version: status.bundledVersion })}
               </Button>
             )}
             <Button appearance="subtle" onClick={() => shell?.uninstallDriver()}>
-              Uninstall
+              {t("cables.uninstall")}
             </Button>
           </div>
           {status.cables.length > 0 && (
@@ -180,10 +171,7 @@ export function VirtualCablesSettings({ driver }: VirtualCablesSettingsProps) {
                   />
                 ))}
               </div>
-              <Caption1 className={styles.hint}>
-                Surround cables pass all channels to Micser. Apps that record a surround cable in stereo get Windows'
-                downmix, which is much quieter, so use stereo for cables that such apps record.
-              </Caption1>
+              <Caption1 className={styles.hint}>{t("cables.surroundHint")}</Caption1>
             </>
           )}
         </>

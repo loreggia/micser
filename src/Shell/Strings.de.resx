@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <data name="TrayOpen" xml:space="preserve">
+    <value>Öffnen</value>
+  </data>
+  <data name="TrayStartWithWindows" xml:space="preserve">
+    <value>Mit Windows starten</value>
+  </data>
+  <data name="TrayClose" xml:space="preserve">
+    <value>Schließen</value>
+  </data>
+  <data name="TrayCloseHint" xml:space="preserve">
+    <value>Schließt das Fenster und das Symbol im Infobereich. Das Audio läuft weiter.</value>
+  </data>
+  <data name="TrayExit" xml:space="preserve">
+    <value>Micser beenden</value>
+  </data>
+  <data name="TrayExitHint" xml:space="preserve">
+    <value>Stoppt die Audio-Engine und schließt Micser.</value>
+  </data>
+  <data name="TrayInstalledVersion" xml:space="preserve">
+    <value>Installierte Version: {0}</value>
+  </data>
+  <data name="TrayCheckingForUpdates" xml:space="preserve">
+    <value>Suche nach Updates…</value>
+  </data>
+  <data name="TrayRestartToUpdate" xml:space="preserve">
+    <value>Neu starten und auf {0} aktualisieren</value>
+  </data>
+  <data name="TrayCheckForUpdates" xml:space="preserve">
+    <value>Nach Updates suchen</value>
+  </data>
+  <data name="StatusRunning" xml:space="preserve">
+    <value>Micser</value>
+  </data>
+  <data name="StatusStarting" xml:space="preserve">
+    <value>Micser – Audio-Engine wird gestartet</value>
+  </data>
+  <data name="StatusPaused" xml:space="preserve">
+    <value>Micser – virtuelle Audiokabel werden geändert</value>
+  </data>
+  <data name="StatusNotRunning" xml:space="preserve">
+    <value>Micser – die Audio-Engine läuft nicht</value>
+  </data>
+  <data name="StatusUpdating" xml:space="preserve">
+    <value>Micser – wird aktualisiert</value>
+  </data>
+  <data name="StatusStopping" xml:space="preserve">
+    <value>Micser – wird beendet</value>
+  </data>
+  <data name="UpToDate" xml:space="preserve">
+    <value>Micser {0} ist auf dem neuesten Stand.</value>
+  </data>
+  <data name="UpdateCheckFailed" xml:space="preserve">
+    <value>Die Suche nach Updates ist fehlgeschlagen.</value>
+  </data>
+  <data name="UpdateReadyTitle" xml:space="preserve">
+    <value>Micser {0} ist bereit</value>
+  </data>
+  <data name="UpdateReadyText" xml:space="preserve">
+    <value>Wähle „Neu starten und aktualisieren“ im Menü des Infobereichs, um es zu installieren.</value>
+  </data>
+  <data name="DriverUpdateAvailable" xml:space="preserve">
+    <value>Ein neuer Treiber für die virtuellen Audiokabel ({0}) ist verfügbar. Installiere ihn in den Einstellungen von Micser.</value>
+  </data>
+  <data name="DriverRebootRequired" xml:space="preserve">
+    <value>Starte Windows neu, um die Änderung der virtuellen Audiokabel abzuschließen.</value>
+  </data>
+  <data name="DriverFailed" xml:space="preserve">
+    <value>Die virtuellen Audiokabel konnten nicht geändert werden. Das Protokoll liegt in %PROGRAMDATA%\Micser\logs\driver-utility.log.</value>
+  </data>
+  <data name="WebView2Missing" xml:space="preserve">
+    <value>Micser braucht die Microsoft Edge WebView2 Runtime, um sein Fenster anzuzeigen. Downloadseite öffnen?</value>
+  </data>
+  <data name="PageEngineUnavailable" xml:space="preserve">
+    <value>Die Audio-Engine läuft nicht und konnte nicht gestartet werden. Ihr Protokoll liegt in %LOCALAPPDATA%\Micser\logs.</value>
+  </data>
+  <data name="PageChangingCables" xml:space="preserve">
+    <value>Die virtuellen Audiokabel werden geändert…</value>
+  </data>
+  <data name="PageStarting" xml:space="preserve">
+    <value>Die Audio-Engine wird gestartet…</value>
+  </data>
+  <data name="FatalError" xml:space="preserve">
+    <value>Micser wurde wegen eines Fehlers beendet: {0}
+
+Das Protokoll liegt in %LOCALAPPDATA%\Micser\logs.</value>
+  </data>
+</root>

@@ -1,12 +1,15 @@
 import {
   getCreateModuleMutationOptions,
   getInstantiateSubgraphTemplateMutationOptions,
+  localize,
   useGetModuleTypes,
+  useLanguage,
   type ModuleDto,
   type ModuleTypeDto,
 } from "@micser/web-sdk";
 import { useMutation } from "@tanstack/react-query";
 import { useReactFlow, type XYPosition } from "@xyflow/react";
+import { useTranslation } from "../i18n";
 import { useNotifyError } from "../notifications";
 import { usePluginWidgets } from "../plugins";
 import type { ModuleNodeType } from "./ModuleNode";
@@ -63,9 +66,10 @@ export function useAddModule() {
   const visibleCenter = useVisibleCenter();
   const freePosition = useFreeModulePosition();
   const notifyError = useNotifyError();
+  const { t } = useTranslation();
   const create = useMutation({
     ...getCreateModuleMutationOptions(),
-    onError: (error) => notifyError("Adding the module failed", error),
+    onError: (error) => notifyError(t("module.addFailed"), error),
   });
 
   return async (type: string, position?: XYPosition, subgraphId?: string): Promise<ModuleDto | undefined> => {
@@ -96,9 +100,10 @@ export function useAddModule() {
 export function useInstantiateTemplate() {
   const visibleCenter = useVisibleCenter();
   const notifyError = useNotifyError();
+  const { t } = useTranslation();
   const { mutate } = useMutation({
     ...getInstantiateSubgraphTemplateMutationOptions(),
-    onError: (error) => notifyError("Adding the subgraph failed", error),
+    onError: (error) => notifyError(t("subgraph.addFailed"), error),
   });
 
   return (templateId: string, position?: XYPosition) =>
@@ -106,12 +111,16 @@ export function useInstantiateTemplate() {
 }
 
 /**
- * The module types with their widget titles, sorted by title, for menus.
+ * The module types with their widget titles in the current language, sorted by title, for menus.
  */
 export function useModuleTypeChoices(): (ModuleTypeDto & { title: string })[] {
   const { data: moduleTypes = [] } = useGetModuleTypes();
   const { widgets } = usePluginWidgets();
+  const language = useLanguage();
   return moduleTypes
-    .map((type) => ({ ...type, title: widgets.get(type.type)?.title ?? type.type }))
-    .sort((a, b) => a.title.localeCompare(b.title));
+    .map((type) => {
+      const widget = widgets.get(type.type);
+      return { ...type, title: widget ? localize(widget.title) : type.type };
+    })
+    .sort((a, b) => a.title.localeCompare(b.title, language));
 }

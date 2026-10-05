@@ -1,8 +1,17 @@
 import { Dropdown, Option } from "@fluentui/react-components";
-import { decibels, milliseconds, ParameterSlider, useDefaultStyles, type WidgetProps } from "@micser/web-sdk";
+import {
+  decibels,
+  formatNumber,
+  milliseconds,
+  ParameterSlider,
+  useDefaultStyles,
+  type WidgetProps,
+} from "@micser/web-sdk";
+import { useTranslation } from "../i18n";
 
 export function CompressorWidget({ module, setState }: WidgetProps<"Compressor">) {
   const styles = useDefaultStyles();
+  const { t } = useTranslation();
   const state = module.state;
 
   return (
@@ -10,15 +19,15 @@ export function CompressorWidget({ module, setState }: WidgetProps<"Compressor">
       <Dropdown
         className={styles.dropdown}
         size="small"
-        value={state.type === "Downward" ? "Downward" : "Upward"}
+        value={state.type === "Downward" ? t("compressor.downward") : t("compressor.upward")}
         selectedOptions={[state.type]}
         onOptionSelect={(_, data) => setState({ ...state, type: data.optionValue as typeof state.type })}
       >
-        <Option value="Downward">Downward</Option>
-        <Option value="Upward">Upward</Option>
+        <Option value="Downward">{t("compressor.downward")}</Option>
+        <Option value="Upward">{t("compressor.upward")}</Option>
       </Dropdown>
       <ParameterSlider
-        label="Threshold"
+        label={t("compressor.threshold")}
         value={state.threshold}
         min={-80}
         max={0}
@@ -27,16 +36,16 @@ export function CompressorWidget({ module, setState }: WidgetProps<"Compressor">
         onChange={(threshold) => setState({ ...state, threshold })}
       />
       <ParameterSlider
-        label="Ratio"
+        label={t("compressor.ratio")}
         value={state.ratio}
         min={1}
         max={20}
         logarithmic
-        format={(v) => `${v.toFixed(1)}:1`}
+        format={(v) => `${formatNumber(v, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}:1`}
         onChange={(ratio) => setState({ ...state, ratio })}
       />
       <ParameterSlider
-        label="Attack"
+        label={t("compressor.attack")}
         value={state.attack}
         min={0.0001}
         max={1}
@@ -45,7 +54,7 @@ export function CompressorWidget({ module, setState }: WidgetProps<"Compressor">
         onChange={(attack) => setState({ ...state, attack })}
       />
       <ParameterSlider
-        label="Release"
+        label={t("compressor.release")}
         value={state.release}
         min={0.001}
         max={5}
@@ -54,7 +63,7 @@ export function CompressorWidget({ module, setState }: WidgetProps<"Compressor">
         onChange={(release) => setState({ ...state, release })}
       />
       <ParameterSlider
-        label="Knee"
+        label={t("compressor.knee")}
         value={state.knee}
         min={0}
         max={24}
@@ -63,7 +72,7 @@ export function CompressorWidget({ module, setState }: WidgetProps<"Compressor">
         onChange={(knee) => setState({ ...state, knee })}
       />
       <ParameterSlider
-        label="Make-up gain"
+        label={t("compressor.makeUpGain")}
         value={state.makeUpGain}
         min={-24}
         max={24}
@@ -72,12 +81,12 @@ export function CompressorWidget({ module, setState }: WidgetProps<"Compressor">
         onChange={(makeUpGain) => setState({ ...state, makeUpGain })}
       />
       <ParameterSlider
-        label="Amount"
+        label={t("compressor.amount")}
         value={state.amount}
         min={0}
         max={1}
         step={0.01}
-        format={(v) => `${Math.round(v * 100)}%`}
+        format={(v) => formatNumber(v, { style: "percent", maximumFractionDigits: 0 })}
         onChange={(amount) => setState({ ...state, amount })}
       />
     </div>

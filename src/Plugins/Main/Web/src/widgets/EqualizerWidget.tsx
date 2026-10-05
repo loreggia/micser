@@ -2,12 +2,14 @@ import { Button, makeStyles, tokens } from "@fluentui/react-components";
 import { AddRegular, DeleteRegular } from "@fluentui/react-icons";
 import {
   decibels,
+  formatNumber,
   hertz,
   ParameterSlider,
   useDefaultStyles,
   type EqualizerBand,
   type WidgetProps,
 } from "@micser/web-sdk";
+import { useTranslation } from "../i18n";
 
 const useStyles = makeStyles({
   band: {
@@ -30,6 +32,7 @@ const maxBands = 32;
 export function EqualizerWidget({ module, setState }: WidgetProps<"Equalizer">) {
   const defaultStyles = useDefaultStyles();
   const styles = useStyles();
+  const { t } = useTranslation();
   const bands = module.state.bands;
   const setBand = (index: number, band: EqualizerBand) => setState({ bands: bands.with(index, band) });
 
@@ -38,17 +41,17 @@ export function EqualizerWidget({ module, setState }: WidgetProps<"Equalizer">) 
       {bands.map((band, index) => (
         <div key={index} className={styles.band}>
           <div className={styles.bandHeader}>
-            <span>Band {index + 1}</span>
+            <span>{t("equalizer.band", { number: index + 1 })}</span>
             <Button
               size="small"
               appearance="subtle"
               icon={<DeleteRegular />}
-              aria-label={`Remove band ${index + 1}`}
+              aria-label={t("equalizer.removeBand", { number: index + 1 })}
               onClick={() => setState({ bands: bands.toSpliced(index, 1) })}
             />
           </div>
           <ParameterSlider
-            label="Frequency"
+            label={t("equalizer.frequency")}
             value={band.frequency}
             min={20}
             max={20000}
@@ -57,7 +60,7 @@ export function EqualizerWidget({ module, setState }: WidgetProps<"Equalizer">) 
             onChange={(frequency) => setBand(index, { ...band, frequency })}
           />
           <ParameterSlider
-            label="Gain"
+            label={t("equalizer.gain")}
             value={band.gain}
             min={-24}
             max={24}
@@ -66,12 +69,12 @@ export function EqualizerWidget({ module, setState }: WidgetProps<"Equalizer">) 
             onChange={(gain) => setBand(index, { ...band, gain })}
           />
           <ParameterSlider
-            label="Q"
+            label={t("equalizer.q")}
             value={band.q}
             min={0.1}
             max={20}
             logarithmic
-            format={(v) => v.toFixed(2)}
+            format={(v) => formatNumber(v, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             onChange={(q) => setBand(index, { ...band, q })}
           />
         </div>
@@ -82,7 +85,7 @@ export function EqualizerWidget({ module, setState }: WidgetProps<"Equalizer">) 
         disabled={bands.length >= maxBands}
         onClick={() => setState({ bands: [...bands, { frequency: 1000, gain: 0, q: 1.41 }] })}
       >
-        Add band
+        {t("equalizer.addBand")}
       </Button>
     </div>
   );

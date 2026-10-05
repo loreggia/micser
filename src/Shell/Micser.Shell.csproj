@@ -18,4 +18,14 @@
     <InternalsVisibleTo Include="Micser.Shell.Tests" />
   </ItemGroup>
 
+  <ItemGroup>
+    <!-- the strongly typed Strings class is generated at build time -->
+    <EmbeddedResource Update="Strings.resx">
+      <StronglyTypedLanguage>CSharp</StronglyTypedLanguage>
+      <StronglyTypedClassName>Strings</StronglyTypedClassName>
+      <StronglyTypedNamespace>Micser.Shell</StronglyTypedNamespace>
+      <StronglyTypedFileName>$(IntermediateOutputPath)Strings.Designer.cs</StronglyTypedFileName>
+    </EmbeddedResource>
+  </ItemGroup>
+
 </Project>

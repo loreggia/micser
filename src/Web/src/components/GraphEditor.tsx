@@ -14,6 +14,7 @@ import {
   getDeleteConnectionMutationOptions,
   getDeleteModuleMutationOptions,
   getDeleteSubgraphMutationOptions,
+  localize,
   useGetConnections,
   useGetModules,
   useGetModuleTypes,
@@ -41,8 +42,9 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslation } from "../i18n";
 import { useNotifyError } from "../notifications";
-import { usePluginWidgets } from "../plugins";
+import { portName, usePluginWidgets } from "../plugins";
 import { ModuleNode, type ModuleNodeType } from "./ModuleNode";
 import { pendingPlacement, pendingSelection } from "./newModules";
 import { findFreePosition, placementMinimum, placementObstacles } from "./placement";
@@ -146,6 +148,7 @@ interface ModuleMenu {
  */
 export function GraphEditor() {
   const styles = useStyles();
+  const { t, language } = useTranslation();
   const { data: modules } = useGetModules();
   const { data: connections } = useGetConnections();
   const { data: moduleTypes } = useGetModuleTypes();
@@ -169,25 +172,45 @@ export function GraphEditor() {
 
   const connect = useMutation({
     ...getCreateConnectionMutationOptions(),
-    onError: (error) => notifyError("Connecting failed", error),
+    onError: (error) => notifyError(t("graph.connectFailed"), error),
   });
   const disconnect = useMutation({
     ...getDeleteConnectionMutationOptions(),
-    onError: (error) => notifyError("Disconnecting failed", error),
+    onError: (error) => notifyError(t("graph.disconnectFailed"), error),
   });
   const remove = useMutation({
     ...getDeleteModuleMutationOptions(),
-    onError: (error) => notifyError("Removing the module failed", error),
+    onError: (error) => notifyError(t("graph.removeModuleFailed"), error),
   });
   const { mutate: createSubgraph } = useMutation({
     ...getCreateSubgraphMutationOptions(),
-    onError: (error) => notifyError("Grouping failed", error),
+    onError: (error) => notifyError(t("graph.groupFailed"), error),
   });
   const removeSubgraph = useMutation({
     ...getDeleteSubgraphMutationOptions(),
-    onError: (error) => notifyError("Deleting the subgraph failed", error),
+    onError: (error) => notifyError(t("subgraph.deleteFailed"), error),
   });
 
+  const ariaLabelConfig = useMemo(
+    () => ({
+      "node.a11yDescription.default": t("graph.aria.node"),
+      "node.a11yDescription.keyboardDisabled": t("graph.aria.nodeKeyboard"),
+      "node.a11yDescription.ariaLiveMessage": ({ direction, x, y }: { direction: string; x: number; y: number }) =>
+        t("graph.aria.nodeMoved", {
+          direction: t(`graph.aria.directions.${direction as "up" | "down" | "left" | "right"}`),
+          x,
+          y,
+        }),
+      "edge.a11yDescription.default": t("graph.aria.edge"),
+      "controls.ariaLabel": t("graph.aria.controls"),
+      "controls.zoomIn.ariaLabel": t("graph.aria.zoomIn"),
+      "controls.zoomOut.ariaLabel": t("graph.aria.zoomOut"),
+      "controls.fitView.ariaLabel": t("graph.aria.fitView"),
+      "controls.interactive.ariaLabel": t("graph.aria.interactive"),
+      "handle.ariaLabel": t("graph.aria.handle"),
+    }),
+    [t]
+  );
   const typesByName = useMemo(() => new Map(moduleTypes?.map((type) => [type.type, type])), [moduleTypes]);
 
   // the collapsed subgraph of each module in one
@@ -212,9 +235,10 @@ export function GraphEditor() {
 
       const module = modules?.find((m) => m.id === moduleId);
       const moduleType = module && typesByName.get(module.type);
-      const title = module?.name || (module && widgets.get(module.type)?.title) || module?.type || port;
+      const widget = module && widgets.get(module.type);
+      const title = module?.name || (widget && localize(widget.title)) || module?.type || port;
       const portCount = (direction === "in" ? moduleType?.inputs : moduleType?.outputs)?.length ?? 0;
-      list.push({ id, label: portCount > 1 ? `${title} · ${port}` : title });
+      list.push({ id, label: portCount > 1 ? `${title} · ${portName(widget, port)}` : title });
     };
 
     for (const connection of connections ?? []) {
@@ -234,7 +258,9 @@ export function GraphEditor() {
     }
 
     return ports;
-  }, [connections, modules, collapsedSubgraphs, typesByName, widgets]);
+    // the labels change with the language
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [connections, modules, collapsedSubgraphs, typesByName, widgets, language]);
 
   useEffect(() => {
     if (!modules || !subgraphs) {
@@ -404,7 +430,7 @@ export function GraphEditor() {
   if (!modules || !connections || !moduleTypes || !subgraphs || isLoadingWidgets) {
     return (
       <div className={styles.loading}>
-        <Spinner label="Connecting to the engine" />
+        <Spinner label={t("graph.connecting")} />
       </div>
     );
   }
@@ -635,6 +661,7 @@ export function GraphEditor() {
         snapToGrid={preferences.snapToGrid}
         snapGrid={[gridSize, gridSize]}
         colorMode="system"
+        ariaLabelConfig={ariaLabelConfig}
         fitView
         minZoom={0.25}
       >
@@ -681,12 +708,12 @@ export function GraphEditor() {
           <MenuList>
             {!moduleMenuInSubgraph && (
               <MenuItem secondaryContent="Ctrl+G" onClick={() => moduleMenu && groupModules(moduleMenu.moduleIds)}>
-                Group
+                {t("graph.group")}
               </MenuItem>
             )}
             {moduleMenuInSubgraph && (
               <MenuItem onClick={() => moduleMenu && removeFromSubgraph(moduleMenu.moduleIds)}>
-                Remove from subgraph
+                {t("graph.removeFromSubgraph")}
               </MenuItem>
             )}
             <MenuDivider />
@@ -694,7 +721,7 @@ export function GraphEditor() {
               secondaryContent="Del"
               onClick={() => moduleMenu && void deleteElements({ nodes: moduleMenu.moduleIds.map((id) => ({ id })) })}
             >
-              Delete
+              {t("common.delete")}
             </MenuItem>
           </MenuList>
         </MenuPopover>

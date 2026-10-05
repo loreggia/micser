@@ -19,3 +19,14 @@ test("a step changes the gain by half a decibel", async () => {
 
   expect(setState).toHaveBeenLastCalledWith({ gain: -5.5 });
 });
+
+test("shows German labels and numbers", async () => {
+  const screen = await render(
+    <TestProviders queryClient={createTestQueryClient()} language="de">
+      <GainWidget module={testModule("Gain", { gain: -6 })} setState={vi.fn()} />
+    </TestProviders>
+  );
+
+  await expect.element(screen.getByText("-6,0 dB")).toBeVisible();
+  await expect.element(screen.getByRole("slider", { name: "Verstärkung" })).toBeVisible();
+});

@@ -1,4 +1,5 @@
-import { useSyncExternalStore } from "react";
+import { useGetPreferences } from "@micser/web-sdk";
+import { useEffect, useSyncExternalStore } from "react";
 
 /** A cable's channel layout; both sides of the cable use it. */
 export type CableLayout = "stereo" | "5.1" | "7.1";
@@ -102,6 +103,11 @@ export class Shell {
     this.webView.postMessage({ type: "setCableCount", cableCount });
   }
 
+  /** The language preference, for the tray menu; null follows the system. */
+  setLanguage(language: string | null) {
+    this.webView.postMessage({ type: "setLanguage", language });
+  }
+
   /** Changes a cable's layout (cable 1 is the first); like the other driver changes, it restarts the cables. */
   setCableLayout(cable: number, layout: CableLayout) {
     this.webView.postMessage({ type: "setCableLayout", cable, layout });
@@ -143,6 +149,18 @@ const webView = (window as { chrome?: { webview?: WebView } }).chrome?.webview;
 
 /** The desktop shell, or undefined in a browser (e.g. the Vite dev server). */
 export const shell = webView ? new Shell(webView) : undefined;
+
+/** Passes the language preference to the shell once it's loaded and whenever it changes. */
+export function useShellLanguage() {
+  const { data: preferences } = useGetPreferences();
+  const language = preferences ? (preferences.language ?? null) : undefined;
+
+  useEffect(() => {
+    if (language !== undefined) {
+      shell?.setLanguage(language);
+    }
+  }, [language]);
+}
 
 /** The shell's state, or undefined in a browser or until the shell answered. */
 export function useShellState(): ShellState | undefined {

@@ -8,4 +8,6 @@
 export interface UiPreferencesDto {
   showStreamStatistics: boolean;
   snapToGrid: boolean;
+  /** @nullable */
+  language?: string | null;
 }
