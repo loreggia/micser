@@ -47,6 +47,9 @@ internal static class Program
 
             ApplicationConfiguration.Initialize();
 
+            // dark window background and title bar in dark mode, so the window doesn't flash light before the UI loads
+            Application.SetColorMode(SystemColorMode.System);
+
             // async code started before Application.Run (the engine supervisor) must continue on the UI thread
             SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
 
