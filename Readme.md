@@ -21,7 +21,7 @@ The application consists of:
 dotnet build Micser.slnx
 dotnet test --solution Micser.slnx
 
-npm install
+npm run setup          # npm install, then the allowed install scripts (lavamoat.allowScripts in package.json)
 npm run build          # production build of the web UI (before dotnet publish of the engine, which serves it)
 npm run lint
 npm run format:check

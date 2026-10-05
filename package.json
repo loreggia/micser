@@ -12,6 +12,10 @@
     "node": ">=22.12"
   },
   "scripts": {
+    "setup": "npm install && npm run allow-scripts:run",
+    "setup:ci": "npm ci && npm run allow-scripts:run",
+    "allow-scripts:auto": "allow-scripts auto && npm exec --no --workspaces -- allow-scripts auto",
+    "allow-scripts:run": "allow-scripts run && npm exec --no --workspaces -- allow-scripts run",
     "dev": "npm run dev -w @micser/web",
     "build": "npm run build --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",
@@ -24,6 +28,8 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@lavamoat/allow-scripts": "^5.1.0",
+    "@lavamoat/preinstall-always-fail": "^3.0.0",
     "@playwright/test": "^1.63.0",
     "@vitejs/plugin-react": "^6.1.1",
     "@vitest/browser-playwright": "^5.0.3",
@@ -40,5 +46,11 @@
   },
   "overrides": {
     "undici": "^7.30.0"
+  },
+  "lavamoat": {
+    "allowScripts": {
+      "@lavamoat/preinstall-always-fail#3.0.0": false,
+      "vitest>vite>esbuild#0.28.2": true
+    }
   }
 }

@@ -30,7 +30,7 @@ jobs:
           cache: npm
 
       - name: Install
-        run: npm ci
+        run: npm run setup:ci
 
       - name: Version
         id: version
