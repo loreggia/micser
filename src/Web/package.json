@@ -14,7 +14,7 @@
     "@fluentui/react-icons": "^2.0.343",
     "@microsoft/signalr": "^10.0.11",
     "@micser/web-sdk": "*",
-    "@tanstack/react-query": "^5.104.0",
+    "@tanstack/react-query": "^5.104.1",
     "@xyflow/react": "^12.12.0",
     "i18next": "^26.4.2",
     "react": "^19.3.0",
@@ -22,11 +22,11 @@
     "react-i18next": "^17.0.15"
   },
   "devDependencies": {
-    "@types/node": "^24.19.0",
+    "@types/node": "^24.19.1",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "@vitejs/plugin-react": "^6.1.1",
-    "vite": "^8.3.1"
+    "vite": "^8.3.2"
   },
   "lavamoat": {
     "allowScripts": {
