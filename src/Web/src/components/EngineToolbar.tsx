@@ -8,12 +8,14 @@ import {
   MenuList,
   MenuPopover,
   MenuTrigger,
+  SplitButton,
   Switch,
   Toolbar,
   ToolbarDivider,
   Tooltip,
   makeStyles,
   tokens,
+  type MenuButtonProps,
 } from "@fluentui/react-components";
 import { AddRegular, ArrowDownloadRegular, SettingsRegular } from "@fluentui/react-icons";
 import {
@@ -29,6 +31,7 @@ import { useTranslation } from "../i18n";
 import { useNotifyError } from "../notifications";
 import { shell, useShellState } from "../shell";
 import { EngineSettingsDialog } from "./EngineSettingsDialog";
+import { ReleaseNotesDialog } from "./ReleaseNotesDialog";
 import { TemplatesSubmenu } from "./TemplatesSubmenu";
 import { useAddModule, useInstantiateTemplate, useModuleTypeChoices } from "./useAddModule";
 
@@ -71,6 +74,7 @@ export function EngineToolbar() {
   const addModule = useAddModule();
   const instantiateTemplate = useInstantiateTemplate();
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [releaseNotesOpen, setReleaseNotesOpen] = useState(false);
   const start = useMutation({
     ...getStartEngineMutationOptions(),
     onError: (error) => notifyError(t("toolbar.startFailed"), error),
@@ -104,11 +108,34 @@ export function EngineToolbar() {
       </Menu>
       <div className={styles.spacer} />
       {shellState?.pendingUpdate && (
-        <Tooltip content={t("toolbar.updateHint")} relationship="description">
-          <Button appearance="primary" icon={<ArrowDownloadRegular />} onClick={() => shell?.installUpdate()}>
-            {t("toolbar.updateTo", { version: shellState.pendingUpdate })}
-          </Button>
-        </Tooltip>
+        <>
+          <Menu positioning="below-end">
+            <MenuTrigger disableButtonEnhancement>
+              {(triggerProps: MenuButtonProps) => (
+                <Tooltip content={t("toolbar.updateHint")} relationship="description">
+                  <SplitButton
+                    appearance="primary"
+                    icon={<ArrowDownloadRegular />}
+                    menuButton={{ ...triggerProps, "aria-label": t("toolbar.updateOptions") }}
+                    primaryActionButton={{ onClick: () => shell?.installUpdate() }}
+                  >
+                    {t("toolbar.updateTo", { version: shellState.pendingUpdate })}
+                  </SplitButton>
+                </Tooltip>
+              )}
+            </MenuTrigger>
+            <MenuPopover>
+              <MenuList>
+                <MenuItem onClick={() => setReleaseNotesOpen(true)}>{t("toolbar.whatsNew")}</MenuItem>
+              </MenuList>
+            </MenuPopover>
+          </Menu>
+          <ReleaseNotesDialog
+            version={shellState.pendingUpdate}
+            open={releaseNotesOpen}
+            onClose={() => setReleaseNotesOpen(false)}
+          />
+        </>
       )}
       {status && (
         <Caption1 className={styles.status}>

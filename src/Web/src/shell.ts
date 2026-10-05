@@ -52,7 +52,10 @@ export interface WebView {
   addEventListener(type: "message", listener: (event: MessageEvent) => void): void;
 }
 
-type ShellMessage = ({ type: "state" } & ShellState) | { type: "updateCheck"; result: UpdateCheckResult };
+type ShellMessage =
+  | ({ type: "state" } & ShellState)
+  | { type: "updateCheck"; result: UpdateCheckResult }
+  | { type: "releaseNotes"; version: string; notes: string | null };
 
 /**
  * The desktop shell, when the UI runs in its WebView2 window. Messages go both ways through WebView2 web messages.
@@ -60,6 +63,7 @@ type ShellMessage = ({ type: "state" } & ShellState) | { type: "updateCheck"; re
 export class Shell {
   private readonly listeners = new Set<() => void>();
   private readonly pendingChecks: ((result: UpdateCheckResult) => void)[] = [];
+  private readonly pendingReleaseNotes = new Map<string, ((notes: string | null) => void)[]>();
   private readonly webView: WebView;
   private current?: ShellState;
 
@@ -78,6 +82,22 @@ export class Shell {
     return new Promise<UpdateCheckResult>((resolve) => {
       this.pendingChecks.push(resolve);
       this.webView.postMessage({ type: "checkForUpdates" });
+    });
+  }
+
+  /**
+   * The markdown release notes of the installed version or of the downloaded update, or null for another version or a release
+   * without notes.
+   */
+  getReleaseNotes(version: string) {
+    return new Promise<string | null>((resolve) => {
+      const waiting = this.pendingReleaseNotes.get(version);
+      if (waiting) {
+        waiting.push(resolve);
+      } else {
+        this.pendingReleaseNotes.set(version, [resolve]);
+        this.webView.postMessage({ type: "getReleaseNotes", version });
+      }
     });
   }
 
@@ -141,6 +161,9 @@ export class Shell {
       this.listeners.forEach((listener) => listener());
     } else if (message.type === "updateCheck") {
       this.pendingChecks.splice(0).forEach((resolve) => resolve(message.result));
+    } else if (message.type === "releaseNotes") {
+      this.pendingReleaseNotes.get(message.version)?.forEach((resolve) => resolve(message.notes));
+      this.pendingReleaseNotes.delete(message.version);
     }
   }
 }

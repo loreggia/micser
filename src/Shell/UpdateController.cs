@@ -16,6 +16,8 @@ internal enum UpdateCheckResult
 /// </summary>
 internal sealed class UpdateController : IDisposable
 {
+    public const string ReleaseNotesFileName = "ReleaseNotes.md";
+
     private static readonly TimeSpan CheckDelay = TimeSpan.FromSeconds(30);
     private static readonly TimeSpan CheckInterval = TimeSpan.FromHours(12);
 
@@ -62,6 +64,31 @@ internal sealed class UpdateController : IDisposable
     {
         _cancellation.Cancel();
         _cancellation.Dispose();
+    }
+
+    /// <summary>
+    /// Returns the markdown release notes of the installed version (from <see cref="ReleaseNotesFileName"/>, written by eng/pack.ps1)
+    /// or of the downloaded update (from its package), or null for another version or a release without notes.
+    /// </summary>
+    public string? GetReleaseNotes(string version)
+    {
+        if (version == CurrentVersion.ToString())
+        {
+            var path = Path.Combine(AppContext.BaseDirectory, ReleaseNotesFileName);
+            try
+            {
+                return File.Exists(path) ? File.ReadAllText(path) : null;
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                Log.Warning(ex, "Reading the release notes failed.");
+                return null;
+            }
+        }
+
+        return PendingUpdate is { } update && version == update.Version.ToString() && !string.IsNullOrWhiteSpace(update.NotesMarkdown)
+            ? update.NotesMarkdown
+            : null;
     }
 
     /// <summary>
