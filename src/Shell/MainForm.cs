@@ -318,7 +318,7 @@ internal sealed class MainForm : Form
             <head>
             <meta charset="utf-8">
             <style>
-              :root { color-scheme: light dark; }
+              :root { color-scheme: light dark; background: Canvas; color: CanvasText; }
               body { margin: 0; height: 100vh; display: grid; place-items: center; font: 14px "Segoe UI", sans-serif; }
             </style>
             </head>
