@@ -284,7 +284,7 @@ docs/
   - The output is `Micser-win-Setup.exe`, a portable zip, and full and delta packages.
   - Both apps use the same runtime, so its files are shared. Setup is about 75 MB.
   - Nothing is code-signed yet, so SmartScreen warns on the first run.
-- **Release:** pushing a tag `vX.Y.Z` runs `.github/workflows/release.yml`.
+- **Release:** pushing a tag `vX.Y.Z` runs CI, which calls `.github/workflows/release.yml` once all its jobs passed.
   - It downloads the previous release (the base for deltas), packs, and publishes a GitHub release.
   - Tags with a suffix (`v0.2.0-beta.1`) become pre-releases, which installed copies ignore.
 - **Install:**
