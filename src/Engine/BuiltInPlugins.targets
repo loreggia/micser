@@ -2,8 +2,8 @@
 
   <!--
     Copies built-in plugins into plugins/<id>/ of the output and publish folders: the plugin project's output (its assembly and private
-    dependencies), its plugin.json, and its widget bundle (Web/dist, built by "npm run build") as web/. plugin.json comes from the project
-    folder rather than the plugin's output, since output items would also be copied into every referencing project.
+    dependencies), its plugin.json and templates.json (if any), and its widget bundle (Web/dist, built by "npm run build") as web/. The JSON files come
+    from the project folder rather than the plugin's output, since output items would also be copied into every referencing project.
     A plugin is a project reference with OutputItemType="BuiltInPlugin" and PluginId metadata; ReferenceOutputAssembly="false" keeps it out of
     the compilation and deps.json, so it's only loaded through the plugin loader.
   -->
@@ -12,6 +12,8 @@
     <ItemGroup>
       <_BuiltInPluginFile Include="%(BuiltInPlugin.RootDir)%(BuiltInPlugin.Directory)**" PluginId="%(BuiltInPlugin.PluginId)" />
       <_BuiltInPluginFile Include="$([System.IO.Path]::GetDirectoryName('%(BuiltInPlugin.MSBuildSourceProjectFile)'))\plugin.json" PluginId="%(BuiltInPlugin.PluginId)" />
+      <_BuiltInPluginTemplates Include="$([System.IO.Path]::GetDirectoryName('%(BuiltInPlugin.MSBuildSourceProjectFile)'))\templates.json" PluginId="%(BuiltInPlugin.PluginId)" />
+      <_BuiltInPluginFile Include="@(_BuiltInPluginTemplates)" Condition="Exists('%(FullPath)')" />
       <_BuiltInPluginWebFile Include="$([System.IO.Path]::GetDirectoryName('%(BuiltInPlugin.MSBuildSourceProjectFile)'))\Web\dist\**" PluginId="%(BuiltInPlugin.PluginId)" />
     </ItemGroup>
     <Error Condition="'@(BuiltInPlugin)' != '' and '%(BuiltInPlugin.PluginId)' == ''" Text="Built-in plugin %(BuiltInPlugin.Identity) has no PluginId." />

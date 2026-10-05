@@ -13,6 +13,7 @@ public sealed record TemplateConnectionDto(Guid SourceModuleId, string SourcePor
 /// <param name="Revision">Increases each time the template is saved over; subgraphs with a lower one are outdated.</param>
 /// <param name="Modules">The modules with template-local ids and positions relative to the subgraph.</param>
 /// <param name="UnavailableTypes">The types of modules in the template whose plugin isn't loaded. A template with any can't be used.</param>
+/// <param name="IsBuiltIn">Provided by a plugin and updated with it; it can't be renamed, saved over or removed.</param>
 public sealed record SubgraphTemplateDto(
     Guid Id,
     string Name,
@@ -21,7 +22,8 @@ public sealed record SubgraphTemplateDto(
     SubgraphSize Size,
     IReadOnlyList<ModuleDto> Modules,
     IReadOnlyList<TemplateConnectionDto> Connections,
-    IReadOnlyList<string> UnavailableTypes);
+    IReadOnlyList<string> UnavailableTypes,
+    bool IsBuiltIn);
 
 /// <param name="SubgraphId">The subgraph to save; it refers to the template afterwards.</param>
 /// <param name="Name">Template names are unique, ignoring case.</param>

@@ -141,6 +141,14 @@ docs/
   - Subgraphs are never updated automatically: one whose `templateRevision` is lower than the template's is outdated. `POST /api/subgraphs/{id}/update-from-template` matches modules by `templateModuleId` and type: matched ones keep their id and outside connections and take the template's settings and state, unmatched ones are removed, missing ones added, and the connections between the modules become the template's (unchanged ones stay). The subgraph keeps its name, position, collapse, mute and bypass, and takes the template's color and size.
   - Only the engine sets `templateId` and `templateModuleId`: a subgraph update can only clear the reference (detach), and a module's `templateModuleId` is cleared when it changes subgraphs. Removing a template clears the references of its subgraphs. Renaming is `PUT /api/subgraph-templates/{id}/name`.
   - Template modules of unknown types are kept as they are, like the graph's; such a template is listed with `unavailableTypes` and can't be instantiated or used for updates (400).
+  - **Built-in templates** come with plugins (`templates` in `plugin.json`), so app and plugin updates can add and change them (`isBuiltIn`):
+    - The engine loads them from the loaded plugins at every start (`LoadPluginTemplates` in `AudioHost`), before the configuration's, and doesn't save them. One that is invalid or whose id or name another plugin's template has is skipped.
+    - They can't be renamed, saved over or removed (400), and their names can't be used by other templates (409). A subgraph created from one is saved as a new template; the save dialog suggests "<name> (custom)".
+    - The user's templates that have a built-in template's name, e.g. one a new release added, are renamed to "<name> (custom)" (or "(custom 2)" and so on) at startup, so releases can add templates without overwriting the user's.
+    - While its plugin isn't loaded, the subgraphs created from one keep their reference (see Configuration below); the UI shows "Template unavailable" and only offers detaching.
+    - A plugin changes a template by increasing its `revision`. The template keeps its id and its modules' ids, which its subgraphs match when they're updated; the subgraphs then show as outdated and are updated by the user.
+    - The engine tests leave them out (`Engine:LoadPluginTemplates`) except where they test them; the end-to-end `EngineApi.templates()` returns only the user's.
+  - Main's templates (`src/Plugins/Main/templates.json`) are effect chains to wire between an input and an output: "Footstep boost" (EQ that cuts the lows and lifts 2.5 kHz, an upward compressor for quiet sounds, a limiter), "Night mode" (a downward compressor with make-up gain, a limiter) and "Voice chat mic" (EQ that cuts rumble and lifts presence, a compressor, an output gain).
 - **Hub** (`/hubs/engine`):
   - Pushes `ModuleChanged`, `ModuleRemoved`, `ConnectionAdded`, `ConnectionRemoved`, `SubgraphChanged`, `SubgraphRemoved`, `TemplatesChanged` (the whole list), `DevicesChanged`, `PluginsChanged`, `PreferencesChanged` and `StatusChanged` to all clients, in the order they happened.
   - `Subscribe(moduleId)` / `Unsubscribe(moduleId)` start and stop `ModuleData` pushes (20 per second) for modules with live data.
@@ -149,7 +157,7 @@ docs/
   - It's versioned, with saves debounced (500 ms) and written atomically.
   - An unreadable file is moved to `config.json.<timestamp>.bak`, and the engine starts empty.
   - Modules of unknown type (their plugin isn't loaded) are kept in the file as they are, with their connections, but stay out of the graph and the API; they come back with their plugin. Invalid modules and dangling connections are skipped.
-  - Subgraphs and templates are kept with the modules. A module whose subgraph is missing loses its `subgraphId`, and a subgraph whose template is missing its reference; deleting a subgraph also takes the unknown-type modules out of it.
+  - Subgraphs and templates are kept with the modules. A module whose subgraph is missing loses its `subgraphId`. A subgraph keeps the reference to a missing template, which may be a built-in one whose plugin isn't loaded, so it's linked again when the plugin is; deleting a subgraph also takes the unknown-type modules out of it.
   - Changing the engine settings rebuilds the graph.
 - **Discovery and security:**
   - The engine binds to `127.0.0.1` with a random port and writes `{ url, token, processId }` to `%LocalAppData%\Micser\engine.json` (`Engine:DiscoveryPath`). That folder is private to the user. The file is deleted on a clean shutdown; after a crash it stays, so readers must check that the process is alive.
@@ -195,9 +203,9 @@ docs/
   - The "More" menu has a "Color" submenu, the template actions (see below), "Ungroup" (the modules stay) and "Delete" (the modules are removed too). The Delete key on a selected subgraph deletes it with its modules as well, in one engine request; the engine also removes the connections of removed modules, so the editor only deletes the other selected modules and connections itself.
 - **Subgraph templates** in the UI:
   - The "More" menu in a subgraph's header has "Save as template…", "Update from template…" and "Detach from template". The header shows the template's name, with "· changed" and an update button when the template's revision is higher.
-  - The save dialog suggests the subgraph's template's name (or the subgraph's), so saving again updates the template; a name that a template already has offers "Replace" and saves over it. Updating asks for confirmation.
+  - The save dialog suggests the subgraph's template's name (or the subgraph's), so saving again updates the template; a name that a template already has offers "Replace" and saves over it. For a built-in template, it suggests "<name> (custom)" and doesn't accept a built-in template's name. Updating asks for confirmation.
   - Both add menus (the toolbar's and the graph's context menu on empty space) end with a "Templates" submenu: the templates by name (those with missing plugins disabled) and "Manage templates…". A template is added at the click, or near the center of the view from the toolbar.
-  - The "Subgraph templates" dialog lists the templates with their module count, how many subgraphs use them and missing plugins, renames (double-click) and removes them.
+  - The "Subgraph templates" dialog lists the templates with their module count, how many subgraphs use them and missing plugins, renames (double-click) and removes them. Built-in templates have a badge and can't be renamed or removed.
   - These dialogs are hosted by `SubgraphActionsProvider` outside the graph (nodes open them through `useSubgraphActions`), where React Flow's key and click handling on nodes doesn't reach them.
 - **Toolbar and settings:**
   - The settings dialog has the audio settings (applied together, which rebuilds the graph) with "Restart audio" (`engine/restart-audio`) and, in the shell, "Restart engine process", the display preferences (applied right away), the plugins (install from a .zip, remove, and "Restart engine to apply" in the shell), and, in the shell, the version with "Check for updates".
@@ -213,7 +221,7 @@ docs/
 ## Plugins
 
 - **Package.** A plugin is a folder named by its id, which is also the root of its zip package:
-  - `plugin.json`: `{ "id", "name", "version", "assembly", "web" }`. `assembly` is a file name in the folder; `web` (optional) is the widget bundle's entry, e.g. `web/index.js`.
+  - `plugin.json`: `{ "id", "name", "version", "assembly", "web", "templates" }`. `assembly` is a file name in the folder; `web` (optional) is the widget bundle's entry, e.g. `web/index.js`; `templates` (optional) is a JSON array of subgraph templates in the configuration's format (see [Engine](#engine)).
   - The assembly with its private dependencies and `.deps.json`, and the widget bundle.
 - **Locations.** Built-in plugins are in the engine's `plugins` folder (`Engine:BuiltInPluginsPath`): shipped with the app and replaced by updates. User plugins are in `%LocalAppData%\Micser\plugins` (`Engine:PluginsPath`): kept across updates and removed on uninstall. A user plugin can't replace a built-in one; a duplicate id fails to load.
 - **Loading** (`PluginLoader`, before the host is built):

@@ -5,6 +5,8 @@ using Micser.Audio.Devices;
 using Micser.Engine.Configuration;
 using Micser.Engine.Contracts;
 using Micser.Engine.Modules;
+using Micser.Engine.Plugins;
+using Microsoft.Extensions.Options;
 
 namespace Micser.Engine.Audio;
 
@@ -22,6 +24,8 @@ public sealed class AudioHost : IDisposable
     private readonly ILoggerFactory _loggerFactory;
     private readonly OrderedDictionary<Guid, ModuleEntry> _modules = [];
     private readonly IEngineNotifier _notifier;
+    private readonly EngineOptions _options;
+    private readonly PluginCatalog _plugins;
     private readonly IServiceProvider _services;
     private readonly EngineConfigStore _store;
     private readonly OrderedDictionary<Guid, SubgraphDto> _subgraphs = [];
@@ -42,10 +46,14 @@ public sealed class AudioHost : IDisposable
         AudioDeviceService devices,
         ISystemVolume systemVolume,
         IEngineNotifier notifier,
+        PluginCatalog plugins,
+        IOptions<EngineOptions> options,
         ILoggerFactory loggerFactory)
     {
         _services = services;
         _catalog = catalog;
+        _plugins = plugins;
+        _options = options.Value;
         _store = store;
         _devices = devices;
         _systemVolume = systemVolume;
@@ -252,21 +260,26 @@ public sealed class AudioHost : IDisposable
 
             _settings = settingsErrors.Count == 0 ? configuration.Settings : new EngineSettingsDto();
             _preferences = configuration.Preferences;
+            if (_options.LoadPluginTemplates)
+            {
+                LoadPluginTemplates();
+            }
+
             foreach (var template in configuration.Templates)
             {
-                if (string.IsNullOrWhiteSpace(template.Name) || !_templates.TryAdd(template.Id, template))
+                if (string.IsNullOrWhiteSpace(template.Name) || !_templates.TryAdd(template.Id, template with { IsBuiltIn = false }))
                 {
                     _logger.LogWarning("Skipping invalid subgraph template {Id}.", template.Id);
                 }
             }
 
+            var renamedTemplates = RenameTemplatesNamedLikeBuiltIns();
+
             foreach (var subgraph in configuration.Subgraphs)
             {
+                // a missing template's reference is kept: it may be a built-in one whose plugin isn't loaded (removing a template clears them)
                 var errors = StateValidator.Validate(subgraph);
-                var valid = subgraph.TemplateId is { } templateId && !_templates.ContainsKey(templateId)
-                    ? subgraph with { TemplateId = null, TemplateRevision = null }
-                    : subgraph;
-                if (errors.Count > 0 || !_subgraphs.TryAdd(valid.Id, valid))
+                if (errors.Count > 0 || !_subgraphs.TryAdd(subgraph.Id, subgraph))
                 {
                     _logger.LogWarning("Skipping invalid subgraph {Id}: {Errors}", subgraph.Id, errors);
                 }
@@ -279,6 +292,11 @@ public sealed class AudioHost : IDisposable
 
             var modules = configuration.Modules.Select(m => m.SubgraphId is { } id && !_subgraphs.ContainsKey(id) ? m with { SubgraphId = null } : m);
             Build(modules, configuration.Connections.Except(_unavailableConnections));
+            if (renamedTemplates)
+            {
+                Persist();
+            }
+
             Engine.Start();
         }
     }
@@ -448,10 +466,13 @@ public sealed class AudioHost : IDisposable
     {
         lock (_lock)
         {
-            if (!_templates.Remove(id))
+            if (!_templates.TryGetValue(id, out var template))
             {
                 return false;
             }
+
+            ThrowIfBuiltIn(template);
+            _templates.Remove(id);
 
             var detached = _subgraphs.Values.Where(s => s.TemplateId == id).Select(s => s with { TemplateId = null, TemplateRevision = null }).ToArray();
             foreach (var subgraph in detached)
@@ -481,6 +502,7 @@ public sealed class AudioHost : IDisposable
                 throw EngineRequestException.NotFound($"Subgraph template {id} not found.");
             }
 
+            ThrowIfBuiltIn(template);
             template = template with { Name = GetTemplateName(request.Name, id) };
             _templates[id] = template;
             Persist();
@@ -520,6 +542,11 @@ public sealed class AudioHost : IDisposable
             if (request.TemplateId is { } existingId && !_templates.TryGetValue(existingId, out existing))
             {
                 throw EngineRequestException.Invalid($"Subgraph template {existingId} not found.");
+            }
+
+            if (existing != null)
+            {
+                ThrowIfBuiltIn(existing);
             }
 
             var name = GetTemplateName(request.Name, existing?.Id);
@@ -797,6 +824,14 @@ public sealed class AudioHost : IDisposable
         return position == null ? null : new ModulePosition(position.X + x, position.Y + y);
     }
 
+    private static void ThrowIfBuiltIn(SubgraphTemplate template)
+    {
+        if (template.IsBuiltIn)
+        {
+            throw EngineRequestException.Invalid($"The subgraph template '{template.Name}' is built in and can't be changed.");
+        }
+    }
+
     private static void ThrowIfInvalid(Dictionary<string, string[]> errors)
     {
         if (errors.Count > 0)
@@ -815,7 +850,8 @@ public sealed class AudioHost : IDisposable
             template.Size,
             template.Modules,
             template.Connections,
-            [.. template.UnavailableModules.Select(m => m.Type)]);
+            [.. template.UnavailableModules.Select(m => m.Type)],
+            template.IsBuiltIn);
     }
 
     /// <summary>
@@ -1033,6 +1069,39 @@ public sealed class AudioHost : IDisposable
         return template;
     }
 
+    /// <summary>
+    /// Adds the loaded plugins' templates as built-in ones. An invalid one, or one whose id or name another plugin's template has, is skipped.
+    /// </summary>
+    private void LoadPluginTemplates()
+    {
+        foreach (var plugin in _plugins.Plugins.Where(p => p.IsLoaded && p.Manifest!.Templates != null))
+        {
+            List<SubgraphTemplate> templates;
+            try
+            {
+                templates = _store.ReadPluginTemplates(Path.Combine(plugin.Directory, plugin.Manifest!.Templates!));
+            }
+            catch (Exception ex) when (ex is JsonException or IOException or NotSupportedException)
+            {
+                _logger.LogWarning(ex, "The templates of the plugin {Id} can't be read.", plugin.Id);
+                continue;
+            }
+
+            foreach (var template in templates)
+            {
+                var moduleIds = template.Modules.Select(m => m.Id).Concat(template.UnavailableModules.Select(m => m.Id)).ToHashSet();
+                var errors = template.Modules.SelectMany(m => StateValidator.Validate(m).Keys).ToArray();
+                if (string.IsNullOrWhiteSpace(template.Name) || errors.Length > 0
+                    || template.Connections.Any(c => !moduleIds.Contains(c.SourceModuleId) || !moduleIds.Contains(c.TargetModuleId))
+                    || _templates.Values.Any(t => string.Equals(t.Name, template.Name, StringComparison.OrdinalIgnoreCase))
+                    || !_templates.TryAdd(template.Id, template with { IsBuiltIn = true }))
+                {
+                    _logger.LogWarning("Skipping the template {Id} of the plugin {Plugin}: it's invalid or its id or name is taken.", template.Id, plugin.Id);
+                }
+            }
+        }
+    }
+
     private void OnDeviceChanged(object? sender, AudioDeviceChangedEventArgs e)
     {
         _notifier.DevicesChanged();
@@ -1090,7 +1159,7 @@ public sealed class AudioHost : IDisposable
             Preferences = _preferences,
             Modules = [.. _modules.Values.Select(ToDto)],
             Subgraphs = [.. _subgraphs.Values],
-            Templates = [.. _templates.Values],
+            Templates = [.. _templates.Values.Where(t => !t.IsBuiltIn)],
             UnavailableModules = [.. _unavailableModules],
             Connections = [.. _connections.Values.Select(c => c.Dto), .. _unavailableConnections],
         });
@@ -1136,6 +1205,30 @@ public sealed class AudioHost : IDisposable
         entry.Module.StateChanged -= OnModuleStateChanged;
         entry.Module.Dispose();
         return connections;
+    }
+
+    /// <summary>
+    /// Renames the user's templates that have a built-in template's name, e.g. one that a plugin update added, to "name (custom)".
+    /// </summary>
+    /// <returns>Whether a template was renamed.</returns>
+    private bool RenameTemplatesNamedLikeBuiltIns()
+    {
+        var builtInNames = _templates.Values.Where(t => t.IsBuiltIn).Select(t => t.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var renamed = false;
+        foreach (var template in _templates.Values.Where(t => !t.IsBuiltIn && builtInNames.Contains(t.Name)).ToArray())
+        {
+            var name = $"{template.Name} (custom)";
+            for (var i = 2; _templates.Values.Any(t => string.Equals(t.Name, name, StringComparison.OrdinalIgnoreCase)); i++)
+            {
+                name = $"{template.Name} (custom {i})";
+            }
+
+            _logger.LogInformation("Renaming the template {Name} to {NewName}: a built-in template has its name.", template.Name, name);
+            _templates[template.Id] = template with { Name = name };
+            renamed = true;
+        }
+
+        return renamed;
     }
 
     private void TearDown()

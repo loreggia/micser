@@ -144,7 +144,7 @@ const resizeHandleStyle = {
  * A subgraph on the graph. Expanded, it's a frame in its color behind its modules, with the name, fit to the modules, mute, bypass, collapse
  * and a menu (color, template actions, ungroup and delete with its modules) in its header, and a resize handle at the bottom right. Collapsed, it's a node with a
  * connector for each port that connections from or to the outside use. A subgraph created from or saved as a template shows the template's
- * name, and a button to update it when the template changed.
+ * name, and a button to update it when the template changed, or "Template unavailable" while the template is missing.
  */
 export function SubgraphNode({ data, selected }: NodeProps<SubgraphNodeType>) {
   const styles = useStyles();
@@ -213,13 +213,21 @@ export function SubgraphNode({ data, selected }: NodeProps<SubgraphNodeType>) {
     />
   );
 
-  const templateName = template && (
+  const templateName = template ? (
     <Tooltip content={isOutdated ? "Template; it changed since" : "Template"} relationship="description">
       <Caption1 className={styles.template}>
         {template.name}
         {isOutdated && " · changed"}
       </Caption1>
     </Tooltip>
+  ) : (
+    // e.g. a built-in template whose plugin isn't loaded; the subgraph is linked again when it is
+    templates &&
+    subgraph.templateId && (
+      <Tooltip content="The template isn't available, e.g. because its plugin isn't loaded" relationship="description">
+        <Caption1 className={styles.template}>Template unavailable</Caption1>
+      </Tooltip>
+    )
   );
 
   const actions = (

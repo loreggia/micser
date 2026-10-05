@@ -1,0 +1,242 @@
+[
+  {
+    "id": "4ddaac11-6f2b-4a01-8b1e-5b9970704db3",
+    "name": "Footstep boost",
+    "revision": 1,
+    "color": "Green",
+    "size": {
+      "width": 1040,
+      "height": 960
+    },
+    "modules": [
+      {
+        "type": "Equalizer",
+        "id": "d0069fb1-d7be-4bbf-88b7-1b1eb5c70963",
+        "name": "Footstep EQ",
+        "position": {
+          "x": 40,
+          "y": 60
+        },
+        "state": {
+          "bands": [
+            {
+              "frequency": 60,
+              "gain": -6,
+              "q": 0.7
+            },
+            {
+              "frequency": 250,
+              "gain": -2,
+              "q": 1
+            },
+            {
+              "frequency": 2500,
+              "gain": 4,
+              "q": 0.8
+            },
+            {
+              "frequency": 6000,
+              "gain": 2,
+              "q": 1
+            }
+          ]
+        }
+      },
+      {
+        "type": "Compressor",
+        "id": "1ec831d6-f096-421e-948c-4e2a4cac76b7",
+        "name": "Upward compressor",
+        "position": {
+          "x": 380,
+          "y": 60
+        },
+        "state": {
+          "type": "Upward",
+          "amount": 0.8,
+          "attack": 0.005,
+          "release": 0.25,
+          "ratio": 2,
+          "threshold": -35,
+          "knee": 6,
+          "makeUpGain": 0
+        }
+      },
+      {
+        "type": "Compressor",
+        "id": "a6afebe0-b693-400c-a9c6-02bb4bff0bae",
+        "name": "Limiter",
+        "position": {
+          "x": 720,
+          "y": 60
+        },
+        "state": {
+          "type": "Downward",
+          "amount": 1,
+          "attack": 0.001,
+          "release": 0.08,
+          "ratio": 20,
+          "threshold": -3,
+          "knee": 2,
+          "makeUpGain": 0
+        }
+      }
+    ],
+    "connections": [
+      {
+        "sourceModuleId": "d0069fb1-d7be-4bbf-88b7-1b1eb5c70963",
+        "sourcePort": "Output",
+        "targetModuleId": "1ec831d6-f096-421e-948c-4e2a4cac76b7",
+        "targetPort": "Input"
+      },
+      {
+        "sourceModuleId": "1ec831d6-f096-421e-948c-4e2a4cac76b7",
+        "sourcePort": "Output",
+        "targetModuleId": "a6afebe0-b693-400c-a9c6-02bb4bff0bae",
+        "targetPort": "Input"
+      }
+    ]
+  },
+  {
+    "id": "a9730f66-d8fb-4bcb-aec0-ea9f5bf2a2a1",
+    "name": "Night mode",
+    "revision": 1,
+    "color": "Purple",
+    "size": {
+      "width": 700,
+      "height": 580
+    },
+    "modules": [
+      {
+        "type": "Compressor",
+        "id": "81685dba-66dd-4fb8-9c23-27b96e5463fc",
+        "name": "Compressor",
+        "position": {
+          "x": 40,
+          "y": 60
+        },
+        "state": {
+          "type": "Downward",
+          "amount": 1,
+          "attack": 0.005,
+          "release": 0.3,
+          "ratio": 4,
+          "threshold": -30,
+          "knee": 8,
+          "makeUpGain": 10
+        }
+      },
+      {
+        "type": "Compressor",
+        "id": "be845eee-81e6-4e30-9741-d68d86c30779",
+        "name": "Limiter",
+        "position": {
+          "x": 380,
+          "y": 60
+        },
+        "state": {
+          "type": "Downward",
+          "amount": 1,
+          "attack": 0.001,
+          "release": 0.08,
+          "ratio": 20,
+          "threshold": -3,
+          "knee": 2,
+          "makeUpGain": 0
+        }
+      }
+    ],
+    "connections": [
+      {
+        "sourceModuleId": "81685dba-66dd-4fb8-9c23-27b96e5463fc",
+        "sourcePort": "Output",
+        "targetModuleId": "be845eee-81e6-4e30-9741-d68d86c30779",
+        "targetPort": "Input"
+      }
+    ]
+  },
+  {
+    "id": "92101771-10f9-45cf-bce1-eb0d7f469ef0",
+    "name": "Voice chat mic",
+    "revision": 1,
+    "color": "Blue",
+    "size": {
+      "width": 1040,
+      "height": 780
+    },
+    "modules": [
+      {
+        "type": "Equalizer",
+        "id": "2fea2c6c-52cf-4d55-bac7-2ceef061a78c",
+        "name": "Voice EQ",
+        "position": {
+          "x": 40,
+          "y": 60
+        },
+        "state": {
+          "bands": [
+            {
+              "frequency": 90,
+              "gain": -9,
+              "q": 0.7
+            },
+            {
+              "frequency": 300,
+              "gain": -2,
+              "q": 1.2
+            },
+            {
+              "frequency": 3000,
+              "gain": 3,
+              "q": 1
+            }
+          ]
+        }
+      },
+      {
+        "type": "Compressor",
+        "id": "9b9398c4-437b-4a2c-82ab-301d590d27ac",
+        "name": "Compressor",
+        "position": {
+          "x": 380,
+          "y": 60
+        },
+        "state": {
+          "type": "Downward",
+          "amount": 1,
+          "attack": 0.005,
+          "release": 0.15,
+          "ratio": 3,
+          "threshold": -24,
+          "knee": 6,
+          "makeUpGain": 6
+        }
+      },
+      {
+        "type": "Gain",
+        "id": "89747d02-4f95-4f39-8e11-ad8c09631a2d",
+        "name": "Output",
+        "position": {
+          "x": 720,
+          "y": 60
+        },
+        "state": {
+          "gain": 0
+        }
+      }
+    ],
+    "connections": [
+      {
+        "sourceModuleId": "2fea2c6c-52cf-4d55-bac7-2ceef061a78c",
+        "sourcePort": "Output",
+        "targetModuleId": "9b9398c4-437b-4a2c-82ab-301d590d27ac",
+        "targetPort": "Input"
+      },
+      {
+        "sourceModuleId": "9b9398c4-437b-4a2c-82ab-301d590d27ac",
+        "sourcePort": "Output",
+        "targetModuleId": "89747d02-4f95-4f39-8e11-ad8c09631a2d",
+        "targetPort": "Input"
+      }
+    ]
+  }
+]

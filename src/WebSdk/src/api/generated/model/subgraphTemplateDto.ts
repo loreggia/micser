@@ -18,4 +18,5 @@ export interface SubgraphTemplateDto {
   modules: ModuleDto[];
   connections: TemplateConnectionDto[];
   unavailableTypes: string[];
+  isBuiltIn: boolean;
 }

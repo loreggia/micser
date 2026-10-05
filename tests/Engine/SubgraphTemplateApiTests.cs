@@ -9,6 +9,159 @@ namespace Micser.Engine.Tests;
 public class SubgraphTemplateApiTests
 {
     [Test]
+    public async Task BuiltInTemplates_CantBeChanged()
+    {
+        await using var factory = new EngineFactory(pluginTemplates: true);
+        using var client = factory.CreateAuthorizedClient();
+        var builtIn = (await client.GetFromJsonAsync<SubgraphTemplateDto[]>("/api/subgraph-templates", factory.Json))!.First();
+        var subgraph = await InstantiateAsync(factory, client, builtIn.Id, new ModulePosition(0, 0));
+
+        using var renamed = await client.PutAsJsonAsync($"/api/subgraph-templates/{builtIn.Id}/name", new RenameSubgraphTemplateRequest("Other"), factory.Json);
+        using var removed = await client.DeleteAsync($"/api/subgraph-templates/{builtIn.Id}");
+        using var savedOver = await client.PostAsJsonAsync("/api/subgraph-templates", new SaveSubgraphTemplateRequest(subgraph.Id, builtIn.Name, builtIn.Id), factory.Json);
+        using var savedAsName = await client.PostAsJsonAsync("/api/subgraph-templates", new SaveSubgraphTemplateRequest(subgraph.Id, builtIn.Name), factory.Json);
+        var custom = await SaveAsync(factory, client, subgraph.Id, $"{builtIn.Name} (custom)");
+        var templates = await client.GetFromJsonAsync<SubgraphTemplateDto[]>("/api/subgraph-templates", factory.Json);
+
+        await Assert.That(renamed.StatusCode).IsEqualTo(HttpStatusCode.BadRequest);
+        await Assert.That(removed.StatusCode).IsEqualTo(HttpStatusCode.BadRequest);
+        await Assert.That(savedOver.StatusCode).IsEqualTo(HttpStatusCode.BadRequest);
+        await Assert.That(savedAsName.StatusCode).IsEqualTo(HttpStatusCode.Conflict);
+        await Assert.That(templates!.Single(t => t.Id == builtIn.Id)).IsEquivalentTo(builtIn);
+        await Assert.That(custom.IsBuiltIn).IsFalse();
+    }
+
+    [Test]
+    public async Task BuiltInTemplates_ComeFromThePluginsAndAreNotSaved()
+    {
+        var directory = EngineFactory.CreateTemporaryDirectory();
+        try
+        {
+            SubgraphDto subgraph;
+            await using (var factory = new EngineFactory(directory, pluginTemplates: true))
+            {
+                using var client = factory.CreateAuthorizedClient();
+                var templates = (await client.GetFromJsonAsync<SubgraphTemplateDto[]>("/api/subgraph-templates", factory.Json))!;
+                foreach (var template in templates)
+                {
+                    var created = await InstantiateAsync(factory, client, template.Id, new ModulePosition(0, 0));
+                    var members = await GetMembersAsync(factory, client, created.Id);
+                    var connections = (await client.GetFromJsonAsync<ConnectionDto[]>("/api/connections"))!;
+
+                    await Assert.That(members.Length).IsEqualTo(template.Modules.Count);
+                    await Assert.That(connections.Count(c => members.Any(m => m.Id == c.TargetModuleId))).IsEqualTo(template.Connections.Count);
+                }
+
+                await Assert.That(templates.Select(t => t.Name)).IsEquivalentTo(["Footstep boost", "Night mode", "Voice chat mic"]);
+                await Assert.That(templates.All(t => t.IsBuiltIn)).IsTrue();
+                subgraph = (await client.GetFromJsonAsync<SubgraphDto[]>("/api/subgraphs", factory.Json))!.First();
+            }
+
+            await Assert.That(JsonNode.Parse(await File.ReadAllTextAsync(Path.Combine(directory, "config.json")))!["templates"]!.AsArray()).IsEmpty();
+
+            await using (var factory = new EngineFactory(directory, pluginTemplates: true))
+            {
+                using var client = factory.CreateAuthorizedClient();
+                var restored = (await client.GetFromJsonAsync<SubgraphDto[]>("/api/subgraphs", factory.Json))!.Single(s => s.Id == subgraph.Id);
+
+                await Assert.That(restored.TemplateId).IsEqualTo(subgraph.TemplateId);
+            }
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    [Test]
+    public async Task BuiltInTemplates_RenameTheUsersTemplatesWithTheirName()
+    {
+        var directory = EngineFactory.CreateTemporaryDirectory();
+        try
+        {
+            SubgraphTemplateDto footsteps;
+            SubgraphTemplateDto night;
+            await using (var factory = new EngineFactory(directory))
+            {
+                using var client = factory.CreateAuthorizedClient();
+                footsteps = await SaveAsync(factory, client, (await CreateChainAsync(factory, client)).Subgraph.Id, "footstep BOOST");
+                night = await SaveAsync(factory, client, (await CreateChainAsync(factory, client)).Subgraph.Id, "Night mode");
+                await SaveAsync(factory, client, (await CreateChainAsync(factory, client)).Subgraph.Id, "Night mode (custom)");
+            }
+
+            await using (var factory = new EngineFactory(directory, pluginTemplates: true))
+            {
+                using var client = factory.CreateAuthorizedClient();
+                var templates = await client.GetFromJsonAsync<SubgraphTemplateDto[]>("/api/subgraph-templates", factory.Json);
+
+                await Assert.That(templates!.Single(t => t.Id == footsteps.Id).Name).IsEqualTo("footstep BOOST (custom)");
+                await Assert.That(templates!.Single(t => t.Id == night.Id).Name).IsEqualTo("Night mode (custom 2)");
+                await Assert.That(templates!.Count(t => t.IsBuiltIn)).IsEqualTo(3);
+            }
+
+            // the new names are saved
+            await using (var factory = new EngineFactory(directory))
+            {
+                using var client = factory.CreateAuthorizedClient();
+                var templates = await client.GetFromJsonAsync<SubgraphTemplateDto[]>("/api/subgraph-templates", factory.Json);
+
+                await Assert.That(templates!.Select(t => t.Name)).IsEquivalentTo(["footstep BOOST (custom)", "Night mode (custom 2)", "Night mode (custom)"]);
+            }
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    [Test]
+    public async Task BuiltInTemplates_WhileTheirPluginIsntLoaded_KeepTheirSubgraphsLinked()
+    {
+        var directory = EngineFactory.CreateTemporaryDirectory();
+        try
+        {
+            SubgraphDto subgraph;
+            await using (var factory = new EngineFactory(directory, pluginTemplates: true))
+            {
+                using var client = factory.CreateAuthorizedClient();
+                var builtIn = (await client.GetFromJsonAsync<SubgraphTemplateDto[]>("/api/subgraph-templates", factory.Json))!.First();
+                subgraph = await InstantiateAsync(factory, client, builtIn.Id, new ModulePosition(0, 0));
+
+                // a change that saves the configuration
+                await factory.AddModuleAsync(client, "Gain");
+            }
+
+            // the templates are missing, as if their plugin weren't loaded
+            await using (var factory = new EngineFactory(directory))
+            {
+                using var client = factory.CreateAuthorizedClient();
+                var restored = (await client.GetFromJsonAsync<SubgraphDto[]>("/api/subgraphs", factory.Json))!.Single();
+                using var update = await client.PostAsync($"/api/subgraphs/{subgraph.Id}/update-from-template", null);
+
+                await Assert.That(restored.TemplateId).IsEqualTo(subgraph.TemplateId);
+                await Assert.That(restored.TemplateRevision).IsEqualTo(subgraph.TemplateRevision);
+                await Assert.That(update.StatusCode).IsEqualTo(HttpStatusCode.NotFound);
+
+                await factory.AddModuleAsync(client, "Gain");
+            }
+
+            await using (var factory = new EngineFactory(directory, pluginTemplates: true))
+            {
+                using var client = factory.CreateAuthorizedClient();
+                using var update = await client.PostAsync($"/api/subgraphs/{subgraph.Id}/update-from-template", null);
+                var updated = await update.Content.ReadFromJsonAsync<SubgraphDto>(factory.Json);
+
+                await Assert.That(update.StatusCode).IsEqualTo(HttpStatusCode.OK);
+                await Assert.That(updated!.TemplateId).IsEqualTo(subgraph.TemplateId);
+            }
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    [Test]
     public async Task DeleteTemplate_ClearsTheReferences()
     {
         await using var factory = new EngineFactory();

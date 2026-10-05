@@ -20,11 +20,14 @@ namespace Micser.Engine.Tests;
 internal sealed class EngineFactory : WebApplicationFactory<Program>
 {
     private readonly bool _ownsDirectory;
+    private readonly bool _pluginTemplates;
 
     /// <param name="directory">The configuration directory; a new temporary one (deleted on dispose) if null.</param>
-    public EngineFactory(string? directory = null)
+    /// <param name="pluginTemplates">Loads the plugins' templates, e.g. Main's, as built-in templates.</param>
+    public EngineFactory(string? directory = null, bool pluginTemplates = false)
     {
         _ownsDirectory = directory == null;
+        _pluginTemplates = pluginTemplates;
         Directory = directory ?? CreateTemporaryDirectory();
         System.IO.Directory.CreateDirectory(Directory);
     }
@@ -103,6 +106,7 @@ internal sealed class EngineFactory : WebApplicationFactory<Program>
         builder.UseSetting("Engine:PluginsPath", PluginsPath);
         builder.UseSetting("Engine:SingleInstance", "false");
         builder.UseSetting("Engine:RequireToken", "true");
+        builder.UseSetting("Engine:LoadPluginTemplates", _pluginTemplates ? "true" : "false");
         builder.ConfigureTestServices(services => services.AddSingleton<ISystemVolume>(SystemVolume));
     }
 }
