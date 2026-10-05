@@ -1,18 +1,17 @@
 name: micser release
 
-# Pushing a tag like v0.2.0 builds the Velopack release and publishes it as a GitHub release, which installed copies update from.
-# Versions with a suffix (v0.2.0-beta.1) become pre-releases, which installed copies ignore.
+# Called by CI for a pushed tag like v0.2.0 once all CI jobs passed: builds the Velopack release and publishes it as a GitHub
+# release, which installed copies update from. Versions with a suffix (v0.2.0-beta.1) become pre-releases, which installed
+# copies ignore.
 on:
-  push:
-    tags:
-      - "v*"
-
-permissions:
-  contents: write
+  workflow_call:
 
 jobs:
   release:
     runs-on: windows-latest
+
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout
