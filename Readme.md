@@ -13,7 +13,7 @@ The application consists of:
 ## Building
 ### Requirements
 * .NET SDK 10.0.100 or later (see `global.json`)
-* Node.js 22.12 or later
+* Node.js 24 or later (npm enforces it); with [Volta](https://volta.sh), the pinned version in `package.json` is used
 * WebView2 Runtime (included in Windows 11)
 
 ### Commands
