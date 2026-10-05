@@ -91,3 +91,41 @@ jobs:
 
       - name: Build
         run: npm run build
+
+  e2e:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install
+        run: npm ci
+
+      - name: Install Chromium
+        run: npx playwright install chromium
+
+      # the tests run it with --no-build
+      - name: Build the engine
+        run: dotnet build src/Engine --configuration Release
+
+      - name: End-to-end tests
+        run: npm run test:e2e
+
+      - name: Upload the report
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: e2e-report
+          path: tests/E2E/playwright-report

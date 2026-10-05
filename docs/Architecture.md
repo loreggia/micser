@@ -23,7 +23,12 @@ Target architecture for the modernization of Micser (decided 2026-09-30). `main`
   - `System.Text.Json` everywhere. Newtonsoft.Json and MessagePack are dropped.
   - Logging goes through `Microsoft.Extensions.Logging`, with Serilog as the provider (`Serilog`, `Serilog.Extensions.Logging`). NLog is dropped.
 - **Tests:** TUnit and NSubstitute. xUnit and Moq are dropped.
-- **Web tests:** Vitest, from one root `vitest.config.ts` with two projects. `*.test.ts` runs in Node. `*.test.tsx` and `*.browser.test.ts` (DOM, storage, module imports) run in Vitest browser mode on headless Chromium through Playwright, because Fluent UI and React Flow need real layout. Components are rendered with `vitest-browser-react`. `@micser/web-sdk/testing` has the shared helpers: `TestProviders` (theme, query client, an engine connection that is never started), `createTestQueryClient()` (seeded with `setQueryData` under the generated keys, so hooks don't fetch) and `testModule()`. There are no end-to-end tests yet.
+- **Web tests:** Vitest, from one root `vitest.config.ts` with two projects. `*.test.ts` runs in Node. `*.test.tsx` and `*.browser.test.ts` (DOM, storage, module imports) run in Vitest browser mode on headless Chromium through Playwright, because Fluent UI and React Flow need real layout. Components are rendered with `vitest-browser-react`. `@micser/web-sdk/testing` has the shared helpers: `TestProviders` (theme, query client, an engine connection that is never started), `createTestQueryClient()` (seeded with `setQueryData` under the generated keys, so hooks don't fetch) and `testModule()`.
+- **End-to-end tests:** Playwright Test in `tests/E2E` (npm workspace `@micser/e2e`), `npm run test:e2e`.
+  - The config starts an engine (`dotnet run`, `--no-build` in CI) on port 5180 and Vite on 5181, apart from the development ports. The engine gets a temporary config and user plugin folder, with no token and no single-instance check.
+  - The tests share that engine, so they run one at a time, and each starts from an empty graph: the `engine` fixture deletes subgraphs, modules and templates and restores the default preferences.
+  - `EngineApi` sets up state and checks results through the HTTP API; `Graph` wraps the React Flow DOM (nodes by `data-id`, ports, connections, menus, notifications).
+  - Chromium only: the shell's WebView2 is Chromium as well.
 - **Engine host:** `Microsoft.NET.Sdk.Web` (Kestrel). It serves the built SPA as static files (roadmap step 4). In development, Vite runs separately and proxies `/api` and `/hubs` to the engine, which then listens on the fixed address `http://127.0.0.1:5080` without requiring the token. `AllowedHosts` is limited to `localhost;127.0.0.1` against DNS rebinding.
 - **Shell:** WinForms (native `NotifyIcon`) with the WebView2 WinForms control. It has no app logic, so WPF isn't needed.
 - **Web tooling:** npm workspaces consume the internal packages (`@micser/web-sdk`, `@micser/plugin-main`) as TypeScript source. Only the SPA and the plugins' widget bundles are built (`npm run build` builds every workspace with a `build` script). TypeScript is pinned to `~6.0` because `typescript-eslint` doesn't support 7.x yet.
@@ -61,6 +66,7 @@ tests/                        mirrors src/
   Engine/                     Micser.Engine.Tests
     TestPlugin/                 a plugin for the plugin loader tests
   Plugins/Main/               Micser.Plugins.Main.Tests
+  E2E/                        @micser/e2e: Playwright end-to-end tests of the UI against a real engine
 tools/                        dev-only programs, in Micser.slnx but never shipped
   AppHost/                    Micser.AppHost: Aspire AppHost that runs engine, Vite and (on demand) shell with a dashboard
   AudioHarness/               routes a real input through a gain module to a real output and prints buffer statistics; also measures latency and probes stream formats
@@ -340,7 +346,12 @@ The plan (signing, installation, phases) is in the [driver plan](https://claude.
      - `EngineConnection`, against a fake SignalR hub: debounced updates, the engine events' cache patches, live data and level subscriptions, and reconnecting.
      - The engine hooks, the shell bridge, plugin bundle loading and `PluginsProvider`, `useAddModule`, and the SPA's Vite plugins.
      - Components: `ParameterSlider`, `ModuleTitle`, `LevelMeter` and Main's widgets.
-   - Follow-up: end-to-end tests (Playwright against the engine and Vite), including the graph editor, which needs a running engine. The checks so far were scripted Playwright runs against Edge outside the repo.
+   - End-to-end tests with Playwright against the engine and Vite (see Defaults), 35 tests:
+     - The app: the toolbar's module menu, adding and selecting, changes from the API and a second window shown live.
+     - Modules: widget edits, mute, volume, collapse, rename, moving on and off the grid, deleting by menu and key.
+     - Connections: connecting by drag, a rejected cycle, deleting, and dropping on empty space to add a connected module.
+     - Context menus, subgraphs (grouping, collapse with proxy ports, mute, rename, ungroup, delete), templates (save, replace, add, the templates dialog) and the settings (preferences, plugins).
+   - Follow-up: E2E tests for the plugin install flow (a .zip through the settings dialog and an engine restart) and the shell-only controls, which need the WebView2 bridge.
 5. **Shell (`src/Shell`)** (done): tray, WebView2 window, engine launch, discovery and supervision, autostart.
    - Verified: engine start, UI and token handoff, single instance, crash restart, the tray's Close and Exit Micser, and restarting the engine process from the UI.
 6. **Packaging and updates** (done): Velopack setup and delta updates from GitHub releases, a release workflow, and install, update and uninstall hooks in the shell.
