@@ -264,7 +264,7 @@ docs/
   - It shows `{engine url}/#token={token}`, or the `--ui <url>` override with the engine's token (Vite in development), and re-navigates when the engine changes. While no engine is available, a status page is shown.
   - Links that open new windows go to the default browser. A missing WebView2 runtime leads to a download prompt.
   - The browser's default context menu is off.
-  - Web messages from the loaded UI (and only from its origin): `getState`, `checkForUpdates` (answered with `updateCheck`), `installUpdate`, `restartEngine`, and for the driver `installDriver`, `setCableCount`, `setCableLayout`, `updateDriver` and `uninstallDriver`, and `setLanguage`. The shell sends `state` (version, whether it can update, a running check, the pending update, whether it can restart the engine, the driver's status) on request and whenever it changes.
+  - Web messages from the loaded UI (and only from its origin): `getState`, `checkForUpdates` (answered with `updateCheck`), `installUpdate`, `getReleaseNotes` (answered with `releaseNotes`), `restartEngine`, and for the driver `installDriver`, `setCableCount`, `setCableLayout`, `updateDriver` and `uninstallDriver`, and `setLanguage`. The shell sends `state` (version, whether it can update, a running check, the pending update, whether it can restart the engine, the driver's status) on request and whenever it changes.
 - **Restarting the engine process:** `EngineSupervisor.RestartEngineAsync` stops the engine gracefully and lets supervision start a new one; it doesn't count toward the crash restart limit. Only available when the shell can start the engine (not in development).
 - **Updates** are run by `UpdateController` (see [Packaging and updates](#packaging-and-updates)), shared by the tray and the window.
 - **Logs:** `%LocalAppData%\Micser\logs\shell-*.log` (Serilog). Fatal startup errors also show a message box.
@@ -287,6 +287,10 @@ docs/
 - **Release:** pushing a tag `vX.Y.Z` runs CI, which calls `.github/workflows/release.yml` once all its jobs passed.
   - It downloads the previous release (the base for deltas), packs, and publishes a GitHub release.
   - Tags with a suffix (`v0.2.0-beta.1`) become pre-releases, which installed copies ignore.
+- **Release notes** are written by hand in `CHANGELOG.md`, for users: changes collect under "Unreleased", which is renamed to `## X.Y.Z` before tagging.
+  - `eng/pack.ps1` takes the version's section and passes it to `vpk pack --releaseNotes`, which embeds it in the package; `vpk upload github` makes it the GitHub release body. It also ships it as `ReleaseNotes.md` in the app folder. The release workflow fails without a section (`-RequireReleaseNotes`).
+  - The shell provides the notes of the installed version (`ReleaseNotes.md`) and of a downloaded update (`VelopackAsset.NotesMarkdown`, from its package). The UI shows them from the toolbar's update button ("What's new") and the settings, rendered with `markdown-to-jsx` (raw HTML stays text).
+  - An update that skips versions shows only the target version's notes.
 - **Install:**
   - The install goes to `%LocalAppData%\Micser`: the stub `Micser.exe`, `Update.exe`, `current\` (the app) and `packages\`. The shell's local data (logs, `engine.json`, `shell.json`, WebView2) lives in the same folder.
   - Uninstalling removes the whole folder. The configuration in `%AppData%\Micser` stays.

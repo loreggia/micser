@@ -163,8 +163,9 @@ internal sealed class MainForm : Form
     /// Handles <c>{ "type": ... }</c> messages from the UI: <c>getState</c>, <c>checkForUpdates</c> (answered with an
     /// <c>updateCheck</c> message), <c>installUpdate</c>, <c>restartEngine</c>, and for the driver <c>installDriver</c> and
     /// <c>setCableCount</c> (with <c>cableCount</c>), <c>setCableLayout</c> (with <c>cable</c> and <c>layout</c>), <c>updateDriver</c> and
-    /// <c>uninstallDriver</c>, and <c>setLanguage</c> (with the UI's <c>language</c> preference, or null). The shell answers with
-    /// <c>state</c> messages (see <see cref="PostState"/>), also whenever the state changes.
+    /// <c>uninstallDriver</c>, <c>setLanguage</c> (with the UI's <c>language</c> preference, or null), and <c>getReleaseNotes</c> (with a
+    /// <c>version</c>; answered with a <c>releaseNotes</c> message with the <c>version</c> and its markdown <c>notes</c>, or null). The
+    /// shell answers with <c>state</c> messages (see <see cref="PostState"/>), also whenever the state changes.
     /// </summary>
     private async void OnWebMessageReceived(object? sender, CoreWebView2WebMessageReceivedEventArgs e)
     {
@@ -179,6 +180,7 @@ internal sealed class MainForm : Form
         int cable;
         string? layout;
         string? language;
+        string? version;
         try
         {
             var message = JsonDocument.Parse(e.WebMessageAsJson).RootElement;
@@ -187,6 +189,7 @@ internal sealed class MainForm : Form
             cable = message.TryGetProperty("cable", out var cableValue) && cableValue.TryGetInt32(out var number) ? number : 0;
             layout = message.TryGetProperty("layout", out var layoutValue) && layoutValue.ValueKind == JsonValueKind.String ? layoutValue.GetString() : null;
             language = message.TryGetProperty("language", out var languageValue) && languageValue.ValueKind == JsonValueKind.String ? languageValue.GetString() : null;
+            version = message.TryGetProperty("version", out var versionValue) && versionValue.ValueKind == JsonValueKind.String ? versionValue.GetString() : null;
         }
         catch (Exception ex) when (ex is JsonException or KeyNotFoundException or InvalidOperationException)
         {
@@ -226,6 +229,9 @@ internal sealed class MainForm : Form
                 break;
             case "setLanguage":
                 _language.SetPreference(language);
+                break;
+            case "getReleaseNotes" when version != null:
+                PostMessage(new { type = "releaseNotes", version, notes = _updates?.GetReleaseNotes(version) });
                 break;
         }
     }

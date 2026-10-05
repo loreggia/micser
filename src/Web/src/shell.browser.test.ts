@@ -69,6 +69,26 @@ test("an update check resolves all waiting checks with the shell's result", asyn
   await expect(second).resolves.toBe("updateReady");
 });
 
+test("asks for a version's release notes once and resolves the waiting requests with the answer for that version", async () => {
+  const { webView, receive } = createWebView();
+  const shell = new Shell(webView);
+
+  const first = shell.getReleaseNotes("2.0.0");
+  const second = shell.getReleaseNotes("2.0.0");
+  const other = shell.getReleaseNotes("1.2.0");
+  expect(webView.postMessage.mock.calls.slice(1).map(([message]) => message)).toEqual([
+    { type: "getReleaseNotes", version: "2.0.0" },
+    { type: "getReleaseNotes", version: "1.2.0" },
+  ]);
+
+  receive({ type: "releaseNotes", version: "2.0.0", notes: "- New" });
+  receive({ type: "releaseNotes", version: "1.2.0", notes: null });
+
+  await expect(first).resolves.toBe("- New");
+  await expect(second).resolves.toBe("- New");
+  await expect(other).resolves.toBeNull();
+});
+
 test("sends the commands with their arguments", () => {
   const { webView } = createWebView();
   const shell = new Shell(webView);

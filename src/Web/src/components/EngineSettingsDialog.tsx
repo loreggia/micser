@@ -32,6 +32,7 @@ import { useTranslation } from "../i18n";
 import { useNotifyError } from "../notifications";
 import { shell, useShellState, type UpdateCheckResult } from "../shell";
 import { PluginsSettings } from "./PluginsSettings";
+import { ReleaseNotesDialog } from "./ReleaseNotesDialog";
 import { VirtualCablesSettings } from "./VirtualCablesSettings";
 
 const sampleRates = [44100, 48000, 96000];
@@ -75,6 +76,7 @@ export function EngineSettingsDialog({ open, settings, onClose }: EngineSettings
   const [preferences, setPreferences] = usePreferences();
   const shellState = useShellState();
   const [checkResult, setCheckResult] = useState<UpdateCheckResult>();
+  const [releaseNotesVersion, setReleaseNotesVersion] = useState<string>();
   const notifyError = useNotifyError();
   const update = useMutation({
     ...getUpdateEngineSettingsMutationOptions(),
@@ -213,6 +215,25 @@ export function EngineSettingsDialog({ open, settings, onClose }: EngineSettings
                     <Caption1 className={styles.hint}>{t(`settings.checkResults.${checkResult}`)}</Caption1>
                   )}
                 </div>
+                <div className={styles.actions}>
+                  {shellState.version && (
+                    <Button onClick={() => setReleaseNotesVersion(shellState.version!)}>
+                      {t("settings.releaseNotes")}
+                    </Button>
+                  )}
+                  {shellState.pendingUpdate && (
+                    <Button onClick={() => setReleaseNotesVersion(shellState.pendingUpdate!)}>
+                      {t("settings.whatsNewIn", { version: shellState.pendingUpdate })}
+                    </Button>
+                  )}
+                </div>
+                {releaseNotesVersion && (
+                  <ReleaseNotesDialog
+                    version={releaseNotesVersion}
+                    open
+                    onClose={() => setReleaseNotesVersion(undefined)}
+                  />
+                )}
               </>
             )}
             {shellState?.driver && (

@@ -45,6 +45,7 @@ dotnet run --project tools/AudioHarness -- formats 2 1             # formats out
 
 ```sh
 ./eng/pack.ps1 -Version 0.1.0       # Velopack release (Setup.exe, packages) in artifacts/releases; tags vX.Y.Z publish via .github/workflows/release.yml
+                                    # release notes: the "## 0.1.0" section of CHANGELOG.md (rename "Unreleased" before tagging)
 ```
 
 The harness opens real devices: use a very low gain (as above) unless audible output is intended.

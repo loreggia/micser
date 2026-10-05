@@ -63,6 +63,37 @@ test.describe("updates", () => {
     await expect(graph.page.getByRole("button", { name: "Update to 2.0.0" })).toBeVisible();
   });
 
+  test("the update button's menu shows the update's release notes", async ({ graph }) => {
+    const shell = await FakeShell.install(graph.page, { ...developmentShell, canUpdate: true, pendingUpdate: "2.0.0" });
+    await graph.open();
+
+    await graph.page.getByRole("button", { name: "More update options" }).click();
+    await graph.page.getByRole("menuitem", { name: "What's new" }).click();
+    expect(await shell.messages()).toEqual([{ type: "getReleaseNotes", version: "2.0.0" }]);
+    await shell.send({
+      type: "releaseNotes",
+      version: "2.0.0",
+      notes: ["### Added", "", "- A **new** module", "- <b>raw</b> HTML stays text"].join("\n"),
+    });
+
+    const dialog = graph.page.getByRole("dialog", { name: "What's new in Micser 2.0.0" });
+    await expect(dialog.getByRole("heading", { name: "Added" })).toBeVisible();
+    await expect(dialog.getByRole("listitem").filter({ hasText: "A new module" })).toBeVisible();
+    await expect(dialog.getByText("<b>raw</b> HTML stays text")).toBeVisible();
+  });
+
+  test("the settings show the installed version's release notes", async ({ graph }) => {
+    const shell = await FakeShell.install(graph.page, { ...developmentShell, version: "1.2.0", canUpdate: true });
+    const settings = await openSettings(graph);
+
+    await settings.getByRole("button", { name: "Release notes" }).click();
+    expect(await shell.messages()).toEqual([{ type: "getReleaseNotes", version: "1.2.0" }]);
+    await shell.send({ type: "releaseNotes", version: "1.2.0", notes: null });
+
+    const dialog = graph.page.getByRole("dialog", { name: "What's new in Micser 1.2.0" });
+    await expect(dialog.getByText("There are no release notes for this version.")).toBeVisible();
+  });
+
   test("the settings check for updates and show the result", async ({ graph }) => {
     const state = { ...developmentShell, version: "1.2.0", canUpdate: true };
     const shell = await FakeShell.install(graph.page, state);
