@@ -16,7 +16,8 @@ export interface Server {
 function build(project: string, configuration: string, property: string) {
   const output = execFileSync(
     "dotnet",
-    ["build", project, "--configuration", configuration, `-getProperty:${property}`],
+    // without a target, -getProperty only evaluates the project
+    ["build", project, "--configuration", configuration, "-t:Build", `-getProperty:${property}`],
     {
       cwd: root,
       encoding: "utf8",
