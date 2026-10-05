@@ -67,7 +67,12 @@ jobs:
           cache: npm
 
       - name: Install
-        run: npm ci
+        run: npm run setup:ci
+
+      - name: Check the install script allowlist is up to date
+        run: |
+          npm run allow-scripts:auto
+          git diff --exit-code -- "*package.json"
 
       - name: Install Chromium for the browser tests
         run: npx playwright install chromium
@@ -111,7 +116,7 @@ jobs:
           cache: npm
 
       - name: Install
-        run: npm ci
+        run: npm run setup:ci
 
       - name: Install Chromium
         run: npx playwright install chromium

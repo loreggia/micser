@@ -13,7 +13,8 @@ dotnet build Micser.slnx
 dotnet test --solution Micser.slnx                      # TUnit on Microsoft.Testing.Platform (global.json "test.runner")
 dotnet test --project tests/Engine/Micser.Engine.Tests.csproj --treenode-filter "/*/*/HealthEndpointTests/*"
 
-npm install                  # root; installs all workspaces
+npm run setup                # root; installs all workspaces, then runs the allowed install scripts
+npm run allow-scripts:auto   # after dependency changes: adds new packages with install scripts to the allowlists (denied)
 npm run build                # typecheck + vite build of src/Web and the plugins' widget bundles (src/Plugins/*/Web/dist)
 npm run typecheck            # tsc in every workspace
 npx playwright install chromium   # once, for the Vitest browser tests
@@ -75,6 +76,7 @@ CI (`.github/workflows/ci.yml`) runs the dotnet build/test, the driver build, np
 - Dependency direction:
   - .NET: `Plugins → Audio` and `Engine → Audio, ServiceDefaults`. The engine's reference to a built-in plugin is build-only (`ReferenceOutputAssembly="false"`, `OutputItemType="BuiltInPlugin"`), which copies it to `plugins/<id>` (`src/Engine/BuiltInPlugins.targets`). `tools/AppHost` references the runnable projects. `Shell` references no Micser project and talks to the engine over HTTP only.
   - npm: `plugin-* → web-sdk` and `web → web-sdk`. The SPA imports plugin widgets at runtime from the URLs the engine reports.
+- npm runs no install scripts (`.npmrc`: `ignore-scripts=true`) and resolves only versions published at least 3 days ago (`min-release-age=3`). Packages with install scripts are listed with their version in `lavamoat.allowScripts`, in the root `package.json` and in each workspace's (allow-scripts only sees the dependencies of the `package.json` it runs in, so the `allow-scripts:*` scripts run it at the root and in every workspace). `npm run setup` (`setup:ci` in CI) runs the allowed ones (esbuild) after installing. `@lavamoat/preinstall-always-fail` stays denied: it fails any install that runs scripts anyway. CI fails when `allow-scripts:auto` changes an allowlist.
 - Package versions are central in `Directory.Packages.props`, so `PackageReference` items carry no `Version`. `TreatWarningsAsErrors` is on for all projects.
 - Libraries:
   - Serilog via `Microsoft.Extensions.Logging` (configured from `appsettings*.json`; the file sink is only enabled in Production).
