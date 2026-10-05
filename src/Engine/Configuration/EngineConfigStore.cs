@@ -41,6 +41,7 @@ public sealed record UnavailableModule(Guid Id, string Type, JsonElement Element
 /// A subgraph template. Like the graph's, its modules of unknown types are kept as they are.
 /// </summary>
 /// <param name="Modules">The modules with template-local ids and positions relative to the subgraph.</param>
+/// <param name="IsBuiltIn">Provided by a plugin: loaded at every start, not saved, and can't be changed.</param>
 public sealed record SubgraphTemplate(
     Guid Id,
     string Name,
@@ -49,7 +50,8 @@ public sealed record SubgraphTemplate(
     SubgraphSize Size,
     IReadOnlyList<ModuleDto> Modules,
     IReadOnlyList<UnavailableModule> UnavailableModules,
-    IReadOnlyList<TemplateConnectionDto> Connections);
+    IReadOnlyList<TemplateConnectionDto> Connections,
+    bool IsBuiltIn = false);
 
 /// <summary>
 /// Loads and saves <see cref="EngineConfiguration"/> as JSON. Saves are debounced and written atomically.
@@ -135,21 +137,13 @@ public sealed class EngineConfigStore : IDisposable
             }
 
             var (modules, unavailableModules) = ReadModules(file.Modules);
-            var templates = new List<SubgraphTemplate>();
-            foreach (var template in file.Templates ?? [])
-            {
-                var (templateModules, templateUnavailableModules) = ReadModules(template.Modules);
-                templates.Add(new SubgraphTemplate(
-                    template.Id, template.Name, template.Revision, template.Color, template.Size, templateModules, templateUnavailableModules, template.Connections));
-            }
-
             return new EngineConfiguration
             {
                 Settings = file.Settings ?? new EngineSettingsDto(),
                 Preferences = file.Preferences ?? new UiPreferencesDto(),
                 Modules = modules,
                 Subgraphs = file.Subgraphs ?? [],
-                Templates = templates,
+                Templates = ReadTemplates(file.Templates ?? []),
                 UnavailableModules = unavailableModules,
                 Connections = file.Connections ?? [],
             };
@@ -161,6 +155,17 @@ public sealed class EngineConfigStore : IDisposable
             File.Move(_path, backup, overwrite: true);
             return new EngineConfiguration();
         }
+    }
+
+    /// <summary>
+    /// Reads a plugin's templates file: a JSON array of templates in the configuration's format.
+    /// </summary>
+    /// <exception cref="JsonException">The file can't be read.</exception>
+    /// <exception cref="IOException">The file can't be read.</exception>
+    public List<SubgraphTemplate> ReadPluginTemplates(string path)
+    {
+        using var stream = File.OpenRead(path);
+        return ReadTemplates(JsonSerializer.Deserialize<List<TemplateFile>>(stream, _json) ?? throw new JsonException("The file is empty."));
     }
 
     /// <summary>
@@ -210,6 +215,18 @@ public sealed class EngineConfigStore : IDisposable
         }
 
         return (modules, unavailableModules);
+    }
+
+    private List<SubgraphTemplate> ReadTemplates(IEnumerable<TemplateFile> templates)
+    {
+        var result = new List<SubgraphTemplate>();
+        foreach (var template in templates)
+        {
+            var (modules, unavailableModules) = ReadModules(template.Modules);
+            result.Add(new SubgraphTemplate(template.Id, template.Name, template.Revision, template.Color, template.Size, modules, unavailableModules, template.Connections));
+        }
+
+        return result;
     }
 
     private List<JsonElement> SerializeModules(IEnumerable<ModuleDto> modules, IEnumerable<UnavailableModule> unavailableModules)

@@ -1,6 +1,7 @@
 import {
   Badge,
   Body1,
+  Body1Strong,
   Button,
   Caption1,
   Dialog,
@@ -59,7 +60,7 @@ const useStyles = makeStyles({
 
 /**
  * The subgraph templates: their modules and the subgraphs using them, renaming (double-click the name) and removing, which keeps the
- * subgraphs created from a template.
+ * subgraphs created from a template. Built-in templates come with the plugins and can't be renamed or removed.
  */
 export function SubgraphTemplatesDialog({ open, onClose }: { open: boolean; onClose: () => void }) {
   const styles = useStyles();
@@ -113,17 +114,29 @@ function TemplateRow({ template }: { template: SubgraphTemplateDto }) {
   return (
     <div className={styles.row}>
       <div>
-        <ModuleTitle
-          name={template.name}
-          fallback={template.name}
-          label="Template name"
-          onRename={(name) => name && rename.mutate({ id: template.id, data: { name } })}
-        />
+        {template.isBuiltIn ? (
+          <Body1Strong>{template.name}</Body1Strong>
+        ) : (
+          <ModuleTitle
+            name={template.name}
+            fallback={template.name}
+            label="Template name"
+            onRename={(name) => name && rename.mutate({ id: template.id, data: { name } })}
+          />
+        )}
         <div className={styles.details}>
           <Caption1>
             {moduleCount === 1 ? "1 module" : `${moduleCount} modules`} ·{" "}
             {usedBy === 0 ? "not used" : usedBy === 1 ? "used by 1 subgraph" : `used by ${usedBy} subgraphs`}
           </Caption1>
+          {template.isBuiltIn && (
+            <Tooltip
+              content="Comes with a plugin. Save a subgraph under another name to change it."
+              relationship="description"
+            >
+              <Badge appearance="tint">Built-in</Badge>
+            </Tooltip>
+          )}
           {missingTypes.length > 0 && (
             <Tooltip content={`Plugins not loaded for: ${missingTypes.join(", ")}`} relationship="description">
               <Badge appearance="tint" color="warning">
@@ -134,7 +147,7 @@ function TemplateRow({ template }: { template: SubgraphTemplateDto }) {
         </div>
       </div>
       <div className={styles.actions}>
-        {confirmingDelete ? (
+        {template.isBuiltIn ? null : confirmingDelete ? (
           <>
             <Caption1>Remove?</Caption1>
             <Button size="small" onClick={() => setConfirmingDelete(false)}>

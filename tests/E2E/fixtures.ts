@@ -98,8 +98,13 @@ export class EngineApi {
     return this.send<SubgraphDto[]>("get", "/api/subgraphs");
   }
 
-  templates() {
-    return this.send<SubgraphTemplateDto[]>("get", "/api/subgraph-templates");
+  async builtInTemplates() {
+    return (await this.send<SubgraphTemplateDto[]>("get", "/api/subgraph-templates")).filter((t) => t.isBuiltIn);
+  }
+
+  /** The user's templates, without the built-in ones. */
+  async templates() {
+    return (await this.send<SubgraphTemplateDto[]>("get", "/api/subgraph-templates")).filter((t) => !t.isBuiltIn);
   }
 
   updateModule(module: ModuleDto) {

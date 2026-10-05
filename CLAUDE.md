@@ -92,6 +92,7 @@ CI (`.github/workflows/ci.yml`) runs the dotnet build/test, the driver build, np
   - Tests drive `AudioGraph.Process()` directly with synthetic modules. Nothing in `tests/` opens real devices.
 - Engine code (`src/Engine`, see "Engine" in `docs/Architecture.md`):
   - A new module type needs its own state record (data annotations on the record's parameters, as in ASP.NET Core), `IStatefulModule<TState>`, and a registration in its plugin's `Add…Plugin()`. The engine, API, config file and OpenAPI pick it up from there.
+  - A plugin's templates (`templates.json`) are built-in templates (see "Subgraph templates" in `docs/Architecture.md`). Increase a template's `revision` with every change, so its subgraphs show as outdated, and keep its id and its modules' ids, which the subgraphs match.
   - `AudioHost` is the single entry point for graph changes. It persists and broadcasts every change, and throws `EngineRequestException` for problem responses.
   - Engine tests use `EngineFactory` (temp config and user plugin directory, token required) with a real audio engine and no devices selected. Main is loaded from `plugins/Main` in the test output; `tests/Engine/TestPlugin` is a plugin for the loader tests that the tests don't reference.
 - Driver code (`src/Vac`, see "VAC driver" in `docs/Architecture.md`):

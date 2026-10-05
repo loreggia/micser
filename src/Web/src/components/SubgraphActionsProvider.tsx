@@ -63,16 +63,17 @@ export function SubgraphActionsProvider({ children }: { children: ReactNode }) {
 }
 
 /**
- * Saves a subgraph as a template. The name starts as the subgraph's template's, so saving again updates it; a name that a template has
- * already replaces that template.
+ * Saves a subgraph as a template. The name starts as the subgraph's template's, so saving again updates it, or with " (custom)" added if
+ * that's a built-in template. A name that a template has already replaces that template, unless it's a built-in one.
  */
 function SaveTemplateDialog({ subgraph, onClose }: { subgraph: SubgraphDto; onClose: () => void }) {
   const styles = useStyles();
   const { data: templates = [] } = useGetSubgraphTemplates();
   const notifyError = useNotifyError();
-  const [name, setName] = useState(
-    () => templates.find((t) => t.id === subgraph.templateId)?.name ?? subgraph.name ?? ""
-  );
+  const [name, setName] = useState(() => {
+    const template = templates.find((t) => t.id === subgraph.templateId);
+    return template ? (template.isBuiltIn ? `${template.name} (custom)` : template.name) : (subgraph.name ?? "");
+  });
   const save = useMutation({
     ...getSaveSubgraphTemplateMutationOptions(),
     onSuccess: onClose,
@@ -82,8 +83,10 @@ function SaveTemplateDialog({ subgraph, onClose }: { subgraph: SubgraphDto; onCl
   const trimmed = name.trim();
   const existing = templates.find((t) => t.name.localeCompare(trimmed, undefined, { sensitivity: "accent" }) === 0);
 
+  const isBuiltIn = existing?.isBuiltIn ?? false;
+
   const submit = () => {
-    if (trimmed) {
+    if (trimmed && !isBuiltIn) {
       save.mutate({ data: { subgraphId: subgraph.id, name: trimmed, templateId: existing?.id ?? null } });
     }
   };
@@ -102,8 +105,10 @@ function SaveTemplateDialog({ subgraph, onClose }: { subgraph: SubgraphDto; onCl
             <DialogContent className={styles.content}>
               <Field
                 label="Template name"
+                validationState={isBuiltIn ? "error" : "none"}
+                validationMessage={isBuiltIn ? "A built-in template has this name." : undefined}
                 hint={
-                  existing
+                  existing && !isBuiltIn
                     ? `Replaces the template "${existing.name}". Subgraphs created from it can then be updated.`
                     : "Saves a new template."
                 }
@@ -115,8 +120,8 @@ function SaveTemplateDialog({ subgraph, onClose }: { subgraph: SubgraphDto; onCl
               <Button appearance="secondary" onClick={onClose}>
                 Cancel
               </Button>
-              <Button appearance="primary" type="submit" disabled={!trimmed || save.isPending}>
-                {existing ? "Replace" : "Save"}
+              <Button appearance="primary" type="submit" disabled={!trimmed || isBuiltIn || save.isPending}>
+                {existing && !isBuiltIn ? "Replace" : "Save"}
               </Button>
             </DialogActions>
           </DialogBody>

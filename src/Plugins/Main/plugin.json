@@ -3,5 +3,6 @@
   "name": "Main",
   "version": "1.0.0",
   "assembly": "Micser.Plugins.Main.dll",
-  "web": "web/index.js"
+  "web": "web/index.js",
+  "templates": "templates.json"
 }

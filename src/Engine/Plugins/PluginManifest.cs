@@ -10,7 +10,10 @@ namespace Micser.Engine.Plugins;
 /// <param name="Id">Identifies the plugin and names its folder.</param>
 /// <param name="Assembly">The file name of the assembly containing the <see cref="Audio.IAudioPlugin"/>.</param>
 /// <param name="Web">The widget bundle's entry, relative to the plugin folder (e.g. <c>web/index.js</c>), if the plugin has widgets.</param>
-public sealed partial record PluginManifest(string Id, string Name, string Version, string Assembly, string? Web)
+/// <param name="Templates">
+/// A JSON file with subgraph templates, relative to the plugin folder, that the engine adds to the configuration once each.
+/// </param>
+public sealed partial record PluginManifest(string Id, string Name, string Version, string Assembly, string? Web, string? Templates = null)
 {
     public const string FileName = "plugin.json";
 
@@ -67,6 +70,11 @@ public sealed partial record PluginManifest(string Id, string Name, string Versi
         if (manifest.Web != null && !IsInside(directory, manifest.Web))
         {
             throw new InvalidDataException("The plugin's web entry must be inside the plugin folder.");
+        }
+
+        if (manifest.Templates != null && !IsInside(directory, manifest.Templates))
+        {
+            throw new InvalidDataException("The plugin's templates file must be inside the plugin folder.");
         }
 
         return manifest;

@@ -96,3 +96,42 @@ test("the templates dialog lists, renames and removes templates", async ({ graph
   // the subgraph stays, without its template
   await expect.poll(async () => (await engine.subgraphs()).map((s) => s.templateId ?? null)).toEqual([null]);
 });
+
+test("a subgraph from a built-in template is saved as a custom template", async ({ graph, engine }) => {
+  await graph.open();
+  await graph.page.getByRole("button", { name: "Add module" }).click();
+  await graph.menu.getByRole("menuitem", { name: "Templates" }).click();
+  await graph.menu.getByRole("menuitem", { name: "Night mode" }).click();
+  await expect.poll(async () => (await engine.subgraphs()).length).toBe(1);
+  const [subgraph] = await engine.subgraphs();
+  const node = graph.node(subgraph.id);
+
+  const dialog = await saveAsTemplate(graph, node);
+  const name = dialog.getByRole("textbox", { name: "Template name" });
+  await expect(name).toHaveValue("Night mode (custom)");
+  // a built-in template can't be replaced
+  await name.fill("night mode");
+  await expect(dialog).toContainText("A built-in template has this name.");
+  await expect(dialog.getByRole("button", { name: "Save" })).toBeDisabled();
+
+  await name.fill("Night mode (custom)");
+  await dialog.getByRole("button", { name: "Save" }).click();
+
+  await expect.poll(async () => (await engine.templates()).map((t) => t.name)).toEqual(["Night mode (custom)"]);
+  const [template] = await engine.templates();
+  await expect.poll(async () => (await engine.subgraphs())[0].templateId).toBe(template.id);
+});
+
+test("the templates dialog shows built-in templates without rename and remove", async ({ graph, engine }) => {
+  const builtIn = await engine.builtInTemplates();
+  await graph.open();
+  await graph.page.getByRole("button", { name: "Add module" }).click();
+  await graph.menu.getByRole("menuitem", { name: "Templates" }).click();
+  await graph.menu.getByRole("menuitem", { name: "Manage templates…" }).click();
+  const dialog = graph.page.getByRole("dialog", { name: "Subgraph templates" });
+
+  await expect(dialog.getByText("Built-in", { exact: true })).toHaveCount(builtIn.length);
+  await expect(dialog.getByRole("button", { name: "Remove (subgraphs created from it stay)" })).toHaveCount(0);
+  await dialog.getByText("Night mode", { exact: true }).dblclick();
+  await expect(dialog.getByRole("textbox", { name: "Template name" })).toHaveCount(0);
+});

@@ -18,6 +18,11 @@ public sealed class EngineOptions
     public string DiscoveryPath { get; set; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Micser", "engine.json");
 
     /// <summary>
+    /// Loads the plugins' subgraph templates as built-in templates.
+    /// </summary>
+    public bool LoadPluginTemplates { get; set; } = true;
+
+    /// <summary>
     /// The plugins shipped with the engine. A relative path is relative to the engine's folder.
     /// </summary>
     public string BuiltInPluginsPath { get; set; } = "plugins";
