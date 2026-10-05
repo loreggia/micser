@@ -1,6 +1,15 @@
-import { buildEngine } from "./servers";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { buildEngine, buildTestPluginPackage } from "./servers";
 
-/** Builds the engine once; each worker starts its own from the build output. */
+/** Builds the engine, which each worker starts from the build output, and the test plugin's package. */
 export default function globalSetup() {
-  process.env.MICSER_E2E_ENGINE = buildEngine(process.env.CI ? "Release" : "Debug");
+  const configuration = process.env.CI ? "Release" : "Debug";
+  const directory = mkdtempSync(join(tmpdir(), "micser-e2e-package-"));
+
+  process.env.MICSER_E2E_ENGINE = buildEngine(configuration);
+  process.env.MICSER_E2E_PLUGIN_PACKAGE = buildTestPluginPackage(configuration, directory);
+
+  return () => rmSync(directory, { recursive: true, force: true });
 }
