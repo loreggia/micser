@@ -1,0 +1,13 @@
+{
+  "name": "@micser/e2e",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "@micser/web-sdk": "*",
+    "@types/node": "^24.19.0"
+  }
+}

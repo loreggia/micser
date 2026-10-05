@@ -26,4 +26,12 @@ export default defineConfig([
       "react-refresh/only-export-components": "off",
     },
   },
+  {
+    // Playwright, not React: its fixtures call use()
+    files: ["tests/E2E/**"],
+    rules: {
+      "react-hooks/rules-of-hooks": "off",
+      "react-refresh/only-export-components": "off",
+    },
+  },
 ]);

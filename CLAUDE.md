@@ -19,6 +19,8 @@ npm run typecheck            # tsc in every workspace
 npx playwright install chromium   # once, for the Vitest browser tests
 npm test                     # Vitest: unit project (Node) and browser project (headless Chromium); "npm run test:watch" to watch
 npx vitest run src/Plugins/Main/Web/src/widgets/GainWidget.test.tsx
+npm run test:e2e             # Playwright (tests/E2E): starts its own engine (port 5180, temp config) and Vite (5181)
+npm run test:e2e -- specs/subgraphs.spec.ts --headed
 npm run lint                 # eslint (flat config at the root)
 npm run format:check         # prettier; .prettierignore limits it to the web workspaces
 npm run generate:api -w @micser/web-sdk   # regenerate the API client after engine API changes (build the engine first)
@@ -46,7 +48,7 @@ dotnet run --project tools/AudioHarness -- formats 2 1             # formats out
 
 The harness opens real devices: use a very low gain (as above) unless audible output is intended.
 
-CI (`.github/workflows/ci.yml`) runs the dotnet build/test, the driver build and npm format/lint/typecheck/test/build as separate jobs.
+CI (`.github/workflows/ci.yml`) runs the dotnet build/test, the driver build, npm format/lint/typecheck/test/build and the end-to-end tests as separate jobs.
 
 ## Working preferences
 
@@ -68,6 +70,7 @@ CI (`.github/workflows/ci.yml`) runs the dotnet build/test, the driver build and
   - UI preferences are stored by the engine (`/api/preferences`, `usePreferences`), not in browser storage: the UI's origin changes with the engine's random port.
   - The UI talks to the desktop shell through WebView2 web messages (`src/Web/src/shell.ts` ↔ `MainForm`); shell-only controls are hidden in a plain browser.
   - Tests sit next to the code. `*.test.ts` runs in Node. `*.test.tsx` and `*.browser.test.ts` (DOM, storage, module imports) run in Vitest browser mode (Chromium), with `render` from `vitest-browser-react` and locators/`expect.element` from `vitest/browser`. Render widgets inside `TestProviders` from `@micser/web-sdk/testing` and seed the query client instead of fetching. A dependency that a browser test newly imports goes into `optimizeDeps.include` in `vitest.config.ts`: a second optimizer pass reloads the tests and can load React twice.
+  - End-to-end tests (`tests/E2E`, Playwright Test) drive the UI against a real engine. Each test starts from an empty engine (`EngineApi.reset()` in `fixtures.ts`); set up state through `EngineApi` and check results there, not only in the DOM. The tests run one at a time because they share the engine.
 - Dependency direction:
   - .NET: `Plugins → Audio` and `Engine → Audio, ServiceDefaults`. The engine's reference to a built-in plugin is build-only (`ReferenceOutputAssembly="false"`, `OutputItemType="BuiltInPlugin"`), which copies it to `plugins/<id>` (`src/Engine/BuiltInPlugins.targets`). `tools/AppHost` references the runnable projects. `Shell` references no Micser project and talks to the engine over HTTP only.
   - npm: `plugin-* → web-sdk` and `web → web-sdk`. The SPA imports plugin widgets at runtime from the URLs the engine reports.
