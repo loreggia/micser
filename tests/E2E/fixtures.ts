@@ -4,11 +4,13 @@ import type {
   ModuleDto,
   ModulePosition,
   ModuleTypeDto,
+  PluginDto,
   SubgraphDto,
   SubgraphTemplateDto,
   UiPreferencesDto,
 } from "@micser/web-sdk";
-import { test as base, expect, type APIRequestContext, type Locator, type Page } from "@playwright/test";
+import { test as base, expect, type APIRequestContext, type Browser, type Locator, type Page } from "@playwright/test";
+import type { ShellState } from "../../src/Web/src/shell";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -65,6 +67,10 @@ export class EngineApi {
 
   moduleTypes() {
     return this.send<ModuleTypeDto[]>("get", "/api/module-types");
+  }
+
+  plugins() {
+    return this.send<PluginDto[]>("get", "/api/plugins");
   }
 
   preferences() {
@@ -189,42 +195,119 @@ export class Graph {
   }
 }
 
+/**
+ * The desktop shell, as the UI sees it in WebView2: `chrome.webview`, injected before the UI loads. It records the messages the UI
+ * posts and answers `getState` with the state it was installed with.
+ */
+export class FakeShell {
+  private readonly page: Page;
+
+  private constructor(page: Page) {
+    this.page = page;
+  }
+
+  static async install(page: Page, state: ShellState) {
+    await page.addInitScript((initialState) => {
+      const listeners: ((event: MessageEvent) => void)[] = [];
+      const shell = {
+        sent: [] as unknown[],
+        receive: (data: unknown) => listeners.forEach((listener) => listener(new MessageEvent("message", { data }))),
+      };
+      const target = window as unknown as { chrome?: Record<string, unknown>; micserShell: typeof shell };
+      target.micserShell = shell;
+      target.chrome ??= {};
+      target.chrome.webview = {
+        postMessage: (message: { type: string }) => {
+          shell.sent.push(message);
+          if (message.type === "getState") {
+            setTimeout(() => shell.receive({ type: "state", ...initialState }));
+          }
+        },
+        addEventListener: (_: string, listener: (event: MessageEvent) => void) => listeners.push(listener),
+      };
+    }, state);
+
+    return new FakeShell(page);
+  }
+
+  /** The messages the UI posted, except the state requests. */
+  async messages() {
+    const sent = await this.page.evaluate(
+      () => (window as unknown as { micserShell: { sent: { type: string }[] } }).micserShell.sent
+    );
+    return sent.filter((message) => message.type !== "getState");
+  }
+
+  /** Posts a message to the UI, as the shell does. */
+  async send(message: { type: string } & Record<string, unknown>) {
+    await this.page.evaluate(
+      (data) => (window as unknown as { micserShell: { receive(data: unknown): void } }).micserShell.receive(data),
+      message
+    );
+  }
+
+  async setState(state: ShellState) {
+    await this.send({ type: "state", ...state });
+  }
+}
+
+/** A shell state for tests: a development build that can't update, restart the engine, or install the driver. */
+export const developmentShell: ShellState = {
+  version: null,
+  canUpdate: false,
+  isCheckingForUpdates: false,
+  pendingUpdate: null,
+  canRestartEngine: false,
+  driver: null,
+};
+
 interface Servers {
   engineUrl: string;
   webUrl: string;
+  /** Restarts the engine at the same address, as the shell does to apply plugin changes. */
+  restartEngine(): Promise<void>;
 }
 
-export const test = base.extend<{ engine: EngineApi; graph: Graph }, { servers: Servers }>({
-  // an engine and a Vite server per worker, so workers don't share the graph
-  servers: [
-    async ({ browser }, use) => {
-      const directory = mkdtempSync(join(tmpdir(), "micser-e2e-"));
-      const engine = await startEngine(process.env.MICSER_E2E_ENGINE!, directory);
-      try {
-        const web = await startWeb(engine.url, join(directory, "vite"));
-        try {
-          // the first load compiles the UI, which takes long while the other workers do the same
-          const page = await browser.newPage();
-          await page.goto(web.url);
-          await expect(page.getByText("Connected", { exact: true })).toBeVisible({ timeout: 60_000 });
-          await page.close();
+/** Starts an engine and a Vite server for it and loads the UI once, then stops them after use. */
+async function withServers(browser: Browser, use: (servers: Servers) => Promise<void>) {
+  const directory = mkdtempSync(join(tmpdir(), "micser-e2e-"));
+  const engine = await startEngine(process.env.MICSER_E2E_ENGINE!, directory);
+  try {
+    const web = await startWeb(engine.url, join(directory, "vite"));
+    try {
+      // the first load compiles the UI, which takes long while the other workers do the same
+      const page = await browser.newPage();
+      await page.goto(web.url);
+      await expect(page.getByText("Connected", { exact: true })).toBeVisible({ timeout: 60_000 });
+      await page.close();
 
-          await use({ engineUrl: engine.url, webUrl: web.url });
-        } finally {
-          await web.stop();
-        }
-      } finally {
-        await engine.stop();
-        rmSync(directory, { recursive: true, force: true, maxRetries: 5 });
-      }
-    },
-    { scope: "worker", timeout: 120_000 },
+      await use({ engineUrl: engine.url, webUrl: web.url, restartEngine: () => engine.restart() });
+    } finally {
+      await web.stop();
+    }
+  } finally {
+    await engine.stop();
+    rmSync(directory, { recursive: true, force: true, maxRetries: 5 });
+  }
+}
+
+export const test = base.extend<
+  { app: Servers; engine: EngineApi; graph: Graph; ownEngine: boolean },
+  { servers: Servers }
+>({
+  // an engine and a Vite server per worker, so workers don't share the graph
+  servers: [async ({ browser }, use) => withServers(browser, use), { scope: "worker", timeout: 120_000 }],
+  // for tests that change the engine beyond what EngineApi.reset() undoes, e.g. its plugins
+  ownEngine: [false, { option: true }],
+  app: [
+    async ({ browser, servers, ownEngine }, use) => (ownEngine ? withServers(browser, use) : use(servers)),
+    { timeout: 120_000 },
   ],
-  baseURL: async ({ servers }, use) => {
-    await use(servers.webUrl);
+  baseURL: async ({ app }, use) => {
+    await use(app.webUrl);
   },
-  engine: async ({ request, servers }, use) => {
-    const engine = new EngineApi(request, servers.engineUrl);
+  engine: async ({ request, app }, use) => {
+    const engine = new EngineApi(request, app.engineUrl);
     await engine.reset();
     await use(engine);
   },

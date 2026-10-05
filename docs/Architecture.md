@@ -25,11 +25,14 @@ Target architecture for the modernization of Micser (decided 2026-09-30). `main`
 - **Tests:** TUnit and NSubstitute. xUnit and Moq are dropped.
 - **Web tests:** Vitest, from one root `vitest.config.ts` with two projects. `*.test.ts` runs in Node. `*.test.tsx` and `*.browser.test.ts` (DOM, storage, module imports) run in Vitest browser mode on headless Chromium through Playwright, because Fluent UI and React Flow need real layout. Components are rendered with `vitest-browser-react`. `@micser/web-sdk/testing` has the shared helpers: `TestProviders` (theme, query client, an engine connection that is never started), `createTestQueryClient()` (seeded with `setQueryData` under the generated keys, so hooks don't fetch) and `testModule()`.
 - **End-to-end tests:** Playwright Test in `tests/E2E` (npm workspace `@micser/e2e`), `npm run test:e2e`.
-  - `globalSetup.ts` builds the engine once (Release in CI). Each worker then starts its own engine from the build output and its own Vite dev server, both on free ports (`servers.ts`, the worker-scoped `servers` fixture), so the tests run in parallel: 35 tests take about 50 s with 8 workers, against 3.6 min on one shared engine.
+  - `globalSetup.ts` builds the engine once (Release in CI), and a plugin package: the engine tests' plugin (module type "Test") with the hand-written widget bundle in `tests/E2E/plugin/web`, which imports `react` through the UI's import map like a real plugin bundle.
+  - Each worker starts its own engine from the build output and its own Vite dev server, both on free ports (`servers.ts`, the worker-scoped `servers` fixture), so the tests run in parallel: 35 tests took about 50 s with 8 workers, against 3.6 min on one shared engine.
     - The engine listens on port 0 and is ready once it has written its discovery file, which has the port. It gets a temporary config and user plugin folder, with no token and no single-instance check.
     - Vite runs through its API with its own dependency cache per worker; concurrent servers would otherwise write the same one. The fixture loads the UI once before the worker's first test, since the first load compiles it, slowly while the other workers do the same.
   - A worker's tests share its engine, and each starts from an empty graph: the `engine` fixture deletes subgraphs, modules and templates and restores the default preferences.
+    - Tests that change more, e.g. the plugins, get an engine and Vite server of their own (`test.use({ ownEngine: true })`). The `app` fixture's `restartEngine()` stops that engine gracefully (`POST /api/engine/shutdown`) and starts it at the same address, as the shell does.
   - `EngineApi` sets up state and checks results through the HTTP API; `Graph` wraps the React Flow DOM (nodes by `data-id`, ports, connections, menus, notifications).
+  - `FakeShell` injects `chrome.webview` before the UI loads: it answers `getState` with a given `ShellState`, records the messages the UI posts and sends the shell's messages, so the shell-only controls are tested without WebView2.
   - Chromium only: the shell's WebView2 is Chromium as well.
 - **Engine host:** `Microsoft.NET.Sdk.Web` (Kestrel). It serves the built SPA as static files (roadmap step 4). In development, Vite runs separately and proxies `/api` and `/hubs` to the engine, which then listens on the fixed address `http://127.0.0.1:5080` without requiring the token. `AllowedHosts` is limited to `localhost;127.0.0.1` against DNS rebinding.
 - **Shell:** WinForms (native `NotifyIcon`) with the WebView2 WinForms control. It has no app logic, so WPF isn't needed.
@@ -348,12 +351,14 @@ The plan (signing, installation, phases) is in the [driver plan](https://claude.
      - `EngineConnection`, against a fake SignalR hub: debounced updates, the engine events' cache patches, live data and level subscriptions, and reconnecting.
      - The engine hooks, the shell bridge, plugin bundle loading and `PluginsProvider`, `useAddModule`, and the SPA's Vite plugins.
      - Components: `ParameterSlider`, `ModuleTitle`, `LevelMeter` and Main's widgets.
-   - End-to-end tests with Playwright against the engine and Vite (see Defaults), 35 tests:
+   - End-to-end tests with Playwright against the engine and Vite (see Defaults), 53 tests in about 1.2 min:
      - The app: the toolbar's module menu, adding and selecting, changes from the API and a second window shown live.
      - Modules: widget edits, mute, volume, collapse, rename, moving on and off the grid, deleting by menu and key.
      - Connections: connecting by drag, a rejected cycle, deleting, and dropping on empty space to add a connected module.
      - Context menus, subgraphs (grouping, collapse with proxy ports, mute, rename, ungroup, delete), templates (save, replace, add, the templates dialog) and the settings (preferences, plugins).
-   - Follow-up: E2E tests for the plugin install flow (a .zip through the settings dialog and an engine restart) and the shell-only controls, which need the WebView2 bridge.
+     - Plugins: installing a package through the settings, the restart, the plugin's module with its widget (through the import map), removing it with another restart, the shell's "Restart engine to apply", and a rejected file.
+     - The shell-only controls against `FakeShell`: hidden in a browser, the toolbar's and the settings' update controls, the update check, restarting the engine process, and the virtual cable settings (install, count, layouts, update, uninstall, problem, busy and unreadable states).
+   - Not covered: the shell's side of the web messages (`MainForm`), which needs WebView2 and the WinForms window.
 5. **Shell (`src/Shell`)** (done): tray, WebView2 window, engine launch, discovery and supervision, autostart.
    - Verified: engine start, UI and token handoff, single instance, crash restart, the tray's Close and Exit Micser, and restarting the engine process from the UI.
 6. **Packaging and updates** (done): Velopack setup and delta updates from GitHub releases, a release workflow, and install, update and uninstall hooks in the shell.
