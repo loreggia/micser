@@ -4,6 +4,11 @@ on:
   push:
   pull_request:
 
+# a newer push to the same branch or PR cancels the run of the older one
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   dotnet:
     runs-on: windows-latest
@@ -74,6 +79,16 @@ jobs:
           npm run allow-scripts:auto
           git diff --exit-code -- "*package.json"
 
+      - name: Get the Playwright version
+        id: playwright
+        run: "\"version=$((npx playwright --version).Split(' ')[-1])\" >> $env:GITHUB_OUTPUT"
+
+      - name: Cache the Playwright browsers
+        uses: actions/cache@v6
+        with:
+          path: ~/AppData/Local/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+
       - name: Install Chromium for the browser tests
         run: npx playwright install chromium
 
@@ -100,6 +115,11 @@ jobs:
   e2e:
     runs-on: windows-latest
 
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
+
     steps:
       - name: Checkout
         uses: actions/checkout@v7
@@ -118,18 +138,28 @@ jobs:
       - name: Install
         run: npm run setup:ci
 
+      - name: Get the Playwright version
+        id: playwright
+        run: "\"version=$((npx playwright --version).Split(' ')[-1])\" >> $env:GITHUB_OUTPUT"
+
+      - name: Cache the Playwright browsers
+        uses: actions/cache@v6
+        with:
+          path: ~/AppData/Local/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+
       - name: Install Chromium
         run: npx playwright install chromium
 
       # builds the engine in Release first (globalSetup.ts)
       - name: End-to-end tests
-        run: npm run test:e2e
+        run: npm run test:e2e -- --shard=${{ matrix.shard }}/3
 
       - name: Upload the report
         if: failure()
         uses: actions/upload-artifact@v7
         with:
-          name: e2e-report
+          name: e2e-report-${{ matrix.shard }}
           path: tests/E2E/playwright-report
 
   release:
