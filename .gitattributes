@@ -10,6 +10,7 @@
 *.json text eol=lf
 *.ts text eol=lf
 *.tsx text eol=lf
+*.code-workspace text eol=lf
 .prettierrc text eol=lf
 
 # INF sources are read by Windows tools
