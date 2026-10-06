@@ -17,7 +17,9 @@ import {
   tokens,
   type MenuButtonProps,
 } from "@fluentui/react-components";
-import { AddRegular, ArrowDownloadRegular, SettingsRegular } from "@fluentui/react-icons";
+import { AddRegular } from "@fluentui/react-icons/svg/add";
+import { ArrowDownloadRegular } from "@fluentui/react-icons/svg/arrow-download";
+import { SettingsRegular } from "@fluentui/react-icons/svg/settings";
 import {
   formatNumber,
   getStartEngineMutationOptions,

@@ -18,6 +18,16 @@ export default defineConfig([
     languageOptions: {
       globals: globals.browser,
     },
+    rules: {
+      "no-restricted-imports": [
+        "error",
+        {
+          name: "@fluentui/react-icons",
+          message:
+            'Import icons from "@fluentui/react-icons/svg/<name>": in development, Vite loads all icons for the package index.',
+        },
+      ],
+    },
   },
   {
     // test code isn't hot reloaded

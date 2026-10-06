@@ -67,7 +67,7 @@ CI (`.github/workflows/ci.yml`) runs the dotnet build/test, the driver build, np
 - Web UI (see "UI" in `docs/Architecture.md`):
   - Engine API changes flow through `src/WebSdk/openapi/engine.json` (written on engine build) and the generated Orval client in `src/WebSdk/src/api/generated`. Never edit them by hand, and commit both.
   - Engine data comes from the generated query hooks; `EngineConnection` keeps the cache in sync via SignalR, so don't poll or invalidate after mutations. Module edits go through `useModuleUpdate`.
-  - Fluent UI v9 components and `makeStyles` with `tokens`; no hard-coded colors.
+  - Fluent UI v9 components and `makeStyles` with `tokens`; no hard-coded colors. Icons come from `@fluentui/react-icons/svg/<name>`, not the package index (a lint rule): in development, Vite would load all icons (17 MB) on every page load.
   - SignalR `hub.on` handlers must not return a value; SignalR would send it to the server as an invocation result.
   - User-facing text goes through the namespace's `useTranslation()` (`src/Web/src/i18n.ts`, a plugin's `Web/src/i18n.ts`), with the key in both `locales/en.ts` and `locales/de.ts`; numbers through `formatNumber` or the SDK's labels. Widget titles are functions (`() => t(...)`), resolved with `localize()`. Text from the engine isn't translated. The shell's texts are in `src/Shell/Strings.resx` and `Strings.de.resx`.
   - UI preferences are stored by the engine (`/api/preferences`, `usePreferences`), not in browser storage: the UI's origin changes with the engine's random port.

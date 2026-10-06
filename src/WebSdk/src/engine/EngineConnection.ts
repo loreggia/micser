@@ -131,6 +131,7 @@ export class EngineConnection {
   private isStopped = true;
   private latestLevels?: ModuleLevels;
   private retryTimer?: number;
+  private stopping = Promise.resolve();
 
   constructor(queryClient: QueryClient) {
     this.queryClient = queryClient;
@@ -244,13 +245,16 @@ export class EngineConnection {
 
   start() {
     this.isStopped = false;
-    void this.connect();
+    // after a stop that is still in progress, e.g. when React's StrictMode stops and restarts the effect
+    void this.stopping.then(() => this.connect());
   }
 
   async stop() {
     this.isStopped = true;
     window.clearTimeout(this.retryTimer);
-    await this.hub.stop();
+    const stopping = this.hub.stop();
+    this.stopping = stopping.catch(() => undefined);
+    await stopping;
   }
 
   /**
@@ -311,11 +315,17 @@ export class EngineConnection {
       return;
     }
 
+    const stopping = this.stopping;
     this.setState("connecting");
     try {
       await this.hub.start();
       this.onConnected();
     } catch {
+      // a stop cancelled the attempt; start() connects again
+      if (this.stopping !== stopping) {
+        return;
+      }
+
       if (this.hub.state === HubConnectionState.Disconnected) {
         this.setState("disconnected");
         this.scheduleRetry();
@@ -332,6 +342,7 @@ export class EngineConnection {
   }
 
   private onConnected() {
+    window.clearTimeout(this.retryTimer);
     this.setState("connected");
     // events may have been missed while disconnected
     void this.queryClient.invalidateQueries();

@@ -14,7 +14,7 @@ import {
   makeStyles,
   tokens,
 } from "@fluentui/react-components";
-import { DeleteRegular } from "@fluentui/react-icons";
+import { DeleteRegular } from "@fluentui/react-icons/svg/delete";
 import {
   getDeleteSubgraphTemplateMutationOptions,
   getRenameSubgraphTemplateMutationOptions,

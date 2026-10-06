@@ -16,7 +16,7 @@ import {
   makeStyles,
   tokens,
 } from "@fluentui/react-components";
-import { ArrowSyncRegular } from "@fluentui/react-icons";
+import { ArrowSyncRegular } from "@fluentui/react-icons/svg/arrow-sync";
 import {
   formatNumber,
   getRestartAudioMutationOptions,

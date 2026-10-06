@@ -15,16 +15,14 @@ import {
   mergeClasses,
   tokens,
 } from "@fluentui/react-components";
-import {
-  ChevronDownRegular,
-  ChevronUpRegular,
-  DeleteRegular,
-  DesktopSpeakerRegular,
-  FlashOffRegular,
-  MoreHorizontalRegular,
-  Speaker2Regular,
-  SpeakerMuteRegular,
-} from "@fluentui/react-icons";
+import { ChevronDownRegular } from "@fluentui/react-icons/svg/chevron-down";
+import { ChevronUpRegular } from "@fluentui/react-icons/svg/chevron-up";
+import { DeleteRegular } from "@fluentui/react-icons/svg/delete";
+import { DesktopSpeakerRegular } from "@fluentui/react-icons/svg/desktop-speaker";
+import { FlashOffRegular } from "@fluentui/react-icons/svg/flash-off";
+import { MoreHorizontalRegular } from "@fluentui/react-icons/svg/more-horizontal";
+import { Speaker2Regular } from "@fluentui/react-icons/svg/speaker";
+import { SpeakerMuteRegular } from "@fluentui/react-icons/svg/speaker-mute";
 import {
   formatNumber,
   localize,
