@@ -1,6 +1,6 @@
 import { execFileSync, spawn } from "node:child_process";
 import { copyFileSync, cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
-import { join, resolve } from "node:path";
+import { dirname, join, resolve } from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
 
 export const root = resolve(import.meta.dirname, "../..");
@@ -91,7 +91,8 @@ async function launchEngine(assembly: string, directory: string, url: string): P
   // a killed engine leaves its file behind
   rmSync(discoveryPath, { force: true });
   const engine = spawn("dotnet", [assembly], {
-    cwd: root,
+    // a published engine serves the UI from wwwroot in its folder
+    cwd: dirname(assembly),
     env: {
       ...process.env,
       ASPNETCORE_ENVIRONMENT: "Development",
