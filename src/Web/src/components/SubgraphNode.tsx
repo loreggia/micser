@@ -16,19 +16,17 @@ import {
   mergeClasses,
   tokens,
 } from "@fluentui/react-components";
-import {
-  ArrowMinimizeRegular,
-  ArrowSyncRegular,
-  ChevronDownRegular,
-  ChevronUpRegular,
-  CircleFilled,
-  DeleteRegular,
-  FlashOffRegular,
-  GroupDismissRegular,
-  MoreHorizontalRegular,
-  Speaker2Regular,
-  SpeakerMuteRegular,
-} from "@fluentui/react-icons";
+import { ArrowMinimizeRegular } from "@fluentui/react-icons/svg/arrow-minimize";
+import { ArrowSyncRegular } from "@fluentui/react-icons/svg/arrow-sync";
+import { ChevronDownRegular } from "@fluentui/react-icons/svg/chevron-down";
+import { ChevronUpRegular } from "@fluentui/react-icons/svg/chevron-up";
+import { CircleFilled } from "@fluentui/react-icons/svg/circle";
+import { DeleteRegular } from "@fluentui/react-icons/svg/delete";
+import { FlashOffRegular } from "@fluentui/react-icons/svg/flash-off";
+import { GroupDismissRegular } from "@fluentui/react-icons/svg/group-dismiss";
+import { MoreHorizontalRegular } from "@fluentui/react-icons/svg/more-horizontal";
+import { Speaker2Regular } from "@fluentui/react-icons/svg/speaker";
+import { SpeakerMuteRegular } from "@fluentui/react-icons/svg/speaker-mute";
 import {
   getDeleteSubgraphMutationOptions,
   SubgraphColor,

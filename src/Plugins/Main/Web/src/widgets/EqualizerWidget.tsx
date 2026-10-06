@@ -1,5 +1,6 @@
 import { Button, makeStyles, tokens } from "@fluentui/react-components";
-import { AddRegular, DeleteRegular } from "@fluentui/react-icons";
+import { AddRegular } from "@fluentui/react-icons/svg/add";
+import { DeleteRegular } from "@fluentui/react-icons/svg/delete";
 import {
   decibels,
   formatNumber,

@@ -1,5 +1,5 @@
 import { Badge, Button, Caption1, Subtitle2, Text, makeStyles, tokens } from "@fluentui/react-components";
-import { DeleteRegular } from "@fluentui/react-icons";
+import { DeleteRegular } from "@fluentui/react-icons/svg/delete";
 import {
   getInstallPluginMutationOptions,
   getRemovePluginMutationOptions,
