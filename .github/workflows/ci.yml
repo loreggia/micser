@@ -72,7 +72,7 @@ jobs:
           cache: npm
 
       - name: Install
-        run: npm run setup:ci
+        uses: ./.github/actions/npm-install
 
       - name: Check the install script allowlist is up to date
         run: |
@@ -136,7 +136,7 @@ jobs:
           cache: npm
 
       - name: Install
-        run: npm run setup:ci
+        uses: ./.github/actions/npm-install
 
       - name: Get the Playwright version
         id: playwright
