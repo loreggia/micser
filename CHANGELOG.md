@@ -10,5 +10,7 @@ from that section, and the release workflow fails without it.
 
 ## Unreleased
 
+## 0.9.0 - 2026-10-06
+
 - "What's new" shows the release notes of a downloaded update, from the update button in the toolbar, and of the installed version, in the
   settings.
