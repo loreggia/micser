@@ -290,14 +290,17 @@ interface Servers {
   restartEngine(): Promise<void>;
 }
 
-/** Starts an engine and a Vite server for it and loads the UI once, then stops them after use. */
+/** Starts an engine and a Vite server for it (unless the engine is published) and loads the UI once, then stops them after use. */
 async function withServers(browser: Browser, use: (servers: Servers) => Promise<void>) {
   const directory = mkdtempSync(join(tmpdir(), "micser-e2e-"));
   const engine = await startEngine(process.env.MICSER_E2E_ENGINE!, directory);
   try {
-    const web = await startWeb(engine.url, join(directory, "vite"));
+    // a published engine serves the built UI itself
+    const web = process.env.MICSER_E2E_PUBLISHED_ENGINE
+      ? { url: engine.url, stop: async () => {} }
+      : await startWeb(engine.url, join(directory, "vite"));
     try {
-      // the first load compiles the UI, which takes long while the other workers do the same
+      // with Vite, the first load compiles the UI, which takes long while the other workers do the same
       const page = await browser.newPage();
       await page.goto(web.url);
       await expect(page.getByText("Connected", { exact: true })).toBeVisible({ timeout: 60_000 });

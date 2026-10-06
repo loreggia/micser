@@ -172,9 +172,17 @@ jobs:
       - name: Install Chromium
         run: npx playwright install chromium
 
-      # builds the engine in Release first (globalSetup.ts)
+      # the published engine serves the built UI and plugin widgets, as in a release
+      - name: Build the UI
+        run: npm run build
+
+      - name: Publish the engine
+        run: dotnet publish src/Engine --configuration Release --output artifacts/e2e-engine
+
       - name: End-to-end tests
         run: npm run test:e2e -- --shard=${{ matrix.shard }}/2
+        env:
+          MICSER_E2E_PUBLISHED_ENGINE: ${{ github.workspace }}/artifacts/e2e-engine/Micser.Engine.dll
 
       - name: Upload the report
         if: failure()
