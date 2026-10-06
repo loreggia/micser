@@ -1,0 +1,64 @@
+{
+  "folders": [
+    {
+      "name": "root",
+      "path": ".",
+    },
+    {
+      "name": "@micser/web",
+      "path": "src/Web",
+    },
+    {
+      "name": "@micser/web-sdk",
+      "path": "src/WebSdk",
+    },
+    {
+      "name": "@micser/plugin-main",
+      "path": "src/Plugins/Main/Web",
+    },
+    {
+      "name": "Micser.AppHost",
+      "path": "tools/AppHost",
+    },
+    {
+      "name": "Micser.Audio",
+      "path": "src/Audio",
+    },
+    {
+      "name": "Micser.AudioHarness",
+      "path": "tools/AudioHarness",
+    },
+    {
+      "name": "Micser.DriverUtility",
+      "path": "src/DriverUtility",
+    },
+    {
+      "name": "Micser.Engine",
+      "path": "src/Engine",
+    },
+    {
+      "name": "Micser.Plugins.Main",
+      "path": "src/Plugins/Main",
+    },
+    {
+      "name": "Micser.ServiceDefaults",
+      "path": "src/ServiceDefaults",
+    },
+    {
+      "name": "Micser.Shell",
+      "path": "src/Shell",
+    },
+    {
+      "name": "Micser.Vac",
+      "path": "src/Vac",
+    },
+  ],
+  "settings": {
+    "editor.formatOnSave": true,
+    "editor.formatOnSaveMode": "file",
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "always",
+    },
+    "i18n-ally.localesPaths": ["src/Web/src/locales", "src/WebSdk/src/i18n", "src/Plugins/Main/Web/src/locales"],
+  },
+}

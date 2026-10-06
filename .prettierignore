@@ -16,6 +16,7 @@
 !/tsconfig.base.json
 !/eslint.config.js
 !/vitest.config.ts
+!/micser.code-workspace
 **/dist
 **/node_modules
 **/generated
