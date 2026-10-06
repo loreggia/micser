@@ -2,7 +2,7 @@ import { createTestQueryClient, testModule, TestProviders } from "@micser/web-sd
 import { expect, test, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 import { render } from "vitest-browser-react";
-import { GainWidget } from "./GainWidget";
+import { GainWidget } from "../GainWidget";
 
 test("a step changes the gain by half a decibel", async () => {
   const setState = vi.fn();

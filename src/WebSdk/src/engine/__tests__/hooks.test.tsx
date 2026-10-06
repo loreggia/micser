@@ -2,10 +2,10 @@ import type { QueryClient } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { renderHook } from "vitest-browser-react";
-import { createTestQueryClient, testModule, TestProviders } from "../../testing";
-import { getGetPreferencesQueryKey, updatePreferences, type UiPreferencesDto } from "../api";
-import { i18n } from "../i18n/i18n";
-import { EngineConnection, type ModuleLevels } from "./EngineConnection";
+import { createTestQueryClient, testModule, TestProviders } from "../../../testing";
+import { getGetPreferencesQueryKey, updatePreferences, type UiPreferencesDto } from "../../api";
+import { i18n } from "../../i18n/i18n";
+import { EngineConnection, type ModuleLevels } from "../EngineConnection";
 import {
   useEngineConnection,
   useEngineConnectionState,
@@ -14,10 +14,10 @@ import {
   useLanguagePreference,
   useModuleUpdate,
   usePreferences,
-} from "./hooks";
+} from "../hooks";
 
-vi.mock("../api", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../api")>()),
+vi.mock("../../api", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("../../api")>()),
   updatePreferences: vi.fn(),
 }));
 

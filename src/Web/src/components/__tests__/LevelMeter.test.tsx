@@ -2,7 +2,7 @@ import { EngineConnection, type ModuleLevels } from "@micser/web-sdk";
 import { createTestQueryClient, TestProviders } from "@micser/web-sdk/testing";
 import { expect, test, vi } from "vitest";
 import { render } from "vitest-browser-react";
-import { LevelMeter } from "./LevelMeter";
+import { LevelMeter } from "../LevelMeter";
 
 async function renderMeter(levels: ModuleLevels | undefined) {
   const queryClient = createTestQueryClient();

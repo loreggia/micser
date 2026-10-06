@@ -1,7 +1,7 @@
 import type { Node } from "@xyflow/react";
 import { describe, expect, test } from "vitest";
-import { findFreePosition, placementMinimum, placementObstacles } from "./placement";
-import { gridSize, subgraphPadding } from "./subgraphs";
+import { findFreePosition, placementMinimum, placementObstacles } from "../placement";
+import { gridSize, subgraphPadding } from "../subgraphs";
 
 const size = { width: 100, height: 50 };
 

@@ -1,5 +1,5 @@
 import { afterEach, expect, test, vi } from "vitest";
-import { defineTranslations, i18n, localize, resolveLanguage } from "./i18n";
+import { defineTranslations, i18n, localize, resolveLanguage } from "../i18n";
 
 afterEach(async () => {
   vi.unstubAllGlobals();

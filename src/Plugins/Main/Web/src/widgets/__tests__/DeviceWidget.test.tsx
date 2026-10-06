@@ -8,7 +8,7 @@ import {
 import { createTestQueryClient, testModule, TestProviders } from "@micser/web-sdk/testing";
 import { expect, test, vi } from "vitest";
 import { render } from "vitest-browser-react";
-import { DeviceWidget } from "./DeviceWidget";
+import { DeviceWidget } from "../DeviceWidget";
 
 function device(id: string, name: string, isActive = true): AudioDeviceInfo {
   return {

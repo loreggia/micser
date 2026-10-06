@@ -9,7 +9,7 @@ import {
   toDecibels,
   toPosition,
   type MeterState,
-} from "./meterState";
+} from "../meterState";
 
 function levels(peak: number, rms = peak / 2): PortLevels[] {
   return [{ port: "Output", peak: [peak], rms: [rms] }];

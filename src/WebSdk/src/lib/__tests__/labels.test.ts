@@ -1,6 +1,6 @@
 import { afterEach, expect, test } from "vitest";
-import { i18n } from "../i18n/i18n";
-import { decibels, formatNumber, hertz, milliseconds } from "./labels";
+import { i18n } from "../../i18n/i18n";
+import { decibels, formatNumber, hertz, milliseconds } from "../labels";
 
 afterEach(() => i18n.changeLanguage("en"));
 

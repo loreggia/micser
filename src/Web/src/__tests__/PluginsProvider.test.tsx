@@ -4,9 +4,9 @@ import { createTestQueryClient, TestProviders } from "@micser/web-sdk/testing";
 import { expect, test } from "vitest";
 import { page } from "vitest/browser";
 import { render } from "vitest-browser-react";
-import { toasterId } from "./notifications";
-import { usePluginWidgets } from "./plugins";
-import { PluginsProvider } from "./PluginsProvider";
+import { toasterId } from "../notifications";
+import { usePluginWidgets } from "../plugins";
+import { PluginsProvider } from "../PluginsProvider";
 
 function bundle(source: string) {
   return URL.createObjectURL(new Blob([source], { type: "text/javascript" }));

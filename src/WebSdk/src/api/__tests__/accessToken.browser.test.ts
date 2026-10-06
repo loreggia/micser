@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, expect, test } from "vitest";
-import { initializeAccessToken } from "./accessToken";
-import { getAccessToken, setAccessToken } from "./engineFetch";
+import { initializeAccessToken } from "../accessToken";
+import { getAccessToken, setAccessToken } from "../engineFetch";
 
 const storageKey = "micser.accessToken";
 let originalUrl: string;

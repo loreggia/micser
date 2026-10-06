@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, expect, test, vi } from "vitest";
-import { EngineApiError, engineFetch, setAccessToken } from "./engineFetch";
+import { EngineApiError, engineFetch, setAccessToken } from "../engineFetch";
 
 const fetch = vi.fn<typeof globalThis.fetch>();
 

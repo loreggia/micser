@@ -2,7 +2,7 @@ import { EngineConnection } from "@micser/web-sdk";
 import { createTestQueryClient, testModule, TestProviders } from "@micser/web-sdk/testing";
 import { expect, test, vi } from "vitest";
 import { render } from "vitest-browser-react";
-import { SpectrumWidget } from "./SpectrumWidget";
+import { SpectrumWidget } from "../SpectrumWidget";
 
 test("draws the module's spectrum while shown", async () => {
   const queryClient = createTestQueryClient();

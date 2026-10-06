@@ -1,14 +1,14 @@
 import { i18n, isPlugin, localize } from "@micser/web-sdk";
 import { readFileSync } from "node:fs";
 import { expect, test } from "vitest";
-import plugin from "./index";
+import plugin from "../index";
 
 interface OpenApiDocument {
   components: { schemas: { ModuleDto: { discriminator: { mapping: Record<string, string> } } } };
 }
 
 const engineDocument = JSON.parse(
-  readFileSync(new URL("../../../../WebSdk/openapi/engine.json", import.meta.url), "utf8")
+  readFileSync(new URL("../../../../../WebSdk/openapi/engine.json", import.meta.url), "utf8")
 ) as OpenApiDocument;
 
 test("the default export is a plugin", () => {

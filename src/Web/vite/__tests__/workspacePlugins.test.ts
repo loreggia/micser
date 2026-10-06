@@ -3,7 +3,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import type { Connect, ViteDevServer } from "vite";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
-import { findWorkspacePlugins, workspacePluginsPlugin } from "./workspacePlugins";
+import { findWorkspacePlugins, workspacePluginsPlugin } from "../workspacePlugins";
 
 let pluginsDirectory: string;
 

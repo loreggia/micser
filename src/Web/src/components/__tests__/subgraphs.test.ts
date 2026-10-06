@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { frameAround, minSubgraphSize, proxyHandleId, resolveHandle } from "./subgraphs";
+import { frameAround, minSubgraphSize, proxyHandleId, resolveHandle } from "../subgraphs";
 
 describe("frameAround", () => {
   test("puts the frame on the grid with padding and room for the header", () => {

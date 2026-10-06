@@ -1,7 +1,7 @@
 import { HubConnectionState } from "@microsoft/signalr";
 import type { QueryClient } from "@tanstack/react-query";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
-import { createTestQueryClient, testModule } from "../../testing";
+import { createTestQueryClient, testModule } from "../../../testing";
 import {
   getGetConnectionsQueryKey,
   getGetDevicesQueryKey,
@@ -17,8 +17,8 @@ import {
   type ConnectionDto,
   type ModuleDto,
   type SubgraphDto,
-} from "../api";
-import { EngineConnection, type EngineConnectionState } from "./EngineConnection";
+} from "../../api";
+import { EngineConnection, type EngineConnectionState } from "../EngineConnection";
 
 /** The parts of a HubConnection that EngineConnection uses, recording the handlers it registers. */
 interface FakeHub {
@@ -76,8 +76,8 @@ vi.mock("@microsoft/signalr", async (importOriginal) => {
   return { ...signalr, HubConnectionBuilder };
 });
 
-vi.mock("../api", async (importOriginal) => ({
-  ...(await importOriginal<typeof import("../api")>()),
+vi.mock("../../api", async (importOriginal) => ({
+  ...(await importOriginal<typeof import("../../api")>()),
   updateModule: vi.fn(),
   updateSubgraph: vi.fn(),
 }));

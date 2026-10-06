@@ -2,9 +2,9 @@ import { sharedModules } from "@micser/web-sdk/vite";
 import { resolve } from "node:path";
 import type { IndexHtmlTransformContext, IndexHtmlTransformHook, ResolvedConfig, UserConfig } from "vite";
 import { describe, expect, test } from "vitest";
-import { sharedModulesPlugin } from "./sharedModules";
+import { sharedModulesPlugin } from "../sharedModules";
 
-const webRoot = resolve(import.meta.dirname, "..");
+const webRoot = resolve(import.meta.dirname, "../..");
 
 function createPlugin(base = "/") {
   const plugin = sharedModulesPlugin();

@@ -3,7 +3,7 @@ import { createTestQueryClient, testModule, TestProviders } from "@micser/web-sd
 import { expect, test, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 import { render } from "vitest-browser-react";
-import { EqualizerWidget } from "./EqualizerWidget";
+import { EqualizerWidget } from "../EqualizerWidget";
 
 const low: EqualizerBand = { frequency: 100, gain: -3, q: 0.7 };
 const high: EqualizerBand = { frequency: 8000, gain: 2, q: 1 };

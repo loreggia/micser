@@ -3,7 +3,7 @@ import { createTestQueryClient, testModule, TestProviders } from "@micser/web-sd
 import { expect, test, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 import { render } from "vitest-browser-react";
-import { CompressorWidget } from "./CompressorWidget";
+import { CompressorWidget } from "../CompressorWidget";
 
 const state: CompressorState = {
   type: "Downward",
