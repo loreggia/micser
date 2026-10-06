@@ -268,13 +268,6 @@ export function GraphEditor() {
     }
 
     const subgraphsById = new Map(subgraphs.map((s) => [s.id, s]));
-    // a new module that was added here becomes the only selected element
-    const selectedId = modules.find((module) => pendingSelection.has(module.id))?.id;
-    if (selectedId) {
-      pendingSelection.delete(selectedId);
-      setEdges((current) => current.map((edge) => (edge.selected ? { ...edge, selected: false } : edge)));
-    }
-
     setNodes((current) => {
       const existing = new Map(current.map((node) => [node.id, node]));
 
@@ -306,10 +299,21 @@ export function GraphEditor() {
           : { id: module.id, type: "module" as const, position, data, ...placement };
       });
 
-      const all = [...subgraphNodes, ...moduleNodes];
-      return selectedId ? all.map((node) => ({ ...node, selected: node.id === selectedId })) : all;
+      return [...subgraphNodes, ...moduleNodes];
     });
-  }, [modules, subgraphs, typesByName, widgets, proxyPorts, setNodes, setEdges]);
+  }, [modules, subgraphs, typesByName, widgets, proxyPorts, setNodes]);
+
+  // a new module that was added here becomes the only selected element once it's on the graph
+  useEffect(() => {
+    const selectedId = pendingSelection.size > 0 ? nodes.find((node) => pendingSelection.has(node.id))?.id : undefined;
+    if (!selectedId) {
+      return;
+    }
+
+    pendingSelection.delete(selectedId);
+    setNodes((current) => current.map((node) => ({ ...node, selected: node.id === selectedId })));
+    setEdges((current) => current.map((edge) => (edge.selected ? { ...edge, selected: false } : edge)));
+  }, [nodes, setNodes, setEdges]);
 
   useEffect(() => {
     if (!connections) {
