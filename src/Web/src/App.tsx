@@ -1,14 +1,22 @@
-import { FluentProvider, Toaster, makeStyles, tokens, webDarkTheme, webLightTheme } from "@fluentui/react-components";
+import {
+  FluentProvider,
+  Toaster,
+  createDarkTheme,
+  createLightTheme,
+  makeStyles,
+  tokens,
+} from "@fluentui/react-components";
 import { EngineProvider, useLanguagePreference } from "@micser/web-sdk";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactFlowProvider } from "@xyflow/react";
-import { useState, useSyncExternalStore } from "react";
+import { useMemo, useState, useSyncExternalStore } from "react";
 import { EngineToolbar } from "./components/EngineToolbar";
 import { GraphEditor } from "./components/GraphEditor";
 import { SubgraphActionsProvider } from "./components/SubgraphActionsProvider";
 import { toasterId, useErrorNotifications } from "./notifications";
 import { PluginsProvider } from "./PluginsProvider";
 import { useShellLanguage } from "./shell";
+import { brandVariants } from "./theme";
 
 const useStyles = makeStyles({
   root: {
@@ -39,8 +47,13 @@ export function App() {
     () => new QueryClient({ defaultOptions: { queries: { staleTime: Infinity, refetchOnWindowFocus: false } } })
   );
 
+  const theme = useMemo(
+    () => (prefersDark ? createDarkTheme(brandVariants) : createLightTheme(brandVariants)),
+    [prefersDark]
+  );
+
   return (
-    <FluentProvider theme={prefersDark ? webDarkTheme : webLightTheme} style={{ height: "100%" }}>
+    <FluentProvider theme={theme} style={{ height: "100%" }}>
       <QueryClientProvider client={queryClient}>
         <EngineProvider>
           <Shell />
