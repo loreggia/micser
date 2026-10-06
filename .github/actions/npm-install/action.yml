@@ -1,0 +1,36 @@
+name: Install npm packages
+description: >-
+  Restores node_modules from the cache and links the workspaces, or runs "npm run setup:ci" and caches node_modules. The
+  workspace links (node_modules/@micser) aren't cached: tar would store them as copies of the sources.
+
+runs:
+  using: composite
+  steps:
+    - name: Restore node_modules
+      id: cache
+      uses: actions/cache/restore@v6
+      with:
+        path: |
+          node_modules
+          !node_modules/@micser
+        key: node-modules-${{ runner.os }}-${{ hashFiles('package-lock.json', '.npmrc', '**/package.json') }}
+
+    - name: Link the workspaces
+      if: steps.cache.outputs.cache-hit == 'true'
+      shell: pwsh
+      run: npm install --offline --no-audit --no-fund
+
+    - name: Install
+      if: steps.cache.outputs.cache-hit != 'true'
+      shell: pwsh
+      run: npm run setup:ci
+
+    # right after the install, before other steps write to node_modules (e.g. Vite's cache)
+    - name: Save node_modules
+      if: steps.cache.outputs.cache-hit != 'true'
+      uses: actions/cache/save@v6
+      with:
+        path: |
+          node_modules
+          !node_modules/@micser
+        key: ${{ steps.cache.outputs.cache-primary-key }}
