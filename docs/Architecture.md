@@ -79,7 +79,7 @@ eng/                          scripts: pack.ps1 (Velopack release), build-vac.ps
 docs/
 ```
 
-**Plugin layout.** A plugin is one folder containing both halves: the .NET project (with its `plugin.json`) and its `Web/` npm package. Adding or changing a module touches one folder. Web tests sit next to the code they test (`*.test.ts`, `*.test.tsx`), widget tests next to the widgets.
+**Plugin layout.** A plugin is one folder containing both halves: the .NET project (with its `plugin.json`) and its `Web/` npm package. Adding or changing a module touches one folder. Web tests sit in a `__tests__` folder next to the code they test (`*.test.ts`, `*.test.tsx`), widget tests next to the widgets.
 
 **Module contract.** The engine exposes module definitions (type name, input/output connectors, state schema) through the API. Widgets are registered by module type name and read connectors from the definition instead of hard-coding them. This avoids the name drift seen on `dev` (`Output` vs. `Output01`).
 

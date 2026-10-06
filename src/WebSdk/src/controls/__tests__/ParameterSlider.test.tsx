@@ -2,7 +2,7 @@ import { FluentProvider, webLightTheme } from "@fluentui/react-components";
 import { expect, test, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 import { render } from "vitest-browser-react";
-import { ParameterSlider, type ParameterSliderProps } from "./ParameterSlider";
+import { ParameterSlider, type ParameterSliderProps } from "../ParameterSlider";
 
 async function renderSlider(props: Partial<ParameterSliderProps>) {
   const onChange = vi.fn<(value: number) => void>();

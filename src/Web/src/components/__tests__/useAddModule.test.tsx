@@ -8,11 +8,11 @@ import type { ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { page } from "vitest/browser";
 import { renderHook } from "vitest-browser-react";
-import { toasterId } from "../notifications";
-import { PluginWidgetsContext } from "../plugins";
-import type { ModuleNodeType } from "./ModuleNode";
-import { pendingPlacement, pendingSelection } from "./newModules";
-import { useAddModule, useModuleTypeChoices } from "./useAddModule";
+import { toasterId } from "../../notifications";
+import { PluginWidgetsContext } from "../../plugins";
+import type { ModuleNodeType } from "../ModuleNode";
+import { pendingPlacement, pendingSelection } from "../newModules";
+import { useAddModule, useModuleTypeChoices } from "../useAddModule";
 
 /** Modules render 100 × 50, so their measured size is known. */
 const nodeTypes = { module: () => <div style={{ width: 100, height: 50 }} /> };

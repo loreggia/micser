@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { definePlugin, isPlugin } from "./plugin";
+import { definePlugin, isPlugin } from "../plugin";
 
 test("isPlugin accepts a plugin", () => {
   expect(isPlugin(definePlugin({ name: "Test", widgets: [] }))).toBe(true);

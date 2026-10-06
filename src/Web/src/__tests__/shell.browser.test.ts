@@ -1,6 +1,6 @@
 import { expect, test, vi } from "vitest";
 import { renderHook } from "vitest-browser-react";
-import { Shell, shell, useShellState, type ShellState, type WebView } from "./shell";
+import { Shell, shell, useShellState, type ShellState, type WebView } from "../shell";
 
 const state: ShellState = {
   version: "1.2.0",

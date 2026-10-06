@@ -2,7 +2,7 @@ import { FluentProvider, webLightTheme } from "@fluentui/react-components";
 import { expect, test, vi } from "vitest";
 import { userEvent } from "vitest/browser";
 import { render } from "vitest-browser-react";
-import { ModuleTitle } from "./ModuleTitle";
+import { ModuleTitle } from "../ModuleTitle";
 
 async function renderTitle(name: string | null) {
   const onRename = vi.fn<(name: string | null) => void>();

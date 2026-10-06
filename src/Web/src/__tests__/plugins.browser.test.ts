@@ -1,6 +1,6 @@
 import type { PluginDto } from "@micser/web-sdk";
 import { expect, test } from "vitest";
-import { loadPluginWidgets } from "./plugins";
+import { loadPluginWidgets } from "../plugins";
 
 function bundle(source: string) {
   return URL.createObjectURL(new Blob([source], { type: "text/javascript" }));
