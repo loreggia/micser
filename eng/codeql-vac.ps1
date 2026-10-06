@@ -33,8 +33,8 @@ if (-not $CodeQL) {
     }
 }
 
-# restores the WDK packages and checks that the driver builds
-& (Join-Path $PSScriptRoot "build-vac.ps1") -Configuration Release -Platform x64
+# the database build below fails if the driver doesn't build
+& (Join-Path $PSScriptRoot "build-vac.ps1") -RestoreOnly
 
 # the driver suites reference microsoft/cpp-queries, which isn't downloaded with them
 & $CodeQL pack download $driversPack microsoft/cpp-queries@0.0.5

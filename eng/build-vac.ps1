@@ -1,8 +1,10 @@
 # Restores the WDK NuGet packages and builds the VAC driver package into src/Vac/bin/<platform>/<configuration>/Micser.Vac.
+# -RestoreOnly only restores the packages.
 param(
     [ValidateSet("Debug", "Release")][string]$Configuration = "Debug",
     [ValidateSet("x64", "ARM64")][string[]]$Platform = @("x64"),
-    [string]$Version = "1.0.0.0"
+    [string]$Version = "1.0.0.0",
+    [switch]$RestoreOnly
 )
 
 $ErrorActionPreference = "Stop"
@@ -20,6 +22,9 @@ if (-not $nuget) {
     }
 }
 & $nuget restore (Join-Path $vacDir "packages.config") -PackagesDirectory (Join-Path $vacDir "packages") -NonInteractive
+if ($RestoreOnly) {
+    return
+}
 
 # the WDK NuGet packages only contain x64 and ARM64 host tools, so the build needs the 64-bit MSBuild
 $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"

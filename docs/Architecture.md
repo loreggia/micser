@@ -29,7 +29,7 @@ Target architecture for the modernization of Micser (decided 2026-09-30). `main`
   - Each worker starts its own engine from the build output and its own Vite dev server, both on free ports (`servers.ts`, the worker-scoped `servers` fixture), so the tests run in parallel: 35 tests took about 50 s with 8 workers, against 3.6 min on one shared engine.
     - The engine listens on port 0 and is ready once it has written its discovery file, which has the port. It gets a temporary config and user plugin folder, with no token and no single-instance check.
     - Vite runs through its API with its own dependency cache per worker; concurrent servers would otherwise write the same one. The fixture loads the UI once before the worker's first test, since the first load compiles it, slowly while the other workers do the same.
-  - CI splits the tests into three shards (`--shard`), one job each, because the runner's 4 cores only get 2 workers.
+  - CI splits the tests into two shards (`--shard`), one job each, because the runner's 4 cores only get 2 workers.
   - A worker's tests share its engine, and each starts from an empty graph: the `engine` fixture deletes subgraphs, modules and templates and restores the default preferences.
     - Tests that change more, e.g. the plugins, get an engine and Vite server of their own (`test.use({ ownEngine: true })`). The `app` fixture's `restartEngine()` stops that engine gracefully (`POST /api/engine/shutdown`) and starts it at the same address, as the shell does.
   - `EngineApi` sets up state and checks results through the HTTP API; `Graph` wraps the React Flow DOM (nodes by `data-id`, ports, connections, menus, notifications).
@@ -347,7 +347,7 @@ The plan (signing, installation, phases) is in the [driver plan](https://claude.
   - In Debug builds, a second adapter (e.g. when a removed device still waits for a reboot) hits a breakpoint in `NewAdapterCommon` and bugchecks without a debugger; the script reboots the VM when `devcon remove` asks for it.
   - Kernel debug output can be captured with Sysinternals `dbgviewcli64 -k -v --duration <s> -l <file>` in the VM.
   - Driver Verifier (standard checks) is enabled for `MicserVac.sys` in the VM, so every test runs under it.
-- **Static analysis.** `eng/codeql-vac.ps1` runs Microsoft's CodeQL driver suites (`microsoft/windows-drivers`, the WHCP `mustfix` and `recommended` suites) and fails on findings in the driver's code; CI runs it for x64. Findings in the WDK headers and `cpp/drivers/init-not-cleared` (PortCls creates the FDO) are excluded.
+- **Static analysis.** `eng/codeql-vac.ps1` runs Microsoft's CodeQL driver suites (`microsoft/windows-drivers`, the WHCP `mustfix` and `recommended` suites) and fails on findings in the driver's code; CI runs it for x64 in a job of its own. Findings in the WDK headers and `cpp/drivers/init-not-cleared` (PortCls creates the FDO) are excluded.
 
 ## Roadmap
 
