@@ -31,14 +31,15 @@ public class SystemVolumeTests
         var other = await factory.AddModuleAsync(client, "Gain");
         (await client.PutAsJsonAsync($"/api/modules/{following.Id}", following with { UseSystemVolume = true }, factory.Json)).EnsureSuccessStatusCode();
         await using var hub = factory.CreateHubConnection();
-        var changed = hub.NextAsync<ModuleDto>("ModuleChanged", m => m.Id == following.Id);
+        // the change from the PUT above may still be queued for sending when the hub connects
+        var changed = hub.NextAsync<ModuleDto>("ModuleChanged", m => m.Id == following.Id && m.Volume == 0.25f);
         await hub.StartAsync();
 
         factory.SystemVolume.Set(new SystemVolumeLevel(0.25f, false));
-        var pushed = await changed.WaitAsync(TimeSpan.FromSeconds(10));
+        var pushed = await changed;
         var modules = await client.GetFromJsonAsync<ModuleDto[]>("/api/modules", factory.Json);
 
-        await Assert.That(pushed.Volume).IsEqualTo(0.25f);
+        await Assert.That(pushed.IsMuted).IsFalse();
         await Assert.That(modules!.Single(m => m.Id == following.Id).Volume).IsEqualTo(0.25f);
         await Assert.That(modules!.Single(m => m.Id == other.Id).Volume).IsEqualTo(1f);
     }
