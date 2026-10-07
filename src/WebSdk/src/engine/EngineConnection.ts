@@ -1,5 +1,5 @@
 import { HubConnection, HubConnectionBuilder, HubConnectionState, LogLevel } from "@microsoft/signalr";
-import type { QueryClient } from "@tanstack/react-query";
+import type { QueryClient, QueryKey, Updater } from "@tanstack/react-query";
 import {
   getAccessToken,
   getGetConnectionsQueryKey,
@@ -157,12 +157,12 @@ export class EngineConnection {
     this.hub.on("ModuleRemoved", (moduleId: string) => this.onModuleRemoved(moduleId));
     // handlers must not return a value: SignalR would send it to the server as an invocation result
     this.hub.on("ConnectionAdded", (connection: ConnectionDto) => {
-      this.queryClient.setQueryData<ConnectionDto[]>(getGetConnectionsQueryKey(), (connections) =>
+      this.setData<ConnectionDto[]>(getGetConnectionsQueryKey(), (connections) =>
         connections && !connections.some((c) => c.id === connection.id) ? [...connections, connection] : connections
       );
     });
     this.hub.on("ConnectionRemoved", (connectionId: string) => {
-      this.queryClient.setQueryData<ConnectionDto[]>(getGetConnectionsQueryKey(), (connections) =>
+      this.setData<ConnectionDto[]>(getGetConnectionsQueryKey(), (connections) =>
         connections?.filter((c) => c.id !== connectionId)
       );
     });
@@ -173,24 +173,24 @@ export class EngineConnection {
     });
     this.hub.on("SubgraphRemoved", (subgraphId: string) => {
       this.subgraphUpdates.delete(subgraphId);
-      this.queryClient.setQueryData<SubgraphDto[]>(getGetSubgraphsQueryKey(), (subgraphs) =>
+      this.setData<SubgraphDto[]>(getGetSubgraphsQueryKey(), (subgraphs) =>
         subgraphs?.filter((s) => s.id !== subgraphId)
       );
     });
     this.hub.on("TemplatesChanged", (templates: SubgraphTemplateDto[]) => {
-      this.queryClient.setQueryData(getGetSubgraphTemplatesQueryKey(), templates);
+      this.setData(getGetSubgraphTemplatesQueryKey(), templates);
     });
     this.hub.on("DevicesChanged", () => {
       void this.queryClient.invalidateQueries({ queryKey: getGetDevicesQueryKey().slice(0, 1) });
     });
     this.hub.on("StatusChanged", (status: EngineStatusDto) => {
-      this.queryClient.setQueryData(getGetEngineStatusQueryKey(), status);
+      this.setData(getGetEngineStatusQueryKey(), status);
     });
     this.hub.on("PreferencesChanged", (preferences: UiPreferencesDto) => {
-      this.queryClient.setQueryData(getGetPreferencesQueryKey(), preferences);
+      this.setData(getGetPreferencesQueryKey(), preferences);
     });
     this.hub.on("PluginsChanged", (plugins: PluginDto[]) => {
-      this.queryClient.setQueryData(getGetPluginsQueryKey(), plugins);
+      this.setData(getGetPluginsQueryKey(), plugins);
     });
     this.hub.on("ModuleData", (moduleId: string, data: unknown) => {
       this.dataListeners.get(moduleId)?.forEach((listener) => listener(data));
@@ -344,8 +344,9 @@ export class EngineConnection {
   private onConnected() {
     window.clearTimeout(this.retryTimer);
     this.setState("connected");
-    // events may have been missed while disconnected
-    void this.queryClient.invalidateQueries();
+    // events may have been missed while disconnected, and fetches that started before the connection may have missed changes; a refetch
+    // would only wait for a first fetch in progress, so those are cancelled
+    void this.queryClient.cancelQueries().then(() => this.queryClient.invalidateQueries());
     for (const moduleId of this.dataListeners.keys()) {
       this.invoke("Subscribe", moduleId);
     }
@@ -364,9 +365,7 @@ export class EngineConnection {
 
   private onModuleRemoved(moduleId: string) {
     this.moduleUpdates.delete(moduleId);
-    this.queryClient.setQueryData<ModuleDto[]>(getGetModulesQueryKey(), (modules) =>
-      modules?.filter((m) => m.id !== moduleId)
-    );
+    this.setData<ModuleDto[]>(getGetModulesQueryKey(), (modules) => modules?.filter((m) => m.id !== moduleId));
     this.queryClient.removeQueries({ queryKey: getGetModuleQueryKey(moduleId) });
   }
 
@@ -382,8 +381,19 @@ export class EngineConnection {
     this.errorListeners.forEach((listener) => listener(error instanceof Error ? error : new Error(String(error))));
   }
 
+  /**
+   * Sets engine data in the cache. A fetch of the same data that is in progress may have read the engine's state before the change, and
+   * its result would replace the newer data, so it's started again.
+   */
+  private setData<T>(queryKey: QueryKey, updater: Updater<T | undefined, T | undefined>) {
+    this.queryClient.setQueryData<T>(queryKey, updater);
+    if (this.queryClient.isFetching({ queryKey, exact: true }) > 0) {
+      void this.queryClient.invalidateQueries({ queryKey, exact: true });
+    }
+  }
+
   private setModuleInCache(module: ModuleDto) {
-    this.queryClient.setQueryData<ModuleDto[]>(getGetModulesQueryKey(), (modules) => {
+    this.setData<ModuleDto[]>(getGetModulesQueryKey(), (modules) => {
       if (!modules) {
         return modules;
       }
@@ -391,11 +401,11 @@ export class EngineConnection {
       const index = modules.findIndex((m) => m.id === module.id);
       return index < 0 ? [...modules, module] : modules.with(index, module);
     });
-    this.queryClient.setQueryData(getGetModuleQueryKey(module.id), module);
+    this.setData(getGetModuleQueryKey(module.id), module);
   }
 
   private setSubgraphInCache(subgraph: SubgraphDto) {
-    this.queryClient.setQueryData<SubgraphDto[]>(getGetSubgraphsQueryKey(), (subgraphs) => {
+    this.setData<SubgraphDto[]>(getGetSubgraphsQueryKey(), (subgraphs) => {
       if (!subgraphs) {
         return subgraphs;
       }
