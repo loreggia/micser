@@ -1,0 +1,58 @@
+version: 2
+
+updates:
+  - package-ecosystem: "nuget"
+    # src/Vac isn't in Micser.slnx
+    directories: ["/", "/src/Vac"]
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 3
+    ignore:
+      - dependency-name: "Microsoft.OpenApi"
+        update-types: ["version-update:semver-major"]
+    groups:
+      # needs a driver build and a VM test
+      wdk:
+        patterns: ["Microsoft.Windows.WDK.*", "Microsoft.Windows.SDK.CPP*"]
+      microsoft-and-system:
+        patterns: ["Microsoft.*", "System.*"]
+      microsoft-and-system-security:
+        applies-to: security-updates
+        patterns: ["Microsoft.*", "System.*"]
+      aspire:
+        patterns: ["Aspire.*"]
+      opentelemetry:
+        patterns: ["OpenTelemetry.*"]
+      serilog:
+        patterns: ["Serilog*"]
+      minor-and-patch:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]
+
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 3
+    groups:
+      security:
+        applies-to: security-updates
+        patterns: ["*"]
+        # changes the allowScripts entry, so it needs "npm run allow-scripts:auto"
+        exclude-patterns: ["esbuild"]
+      # can move esbuild, which needs "npm run allow-scripts:auto"
+      vite-and-vitest:
+        patterns: ["vite", "@vitejs/*", "vitest", "@vitest/*", "vitest-browser-react"]
+      playwright:
+        patterns: ["playwright", "@playwright/*"]
+      react:
+        patterns: ["react", "react-dom", "@types/react", "@types/react-dom"]
+      fluentui:
+        patterns: ["@fluentui/*"]
+      eslint:
+        patterns: ["eslint", "@eslint/*"]
+      minor-and-patch:
+        patterns: ["*"]
+        update-types: ["minor", "patch"]

@@ -31,7 +31,8 @@ $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.e
 $msbuild = & $vswhere -latest -requires Microsoft.Component.MSBuild -find "MSBuild\**\Bin\amd64\MSBuild.exe" | Select-Object -First 1
 if (-not $msbuild) { throw "64-bit MSBuild not found" }
 
-$infVerif = Join-Path $vacDir "packages/Microsoft.Windows.WDK.x64.10.0.28000.2526/c/tools/10.0.28000.0/x64/infverif.exe"
+$wdkVersion = (([xml](Get-Content (Join-Path $vacDir "packages.config"))).packages.package | Where-Object id -eq "Microsoft.Windows.WDK.x64").version
+$infVerif = (Resolve-Path (Join-Path $vacDir "packages/Microsoft.Windows.WDK.x64.$wdkVersion/c/tools/10.*/x64/infverif.exe")).Path
 
 foreach ($p in $Platform) {
     & $msbuild (Join-Path $vacDir "Micser.Vac.vcxproj") -nologo -m -v:m `
