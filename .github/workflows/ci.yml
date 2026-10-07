@@ -116,6 +116,14 @@ jobs:
       - name: Format
         run: npm run format:check
 
+      # the results of unchanged files (by content), from the latest run with the same dependencies and config
+      - name: Cache the ESLint results
+        uses: actions/cache@v6
+        with:
+          path: node_modules/.cache/eslint
+          key: eslint-${{ runner.os }}-${{ hashFiles('package-lock.json', 'eslint.config.js') }}-${{ github.sha }}
+          restore-keys: eslint-${{ runner.os }}-${{ hashFiles('package-lock.json', 'eslint.config.js') }}-
+
       - name: Lint
         run: npm run lint
 
