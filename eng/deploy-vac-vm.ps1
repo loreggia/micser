@@ -17,13 +17,15 @@ $root = Split-Path $PSScriptRoot -Parent
 $vacDir = Join-Path $root "src/Vac"
 $binDir = Join-Path $vacDir "bin/x64/$Configuration"
 $harnessDir = Join-Path $root "artifacts/harness"
-$devcon = Join-Path $vacDir "packages/Microsoft.Windows.WDK.x64.10.0.28000.2526/c/tools/10.0.28000.0/x64/devcon.exe"
 $remoteDir = "C:\MicserVac"
 $hardwareId = "ROOT\MicserVac"
 
 if (-not $NoBuild) {
     & (Join-Path $PSScriptRoot "build-vac.ps1") -Configuration $Configuration -Platform x64
 }
+
+$wdkVersion = (([xml](Get-Content (Join-Path $vacDir "packages.config"))).packages.package | Where-Object id -eq "Microsoft.Windows.WDK.x64").version
+$devcon = (Resolve-Path (Join-Path $vacDir "packages/Microsoft.Windows.WDK.x64.$wdkVersion/c/tools/10.*/x64/devcon.exe")).Path
 
 if ($TestSeconds -gt 0) {
     dotnet publish (Join-Path $root "tools/AudioHarness") -c Release -r win-x64 --self-contained -o $harnessDir
