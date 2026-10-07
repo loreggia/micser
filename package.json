@@ -22,7 +22,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test -c tests/E2E",
-    "lint": "eslint . --cache --cache-strategy content --cache-location node_modules/.cache/eslint/",
+    "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },

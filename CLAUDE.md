@@ -25,7 +25,7 @@ npm run test:e2e -- specs/subgraphs.spec.ts --headed
 # as in CI: against a published engine, which serves the built UI (no Vite)
 npm run build && dotnet publish src/Engine -c Release -o artifacts/e2e-engine
 MICSER_E2E_PUBLISHED_ENGINE=artifacts/e2e-engine/Micser.Engine.dll npm run test:e2e
-npm run lint                 # eslint (flat config at the root), caching results by file content in node_modules/.cache/eslint
+npm run lint                 # eslint (flat config at the root)
 npm run format:check         # prettier; .prettierignore limits it to the web workspaces
 npm run generate:api -w @micser/web-sdk   # regenerate the API client after engine API changes (build the engine first)
 
