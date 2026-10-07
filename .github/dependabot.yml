@@ -36,6 +36,12 @@ updates:
       interval: "weekly"
     cooldown:
       default-days: 3
+    ignore:
+      # @types/node follows the Node version (volta.node in package.json)
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "typescript"
+        update-types: ["version-update:semver-major"]
     groups:
       security:
         applies-to: security-updates
