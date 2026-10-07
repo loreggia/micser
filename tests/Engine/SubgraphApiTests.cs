@@ -172,7 +172,8 @@ public class SubgraphApiTests
         var gain = await factory.AddModuleAsync(client, "Gain");
         var subgraph = await CreateSubgraphAsync(factory, client, new ModulePosition(0, 0), gain.Id);
         await using var hub = factory.CreateHubConnection();
-        var changed = hub.NextAsync<SubgraphDto>("SubgraphChanged");
+        // the change from creating the subgraph may still be queued for sending when the hub connects
+        var changed = hub.NextAsync<SubgraphDto>("SubgraphChanged", s => s.IsMuted);
         await hub.StartAsync();
 
         using var response = await client.PutAsJsonAsync($"/api/subgraphs/{subgraph.Id}", subgraph with { IsMuted = true, IsBypassed = true }, factory.Json);
@@ -180,7 +181,7 @@ public class SubgraphApiTests
         var audioModule = (EffectModule)GetAudioModule(factory, gain.Id);
 
         await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.OK);
-        await Assert.That((await changed).IsMuted).IsTrue();
+        await Assert.That((await changed).IsBypassed).IsTrue();
         await Assert.That(module!.IsMuted).IsFalse();
         await Assert.That(module.IsBypassed).IsFalse();
         await Assert.That(audioModule.IsMuted).IsTrue();
