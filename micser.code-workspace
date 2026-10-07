@@ -61,5 +61,6 @@
     "editor.formatOnSaveMode": "file",
     "files.eol": "\n",
     "i18n-ally.localesPaths": ["src/Web/src/locales", "src/WebSdk/src/i18n", "src/Plugins/Main/Web/src/locales"],
+    "powershell.cwd": "root",
   },
 }
