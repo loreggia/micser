@@ -3,8 +3,8 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup Label="AppHost">
-    <PackageVersion Include="Aspire.Hosting.Browsers" Version="13.6.0-preview.1.26479.8" />
-    <PackageVersion Include="Aspire.Hosting.JavaScript" Version="13.6.0" />
+    <PackageVersion Include="Aspire.Hosting.Browsers" Version="13.6.1-preview.1.26506.6" />
+    <PackageVersion Include="Aspire.Hosting.JavaScript" Version="13.6.1" />
   </ItemGroup>
   <ItemGroup Label="Audio">
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.12" />
