@@ -246,6 +246,21 @@ describe("engine events", () => {
     expect(queryClient.getQueryData(getGetModuleQueryKey(original.id))).toEqual(withGain(6));
   });
 
+  test("an event during a fetch of the same data starts the fetch again, which may have read older data", () => {
+    void queryClient.fetchQuery({
+      queryKey: getGetModulesQueryKey(),
+      queryFn: () => new Promise<ModuleDto[]>(() => {}),
+      // the cached modules are fresh
+      staleTime: 0,
+    });
+    const invalidate = vi.spyOn(queryClient, "invalidateQueries");
+
+    receive("ModuleChanged", withGain(6));
+
+    expect(invalidate).toHaveBeenCalledWith({ queryKey: getGetModulesQueryKey(), exact: true });
+    expect(invalidate).not.toHaveBeenCalledWith({ queryKey: getGetModuleQueryKey(original.id), exact: true });
+  });
+
   test("a new module is added", () => {
     const other = testModule("Gain", { gain: 1 }, { id: "gain-2" });
 
@@ -422,9 +437,44 @@ describe("connection", () => {
 
     hub().reconnecting!();
     hub().reconnected!();
+    await vi.advanceTimersByTimeAsync(0);
 
     expect(states).toEqual(["reconnecting", "connected"]);
     expect(invalidate).toHaveBeenCalledOnce();
+  });
+
+  test("connecting cancels the fetches in progress before reloading, since they may have missed changes", async () => {
+    const cancel = vi.spyOn(queryClient, "cancelQueries");
+    const invalidate = vi.spyOn(queryClient, "invalidateQueries");
+
+    connection.start();
+    await vi.advanceTimersByTimeAsync(0);
+
+    expect(cancel).toHaveBeenCalledBefore(invalidate);
+  });
+
+  test("starting while a stop is in progress connects once it's done, as when StrictMode restarts an effect", async () => {
+    let rejectStart: (error: Error) => void = () => {};
+    hub().start.mockImplementationOnce(() => {
+      hub().state = HubConnectionState.Connecting;
+      return new Promise((_, reject) => (rejectStart = reject));
+    });
+    hub().stop.mockImplementationOnce(async () => {
+      hub().state = HubConnectionState.Disconnecting;
+      rejectStart(new Error("Stopped during negotiation"));
+      await Promise.resolve();
+      hub().state = HubConnectionState.Disconnected;
+    });
+    const states = recordStates();
+
+    connection.start();
+    await vi.advanceTimersByTimeAsync(0);
+    void connection.stop();
+    connection.start();
+    await vi.advanceTimersByTimeAsync(0);
+
+    expect(hub().start).toHaveBeenCalledTimes(2);
+    expect(states.at(-1)).toBe("connected");
   });
 
   test("a closed connection is restarted, but not after stopping", async () => {

@@ -302,8 +302,17 @@ async function withServers(browser: Browser, use: (servers: Servers) => Promise<
     try {
       // with Vite, the first load compiles the UI, which takes long while the other workers do the same
       const page = await browser.newPage();
+      // this page isn't traced, so its errors go into the failure, e.g. a module that didn't load
+      const problems: string[] = [];
+      page.on("console", (message) => void (message.type() === "error" && problems.push(message.text())));
+      page.on("requestfailed", (request) => void problems.push(`${request.url()}: ${request.failure()?.errorText}`));
       await page.goto(web.url);
-      await expect(page.getByText("Connected", { exact: true })).toBeVisible({ timeout: 60_000 });
+      try {
+        await expect(page.getByText("Connected", { exact: true })).toBeVisible({ timeout: 60_000 });
+      } catch (error) {
+        throw new Error(`The UI didn't connect to the engine.\n${problems.join("\n")}`, { cause: error });
+      }
+
       await page.close();
 
       await use({ engineUrl: engine.url, webUrl: web.url, restartEngine: () => engine.restart() });

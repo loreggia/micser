@@ -184,12 +184,14 @@ jobs:
         env:
           MICSER_E2E_PUBLISHED_ENGINE: ${{ github.workspace }}/artifacts/e2e-engine/Micser.Engine.dll
 
+      # also after a test passed on retry: the report has the failed attempt's trace
       - name: Upload the report
-        if: failure()
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v7
         with:
           name: e2e-report-${{ matrix.shard }}
           path: tests/E2E/playwright-report
+          retention-days: 14
 
   release:
     needs: [dotnet, vac, vac-codeql, web, e2e]

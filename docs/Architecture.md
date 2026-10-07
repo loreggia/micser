@@ -175,7 +175,7 @@ docs/
   - Both the document and the client are committed. CI fails if either is out of date.
   - `engineFetch` adds the access token and throws `EngineApiError` with the problem details.
 - **State:**
-  - Engine data lives in the TanStack Query cache, which never goes stale. `EngineConnection` (SignalR) patches it from engine events and refetches everything after a reconnect.
+  - Engine data lives in the TanStack Query cache, which never goes stale. `EngineConnection` (SignalR) patches it from engine events and refetches everything after connecting, cancelling fetches that started before (they may have missed events). An event that arrives while the same data is being fetched restarts that fetch, whose result could be older than the event.
   - Module and subgraph updates (`useModuleUpdate`, `useSubgraphUpdate`) show immediately and go to the engine debounced (80 ms, last value wins). Engine echoes are ignored while an update is pending, so controls don't jump back.
   - `useModuleData(moduleId)` subscribes to live data (spectrum, stream statistics).
 - **Widgets:**

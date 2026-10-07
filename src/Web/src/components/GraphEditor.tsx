@@ -270,6 +270,9 @@ export function GraphEditor() {
     const subgraphsById = new Map(subgraphs.map((s) => [s.id, s]));
     setNodes((current) => {
       const existing = new Map(current.map((node) => [node.id, node]));
+      // React Flow can have measured a node before the measurement reaches `current`; given a node without it, React Flow forgets the
+      // node's ports and may not measure them again, which leaves its connections undrawn
+      const measured = (node: GraphNode) => node.measured ?? getInternalNode(node.id)?.measured;
 
       // parents have to come before their children
       const subgraphNodes = subgraphs.map((subgraph): SubgraphNodeType => {
@@ -283,7 +286,7 @@ export function GraphEditor() {
         const position = node?.dragging ? node.position : subgraph.position;
 
         return node
-          ? { ...node, data, position, ...size }
+          ? { ...node, measured: measured(node), data, position, ...size }
           : { id: subgraph.id, type: "subgraph" as const, position, data, ...size };
       });
 
@@ -295,13 +298,13 @@ export function GraphEditor() {
         const placement = { parentId: subgraph?.id, hidden: subgraph?.isCollapsed ?? false };
 
         return node
-          ? { ...node, data, position, ...placement }
+          ? { ...node, measured: measured(node), data, position, ...placement }
           : { id: module.id, type: "module" as const, position, data, ...placement };
       });
 
       return [...subgraphNodes, ...moduleNodes];
     });
-  }, [modules, subgraphs, typesByName, widgets, proxyPorts, setNodes]);
+  }, [modules, subgraphs, typesByName, widgets, proxyPorts, setNodes, getInternalNode]);
 
   // a new module that was added here becomes the only selected element once it's on the graph
   useEffect(() => {
