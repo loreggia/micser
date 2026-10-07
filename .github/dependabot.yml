@@ -2,8 +2,8 @@ version: 2
 
 updates:
   - package-ecosystem: "nuget"
-    # src/Vac isn't in Micser.slnx
-    directories: ["/", "/src/Vac"]
+    # doesn't cover the WDK packages in src/Vac/packages.config: Dependabot only reads .NET projects, not .vcxproj
+    directory: "/"
     schedule:
       interval: "weekly"
     cooldown:
@@ -12,9 +12,6 @@ updates:
       - dependency-name: "Microsoft.OpenApi"
         update-types: ["version-update:semver-major"]
     groups:
-      # needs a driver build and a VM test
-      wdk:
-        patterns: ["Microsoft.Windows.WDK.*", "Microsoft.Windows.SDK.CPP*"]
       microsoft-and-system:
         patterns: ["Microsoft.*", "System.*"]
       microsoft-and-system-security:
