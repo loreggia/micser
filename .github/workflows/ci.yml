@@ -51,7 +51,7 @@ jobs:
           key: vac-packages-${{ hashFiles('src/Vac/packages.config') }}
 
       - name: Build and verify
-        run: ./eng/build-vac.ps1 -Configuration Release -Platform ${{ matrix.platform }}
+        run: ./scripts/build-vac.ps1 -Configuration Release -Platform ${{ matrix.platform }}
 
   vac-codeql:
     # like the vac job
@@ -69,7 +69,7 @@ jobs:
           key: vac-packages-${{ hashFiles('src/Vac/packages.config') }}
 
       - name: CodeQL driver checks
-        run: ./eng/codeql-vac.ps1
+        run: ./scripts/codeql-vac.ps1
 
       - name: Upload CodeQL results
         if: always()

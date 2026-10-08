@@ -47,7 +47,7 @@ jobs:
 
       - name: Pack
         shell: pwsh
-        run: ./eng/pack.ps1 -Version ${{ steps.version.outputs.version }} -RequireReleaseNotes
+        run: ./scripts/pack.ps1 -Version ${{ steps.version.outputs.version }} -RequireReleaseNotes
 
       - name: Publish
         run: dotnet vpk upload github --repoUrl ${{ github.server_url }}/${{ github.repository }} --channel win --outputDir artifacts/releases --token ${{ secrets.GITHUB_TOKEN }} --tag ${{ github.ref_name }} --releaseName "Micser ${{ steps.version.outputs.version }}" --publish ${{ steps.version.outputs.pre }}

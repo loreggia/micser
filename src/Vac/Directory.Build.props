@@ -5,7 +5,7 @@
     <WdkVersion>$([System.Text.RegularExpressions.Regex]::Match($([System.IO.File]::ReadAllText('$(MSBuildThisFileDirectory)packages.config')), 'id="Microsoft\.Windows\.WDK\.x64" version="([^"]+)"').Result('$1'))</WdkVersion>
     <WdkPackages>$(MSBuildThisFileDirectory)packages\</WdkPackages>
   </PropertyGroup>
-  <!-- WDK and SDK from NuGet (packages.config, restored by eng/build-vac.ps1) -->
+  <!-- WDK and SDK from NuGet (packages.config, restored by scripts/build-vac.ps1) -->
   <Import Project="$(WdkPackages)Microsoft.Windows.WDK.x64.$(WdkVersion)\build\native\Microsoft.Windows.WDK.x64.props" Condition="'$(Platform)' == 'x64'" />
   <Import Project="$(WdkPackages)Microsoft.Windows.WDK.arm64.$(WdkVersion)\build\native\Microsoft.Windows.WDK.arm64.props" Condition="'$(Platform)' == 'ARM64'" />
   <Import Project="$(WdkPackages)Microsoft.Windows.SDK.CPP.x64.$(WdkVersion)\build\native\Microsoft.Windows.SDK.cpp.x64.props" Condition="'$(Platform)' == 'x64'" />
