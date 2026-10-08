@@ -3,7 +3,13 @@ using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Micser.Audio;
 
-public sealed record Connection(OutputPort Source, InputPort Target);
+/// <summary>
+/// A connection from an output to an input, as a whole or from or to a single channel (see <see cref="ChannelMixer"/>). A channel that the
+/// current layout doesn't have is silent.
+/// </summary>
+/// <param name="SourceChannel">The only source channel taken, or null for all.</param>
+/// <param name="TargetChannel">The only target channel added to, or null for all.</param>
+public sealed record Connection(OutputPort Source, InputPort Target, int? SourceChannel = null, int? TargetChannel = null);
 
 /// <summary>
 /// The modules and connections that are processed together, one block per <see cref="Process"/> call.
@@ -62,9 +68,15 @@ public sealed class AudioGraph
         }
     }
 
+    /// <param name="sourceChannel">The only source channel to take (0..63), or null for all.</param>
+    /// <param name="targetChannel">The only target channel to add to (0..63), or null for all.</param>
     /// <exception cref="InvalidOperationException">A port's module isn't part of the graph, the connection exists or it would create a cycle.</exception>
-    public Connection Connect(OutputPort source, InputPort target)
+    public Connection Connect(OutputPort source, InputPort target, int? sourceChannel = null, int? targetChannel = null)
     {
+        ThrowIfInvalidChannel(sourceChannel, nameof(sourceChannel));
+        ThrowIfInvalidChannel(targetChannel, nameof(targetChannel));
+        var connection = new Connection(source, target, sourceChannel, targetChannel);
+
         lock (_editLock)
         {
             if (!_modules.Contains(source.Module) || !_modules.Contains(target.Module))
@@ -72,9 +84,9 @@ public sealed class AudioGraph
                 throw new InvalidOperationException("Both modules must be part of the graph.");
             }
 
-            if (_connections.Exists(c => c.Source == source && c.Target == target))
+            if (_connections.Contains(connection))
             {
-                throw new InvalidOperationException($"{source} is already connected to {target}.");
+                throw new InvalidOperationException($"{Describe(connection)} already exists.");
             }
 
             if (Reaches(target.Module, source.Module))
@@ -82,18 +94,17 @@ public sealed class AudioGraph
                 throw new InvalidOperationException($"Connecting {source} to {target} would create a cycle.");
             }
 
-            var connection = new Connection(source, target);
             _connections.Add(connection);
             Rebuild();
             return connection;
         }
     }
 
-    public bool Disconnect(OutputPort source, InputPort target)
+    public bool Disconnect(OutputPort source, InputPort target, int? sourceChannel = null, int? targetChannel = null)
     {
         lock (_editLock)
         {
-            if (_connections.RemoveAll(c => c.Source == source && c.Target == target) == 0)
+            if (!_connections.Remove(new Connection(source, target, sourceChannel, targetChannel)))
             {
                 return false;
             }
@@ -158,6 +169,22 @@ public sealed class AudioGraph
         }
     }
 
+    private static string Describe(Connection connection)
+    {
+        var source = connection.SourceChannel is { } s ? $"{connection.Source}[{s}]" : connection.Source.ToString();
+        var target = connection.TargetChannel is { } t ? $"{connection.Target}[{t}]" : connection.Target.ToString();
+        return $"The connection from {source} to {target}";
+    }
+
+    private static void ThrowIfInvalidChannel(int? channel, string paramName)
+    {
+        if (channel is { } c)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegative(c, paramName);
+            ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(c, AudioModule.MaxChannelCount, paramName);
+        }
+    }
+
     private bool Reaches(AudioModule from, AudioModule to)
     {
         var visited = new HashSet<AudioModule>();
@@ -195,7 +222,7 @@ public sealed class AudioGraph
         {
             var inputs = module.Inputs.ToArray();
             var sources = inputs
-                .Select(input => _connections.Where(c => c.Target == input).Select(c => c.Source).ToArray())
+                .Select(input => _connections.Where(c => c.Target == input).ToArray())
                 .ToArray();
             steps.Add(new Step(module, inputs, sources));
 
@@ -215,5 +242,5 @@ public sealed class AudioGraph
         }
     }
 
-    private sealed record Step(AudioModule Module, InputPort[] Inputs, OutputPort[][] Sources);
+    private sealed record Step(AudioModule Module, InputPort[] Inputs, Connection[][] Sources);
 }

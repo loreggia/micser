@@ -16,6 +16,13 @@ public class ChannelMixerTests
     }
 
     [Test]
+    public async Task Channels_OutsideTheLayouts_AreRejected()
+    {
+        await Assert.That(() => new ChannelMixer(ChannelLayout.Stereo, ChannelLayout.Stereo, 2, null)).Throws<ArgumentOutOfRangeException>();
+        await Assert.That(() => new ChannelMixer(ChannelLayout.Stereo, ChannelLayout.Stereo, null, -1)).Throws<ArgumentOutOfRangeException>();
+    }
+
+    [Test]
     public async Task MixInto_AddsToTarget()
     {
         var mixer = new ChannelMixer(ChannelLayout.Mono, ChannelLayout.Stereo);
@@ -57,6 +64,29 @@ public class ChannelMixerTests
         await Assert.That(mixer.GetGain(0, 0)).IsEqualTo(1f);
         await Assert.That(mixer.GetGain(1, 1)).IsEqualTo(1f);
         await Assert.That(mixer.GetGain(0, 1)).IsEqualTo(0f);
+    }
+
+    [Test]
+    public async Task SourceAndTargetChannel_MapOneToOne()
+    {
+        var mixer = new ChannelMixer(ChannelLayout.Surround71, ChannelLayout.Stereo, 5, 1);
+
+        await Assert.That(mixer.GetGain(5, 1)).IsEqualTo(1f);
+        await Assert.That(mixer.GetGain(5, 0)).IsEqualTo(0f);
+        await Assert.That(mixer.GetGain(1, 1)).IsEqualTo(0f);
+    }
+
+    [Test]
+    public async Task SourceChannel_IsMixedInAsMono()
+    {
+        var toStereo = new ChannelMixer(ChannelLayout.Surround51, ChannelLayout.Stereo, 2, null);
+        var toSurround = new ChannelMixer(ChannelLayout.Stereo, ChannelLayout.Surround51, 1, null);
+
+        await Assert.That(toStereo.GetGain(2, 0)).IsEqualTo(1f);
+        await Assert.That(toStereo.GetGain(2, 1)).IsEqualTo(1f);
+        await Assert.That(toStereo.GetGain(0, 0)).IsEqualTo(0f);
+        await Assert.That(toSurround.GetGain(1, ChannelLayout.Surround51.IndexOf(Speakers.FrontCenter))).IsEqualTo(1f);
+        await Assert.That(toSurround.GetGain(1, ChannelLayout.Surround51.IndexOf(Speakers.FrontRight))).IsEqualTo(0f);
     }
 
     [Test]
@@ -102,6 +132,17 @@ public class ChannelMixerTests
         await Assert.That(mixer.GetGain(source.IndexOf(Speakers.SideLeft), 0)).IsEqualTo(MinusThreeDb);
         await Assert.That(mixer.GetGain(source.IndexOf(Speakers.SideLeft), 1)).IsEqualTo(0f);
         await Assert.That(mixer.GetGain(source.IndexOf(Speakers.LowFrequency), 0)).IsEqualTo(0f);
+    }
+
+    [Test]
+    public async Task TargetChannel_GetsTheSourceMixedDown()
+    {
+        var mixer = new ChannelMixer(ChannelLayout.Surround51, ChannelLayout.Quad, null, 3);
+        var lfe = ChannelLayout.Surround51.IndexOf(Speakers.LowFrequency);
+
+        await Assert.That(mixer.GetGain(0, 3)).IsEqualTo(0.2f);
+        await Assert.That(mixer.GetGain(lfe, 3)).IsEqualTo(0f);
+        await Assert.That(mixer.GetGain(0, 0)).IsEqualTo(0f);
     }
 
     [Test]

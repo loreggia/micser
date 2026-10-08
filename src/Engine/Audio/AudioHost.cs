@@ -123,8 +123,25 @@ public sealed class AudioHost : IDisposable
 
         lock (_lock)
         {
-            var connection = ConnectCore(new ConnectionDto(Guid.NewGuid(), request.SourceModuleId, request.SourcePort, request.TargetModuleId, request.TargetPort));
+            var dto = new ConnectionDto(
+                Guid.NewGuid(), request.SourceModuleId, request.SourcePort, request.TargetModuleId, request.TargetPort, request.SourceChannel, request.TargetChannel);
+            if (dto.TargetChannel is { } channel && _modules.TryGetValue(dto.TargetModuleId, out var target)
+                && target.Settings.ChannelCount is { } channelCount && channel >= channelCount && IsFlexibleInput(target, dto.TargetPort))
+            {
+                throw EngineRequestException.Invalid(new Dictionary<string, string[]>
+                {
+                    ["targetChannel"] = [$"The module has {channelCount} channels."],
+                });
+            }
+
+            var connection = ConnectCore(dto);
+            ModuleEntry[] changed = [.. new[] { _modules[dto.SourceModuleId], _modules[dto.TargetModuleId] }.Distinct().Where(FixChannelSettings)];
             Persist();
+            foreach (var entry in changed)
+            {
+                _notifier.ModuleChanged(ToDto(entry));
+            }
+
             _notifier.ConnectionAdded(connection.Dto);
             return connection.Dto;
         }
@@ -139,7 +156,7 @@ public sealed class AudioHost : IDisposable
                 return false;
             }
 
-            Graph.Disconnect(connection.Source, connection.Target);
+            Disconnect(connection);
             Persist();
             _notifier.ConnectionRemoved(connectionId);
             return true;
@@ -207,7 +224,8 @@ public sealed class AudioHost : IDisposable
                 [.. module.Inputs.Select(p => p.Name)],
                 [.. module.Outputs.Select(p => p.Name)],
                 definition.GetState(module),
-                module is EffectModule);
+                module is EffectModule,
+                SupportsChannelCount(module));
         })];
     }
 
@@ -326,6 +344,11 @@ public sealed class AudioHost : IDisposable
             }
 
             var connections = ConnectTemplate(template.Connections, moduleIds);
+            foreach (var entry in modules)
+            {
+                FixChannelSettings(entry);
+            }
+
             Persist();
 
             _notifier.SubgraphChanged(subgraph);
@@ -578,7 +601,8 @@ public sealed class AudioHost : IDisposable
                 [.. _connections.Values
                     .Select(c => c.Dto)
                     .Where(c => localIds.ContainsKey(c.SourceModuleId) && localIds.ContainsKey(c.TargetModuleId))
-                    .Select(c => new TemplateConnectionDto(localIds[c.SourceModuleId], c.SourcePort, localIds[c.TargetModuleId], c.TargetPort))]);
+                    .Select(c => new TemplateConnectionDto(
+                        localIds[c.SourceModuleId], c.SourcePort, localIds[c.TargetModuleId], c.TargetPort, c.SourceChannel, c.TargetChannel))]);
             _templates[template.Id] = template;
             subgraph = subgraph with { TemplateId = template.Id, TemplateRevision = template.Revision };
             _subgraphs[subgraph.Id] = subgraph;
@@ -637,11 +661,13 @@ public sealed class AudioHost : IDisposable
             }
 
             ThrowIfUnknownSubgraph(dto.SubgraphId);
+            ThrowIfChannelsInUse(entry, dto);
 
             entry.Settings = WithSystemVolume(ModuleSettings.From(dto) with
             {
                 IsBypassed = dto.IsBypassed && entry.Module is EffectModule,
                 TemplateModuleId = dto.SubgraphId == entry.Settings.SubgraphId ? entry.Settings.TemplateModuleId : null,
+                ChannelCount = SupportsChannelCount(entry.Module) ? dto.ChannelCount : null,
             });
             ApplySettings(entry.Module, entry.Settings);
             entry.Definition.SetState(entry.Module, dto.StateObject);
@@ -760,20 +786,26 @@ public sealed class AudioHost : IDisposable
             // connections between the modules that the template has stay; the others are replaced
             var memberIds = moduleIds.Values.ToHashSet();
             var wanted = template.Connections
-                .Select(c => new TemplateConnectionDto(moduleIds[c.SourceModuleId], c.SourcePort, moduleIds[c.TargetModuleId], c.TargetPort))
+                .Select(c => c with { SourceModuleId = moduleIds[c.SourceModuleId], TargetModuleId = moduleIds[c.TargetModuleId] })
                 .ToHashSet();
             foreach (var connection in _connections.Values.Where(c => memberIds.Contains(c.Dto.SourceModuleId) && memberIds.Contains(c.Dto.TargetModuleId)).ToArray())
             {
                 var dto = connection.Dto;
-                if (!wanted.Remove(new TemplateConnectionDto(dto.SourceModuleId, dto.SourcePort, dto.TargetModuleId, dto.TargetPort)))
+                if (!wanted.Remove(new TemplateConnectionDto(
+                    dto.SourceModuleId, dto.SourcePort, dto.TargetModuleId, dto.TargetPort, dto.SourceChannel, dto.TargetChannel)))
                 {
                     _connections.Remove(dto.Id);
-                    Graph.Disconnect(connection.Source, connection.Target);
+                    Disconnect(connection);
                     removedConnections.Add(connection);
                 }
             }
 
             var addedConnections = ConnectTemplate([.. wanted], memberIds.ToDictionary(m => m));
+            foreach (var entry in changed)
+            {
+                FixChannelSettings(entry);
+            }
+
             subgraph = subgraph with { Color = template.Color, Size = template.Size, TemplateRevision = template.Revision };
             _subgraphs[id] = subgraph;
             Persist();
@@ -814,6 +846,14 @@ public sealed class AudioHost : IDisposable
         }
     }
 
+    /// <summary>
+    /// Whether the module's input takes its layout from its sources or from <see cref="AudioModule.ChannelCount"/>.
+    /// </summary>
+    private static bool IsFlexibleInput(ModuleEntry entry, string port)
+    {
+        return entry.Module.Inputs.FirstOrDefault(p => p.Name == port) is { Layout: null };
+    }
+
     private static bool IsInSubgraph(UnavailableModule module, Guid subgraphId)
     {
         return module.Element.TryGetProperty("subgraphId", out var id) && id.TryGetGuid(out var guid) && guid == subgraphId;
@@ -822,6 +862,11 @@ public sealed class AudioHost : IDisposable
     private static ModulePosition? Offset(ModulePosition? position, double x, double y)
     {
         return position == null ? null : new ModulePosition(position.X + x, position.Y + y);
+    }
+
+    private static bool SupportsChannelCount(AudioModule module)
+    {
+        return module.Inputs.Any(p => p.Layout == null);
     }
 
     private static void ThrowIfBuiltIn(SubgraphTemplate template)
@@ -896,17 +941,22 @@ public sealed class AudioHost : IDisposable
         }
 
         module.StateChanged += OnModuleStateChanged;
-        var entry = new ModuleEntry(id, definition, module, settings with { IsBypassed = settings.IsBypassed && module is EffectModule });
+        var entry = new ModuleEntry(
+            id,
+            definition,
+            module,
+            settings with { IsBypassed = settings.IsBypassed && module is EffectModule, ChannelCount = SupportsChannelCount(module) ? settings.ChannelCount : null });
         _modules.Add(id, entry);
         return entry;
     }
 
     /// <summary>
-    /// Sets the module's volume, mute and bypass, combining mute and bypass with its subgraph's.
+    /// Sets the module's channel count, volume, mute and bypass, combining mute and bypass with its subgraph's.
     /// </summary>
     private void ApplySettings(AudioModule module, ModuleSettings settings)
     {
         var subgraph = settings.SubgraphId is { } id && _subgraphs.TryGetValue(id, out var s) ? s : null;
+        module.ChannelCount = SupportsChannelCount(module) ? settings.ChannelCount : null;
         module.Volume = settings.Volume;
         module.IsMuted = settings.IsMuted || subgraph?.IsMuted == true;
         if (module is EffectModule effect)
@@ -954,6 +1004,11 @@ public sealed class AudioHost : IDisposable
                 _logger.LogWarning("Skipping connection {Id}: {Reason}", connection.Id, ex.Message);
             }
         }
+
+        foreach (var entry in _modules.Values)
+        {
+            FixChannelSettings(entry);
+        }
     }
 
     private ConnectionEntry ConnectCore(ConnectionDto dto)
@@ -968,6 +1023,11 @@ public sealed class AudioHost : IDisposable
         var targetPort = target.Module.Inputs.FirstOrDefault(p => p.Name == dto.TargetPort)
             ?? throw EngineRequestException.Invalid($"Module type '{target.Definition.Type}' has no input '{dto.TargetPort}'.");
 
+        if (dto.SourceChannel is < 0 or >= AudioModule.MaxChannelCount || dto.TargetChannel is < 0 or >= AudioModule.MaxChannelCount)
+        {
+            throw EngineRequestException.Invalid($"Channels are 0..{AudioModule.MaxChannelCount - 1}.");
+        }
+
         if (_connections.ContainsKey(dto.Id))
         {
             throw EngineRequestException.Conflict($"Connection {dto.Id} already exists.");
@@ -975,7 +1035,7 @@ public sealed class AudioHost : IDisposable
 
         try
         {
-            Graph.Connect(sourcePort, targetPort);
+            Graph.Connect(sourcePort, targetPort, dto.SourceChannel, dto.TargetChannel);
         }
         catch (InvalidOperationException ex)
         {
@@ -999,7 +1059,13 @@ public sealed class AudioHost : IDisposable
             try
             {
                 created.Add(ConnectCore(new ConnectionDto(
-                    Guid.NewGuid(), moduleIds[connection.SourceModuleId], connection.SourcePort, moduleIds[connection.TargetModuleId], connection.TargetPort)));
+                    Guid.NewGuid(),
+                    moduleIds[connection.SourceModuleId],
+                    connection.SourcePort,
+                    moduleIds[connection.TargetModuleId],
+                    connection.TargetPort,
+                    connection.SourceChannel,
+                    connection.TargetChannel)));
             }
             catch (EngineRequestException ex)
             {
@@ -1016,6 +1082,39 @@ public sealed class AudioHost : IDisposable
         return new EngineStatusDto(Engine.IsRunning, _settings, statistics.Blocks, statistics.LateBlocks, statistics.MaxProcessingTime.TotalMilliseconds);
     }
 
+    private void Disconnect(ConnectionEntry connection)
+    {
+        Graph.Disconnect(connection.Source, connection.Target, connection.Dto.SourceChannel, connection.Dto.TargetChannel);
+    }
+
+    /// <summary>
+    /// Turns <see cref="ModuleSettings.ShowChannels"/> on for a module with connections to or from single channels, and raises its channel
+    /// count to what they need.
+    /// </summary>
+    /// <returns>Whether the settings changed.</returns>
+    private bool FixChannelSettings(ModuleEntry entry)
+    {
+        var settings = entry.Settings;
+        if (!settings.ShowChannels && GetChannelConnections(entry.Id).Any())
+        {
+            settings = settings with { ShowChannels = true };
+        }
+
+        if (settings.ChannelCount is { } channelCount && GetRequiredChannelCount(entry) is var required && channelCount < required)
+        {
+            settings = settings with { ChannelCount = required };
+        }
+
+        if (settings == entry.Settings)
+        {
+            return false;
+        }
+
+        entry.Settings = settings;
+        ApplySettings(entry.Module, settings);
+        return true;
+    }
+
     /// <summary>
     /// The module's position in the graph, not relative to its subgraph.
     /// </summary>
@@ -1024,6 +1123,28 @@ public sealed class AudioHost : IDisposable
         return settings.SubgraphId is { } id && _subgraphs.TryGetValue(id, out var subgraph)
             ? Offset(settings.Position, subgraph.Position.X, subgraph.Position.Y)
             : settings.Position;
+    }
+
+    /// <summary>
+    /// The connections, also of unavailable modules, that take a single channel of the module's outputs or add to a single channel of its inputs.
+    /// </summary>
+    private IEnumerable<ConnectionDto> GetChannelConnections(Guid moduleId)
+    {
+        return _connections.Values.Select(c => c.Dto)
+            .Concat(_unavailableConnections)
+            .Where(c => (c.SourceModuleId == moduleId && c.SourceChannel != null) || (c.TargetModuleId == moduleId && c.TargetChannel != null));
+    }
+
+    /// <summary>
+    /// The lowest channel count the module's connections to single channels of its flexible inputs need; 1 without any.
+    /// </summary>
+    private int GetRequiredChannelCount(ModuleEntry entry)
+    {
+        return GetChannelConnections(entry.Id)
+            .Where(c => c.TargetModuleId == entry.Id && c.TargetChannel != null && IsFlexibleInput(entry, c.TargetPort))
+            .Select(c => c.TargetChannel!.Value + 1)
+            .DefaultIfEmpty(1)
+            .Max();
     }
 
     /// <summary>
@@ -1242,6 +1363,27 @@ public sealed class AudioHost : IDisposable
 
         _modules.Clear();
         _connections.Clear();
+    }
+
+    /// <summary>
+    /// Rejects an update that hides the channels of a module with connections to or from single channels, or sets a channel count lower
+    /// than they need.
+    /// </summary>
+    private void ThrowIfChannelsInUse(ModuleEntry entry, ModuleDto dto)
+    {
+        var errors = new Dictionary<string, string[]>();
+        if (!dto.ShowChannels && GetChannelConnections(entry.Id).Any())
+        {
+            errors["showChannels"] = ["Connections to or from single channels of the module exist."];
+        }
+
+        if (SupportsChannelCount(entry.Module) && dto.ChannelCount is { } channelCount && GetRequiredChannelCount(entry) is var required
+            && channelCount < required)
+        {
+            errors["channelCount"] = [$"The module's connections to single channels need {required} channels."];
+        }
+
+        ThrowIfInvalid(errors);
     }
 
     private void ThrowIfUnknownSubgraph(Guid? id)

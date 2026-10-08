@@ -1,15 +1,34 @@
 using System.ComponentModel.DataAnnotations;
+using Micser.Audio;
 using Micser.Engine.Plugins;
 
 namespace Micser.Engine.Contracts;
 
-public sealed record ConnectionDto(Guid Id, Guid SourceModuleId, string SourcePort, Guid TargetModuleId, string TargetPort);
+/// <param name="SourceChannel">The only channel of the source port taken (0-based), or null for all.</param>
+/// <param name="TargetChannel">The only channel of the target port added to (0-based), or null for all.</param>
+public sealed record ConnectionDto(
+    Guid Id,
+    Guid SourceModuleId,
+    string SourcePort,
+    Guid TargetModuleId,
+    string TargetPort,
+    int? SourceChannel = null,
+    int? TargetChannel = null);
 
+/// <param name="SourceChannel">
+/// The only channel of the source port to take (0-based), or null for all. A channel the port doesn't have right now is silent.
+/// </param>
+/// <param name="TargetChannel">
+/// The only channel of the target port to add to (0-based), or null for all. With a fixed <see cref="ModuleDto.ChannelCount"/>, it must be
+/// below it.
+/// </param>
 public sealed record CreateConnectionRequest(
     Guid SourceModuleId,
     [Required] string SourcePort,
     Guid TargetModuleId,
-    [Required] string TargetPort);
+    [Required] string TargetPort,
+    [Range(0, AudioModule.MaxChannelCount - 1)] int? SourceChannel = null,
+    [Range(0, AudioModule.MaxChannelCount - 1)] int? TargetChannel = null);
 
 /// <param name="SampleRate">The sample rate the graph is processed at, in Hz.</param>
 /// <param name="FrameCount">Frames per processing block; smaller blocks lower the latency and raise the CPU load.</param>

@@ -12,6 +12,8 @@ namespace Micser.Audio;
 /// neighbours (e.g. center into front left/right at -3 dB, back into side or front). LFE is dropped.</item>
 /// <item>Otherwise channels are mapped by index; surplus channels are dropped.</item>
 /// </list>
+/// It can also take a single source channel (mixed in as a mono source) or add to a single target channel (mixed down as for a mono
+/// target), or both (1:1).
 /// </summary>
 public sealed class ChannelMixer
 {
@@ -39,15 +41,56 @@ public sealed class ChannelMixer
     private readonly Route[] _routes;
 
     public ChannelMixer(ChannelLayout source, ChannelLayout target)
+        : this(source, target, null, null)
     {
+    }
+
+    /// <summary>
+    /// Creates a mixer that takes only one channel of the source, or adds only to one channel of the target. A source channel is mixed in
+    /// like a mono source; for a target channel, the source is mixed down like for a mono target.
+    /// </summary>
+    /// <param name="sourceChannel">The source channel to take, or null for all.</param>
+    /// <param name="targetChannel">The target channel to add to, or null for all.</param>
+    public ChannelMixer(ChannelLayout source, ChannelLayout target, int? sourceChannel, int? targetChannel)
+    {
+        if (sourceChannel is { } sourceIndex)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegative(sourceIndex, nameof(sourceChannel));
+            ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(sourceIndex, source.ChannelCount, nameof(sourceChannel));
+        }
+
+        if (targetChannel is { } targetIndex)
+        {
+            ArgumentOutOfRangeException.ThrowIfNegative(targetIndex, nameof(targetChannel));
+            ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(targetIndex, target.ChannelCount, nameof(targetChannel));
+        }
+
         Source = source;
         Target = target;
-        _routes = CreateRoutes(source, target);
+        SourceChannel = sourceChannel;
+        TargetChannel = targetChannel;
+        _routes = (sourceChannel, targetChannel) switch
+        {
+            ({ } s, { } t) => [new Route(s, t, 1f)],
+            ({ } s, null) => [.. CreateRoutes(ChannelLayout.Mono, target).Select(r => r with { SourceChannel = s })],
+            (null, { } t) => [.. CreateRoutes(source, ChannelLayout.Mono).Select(r => r with { TargetChannel = t })],
+            _ => CreateRoutes(source, target),
+        };
     }
 
     public ChannelLayout Source { get; }
 
+    /// <summary>
+    /// The only source channel taken, or null for all.
+    /// </summary>
+    public int? SourceChannel { get; }
+
     public ChannelLayout Target { get; }
+
+    /// <summary>
+    /// The only target channel added to, or null for all.
+    /// </summary>
+    public int? TargetChannel { get; }
 
     /// <summary>
     /// Gets the gain applied from a source channel to a target channel.

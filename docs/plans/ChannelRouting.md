@@ -14,18 +14,18 @@ Channels are part of a connection, not separate ports. Module types, plugins, `M
 
 - A connection gets `sourceChannel` and `targetChannel` (0-based, optional). Without both it carries the whole port, as now.
 
-  | Connection | Mixing |
-  |---|---|
-  | whole → whole | as now (`ChannelMixer`) |
-  | channel → whole | the source channel as mono, by the mono rule (front center, or front left and right) |
-  | whole → channel | the source folded to mono (average without LFE), added to that channel |
-  | channel → channel | added 1:1 |
+  | Connection        | Mixing                                                                               |
+  | ----------------- | ------------------------------------------------------------------------------------ |
+  | whole → whole     | as now (`ChannelMixer`)                                                              |
+  | channel → whole   | the source channel as mono, by the mono rule (front center, or front left and right) |
+  | whole → channel   | the source folded to mono (average without LFE), added to that channel               |
+  | channel → channel | added 1:1                                                                            |
 
 - A channel that the current layout doesn't have is silent. Such connections are kept (config, API), so they work again when e.g. an unplugged device comes back.
 - `ModuleDto` gets `showChannels` (default false) and `channelCount` (null = Auto, otherwise 1–64). Both are saved with the module and in templates.
 - `ModuleTypeDto` gets `supportsChannelCount`: the module has an input whose layout comes from its sources.
 
-## Phase 1: audio and engine
+## Phase 1: audio and engine (done)
 
 - `src/Audio`
   - `Connection` gets `SourceChannel` and `TargetChannel`. `AudioGraph.Connect` treats ports plus channels as unique, so a whole and a channel connection between the same ports can both exist. Cycle detection stays per module.
@@ -37,7 +37,8 @@ Channels are part of a connection, not separate ports. Module types, plugins, `M
 - API and `AudioHost`
   - `ConnectionDto` and `CreateConnectionRequest` get `int? sourceChannel` and `int? targetChannel` (`[Range(0, 63)]`). The duplicate check (409) includes them. Channels the port doesn't have right now are accepted, since layouts change at runtime.
   - A module with channel connections on its side has `showChannels = true`: the end that names a channel counts (for channel → whole only the source module, for channel → channel both). Creating a channel connection (API or template instantiation) turns it on and broadcasts `ModuleChanged`; turning it off while such connections exist is rejected (400).
-  - A `channelCount` below the highest target channel of the module's channel connections is rejected (400). `[Range(1, 64)]`.
+  - A `channelCount` below the highest target channel of the module's channel connections is rejected (400), and so is a connection to a channel beyond a set `channelCount` of an input without a fixed layout. `[Range(1, 64)]`.
+  - Restoring the configuration and instantiating or updating from a template fix `showChannels` and `channelCount` instead of rejecting, so nothing is dropped.
   - "Update from template" takes the template's `showChannels` and `channelCount` unless that would break these rules.
 - Config and templates
   - `TemplateConnectionDto` gets the channels; updating from a template matches on them.

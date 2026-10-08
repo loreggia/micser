@@ -360,6 +360,27 @@ public class SubgraphTemplateApiTests
     }
 
     [Test]
+    public async Task Templates_KeepChannelConnections()
+    {
+        await using var factory = new EngineFactory();
+        using var client = factory.CreateAuthorizedClient();
+        var (subgraph, first, second) = await CreateChainAsync(factory, client);
+        (await client.PostAsJsonAsync("/api/connections", new CreateConnectionRequest(first.Id, "Output", second.Id, "Input", 0, 1))).EnsureSuccessStatusCode();
+
+        var template = await SaveAsync(factory, client, subgraph.Id, "Chain");
+        var created = await InstantiateAsync(factory, client, template.Id, new ModulePosition(1000, 500));
+        var modules = await GetMembersAsync(factory, client, created.Id);
+        var connections = (await client.GetFromJsonAsync<ConnectionDto[]>("/api/connections"))!
+            .Where(c => modules.Any(m => m.Id == c.SourceModuleId))
+            .ToArray();
+
+        await Assert.That(template.Connections.Select(c => (c.SourceChannel, c.TargetChannel))).IsEquivalentTo([((int?)null, (int?)null), (0, 1)]);
+        await Assert.That(template.Modules.All(m => m.ShowChannels)).IsTrue();
+        await Assert.That(connections.Select(c => (c.SourceChannel, c.TargetChannel))).IsEquivalentTo([((int?)null, (int?)null), (0, 1)]);
+        await Assert.That(modules.All(m => m.ShowChannels)).IsTrue();
+    }
+
+    [Test]
     public async Task UpdateSubgraph_CanClearButNotSetTheTemplate()
     {
         await using var factory = new EngineFactory();
