@@ -10,6 +10,10 @@ from that section, and the release workflow fails without it.
 
 ## Unreleased
 
+## 0.11.0 - 2026-10-08
+
+- Internal maintenance; no user-visible changes.
+
 ## 0.10.0 - 2026-10-08
 
 - Micser uses its own green accent colour instead of the default blue.
