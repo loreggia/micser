@@ -39,7 +39,7 @@ src/
   Shell/                      Micser.Shell: tray + WebView2 window, engine launcher, updates
   ServiceDefaults/            Micser.ServiceDefaults: OpenTelemetry setup, exported only when run from the AppHost
   DriverUtility/              Micser.DriverUtility: VAC driver install/config CLI (standalone)
-  Vac/                        Micser.Vac: VAC driver (C++), built by eng/build-vac.ps1, not in Micser.slnx
+  Vac/                        Micser.Vac: VAC driver (C++), built by scripts/build-vac.ps1, not in Micser.slnx
 tests/                        mirrors src/
   Audio/, DriverUtility/, Engine/, Plugins/Main/, Shell/
   Engine/TestPlugin/          a plugin for the plugin loader tests
@@ -47,7 +47,8 @@ tests/                        mirrors src/
 tools/                        dev-only programs, in Micser.slnx but never shipped
   AppHost/                    Aspire AppHost: engine, Vite and (on demand) shell with a dashboard
   AudioHarness/               routes real devices through a gain module; measures latency, probes stream formats
-eng/                          pack.ps1 (Velopack release), build-vac.ps1, codeql-vac.ps1, deploy-vac-vm.ps1 (driver)
+scripts/                      pack.ps1 (Velopack release), build-vac.ps1, codeql-vac.ps1, deploy-vac-vm.ps1 (driver),
+                              repair-line-endings.mts (pre-commit hook, npm run fix-line-endings)
 docs/
 ```
 
@@ -244,7 +245,7 @@ docs/
 
 ## Packaging and updates
 
-- **Build:** `eng/pack.ps1 -Version x.y.z` builds the web UI, publishes engine and shell self-contained (win-x64) into one folder, and packs it with `vpk` (a local dotnet tool) into `artifacts/releases`.
+- **Build:** `scripts/pack.ps1 -Version x.y.z` builds the web UI, publishes engine and shell self-contained (win-x64) into one folder, and packs it with `vpk` (a local dotnet tool) into `artifacts/releases`.
   - The output is `Micser-win-Setup.exe`, a portable zip, and full and delta packages.
   - Both apps use the same runtime, so its files are shared.
   - Nothing is code-signed yet, so SmartScreen warns on the first run. Signing would go through `vpk pack --signParams`.
@@ -252,7 +253,7 @@ docs/
   - It downloads the previous release (the base for deltas), packs, and publishes a GitHub release.
   - Tags with a suffix (`v0.2.0-beta.1`) become pre-releases, which installed copies ignore.
 - **Release notes** are written by hand in `CHANGELOG.md`, for users: changes collect under "Unreleased", which is renamed to `## X.Y.Z` before tagging.
-  - `eng/pack.ps1` takes the version's section and passes it to `vpk pack --releaseNotes`, which embeds it in the package; `vpk upload github` makes it the GitHub release body. It also ships it as `ReleaseNotes.md` in the app folder. The release workflow fails without a section (`-RequireReleaseNotes`).
+  - `scripts/pack.ps1` takes the version's section and passes it to `vpk pack --releaseNotes`, which embeds it in the package; `vpk upload github` makes it the GitHub release body. It also ships it as `ReleaseNotes.md` in the app folder. The release workflow fails without a section (`-RequireReleaseNotes`).
   - The shell provides the notes of the installed version (`ReleaseNotes.md`) and of a downloaded update (`VelopackAsset.NotesMarkdown`, from its package). An update that skips versions shows only the target version's notes.
 - **Install:**
   - The install goes to `%LocalAppData%\Micser`: the stub `Micser.exe`, `Update.exe`, `current\` (the app) and `packages\`. The shell's local data (logs, `engine.json`, `shell.json`, WebView2) lives in the same folder.
@@ -268,7 +269,7 @@ docs/
   - A downloaded update is also applied on the next shell start.
   - `MICSER_UPDATE_SOURCE` points the shell at another feed (a local folder or URL) for testing.
   - Velopack logs to `%LocalAppData%\velopack\velopack_Micser.log`.
-- **Driver:** Velopack can't run elevated steps, so the VAC driver isn't part of the app's installation. `eng/pack.ps1 -DriverPackage <dir>` puts the driver and `DriverUtility` in the release's `driver` folder, and the shell installs and changes the driver from the settings by running `DriverUtility` elevated (see [VAC driver](#vac-driver)). The release workflow doesn't bundle it until the driver is attestation-signed (EV certificate); without a driver package the app hides the driver settings.
+- **Driver:** Velopack can't run elevated steps, so the VAC driver isn't part of the app's installation. `scripts/pack.ps1 -DriverPackage <dir>` puts the driver and `DriverUtility` in the release's `driver` folder, and the shell installs and changes the driver from the settings by running `DriverUtility` elevated (see [VAC driver](#vac-driver)). The release workflow doesn't bundle it until the driver is attestation-signed (EV certificate); without a driver package the app hides the driver settings.
 
 ## VAC driver
 
@@ -290,16 +291,16 @@ docs/
   - Windows doesn't set the endpoint's `PKEY_AudioEndpoint_PhysicalSpeakers`, which some games might read instead of the mix format (untested).
 - **DRM.** Render streams with `CopyProtect` rights don't write into the cable.
 - **DriverUtility** (Native AOT exe, SetupAPI): `status | install | update | set-count | set-layout | sync-formats | uninstall`. It copies itself and the driver package to `%ProgramFiles%\Micser\Driver` with its own "Apps and Features" entry, so uninstalling Micser leaves the driver, and logs to `%ProgramData%\Micser\logs`. The shell runs it elevated with the engine paused, reads its status at start (a tray notice for a newer bundled driver), and the settings' "Virtual audio cables" section drives it.
-- **Build.** The WDK and SDK come from NuGet (`src/Vac/packages.config`, restored by `eng/build-vac.ps1`); the build also needs the WDK component of Visual Studio (`Microsoft.Windows.DriverKit`) and the Spectre-mitigated libraries, and the 64-bit MSBuild because the WDK packages only ship 64-bit host tools. x64 and ARM64, warnings as errors, Spectre mitigation, InfVerif `/w` after each build. Minimum Windows 10 2004 (19041) because of `ExAllocatePool2`. CI builds it on the `windows-2025-vs2026` image.
+- **Build.** The WDK and SDK come from NuGet (`src/Vac/packages.config`, restored by `scripts/build-vac.ps1`); the build also needs the WDK component of Visual Studio (`Microsoft.Windows.DriverKit`) and the Spectre-mitigated libraries, and the 64-bit MSBuild because the WDK packages only ship 64-bit host tools. x64 and ARM64, warnings as errors, Spectre mitigation, InfVerif `/w` after each build. Minimum Windows 10 2004 (19041) because of `ExAllocatePool2`. CI builds it on the `windows-2025-vs2026` image.
 - **Signing.** Builds are test-signed with the WDK test certificate. Release signing (EV certificate, attestation signing) is pending.
-- **Testing.** `eng/deploy-vac-vm.ps1` installs a build in the Hyper-V VM "DriverTesting" with test signing on (PowerShell Direct, `devcon`), and with `-TestSeconds` runs `AudioHarness latency` from cable input to cable output there. `AudioHarness formats` checks the accepted formats and the channel mapping.
+- **Testing.** `scripts/deploy-vac-vm.ps1` installs a build in the Hyper-V VM "DriverTesting" with test signing on (PowerShell Direct, `devcon`), and with `-TestSeconds` runs `AudioHarness latency` from cable input to cable output there. `AudioHarness formats` checks the accepted formats and the channel mapping.
   - Every dev build has the same `DriverVer`, so PnP keeps using an older package from the driver store and `devcon update` still reports success. The script therefore removes the device and all Micser packages before each install.
   - In an enhanced (RDP) session the VM only shows "Remote Audio", not the cable endpoints. PowerShell Direct and the basic console session see them.
   - A user must be signed in at the console (basic session): otherwise the audio engine renders silence for the PowerShell Direct session's streams, also into the loopback. The VM signs in automatically (Winlogon `AutoAdminLogon`, with `DevicePasswordLessBuildVersion` = 0), so this survives reboots.
   - In Debug builds, a second adapter (e.g. when a removed device still waits for a reboot) hits a breakpoint in `NewAdapterCommon` and bugchecks without a debugger; the script reboots the VM when `devcon remove` asks for it.
   - Kernel debug output can be captured with Sysinternals `dbgviewcli64 -k -v --duration <s> -l <file>` in the VM.
   - Driver Verifier (standard checks) is enabled for `MicserVac.sys` in the VM, so every test runs under it.
-- **Static analysis.** `eng/codeql-vac.ps1` runs Microsoft's CodeQL driver suites (`microsoft/windows-drivers`, the WHCP `mustfix` and `recommended` suites) and fails on findings in the driver's code; CI runs it for x64 in a job of its own. Findings in the WDK headers and `cpp/drivers/init-not-cleared` (PortCls creates the FDO) are excluded.
+- **Static analysis.** `scripts/codeql-vac.ps1` runs Microsoft's CodeQL driver suites (`microsoft/windows-drivers`, the WHCP `mustfix` and `recommended` suites) and fails on findings in the driver's code; CI runs it for x64 in a job of its own. Findings in the WDK headers and `cpp/drivers/init-not-cleared` (PortCls creates the FDO) are excluded.
 
 ## Testing
 

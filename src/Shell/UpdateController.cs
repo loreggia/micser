@@ -67,7 +67,7 @@ internal sealed class UpdateController : IDisposable
     }
 
     /// <summary>
-    /// Returns the markdown release notes of the installed version (from <see cref="ReleaseNotesFileName"/>, written by eng/pack.ps1)
+    /// Returns the markdown release notes of the installed version (from <see cref="ReleaseNotesFileName"/>, written by scripts/pack.ps1)
     /// or of the downloaded update (from its package), or null for another version or a release without notes.
     /// </summary>
     public string? GetReleaseNotes(string version)

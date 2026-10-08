@@ -40,13 +40,13 @@ dotnet run --project tools/AudioHarness -- formats 2 1             # formats out
 ```
 
 ```sh
-./eng/build-vac.ps1 -Platform x64,ARM64           # VAC driver: restores the WDK NuGet packages, builds src/Vac, runs InfVerif
-./eng/deploy-vac-vm.ps1 -TestSeconds 600          # installs the test-signed driver in the Hyper-V VM "DriverTesting" and runs the cable latency test
-./eng/codeql-vac.ps1                              # Microsoft CodeQL driver checks (WHCP suites); fails on findings in src/Vac
+./scripts/build-vac.ps1 -Platform x64,ARM64       # VAC driver: restores the WDK NuGet packages, builds src/Vac, runs InfVerif
+./scripts/deploy-vac-vm.ps1 -TestSeconds 600      # installs the test-signed driver in the Hyper-V VM "DriverTesting" and runs the cable latency test
+./scripts/codeql-vac.ps1                          # Microsoft CodeQL driver checks (WHCP suites); fails on findings in src/Vac
 ```
 
 ```sh
-./eng/pack.ps1 -Version 0.1.0       # Velopack release (Setup.exe, packages) in artifacts/releases; tags vX.Y.Z publish via .github/workflows/release.yml
+./scripts/pack.ps1 -Version 0.1.0   # Velopack release (Setup.exe, packages) in artifacts/releases; tags vX.Y.Z publish via .github/workflows/release.yml
                                     # release notes: the "## 0.1.0" section of CHANGELOG.md (rename "Unreleased" before tagging)
 ```
 
@@ -107,7 +107,7 @@ Tests (see "Testing"):
 
 Driver (`src/Vac`, see "VAC driver"):
 
-- It isn't in `Micser.slnx`; build it with `eng/build-vac.ps1`. Its `Directory.Build.props` replaces the root one.
+- It isn't in `Micser.slnx`; build it with `scripts/build-vac.ps1`. Its `Directory.Build.props` replaces the root one.
 - Code that runs at DISPATCH_LEVEL (stream position updates, `CCable`) stays in `#pragma code_seg()` and touches only nonpaged memory.
 - A change to a cable's format also needs the endpoints' stored device format set again (`DriverUtility`, `CableEndpoints`).
 - Keep the INX ASCII: as UTF-16 without BOM, inf2cat didn't recognize the stamped INF.

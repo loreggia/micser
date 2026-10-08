@@ -49,7 +49,7 @@ dotnet run --project src/Shell -- --ui http://localhost:5173   # optional: the t
 ### Packaging
 
 ```powershell
-./eng/pack.ps1 -Version 0.1.0   # Velopack setup and update packages in artifacts/releases
+./scripts/pack.ps1 -Version 0.1.0   # Velopack setup and update packages in artifacts/releases
 ```
 
 Pushing a tag `vX.Y.Z` builds the release on GitHub Actions and publishes it as a GitHub release, which installed copies update from.
@@ -59,8 +59,8 @@ Pushing a tag `vX.Y.Z` builds the release on GitHub Actions and publishes it as 
 The virtual audio cable driver (`src/Vac`) is not part of `Micser.slnx`. It needs Visual Studio with the Windows Driver Kit component and the Spectre-mitigated libraries; the WDK itself comes from NuGet.
 
 ```powershell
-./eng/build-vac.ps1 -Platform x64,ARM64   # test-signed driver packages in src/Vac/bin
-./eng/codeql-vac.ps1                      # Microsoft's CodeQL driver checks
+./scripts/build-vac.ps1 -Platform x64,ARM64   # test-signed driver packages in src/Vac/bin
+./scripts/codeql-vac.ps1                      # Microsoft's CodeQL driver checks
 ```
 
 ## Plugins
