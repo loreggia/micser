@@ -88,6 +88,30 @@
         }
       }
     },
+    "/api/port-layouts": {
+      "get": {
+        "tags": [
+          "Modules"
+        ],
+        "description": "The channel layouts of all modules' ports in the last processed block; changes are pushed as PortLayoutsChanged.",
+        "operationId": "GetPortLayouts",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ModulePortLayoutsDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/modules": {
       "get": {
         "tags": [
@@ -2146,6 +2170,32 @@
           }
         }
       },
+      "ModulePortLayoutsDto": {
+        "required": [
+          "moduleId",
+          "inputs",
+          "outputs"
+        ],
+        "type": "object",
+        "properties": {
+          "moduleId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "inputs": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/PortLayoutDto"
+            }
+          },
+          "outputs": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/PortLayoutDto"
+            }
+          }
+        }
+      },
       "ModulePosition": {
         "required": [
           "x",
@@ -2275,6 +2325,28 @@
           }
         }
       },
+      "PortLayoutDto": {
+        "required": [
+          "channelCount",
+          "speakers"
+        ],
+        "type": "object",
+        "properties": {
+          "channelCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "speakers": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/SpeakerPosition"
+            }
+          }
+        }
+      },
       "RenameSubgraphTemplateRequest": {
         "required": [
           "name"
@@ -2308,6 +2380,28 @@
             "format": "uuid"
           }
         }
+      },
+      "SpeakerPosition": {
+        "enum": [
+          "FrontLeft",
+          "FrontRight",
+          "FrontCenter",
+          "LowFrequency",
+          "BackLeft",
+          "BackRight",
+          "FrontLeftOfCenter",
+          "FrontRightOfCenter",
+          "BackCenter",
+          "SideLeft",
+          "SideRight",
+          "TopCenter",
+          "TopFrontLeft",
+          "TopFrontCenter",
+          "TopFrontRight",
+          "TopBackLeft",
+          "TopBackCenter",
+          "TopBackRight"
+        ]
       },
       "Speakers": {
         "type": "string"

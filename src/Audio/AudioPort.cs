@@ -1,8 +1,11 @@
+using NAudio.Wave;
+
 namespace Micser.Audio;
 
 public abstract class AudioPort
 {
     private AudioBuffer? _buffer;
+    private long _publishedLayout;
 
     private protected AudioPort(AudioModule module, string name)
     {
@@ -14,6 +17,18 @@ public abstract class AudioPort
     /// The port's buffer for the current block. Available once the module is added to a graph.
     /// </summary>
     public AudioBuffer Buffer => _buffer ?? throw new InvalidOperationException("The module has not been added to a graph.");
+
+    /// <summary>
+    /// The layout of the last processed block, readable from any thread; <see cref="ChannelLayout.None"/> before the first block.
+    /// </summary>
+    public ChannelLayout LastLayout
+    {
+        get
+        {
+            var packed = Volatile.Read(ref _publishedLayout);
+            return new ChannelLayout((int)(packed >> 32), (Speakers)(uint)packed);
+        }
+    }
 
     public AudioModule Module { get; }
 
@@ -27,6 +42,15 @@ public abstract class AudioPort
     internal void Allocate(int frameCount)
     {
         _buffer = new AudioBuffer(frameCount);
+    }
+
+    /// <summary>
+    /// Makes the buffer's layout the <see cref="LastLayout"/>. Audio thread only.
+    /// </summary>
+    internal void PublishLayout()
+    {
+        var layout = Buffer.Layout;
+        Volatile.Write(ref _publishedLayout, ((long)layout.ChannelCount << 32) | (uint)layout.Speakers);
     }
 }
 

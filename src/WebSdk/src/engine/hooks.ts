@@ -4,8 +4,10 @@ import { i18n, resolveLanguage } from "../i18n/i18n";
 import {
   getGetPreferencesQueryKey,
   updatePreferences,
+  useGetPortLayouts,
   useGetPreferences,
   type ModuleDto,
+  type ModulePortLayoutsDto,
   type SubgraphDto,
   type UiPreferencesDto,
 } from "../api";
@@ -51,6 +53,17 @@ export function useModuleLevels(moduleId: string): PortLevels[] | undefined {
   const connection = useEngineConnection();
   const subscribe = useCallback((onChange: () => void) => connection.subscribeLevels(onChange), [connection]);
   return useSyncExternalStore(subscribe, () => connection.levels?.[moduleId]);
+}
+
+/**
+ * Returns the channel layouts of a module's ports in the last processed block, or undefined until they're loaded. The engine pushes their
+ * changes, e.g. when a device opens or the channel count changes.
+ */
+export function usePortLayouts(moduleId: string): ModulePortLayoutsDto | undefined {
+  const { data } = useGetPortLayouts({
+    query: { select: (layouts) => layouts.find((layout) => layout.moduleId === moduleId) },
+  });
+  return data;
 }
 
 const defaultPreferences: UiPreferencesDto = { showStreamStatistics: false, snapToGrid: true, language: null };

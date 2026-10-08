@@ -1,10 +1,12 @@
 using Micser.Engine.Audio;
+using Micser.Engine.Contracts;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Micser.Engine.Hubs;
 
 /// <summary>
-/// Pushes the live data of subscribed modules to their subscribers, and the levels of all modules to the level subscribers.
+/// Pushes the live data of subscribed modules to their subscribers, the levels of all modules to the level subscribers, and changed port
+/// layouts to all clients.
 /// </summary>
 public sealed class ModuleDataPublisher : BackgroundService
 {
@@ -13,6 +15,7 @@ public sealed class ModuleDataPublisher : BackgroundService
     private readonly IHubContext<EngineHub, IEngineClient> _hub;
     private readonly ILogger<ModuleDataPublisher> _logger;
     private readonly ModuleDataSubscriptions _subscriptions;
+    private Dictionary<Guid, ModulePortLayoutsDto> _portLayouts = [];
 
     /// <summary>
     /// Pushes the live data of subscribed modules to their subscribers.
@@ -35,6 +38,7 @@ public sealed class ModuleDataPublisher : BackgroundService
         while (await timer.WaitForNextTickAsync(stoppingToken))
         {
             await PublishLevelsAsync();
+            await PublishPortLayoutsAsync();
             foreach (var moduleId in _subscriptions.GetSubscribedModules())
             {
                 try
@@ -52,6 +56,13 @@ public sealed class ModuleDataPublisher : BackgroundService
         }
     }
 
+    private static bool HaveSameLayouts(IReadOnlyDictionary<string, PortLayoutDto> ports, IReadOnlyDictionary<string, PortLayoutDto> others)
+    {
+        return ports.Count == others.Count && ports.All(port => others.TryGetValue(port.Key, out var other)
+            && other.ChannelCount == port.Value.ChannelCount
+            && (other.Speakers ?? []).SequenceEqual(port.Value.Speakers ?? []));
+    }
+
     private async Task PublishLevelsAsync()
     {
         try
@@ -66,6 +77,26 @@ public sealed class ModuleDataPublisher : BackgroundService
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "Publishing the levels failed.");
+        }
+    }
+
+    private async Task PublishPortLayoutsAsync()
+    {
+        try
+        {
+            var layouts = _host.GetPortLayouts();
+            ModulePortLayoutsDto[] changed = [.. layouts.Where(layout => !_portLayouts.TryGetValue(layout.ModuleId, out var previous)
+                || !HaveSameLayouts(previous.Inputs, layout.Inputs)
+                || !HaveSameLayouts(previous.Outputs, layout.Outputs))];
+            _portLayouts = layouts.ToDictionary(layout => layout.ModuleId);
+            if (changed.Length > 0)
+            {
+                await _hub.Clients.All.PortLayoutsChanged(changed);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Publishing the port layouts failed.");
         }
     }
 }

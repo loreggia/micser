@@ -61,6 +61,7 @@ export function testModule<T extends ModuleType>(
     isBypassed: false,
     isCollapsed: false,
     isMuted: false,
+    showChannels: false,
     useSystemVolume: false,
     volume: 1,
     ...overrides,

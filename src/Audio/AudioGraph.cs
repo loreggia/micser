@@ -129,6 +129,7 @@ public sealed class AudioGraph
                     for (var i = 0; i < step.Inputs.Length; i++)
                     {
                         step.Inputs[i].Mix(step.Sources[i]);
+                        step.Inputs[i].PublishLayout();
                     }
 
                     step.Module.ProcessBlock();
@@ -139,6 +140,7 @@ public sealed class AudioGraph
                     foreach (var output in step.Module.Outputs)
                     {
                         output.Buffer.SetLayout(ChannelLayout.None);
+                        output.PublishLayout();
                     }
 
                     if (_failingModules.Add(step.Module))

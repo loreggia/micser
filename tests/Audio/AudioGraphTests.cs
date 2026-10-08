@@ -236,6 +236,27 @@ public class AudioGraphTests
     }
 
     [Test]
+    public async Task Process_PublishesThePortLayouts()
+    {
+        var graph = new AudioGraph(Format);
+        var source = new ConstantSource(ChannelLayout.Quad);
+        var failing = new ThrowingSource();
+        var sink = new RecordingSink(ChannelLayout.Stereo);
+        graph.Add(source);
+        graph.Add(failing);
+        graph.Add(sink);
+        graph.Connect(source.Output, sink.Input);
+        var before = sink.Input.LastLayout;
+
+        graph.Process();
+
+        await Assert.That(before).IsEqualTo(ChannelLayout.None);
+        await Assert.That(source.Output.LastLayout).IsEqualTo(ChannelLayout.Quad);
+        await Assert.That(sink.Input.LastLayout).IsEqualTo(ChannelLayout.Stereo);
+        await Assert.That(failing.Output.LastLayout).IsEqualTo(ChannelLayout.None);
+    }
+
+    [Test]
     public async Task Process_RunsModulesInDependencyOrder()
     {
         var graph = new AudioGraph(Format);
