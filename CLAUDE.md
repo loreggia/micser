@@ -59,6 +59,7 @@ The harness opens real devices: use a very low gain (as above) unless audible ou
 ## Rules
 
 General:
+
 - Keep the folder layout and dependency direction in "Layout" of `docs/Architecture.md`: new projects go into `src/` (shipping), `tests/` (mirroring `src/`) or `tools/` (dev-only).
 - Nothing in `src/` compiles against a plugin, Main included (see "Plugins").
 - Package versions are central in `Directory.Packages.props`, so `PackageReference` items carry no `Version`. `TreatWarningsAsErrors` is on for all projects.
@@ -66,6 +67,7 @@ General:
 - npm runs no install scripts; after dependency changes, run `npm run allow-scripts:auto` (CI fails if it changes an allowlist). See "Development" for the npm setup.
 
 C#:
+
 - C# code is cleaned up with CodeMaid (settings in `CodeMaid.config`). Write new code in its layout so a cleanup run doesn't reshuffle it:
   - Member order by type: fields, constructors, destructors, delegates, events, properties, indexers, methods, nested enums, interfaces, structs, classes.
   - Within a type group: by access level (public, internal, protected, private), then alphabetically.
@@ -74,16 +76,19 @@ C#:
 - No primary constructors on classes or structs: use explicit constructors that assign `_camelCase` fields or properties. Positional records are fine.
 
 Audio (`src/Audio`, see "Audio engine"):
+
 - `Process` methods run on the audio thread. Don't allocate, lock (except the existing per-block locks) or log there on the normal path.
 - Module parameters are plain properties written from other threads. A parameter set that must change atomically is replaced as a whole (see `EqualizerModule.Bands`).
 - Nothing in `tests/` opens real devices.
 
 Engine (`src/Engine`, see "Engine"):
+
 - A new module type needs its own state record (data annotations on the record's parameters, as in ASP.NET Core), `IStatefulModule<TState>`, and a registration in its plugin's `ConfigureServices`. The engine, API, config file and OpenAPI pick it up from there.
 - Graph changes go through `AudioHost`.
 - When changing a plugin's built-in template (`templates.json`), increase its `revision` and keep its id and its modules' ids.
 
 Web UI (see "UI"):
+
 - Never edit `src/WebSdk/openapi/engine.json` or `src/WebSdk/src/api/generated` by hand; regenerate them and commit both.
 - Engine data comes from the generated query hooks; don't poll or invalidate after mutations. Module edits go through `useModuleUpdate`.
 - Fluent UI v9 components and `makeStyles` with `tokens`; no hard-coded colors. Icons come from `@fluentui/react-icons/svg/<name>`, not the package index (a lint rule).
@@ -95,10 +100,12 @@ Web UI (see "UI"):
 - Prettier style: 2 spaces, double quotes, semicolons, print width 120.
 
 Tests (see "Testing"):
+
 - Web tests sit in a `__tests__` folder next to the code they test. Render widgets inside `TestProviders` and seed the query client instead of fetching. A dependency that a browser test newly imports goes into `optimizeDeps.include` in `vitest.config.ts`: a second optimizer pass reloads the tests and can load React twice.
 - End-to-end tests set up state through `EngineApi` and check results there, not only in the DOM. A test that changes what `reset()` doesn't undo (plugins) uses `test.use({ ownEngine: true })`. Shell-only controls are tested with `FakeShell`.
 
 Driver (`src/Vac`, see "VAC driver"):
+
 - It isn't in `Micser.slnx`; build it with `eng/build-vac.ps1`. Its `Directory.Build.props` replaces the root one.
 - Code that runs at DISPATCH_LEVEL (stream position updates, `CCable`) stays in `#pragma code_seg()` and touches only nonpaged memory.
 - A change to a cable's format also needs the endpoints' stored device format set again (`DriverUtility`, `CableEndpoints`).

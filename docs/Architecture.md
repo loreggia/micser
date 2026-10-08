@@ -54,6 +54,7 @@ docs/
 **Module contract.** The engine exposes module definitions (type name, input/output connectors, state schema) through the API. Widgets are registered by module type name and read connectors from the definition instead of hard-coding them.
 
 **Dependencies** go one way:
+
 - .NET: `Plugins → Audio`, `Engine → Audio, ServiceDefaults`, and `Shell → nothing` (it talks to the engine over HTTP only). `DriverUtility` is standalone. The engine's reference to a built-in plugin is build-only (`ReferenceOutputAssembly="false"`): it copies the plugin to `plugins/<id>` without compiling against it.
 - npm: `plugin-* → web-sdk` and `web → web-sdk`. The SPA loads plugin widgets at runtime.
 

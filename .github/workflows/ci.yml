@@ -102,7 +102,7 @@ jobs:
 
       - name: Get the Playwright version
         id: playwright
-        run: "\"version=$((npx playwright --version).Split(' ')[-1])\" >> $env:GITHUB_OUTPUT"
+        run: '"version=$((npx playwright --version).Split('' '')[-1])" >> $env:GITHUB_OUTPUT'
 
       - name: Cache the Playwright browsers
         uses: actions/cache@v6
@@ -161,7 +161,7 @@ jobs:
 
       - name: Get the Playwright version
         id: playwright
-        run: "\"version=$((npx playwright --version).Split(' ')[-1])\" >> $env:GITHUB_OUTPUT"
+        run: '"version=$((npx playwright --version).Split('' '')[-1])" >> $env:GITHUB_OUTPUT'
 
       - name: Cache the Playwright browsers
         uses: actions/cache@v6
