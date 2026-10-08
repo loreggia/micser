@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
+using Micser.Audio;
 
 namespace Micser.Engine.Contracts;
 
@@ -14,6 +15,14 @@ public sealed record ModulePosition(double X, double Y);
 /// </summary>
 public abstract record ModuleDto
 {
+    /// <summary>
+    /// The channel count of the inputs that otherwise take their layout from their sources, or null to do so. Only modules whose type
+    /// <see cref="ModuleTypeDto.SupportsChannelCount"/> have it; it is ignored for all others. It can't be lower than the channels the
+    /// module's connections to single channels need.
+    /// </summary>
+    [Range(1, AudioModule.MaxChannelCount)]
+    public int? ChannelCount { get; init; }
+
     public required Guid Id { get; init; }
 
     /// <summary>
@@ -42,6 +51,12 @@ public abstract record ModuleDto
     /// <summary>
     /// The subgraph the module belongs to, from <c>GET /api/subgraphs</c>.
     /// </summary>
+    /// <summary>
+    /// Shows a connector per channel below each port in the UI's graph editor. It can't be turned off while connections to or from single
+    /// channels of the module exist; creating such a connection turns it on.
+    /// </summary>
+    public bool ShowChannels { get; init; }
+
     public Guid? SubgraphId { get; init; }
 
     /// <summary>
@@ -85,4 +100,11 @@ public sealed record CreateModuleRequest([Required] string Type, [MaxLength(100)
 /// <param name="Outputs">Names of the output ports.</param>
 /// <param name="DefaultState">The state of a new module of this type.</param>
 /// <param name="SupportsBypass">Whether <see cref="ModuleDto.IsBypassed"/> has an effect.</param>
-public sealed record ModuleTypeDto(string Type, IReadOnlyList<string> Inputs, IReadOnlyList<string> Outputs, object DefaultState, bool SupportsBypass);
+/// <param name="SupportsChannelCount">Whether <see cref="ModuleDto.ChannelCount"/> has an effect.</param>
+public sealed record ModuleTypeDto(
+    string Type,
+    IReadOnlyList<string> Inputs,
+    IReadOnlyList<string> Outputs,
+    object DefaultState,
+    bool SupportsBypass,
+    bool SupportsChannelCount);

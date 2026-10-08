@@ -14,6 +14,35 @@ public class AudioGraphTests
     }
 
     [Test]
+    [Arguments(0)]
+    [Arguments(65)]
+    public async Task ChannelCount_RejectsInvalidCounts(int channelCount)
+    {
+        var sink = new RecordingSink();
+
+        await Assert.That(() => { sink.ChannelCount = channelCount; }).Throws<ArgumentOutOfRangeException>();
+    }
+
+    [Test]
+    public async Task Connect_ChannelsMakeConnectionsDistinct()
+    {
+        var graph = new AudioGraph(Format);
+        var source = new ConstantSource(ChannelLayout.Stereo);
+        var sink = new RecordingSink();
+        graph.Add(source);
+        graph.Add(sink);
+        graph.Connect(source.Output, sink.Input);
+        graph.Connect(source.Output, sink.Input, 1, 0);
+        graph.Connect(source.Output, sink.Input, 1);
+
+        await Assert.That(graph.Connections.Count).IsEqualTo(3);
+        await Assert.That(() => graph.Connect(source.Output, sink.Input, 1, 0)).Throws<InvalidOperationException>();
+        await Assert.That(graph.Disconnect(source.Output, sink.Input, 1, 0)).IsTrue();
+        await Assert.That(graph.Disconnect(source.Output, sink.Input, 1, 0)).IsFalse();
+        await Assert.That(graph.Connections.Count).IsEqualTo(2);
+    }
+
+    [Test]
     public async Task Connect_RejectsCycles()
     {
         var graph = new AudioGraph(Format);
@@ -39,6 +68,22 @@ public class AudioGraphTests
 
         await Assert.That(() => graph.Connect(source.Output, sink.Input)).Throws<InvalidOperationException>();
         await Assert.That(() => graph.Connect(source.Output, new RecordingSink().Input)).Throws<InvalidOperationException>();
+    }
+
+    [Test]
+    [Arguments(-1)]
+    [Arguments(64)]
+    public async Task Connect_RejectsInvalidChannels(int channel)
+    {
+        var graph = new AudioGraph(Format);
+        var source = new ConstantSource(ChannelLayout.Stereo);
+        var sink = new RecordingSink();
+        graph.Add(source);
+        graph.Add(sink);
+
+        await Assert.That(() => graph.Connect(source.Output, sink.Input, channel)).Throws<ArgumentOutOfRangeException>();
+        await Assert.That(() => graph.Connect(source.Output, sink.Input, null, channel)).Throws<ArgumentOutOfRangeException>();
+        await Assert.That(graph.Connections).IsEmpty();
     }
 
     [Test]
@@ -95,6 +140,80 @@ public class AudioGraphTests
         graph.Process();
 
         await Assert.That(sink.Last!.GetChannel(0).ToArray()).All().Satisfy(s => s.IsEqualTo(0f));
+    }
+
+    [Test]
+    public async Task Process_ChannelCount_SetsTheLayoutOfInputsWithoutFixedLayout()
+    {
+        var graph = new AudioGraph(Format);
+        var source = new ConstantSource(ChannelLayout.Stereo);
+        var flexible = new RecordingSink { ChannelCount = 6 };
+        var fixedLayout = new RecordingSink(ChannelLayout.Mono) { ChannelCount = 6 };
+        graph.Add(source);
+        graph.Add(flexible);
+        graph.Add(fixedLayout);
+        graph.Connect(source.Output, flexible.Input);
+        graph.Connect(source.Output, fixedLayout.Input);
+
+        graph.Process();
+        var withChannelCount = flexible.Last!.Layout;
+        flexible.ChannelCount = null;
+        graph.Process();
+
+        await Assert.That(withChannelCount).IsEqualTo(ChannelLayout.Surround51);
+        await Assert.That(fixedLayout.Last!.Layout).IsEqualTo(ChannelLayout.Mono);
+        await Assert.That(flexible.Last!.Layout).IsEqualTo(ChannelLayout.Stereo);
+    }
+
+    [Test]
+    public async Task Process_ChannelToChannel_RoutesOnlyThatChannel()
+    {
+        var graph = new AudioGraph(Format);
+        var source = new ConstantSource(ChannelLayout.Quad);
+        var sink = new RecordingSink(ChannelLayout.Stereo);
+        graph.Add(source);
+        graph.Add(sink);
+        graph.Connect(source.Output, sink.Input, 2, 1);
+        graph.Connect(source.Output, sink.Input, 3, 0);
+
+        graph.Process();
+
+        await Assert.That(sink.Last!.GetChannel(0)[0]).IsEqualTo(4f);
+        await Assert.That(sink.Last!.GetChannel(1)[0]).IsEqualTo(3f);
+    }
+
+    [Test]
+    public async Task Process_ChannelToWholeInput_MixesInAsMono()
+    {
+        var graph = new AudioGraph(Format);
+        var source = new ConstantSource(ChannelLayout.Quad);
+        var sink = new RecordingSink(ChannelLayout.Stereo);
+        graph.Add(source);
+        graph.Add(sink);
+        graph.Connect(source.Output, sink.Input, 1);
+
+        graph.Process();
+
+        await Assert.That(sink.Last!.GetChannel(0)[0]).IsEqualTo(2f);
+        await Assert.That(sink.Last!.GetChannel(1)[0]).IsEqualTo(2f);
+    }
+
+    [Test]
+    public async Task Process_ChannelsOutsideTheLayouts_AreSilent()
+    {
+        var graph = new AudioGraph(Format);
+        var source = new ConstantSource(ChannelLayout.Stereo);
+        var sink = new RecordingSink(ChannelLayout.Stereo);
+        graph.Add(source);
+        graph.Add(sink);
+        graph.Connect(source.Output, sink.Input, 5, 0);
+        graph.Connect(source.Output, sink.Input, 0, 5);
+        graph.Connect(source.Output, sink.Input, 0, 1);
+
+        graph.Process();
+
+        await Assert.That(sink.Last!.GetChannel(0)[0]).IsEqualTo(0f);
+        await Assert.That(sink.Last!.GetChannel(1)[0]).IsEqualTo(1f);
     }
 
     [Test]
@@ -167,6 +286,23 @@ public class AudioGraphTests
     }
 
     [Test]
+    public async Task Process_WholeOutputToChannel_MixesDown()
+    {
+        var graph = new AudioGraph(Format);
+        var source = new ConstantSource(ChannelLayout.Stereo);
+        var sink = new RecordingSink(ChannelLayout.Quad);
+        graph.Add(source);
+        graph.Add(sink);
+        graph.Connect(source.Output, sink.Input, null, 2);
+
+        graph.Process();
+
+        await Assert.That(sink.Last!.GetChannel(2)[0]).IsEqualTo(1.5f);
+        await Assert.That(sink.Last!.GetChannel(0)[0]).IsEqualTo(0f);
+        await Assert.That(sink.Last!.GetChannel(3)[0]).IsEqualTo(0f);
+    }
+
+    [Test]
     public async Task Process_WithFixedLayout_ConvertsSources()
     {
         var graph = new AudioGraph(Format);
@@ -200,6 +336,37 @@ public class AudioGraphTests
         await Assert.That(sink.Last!.Layout).IsEqualTo(ChannelLayout.Stereo);
         await Assert.That(sink.Last.GetChannel(0)[0]).IsEqualTo(0.75f);
         await Assert.That(sink.Last.GetChannel(1)[0]).IsEqualTo(1.75f);
+    }
+
+    [Test]
+    public async Task Process_WithoutFixedLayout_WidensToTargetChannels()
+    {
+        var graph = new AudioGraph(Format);
+        var mono = new ConstantSource(ChannelLayout.Mono);
+        var stereo = new ConstantSource(ChannelLayout.Stereo);
+        var onlyChannels = new RecordingSink();
+        var highChannel = new RecordingSink();
+        var mixed = new RecordingSink();
+        graph.Add(mono);
+        graph.Add(stereo);
+        graph.Add(onlyChannels);
+        graph.Add(highChannel);
+        graph.Add(mixed);
+        graph.Connect(mono.Output, onlyChannels.Input, null, 0);
+        graph.Connect(mono.Output, highChannel.Input, null, 3);
+        graph.Connect(stereo.Output, mixed.Input);
+        graph.Connect(mono.Output, mixed.Input, null, 4);
+
+        graph.Process();
+
+        await Assert.That(onlyChannels.Last!.Layout).IsEqualTo(ChannelLayout.Stereo);
+        await Assert.That(onlyChannels.Last!.GetChannel(0)[0]).IsEqualTo(1f);
+        await Assert.That(onlyChannels.Last!.GetChannel(1)[0]).IsEqualTo(0f);
+        await Assert.That(highChannel.Last!.Layout).IsEqualTo(ChannelLayout.Quad);
+        await Assert.That(highChannel.Last!.GetChannel(3)[0]).IsEqualTo(1f);
+        await Assert.That(mixed.Last!.Layout).IsEqualTo(ChannelLayout.FromChannelCount(5));
+        await Assert.That(mixed.Last!.GetChannel(1)[0]).IsEqualTo(2f);
+        await Assert.That(mixed.Last!.GetChannel(4)[0]).IsEqualTo(1f);
     }
 
     [Test]

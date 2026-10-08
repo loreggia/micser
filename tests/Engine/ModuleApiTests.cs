@@ -1,8 +1,10 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json.Nodes;
+using Micser.Engine.Audio;
 using Micser.Engine.Contracts;
 using Micser.Plugins.Main.Modules;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Micser.Engine.Tests;
 
@@ -48,6 +50,18 @@ public class ModuleApiTests
         await Assert.That((float?)gain["defaultState"]!["gain"]).IsEqualTo(0f);
         await Assert.That((bool?)gain["supportsBypass"]).IsTrue();
         await Assert.That((bool?)types!.Single(t => (string?)t!["type"] == "DeviceOutput")!["supportsBypass"]).IsFalse();
+    }
+
+    [Test]
+    public async Task ModuleTypes_TellWhichSupportAChannelCount()
+    {
+        await using var factory = new EngineFactory();
+        using var client = factory.CreateAuthorizedClient();
+
+        var types = await client.GetFromJsonAsync<ModuleTypeDto[]>("/api/module-types");
+        var supported = types!.Where(t => t.SupportsChannelCount).Select(t => t.Type);
+
+        await Assert.That(supported).IsEquivalentTo(["Gain", "Compressor", "Equalizer", "Pitch", "Spectrum"]);
     }
 
     [Test]
@@ -101,6 +115,52 @@ public class ModuleApiTests
         var updated = await response.Content.ReadFromJsonAsync<ModuleDto>(factory.Json);
 
         await Assert.That(updated!.IsBypassed).IsFalse();
+    }
+
+    [Test]
+    public async Task UpdateModule_ChannelCount_AppliesToModulesThatSupportIt()
+    {
+        await using var factory = new EngineFactory();
+        using var client = factory.CreateAuthorizedClient();
+        var gain = await factory.AddModuleAsync(client, "Gain");
+        var device = await factory.AddModuleAsync(client, "DeviceOutput");
+
+        using var gainResponse = await client.PutAsJsonAsync($"/api/modules/{gain.Id}", gain with { ChannelCount = 6 }, factory.Json);
+        using var deviceResponse = await client.PutAsJsonAsync($"/api/modules/{device.Id}", device with { ChannelCount = 6 }, factory.Json);
+        var updatedGain = await gainResponse.Content.ReadFromJsonAsync<ModuleDto>(factory.Json);
+        var updatedDevice = await deviceResponse.Content.ReadFromJsonAsync<ModuleDto>(factory.Json);
+
+        await Assert.That(updatedGain!.ChannelCount).IsEqualTo(6);
+        await Assert.That(factory.Services.GetRequiredService<AudioHost>().GetAudioModule(gain.Id)!.ChannelCount).IsEqualTo(6);
+        await Assert.That(updatedDevice!.ChannelCount).IsNull();
+    }
+
+    [Test]
+    public async Task UpdateModule_ChannelSettingsInUse_AreBadRequest()
+    {
+        await using var factory = new EngineFactory();
+        using var client = factory.CreateAuthorizedClient();
+        var source = await factory.AddModuleAsync(client, "Gain");
+        var target = await factory.AddModuleAsync(client, "Gain");
+        var created = await client.PostAsJsonAsync("/api/connections", new CreateConnectionRequest(source.Id, "Output", target.Id, "Input", TargetChannel: 3));
+        var connection = await created.Content.ReadFromJsonAsync<ConnectionDto>();
+        target = (await client.GetFromJsonAsync<ModuleDto>($"/api/modules/{target.Id}", factory.Json))!;
+
+        using var hidden = await client.PutAsJsonAsync($"/api/modules/{target.Id}", target with { ShowChannels = false }, factory.Json);
+        using var tooFew = await client.PutAsJsonAsync($"/api/modules/{target.Id}", target with { ChannelCount = 3 }, factory.Json);
+        using var enough = await client.PutAsJsonAsync($"/api/modules/{target.Id}", target with { ChannelCount = 4 }, factory.Json);
+        (await client.DeleteAsync($"/api/connections/{connection!.Id}")).EnsureSuccessStatusCode();
+        using var hiddenWithoutConnections = await client.PutAsJsonAsync($"/api/modules/{target.Id}", target with { ShowChannels = false }, factory.Json);
+        var hiddenErrors = (await hidden.Content.ReadFromJsonAsync<JsonObject>())!["errors"]!.AsObject().Select(e => e.Key);
+        var tooFewErrors = (await tooFew.Content.ReadFromJsonAsync<JsonObject>())!["errors"]!.AsObject().Select(e => e.Key);
+
+        await Assert.That(target.ShowChannels).IsTrue();
+        await Assert.That(hidden.StatusCode).IsEqualTo(HttpStatusCode.BadRequest);
+        await Assert.That(hiddenErrors).IsEquivalentTo(["showChannels"]);
+        await Assert.That(tooFew.StatusCode).IsEqualTo(HttpStatusCode.BadRequest);
+        await Assert.That(tooFewErrors).IsEquivalentTo(["channelCount"]);
+        await Assert.That(enough.StatusCode).IsEqualTo(HttpStatusCode.OK);
+        await Assert.That(hiddenWithoutConnections.StatusCode).IsEqualTo(HttpStatusCode.OK);
     }
 
     [Test]

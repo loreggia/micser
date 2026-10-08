@@ -35,7 +35,7 @@ public abstract class AudioPort
 /// </summary>
 public sealed class InputPort : AudioPort
 {
-    private readonly Dictionary<(ChannelLayout Source, ChannelLayout Target), ChannelMixer> _mixers = [];
+    private readonly Dictionary<MixerKey, ChannelMixer> _mixers = [];
 
     internal InputPort(AudioModule module, string name, ChannelLayout? layout)
         : base(module, name)
@@ -44,35 +44,57 @@ public sealed class InputPort : AudioPort
     }
 
     /// <summary>
-    /// The layout the connected outputs are mixed into. When null, the widest layout of the connected outputs is used.
+    /// The layout the connected outputs are mixed into. When null, it is <see cref="AudioModule.ChannelCount"/>'s layout or, if that isn't
+    /// set either, the widest layout of the outputs connected as a whole, widened to the highest target channel of the connections to a
+    /// single channel (at least stereo without outputs connected as a whole).
     /// </summary>
     public ChannelLayout? Layout { get; set; }
 
-    internal void Mix(ReadOnlySpan<OutputPort> sources)
+    internal void Mix(ReadOnlySpan<Connection> sources)
     {
-        var target = Layout ?? GetWidestLayout(sources);
+        var target = Layout ?? GetLayout(sources);
         Buffer.SetLayout(target);
         Buffer.Clear();
 
         foreach (var source in sources)
         {
-            var sourceBuffer = source.Buffer;
-            if (!_mixers.TryGetValue((sourceBuffer.Layout, target), out var mixer))
+            var sourceBuffer = source.Source.Buffer;
+            if (source.SourceChannel >= sourceBuffer.ChannelCount || source.TargetChannel >= target.ChannelCount)
             {
-                mixer = new ChannelMixer(sourceBuffer.Layout, target);
-                _mixers.Add((sourceBuffer.Layout, target), mixer);
+                continue;
+            }
+
+            var key = new MixerKey(sourceBuffer.Layout, target, source.SourceChannel, source.TargetChannel);
+            if (!_mixers.TryGetValue(key, out var mixer))
+            {
+                mixer = new ChannelMixer(sourceBuffer.Layout, target, source.SourceChannel, source.TargetChannel);
+                _mixers.Add(key, mixer);
             }
 
             mixer.MixInto(sourceBuffer, Buffer);
         }
     }
 
-    private static ChannelLayout GetWidestLayout(ReadOnlySpan<OutputPort> sources)
+    private ChannelLayout GetLayout(ReadOnlySpan<Connection> sources)
     {
+        if (Module.ChannelCount is { } channelCount)
+        {
+            return ChannelLayout.FromChannelCount(channelCount);
+        }
+
         var layout = ChannelLayout.None;
+        var hasWholeSources = false;
+        var channelCountNeeded = 0;
         foreach (var source in sources)
         {
-            var candidate = source.Buffer.Layout;
+            if (source.TargetChannel is { } channel)
+            {
+                channelCountNeeded = Math.Max(channelCountNeeded, channel + 1);
+                continue;
+            }
+
+            hasWholeSources = true;
+            var candidate = source.Source.Buffer.Layout;
             if (candidate.ChannelCount > layout.ChannelCount ||
                 (candidate.ChannelCount == layout.ChannelCount && candidate.HasSpeakerPositions && !layout.HasSpeakerPositions))
             {
@@ -80,8 +102,15 @@ public sealed class InputPort : AudioPort
             }
         }
 
-        return layout;
+        if (channelCountNeeded > 0 && !hasWholeSources)
+        {
+            channelCountNeeded = Math.Max(channelCountNeeded, 2);
+        }
+
+        return layout.ChannelCount < channelCountNeeded ? ChannelLayout.FromChannelCount(channelCountNeeded) : layout;
     }
+
+    private readonly record struct MixerKey(ChannelLayout Source, ChannelLayout Target, int? SourceChannel, int? TargetChannel);
 }
 
 /// <summary>

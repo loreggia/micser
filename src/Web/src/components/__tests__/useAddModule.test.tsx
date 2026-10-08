@@ -167,6 +167,7 @@ describe("useModuleTypeChoices", () => {
       outputs: [],
       defaultState: {},
       supportsBypass: false,
+      supportsChannelCount: false,
     });
     queryClient.setQueryData(getGetModuleTypesQueryKey(), [
       moduleType("Gain"),
