@@ -1,25 +1,26 @@
-# Prettier only formats the web workspaces, the end-to-end tests and the web tooling config at the root.
-/*
-!/src
-/src/*
-!/src/Web
-!/src/WebSdk
-!/src/Plugins
-/src/Plugins/*/*
-!/src/Plugins/*/Web
-!/tests
-/tests/*
-!/tests/E2E
-!/.prettierrc
-!/package.json
-!/package-lock.json
-!/tsconfig.base.json
-!/eslint.config.js
-!/vitest.config.ts
-!/micser.code-workspace
+# Prettier also reads .gitignore; this lists what it should skip beyond that, with the build outputs repeated for clarity.
+
+# Build outputs and restored packages
+**/bin
+**/obj
 **/dist
 **/node_modules
-**/generated
-**/openapi
+**/packages
+artifacts
+TestResults
 **/test-results
 **/playwright-report
+.vitest
+.vs
+
+# Generated code (see "UI" in docs/Architecture.md)
+src/WebSdk/openapi
+src/WebSdk/src/api/generated
+
+# Lockfiles, written by npm
+package-lock.json
+
+# Third-party content, kept as published
+.agents/skills
+.claude/skills
+docs/audio

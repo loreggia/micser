@@ -1,5 +1,3 @@
 {
-    "recommendations": [
-        "microsoft-aspire.aspire-vscode"
-    ]
+  "recommendations": ["microsoft-aspire.aspire-vscode"]
 }

@@ -4,9 +4,7 @@
   "tools": {
     "vpk": {
       "version": "1.2.161",
-      "commands": [
-        "vpk"
-      ],
+      "commands": ["vpk"],
       "rollForward": false
     }
   }
