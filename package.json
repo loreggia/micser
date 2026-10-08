@@ -2,56 +2,72 @@
   "name": "micser",
   "private": true,
   "type": "module",
-  "workspaces": [
-    "src/Web",
-    "src/WebSdk",
-    "src/Plugins/*/Web",
-    "tests/E2E"
-  ],
-  "engines": {
-    "node": ">=24"
-  },
   "scripts": {
-    "setup": "npm install && npm run allow-scripts:run",
+    "setup": "npm install && npm run allow-scripts:run && husky",
     "setup:ci": "npm ci && npm run allow-scripts:run",
     "allow-scripts:auto": "allow-scripts auto && npm exec --no --workspaces -- allow-scripts auto",
     "allow-scripts:run": "allow-scripts run && npm exec --no --workspaces -- allow-scripts run",
     "dev": "npm run dev -w @micser/web",
     "build": "npm run build --workspaces --if-present",
-    "typecheck": "npm run typecheck --workspaces --if-present",
+    "typecheck": "npm run typecheck --workspaces --if-present && tsc -p scripts",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test -c tests/E2E",
     "lint": "eslint .",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "fix-line-endings": "node scripts/repair-line-endings.mts",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@lavamoat/allow-scripts": "^5.1.0",
     "@lavamoat/preinstall-always-fail": "^3.0.0",
     "@playwright/test": "^1.63.0",
+    "@types/node": "^24.19.1",
     "@vitejs/plugin-react": "^6.1.1",
     "@vitest/browser-playwright": "^5.0.3",
     "eslint": "^10.12.0",
+    "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.7",
     "globals": "^17.13.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.6.0",
     "playwright": "^1.63.0",
     "prettier": "^3.9.9",
     "typescript": "~6.0.3",
-    "typescript-eslint": "^8.71.0",
+    "typescript-eslint": "^8.71.1",
     "vitest": "^5.0.3",
     "vitest-browser-react": "^2.3.0"
   },
   "overrides": {
     "undici": "^7.30.0"
   },
+  "workspaces": [
+    "src/Web",
+    "src/WebSdk",
+    "src/Plugins/*/Web",
+    "tests/E2E"
+  ],
   "lavamoat": {
     "allowScripts": {
       "@lavamoat/preinstall-always-fail#3.0.0": false,
       "vitest>vite>esbuild#0.28.2": true
     }
+  },
+  "lint-staged": {
+    "**/*": [
+      "node scripts/repair-line-endings.mts",
+      "prettier --write --ignore-unknown"
+    ],
+    "*.{js,jsx,mjs,cjs,ts,tsx,mts,cts}": [
+      "eslint --fix --no-warn-ignored",
+      "prettier --write"
+    ]
+  },
+  "engines": {
+    "node": ">=24"
   },
   "volta": {
     "node": "24.21.0"

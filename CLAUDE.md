@@ -11,7 +11,7 @@ dotnet build Micser.slnx
 dotnet test --solution Micser.slnx                      # TUnit on Microsoft.Testing.Platform (global.json "test.runner")
 dotnet test --project tests/Engine/Micser.Engine.Tests.csproj --treenode-filter "/*/*/HealthEndpointTests/*"
 
-npm run setup                # root; installs all workspaces, then runs the allowed install scripts
+npm run setup                # root; installs all workspaces, runs the allowed install scripts and installs the pre-commit hook
 npm run allow-scripts:auto   # after dependency changes: adds new packages with install scripts to the allowlists (denied)
 npm run build                # typecheck + vite build of src/Web and the plugins' widget bundles (src/Plugins/*/Web/dist)
 npm run typecheck            # tsc in every workspace
@@ -25,6 +25,7 @@ npm run build && dotnet publish src/Engine -c Release -o artifacts/e2e-engine
 MICSER_E2E_PUBLISHED_ENGINE=artifacts/e2e-engine/Micser.Engine.dll npm run test:e2e
 npm run lint                 # eslint (flat config at the root)
 npm run format:check         # prettier; .prettierignore limits it to the web workspaces
+npm run fix-line-endings     # rewrites working-tree line endings to what git would check out (.gitattributes, core.autocrlf)
 npm run generate:api -w @micser/web-sdk   # regenerate the API client after engine API changes (build the engine first)
 
 aspire start                        # AppHost (tools/AppHost): engine + Vite, shell on demand, dashboard; "aspire stop" ends it
