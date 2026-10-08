@@ -63,4 +63,15 @@
     "i18n-ally.localesPaths": ["src/Web/src/locales", "src/WebSdk/src/i18n", "src/Plugins/Main/Web/src/locales"],
     "powershell.cwd": "root",
   },
+  "extensions": {
+    "recommendations": [
+      "dbaeumer.vscode-eslint",
+      "esbenp.prettier-vscode",
+      "github.vscode-github-actions",
+      "lokalise.i18n-ally",
+      "ms-azuretools.vscode-docker",
+      "ms-dotnettools.csdevkit",
+      "ms-vscode.powershell",
+    ],
+  },
 }
