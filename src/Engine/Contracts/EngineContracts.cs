@@ -42,6 +42,53 @@ public sealed record EngineSettingsDto(
 public sealed record EngineStatusDto(bool IsRunning, EngineSettingsDto Settings, long Blocks, long LateBlocks, double MaxProcessingMilliseconds);
 
 /// <summary>
+/// The channel layouts of a module's ports while the audio runs.
+/// </summary>
+/// <param name="Inputs">The layouts of the input ports, by name.</param>
+/// <param name="Outputs">The layouts of the output ports, by name.</param>
+public sealed record ModulePortLayoutsDto(Guid ModuleId, IReadOnlyDictionary<string, PortLayoutDto> Inputs, IReadOnlyDictionary<string, PortLayoutDto> Outputs);
+
+/// <summary>
+/// The channel layout of a port in the last processed block.
+/// </summary>
+/// <param name="ChannelCount">0 while the port carries nothing, e.g. a device output without an open device or a module that isn't processed.</param>
+/// <param name="Speakers">The speaker of each channel, or null if the channels have no speaker positions.</param>
+public sealed record PortLayoutDto(int ChannelCount, IReadOnlyList<SpeakerPosition>? Speakers)
+{
+    public static PortLayoutDto From(ChannelLayout layout)
+    {
+        return new PortLayoutDto(
+            layout.ChannelCount,
+            layout.HasSpeakerPositions ? [.. Enumerable.Range(0, layout.ChannelCount).Select(c => (SpeakerPosition)(uint)layout.GetSpeaker(c))] : null);
+    }
+}
+
+/// <summary>
+/// The speaker of a channel (WAVEFORMATEXTENSIBLE).
+/// </summary>
+public enum SpeakerPosition : uint
+{
+    FrontLeft = 0x1,
+    FrontRight = 0x2,
+    FrontCenter = 0x4,
+    LowFrequency = 0x8,
+    BackLeft = 0x10,
+    BackRight = 0x20,
+    FrontLeftOfCenter = 0x40,
+    FrontRightOfCenter = 0x80,
+    BackCenter = 0x100,
+    SideLeft = 0x200,
+    SideRight = 0x400,
+    TopCenter = 0x800,
+    TopFrontLeft = 0x1000,
+    TopFrontCenter = 0x2000,
+    TopFrontRight = 0x4000,
+    TopBackLeft = 0x8000,
+    TopBackCenter = 0x10000,
+    TopBackRight = 0x20000,
+}
+
+/// <summary>
 /// The levels of one port of a module, per channel as linear amplitude (1 = full scale). Pushed by the hub, not part of the HTTP API.
 /// </summary>
 /// <param name="Port">The output port, or null for the signal a module without outputs passes on (e.g. what a device output plays).</param>

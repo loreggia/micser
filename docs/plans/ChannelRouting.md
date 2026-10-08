@@ -45,11 +45,11 @@ Channels are part of a connection, not separate ports. Module types, plugins, `M
   - The config stays at `Version = 1` with null defaults: the store moves a file with another version to `.bak` and starts empty, so a bump would lose the user's setup on a downgrade. An older engine ignores the new fields and turns channel connections into whole ones.
 - Tests: the four mixing cases, out-of-range channels, Auto widening, fixed channel counts, duplicates; API validation, the `showChannels` and `channelCount` rules, config round trip, templates.
 
-## Phase 2: port layouts
+## Phase 2: port layouts (done)
 
 - Each port publishes its last layout (channel count and speaker mask) atomically from the audio thread, in one 64-bit write.
 - `GET /api/port-layouts` returns all of them; the hub pushes changes as `PortLayoutsChanged`, checked in the same loop that reads the levels. A device module without an open stream reports zero channels. They're runtime state, not part of `ModuleDto` or the config.
-- Regenerate the API client.
+- Regenerate the API client. The web SDK patches the cached layouts from `PortLayoutsChanged` (and drops a removed module's); `usePortLayouts(moduleId)` reads them.
 
 ## Phase 3: UI
 

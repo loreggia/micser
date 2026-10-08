@@ -27,6 +27,7 @@ public static class ApiEndpoints
         MapDevices(api);
         MapEngine(api);
         MapPlugins(api);
+        MapPortLayouts(api);
         MapPreferences(api);
         MapSubgraphs(api);
         MapSubgraphTemplates(api);
@@ -153,6 +154,14 @@ public static class ApiEndpoints
             service.Remove(id) ? TypedResults.NoContent() : TypedResults.NotFound())
             .WithName("RemovePlugin")
             .WithDescription("Stages a user plugin for removal when the engine restarts, or cancels its staged installation.");
+    }
+
+    private static void MapPortLayouts(RouteGroupBuilder api)
+    {
+        api.MapGet("/port-layouts", (AudioHost host) => TypedResults.Ok(host.GetPortLayouts()))
+            .WithName("GetPortLayouts")
+            .WithTags("Modules")
+            .WithDescription("The channel layouts of all modules' ports in the last processed block; changes are pushed as PortLayoutsChanged.");
     }
 
     private static void MapPreferences(RouteGroupBuilder api)

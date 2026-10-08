@@ -26,6 +26,7 @@ import type {
 import type {
   CreateModuleRequest,
   ModuleDto,
+  ModulePortLayoutsDto,
   ModuleTypeDto
 } from '../model';
 
@@ -138,6 +139,103 @@ export function useGetModuleTypes<TData = Awaited<ReturnType<typeof getModuleTyp
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getGetModuleTypesQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+export const getGetPortLayoutsUrl = () => {
+
+
+
+
+  return `/api/port-layouts`
+}
+
+/**
+ * The channel layouts of all modules' ports in the last processed block; changes are pushed as PortLayoutsChanged.
+ */
+export const getPortLayouts = async ( options?: Parameters<typeof engineFetch>[1]): Promise<ModulePortLayoutsDto[]> => {
+
+  return engineFetch<ModulePortLayoutsDto[]>(getGetPortLayoutsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetPortLayoutsQueryKey = () => {
+    return [
+    `/api/port-layouts`
+    ] as const;
+    }
+
+
+export const getGetPortLayoutsQueryOptions = <TData = Awaited<ReturnType<typeof getPortLayouts>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPortLayouts>>, TError, TData>>, request?: SecondParameter<typeof engineFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetPortLayoutsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getPortLayouts>>> = ({ signal }) => getPortLayouts({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getPortLayouts>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type GetPortLayoutsQueryResult = NonNullable<Awaited<ReturnType<typeof getPortLayouts>>>
+export type GetPortLayoutsQueryError = unknown
+
+
+export function useGetPortLayouts<TData = Awaited<ReturnType<typeof getPortLayouts>>, TError = unknown>(
+  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPortLayouts>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getPortLayouts>>,
+          TError,
+          Awaited<ReturnType<typeof getPortLayouts>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof engineFetch>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetPortLayouts<TData = Awaited<ReturnType<typeof getPortLayouts>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPortLayouts>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof getPortLayouts>>,
+          TError,
+          Awaited<ReturnType<typeof getPortLayouts>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof engineFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useGetPortLayouts<TData = Awaited<ReturnType<typeof getPortLayouts>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPortLayouts>>, TError, TData>>, request?: SecondParameter<typeof engineFetch>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useGetPortLayouts<TData = Awaited<ReturnType<typeof getPortLayouts>>, TError = unknown>(
+  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPortLayouts>>, TError, TData>>, request?: SecondParameter<typeof engineFetch>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getGetPortLayoutsQueryOptions(options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

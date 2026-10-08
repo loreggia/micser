@@ -3,7 +3,13 @@ import type { ReactNode } from "react";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { renderHook } from "vitest-browser-react";
 import { createTestQueryClient, testModule, TestProviders } from "../../../testing";
-import { getGetPreferencesQueryKey, updatePreferences, type UiPreferencesDto } from "../../api";
+import {
+  getGetPortLayoutsQueryKey,
+  getGetPreferencesQueryKey,
+  updatePreferences,
+  type ModulePortLayoutsDto,
+  type UiPreferencesDto,
+} from "../../api";
 import { i18n } from "../../i18n/i18n";
 import { EngineConnection, type ModuleLevels } from "../EngineConnection";
 import {
@@ -13,6 +19,7 @@ import {
   useModuleLevels,
   useLanguagePreference,
   useModuleUpdate,
+  usePortLayouts,
   usePreferences,
 } from "../hooks";
 
@@ -168,6 +175,29 @@ describe("useModuleLevels", () => {
     vi.spyOn(connection, "levels", "get").mockReturnValue({});
 
     const { result } = await renderHook(() => useModuleLevels("gain-1"), { wrapper });
+
+    expect(result.current).toBeUndefined();
+  });
+});
+
+describe("usePortLayouts", () => {
+  test("returns the module's port layouts", async () => {
+    const gain: ModulePortLayoutsDto = {
+      moduleId: "gain-1",
+      inputs: { Input: { channelCount: 2, speakers: ["FrontLeft", "FrontRight"] } },
+      outputs: { Output: { channelCount: 2, speakers: ["FrontLeft", "FrontRight"] } },
+    };
+    queryClient.setQueryData(getGetPortLayoutsQueryKey(), [gain, { moduleId: "gain-2", inputs: {}, outputs: {} }]);
+
+    const { result } = await renderHook(() => usePortLayouts("gain-1"), { wrapper });
+
+    expect(result.current).toEqual(gain);
+  });
+
+  test("is undefined for a module without layouts", async () => {
+    queryClient.setQueryData(getGetPortLayoutsQueryKey(), []);
+
+    const { result } = await renderHook(() => usePortLayouts("gain-1"), { wrapper });
 
     expect(result.current).toBeUndefined();
   });

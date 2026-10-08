@@ -229,6 +229,23 @@ public sealed class AudioHost : IDisposable
         })];
     }
 
+    /// <summary>
+    /// The layouts of all modules' ports in the last processed block.
+    /// </summary>
+    public IReadOnlyList<ModulePortLayoutsDto> GetPortLayouts()
+    {
+        (Guid Id, AudioModule Module)[] modules;
+        lock (_lock)
+        {
+            modules = [.. _modules.Values.Select(entry => (entry.Id, entry.Module))];
+        }
+
+        return [.. modules.Select(m => new ModulePortLayoutsDto(
+            m.Id,
+            m.Module.Inputs.ToDictionary(p => p.Name, p => PortLayoutDto.From(p.LastLayout)),
+            m.Module.Outputs.ToDictionary(p => p.Name, p => PortLayoutDto.From(p.LastLayout))))];
+    }
+
     public UiPreferencesDto GetPreferences()
     {
         lock (_lock)

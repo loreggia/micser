@@ -38,6 +38,35 @@ public class EngineHubTests
     }
 
     [Test]
+    public async Task PortLayouts_AreListedAndTheirChangesPushed()
+    {
+        await using var factory = new EngineFactory();
+        using var client = factory.CreateAuthorizedClient();
+        var gain = await factory.AddModuleAsync(client, "Gain");
+        await using var hub = factory.CreateHubConnection();
+        var pushed = hub.NextAsync<ModulePortLayoutsDto[]>(
+            "PortLayoutsChanged", layouts => layouts.Any(l => l.ModuleId == gain.Id && l.Outputs["Output"].ChannelCount == 6));
+        await hub.StartAsync();
+
+        (await client.PutAsJsonAsync($"/api/modules/{gain.Id}", gain with { ChannelCount = 6 }, factory.Json)).EnsureSuccessStatusCode();
+        var layout = (await pushed).Single(l => l.ModuleId == gain.Id);
+        var listed = (await client.GetFromJsonAsync<ModulePortLayoutsDto[]>("/api/port-layouts", factory.Json))!.Single(l => l.ModuleId == gain.Id);
+
+        await Assert.That(layout.Inputs["Input"].ChannelCount).IsEqualTo(6);
+        await Assert.That(layout.Inputs["Input"].Speakers).IsEquivalentTo(
+            [
+                SpeakerPosition.FrontLeft,
+                SpeakerPosition.FrontRight,
+                SpeakerPosition.FrontCenter,
+                SpeakerPosition.LowFrequency,
+                SpeakerPosition.SideLeft,
+                SpeakerPosition.SideRight,
+            ],
+            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert.That(listed.Outputs["Output"].ChannelCount).IsEqualTo(6);
+    }
+
+    [Test]
     public async Task Subscribe_DeliversModuleData()
     {
         await using var factory = new EngineFactory();

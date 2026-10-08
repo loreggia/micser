@@ -143,6 +143,7 @@ public abstract class AudioModule : IDisposable
             {
                 output.Buffer.ApplyGain(start, end);
                 output.Meter?.Measure(output.Buffer);
+                output.PublishLayout();
             }
         }
     }
