@@ -1,10 +1,12 @@
+using Micser.Audio;
 using Micser.Engine.Audio;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Micser.Engine.Hubs;
 
 /// <summary>
-/// Pushes the live data of subscribed modules to their subscribers, and the levels of all modules to the level subscribers.
+/// Pushes the live data of subscribed modules to their subscribers, the levels of all modules to the level subscribers, and changed port
+/// layouts to all clients.
 /// </summary>
 public sealed class ModuleDataPublisher : BackgroundService
 {
@@ -12,6 +14,7 @@ public sealed class ModuleDataPublisher : BackgroundService
     private readonly AudioHost _host;
     private readonly IHubContext<EngineHub, IEngineClient> _hub;
     private readonly ILogger<ModuleDataPublisher> _logger;
+    private readonly Dictionary<Guid, ChannelLayout[]> _portLayouts = [];
     private readonly ModuleDataSubscriptions _subscriptions;
 
     /// <summary>
@@ -35,6 +38,7 @@ public sealed class ModuleDataPublisher : BackgroundService
         while (await timer.WaitForNextTickAsync(stoppingToken))
         {
             await PublishLevelsAsync();
+            await PublishPortLayoutsAsync();
             foreach (var moduleId in _subscriptions.GetSubscribedModules())
             {
                 try
@@ -66,6 +70,24 @@ public sealed class ModuleDataPublisher : BackgroundService
         catch (Exception ex)
         {
             _logger.LogWarning(ex, "Publishing the levels failed.");
+        }
+    }
+
+    private async Task PublishPortLayoutsAsync()
+    {
+        try
+        {
+            var changed = _host.GetChangedPortLayouts(_portLayouts);
+            if (changed.Count > 0)
+            {
+                await _hub.Clients.All.PortLayoutsChanged(changed);
+            }
+        }
+        catch (Exception ex)
+        {
+            // sends all layouts again, as clients may have missed these
+            _portLayouts.Clear();
+            _logger.LogWarning(ex, "Publishing the port layouts failed.");
         }
     }
 }

@@ -11,4 +11,6 @@ export interface ModuleTypeDto {
   outputs: string[];
   defaultState: unknown;
   supportsBypass: boolean;
+  supportsChannelCount: boolean;
+  channelCountInputs: string[];
 }

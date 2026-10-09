@@ -5,7 +5,13 @@ namespace Micser.Engine.Contracts;
 /// <summary>
 /// A connection between two modules of a subgraph template, by their template-local ids.
 /// </summary>
-public sealed record TemplateConnectionDto(Guid SourceModuleId, string SourcePort, Guid TargetModuleId, string TargetPort);
+public sealed record TemplateConnectionDto(
+    Guid SourceModuleId,
+    string SourcePort,
+    Guid TargetModuleId,
+    string TargetPort,
+    int? SourceChannel = null,
+    int? TargetChannel = null);
 
 /// <summary>
 /// A saved subgraph: its frame, modules and the connections between them, to create subgraphs from.

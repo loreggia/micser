@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
+using Micser.Audio;
 
 namespace Micser.Engine.Contracts;
 
@@ -14,6 +15,14 @@ public sealed record ModulePosition(double X, double Y);
 /// </summary>
 public abstract record ModuleDto
 {
+    /// <summary>
+    /// The channel count of the inputs that otherwise take their layout from their sources, or null to do so. Only modules whose type
+    /// <see cref="ModuleTypeDto.SupportsChannelCount"/> have it; it is ignored for all others. It can't be lower than the channels the
+    /// module's connections to single channels need.
+    /// </summary>
+    [Range(1, AudioModule.MaxChannelCount)]
+    public int? ChannelCount { get; init; }
+
     public required Guid Id { get; init; }
 
     /// <summary>
@@ -38,6 +47,12 @@ public abstract record ModuleDto
     /// Relative to the subgraph's position if <see cref="SubgraphId"/> is set.
     /// </summary>
     public ModulePosition? Position { get; init; }
+
+    /// <summary>
+    /// Shows a connector per channel below each port in the UI's graph editor. It stays on while connections to or from single channels of
+    /// the module exist (an update turning it off is ignored then); creating such a connection turns it on.
+    /// </summary>
+    public bool ShowChannels { get; init; }
 
     /// <summary>
     /// The subgraph the module belongs to, from <c>GET /api/subgraphs</c>.
@@ -78,11 +93,29 @@ public sealed record ModuleDto<TState> : ModuleDto
 /// <param name="Type">A module type from <c>GET /api/module-types</c>.</param>
 /// <param name="Position">Relative to the subgraph's position if <paramref name="SubgraphId"/> is set.</param>
 /// <param name="SubgraphId">The subgraph to add the module to.</param>
-public sealed record CreateModuleRequest([Required] string Type, [MaxLength(100)] string? Name = null, ModulePosition? Position = null, Guid? SubgraphId = null);
+/// <param name="ShowChannels">Whether the module shows its channel connectors (<see cref="ModuleDto.ShowChannels"/>).</param>
+public sealed record CreateModuleRequest(
+    [Required] string Type,
+    [MaxLength(100)] string? Name = null,
+    ModulePosition? Position = null,
+    Guid? SubgraphId = null,
+    bool ShowChannels = false);
 
 /// <param name="Type">The name identifying the module type, e.g. "Gain".</param>
 /// <param name="Inputs">Names of the input ports.</param>
 /// <param name="Outputs">Names of the output ports.</param>
 /// <param name="DefaultState">The state of a new module of this type.</param>
 /// <param name="SupportsBypass">Whether <see cref="ModuleDto.IsBypassed"/> has an effect.</param>
-public sealed record ModuleTypeDto(string Type, IReadOnlyList<string> Inputs, IReadOnlyList<string> Outputs, object DefaultState, bool SupportsBypass);
+/// <param name="SupportsChannelCount">Whether <see cref="ModuleDto.ChannelCount"/> has an effect.</param>
+/// <param name="ChannelCountInputs">
+/// The inputs that <see cref="ModuleDto.ChannelCount"/> applies to: those without a fixed layout. Their connections to single channels
+/// limit it.
+/// </param>
+public sealed record ModuleTypeDto(
+    string Type,
+    IReadOnlyList<string> Inputs,
+    IReadOnlyList<string> Outputs,
+    object DefaultState,
+    bool SupportsBypass,
+    bool SupportsChannelCount,
+    IReadOnlyList<string> ChannelCountInputs);

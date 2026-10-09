@@ -9,6 +9,7 @@ import {
   getGetModuleQueryKey,
   getGetModulesQueryKey,
   getGetPluginsQueryKey,
+  getGetPortLayoutsQueryKey,
   getGetPreferencesQueryKey,
   getGetSubgraphsQueryKey,
   getGetSubgraphTemplatesQueryKey,
@@ -16,6 +17,7 @@ import {
   updateSubgraph,
   type ConnectionDto,
   type ModuleDto,
+  type ModulePortLayoutsDto,
   type SubgraphDto,
 } from "../../api";
 import { EngineConnection, type EngineConnectionState } from "../EngineConnection";
@@ -229,6 +231,7 @@ describe("engine events", () => {
       ["StatusChanged", {}],
       ["PreferencesChanged", {}],
       ["PluginsChanged", []],
+      ["PortLayoutsChanged", []],
       ["ModuleData", original.id, {}],
       ["Levels", {}],
     ];
@@ -303,12 +306,36 @@ describe("engine events", () => {
     expect(queryClient.getQueryData(getGetConnectionsQueryKey())).toEqual([]);
   });
 
+  test("changed port layouts replace the module's cached ones, and a removed module's are dropped", () => {
+    const layouts = (moduleId: string, channelCount: number): ModulePortLayoutsDto => ({
+      moduleId,
+      inputs: { Input: { channelCount, speakers: null } },
+      outputs: { Output: { channelCount, speakers: null } },
+    });
+    queryClient.setQueryData(getGetPortLayoutsQueryKey(), [layouts(original.id, 0), layouts("gain-2", 2)]);
+
+    receive("PortLayoutsChanged", [layouts(original.id, 6), layouts("gain-3", 1)]);
+    expect(queryClient.getQueryData(getGetPortLayoutsQueryKey())).toEqual([
+      layouts(original.id, 6),
+      layouts("gain-2", 2),
+      layouts("gain-3", 1),
+    ]);
+
+    receive("ModuleRemoved", "gain-2");
+    expect(queryClient.getQueryData(getGetPortLayoutsQueryKey())).toEqual([
+      layouts(original.id, 6),
+      layouts("gain-3", 1),
+    ]);
+  });
+
   test("events don't create lists that weren't loaded", () => {
     receive("ConnectionAdded", connectionA);
     receive("SubgraphChanged", subgraph);
+    receive("PortLayoutsChanged", [{ moduleId: original.id, inputs: {}, outputs: {} }]);
 
     expect(queryClient.getQueryData(getGetConnectionsQueryKey())).toBeUndefined();
     expect(queryClient.getQueryData(getGetSubgraphsQueryKey())).toBeUndefined();
+    expect(queryClient.getQueryData(getGetPortLayoutsQueryKey())).toBeUndefined();
   });
 
   test("a subgraph change is ignored while a local update is pending", async () => {

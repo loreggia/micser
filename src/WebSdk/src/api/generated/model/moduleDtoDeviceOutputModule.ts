@@ -11,6 +11,12 @@ import type { ModulePosition } from './modulePosition';
 export interface ModuleDtoDeviceOutputModule {
   type: ModuleDtoDeviceOutputModuleType;
   state: DeviceOutputState;
+  /**
+     * @minimum 1
+     * @maximum 64
+     * @nullable
+     */
+  channelCount?: number | null;
   id: string;
   isBypassed: boolean;
   isCollapsed: boolean;
@@ -21,6 +27,7 @@ export interface ModuleDtoDeviceOutputModule {
      */
   name?: string | null;
   position?: null | ModulePosition;
+  showChannels: boolean;
   /** @nullable */
   subgraphId?: string | null;
   /** @nullable */
