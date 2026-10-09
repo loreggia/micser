@@ -40,17 +40,23 @@ export class EngineApi {
     return this.send<SubgraphDto>("post", "/api/subgraphs", { name: null, color: "Blue", ...request });
   }
 
-  connect(source: ModuleDto, target: ModuleDto) {
+  /** Connects the modules' first ports, or single channels of them. */
+  connect(source: ModuleDto, target: ModuleDto, channels: { sourceChannel?: number; targetChannel?: number } = {}) {
     return this.send<ConnectionDto>("post", "/api/connections", {
       sourceModuleId: source.id,
       sourcePort: "Output",
       targetModuleId: target.id,
       targetPort: "Input",
+      ...channels,
     });
   }
 
   connections() {
     return this.send<ConnectionDto[]>("get", "/api/connections");
+  }
+
+  disconnect(id: string) {
+    return this.send<void>("delete", `/api/connections/${id}`);
   }
 
   deleteModule(id: string) {
@@ -115,6 +121,10 @@ export class EngineApi {
     return this.send<ModuleDto>("put", `/api/modules/${module.id}`, module);
   }
 
+  updateSubgraph(subgraph: SubgraphDto) {
+    return this.send<SubgraphDto>("put", `/api/subgraphs/${subgraph.id}`, subgraph);
+  }
+
   private async send<T>(method: "get" | "post" | "put" | "delete", path: string, data?: unknown): Promise<T> {
     const response = await this.request.fetch(this.url + path, { method, data });
     if (!response.ok()) {
@@ -157,6 +167,16 @@ export class Graph {
   /** The first input or output of a node. */
   port(node: Locator, type: "input" | "output") {
     return node.locator(`.react-flow__handle.${type === "input" ? "target" : "source"}`).first();
+  }
+
+  /** A port's connector by its handle id: the port's name, or "<port>:<channel>" for one of its channels (0-based). */
+  handle(node: Locator, handleId: string) {
+    return node.locator(`.react-flow__handle[data-handleid="${handleId}"]`);
+  }
+
+  /** Opens a module's or subgraph's "More" menu. */
+  async openMoreMenu(node: Locator) {
+    await node.getByRole("button", { name: "More" }).click();
   }
 
   /** A notification's title. */
