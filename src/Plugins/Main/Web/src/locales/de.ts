@@ -9,6 +9,7 @@ export const de: Translations<typeof en> = {
     gain: "Verstärkung",
     compressor: "Kompressor",
     equalizer: "Equalizer",
+    filter: "Filter",
     pitch: "Tonhöhe",
     spectrum: "Spektrum",
   },
@@ -41,6 +42,13 @@ export const de: Translations<typeof en> = {
     gain: "Verstärkung",
     q: "Güte",
     addBand: "Band hinzufügen",
+  },
+  filter: {
+    highPass: "Hochpass",
+    lowPass: "Tiefpass",
+    frequency: "Frequenz",
+    slope: "Flankensteilheit",
+    decibelsPerOctave: "{{value}} dB/Okt.",
   },
   gain: {
     gain: "Verstärkung",
