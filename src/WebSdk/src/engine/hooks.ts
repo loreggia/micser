@@ -66,7 +66,12 @@ export function usePortLayouts(moduleId: string): ModulePortLayoutsDto | undefin
   return data;
 }
 
-const defaultPreferences: UiPreferencesDto = { showStreamStatistics: false, snapToGrid: true, language: null };
+const defaultPreferences: UiPreferencesDto = {
+  showStreamStatistics: false,
+  snapToGrid: true,
+  language: null,
+  showChannelsByDefault: false,
+};
 
 /**
  * Returns the UI preferences (defaults until loaded) and a function that changes some of them. Changes show immediately; the engine stores

@@ -190,6 +190,11 @@ export function EngineSettingsDialog({ open, settings, onClose }: EngineSettings
               checked={preferences.snapToGrid}
               onChange={(_, data) => setPreferences({ snapToGrid: data.checked })}
             />
+            <Switch
+              label={t("settings.showChannelsByDefault")}
+              checked={preferences.showChannelsByDefault}
+              onChange={(_, data) => setPreferences({ showChannelsByDefault: data.checked })}
+            />
             <Divider />
             <PluginsSettings />
             {shellState?.canUpdate && (

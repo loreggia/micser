@@ -13,4 +13,5 @@ export interface CreateModuleRequest {
   position?: null | ModulePosition;
   /** @nullable */
   subgraphId?: string | null;
+  showChannels: boolean;
 }

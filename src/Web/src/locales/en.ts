@@ -47,6 +47,7 @@ export const en = {
     systemLanguage: "System ({{language}})",
     showStreamStatistics: "Show stream statistics (dropouts and buffer size of device modules)",
     snapToGrid: "Snap modules to the grid",
+    showChannelsByDefault: "Show the channels of new modules",
     restartToUpdate: "Restart to update to {{version}}",
     checkingForUpdates: "Checking for updates…",
     checkForUpdates: "Check for updates",

@@ -4,6 +4,7 @@ import {
   localize,
   useGetModuleTypes,
   useLanguage,
+  usePreferences,
   type ModuleDto,
   type ModuleTypeDto,
 } from "@micser/web-sdk";
@@ -59,7 +60,8 @@ function useFreeModulePosition() {
 /**
  * Returns a function that adds a module of a type, at a graph position (relative to the subgraph if given) or near the center of the
  * visible graph, moved to where it doesn't overlap other nodes, and resolves to the new module (undefined if adding failed). The module
- * also appears through the engine's change notification, and becomes the only selected element on the graph.
+ * shows its channels if the preference says so, also appears through the engine's change notification, and becomes the only selected
+ * element on the graph.
  */
 export function useAddModule() {
   const { getNode, setEdges, setNodes } = useReactFlow();
@@ -67,6 +69,7 @@ export function useAddModule() {
   const freePosition = useFreeModulePosition();
   const notifyError = useNotifyError();
   const { t } = useTranslation();
+  const [preferences] = usePreferences();
   const create = useMutation({
     ...getCreateModuleMutationOptions(),
     onError: (error) => notifyError(t("module.addFailed"), error),
@@ -76,7 +79,12 @@ export function useAddModule() {
     try {
       const wanted = position ?? visibleCenter();
       const module = await create.mutateAsync({
-        data: { type, position: freePosition(type, wanted, subgraphId), subgraphId },
+        data: {
+          type,
+          position: freePosition(type, wanted, subgraphId),
+          subgraphId,
+          showChannels: preferences.showChannelsByDefault,
+        },
       });
       pendingPlacement.set(module.id, wanted);
       if (getNode(module.id)) {
