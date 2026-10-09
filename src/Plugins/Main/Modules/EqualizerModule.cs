@@ -10,7 +10,8 @@ namespace Micser.Plugins.Main.Modules;
 public sealed record EqualizerBand(
     [Range(20f, 20000f)] float Frequency,
     [Range(-24f, 24f)] float Gain,
-    [Range(0.1f, 20f)] float Q = 1.41f);
+    [Range(0.1f, 20f)] float Q = 1.41f
+);
 
 public sealed record EqualizerState([MaxLength(32)] IReadOnlyList<EqualizerBand> Bands);
 
@@ -62,7 +63,8 @@ public class EqualizerModule : EffectModule, IStatefulModule<EqualizerState>
         var sampleRate = Format.SampleRate;
         if (_filters.Length != channelCount || _appliedBands?.Count != bands.Count)
         {
-            _filters = Enumerable.Range(0, channelCount)
+            _filters = Enumerable
+                .Range(0, channelCount)
                 .Select(_ => bands.Select(b => BiQuadFilter.PeakingEQ(sampleRate, b.Frequency, b.Q, b.Gain)).ToArray())
                 .ToArray();
         }

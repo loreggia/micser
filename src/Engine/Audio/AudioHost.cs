@@ -1,12 +1,12 @@
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using Microsoft.Extensions.Options;
 using Micser.Audio;
 using Micser.Audio.Devices;
 using Micser.Engine.Configuration;
 using Micser.Engine.Contracts;
 using Micser.Engine.Modules;
 using Micser.Engine.Plugins;
-using Microsoft.Extensions.Options;
 
 namespace Micser.Engine.Audio;
 
@@ -48,7 +48,8 @@ public sealed class AudioHost : IDisposable
         IEngineNotifier notifier,
         PluginCatalog plugins,
         IOptions<EngineOptions> options,
-        ILoggerFactory loggerFactory)
+        ILoggerFactory loggerFactory
+    )
     {
         _services = services;
         _catalog = catalog;
@@ -71,13 +72,24 @@ public sealed class AudioHost : IDisposable
     public ModuleDto AddModule(CreateModuleRequest request)
     {
         ThrowIfInvalid(StateValidator.Validate(request));
-        var definition = _catalog.TryGetDefinition(request.Type) ?? throw EngineRequestException.Invalid($"Unknown module type '{request.Type}'.");
+        var definition =
+            _catalog.TryGetDefinition(request.Type)
+            ?? throw EngineRequestException.Invalid($"Unknown module type '{request.Type}'.");
 
         lock (_lock)
         {
             ThrowIfUnknownSubgraph(request.SubgraphId);
             var settings = new ModuleSettings(
-                request.Name, request.Position, 1f, false, false, false, false, request.SubgraphId, ShowChannels: request.ShowChannels);
+                request.Name,
+                request.Position,
+                1f,
+                false,
+                false,
+                false,
+                false,
+                request.SubgraphId,
+                ShowChannels: request.ShowChannels
+            );
             var entry = AddModuleCore(Guid.NewGuid(), definition, settings, null);
             Persist();
             var dto = ToDto(entry);
@@ -95,16 +107,28 @@ public sealed class AudioHost : IDisposable
 
         lock (_lock)
         {
-            var members = request.ModuleIds.Distinct().Select(id => _modules.TryGetValue(id, out var entry)
-                ? entry
-                : throw EngineRequestException.Invalid($"Module {id} not found.")).ToArray();
+            var members = request
+                .ModuleIds.Distinct()
+                .Select(id =>
+                    _modules.TryGetValue(id, out var entry)
+                        ? entry
+                        : throw EngineRequestException.Invalid($"Module {id} not found.")
+                )
+                .ToArray();
 
             var subgraph = new SubgraphDto(Guid.NewGuid(), request.Name, request.Position, request.Size, request.Color);
-            var positions = members.Select(m => Offset(GetAbsolutePosition(m.Settings), -subgraph.Position.X, -subgraph.Position.Y)).ToArray();
+            var positions = members
+                .Select(m => Offset(GetAbsolutePosition(m.Settings), -subgraph.Position.X, -subgraph.Position.Y))
+                .ToArray();
             _subgraphs.Add(subgraph.Id, subgraph);
             for (var i = 0; i < members.Length; i++)
             {
-                members[i].Settings = members[i].Settings with { SubgraphId = subgraph.Id, Position = positions[i], TemplateModuleId = null };
+                members[i].Settings = members[i].Settings with
+                {
+                    SubgraphId = subgraph.Id,
+                    Position = positions[i],
+                    TemplateModuleId = null,
+                };
                 ApplySettings(members[i].Module, members[i].Settings);
             }
 
@@ -126,18 +150,37 @@ public sealed class AudioHost : IDisposable
         lock (_lock)
         {
             var dto = new ConnectionDto(
-                Guid.NewGuid(), request.SourceModuleId, request.SourcePort, request.TargetModuleId, request.TargetPort, request.SourceChannel, request.TargetChannel);
-            if (dto.TargetChannel is { } channel && _modules.TryGetValue(dto.TargetModuleId, out var target)
-                && target.Settings.ChannelCount is { } channelCount && channel >= channelCount && IsFlexibleInput(target, dto.TargetPort))
+                Guid.NewGuid(),
+                request.SourceModuleId,
+                request.SourcePort,
+                request.TargetModuleId,
+                request.TargetPort,
+                request.SourceChannel,
+                request.TargetChannel
+            );
+            if (
+                dto.TargetChannel is { } channel
+                && _modules.TryGetValue(dto.TargetModuleId, out var target)
+                && target.Settings.ChannelCount is { } channelCount
+                && channel >= channelCount
+                && IsFlexibleInput(target, dto.TargetPort)
+            )
             {
-                throw EngineRequestException.Invalid(new Dictionary<string, string[]>
-                {
-                    ["targetChannel"] = [$"The module has {channelCount} channels."],
-                });
+                throw EngineRequestException.Invalid(
+                    new Dictionary<string, string[]>
+                    {
+                        ["targetChannel"] = [$"The module has {channelCount} channels."],
+                    }
+                );
             }
 
             var connection = ConnectCore(dto);
-            ModuleEntry[] changed = [.. new[] { _modules[dto.SourceModuleId], _modules[dto.TargetModuleId] }.Distinct().Where(FixChannelSettings)];
+            ModuleEntry[] changed =
+            [
+                .. new[] { _modules[dto.SourceModuleId], _modules[dto.TargetModuleId] }
+                    .Distinct()
+                    .Where(FixChannelSettings),
+            ];
             Persist();
             foreach (var entry in changed)
             {
@@ -197,7 +240,10 @@ public sealed class AudioHost : IDisposable
 
                 for (var i = 0; i < layouts.Length; i++)
                 {
-                    var layout = i < module.Inputs.Count ? module.Inputs[i].LastLayout : module.Outputs[i - module.Inputs.Count].LastLayout;
+                    var layout =
+                        i < module.Inputs.Count
+                            ? module.Inputs[i].LastLayout
+                            : module.Outputs[i - module.Inputs.Count].LastLayout;
                     if (layout != layouts[i])
                     {
                         layouts[i] = layout;
@@ -266,18 +312,21 @@ public sealed class AudioHost : IDisposable
     /// </summary>
     public IReadOnlyList<ModuleTypeDto> GetModuleTypes()
     {
-        return _moduleTypes ??= [.. _catalog.Definitions.Select(definition =>
-        {
-            using var module = definition.CreateModule(_services);
-            return new ModuleTypeDto(
-                definition.Type,
-                [.. module.Inputs.Select(p => p.Name)],
-                [.. module.Outputs.Select(p => p.Name)],
-                definition.GetState(module),
-                module is EffectModule,
-                SupportsChannelCount(module),
-                [.. module.Inputs.Where(p => p.Layout == null).Select(p => p.Name)]);
-        })];
+        return _moduleTypes ??= [
+            .. _catalog.Definitions.Select(definition =>
+            {
+                using var module = definition.CreateModule(_services);
+                return new ModuleTypeDto(
+                    definition.Type,
+                    [.. module.Inputs.Select(p => p.Name)],
+                    [.. module.Outputs.Select(p => p.Name)],
+                    definition.GetState(module),
+                    module is EffectModule,
+                    SupportsChannelCount(module),
+                    [.. module.Inputs.Where(p => p.Layout == null).Select(p => p.Name)]
+                );
+            }),
+        ];
     }
 
     /// <summary>
@@ -350,7 +399,10 @@ public sealed class AudioHost : IDisposable
 
             foreach (var template in configuration.Templates)
             {
-                if (string.IsNullOrWhiteSpace(template.Name) || !_templates.TryAdd(template.Id, template with { IsBuiltIn = false }))
+                if (
+                    string.IsNullOrWhiteSpace(template.Name)
+                    || !_templates.TryAdd(template.Id, template with { IsBuiltIn = false })
+                )
                 {
                     _logger.LogWarning("Skipping invalid subgraph template {Id}.", template.Id);
                 }
@@ -371,9 +423,15 @@ public sealed class AudioHost : IDisposable
             // modules whose plugin isn't loaded and their connections stay in the configuration only
             var unavailableIds = configuration.UnavailableModules.Select(m => m.Id).ToHashSet();
             _unavailableModules.AddRange(configuration.UnavailableModules);
-            _unavailableConnections.AddRange(configuration.Connections.Where(c => unavailableIds.Contains(c.SourceModuleId) || unavailableIds.Contains(c.TargetModuleId)));
+            _unavailableConnections.AddRange(
+                configuration.Connections.Where(c =>
+                    unavailableIds.Contains(c.SourceModuleId) || unavailableIds.Contains(c.TargetModuleId)
+                )
+            );
 
-            var modules = configuration.Modules.Select(m => m.SubgraphId is { } id && !_subgraphs.ContainsKey(id) ? m with { SubgraphId = null } : m);
+            var modules = configuration.Modules.Select(m =>
+                m.SubgraphId is { } id && !_subgraphs.ContainsKey(id) ? m with { SubgraphId = null } : m
+            );
             Build(modules, configuration.Connections.Except(_unavailableConnections));
             if (renamedTemplates)
             {
@@ -395,7 +453,14 @@ public sealed class AudioHost : IDisposable
         {
             var template = GetUsableTemplate(templateId);
             var subgraph = new SubgraphDto(
-                Guid.NewGuid(), template.Name, request.Position, template.Size, template.Color, TemplateId: template.Id, TemplateRevision: template.Revision);
+                Guid.NewGuid(),
+                template.Name,
+                request.Position,
+                template.Size,
+                template.Color,
+                TemplateId: template.Id,
+                TemplateRevision: template.Revision
+            );
             _subgraphs.Add(subgraph.Id, subgraph);
 
             var moduleIds = new Dictionary<Guid, Guid>();
@@ -446,9 +511,17 @@ public sealed class AudioHost : IDisposable
         var levels = new Dictionary<Guid, PortLevelsDto[]>();
         foreach (var (id, module) in modules)
         {
-            PortLevelsDto[] ports = [.. module.ReadLevels()
-                .Where(port => port.Channels.Length > 0)
-                .Select(port => new PortLevelsDto(port.Port, [.. port.Channels.Select(c => c.Peak)], [.. port.Channels.Select(c => c.Rms)]))];
+            PortLevelsDto[] ports =
+            [
+                .. module
+                    .ReadLevels()
+                    .Where(port => port.Channels.Length > 0)
+                    .Select(port => new PortLevelsDto(
+                        port.Port,
+                        [.. port.Channels.Select(c => c.Peak)],
+                        [.. port.Channels.Select(c => c.Rms)]
+                    )),
+            ];
             if (ports.Length > 0)
             {
                 levels[id] = ports;
@@ -503,7 +576,9 @@ public sealed class AudioHost : IDisposable
 
                 var unavailableIds = _unavailableModules.Where(m => IsInSubgraph(m, id)).Select(m => m.Id).ToHashSet();
                 _unavailableModules.RemoveAll(m => unavailableIds.Contains(m.Id));
-                _unavailableConnections.RemoveAll(c => unavailableIds.Contains(c.SourceModuleId) || unavailableIds.Contains(c.TargetModuleId));
+                _unavailableConnections.RemoveAll(c =>
+                    unavailableIds.Contains(c.SourceModuleId) || unavailableIds.Contains(c.TargetModuleId)
+                );
             }
             else
             {
@@ -562,7 +637,10 @@ public sealed class AudioHost : IDisposable
             ThrowIfBuiltIn(template);
             _templates.Remove(id);
 
-            var detached = _subgraphs.Values.Where(s => s.TemplateId == id).Select(s => s with { TemplateId = null, TemplateRevision = null }).ToArray();
+            var detached = _subgraphs
+                .Values.Where(s => s.TemplateId == id)
+                .Select(s => s with { TemplateId = null, TemplateRevision = null })
+                .ToArray();
             foreach (var subgraph in detached)
             {
                 _subgraphs[subgraph.Id] = subgraph;
@@ -661,13 +739,31 @@ public sealed class AudioHost : IDisposable
                 (existing?.Revision ?? 0) + 1,
                 subgraph.Color,
                 subgraph.Size,
-                [.. members.Select(m => ToDto(m) with { Id = localIds[m.Id], SubgraphId = null, TemplateModuleId = null })],
+                [
+                    .. members.Select(m =>
+                        ToDto(m) with
+                        {
+                            Id = localIds[m.Id],
+                            SubgraphId = null,
+                            TemplateModuleId = null,
+                        }
+                    ),
+                ],
                 [],
-                [.. _connections.Values
-                    .Select(c => c.Dto)
-                    .Where(c => localIds.ContainsKey(c.SourceModuleId) && localIds.ContainsKey(c.TargetModuleId))
-                    .Select(c => new TemplateConnectionDto(
-                        localIds[c.SourceModuleId], c.SourcePort, localIds[c.TargetModuleId], c.TargetPort, c.SourceChannel, c.TargetChannel))]);
+                [
+                    .. _connections
+                        .Values.Select(c => c.Dto)
+                        .Where(c => localIds.ContainsKey(c.SourceModuleId) && localIds.ContainsKey(c.TargetModuleId))
+                        .Select(c => new TemplateConnectionDto(
+                            localIds[c.SourceModuleId],
+                            c.SourcePort,
+                            localIds[c.TargetModuleId],
+                            c.TargetPort,
+                            c.SourceChannel,
+                            c.TargetChannel
+                        )),
+                ]
+            );
             _templates[template.Id] = template;
             subgraph = subgraph with { TemplateId = template.Id, TemplateRevision = template.Revision };
             _subgraphs[subgraph.Id] = subgraph;
@@ -729,13 +825,16 @@ public sealed class AudioHost : IDisposable
             ThrowIfChannelCountTooLow(entry, dto);
 
             // channel connections keep the channels shown, also against an update made from an older copy of the module
-            entry.Settings = WithSystemVolume(ModuleSettings.From(dto) with
-            {
-                IsBypassed = dto.IsBypassed && entry.Module is EffectModule,
-                TemplateModuleId = dto.SubgraphId == entry.Settings.SubgraphId ? entry.Settings.TemplateModuleId : null,
-                ShowChannels = dto.ShowChannels || GetChannelConnections(entry.Id).Any(),
-                ChannelCount = SupportsChannelCount(entry.Module) ? dto.ChannelCount : null,
-            });
+            entry.Settings = WithSystemVolume(
+                ModuleSettings.From(dto) with
+                {
+                    IsBypassed = dto.IsBypassed && entry.Module is EffectModule,
+                    TemplateModuleId =
+                        dto.SubgraphId == entry.Settings.SubgraphId ? entry.Settings.TemplateModuleId : null,
+                    ShowChannels = dto.ShowChannels || GetChannelConnections(entry.Id).Any(),
+                    ChannelCount = SupportsChannelCount(entry.Module) ? dto.ChannelCount : null,
+                }
+            );
             ApplySettings(entry.Module, entry.Settings);
             entry.Definition.SetState(entry.Module, dto.StateObject);
             Persist();
@@ -785,9 +884,19 @@ public sealed class AudioHost : IDisposable
             }
 
             // only the engine sets the template reference; clearing it detaches the subgraph
-            var subgraph = dto.TemplateId == null
-                ? dto with { Id = id, TemplateRevision = null }
-                : dto with { Id = id, TemplateId = current.TemplateId, TemplateRevision = current.TemplateRevision };
+            var subgraph =
+                dto.TemplateId == null
+                    ? dto with
+                    {
+                        Id = id,
+                        TemplateRevision = null,
+                    }
+                    : dto with
+                    {
+                        Id = id,
+                        TemplateId = current.TemplateId,
+                        TemplateRevision = current.TemplateRevision,
+                    };
             _subgraphs[id] = subgraph;
             foreach (var entry in _modules.Values.Where(m => m.Settings.SubgraphId == id))
             {
@@ -827,7 +936,9 @@ public sealed class AudioHost : IDisposable
             {
                 var definition = _catalog.GetDefinition(dto);
                 var settings = ModuleSettings.From(dto) with { SubgraphId = id, TemplateModuleId = dto.Id };
-                var entry = members.FirstOrDefault(m => m.Settings.TemplateModuleId == dto.Id && m.Definition == definition);
+                var entry = members.FirstOrDefault(m =>
+                    m.Settings.TemplateModuleId == dto.Id && m.Definition == definition
+                );
                 if (entry == null)
                 {
                     entry = AddModuleCore(Guid.NewGuid(), definition, settings, dto.StateObject);
@@ -835,7 +946,12 @@ public sealed class AudioHost : IDisposable
                 else
                 {
                     members.Remove(entry);
-                    entry.Settings = WithSystemVolume(settings with { IsBypassed = settings.IsBypassed && entry.Module is EffectModule });
+                    entry.Settings = WithSystemVolume(
+                        settings with
+                        {
+                            IsBypassed = settings.IsBypassed && entry.Module is EffectModule,
+                        }
+                    );
                     ApplySettings(entry.Module, entry.Settings);
                     definition.SetState(entry.Module, dto.StateObject);
                 }
@@ -852,14 +968,36 @@ public sealed class AudioHost : IDisposable
 
             // connections between the modules that the template has stay; the others are replaced
             var memberIds = moduleIds.Values.ToHashSet();
-            var wanted = template.Connections
-                .Select(c => c with { SourceModuleId = moduleIds[c.SourceModuleId], TargetModuleId = moduleIds[c.TargetModuleId] })
+            var wanted = template
+                .Connections.Select(c =>
+                    c with
+                    {
+                        SourceModuleId = moduleIds[c.SourceModuleId],
+                        TargetModuleId = moduleIds[c.TargetModuleId],
+                    }
+                )
                 .ToHashSet();
-            foreach (var connection in _connections.Values.Where(c => memberIds.Contains(c.Dto.SourceModuleId) && memberIds.Contains(c.Dto.TargetModuleId)).ToArray())
+            foreach (
+                var connection in _connections
+                    .Values.Where(c =>
+                        memberIds.Contains(c.Dto.SourceModuleId) && memberIds.Contains(c.Dto.TargetModuleId)
+                    )
+                    .ToArray()
+            )
             {
                 var dto = connection.Dto;
-                if (!wanted.Remove(new TemplateConnectionDto(
-                    dto.SourceModuleId, dto.SourcePort, dto.TargetModuleId, dto.TargetPort, dto.SourceChannel, dto.TargetChannel)))
+                if (
+                    !wanted.Remove(
+                        new TemplateConnectionDto(
+                            dto.SourceModuleId,
+                            dto.SourcePort,
+                            dto.TargetModuleId,
+                            dto.TargetPort,
+                            dto.SourceChannel,
+                            dto.TargetChannel
+                        )
+                    )
+                )
                 {
                     _connections.Remove(dto.Id);
                     Disconnect(connection);
@@ -873,7 +1011,12 @@ public sealed class AudioHost : IDisposable
                 FixChannelSettings(entry);
             }
 
-            subgraph = subgraph with { Color = template.Color, Size = template.Size, TemplateRevision = template.Revision };
+            subgraph = subgraph with
+            {
+                Color = template.Color,
+                Size = template.Size,
+                TemplateRevision = template.Revision,
+            };
             _subgraphs[id] = subgraph;
             Persist();
 
@@ -923,7 +1066,9 @@ public sealed class AudioHost : IDisposable
 
     private static bool IsInSubgraph(UnavailableModule module, Guid subgraphId)
     {
-        return module.Element.TryGetProperty("subgraphId", out var id) && id.TryGetGuid(out var guid) && guid == subgraphId;
+        return module.Element.TryGetProperty("subgraphId", out var id)
+            && id.TryGetGuid(out var guid)
+            && guid == subgraphId;
     }
 
     private static ModulePosition? Offset(ModulePosition? position, double x, double y)
@@ -940,7 +1085,9 @@ public sealed class AudioHost : IDisposable
     {
         if (template.IsBuiltIn)
         {
-            throw EngineRequestException.Invalid($"The subgraph template '{template.Name}' is built in and can't be changed.");
+            throw EngineRequestException.Invalid(
+                $"The subgraph template '{template.Name}' is built in and can't be changed."
+            );
         }
     }
 
@@ -963,7 +1110,8 @@ public sealed class AudioHost : IDisposable
             template.Modules,
             template.Connections,
             [.. template.UnavailableModules.Select(m => m.Type)],
-            template.IsBuiltIn);
+            template.IsBuiltIn
+        );
     }
 
     private static ModulePortLayoutsDto ToPortLayoutsDto(Guid id, AudioModule module)
@@ -971,7 +1119,8 @@ public sealed class AudioHost : IDisposable
         return new ModulePortLayoutsDto(
             id,
             module.Inputs.ToDictionary(p => p.Name, p => PortLayoutDto.From(p.LastLayout)),
-            module.Outputs.ToDictionary(p => p.Name, p => PortLayoutDto.From(p.LastLayout)));
+            module.Outputs.ToDictionary(p => p.Name, p => PortLayoutDto.From(p.LastLayout))
+        );
     }
 
     /// <summary>
@@ -992,7 +1141,10 @@ public sealed class AudioHost : IDisposable
             position["y"] = (double?)position["y"] + subgraph.Position.Y;
         }
 
-        return module with { Element = JsonSerializer.SerializeToElement(node) };
+        return module with
+        {
+            Element = JsonSerializer.SerializeToElement(node),
+        };
     }
 
     private ModuleEntry AddModuleCore(Guid id, AudioModuleDefinition definition, ModuleSettings settings, object? state)
@@ -1020,7 +1172,12 @@ public sealed class AudioHost : IDisposable
             id,
             definition,
             module,
-            settings with { IsBypassed = settings.IsBypassed && module is EffectModule, ChannelCount = SupportsChannelCount(module) ? settings.ChannelCount : null });
+            settings with
+            {
+                IsBypassed = settings.IsBypassed && module is EffectModule,
+                ChannelCount = SupportsChannelCount(module) ? settings.ChannelCount : null,
+            }
+        );
         _modules.Add(id, entry);
         return entry;
     }
@@ -1045,7 +1202,10 @@ public sealed class AudioHost : IDisposable
     /// </summary>
     private void Build(IEnumerable<ModuleDto> modules, IEnumerable<ConnectionDto> connections)
     {
-        _graph = new AudioGraph(new ProcessingFormat(_settings.SampleRate, _settings.FrameCount), _loggerFactory.CreateLogger<AudioGraph>());
+        _graph = new AudioGraph(
+            new ProcessingFormat(_settings.SampleRate, _settings.FrameCount),
+            _loggerFactory.CreateLogger<AudioGraph>()
+        );
         _engine = new AudioEngine(_graph, _loggerFactory.CreateLogger<AudioEngine>());
 
         foreach (var dto in modules)
@@ -1088,17 +1248,29 @@ public sealed class AudioHost : IDisposable
 
     private ConnectionEntry ConnectCore(ConnectionDto dto)
     {
-        if (!_modules.TryGetValue(dto.SourceModuleId, out var source) || !_modules.TryGetValue(dto.TargetModuleId, out var target))
+        if (
+            !_modules.TryGetValue(dto.SourceModuleId, out var source)
+            || !_modules.TryGetValue(dto.TargetModuleId, out var target)
+        )
         {
             throw EngineRequestException.Invalid("Source or target module not found.");
         }
 
-        var sourcePort = source.Module.Outputs.FirstOrDefault(p => p.Name == dto.SourcePort)
-            ?? throw EngineRequestException.Invalid($"Module type '{source.Definition.Type}' has no output '{dto.SourcePort}'.");
-        var targetPort = target.Module.Inputs.FirstOrDefault(p => p.Name == dto.TargetPort)
-            ?? throw EngineRequestException.Invalid($"Module type '{target.Definition.Type}' has no input '{dto.TargetPort}'.");
+        var sourcePort =
+            source.Module.Outputs.FirstOrDefault(p => p.Name == dto.SourcePort)
+            ?? throw EngineRequestException.Invalid(
+                $"Module type '{source.Definition.Type}' has no output '{dto.SourcePort}'."
+            );
+        var targetPort =
+            target.Module.Inputs.FirstOrDefault(p => p.Name == dto.TargetPort)
+            ?? throw EngineRequestException.Invalid(
+                $"Module type '{target.Definition.Type}' has no input '{dto.TargetPort}'."
+            );
 
-        if (dto.SourceChannel is < 0 or >= AudioModule.MaxChannelCount || dto.TargetChannel is < 0 or >= AudioModule.MaxChannelCount)
+        if (
+            dto.SourceChannel is < 0 or >= AudioModule.MaxChannelCount
+            || dto.TargetChannel is < 0 or >= AudioModule.MaxChannelCount
+        )
         {
             throw EngineRequestException.Invalid($"Channels are 0..{AudioModule.MaxChannelCount - 1}.");
         }
@@ -1126,21 +1298,29 @@ public sealed class AudioHost : IDisposable
     /// Creates template connections between the modules the ids map to. Connections the graph rejects (e.g. a cycle through modules outside
     /// the subgraph) are skipped.
     /// </summary>
-    private List<ConnectionEntry> ConnectTemplate(IReadOnlyList<TemplateConnectionDto> connections, Dictionary<Guid, Guid> moduleIds)
+    private List<ConnectionEntry> ConnectTemplate(
+        IReadOnlyList<TemplateConnectionDto> connections,
+        Dictionary<Guid, Guid> moduleIds
+    )
     {
         var created = new List<ConnectionEntry>();
         foreach (var connection in connections)
         {
             try
             {
-                created.Add(ConnectCore(new ConnectionDto(
-                    Guid.NewGuid(),
-                    moduleIds[connection.SourceModuleId],
-                    connection.SourcePort,
-                    moduleIds[connection.TargetModuleId],
-                    connection.TargetPort,
-                    connection.SourceChannel,
-                    connection.TargetChannel)));
+                created.Add(
+                    ConnectCore(
+                        new ConnectionDto(
+                            Guid.NewGuid(),
+                            moduleIds[connection.SourceModuleId],
+                            connection.SourcePort,
+                            moduleIds[connection.TargetModuleId],
+                            connection.TargetPort,
+                            connection.SourceChannel,
+                            connection.TargetChannel
+                        )
+                    )
+                );
             }
             catch (EngineRequestException ex)
             {
@@ -1154,12 +1334,23 @@ public sealed class AudioHost : IDisposable
     private EngineStatusDto CreateStatus()
     {
         var statistics = Engine.Statistics;
-        return new EngineStatusDto(Engine.IsRunning, _settings, statistics.Blocks, statistics.LateBlocks, statistics.MaxProcessingTime.TotalMilliseconds);
+        return new EngineStatusDto(
+            Engine.IsRunning,
+            _settings,
+            statistics.Blocks,
+            statistics.LateBlocks,
+            statistics.MaxProcessingTime.TotalMilliseconds
+        );
     }
 
     private void Disconnect(ConnectionEntry connection)
     {
-        Graph.Disconnect(connection.Source, connection.Target, connection.Dto.SourceChannel, connection.Dto.TargetChannel);
+        Graph.Disconnect(
+            connection.Source,
+            connection.Target,
+            connection.Dto.SourceChannel,
+            connection.Dto.TargetChannel
+        );
     }
 
     /// <summary>
@@ -1175,7 +1366,11 @@ public sealed class AudioHost : IDisposable
             settings = settings with { ShowChannels = true };
         }
 
-        if (settings.ChannelCount is { } channelCount && GetRequiredChannelCount(entry) is var required && channelCount < required)
+        if (
+            settings.ChannelCount is { } channelCount
+            && GetRequiredChannelCount(entry) is var required
+            && channelCount < required
+        )
         {
             settings = settings with { ChannelCount = required };
         }
@@ -1206,8 +1401,12 @@ public sealed class AudioHost : IDisposable
     /// </summary>
     private IEnumerable<ConnectionDto> GetChannelConnections(Guid moduleId)
     {
-        return _connections.Values.Select(c => c.Dto)
-            .Where(c => (c.SourceModuleId == moduleId && c.SourceChannel != null) || (c.TargetModuleId == moduleId && c.TargetChannel != null));
+        return _connections
+            .Values.Select(c => c.Dto)
+            .Where(c =>
+                (c.SourceModuleId == moduleId && c.SourceChannel != null)
+                || (c.TargetModuleId == moduleId && c.TargetChannel != null)
+            );
     }
 
     /// <summary>
@@ -1233,7 +1432,11 @@ public sealed class AudioHost : IDisposable
             throw EngineRequestException.Invalid("The template name is empty.");
         }
 
-        if (_templates.Values.Any(t => t.Id != templateId && string.Equals(t.Name, name, StringComparison.OrdinalIgnoreCase)))
+        if (
+            _templates.Values.Any(t =>
+                t.Id != templateId && string.Equals(t.Name, name, StringComparison.OrdinalIgnoreCase)
+            )
+        )
         {
             throw EngineRequestException.Conflict($"A subgraph template named '{name}' exists.");
         }
@@ -1254,7 +1457,9 @@ public sealed class AudioHost : IDisposable
         if (template.UnavailableModules.Count > 0)
         {
             var types = string.Join(", ", template.UnavailableModules.Select(m => m.Type).Distinct());
-            throw EngineRequestException.Invalid($"The template '{template.Name}' has modules whose plugin isn't loaded: {types}.");
+            throw EngineRequestException.Invalid(
+                $"The template '{template.Name}' has modules whose plugin isn't loaded: {types}."
+            );
         }
 
         foreach (var module in template.Modules)
@@ -1285,14 +1490,28 @@ public sealed class AudioHost : IDisposable
 
             foreach (var template in templates)
             {
-                var moduleIds = template.Modules.Select(m => m.Id).Concat(template.UnavailableModules.Select(m => m.Id)).ToHashSet();
+                var moduleIds = template
+                    .Modules.Select(m => m.Id)
+                    .Concat(template.UnavailableModules.Select(m => m.Id))
+                    .ToHashSet();
                 var errors = template.Modules.SelectMany(m => StateValidator.Validate(m).Keys).ToArray();
-                if (string.IsNullOrWhiteSpace(template.Name) || errors.Length > 0
-                    || template.Connections.Any(c => !moduleIds.Contains(c.SourceModuleId) || !moduleIds.Contains(c.TargetModuleId))
-                    || _templates.Values.Any(t => string.Equals(t.Name, template.Name, StringComparison.OrdinalIgnoreCase))
-                    || !_templates.TryAdd(template.Id, template with { IsBuiltIn = true }))
+                if (
+                    string.IsNullOrWhiteSpace(template.Name)
+                    || errors.Length > 0
+                    || template.Connections.Any(c =>
+                        !moduleIds.Contains(c.SourceModuleId) || !moduleIds.Contains(c.TargetModuleId)
+                    )
+                    || _templates.Values.Any(t =>
+                        string.Equals(t.Name, template.Name, StringComparison.OrdinalIgnoreCase)
+                    )
+                    || !_templates.TryAdd(template.Id, template with { IsBuiltIn = true })
+                )
                 {
-                    _logger.LogWarning("Skipping the template {Id} of the plugin {Plugin}: it's invalid or its id or name is taken.", template.Id, plugin.Id);
+                    _logger.LogWarning(
+                        "Skipping the template {Id} of the plugin {Plugin}: it's invalid or its id or name is taken.",
+                        template.Id,
+                        plugin.Id
+                    );
                 }
             }
         }
@@ -1349,16 +1568,18 @@ public sealed class AudioHost : IDisposable
 
     private void Persist()
     {
-        _store.Save(new EngineConfiguration
-        {
-            Settings = _settings,
-            Preferences = _preferences,
-            Modules = [.. _modules.Values.Select(ToDto)],
-            Subgraphs = [.. _subgraphs.Values],
-            Templates = [.. _templates.Values.Where(t => !t.IsBuiltIn)],
-            UnavailableModules = [.. _unavailableModules],
-            Connections = [.. _connections.Values.Select(c => c.Dto), .. _unavailableConnections],
-        });
+        _store.Save(
+            new EngineConfiguration
+            {
+                Settings = _settings,
+                Preferences = _preferences,
+                Modules = [.. _modules.Values.Select(ToDto)],
+                Subgraphs = [.. _subgraphs.Values],
+                Templates = [.. _templates.Values.Where(t => !t.IsBuiltIn)],
+                UnavailableModules = [.. _unavailableModules],
+                Connections = [.. _connections.Values.Select(c => c.Dto), .. _unavailableConnections],
+            }
+        );
     }
 
     /// <summary>
@@ -1390,7 +1611,9 @@ public sealed class AudioHost : IDisposable
     private ConnectionEntry[] RemoveModuleCore(ModuleEntry entry)
     {
         _modules.Remove(entry.Id);
-        var connections = _connections.Values.Where(c => c.Dto.SourceModuleId == entry.Id || c.Dto.TargetModuleId == entry.Id).ToArray();
+        var connections = _connections
+            .Values.Where(c => c.Dto.SourceModuleId == entry.Id || c.Dto.TargetModuleId == entry.Id)
+            .ToArray();
         foreach (var connection in connections)
         {
             _connections.Remove(connection.Dto.Id);
@@ -1409,17 +1632,28 @@ public sealed class AudioHost : IDisposable
     /// <returns>Whether a template was renamed.</returns>
     private bool RenameTemplatesNamedLikeBuiltIns()
     {
-        var builtInNames = _templates.Values.Where(t => t.IsBuiltIn).Select(t => t.Name).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var builtInNames = _templates
+            .Values.Where(t => t.IsBuiltIn)
+            .Select(t => t.Name)
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
         var renamed = false;
         foreach (var template in _templates.Values.Where(t => !t.IsBuiltIn && builtInNames.Contains(t.Name)).ToArray())
         {
             var name = $"{template.Name} (custom)";
-            for (var i = 2; _templates.Values.Any(t => string.Equals(t.Name, name, StringComparison.OrdinalIgnoreCase)); i++)
+            for (
+                var i = 2;
+                _templates.Values.Any(t => string.Equals(t.Name, name, StringComparison.OrdinalIgnoreCase));
+                i++
+            )
             {
                 name = $"{template.Name} (custom {i})";
             }
 
-            _logger.LogInformation("Renaming the template {Name} to {NewName}: a built-in template has its name.", template.Name, name);
+            _logger.LogInformation(
+                "Renaming the template {Name} to {NewName}: a built-in template has its name.",
+                template.Name,
+                name
+            );
             _templates[template.Id] = template with { Name = name };
             renamed = true;
         }
@@ -1445,13 +1679,19 @@ public sealed class AudioHost : IDisposable
     /// </summary>
     private void ThrowIfChannelCountTooLow(ModuleEntry entry, ModuleDto dto)
     {
-        if (SupportsChannelCount(entry.Module) && dto.ChannelCount is { } channelCount && GetRequiredChannelCount(entry) is var required
-            && channelCount < required)
+        if (
+            SupportsChannelCount(entry.Module)
+            && dto.ChannelCount is { } channelCount
+            && GetRequiredChannelCount(entry) is var required
+            && channelCount < required
+        )
         {
-            throw EngineRequestException.Invalid(new Dictionary<string, string[]>
-            {
-                ["channelCount"] = [$"The module's connections to single channels need {required} channels."],
-            });
+            throw EngineRequestException.Invalid(
+                new Dictionary<string, string[]>
+                {
+                    ["channelCount"] = [$"The module's connections to single channels need {required} channels."],
+                }
+            );
         }
     }
 
@@ -1474,7 +1714,11 @@ public sealed class AudioHost : IDisposable
     private ModuleSettings WithSystemVolume(ModuleSettings settings)
     {
         return settings.UseSystemVolume && _systemVolume.Level is { } level
-            ? settings with { Volume = level.Gain, IsMuted = level.IsMuted }
+            ? settings with
+            {
+                Volume = level.Gain,
+                IsMuted = level.IsMuted,
+            }
             : settings;
     }
 

@@ -31,7 +31,10 @@ internal static class InstallHooks
         {
             using var http = new HttpClient();
             using var timeout = new CancellationTokenSource(EngineStopTimeout);
-            var engine = new EngineLocator(EngineLocator.DefaultDiscoveryPath, http).FindAsync(timeout.Token).GetAwaiter().GetResult();
+            var engine = new EngineLocator(EngineLocator.DefaultDiscoveryPath, http)
+                .FindAsync(timeout.Token)
+                .GetAwaiter()
+                .GetResult();
             if (engine != null)
             {
                 EngineControl.ShutdownAsync(http, engine, timeout.Token).GetAwaiter().GetResult();
@@ -53,7 +56,8 @@ internal static class InstallHooks
                 autostart.SetEnabled(enabled);
             }
         }
-        catch (Exception ex) when (ex is UnauthorizedAccessException or System.Security.SecurityException or IOException)
+        catch (Exception ex)
+            when (ex is UnauthorizedAccessException or System.Security.SecurityException or IOException)
         {
             // the user can change it in the tray menu
         }

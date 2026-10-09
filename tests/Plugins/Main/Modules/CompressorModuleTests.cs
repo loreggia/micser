@@ -8,7 +8,12 @@ public class CompressorModuleTests
     [Test]
     public async Task Amount_Zero_LeavesSignalUnchanged()
     {
-        var compressor = new CompressorModule { Threshold = -20f, Ratio = 4f, Amount = 0f };
+        var compressor = new CompressorModule
+        {
+            Threshold = -20f,
+            Ratio = 4f,
+            Amount = 0f,
+        };
         var bench = new SignalTestBench(1000, 1f, null, compressor);
 
         var output = bench.Run(TimeSpan.FromSeconds(0.5));
@@ -19,7 +24,12 @@ public class CompressorModuleTests
     [Test]
     public async Task Downward_LeavesLevelBelowThresholdUnchanged()
     {
-        var compressor = new CompressorModule { Threshold = -20f, Ratio = 4f, Knee = 0f };
+        var compressor = new CompressorModule
+        {
+            Threshold = -20f,
+            Ratio = 4f,
+            Knee = 0f,
+        };
         var bench = new SignalTestBench(1000, Decibels.ToLinear(-40f), null, compressor);
 
         var output = bench.Run(TimeSpan.FromSeconds(0.5));
@@ -31,7 +41,14 @@ public class CompressorModuleTests
     [Test]
     public async Task Downward_ReducesLevelAboveThresholdByRatio()
     {
-        var compressor = new CompressorModule { Threshold = -20f, Ratio = 4f, Knee = 0f, Attack = 0.001f, Release = 0.05f };
+        var compressor = new CompressorModule
+        {
+            Threshold = -20f,
+            Ratio = 4f,
+            Knee = 0f,
+            Attack = 0.001f,
+            Release = 0.05f,
+        };
         var bench = new SignalTestBench(1000, 1f, null, compressor);
 
         var output = bench.Run(TimeSpan.FromSeconds(1));
@@ -44,7 +61,12 @@ public class CompressorModuleTests
     [Test]
     public async Task InvertedStereoChannels_AreStillDetected()
     {
-        var compressor = new CompressorModule { Threshold = -20f, Ratio = 4f, Knee = 0f };
+        var compressor = new CompressorModule
+        {
+            Threshold = -20f,
+            Ratio = 4f,
+            Knee = 0f,
+        };
         var inverter = new InvertSecondChannel();
         var bench = new SignalTestBench(1000, 1f, ChannelLayout.Stereo, inverter, compressor);
 
@@ -56,7 +78,13 @@ public class CompressorModuleTests
     [Test]
     public async Task Upward_RaisesLevelBelowThreshold()
     {
-        var compressor = new CompressorModule { Type = CompressorType.Upward, Threshold = -20f, Ratio = 2f, Knee = 0f };
+        var compressor = new CompressorModule
+        {
+            Type = CompressorType.Upward,
+            Threshold = -20f,
+            Ratio = 2f,
+            Knee = 0f,
+        };
         var bench = new SignalTestBench(1000, Decibels.ToLinear(-40f), null, compressor);
 
         var output = bench.Run(TimeSpan.FromSeconds(1));

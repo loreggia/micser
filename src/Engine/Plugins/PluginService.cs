@@ -29,8 +29,8 @@ public sealed class PluginService
 
     public IReadOnlyList<PluginDto> GetPlugins()
     {
-        var plugins = _catalog.Plugins
-            .Select(p => new PluginDto(
+        var plugins = _catalog
+            .Plugins.Select(p => new PluginDto(
                 p.Id,
                 p.Manifest?.Name,
                 p.Manifest?.Version,
@@ -38,7 +38,8 @@ public sealed class PluginService
                 p.IsLoaded,
                 p.Error,
                 p.IsLoaded && p.Manifest!.WebPath != null ? GetWebUrl(p.Manifest) : null,
-                p.IsBuiltIn ? PluginChange.None : _installer.GetPendingChange(p.Id)))
+                p.IsBuiltIn ? PluginChange.None : _installer.GetPendingChange(p.Id)
+            ))
             .ToList();
 
         // staged plugins that aren't installed yet
@@ -46,7 +47,18 @@ public sealed class PluginService
         {
             if (!plugins.Any(p => !p.IsBuiltIn && string.Equals(p.Id, manifest.Id, StringComparison.OrdinalIgnoreCase)))
             {
-                plugins.Add(new PluginDto(manifest.Id, manifest.Name, manifest.Version, false, false, null, null, PluginChange.Install));
+                plugins.Add(
+                    new PluginDto(
+                        manifest.Id,
+                        manifest.Name,
+                        manifest.Version,
+                        false,
+                        false,
+                        null,
+                        null,
+                        PluginChange.Install
+                    )
+                );
             }
         }
 

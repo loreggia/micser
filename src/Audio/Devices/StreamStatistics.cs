@@ -15,4 +15,5 @@ public readonly record struct StreamStatistics(
     long Underruns,
     long Overruns,
     double TargetMilliseconds,
-    long Resyncs);
+    long Resyncs
+);

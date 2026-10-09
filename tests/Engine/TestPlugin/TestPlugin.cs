@@ -1,5 +1,5 @@
-using Micser.Audio;
 using Microsoft.Extensions.DependencyInjection;
+using Micser.Audio;
 
 namespace Micser.Engine.TestPlugin;
 
@@ -19,9 +19,7 @@ public sealed class TestModule : EffectModule, IStatefulModule<TestState>
         Value = state.Value;
     }
 
-    protected override void Process(AudioBuffer buffer)
-    {
-    }
+    protected override void Process(AudioBuffer buffer) { }
 }
 
 /// <summary>

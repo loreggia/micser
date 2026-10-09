@@ -22,6 +22,9 @@ public class GainModuleTests
 
         var output = bench.Run(TimeSpan.FromMilliseconds(100));
 
-        await Assert.That(SignalTestBench.Peak(output.AsSpan(SignalTestBench.Format.FrameCount))).IsEqualTo(0.25f * Decibels.ToLinear(6f)).Within(0.002f);
+        await Assert
+            .That(SignalTestBench.Peak(output.AsSpan(SignalTestBench.Format.FrameCount)))
+            .IsEqualTo(0.25f * Decibels.ToLinear(6f))
+            .Within(0.002f);
     }
 }

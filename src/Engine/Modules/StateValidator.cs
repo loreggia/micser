@@ -13,7 +13,10 @@ namespace Micser.Engine.Modules;
 /// </summary>
 public static class StateValidator
 {
-    private static readonly ConcurrentDictionary<Type, (PropertyInfo Property, ValidationAttribute[] Attributes)[]> ParameterAttributes = new();
+    private static readonly ConcurrentDictionary<
+        Type,
+        (PropertyInfo Property, ValidationAttribute[] Attributes)[]
+    > ParameterAttributes = new();
 
     /// <summary>
     /// Returns the errors keyed by camelCase property path (e.g. <c>state.bands[0].frequency</c>); empty if valid.
@@ -37,30 +40,51 @@ public static class StateValidator
     /// </summary>
     private static (PropertyInfo Property, ValidationAttribute[] Attributes)[] GetParameterAttributes(Type type)
     {
-        return ParameterAttributes.GetOrAdd(type, static type =>
-        {
-            var properties = type.GetProperties().ToDictionary(p => p.Name, StringComparer.Ordinal);
-            var constructor = type.GetConstructors()
-                .Where(c => c.GetParameters() is { Length: > 0 } parameters && parameters.All(p => properties.ContainsKey(p.Name!)))
-                .MaxBy(c => c.GetParameters().Length);
+        return ParameterAttributes.GetOrAdd(
+            type,
+            static type =>
+            {
+                var properties = type.GetProperties().ToDictionary(p => p.Name, StringComparer.Ordinal);
+                var constructor = type.GetConstructors()
+                    .Where(c =>
+                        c.GetParameters() is { Length: > 0 } parameters
+                        && parameters.All(p => properties.ContainsKey(p.Name!))
+                    )
+                    .MaxBy(c => c.GetParameters().Length);
 
-            return constructor == null
-                ? []
-                :
-                [
-                    .. constructor.GetParameters()
-                        .Select(p => (Property: properties[p.Name!], Attributes: p.GetCustomAttributes<ValidationAttribute>().ToArray()))
-                        .Where(p => p.Attributes.Length > 0),
-                ];
-        });
+                return constructor == null
+                    ? []
+                    :
+                    [
+                        .. constructor
+                            .GetParameters()
+                            .Select(p =>
+                                (
+                                    Property: properties[p.Name!],
+                                    Attributes: p.GetCustomAttributes<ValidationAttribute>().ToArray()
+                                )
+                            )
+                            .Where(p => p.Attributes.Length > 0),
+                    ];
+            }
+        );
     }
 
     private static bool IsLeaf(Type type)
     {
-        return type.IsPrimitive || type.IsEnum || type == typeof(string) || type == typeof(decimal) || type == typeof(Guid);
+        return type.IsPrimitive
+            || type.IsEnum
+            || type == typeof(string)
+            || type == typeof(decimal)
+            || type == typeof(Guid);
     }
 
-    private static void Validate(object instance, string path, Dictionary<string, List<string>> errors, HashSet<object> visited)
+    private static void Validate(
+        object instance,
+        string path,
+        Dictionary<string, List<string>> errors,
+        HashSet<object> visited
+    )
     {
         if (IsLeaf(instance.GetType()) || !visited.Add(instance))
         {
@@ -91,7 +115,11 @@ public static class StateValidator
 
         foreach (var property in instance.GetType().GetProperties())
         {
-            if (property.GetIndexParameters().Length > 0 || IsLeaf(property.PropertyType) || property.IsDefined(typeof(JsonIgnoreAttribute)))
+            if (
+                property.GetIndexParameters().Length > 0
+                || IsLeaf(property.PropertyType)
+                || property.IsDefined(typeof(JsonIgnoreAttribute))
+            )
             {
                 continue;
             }

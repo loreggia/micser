@@ -13,7 +13,8 @@ public sealed record ConnectionDto(
     Guid TargetModuleId,
     string TargetPort,
     int? SourceChannel = null,
-    int? TargetChannel = null);
+    int? TargetChannel = null
+);
 
 /// <param name="SourceChannel">
 /// The only channel of the source port to take (0-based), or null for all. A channel the port doesn't have right now is silent.
@@ -28,25 +29,37 @@ public sealed record CreateConnectionRequest(
     Guid TargetModuleId,
     [Required] string TargetPort,
     [Range(0, AudioModule.MaxChannelCount - 1)] int? SourceChannel = null,
-    [Range(0, AudioModule.MaxChannelCount - 1)] int? TargetChannel = null);
+    [Range(0, AudioModule.MaxChannelCount - 1)] int? TargetChannel = null
+);
 
 /// <param name="SampleRate">The sample rate the graph is processed at, in Hz.</param>
 /// <param name="FrameCount">Frames per processing block; smaller blocks lower the latency and raise the CPU load.</param>
 public sealed record EngineSettingsDto(
     [Range(8000, 192000)] int SampleRate = 48000,
-    [Range(32, 4800)] int FrameCount = 240);
+    [Range(32, 4800)] int FrameCount = 240
+);
 
 /// <param name="Blocks">Blocks processed since the engine started.</param>
 /// <param name="LateBlocks">Times processing fell behind and skipped ahead.</param>
 /// <param name="MaxProcessingMilliseconds">Longest time a block took to process since the engine started.</param>
-public sealed record EngineStatusDto(bool IsRunning, EngineSettingsDto Settings, long Blocks, long LateBlocks, double MaxProcessingMilliseconds);
+public sealed record EngineStatusDto(
+    bool IsRunning,
+    EngineSettingsDto Settings,
+    long Blocks,
+    long LateBlocks,
+    double MaxProcessingMilliseconds
+);
 
 /// <summary>
 /// The channel layouts of a module's ports while the audio runs.
 /// </summary>
 /// <param name="Inputs">The layouts of the input ports, by name.</param>
 /// <param name="Outputs">The layouts of the output ports, by name.</param>
-public sealed record ModulePortLayoutsDto(Guid ModuleId, IReadOnlyDictionary<string, PortLayoutDto> Inputs, IReadOnlyDictionary<string, PortLayoutDto> Outputs);
+public sealed record ModulePortLayoutsDto(
+    Guid ModuleId,
+    IReadOnlyDictionary<string, PortLayoutDto> Inputs,
+    IReadOnlyDictionary<string, PortLayoutDto> Outputs
+);
 
 /// <summary>
 /// The channel layout of a port in the last processed block.
@@ -68,7 +81,10 @@ public sealed record PortLayoutDto(int ChannelCount, IReadOnlyList<SpeakerPositi
         var hasKnownSpeakers = layout.HasSpeakerPositions && ((uint)layout.Speakers & ~KnownSpeakers) == 0;
         return new PortLayoutDto(
             layout.ChannelCount,
-            hasKnownSpeakers ? [.. Enumerable.Range(0, layout.ChannelCount).Select(c => (SpeakerPosition)(uint)layout.GetSpeaker(c))] : null);
+            hasKnownSpeakers
+                ? [.. Enumerable.Range(0, layout.ChannelCount).Select(c => (SpeakerPosition)(uint)layout.GetSpeaker(c))]
+                : null
+        );
     }
 }
 
@@ -113,7 +129,12 @@ public sealed record PortLevelsDto(string? Port, float[] Peak, float[] Rms);
 /// <param name="SnapToGrid">Whether modules snap to the grid when moved.</param>
 /// <param name="Language">The UI's language, e.g. "de"; null follows the system. Languages the UI doesn't have also follow the system.</param>
 /// <param name="ShowChannelsByDefault">Whether modules the UI adds show their channel connectors.</param>
-public sealed record UiPreferencesDto(bool ShowStreamStatistics = false, bool SnapToGrid = true, string? Language = null, bool ShowChannelsByDefault = false);
+public sealed record UiPreferencesDto(
+    bool ShowStreamStatistics = false,
+    bool SnapToGrid = true,
+    string? Language = null,
+    bool ShowChannelsByDefault = false
+);
 
 /// <summary>
 /// A plugin: loaded at the engine's start, failed to load, or staged for installation.
@@ -123,4 +144,13 @@ public sealed record UiPreferencesDto(bool ShowStreamStatistics = false, bool Sn
 /// <param name="Error">Why the plugin isn't loaded; null if it's loaded or only staged.</param>
 /// <param name="WebUrl">The URL of the plugin's widget bundle (an ES module), if it's loaded and has widgets.</param>
 /// <param name="PendingChange">A change that's applied when the engine restarts.</param>
-public sealed record PluginDto(string Id, string? Name, string? Version, bool IsBuiltIn, bool IsLoaded, string? Error, string? WebUrl, PluginChange PendingChange);
+public sealed record PluginDto(
+    string Id,
+    string? Name,
+    string? Version,
+    bool IsBuiltIn,
+    bool IsLoaded,
+    string? Error,
+    string? WebUrl,
+    PluginChange PendingChange
+);

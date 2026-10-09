@@ -1,6 +1,6 @@
+using Microsoft.Extensions.Logging;
 using Micser.Audio;
 using Micser.Audio.Devices;
-using Microsoft.Extensions.Logging;
 
 namespace Micser.Plugins.Main.Modules;
 
@@ -25,16 +25,19 @@ public abstract class CaptureModule : DeviceModule<CaptureStream>
 
     protected override void Process()
     {
-        UseStream(static (stream, output) =>
-        {
-            if (stream == null)
+        UseStream(
+            static (stream, output) =>
             {
-                output.Buffer.SetLayout(ChannelLayout.None);
-            }
-            else
-            {
-                stream.Read(output.Buffer);
-            }
-        }, Output);
+                if (stream == null)
+                {
+                    output.Buffer.SetLayout(ChannelLayout.None);
+                }
+                else
+                {
+                    stream.Read(output.Buffer);
+                }
+            },
+            Output
+        );
     }
 }

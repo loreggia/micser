@@ -32,11 +32,13 @@ internal sealed record WindowSettings(int X, int Y, int Width, int Height, bool 
     public bool IsVisibleOn(IEnumerable<Rectangle> screens)
     {
         var titleBar = new Rectangle(X, Y, Width, 40);
-        return Width > 0 && Height > 0 && screens.Any(screen =>
-        {
-            var visible = Rectangle.Intersect(screen, titleBar);
-            return visible.Width >= 100 && visible.Height >= 20;
-        });
+        return Width > 0
+            && Height > 0
+            && screens.Any(screen =>
+            {
+                var visible = Rectangle.Intersect(screen, titleBar);
+                return visible.Width >= 100 && visible.Height >= 20;
+            });
     }
 
     public void Save(string path)

@@ -120,7 +120,11 @@ public sealed class PluginInstaller
             }
 
             var manifests = new List<PluginManifest>();
-            foreach (var directory in Directory.EnumerateDirectories(_pendingPath).Where(d => PluginManifest.IsValidId(Path.GetFileName(d))))
+            foreach (
+                var directory in Directory
+                    .EnumerateDirectories(_pendingPath)
+                    .Where(d => PluginManifest.IsValidId(Path.GetFileName(d)))
+            )
             {
                 try
                 {

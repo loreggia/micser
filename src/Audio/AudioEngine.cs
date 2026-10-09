@@ -38,10 +38,12 @@ public sealed class AudioEngine : IDisposable
 
     public bool IsRunning => _thread != null;
 
-    public EngineStatistics Statistics => new(
-        Interlocked.Read(ref _blocks),
-        Interlocked.Read(ref _lateBlocks),
-        TimeSpan.FromSeconds((double)Interlocked.Read(ref _maxProcessingTicks) / Stopwatch.Frequency));
+    public EngineStatistics Statistics =>
+        new(
+            Interlocked.Read(ref _blocks),
+            Interlocked.Read(ref _lateBlocks),
+            TimeSpan.FromSeconds((double)Interlocked.Read(ref _maxProcessingTicks) / Stopwatch.Frequency)
+        );
 
     public void Dispose()
     {
@@ -123,7 +125,12 @@ public sealed class AudioEngine : IDisposable
             _logger.LogWarning("Could not register the audio thread with MMCSS.");
         }
 
-        using var timer = NativeMethods.CreateWaitableTimerEx(0, null, NativeMethods.CreateWaitableTimerHighResolution, NativeMethods.TimerAllAccess);
+        using var timer = NativeMethods.CreateWaitableTimerEx(
+            0,
+            null,
+            NativeMethods.CreateWaitableTimerHighResolution,
+            NativeMethods.TimerAllAccess
+        );
         if (timer.IsInvalid)
         {
             _logger.LogWarning("High resolution timers are not available; block timing will be less precise.");
@@ -131,7 +138,11 @@ public sealed class AudioEngine : IDisposable
 
         var period = (long)(_graph.Format.BlockDuration.TotalSeconds * Stopwatch.Frequency);
         var deadline = Stopwatch.GetTimestamp();
-        _logger.LogInformation("Audio engine started ({SampleRate} Hz, {FrameCount} frames per block).", _graph.Format.SampleRate, _graph.Format.FrameCount);
+        _logger.LogInformation(
+            "Audio engine started ({SampleRate} Hz, {FrameCount} frames per block).",
+            _graph.Format.SampleRate,
+            _graph.Format.FrameCount
+        );
 
         try
         {

@@ -13,7 +13,10 @@ public class EqualizerModuleTests
 
         var output = bench.Run(TimeSpan.FromMilliseconds(500));
 
-        await Assert.That(Decibels.FromLinear(SignalTestBench.Peak(output.AsSpan(output.Length - 4800)) / 0.1f)).IsEqualTo(0f).Within(0.5f);
+        await Assert
+            .That(Decibels.FromLinear(SignalTestBench.Peak(output.AsSpan(output.Length - 4800)) / 0.1f))
+            .IsEqualTo(0f)
+            .Within(0.5f);
     }
 
     [Test]
@@ -24,7 +27,10 @@ public class EqualizerModuleTests
 
         var output = bench.Run(TimeSpan.FromMilliseconds(500));
 
-        await Assert.That(Decibels.FromLinear(SignalTestBench.Peak(output.AsSpan(output.Length - 4800)) / 0.1f)).IsEqualTo(12f).Within(0.2f);
+        await Assert
+            .That(Decibels.FromLinear(SignalTestBench.Peak(output.AsSpan(output.Length - 4800)) / 0.1f))
+            .IsEqualTo(12f)
+            .Within(0.2f);
     }
 
     [Test]
@@ -37,7 +43,10 @@ public class EqualizerModuleTests
         equalizer.Bands = [new EqualizerBand(1000, -12f, 1f)];
         var output = bench.Run(TimeSpan.FromMilliseconds(500));
 
-        await Assert.That(Decibels.FromLinear(SignalTestBench.Peak(output.AsSpan(output.Length - 4800)) / 0.1f)).IsEqualTo(-12f).Within(0.2f);
+        await Assert
+            .That(Decibels.FromLinear(SignalTestBench.Peak(output.AsSpan(output.Length - 4800)) / 0.1f))
+            .IsEqualTo(-12f)
+            .Within(0.2f);
     }
 
     [Test]

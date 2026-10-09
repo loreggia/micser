@@ -13,13 +13,27 @@ public class SubgraphTemplateApiTests
     {
         await using var factory = new EngineFactory(pluginTemplates: true);
         using var client = factory.CreateAuthorizedClient();
-        var builtIn = (await client.GetFromJsonAsync<SubgraphTemplateDto[]>("/api/subgraph-templates", factory.Json))!.First();
+        var builtIn = (
+            await client.GetFromJsonAsync<SubgraphTemplateDto[]>("/api/subgraph-templates", factory.Json)
+        )!.First();
         var subgraph = await InstantiateAsync(factory, client, builtIn.Id, new ModulePosition(0, 0));
 
-        using var renamed = await client.PutAsJsonAsync($"/api/subgraph-templates/{builtIn.Id}/name", new RenameSubgraphTemplateRequest("Other"), factory.Json);
+        using var renamed = await client.PutAsJsonAsync(
+            $"/api/subgraph-templates/{builtIn.Id}/name",
+            new RenameSubgraphTemplateRequest("Other"),
+            factory.Json
+        );
         using var removed = await client.DeleteAsync($"/api/subgraph-templates/{builtIn.Id}");
-        using var savedOver = await client.PostAsJsonAsync("/api/subgraph-templates", new SaveSubgraphTemplateRequest(subgraph.Id, builtIn.Name, builtIn.Id), factory.Json);
-        using var savedAsName = await client.PostAsJsonAsync("/api/subgraph-templates", new SaveSubgraphTemplateRequest(subgraph.Id, builtIn.Name), factory.Json);
+        using var savedOver = await client.PostAsJsonAsync(
+            "/api/subgraph-templates",
+            new SaveSubgraphTemplateRequest(subgraph.Id, builtIn.Name, builtIn.Id),
+            factory.Json
+        );
+        using var savedAsName = await client.PostAsJsonAsync(
+            "/api/subgraph-templates",
+            new SaveSubgraphTemplateRequest(subgraph.Id, builtIn.Name),
+            factory.Json
+        );
         var custom = await SaveAsync(factory, client, subgraph.Id, $"{builtIn.Name} (custom)");
         var templates = await client.GetFromJsonAsync<SubgraphTemplateDto[]>("/api/subgraph-templates", factory.Json);
 
@@ -41,7 +55,9 @@ public class SubgraphTemplateApiTests
             await using (var factory = new EngineFactory(directory, pluginTemplates: true))
             {
                 using var client = factory.CreateAuthorizedClient();
-                var templates = (await client.GetFromJsonAsync<SubgraphTemplateDto[]>("/api/subgraph-templates", factory.Json))!;
+                var templates = (
+                    await client.GetFromJsonAsync<SubgraphTemplateDto[]>("/api/subgraph-templates", factory.Json)
+                )!;
                 foreach (var template in templates)
                 {
                     var created = await InstantiateAsync(factory, client, template.Id, new ModulePosition(0, 0));
@@ -49,20 +65,32 @@ public class SubgraphTemplateApiTests
                     var connections = (await client.GetFromJsonAsync<ConnectionDto[]>("/api/connections"))!;
 
                     await Assert.That(members.Length).IsEqualTo(template.Modules.Count);
-                    await Assert.That(connections.Count(c => members.Any(m => m.Id == c.TargetModuleId))).IsEqualTo(template.Connections.Count);
+                    await Assert
+                        .That(connections.Count(c => members.Any(m => m.Id == c.TargetModuleId)))
+                        .IsEqualTo(template.Connections.Count);
                 }
 
-                await Assert.That(templates.Select(t => t.Name)).IsEquivalentTo(["Footstep boost", "Night mode", "Voice chat mic"]);
+                await Assert
+                    .That(templates.Select(t => t.Name))
+                    .IsEquivalentTo(["Footstep boost", "Night mode", "Voice chat mic"]);
                 await Assert.That(templates.All(t => t.IsBuiltIn)).IsTrue();
                 subgraph = (await client.GetFromJsonAsync<SubgraphDto[]>("/api/subgraphs", factory.Json))!.First();
             }
 
-            await Assert.That(JsonNode.Parse(await File.ReadAllTextAsync(Path.Combine(directory, "config.json")))!["templates"]!.AsArray()).IsEmpty();
+            await Assert
+                .That(
+                    JsonNode.Parse(await File.ReadAllTextAsync(Path.Combine(directory, "config.json")))![
+                        "templates"
+                    ]!.AsArray()
+                )
+                .IsEmpty();
 
             await using (var factory = new EngineFactory(directory, pluginTemplates: true))
             {
                 using var client = factory.CreateAuthorizedClient();
-                var restored = (await client.GetFromJsonAsync<SubgraphDto[]>("/api/subgraphs", factory.Json))!.Single(s => s.Id == subgraph.Id);
+                var restored = (await client.GetFromJsonAsync<SubgraphDto[]>("/api/subgraphs", factory.Json))!.Single(
+                    s => s.Id == subgraph.Id
+                );
 
                 await Assert.That(restored.TemplateId).IsEqualTo(subgraph.TemplateId);
             }
@@ -84,17 +112,37 @@ public class SubgraphTemplateApiTests
             await using (var factory = new EngineFactory(directory))
             {
                 using var client = factory.CreateAuthorizedClient();
-                footsteps = await SaveAsync(factory, client, (await CreateChainAsync(factory, client)).Subgraph.Id, "footstep BOOST");
-                night = await SaveAsync(factory, client, (await CreateChainAsync(factory, client)).Subgraph.Id, "Night mode");
-                await SaveAsync(factory, client, (await CreateChainAsync(factory, client)).Subgraph.Id, "Night mode (custom)");
+                footsteps = await SaveAsync(
+                    factory,
+                    client,
+                    (await CreateChainAsync(factory, client)).Subgraph.Id,
+                    "footstep BOOST"
+                );
+                night = await SaveAsync(
+                    factory,
+                    client,
+                    (await CreateChainAsync(factory, client)).Subgraph.Id,
+                    "Night mode"
+                );
+                await SaveAsync(
+                    factory,
+                    client,
+                    (await CreateChainAsync(factory, client)).Subgraph.Id,
+                    "Night mode (custom)"
+                );
             }
 
             await using (var factory = new EngineFactory(directory, pluginTemplates: true))
             {
                 using var client = factory.CreateAuthorizedClient();
-                var templates = await client.GetFromJsonAsync<SubgraphTemplateDto[]>("/api/subgraph-templates", factory.Json);
+                var templates = await client.GetFromJsonAsync<SubgraphTemplateDto[]>(
+                    "/api/subgraph-templates",
+                    factory.Json
+                );
 
-                await Assert.That(templates!.Single(t => t.Id == footsteps.Id).Name).IsEqualTo("footstep BOOST (custom)");
+                await Assert
+                    .That(templates!.Single(t => t.Id == footsteps.Id).Name)
+                    .IsEqualTo("footstep BOOST (custom)");
                 await Assert.That(templates!.Single(t => t.Id == night.Id).Name).IsEqualTo("Night mode (custom 2)");
                 await Assert.That(templates!.Count(t => t.IsBuiltIn)).IsEqualTo(3);
             }
@@ -103,9 +151,14 @@ public class SubgraphTemplateApiTests
             await using (var factory = new EngineFactory(directory))
             {
                 using var client = factory.CreateAuthorizedClient();
-                var templates = await client.GetFromJsonAsync<SubgraphTemplateDto[]>("/api/subgraph-templates", factory.Json);
+                var templates = await client.GetFromJsonAsync<SubgraphTemplateDto[]>(
+                    "/api/subgraph-templates",
+                    factory.Json
+                );
 
-                await Assert.That(templates!.Select(t => t.Name)).IsEquivalentTo(["footstep BOOST (custom)", "Night mode (custom 2)", "Night mode (custom)"]);
+                await Assert
+                    .That(templates!.Select(t => t.Name))
+                    .IsEquivalentTo(["footstep BOOST (custom)", "Night mode (custom 2)", "Night mode (custom)"]);
             }
         }
         finally
@@ -124,7 +177,9 @@ public class SubgraphTemplateApiTests
             await using (var factory = new EngineFactory(directory, pluginTemplates: true))
             {
                 using var client = factory.CreateAuthorizedClient();
-                var builtIn = (await client.GetFromJsonAsync<SubgraphTemplateDto[]>("/api/subgraph-templates", factory.Json))!.First();
+                var builtIn = (
+                    await client.GetFromJsonAsync<SubgraphTemplateDto[]>("/api/subgraph-templates", factory.Json)
+                )!.First();
                 subgraph = await InstantiateAsync(factory, client, builtIn.Id, new ModulePosition(0, 0));
 
                 // a change that saves the configuration
@@ -185,11 +240,22 @@ public class SubgraphTemplateApiTests
         await using var factory = new EngineFactory();
         using var client = factory.CreateAuthorizedClient();
         var (subgraph, first, _) = await CreateChainAsync(factory, client);
-        (await client.PutAsJsonAsync<ModuleDto>($"/api/modules/{first.Id}", ((ModuleDto<GainState>)first) with { State = new GainState(-6f) }, factory.Json)).EnsureSuccessStatusCode();
+        (
+            await client.PutAsJsonAsync<ModuleDto>(
+                $"/api/modules/{first.Id}",
+                ((ModuleDto<GainState>)first) with
+                {
+                    State = new GainState(-6f),
+                },
+                factory.Json
+            )
+        ).EnsureSuccessStatusCode();
         var template = await SaveAsync(factory, client, subgraph.Id, "Chain");
 
         var created = await InstantiateAsync(factory, client, template.Id, new ModulePosition(1000, 500));
-        var modules = (await client.GetFromJsonAsync<ModuleDto[]>("/api/modules", factory.Json))!.Where(m => m.SubgraphId == created.Id).ToArray();
+        var modules = (await client.GetFromJsonAsync<ModuleDto[]>("/api/modules", factory.Json))!
+            .Where(m => m.SubgraphId == created.Id)
+            .ToArray();
         var connections = await client.GetFromJsonAsync<ConnectionDto[]>("/api/connections");
 
         await Assert.That(created.TemplateId).IsEqualTo(template.Id);
@@ -197,9 +263,17 @@ public class SubgraphTemplateApiTests
         await Assert.That(created.Name).IsEqualTo("Chain");
         await Assert.That(created.Position).IsEqualTo(new ModulePosition(1000, 500));
         await Assert.That(modules.Length).IsEqualTo(2);
-        await Assert.That(modules.Select(m => m.TemplateModuleId)).IsEquivalentTo(template.Modules.Select(m => (Guid?)m.Id));
+        await Assert
+            .That(modules.Select(m => m.TemplateModuleId))
+            .IsEquivalentTo(template.Modules.Select(m => (Guid?)m.Id));
         await Assert.That(modules.OfType<ModuleDto<GainState>>().Select(m => m.State.Gain)).Contains(-6f);
-        await Assert.That(connections!.Count(c => modules.Any(m => m.Id == c.SourceModuleId) && modules.Any(m => m.Id == c.TargetModuleId))).IsEqualTo(1);
+        await Assert
+            .That(
+                connections!.Count(c =>
+                    modules.Any(m => m.Id == c.SourceModuleId) && modules.Any(m => m.Id == c.TargetModuleId)
+                )
+            )
+            .IsEqualTo(1);
     }
 
     [Test]
@@ -211,16 +285,25 @@ public class SubgraphTemplateApiTests
         var config = new JsonObject
         {
             ["version"] = 1,
-            ["templates"] = new JsonArray(new JsonObject
-            {
-                ["id"] = templateId,
-                ["name"] = "Missing",
-                ["revision"] = 1,
-                ["color"] = "Teal",
-                ["size"] = new JsonObject { ["width"] = 400, ["height"] = 300 },
-                ["modules"] = new JsonArray(new JsonObject { ["type"] = "Nope", ["id"] = Guid.NewGuid(), ["state"] = new JsonObject() }),
-                ["connections"] = new JsonArray(),
-            }),
+            ["templates"] = new JsonArray(
+                new JsonObject
+                {
+                    ["id"] = templateId,
+                    ["name"] = "Missing",
+                    ["revision"] = 1,
+                    ["color"] = "Teal",
+                    ["size"] = new JsonObject { ["width"] = 400, ["height"] = 300 },
+                    ["modules"] = new JsonArray(
+                        new JsonObject
+                        {
+                            ["type"] = "Nope",
+                            ["id"] = Guid.NewGuid(),
+                            ["state"] = new JsonObject(),
+                        }
+                    ),
+                    ["connections"] = new JsonArray(),
+                }
+            ),
         };
         await File.WriteAllTextAsync(Path.Combine(directory, "config.json"), config.ToJsonString());
         try
@@ -228,9 +311,15 @@ public class SubgraphTemplateApiTests
             await using (var factory = new EngineFactory(directory))
             {
                 using var client = factory.CreateAuthorizedClient();
-                var templates = await client.GetFromJsonAsync<SubgraphTemplateDto[]>("/api/subgraph-templates", factory.Json);
+                var templates = await client.GetFromJsonAsync<SubgraphTemplateDto[]>(
+                    "/api/subgraph-templates",
+                    factory.Json
+                );
                 using var response = await client.PostAsJsonAsync(
-                    $"/api/subgraph-templates/{templateId}/instantiate", new InstantiateSubgraphTemplateRequest(new ModulePosition(0, 0)), factory.Json);
+                    $"/api/subgraph-templates/{templateId}/instantiate",
+                    new InstantiateSubgraphTemplateRequest(new ModulePosition(0, 0)),
+                    factory.Json
+                );
 
                 // a change that saves the configuration
                 var gain = await factory.AddModuleAsync(client, "Gain");
@@ -244,7 +333,10 @@ public class SubgraphTemplateApiTests
             await using (var factory = new EngineFactory(directory))
             {
                 using var client = factory.CreateAuthorizedClient();
-                var templates = await client.GetFromJsonAsync<SubgraphTemplateDto[]>("/api/subgraph-templates", factory.Json);
+                var templates = await client.GetFromJsonAsync<SubgraphTemplateDto[]>(
+                    "/api/subgraph-templates",
+                    factory.Json
+                );
 
                 await Assert.That(templates!.Single().UnavailableTypes).IsEquivalentTo(["Nope"]);
             }
@@ -265,11 +357,21 @@ public class SubgraphTemplateApiTests
         await SaveAsync(factory, client, first.Id, "First");
         var template = await SaveAsync(factory, client, second.Id, "Second");
 
-        using var conflict = await client.PutAsJsonAsync($"/api/subgraph-templates/{template.Id}/name", new RenameSubgraphTemplateRequest("first"), factory.Json);
-        using var renamed = await client.PutAsJsonAsync($"/api/subgraph-templates/{template.Id}/name", new RenameSubgraphTemplateRequest(" Third "), factory.Json);
+        using var conflict = await client.PutAsJsonAsync(
+            $"/api/subgraph-templates/{template.Id}/name",
+            new RenameSubgraphTemplateRequest("first"),
+            factory.Json
+        );
+        using var renamed = await client.PutAsJsonAsync(
+            $"/api/subgraph-templates/{template.Id}/name",
+            new RenameSubgraphTemplateRequest(" Third "),
+            factory.Json
+        );
 
         await Assert.That(conflict.StatusCode).IsEqualTo(HttpStatusCode.Conflict);
-        await Assert.That((await renamed.Content.ReadFromJsonAsync<SubgraphTemplateDto>(factory.Json))!.Name).IsEqualTo("Third");
+        await Assert
+            .That((await renamed.Content.ReadFromJsonAsync<SubgraphTemplateDto>(factory.Json))!.Name)
+            .IsEqualTo("Third");
     }
 
     [Test]
@@ -281,7 +383,11 @@ public class SubgraphTemplateApiTests
         var (second, _, _) = await CreateChainAsync(factory, client);
         await SaveAsync(factory, client, first.Id, "Chain");
 
-        using var response = await client.PostAsJsonAsync("/api/subgraph-templates", new SaveSubgraphTemplateRequest(second.Id, "chain"), factory.Json);
+        using var response = await client.PostAsJsonAsync(
+            "/api/subgraph-templates",
+            new SaveSubgraphTemplateRequest(second.Id, "chain"),
+            factory.Json
+        );
 
         await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.Conflict);
     }
@@ -323,7 +429,8 @@ public class SubgraphTemplateApiTests
         await Assert.That(template.Connections).HasSingleItem();
         await Assert.That(subgraphs!.Single().TemplateId).IsEqualTo(template.Id);
         await Assert.That(subgraphs!.Single().TemplateRevision).IsEqualTo(1);
-        await Assert.That(modules!.Where(m => m.Id == first.Id || m.Id == second.Id).Select(m => m.TemplateModuleId))
+        await Assert
+            .That(modules!.Where(m => m.Id == first.Id || m.Id == second.Id).Select(m => m.TemplateModuleId))
             .IsEquivalentTo(template.Modules.Select(m => (Guid?)m.Id));
     }
 
@@ -344,11 +451,16 @@ public class SubgraphTemplateApiTests
             await using (var factory = new EngineFactory(directory))
             {
                 using var client = factory.CreateAuthorizedClient();
-                var templates = await client.GetFromJsonAsync<SubgraphTemplateDto[]>("/api/subgraph-templates", factory.Json);
+                var templates = await client.GetFromJsonAsync<SubgraphTemplateDto[]>(
+                    "/api/subgraph-templates",
+                    factory.Json
+                );
                 var subgraphs = await client.GetFromJsonAsync<SubgraphDto[]>("/api/subgraphs", factory.Json);
 
                 await Assert.That(templates!.Single().Name).IsEqualTo("Chain");
-                await Assert.That(templates!.Single().Modules.Select(m => m.Id)).IsEquivalentTo(template.Modules.Select(m => m.Id));
+                await Assert
+                    .That(templates!.Single().Modules.Select(m => m.Id))
+                    .IsEquivalentTo(template.Modules.Select(m => m.Id));
                 await Assert.That(templates!.Single().Connections).IsEquivalentTo(template.Connections);
                 await Assert.That(subgraphs!.Single().TemplateId).IsEqualTo(template.Id);
             }
@@ -365,7 +477,12 @@ public class SubgraphTemplateApiTests
         await using var factory = new EngineFactory();
         using var client = factory.CreateAuthorizedClient();
         var (subgraph, first, second) = await CreateChainAsync(factory, client);
-        (await client.PostAsJsonAsync("/api/connections", new CreateConnectionRequest(first.Id, "Output", second.Id, "Input", 0, 1))).EnsureSuccessStatusCode();
+        (
+            await client.PostAsJsonAsync(
+                "/api/connections",
+                new CreateConnectionRequest(first.Id, "Output", second.Id, "Input", 0, 1)
+            )
+        ).EnsureSuccessStatusCode();
 
         var template = await SaveAsync(factory, client, subgraph.Id, "Chain");
         var created = await InstantiateAsync(factory, client, template.Id, new ModulePosition(1000, 500));
@@ -374,9 +491,13 @@ public class SubgraphTemplateApiTests
             .Where(c => modules.Any(m => m.Id == c.SourceModuleId))
             .ToArray();
 
-        await Assert.That(template.Connections.Select(c => (c.SourceChannel, c.TargetChannel))).IsEquivalentTo([((int?)null, (int?)null), (0, 1)]);
+        await Assert
+            .That(template.Connections.Select(c => (c.SourceChannel, c.TargetChannel)))
+            .IsEquivalentTo([((int?)null, (int?)null), (0, 1)]);
         await Assert.That(template.Modules.All(m => m.ShowChannels)).IsTrue();
-        await Assert.That(connections.Select(c => (c.SourceChannel, c.TargetChannel))).IsEquivalentTo([((int?)null, (int?)null), (0, 1)]);
+        await Assert
+            .That(connections.Select(c => (c.SourceChannel, c.TargetChannel)))
+            .IsEquivalentTo([((int?)null, (int?)null), (0, 1)]);
         await Assert.That(modules.All(m => m.ShowChannels)).IsTrue();
     }
 
@@ -389,8 +510,24 @@ public class SubgraphTemplateApiTests
         var template = await SaveAsync(factory, client, subgraph.Id, "Chain");
         var (other, _, _) = await CreateChainAsync(factory, client);
 
-        using var set = await client.PutAsJsonAsync($"/api/subgraphs/{other.Id}", other with { TemplateId = template.Id, TemplateRevision = 1 }, factory.Json);
-        using var cleared = await client.PutAsJsonAsync($"/api/subgraphs/{subgraph.Id}", subgraph with { TemplateId = null, TemplateRevision = 1 }, factory.Json);
+        using var set = await client.PutAsJsonAsync(
+            $"/api/subgraphs/{other.Id}",
+            other with
+            {
+                TemplateId = template.Id,
+                TemplateRevision = 1,
+            },
+            factory.Json
+        );
+        using var cleared = await client.PutAsJsonAsync(
+            $"/api/subgraphs/{subgraph.Id}",
+            subgraph with
+            {
+                TemplateId = null,
+                TemplateRevision = 1,
+            },
+            factory.Json
+        );
 
         await Assert.That((await set.Content.ReadFromJsonAsync<SubgraphDto>(factory.Json))!.TemplateId).IsNull();
         var detached = (await cleared.Content.ReadFromJsonAsync<SubgraphDto>(factory.Json))!;
@@ -411,13 +548,36 @@ public class SubgraphTemplateApiTests
         var kept = instanceModules.Single(m => m.TemplateModuleId == firstLocalId);
         var removed = instanceModules.Single(m => m.Id != kept.Id);
         var outside = await factory.AddModuleAsync(client, "Gain");
-        (await client.PostAsJsonAsync("/api/connections", new CreateConnectionRequest(outside.Id, "Output", kept.Id, "Input"))).EnsureSuccessStatusCode();
+        (
+            await client.PostAsJsonAsync(
+                "/api/connections",
+                new CreateConnectionRequest(outside.Id, "Output", kept.Id, "Input")
+            )
+        ).EnsureSuccessStatusCode();
 
         // the source gets a new gain state, loses its second module, gains a compressor after the first one
-        (await client.PutAsJsonAsync<ModuleDto>($"/api/modules/{first.Id}", ((ModuleDto<GainState>)first) with { State = new GainState(-12f) }, factory.Json)).EnsureSuccessStatusCode();
+        (
+            await client.PutAsJsonAsync<ModuleDto>(
+                $"/api/modules/{first.Id}",
+                ((ModuleDto<GainState>)first) with
+                {
+                    State = new GainState(-12f),
+                },
+                factory.Json
+            )
+        ).EnsureSuccessStatusCode();
         (await client.DeleteAsync($"/api/modules/{second.Id}")).EnsureSuccessStatusCode();
-        var compressor = await AddModuleAsync(factory, client, new CreateModuleRequest("Compressor", SubgraphId: source.Id));
-        (await client.PostAsJsonAsync("/api/connections", new CreateConnectionRequest(first.Id, "Output", compressor.Id, "Input"))).EnsureSuccessStatusCode();
+        var compressor = await AddModuleAsync(
+            factory,
+            client,
+            new CreateModuleRequest("Compressor", SubgraphId: source.Id)
+        );
+        (
+            await client.PostAsJsonAsync(
+                "/api/connections",
+                new CreateConnectionRequest(first.Id, "Output", compressor.Id, "Input")
+            )
+        ).EnsureSuccessStatusCode();
         await SaveAsync(factory, client, source.Id, "Chain", template.Id);
 
         using var response = await client.PostAsync($"/api/subgraphs/{instance.Id}/update-from-template", null);
@@ -431,9 +591,13 @@ public class SubgraphTemplateApiTests
         await Assert.That(members.Select(m => m.Id)).DoesNotContain(removed.Id);
         await Assert.That(((ModuleDto<GainState>)members.Single(m => m.Id == kept.Id)).State.Gain).IsEqualTo(-12f);
         var added = members.OfType<ModuleDto<CompressorState>>().Single();
-        await Assert.That(connections!.Any(c => c.SourceModuleId == outside.Id && c.TargetModuleId == kept.Id)).IsTrue();
+        await Assert
+            .That(connections!.Any(c => c.SourceModuleId == outside.Id && c.TargetModuleId == kept.Id))
+            .IsTrue();
         await Assert.That(connections!.Any(c => c.SourceModuleId == kept.Id && c.TargetModuleId == added.Id)).IsTrue();
-        await Assert.That(connections!.Any(c => c.SourceModuleId == removed.Id || c.TargetModuleId == removed.Id)).IsFalse();
+        await Assert
+            .That(connections!.Any(c => c.SourceModuleId == removed.Id || c.TargetModuleId == removed.Id))
+            .IsFalse();
     }
 
     [Test]
@@ -448,7 +612,11 @@ public class SubgraphTemplateApiTests
         await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.BadRequest);
     }
 
-    private static async Task<ModuleDto> AddModuleAsync(EngineFactory factory, HttpClient client, CreateModuleRequest request)
+    private static async Task<ModuleDto> AddModuleAsync(
+        EngineFactory factory,
+        HttpClient client,
+        CreateModuleRequest request
+    )
     {
         var response = await client.PostAsJsonAsync("/api/modules", request, factory.Json);
         response.EnsureSuccessStatusCode();
@@ -458,39 +626,86 @@ public class SubgraphTemplateApiTests
     /// <summary>
     /// A subgraph with two gains named "First" and "Second", the first connected to the second.
     /// </summary>
-    private static async Task<(SubgraphDto Subgraph, ModuleDto First, ModuleDto Second)> CreateChainAsync(EngineFactory factory, HttpClient client)
+    private static async Task<(SubgraphDto Subgraph, ModuleDto First, ModuleDto Second)> CreateChainAsync(
+        EngineFactory factory,
+        HttpClient client
+    )
     {
-        var first = await AddModuleAsync(factory, client, new CreateModuleRequest("Gain", "First", new ModulePosition(0, 0)));
-        var second = await AddModuleAsync(factory, client, new CreateModuleRequest("Gain", "Second", new ModulePosition(300, 0)));
-        (await client.PostAsJsonAsync("/api/connections", new CreateConnectionRequest(first.Id, "Output", second.Id, "Input"))).EnsureSuccessStatusCode();
+        var first = await AddModuleAsync(
+            factory,
+            client,
+            new CreateModuleRequest("Gain", "First", new ModulePosition(0, 0))
+        );
+        var second = await AddModuleAsync(
+            factory,
+            client,
+            new CreateModuleRequest("Gain", "Second", new ModulePosition(300, 0))
+        );
+        (
+            await client.PostAsJsonAsync(
+                "/api/connections",
+                new CreateConnectionRequest(first.Id, "Output", second.Id, "Input")
+            )
+        ).EnsureSuccessStatusCode();
         var subgraph = await CreateSubgraphAsync(factory, client, first.Id, second.Id);
         var modules = await GetMembersAsync(factory, client, subgraph.Id);
         return (subgraph, modules.Single(m => m.Id == first.Id), modules.Single(m => m.Id == second.Id));
     }
 
-    private static async Task<SubgraphDto> CreateSubgraphAsync(EngineFactory factory, HttpClient client, params Guid[] moduleIds)
+    private static async Task<SubgraphDto> CreateSubgraphAsync(
+        EngineFactory factory,
+        HttpClient client,
+        params Guid[] moduleIds
+    )
     {
         var response = await client.PostAsJsonAsync(
-            "/api/subgraphs", new CreateSubgraphRequest(null, new ModulePosition(-40, -80), new SubgraphSize(700, 300), moduleIds), factory.Json);
+            "/api/subgraphs",
+            new CreateSubgraphRequest(null, new ModulePosition(-40, -80), new SubgraphSize(700, 300), moduleIds),
+            factory.Json
+        );
         response.EnsureSuccessStatusCode();
         return (await response.Content.ReadFromJsonAsync<SubgraphDto>(factory.Json))!;
     }
 
     private static async Task<ModuleDto[]> GetMembersAsync(EngineFactory factory, HttpClient client, Guid subgraphId)
     {
-        return [.. (await client.GetFromJsonAsync<ModuleDto[]>("/api/modules", factory.Json))!.Where(m => m.SubgraphId == subgraphId)];
+        return
+        [
+            .. (await client.GetFromJsonAsync<ModuleDto[]>("/api/modules", factory.Json))!.Where(m =>
+                m.SubgraphId == subgraphId
+            ),
+        ];
     }
 
-    private static async Task<SubgraphDto> InstantiateAsync(EngineFactory factory, HttpClient client, Guid templateId, ModulePosition position)
+    private static async Task<SubgraphDto> InstantiateAsync(
+        EngineFactory factory,
+        HttpClient client,
+        Guid templateId,
+        ModulePosition position
+    )
     {
-        var response = await client.PostAsJsonAsync($"/api/subgraph-templates/{templateId}/instantiate", new InstantiateSubgraphTemplateRequest(position), factory.Json);
+        var response = await client.PostAsJsonAsync(
+            $"/api/subgraph-templates/{templateId}/instantiate",
+            new InstantiateSubgraphTemplateRequest(position),
+            factory.Json
+        );
         response.EnsureSuccessStatusCode();
         return (await response.Content.ReadFromJsonAsync<SubgraphDto>(factory.Json))!;
     }
 
-    private static async Task<SubgraphTemplateDto> SaveAsync(EngineFactory factory, HttpClient client, Guid subgraphId, string name, Guid? templateId = null)
+    private static async Task<SubgraphTemplateDto> SaveAsync(
+        EngineFactory factory,
+        HttpClient client,
+        Guid subgraphId,
+        string name,
+        Guid? templateId = null
+    )
     {
-        var response = await client.PostAsJsonAsync("/api/subgraph-templates", new SaveSubgraphTemplateRequest(subgraphId, name, templateId), factory.Json);
+        var response = await client.PostAsJsonAsync(
+            "/api/subgraph-templates",
+            new SaveSubgraphTemplateRequest(subgraphId, name, templateId),
+            factory.Json
+        );
         response.EnsureSuccessStatusCode();
         return (await response.Content.ReadFromJsonAsync<SubgraphTemplateDto>(factory.Json))!;
     }

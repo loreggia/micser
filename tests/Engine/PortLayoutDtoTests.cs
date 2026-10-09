@@ -12,9 +12,12 @@ public class PortLayoutDtoTests
         var dto = PortLayoutDto.From(ChannelLayout.Stereo);
 
         await Assert.That(dto.ChannelCount).IsEqualTo(2);
-        await Assert.That(dto.Speakers).IsEquivalentTo(
-            [SpeakerPosition.FrontLeft, SpeakerPosition.FrontRight],
-            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert
+            .That(dto.Speakers)
+            .IsEquivalentTo(
+                [SpeakerPosition.FrontLeft, SpeakerPosition.FrontRight],
+                TUnit.Assertions.Enums.CollectionOrdering.Matching
+            );
     }
 
     [Test]

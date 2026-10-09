@@ -56,7 +56,11 @@ public sealed class ModuleDataSubscriptions
     {
         lock (_lock)
         {
-            if (_subscribers.TryGetValue(moduleId, out var connections) && connections.Remove(connectionId) && connections.Count == 0)
+            if (
+                _subscribers.TryGetValue(moduleId, out var connections)
+                && connections.Remove(connectionId)
+                && connections.Count == 0
+            )
             {
                 _subscribers.Remove(moduleId);
             }

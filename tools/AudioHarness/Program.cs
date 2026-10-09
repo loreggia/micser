@@ -1,8 +1,8 @@
+using Microsoft.Extensions.Logging;
 using Micser.Audio;
 using Micser.Audio.Devices;
 using Micser.AudioHarness;
 using Micser.Plugins.Main.Modules;
-using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Extensions.Logging;
 
@@ -54,8 +54,12 @@ if (args[0] == "latency")
         cancellation.CancelAfter(TimeSpan.FromSeconds(int.Parse(args[secondsIndex + 1])));
     }
 
-    var positional = secondsIndex < 0 ? args : args.Where((_, i) => i != secondsIndex && i != secondsIndex + 1).ToArray();
-    return await MeasureLatencyAsync(positional.Length > 1 ? positional[1] : "default", positional.Length > 2 ? positional[2] : null);
+    var positional =
+        secondsIndex < 0 ? args : args.Where((_, i) => i != secondsIndex && i != secondsIndex + 1).ToArray();
+    return await MeasureLatencyAsync(
+        positional.Length > 1 ? positional[1] : "default",
+        positional.Length > 2 ? positional[2] : null
+    );
 }
 
 if (args[0] == "formats")
@@ -74,9 +78,16 @@ if (args[0] == "formats")
 
 var loopback = args.Contains("--loopback");
 var gainIndex = Array.IndexOf(args, "--gain");
-var gain = gainIndex >= 0 && gainIndex < args.Length - 1 ? float.Parse(args[gainIndex + 1], System.Globalization.CultureInfo.InvariantCulture) : 0f;
+var gain =
+    gainIndex >= 0 && gainIndex < args.Length - 1
+        ? float.Parse(args[gainIndex + 1], System.Globalization.CultureInfo.InvariantCulture)
+        : 0f;
 
-var input = ResolveDevice(args[0], loopback ? DeviceDirection.Output : DeviceDirection.Input, loopback ? outputs : inputs);
+var input = ResolveDevice(
+    args[0],
+    loopback ? DeviceDirection.Output : DeviceDirection.Input,
+    loopback ? outputs : inputs
+);
 var output = args.Length > 1 ? ResolveDevice(args[1], DeviceDirection.Output, outputs) : null;
 if (input == null || output == null)
 {
@@ -102,7 +113,9 @@ graph.Connect(gainModule.Output, outputModule.Input);
 using var engine = new AudioEngine(graph, loggerFactory.CreateLogger<AudioEngine>());
 engine.Start();
 
-Console.WriteLine($"{input.Name} ({input.Layout}, {input.SampleRate} Hz) -> gain {gain:+0.#;-0.#;0} dB -> {output.Name} ({output.Layout}, {output.SampleRate} Hz)");
+Console.WriteLine(
+    $"{input.Name} ({input.Layout}, {input.SampleRate} Hz) -> gain {gain:+0.#;-0.#;0} dB -> {output.Name} ({output.Layout}, {output.SampleRate} Hz)"
+);
 Console.WriteLine("Press Ctrl+C to stop.");
 
 try
@@ -113,13 +126,12 @@ try
         var stats = engine.Statistics;
         engine.ResetMaxProcessingTime();
         Console.WriteLine(
-            $"blocks {stats.Blocks,6} late {stats.LateBlocks,3} max {stats.MaxProcessingTime.TotalMilliseconds,5:0.00} ms | " +
-            $"in {Format(inputModule.Statistics)} | out {Format(outputModule.Statistics)}");
+            $"blocks {stats.Blocks, 6} late {stats.LateBlocks, 3} max {stats.MaxProcessingTime.TotalMilliseconds, 5:0.00} ms | "
+                + $"in {Format(inputModule.Statistics)} | out {Format(outputModule.Statistics)}"
+        );
     }
 }
-catch (OperationCanceledException)
-{
-}
+catch (OperationCanceledException) { }
 
 engine.Stop();
 return 0;
@@ -127,7 +139,7 @@ return 0;
 static string Format(StreamStatistics? statistics)
 {
     return statistics is { } s
-        ? $"fill {s.Fill,6:0}/{s.TargetFill:0} corr {(s.Correction - 1) * 1e6,6:+0;-0;0} ppm under {s.Underruns,3} over {s.Overruns,3}"
+        ? $"fill {s.Fill, 6:0}/{s.TargetFill:0} corr {(s.Correction - 1) * 1e6, 6:+0;-0;0} ppm under {s.Underruns, 3} over {s.Overruns, 3}"
         : "no device";
 }
 
@@ -137,7 +149,7 @@ static void PrintDevices(string title, IReadOnlyList<AudioDeviceInfo> devices)
     for (var i = 0; i < devices.Count; i++)
     {
         var device = devices[i];
-        Console.WriteLine($"  {i + 1,2}. {device.Name} [{device.Layout}, {device.SampleRate} Hz]");
+        Console.WriteLine($"  {i + 1, 2}. {device.Name} [{device.Layout}, {device.SampleRate} Hz]");
         Console.WriteLine($"      {device.Id}");
     }
 }
@@ -152,14 +164,18 @@ async Task<int> MeasureLatencyAsync(string outputArgument, string? inputArgument
         return 1;
     }
 
-    var format = new ProcessingFormat(48000, int.Parse(Environment.GetEnvironmentVariable("MICSER_BLOCK") ?? ProcessingFormat.Default.FrameCount.ToString()));
+    var format = new ProcessingFormat(
+        48000,
+        int.Parse(Environment.GetEnvironmentVariable("MICSER_BLOCK") ?? ProcessingFormat.Default.FrameCount.ToString())
+    );
     var latencyGraph = new AudioGraph(format, loggerFactory.CreateLogger<AudioGraph>());
     using var source = new NoiseBurstSource(format.SampleRate / 2);
     using var detector = new NoiseBurstDetector(source, format.SampleRate * 2 / 5);
     using var render = new DeviceOutputModule(devices, loggerFactory.CreateLogger<DeviceOutputModule>());
-    using CaptureModule capture = inputDevice != null
-        ? new DeviceInputModule(devices, loggerFactory.CreateLogger<DeviceInputModule>())
-        : new LoopbackInputModule(devices, loggerFactory.CreateLogger<LoopbackInputModule>());
+    using CaptureModule capture =
+        inputDevice != null
+            ? new DeviceInputModule(devices, loggerFactory.CreateLogger<DeviceInputModule>())
+            : new LoopbackInputModule(devices, loggerFactory.CreateLogger<LoopbackInputModule>());
     render.SelectDevice(device.Id);
     capture.SelectDevice(inputDevice?.Id ?? device.Id);
     latencyGraph.Add(source);
@@ -171,9 +187,11 @@ async Task<int> MeasureLatencyAsync(string outputArgument, string? inputArgument
 
     using var latencyEngine = new AudioEngine(latencyGraph, loggerFactory.CreateLogger<AudioEngine>());
     latencyEngine.Start();
-    Console.WriteLine(inputDevice != null
-        ? $"Measuring {device.Name} -> {inputDevice.Name} ({inputDevice.Layout}, {inputDevice.SampleRate} Hz). Press Ctrl+C to stop."
-        : $"Measuring {device.Name} ({device.Layout}, {device.SampleRate} Hz). Press Ctrl+C to stop.");
+    Console.WriteLine(
+        inputDevice != null
+            ? $"Measuring {device.Name} -> {inputDevice.Name} ({inputDevice.Layout}, {inputDevice.SampleRate} Hz). Press Ctrl+C to stop."
+            : $"Measuring {device.Name} ({device.Layout}, {device.SampleRate} Hz). Press Ctrl+C to stop."
+    );
 
     var all = new List<double>();
     var missed = 0;
@@ -185,18 +203,20 @@ async Task<int> MeasureLatencyAsync(string outputArgument, string? inputArgument
             var measured = detector.TakeLatencies().Select(l => l * 1000d / format.SampleRate).ToArray();
             all.AddRange(measured.OfType<double>());
             missed += measured.Count(m => m == null);
-            Console.WriteLine($"round trip {string.Join(", ", measured.Select(m => m is { } ms ? $"{ms,6:0.0} ms" : "  none   "))} | in {Format(capture.Statistics)} | out {Format(render.Statistics)}");
+            Console.WriteLine(
+                $"round trip {string.Join(", ", measured.Select(m => m is { } ms ? $"{ms, 6:0.0} ms" : "  none   "))} | in {Format(capture.Statistics)} | out {Format(render.Statistics)}"
+            );
         }
     }
-    catch (OperationCanceledException)
-    {
-    }
+    catch (OperationCanceledException) { }
 
     latencyEngine.Stop();
     if (all.Count > 0)
     {
         all.Sort();
-        Console.WriteLine($"min {all[0]:0.0} ms, median {all[all.Count / 2]:0.0} ms, max {all[^1]:0.0} ms ({all.Count} bursts, {missed} missed)");
+        Console.WriteLine(
+            $"min {all[0]:0.0} ms, median {all[all.Count / 2]:0.0} ms, max {all[^1]:0.0} ms ({all.Count} bursts, {missed} missed)"
+        );
     }
 
     return 0;

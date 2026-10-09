@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
-
   <PropertyGroup>
     <TargetFramework>net10.0-windows</TargetFramework>
     <!-- the OpenAPI document is generated on build; the web SDK generates its API client from it -->
@@ -9,7 +8,11 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
-    <PackageReference Include="Microsoft.Extensions.ApiDescription.Server" PrivateAssets="all" IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive" />
+    <PackageReference
+      Include="Microsoft.Extensions.ApiDescription.Server"
+      PrivateAssets="all"
+      IncludeAssets="runtime; build; native; contentfiles; analyzers; buildtransitive"
+    />
     <PackageReference Include="Serilog" />
     <PackageReference Include="Serilog.Extensions.Hosting" />
     <PackageReference Include="Serilog.Extensions.Logging" />
@@ -20,7 +23,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Audio\Micser.Audio.csproj" />
-    <ProjectReference Include="..\Plugins\Main\Micser.Plugins.Main.csproj" ReferenceOutputAssembly="false" OutputItemType="BuiltInPlugin" PluginId="Main" />
+    <ProjectReference
+      Include="..\Plugins\Main\Micser.Plugins.Main.csproj"
+      ReferenceOutputAssembly="false"
+      OutputItemType="BuiltInPlugin"
+      PluginId="Main"
+    />
     <ProjectReference Include="..\ServiceDefaults\Micser.ServiceDefaults.csproj" />
   </ItemGroup>
 
@@ -30,13 +38,19 @@
 
   <!-- Run "npm run build" first; the engine serves the web UI from wwwroot. -->
   <Target Name="PublishWebUi" AfterTargets="Publish">
-    <Warning Condition="!Exists('$(MSBuildProjectDirectory)\..\Web\dist\index.html')" Text="The web UI isn't built (src/Web/dist); the published engine won't serve it." />
+    <Warning
+      Condition="!Exists('$(MSBuildProjectDirectory)\..\Web\dist\index.html')"
+      Text="The web UI isn't built (src/Web/dist); the published engine won't serve it."
+    />
     <ItemGroup>
       <WebUiFile Include="$(MSBuildProjectDirectory)\..\Web\dist\**" />
     </ItemGroup>
-    <Copy SourceFiles="@(WebUiFile)" DestinationFiles="@(WebUiFile->'$(PublishDir)wwwroot\%(RecursiveDir)%(Filename)%(Extension)')" SkipUnchangedFiles="true" />
+    <Copy
+      SourceFiles="@(WebUiFile)"
+      DestinationFiles="@(WebUiFile->'$(PublishDir)wwwroot\%(RecursiveDir)%(Filename)%(Extension)')"
+      SkipUnchangedFiles="true"
+    />
   </Target>
 
   <Import Project="BuiltInPlugins.targets" />
-
 </Project>

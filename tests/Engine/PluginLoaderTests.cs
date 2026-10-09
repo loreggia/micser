@@ -1,8 +1,8 @@
 using System.IO.Compression;
 using System.Runtime.Loader;
+using Microsoft.Extensions.DependencyInjection;
 using Micser.Audio;
 using Micser.Engine.Plugins;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Micser.Engine.Tests;
 
@@ -64,7 +64,10 @@ public sealed class PluginLoaderTests : IDisposable
     public async Task Load_InvalidManifest_Fails()
     {
         var directory = CopyTestPlugin(_userPath);
-        await File.WriteAllTextAsync(Path.Combine(directory, PluginManifest.FileName), """{ "id": "Test", "name": "Test", "version": "1", "assembly": "..\\x.dll" }""");
+        await File.WriteAllTextAsync(
+            Path.Combine(directory, PluginManifest.FileName),
+            """{ "id": "Test", "name": "Test", "version": "1", "assembly": "..\\x.dll" }"""
+        );
 
         var catalog = PluginLoader.Load(new ServiceCollection(), _builtInPath, _userPath);
 
@@ -87,7 +90,9 @@ public sealed class PluginLoaderTests : IDisposable
 
         var definition = services.Select(d => d.ImplementationInstance).OfType<AudioModuleDefinition>().Single();
         await Assert.That(definition.Type).IsEqualTo("Test");
-        await Assert.That(AssemblyLoadContext.GetLoadContext(definition.ModuleType.Assembly)).IsNotEqualTo(AssemblyLoadContext.Default);
+        await Assert
+            .That(AssemblyLoadContext.GetLoadContext(definition.ModuleType.Assembly))
+            .IsNotEqualTo(AssemblyLoadContext.Default);
 
         // Micser.Audio is shared with the engine, so the module is an AudioModule of the host
         await Assert.That(definition.CreateModule(services.BuildServiceProvider())).IsAssignableTo<AudioModule>();
@@ -109,7 +114,10 @@ public sealed class PluginLoaderTests : IDisposable
     [Test]
     public async Task StageInstall_IsAppliedAtTheNextLoad()
     {
-        var installer = new PluginInstaller(_userPath, PluginLoader.Load(new ServiceCollection(), _builtInPath, _userPath));
+        var installer = new PluginInstaller(
+            _userPath,
+            PluginLoader.Load(new ServiceCollection(), _builtInPath, _userPath)
+        );
 
         using (var package = CreatePackage(CopyTestPlugin(_directory)))
         {
@@ -124,14 +132,19 @@ public sealed class PluginLoaderTests : IDisposable
         var catalog = PluginLoader.Load(new ServiceCollection(), _builtInPath, _userPath);
 
         await Assert.That(catalog.Plugins.Single().IsLoaded).IsTrue();
-        await Assert.That(new PluginInstaller(_userPath, catalog).GetPendingChange("Test")).IsEqualTo(PluginChange.None);
+        await Assert
+            .That(new PluginInstaller(_userPath, catalog).GetPendingChange("Test"))
+            .IsEqualTo(PluginChange.None);
     }
 
     [Test]
     public async Task StageInstall_RejectsBuiltInIds()
     {
         CopyTestPlugin(_builtInPath);
-        var installer = new PluginInstaller(_userPath, PluginLoader.Load(new ServiceCollection(), _builtInPath, _userPath));
+        var installer = new PluginInstaller(
+            _userPath,
+            PluginLoader.Load(new ServiceCollection(), _builtInPath, _userPath)
+        );
         using var package = CreatePackage(CopyTestPlugin(_directory));
 
         await Assert.That(() => installer.StageInstall(package)).Throws<InvalidDataException>();
@@ -141,7 +154,10 @@ public sealed class PluginLoaderTests : IDisposable
     [Test]
     public async Task StageInstall_RejectsInvalidPackages()
     {
-        var installer = new PluginInstaller(_userPath, PluginLoader.Load(new ServiceCollection(), _builtInPath, _userPath));
+        var installer = new PluginInstaller(
+            _userPath,
+            PluginLoader.Load(new ServiceCollection(), _builtInPath, _userPath)
+        );
 
         using var notZip = new MemoryStream([1, 2, 3]);
         using var withoutManifest = CreatePackage(("readme.txt", "hello"));
@@ -176,7 +192,10 @@ public sealed class PluginLoaderTests : IDisposable
     public async Task StageRemoval_RejectsBuiltInPlugins()
     {
         CopyTestPlugin(_builtInPath);
-        var installer = new PluginInstaller(_userPath, PluginLoader.Load(new ServiceCollection(), _builtInPath, _userPath));
+        var installer = new PluginInstaller(
+            _userPath,
+            PluginLoader.Load(new ServiceCollection(), _builtInPath, _userPath)
+        );
 
         await Assert.That(() => installer.StageRemoval("Test")).Throws<InvalidDataException>();
     }

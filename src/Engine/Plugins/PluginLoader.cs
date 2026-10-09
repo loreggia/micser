@@ -25,7 +25,8 @@ public static class PluginLoader
                 continue;
             }
 
-            var directories = Directory.EnumerateDirectories(root)
+            var directories = Directory
+                .EnumerateDirectories(root)
                 .Where(d => !Path.GetFileName(d).StartsWith('.'))
                 .Order(StringComparer.OrdinalIgnoreCase);
 
@@ -40,13 +41,16 @@ public static class PluginLoader
 
     private static Type FindPluginType(Assembly assembly)
     {
-        var types = assembly.GetExportedTypes()
+        var types = assembly
+            .GetExportedTypes()
             .Where(t => t is { IsClass: true, IsAbstract: false } && typeof(IAudioPlugin).IsAssignableFrom(t))
             .ToArray();
 
         return types.Length == 1
             ? types[0]
-            : throw new InvalidDataException($"The assembly {assembly.GetName().Name} must have exactly one public {nameof(IAudioPlugin)}, found {types.Length}.");
+            : throw new InvalidDataException(
+                $"The assembly {assembly.GetName().Name} must have exactly one public {nameof(IAudioPlugin)}, found {types.Length}."
+            );
     }
 
     private static Assembly LoadAssembly(PluginManifest manifest, string assemblyPath)
@@ -59,7 +63,12 @@ public static class PluginLoader
             : new PluginLoadContext(manifest.Id, assemblyPath).LoadFromAssemblyPath(assemblyPath);
     }
 
-    private static PluginInfo LoadPlugin(IServiceCollection services, string directory, bool isBuiltIn, IReadOnlyList<PluginInfo> loaded)
+    private static PluginInfo LoadPlugin(
+        IServiceCollection services,
+        string directory,
+        bool isBuiltIn,
+        IReadOnlyList<PluginInfo> loaded
+    )
     {
         var folderName = Path.GetFileName(directory);
         PluginManifest? manifest = null;
@@ -97,7 +106,14 @@ public static class PluginLoader
         catch (Exception ex)
         {
             var error = ex is TargetInvocationException { InnerException: { } inner } ? inner : ex;
-            return new PluginInfo(manifest?.Id ?? folderName, directory, isBuiltIn, manifest, error.Message, error is InvalidDataException ? null : error);
+            return new PluginInfo(
+                manifest?.Id ?? folderName,
+                directory,
+                isBuiltIn,
+                manifest,
+                error.Message,
+                error is InvalidDataException ? null : error
+            );
         }
     }
 }

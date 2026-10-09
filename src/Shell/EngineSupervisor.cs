@@ -119,7 +119,8 @@ internal sealed class EngineSupervisor : IDisposable
                     using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(10));
                     await EngineControl.ShutdownAsync(_http, engine, timeout.Token);
                 }
-                catch (Exception ex) when (ex is HttpRequestException or ArgumentException or OperationCanceledException)
+                catch (Exception ex)
+                    when (ex is HttpRequestException or ArgumentException or OperationCanceledException)
                 {
                     Log.Warning(ex, "Stopping the engine failed.");
                 }
@@ -192,12 +193,14 @@ internal sealed class EngineSupervisor : IDisposable
         try
         {
             // not a child of the shell: the engine keeps running when the shell exits
-            using var process = Process.Start(new ProcessStartInfo(_enginePath!)
-            {
-                UseShellExecute = false,
-                CreateNoWindow = true,
-                WorkingDirectory = Path.GetDirectoryName(_enginePath),
-            });
+            using var process = Process.Start(
+                new ProcessStartInfo(_enginePath!)
+                {
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    WorkingDirectory = Path.GetDirectoryName(_enginePath),
+                }
+            );
         }
         catch (Exception ex) when (ex is System.ComponentModel.Win32Exception or InvalidOperationException)
         {
@@ -251,7 +254,9 @@ internal sealed class EngineSupervisor : IDisposable
                 {
                     if (_launchedAt != null)
                     {
-                        Log.Error("The engine didn't start or keeps stopping; see its log in %LOCALAPPDATA%\\Micser\\logs.");
+                        Log.Error(
+                            "The engine didn't start or keeps stopping; see its log in %LOCALAPPDATA%\\Micser\\logs."
+                        );
                         _launchedAt = null;
                     }
 
@@ -261,8 +266,6 @@ internal sealed class EngineSupervisor : IDisposable
                 await Task.Delay(engine == null ? PollInterval / 4 : PollInterval, cancellationToken);
             }
         }
-        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
-        {
-        }
+        catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested) { }
     }
 }

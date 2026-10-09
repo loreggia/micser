@@ -49,21 +49,57 @@ internal static unsafe partial class NativeMethods
 
     [LibraryImport("newdev.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool DiUninstallDevice(nint hwndParent, nint deviceInfoSet, ref SP_DEVINFO_DATA deviceInfoData, uint flags, [MarshalAs(UnmanagedType.Bool)] out bool needReboot);
+    public static partial bool DiUninstallDevice(
+        nint hwndParent,
+        nint deviceInfoSet,
+        ref SP_DEVINFO_DATA deviceInfoData,
+        uint flags,
+        [MarshalAs(UnmanagedType.Bool)] out bool needReboot
+    );
 
     [LibraryImport("setupapi.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool SetupDiCallClassInstaller(uint installFunction, nint deviceInfoSet, ref SP_DEVINFO_DATA deviceInfoData);
+    public static partial bool SetupDiCallClassInstaller(
+        uint installFunction,
+        nint deviceInfoSet,
+        ref SP_DEVINFO_DATA deviceInfoData
+    );
 
-    [LibraryImport("setupapi.dll", EntryPoint = "SetupDiCreateDeviceInfoW", SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
+    [LibraryImport(
+        "setupapi.dll",
+        EntryPoint = "SetupDiCreateDeviceInfoW",
+        SetLastError = true,
+        StringMarshalling = StringMarshalling.Utf16
+    )]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool SetupDiCreateDeviceInfo(nint deviceInfoSet, string deviceName, ref Guid classGuid, string? deviceDescription, nint hwndParent, uint creationFlags, ref SP_DEVINFO_DATA deviceInfoData);
+    public static partial bool SetupDiCreateDeviceInfo(
+        nint deviceInfoSet,
+        string deviceName,
+        ref Guid classGuid,
+        string? deviceDescription,
+        nint hwndParent,
+        uint creationFlags,
+        ref SP_DEVINFO_DATA deviceInfoData
+    );
 
     [LibraryImport("setupapi.dll", SetLastError = true)]
     public static partial nint SetupDiCreateDeviceInfoList(ref Guid classGuid, nint hwndParent);
 
-    [LibraryImport("setupapi.dll", EntryPoint = "SetupDiCreateDevRegKeyW", SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
-    public static partial nint SetupDiCreateDevRegKey(nint deviceInfoSet, ref SP_DEVINFO_DATA deviceInfoData, uint scope, uint hwProfile, uint keyType, nint infHandle, string? infSectionName);
+    [LibraryImport(
+        "setupapi.dll",
+        EntryPoint = "SetupDiCreateDevRegKeyW",
+        SetLastError = true,
+        StringMarshalling = StringMarshalling.Utf16
+    )]
+    public static partial nint SetupDiCreateDevRegKey(
+        nint deviceInfoSet,
+        ref SP_DEVINFO_DATA deviceInfoData,
+        uint scope,
+        uint hwProfile,
+        uint keyType,
+        nint infHandle,
+        string? infSectionName
+    );
 
     [LibraryImport("setupapi.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
@@ -71,45 +107,120 @@ internal static unsafe partial class NativeMethods
 
     [LibraryImport("setupapi.dll", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool SetupDiEnumDeviceInfo(nint deviceInfoSet, uint memberIndex, ref SP_DEVINFO_DATA deviceInfoData);
+    public static partial bool SetupDiEnumDeviceInfo(
+        nint deviceInfoSet,
+        uint memberIndex,
+        ref SP_DEVINFO_DATA deviceInfoData
+    );
 
-    [LibraryImport("setupapi.dll", EntryPoint = "SetupDiGetClassDevsW", SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
+    [LibraryImport(
+        "setupapi.dll",
+        EntryPoint = "SetupDiGetClassDevsW",
+        SetLastError = true,
+        StringMarshalling = StringMarshalling.Utf16
+    )]
     public static partial nint SetupDiGetClassDevs(nint classGuid, string? enumerator, nint hwndParent, uint flags);
 
     [LibraryImport("setupapi.dll", EntryPoint = "SetupDiGetDeviceInstallParamsW", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool SetupDiGetDeviceInstallParams(nint deviceInfoSet, ref SP_DEVINFO_DATA deviceInfoData, ref SP_DEVINSTALL_PARAMS deviceInstallParams);
+    public static partial bool SetupDiGetDeviceInstallParams(
+        nint deviceInfoSet,
+        ref SP_DEVINFO_DATA deviceInfoData,
+        ref SP_DEVINSTALL_PARAMS deviceInstallParams
+    );
 
     [LibraryImport("setupapi.dll", EntryPoint = "SetupDiGetDevicePropertyW", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool SetupDiGetDeviceProperty(nint deviceInfoSet, ref SP_DEVINFO_DATA deviceInfoData, in DEVPROPKEY propertyKey, out uint propertyType, byte* propertyBuffer, uint propertyBufferSize, out uint requiredSize, uint flags);
+    public static partial bool SetupDiGetDeviceProperty(
+        nint deviceInfoSet,
+        ref SP_DEVINFO_DATA deviceInfoData,
+        in DEVPROPKEY propertyKey,
+        out uint propertyType,
+        byte* propertyBuffer,
+        uint propertyBufferSize,
+        out uint requiredSize,
+        uint flags
+    );
 
     [LibraryImport("setupapi.dll", EntryPoint = "SetupDiGetDeviceRegistryPropertyW", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool SetupDiGetDeviceRegistryProperty(nint deviceInfoSet, ref SP_DEVINFO_DATA deviceInfoData, uint property, out uint propertyRegDataType, byte* propertyBuffer, uint propertyBufferSize, out uint requiredSize);
+    public static partial bool SetupDiGetDeviceRegistryProperty(
+        nint deviceInfoSet,
+        ref SP_DEVINFO_DATA deviceInfoData,
+        uint property,
+        out uint propertyRegDataType,
+        byte* propertyBuffer,
+        uint propertyBufferSize,
+        out uint requiredSize
+    );
 
-    [LibraryImport("setupapi.dll", EntryPoint = "SetupDiGetINFClassW", SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
+    [LibraryImport(
+        "setupapi.dll",
+        EntryPoint = "SetupDiGetINFClassW",
+        SetLastError = true,
+        StringMarshalling = StringMarshalling.Utf16
+    )]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool SetupDiGetINFClass(string infName, out Guid classGuid, char* className, uint classNameSize, out uint requiredSize);
+    public static partial bool SetupDiGetINFClass(
+        string infName,
+        out Guid classGuid,
+        char* className,
+        uint classNameSize,
+        out uint requiredSize
+    );
 
     [LibraryImport("setupapi.dll", SetLastError = true)]
-    public static partial nint SetupDiOpenDevRegKey(nint deviceInfoSet, ref SP_DEVINFO_DATA deviceInfoData, uint scope, uint hwProfile, uint keyType, uint samDesired);
+    public static partial nint SetupDiOpenDevRegKey(
+        nint deviceInfoSet,
+        ref SP_DEVINFO_DATA deviceInfoData,
+        uint scope,
+        uint hwProfile,
+        uint keyType,
+        uint samDesired
+    );
 
     [LibraryImport("setupapi.dll", EntryPoint = "SetupDiSetClassInstallParamsW", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool SetupDiSetClassInstallParams(nint deviceInfoSet, ref SP_DEVINFO_DATA deviceInfoData, ref SP_PROPCHANGE_PARAMS classInstallParams, uint classInstallParamsSize);
+    public static partial bool SetupDiSetClassInstallParams(
+        nint deviceInfoSet,
+        ref SP_DEVINFO_DATA deviceInfoData,
+        ref SP_PROPCHANGE_PARAMS classInstallParams,
+        uint classInstallParamsSize
+    );
 
     [LibraryImport("setupapi.dll", EntryPoint = "SetupDiSetDeviceRegistryPropertyW", SetLastError = true)]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool SetupDiSetDeviceRegistryProperty(nint deviceInfoSet, ref SP_DEVINFO_DATA deviceInfoData, uint property, byte* propertyBuffer, uint propertyBufferSize);
+    public static partial bool SetupDiSetDeviceRegistryProperty(
+        nint deviceInfoSet,
+        ref SP_DEVINFO_DATA deviceInfoData,
+        uint property,
+        byte* propertyBuffer,
+        uint propertyBufferSize
+    );
 
-    [LibraryImport("setupapi.dll", EntryPoint = "SetupUninstallOEMInfW", SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
+    [LibraryImport(
+        "setupapi.dll",
+        EntryPoint = "SetupUninstallOEMInfW",
+        SetLastError = true,
+        StringMarshalling = StringMarshalling.Utf16
+    )]
     [return: MarshalAs(UnmanagedType.Bool)]
     public static partial bool SetupUninstallOEMInf(string infFileName, uint flags, nint reserved);
 
-    [LibraryImport("newdev.dll", EntryPoint = "UpdateDriverForPlugAndPlayDevicesW", SetLastError = true, StringMarshalling = StringMarshalling.Utf16)]
+    [LibraryImport(
+        "newdev.dll",
+        EntryPoint = "UpdateDriverForPlugAndPlayDevicesW",
+        SetLastError = true,
+        StringMarshalling = StringMarshalling.Utf16
+    )]
     [return: MarshalAs(UnmanagedType.Bool)]
-    public static partial bool UpdateDriverForPlugAndPlayDevices(nint hwndParent, string hardwareId, string fullInfPath, uint installFlags, [MarshalAs(UnmanagedType.Bool)] out bool rebootRequired);
+    public static partial bool UpdateDriverForPlugAndPlayDevices(
+        nint hwndParent,
+        string hardwareId,
+        string fullInfPath,
+        uint installFlags,
+        [MarshalAs(UnmanagedType.Bool)] out bool rebootRequired
+    );
 
     [StructLayout(LayoutKind.Sequential)]
     public readonly struct DEVPROPKEY

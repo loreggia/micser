@@ -1,6 +1,6 @@
+using Microsoft.AspNetCore.SignalR;
 using Micser.Audio;
 using Micser.Engine.Audio;
-using Microsoft.AspNetCore.SignalR;
 
 namespace Micser.Engine.Hubs;
 
@@ -24,7 +24,8 @@ public sealed class ModuleDataPublisher : BackgroundService
         AudioHost host,
         ModuleDataSubscriptions subscriptions,
         IHubContext<EngineHub, IEngineClient> hub,
-        ILogger<ModuleDataPublisher> logger)
+        ILogger<ModuleDataPublisher> logger
+    )
     {
         _host = host;
         _subscriptions = subscriptions;

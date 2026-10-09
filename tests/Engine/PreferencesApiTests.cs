@@ -20,7 +20,12 @@ public class PreferencesApiTests
     public async Task UpdatePreferences_BroadcastsAndPersists()
     {
         var directory = EngineFactory.CreateTemporaryDirectory();
-        var updated = new UiPreferencesDto(ShowStreamStatistics: true, SnapToGrid: false, Language: "de", ShowChannelsByDefault: true);
+        var updated = new UiPreferencesDto(
+            ShowStreamStatistics: true,
+            SnapToGrid: false,
+            Language: "de",
+            ShowChannelsByDefault: true
+        );
         try
         {
             await using (var factory = new EngineFactory(directory))
@@ -39,7 +44,9 @@ public class PreferencesApiTests
             {
                 using var client = factory.CreateAuthorizedClient();
 
-                await Assert.That(await client.GetFromJsonAsync<UiPreferencesDto>("/api/preferences")).IsEqualTo(updated);
+                await Assert
+                    .That(await client.GetFromJsonAsync<UiPreferencesDto>("/api/preferences"))
+                    .IsEqualTo(updated);
             }
         }
         finally

@@ -24,7 +24,10 @@ public class StateValidatorTests
     [Test]
     public async Task Validate_RecursesIntoPropertiesAndCollections()
     {
-        var errors = StateValidator.Validate(new Container(new ParameterRecord(1, "ok"), [new ParameterRecord(1, "ok"), new ParameterRecord(42, "ok")]), "state");
+        var errors = StateValidator.Validate(
+            new Container(new ParameterRecord(1, "ok"), [new ParameterRecord(1, "ok"), new ParameterRecord(42, "ok")]),
+            "state"
+        );
 
         await Assert.That(errors.Keys).IsEquivalentTo(["state.items[1].value"]);
     }

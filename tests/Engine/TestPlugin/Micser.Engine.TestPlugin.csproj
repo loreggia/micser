@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <!-- A plugin for the plugin loader tests, loaded in its own load context (the tests don't reference its assembly). -->
 
   <PropertyGroup>
@@ -9,5 +8,4 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Audio\Micser.Audio.csproj" Private="false" />
   </ItemGroup>
-
 </Project>

@@ -73,7 +73,8 @@ public class PitchModule : EffectModule, IStatefulModule<PitchState>
         var factor = GetPitchFactor(pitch);
         for (var c = 0; c < buffer.ChannelCount; c++)
         {
-            _shifters[c].PitchShift(factor, buffer.FrameCount, fftSize, oversampling, Format.SampleRate, buffer.GetChannel(c));
+            _shifters[c]
+                .PitchShift(factor, buffer.FrameCount, fftSize, oversampling, Format.SampleRate, buffer.GetChannel(c));
         }
     }
 }

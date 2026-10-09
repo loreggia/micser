@@ -8,7 +8,14 @@ namespace Micser.Shell;
 /// <summary>
 /// What <c>Micser.DriverUtility status</c> reports (see its DriverStatus).
 /// </summary>
-internal sealed record DriverStatus(bool Installed, uint? Problem, string? InstalledVersion, string? BundledVersion, int CableCount, bool UpdateAvailable)
+internal sealed record DriverStatus(
+    bool Installed,
+    uint? Problem,
+    string? InstalledVersion,
+    string? BundledVersion,
+    int CableCount,
+    bool UpdateAvailable
+)
 {
     public IReadOnlyList<CableStatus> Cables { get; init; } = [];
 }
@@ -166,13 +173,15 @@ internal sealed class DriverController
     {
         try
         {
-            using var process = Process.Start(new ProcessStartInfo(_utilityPath, command)
-            {
-                UseShellExecute = false,
-                CreateNoWindow = true,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-            })!;
+            using var process = Process.Start(
+                new ProcessStartInfo(_utilityPath, command)
+                {
+                    UseShellExecute = false,
+                    CreateNoWindow = true,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true,
+                }
+            )!;
             var output = process.StandardOutput.ReadToEndAsync();
             var error = process.StandardError.ReadToEndAsync();
             await process.WaitForExitAsync();

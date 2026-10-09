@@ -17,10 +17,12 @@ internal sealed class SampleConverter
 
     public SampleConverter(WaveFormat format)
     {
-        _isFloat = format.Encoding == WaveFormatEncoding.IeeeFloat ||
-                   (format is WaveFormatExtensible { SubFormat: var floatFormat } && floatFormat == IeeeFloatSubFormat);
-        var isPcm = format.Encoding == WaveFormatEncoding.Pcm ||
-                    (format is WaveFormatExtensible { SubFormat: var pcmFormat } && pcmFormat == PcmSubFormat);
+        _isFloat =
+            format.Encoding == WaveFormatEncoding.IeeeFloat
+            || (format is WaveFormatExtensible { SubFormat: var floatFormat } && floatFormat == IeeeFloatSubFormat);
+        var isPcm =
+            format.Encoding == WaveFormatEncoding.Pcm
+            || (format is WaveFormatExtensible { SubFormat: var pcmFormat } && pcmFormat == PcmSubFormat);
         _bytesPerSample = format.BitsPerSample / 8;
 
         if (!(_isFloat && _bytesPerSample == 4) && !(isPcm && _bytesPerSample is 2 or 3 or 4))

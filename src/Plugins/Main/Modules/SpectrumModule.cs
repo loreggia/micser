@@ -39,9 +39,7 @@ public class SpectrumModule : EffectModule, IStatefulModule<SpectrumState>, IMod
         return new SpectrumState();
     }
 
-    public void SetState(SpectrumState state)
-    {
-    }
+    public void SetState(SpectrumState state) { }
 
     public Spectrum? GetSpectrum()
     {

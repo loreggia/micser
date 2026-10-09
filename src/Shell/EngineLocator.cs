@@ -26,7 +26,11 @@ internal sealed class EngineLocator
     }
 
     public static string DefaultDiscoveryPath { get; } =
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Micser", "engine.json");
+        Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "Micser",
+            "engine.json"
+        );
 
     public string DiscoveryPath { get; }
 
@@ -48,7 +52,8 @@ internal sealed class EngineLocator
             using var response = await _http.GetAsync(new Uri(info.Url, "/api/health"), timeout.Token);
             return response.IsSuccessStatusCode ? info : null;
         }
-        catch (Exception ex) when (ex is HttpRequestException or TaskCanceledException && !cancellationToken.IsCancellationRequested)
+        catch (Exception ex)
+            when (ex is HttpRequestException or TaskCanceledException && !cancellationToken.IsCancellationRequested)
         {
             return null;
         }
@@ -58,7 +63,12 @@ internal sealed class EngineLocator
     {
         try
         {
-            using var stream = new FileStream(DiscoveryPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite | FileShare.Delete);
+            using var stream = new FileStream(
+                DiscoveryPath,
+                FileMode.Open,
+                FileAccess.Read,
+                FileShare.ReadWrite | FileShare.Delete
+            );
             var file = JsonSerializer.Deserialize<DiscoveryFile>(stream, JsonSerializerOptions.Web);
             return file is { Url: not null } && Uri.TryCreate(file.Url, UriKind.Absolute, out var url)
                 ? new EngineInfo(url, file.Token, file.ProcessId)
@@ -75,7 +85,8 @@ internal sealed class EngineLocator
         try
         {
             using var process = Process.GetProcessById(processId);
-            return !process.HasExited && process.ProcessName.Equals("Micser.Engine", StringComparison.OrdinalIgnoreCase);
+            return !process.HasExited
+                && process.ProcessName.Equals("Micser.Engine", StringComparison.OrdinalIgnoreCase);
         }
         catch (Exception ex) when (ex is ArgumentException or InvalidOperationException)
         {

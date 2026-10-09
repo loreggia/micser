@@ -17,7 +17,9 @@ public class AutostartTests
             var enabled = autostart.IsEnabled;
             using (var key = Registry.CurrentUser.OpenSubKey(keyPath))
             {
-                await Assert.That(key!.GetValue("Micser")).IsEqualTo(@"""C:\Program Files\Micser\Micser.Shell.exe"" --minimized");
+                await Assert
+                    .That(key!.GetValue("Micser"))
+                    .IsEqualTo(@"""C:\Program Files\Micser\Micser.Shell.exe"" --minimized");
             }
 
             autostart.SetEnabled(false);
@@ -40,7 +42,9 @@ public class AutostartTests
         {
             new Autostart(@"C:\Old\Micser.Shell.exe", Registry.CurrentUser, keyPath).SetEnabled(true);
 
-            await Assert.That(new Autostart(@"C:\New\Micser.Shell.exe", Registry.CurrentUser, keyPath).IsEnabled).IsFalse();
+            await Assert
+                .That(new Autostart(@"C:\New\Micser.Shell.exe", Registry.CurrentUser, keyPath).IsEnabled)
+                .IsFalse();
         }
         finally
         {

@@ -1,10 +1,10 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json.Nodes;
+using Microsoft.Extensions.DependencyInjection;
 using Micser.Engine.Audio;
 using Micser.Engine.Contracts;
 using Micser.Plugins.Main.Modules;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Micser.Engine.Tests;
 
@@ -41,7 +41,11 @@ public class ModuleApiTests
         await using var factory = new EngineFactory();
         using var client = factory.CreateAuthorizedClient();
 
-        using var response = await client.PostAsJsonAsync("/api/modules", new CreateModuleRequest("Gain", ShowChannels: true), factory.Json);
+        using var response = await client.PostAsJsonAsync(
+            "/api/modules",
+            new CreateModuleRequest("Gain", ShowChannels: true),
+            factory.Json
+        );
         var module = await response.EnsureSuccessStatusCode().Content.ReadFromJsonAsync<ModuleDto>(factory.Json);
 
         await Assert.That(module!.ShowChannels).IsTrue();
@@ -57,12 +61,24 @@ public class ModuleApiTests
         var types = await client.GetFromJsonAsync<JsonArray>("/api/module-types");
         var gain = types!.Single(t => (string?)t!["type"] == "Gain")!;
 
-        await Assert.That(types!.Select(t => (string)t!["type"]!)).IsEquivalentTo(
-            ["DeviceInput", "LoopbackInput", "DeviceOutput", "Gain", "Compressor", "Equalizer", "Pitch", "Spectrum"]);
+        await Assert
+            .That(types!.Select(t => (string)t!["type"]!))
+            .IsEquivalentTo([
+                "DeviceInput",
+                "LoopbackInput",
+                "DeviceOutput",
+                "Gain",
+                "Compressor",
+                "Equalizer",
+                "Pitch",
+                "Spectrum",
+            ]);
         await Assert.That(gain["inputs"]!.AsArray().Select(p => (string)p!)).IsEquivalentTo(["Input"]);
         await Assert.That((float?)gain["defaultState"]!["gain"]).IsEqualTo(0f);
         await Assert.That((bool?)gain["supportsBypass"]).IsTrue();
-        await Assert.That((bool?)types!.Single(t => (string?)t!["type"] == "DeviceOutput")!["supportsBypass"]).IsFalse();
+        await Assert
+            .That((bool?)types!.Single(t => (string?)t!["type"] == "DeviceOutput")!["supportsBypass"])
+            .IsFalse();
     }
 
     [Test]
@@ -86,7 +102,12 @@ public class ModuleApiTests
         using var client = factory.CreateAuthorizedClient();
         var first = await factory.AddModuleAsync(client, "Gain");
         var second = await factory.AddModuleAsync(client, "Gain");
-        (await client.PostAsJsonAsync("/api/connections", new CreateConnectionRequest(first.Id, "Output", second.Id, "Input"))).EnsureSuccessStatusCode();
+        (
+            await client.PostAsJsonAsync(
+                "/api/connections",
+                new CreateConnectionRequest(first.Id, "Output", second.Id, "Input")
+            )
+        ).EnsureSuccessStatusCode();
 
         using var response = await client.DeleteAsync($"/api/modules/{first.Id}");
         var connections = await client.GetFromJsonAsync<ConnectionDto[]>("/api/connections");
@@ -106,9 +127,20 @@ public class ModuleApiTests
 
         using var response = await client.PutAsJsonAsync<ModuleDto>(
             $"/api/modules/{module.Id}",
-            module with { Name = "Boost", Volume = 0.5f, IsBypassed = true, IsCollapsed = true, State = new GainState(6f), Position = new ModulePosition(10, 20) },
-            factory.Json);
-        var updated = (ModuleDto<GainState>)(await client.GetFromJsonAsync<ModuleDto>($"/api/modules/{module.Id}", factory.Json))!;
+            module with
+            {
+                Name = "Boost",
+                Volume = 0.5f,
+                IsBypassed = true,
+                IsCollapsed = true,
+                State = new GainState(6f),
+                Position = new ModulePosition(10, 20),
+            },
+            factory.Json
+        );
+        var updated =
+            (ModuleDto<GainState>)
+                (await client.GetFromJsonAsync<ModuleDto>($"/api/modules/{module.Id}", factory.Json))!;
 
         await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.OK);
         await Assert.That(updated.State.Gain).IsEqualTo(6f);
@@ -126,7 +158,14 @@ public class ModuleApiTests
         using var client = factory.CreateAuthorizedClient();
         var module = (ModuleDto<DeviceOutputState>)await factory.AddModuleAsync(client, "DeviceOutput");
 
-        using var response = await client.PutAsJsonAsync<ModuleDto>($"/api/modules/{module.Id}", module with { IsBypassed = true }, factory.Json);
+        using var response = await client.PutAsJsonAsync<ModuleDto>(
+            $"/api/modules/{module.Id}",
+            module with
+            {
+                IsBypassed = true,
+            },
+            factory.Json
+        );
         var updated = await response.Content.ReadFromJsonAsync<ModuleDto>(factory.Json);
 
         await Assert.That(updated!.IsBypassed).IsFalse();
@@ -140,13 +179,29 @@ public class ModuleApiTests
         var gain = await factory.AddModuleAsync(client, "Gain");
         var device = await factory.AddModuleAsync(client, "DeviceOutput");
 
-        using var gainResponse = await client.PutAsJsonAsync($"/api/modules/{gain.Id}", gain with { ChannelCount = 6 }, factory.Json);
-        using var deviceResponse = await client.PutAsJsonAsync($"/api/modules/{device.Id}", device with { ChannelCount = 6 }, factory.Json);
+        using var gainResponse = await client.PutAsJsonAsync(
+            $"/api/modules/{gain.Id}",
+            gain with
+            {
+                ChannelCount = 6,
+            },
+            factory.Json
+        );
+        using var deviceResponse = await client.PutAsJsonAsync(
+            $"/api/modules/{device.Id}",
+            device with
+            {
+                ChannelCount = 6,
+            },
+            factory.Json
+        );
         var updatedGain = await gainResponse.Content.ReadFromJsonAsync<ModuleDto>(factory.Json);
         var updatedDevice = await deviceResponse.Content.ReadFromJsonAsync<ModuleDto>(factory.Json);
 
         await Assert.That(updatedGain!.ChannelCount).IsEqualTo(6);
-        await Assert.That(factory.Services.GetRequiredService<AudioHost>().GetAudioModule(gain.Id)!.ChannelCount).IsEqualTo(6);
+        await Assert
+            .That(factory.Services.GetRequiredService<AudioHost>().GetAudioModule(gain.Id)!.ChannelCount)
+            .IsEqualTo(6);
         await Assert.That(updatedDevice!.ChannelCount).IsNull();
     }
 
@@ -157,18 +212,51 @@ public class ModuleApiTests
         using var client = factory.CreateAuthorizedClient();
         var source = await factory.AddModuleAsync(client, "Gain");
         var target = await factory.AddModuleAsync(client, "Gain");
-        var created = await client.PostAsJsonAsync("/api/connections", new CreateConnectionRequest(source.Id, "Output", target.Id, "Input", TargetChannel: 3));
+        var created = await client.PostAsJsonAsync(
+            "/api/connections",
+            new CreateConnectionRequest(source.Id, "Output", target.Id, "Input", TargetChannel: 3)
+        );
         var connection = await created.Content.ReadFromJsonAsync<ConnectionDto>();
         target = (await client.GetFromJsonAsync<ModuleDto>($"/api/modules/{target.Id}", factory.Json))!;
 
-        using var hidden = await client.PutAsJsonAsync($"/api/modules/{target.Id}", target with { ShowChannels = false }, factory.Json);
+        using var hidden = await client.PutAsJsonAsync(
+            $"/api/modules/{target.Id}",
+            target with
+            {
+                ShowChannels = false,
+            },
+            factory.Json
+        );
         var stillShown = await hidden.Content.ReadFromJsonAsync<ModuleDto>(factory.Json);
-        using var tooFew = await client.PutAsJsonAsync($"/api/modules/{target.Id}", target with { ChannelCount = 3 }, factory.Json);
-        using var enough = await client.PutAsJsonAsync($"/api/modules/{target.Id}", target with { ChannelCount = 4 }, factory.Json);
+        using var tooFew = await client.PutAsJsonAsync(
+            $"/api/modules/{target.Id}",
+            target with
+            {
+                ChannelCount = 3,
+            },
+            factory.Json
+        );
+        using var enough = await client.PutAsJsonAsync(
+            $"/api/modules/{target.Id}",
+            target with
+            {
+                ChannelCount = 4,
+            },
+            factory.Json
+        );
         (await client.DeleteAsync($"/api/connections/{connection!.Id}")).EnsureSuccessStatusCode();
-        using var hiddenWithoutConnections = await client.PutAsJsonAsync($"/api/modules/{target.Id}", target with { ShowChannels = false }, factory.Json);
+        using var hiddenWithoutConnections = await client.PutAsJsonAsync(
+            $"/api/modules/{target.Id}",
+            target with
+            {
+                ShowChannels = false,
+            },
+            factory.Json
+        );
         var hiddenAfterwards = await hiddenWithoutConnections.Content.ReadFromJsonAsync<ModuleDto>(factory.Json);
-        var tooFewErrors = (await tooFew.Content.ReadFromJsonAsync<JsonObject>())!["errors"]!.AsObject().Select(e => e.Key);
+        var tooFewErrors = (await tooFew.Content.ReadFromJsonAsync<JsonObject>())!["errors"]!
+            .AsObject()
+            .Select(e => e.Key);
 
         await Assert.That(target.ShowChannels).IsTrue();
         await Assert.That(hidden.StatusCode).IsEqualTo(HttpStatusCode.OK);
@@ -189,8 +277,13 @@ public class ModuleApiTests
 
         using var response = await client.PutAsJsonAsync<ModuleDto>(
             $"/api/modules/{module.Id}",
-            module with { Volume = 2f, State = new EqualizerState([new EqualizerBand(1000, 0), new EqualizerBand(5, 0)]) },
-            factory.Json);
+            module with
+            {
+                Volume = 2f,
+                State = new EqualizerState([new EqualizerBand(1000, 0), new EqualizerBand(5, 0)]),
+            },
+            factory.Json
+        );
         var problem = await response.Content.ReadFromJsonAsync<JsonObject>();
         var errors = problem!["errors"]!.AsObject().Select(e => e.Key).ToArray();
 
@@ -205,7 +298,14 @@ public class ModuleApiTests
         using var client = factory.CreateAuthorizedClient();
         var module = await factory.AddModuleAsync(client, "Gain");
 
-        using var response = await client.PutAsJsonAsync($"/api/modules/{module.Id}", module with { Name = new string('x', 101) }, factory.Json);
+        using var response = await client.PutAsJsonAsync(
+            $"/api/modules/{module.Id}",
+            module with
+            {
+                Name = new string('x', 101),
+            },
+            factory.Json
+        );
         var problem = await response.Content.ReadFromJsonAsync<JsonObject>();
 
         await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.BadRequest);
@@ -222,7 +322,8 @@ public class ModuleApiTests
         using var response = await client.PutAsJsonAsync<ModuleDto>(
             $"/api/modules/{module.Id}",
             new ModuleDto<PitchState> { Id = module.Id, State = new PitchState() },
-            factory.Json);
+            factory.Json
+        );
 
         await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.BadRequest);
     }

@@ -38,7 +38,13 @@ public sealed class CaptureStream : IDeviceStream
     private long _resyncs;
     private long _underruns;
 
-    internal CaptureStream(MMDevice device, bool loopback, ProcessingFormat format, double? initialTargetMilliseconds, ILogger logger)
+    internal CaptureStream(
+        MMDevice device,
+        bool loopback,
+        ProcessingFormat format,
+        double? initialTargetMilliseconds,
+        ILogger logger
+    )
     {
         _device = device;
         _format = format;
@@ -56,8 +62,13 @@ public sealed class CaptureStream : IDeviceStream
         }
 
         _recorder = builder.Build();
-        logger.LogInformation("Capture from {Device}: latency {Latency} ms, low latency {LowLatency} ({Reason}).",
-            device.FriendlyName, _recorder.LatencyMilliseconds, _recorder.LowLatencyActive, _recorder.LowLatencyUnavailableReason);
+        logger.LogInformation(
+            "Capture from {Device}: latency {Latency} ms, low latency {LowLatency} ({Reason}).",
+            device.FriendlyName,
+            _recorder.LatencyMilliseconds,
+            _recorder.LowLatencyActive,
+            _recorder.LowLatencyUnavailableReason
+        );
 
         var deviceFormat = _recorder.WaveFormat;
         Layout = ChannelLayout.FromWaveFormat(deviceFormat);
@@ -82,18 +93,25 @@ public sealed class CaptureStream : IDeviceStream
 
     public int DeviceSampleRate { get; }
 
-    public bool IsFaulted => _isStopped || (_detectsStalls && StreamBuffering.IsStalled(_openedAt, Interlocked.Read(ref _lastData), Environment.TickCount64));
+    public bool IsFaulted =>
+        _isStopped
+        || (
+            _detectsStalls
+            && StreamBuffering.IsStalled(_openedAt, Interlocked.Read(ref _lastData), Environment.TickCount64)
+        );
 
     public ChannelLayout Layout { get; }
 
-    public StreamStatistics Statistics => new(
-        _drift.SmoothedFill,
-        _drift.TargetFill,
-        _drift.Correction,
-        Interlocked.Read(ref _underruns),
-        Interlocked.Read(ref _overruns),
-        _drift.TargetFill * 1000 / DeviceSampleRate,
-        Interlocked.Read(ref _resyncs));
+    public StreamStatistics Statistics =>
+        new(
+            _drift.SmoothedFill,
+            _drift.TargetFill,
+            _drift.Correction,
+            Interlocked.Read(ref _underruns),
+            Interlocked.Read(ref _overruns),
+            _drift.TargetFill * 1000 / DeviceSampleRate,
+            Interlocked.Read(ref _resyncs)
+        );
 
     public void Dispose()
     {
@@ -177,7 +195,12 @@ public sealed class CaptureStream : IDeviceStream
         }
     }
 
-    private void OnDataAvailable(ReadOnlySpan<byte> data, AudioClientBufferFlags flags, long devicePosition, long qpcPosition)
+    private void OnDataAvailable(
+        ReadOnlySpan<byte> data,
+        AudioClientBufferFlags flags,
+        long devicePosition,
+        long qpcPosition
+    )
     {
         Interlocked.Exchange(ref _lastData, Environment.TickCount64);
         var samples = data.Length / _converter.BytesPerSample;

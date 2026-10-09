@@ -16,7 +16,8 @@ public abstract class AudioPort
     /// <summary>
     /// The port's buffer for the current block. Available once the module is added to a graph.
     /// </summary>
-    public AudioBuffer Buffer => _buffer ?? throw new InvalidOperationException("The module has not been added to a graph.");
+    public AudioBuffer Buffer =>
+        _buffer ?? throw new InvalidOperationException("The module has not been added to a graph.");
 
     /// <summary>
     /// The layout of the last processed block, readable from any thread; <see cref="ChannelLayout.None"/> before the first block.
@@ -127,8 +128,14 @@ public sealed class InputPort : AudioPort
 
             hasWholeSources = true;
             var candidate = source.SourceChannel == null ? source.Source.Buffer.Layout : ChannelLayout.Mono;
-            if (candidate.ChannelCount > layout.ChannelCount ||
-                (candidate.ChannelCount == layout.ChannelCount && candidate.HasSpeakerPositions && !layout.HasSpeakerPositions))
+            if (
+                candidate.ChannelCount > layout.ChannelCount
+                || (
+                    candidate.ChannelCount == layout.ChannelCount
+                    && candidate.HasSpeakerPositions
+                    && !layout.HasSpeakerPositions
+                )
+            )
             {
                 layout = candidate;
             }
@@ -142,7 +149,12 @@ public sealed class InputPort : AudioPort
         return layout.ChannelCount < channelCountNeeded ? ChannelLayout.FromChannelCount(channelCountNeeded) : layout;
     }
 
-    private readonly record struct MixerKey(ChannelLayout Source, ChannelLayout Target, int? SourceChannel, int? TargetChannel);
+    private readonly record struct MixerKey(
+        ChannelLayout Source,
+        ChannelLayout Target,
+        int? SourceChannel,
+        int? TargetChannel
+    );
 }
 
 /// <summary>
@@ -151,9 +163,7 @@ public sealed class InputPort : AudioPort
 public sealed class OutputPort : AudioPort
 {
     internal OutputPort(AudioModule module, string name)
-        : base(module, name)
-    {
-    }
+        : base(module, name) { }
 
     /// <summary>
     /// Measures the output after volume and mute. Available once the module is added to a graph.

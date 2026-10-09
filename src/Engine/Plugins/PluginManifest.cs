@@ -13,7 +13,14 @@ namespace Micser.Engine.Plugins;
 /// <param name="Templates">
 /// A JSON file with subgraph templates, relative to the plugin folder, that the engine adds to the configuration once each.
 /// </param>
-public sealed partial record PluginManifest(string Id, string Name, string Version, string Assembly, string? Web, string? Templates = null)
+public sealed partial record PluginManifest(
+    string Id,
+    string Name,
+    string Version,
+    string Assembly,
+    string? Web,
+    string? Templates = null
+)
 {
     public const string FileName = "plugin.json";
 
@@ -54,7 +61,9 @@ public sealed partial record PluginManifest(string Id, string Name, string Versi
 
         if (manifest == null || !IsValidId(manifest.Id))
         {
-            throw new InvalidDataException("The plugin's id is missing or invalid (letters, digits, '.', '_' and '-').");
+            throw new InvalidDataException(
+                "The plugin's id is missing or invalid (letters, digits, '.', '_' and '-')."
+            );
         }
 
         if (string.IsNullOrWhiteSpace(manifest.Name) || string.IsNullOrWhiteSpace(manifest.Version))

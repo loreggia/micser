@@ -11,7 +11,8 @@ public sealed record TemplateConnectionDto(
     Guid TargetModuleId,
     string TargetPort,
     int? SourceChannel = null,
-    int? TargetChannel = null);
+    int? TargetChannel = null
+);
 
 /// <summary>
 /// A saved subgraph: its frame, modules and the connections between them, to create subgraphs from.
@@ -29,12 +30,17 @@ public sealed record SubgraphTemplateDto(
     IReadOnlyList<ModuleDto> Modules,
     IReadOnlyList<TemplateConnectionDto> Connections,
     IReadOnlyList<string> UnavailableTypes,
-    bool IsBuiltIn);
+    bool IsBuiltIn
+);
 
 /// <param name="SubgraphId">The subgraph to save; it refers to the template afterwards.</param>
 /// <param name="Name">Template names are unique, ignoring case.</param>
 /// <param name="TemplateId">The template to save over, keeping its id; a new template if null.</param>
-public sealed record SaveSubgraphTemplateRequest(Guid SubgraphId, [Required, MaxLength(100)] string Name, Guid? TemplateId = null);
+public sealed record SaveSubgraphTemplateRequest(
+    Guid SubgraphId,
+    [Required, MaxLength(100)] string Name,
+    Guid? TemplateId = null
+);
 
 /// <param name="Position">The new subgraph's position.</param>
 public sealed record InstantiateSubgraphTemplateRequest([Required] ModulePosition Position);

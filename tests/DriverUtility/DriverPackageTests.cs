@@ -8,7 +8,10 @@ public class DriverPackageTests
         var directory = Directory.CreateTempSubdirectory("micser-driver-");
         try
         {
-            await File.WriteAllTextAsync(Path.Combine(directory.FullName, "Micser.Vac.inf"), "[Version]\r\nDriverVer = 10/03/2026,1.2.3.4\r\n");
+            await File.WriteAllTextAsync(
+                Path.Combine(directory.FullName, "Micser.Vac.inf"),
+                "[Version]\r\nDriverVer = 10/03/2026,1.2.3.4\r\n"
+            );
 
             var package = DriverPackage.Load(directory.FullName);
 

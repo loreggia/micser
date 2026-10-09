@@ -76,7 +76,9 @@ public sealed class AudioDeviceService : IDisposable
 
     public IReadOnlyList<AudioDeviceInfo> GetDevices(DeviceDirection direction, bool includeInactive = false)
     {
-        var state = includeInactive ? DeviceState.Active | DeviceState.Disabled | DeviceState.Unplugged : DeviceState.Active;
+        var state = includeInactive
+            ? DeviceState.Active | DeviceState.Disabled | DeviceState.Unplugged
+            : DeviceState.Active;
         using var devices = _enumerator.EnumerateAudioEndPoints(ToDataFlow(direction), state);
 
         var result = new List<AudioDeviceInfo>(devices.Count);
@@ -95,7 +97,13 @@ public sealed class AudioDeviceService : IDisposable
     /// <exception cref="InvalidOperationException">The device doesn't exist or isn't an active input.</exception>
     public CaptureStream OpenCapture(string deviceId, ProcessingFormat format, double? initialTargetMilliseconds = null)
     {
-        return new CaptureStream(GetActiveDevice(deviceId, DataFlow.Capture), false, format, initialTargetMilliseconds, _logger);
+        return new CaptureStream(
+            GetActiveDevice(deviceId, DataFlow.Capture),
+            false,
+            format,
+            initialTargetMilliseconds,
+            _logger
+        );
     }
 
     /// <summary>
@@ -103,9 +111,19 @@ public sealed class AudioDeviceService : IDisposable
     /// </summary>
     /// <param name="initialTargetMilliseconds">The buffer to start with, e.g. one the stream learned before; null for the minimum.</param>
     /// <exception cref="InvalidOperationException">The device doesn't exist or isn't an active output.</exception>
-    public CaptureStream OpenLoopback(string deviceId, ProcessingFormat format, double? initialTargetMilliseconds = null)
+    public CaptureStream OpenLoopback(
+        string deviceId,
+        ProcessingFormat format,
+        double? initialTargetMilliseconds = null
+    )
     {
-        return new CaptureStream(GetActiveDevice(deviceId, DataFlow.Render), true, format, initialTargetMilliseconds, _logger);
+        return new CaptureStream(
+            GetActiveDevice(deviceId, DataFlow.Render),
+            true,
+            format,
+            initialTargetMilliseconds,
+            _logger
+        );
     }
 
     /// <param name="initialTargetMilliseconds">The buffer to start with, e.g. one the stream learned before; null for the minimum.</param>
@@ -157,7 +175,8 @@ public sealed class AudioDeviceService : IDisposable
             device.DataFlow == DataFlow.Capture ? DeviceDirection.Input : DeviceDirection.Output,
             isActive,
             layout,
-            sampleRate);
+            sampleRate
+        );
     }
 
     private MMDevice GetActiveDevice(string id, DataFlow dataFlow)
@@ -166,7 +185,9 @@ public sealed class AudioDeviceService : IDisposable
         if (device.DataFlow != dataFlow || device.State != DeviceState.Active)
         {
             device.Dispose();
-            throw new InvalidOperationException($"Audio device '{id}' is not an active {(dataFlow == DataFlow.Capture ? "input" : "output")}.");
+            throw new InvalidOperationException(
+                $"Audio device '{id}' is not an active {(dataFlow == DataFlow.Capture ? "input" : "output")}."
+            );
         }
 
         return device;

@@ -72,6 +72,7 @@
   },
   "extensions": {
     "recommendations": [
+      "csharpier.csharpier-vscode",
       "dbaeumer.vscode-eslint",
       "esbenp.prettier-vscode",
       "github.vscode-github-actions",

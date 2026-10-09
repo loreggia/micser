@@ -31,7 +31,8 @@ public sealed record CompressorState(
     [Range(1f, 20f)] float Ratio = 2f,
     [Range(-80f, 0f)] float Threshold = -10f,
     [Range(0f, 24f)] float Knee = 5f,
-    [Range(-24f, 24f)] float MakeUpGain = 0f);
+    [Range(-24f, 24f)] float MakeUpGain = 0f
+);
 
 /// <summary>
 /// Stereo-linked compressor: the gain is computed from the peak of all channels and applied to all of them.
@@ -90,8 +91,16 @@ public class CompressorModule : EffectModule, IStatefulModule<CompressorState>
 
     public void SetState(CompressorState state)
     {
-        (Type, Amount, Attack, Release, Ratio, Threshold, Knee, MakeUpGain) =
-            (state.Type, state.Amount, state.Attack, state.Release, state.Ratio, state.Threshold, state.Knee, state.MakeUpGain);
+        (Type, Amount, Attack, Release, Ratio, Threshold, Knee, MakeUpGain) = (
+            state.Type,
+            state.Amount,
+            state.Attack,
+            state.Release,
+            state.Ratio,
+            state.Threshold,
+            state.Knee,
+            state.MakeUpGain
+        );
     }
 
     protected override void OnAttached()
@@ -149,7 +158,15 @@ public class CompressorModule : EffectModule, IStatefulModule<CompressorState>
         }
     }
 
-    private float ComputeGain(float level, CompressorType type, float slope, float threshold, float knee, float amount, float makeUpGain)
+    private float ComputeGain(
+        float level,
+        CompressorType type,
+        float slope,
+        float threshold,
+        float knee,
+        float amount,
+        float makeUpGain
+    )
     {
         // exact silence keeps the envelope, otherwise the gain jumps when audio starts after a pause
         if (level < float.Epsilon)
@@ -158,9 +175,10 @@ public class CompressorModule : EffectModule, IStatefulModule<CompressorState>
         }
 
         var levelDb = level < 0.000001f ? -120f : Decibels.FromLinear(level);
-        var compressedDb = type == CompressorType.Downward
-            ? CompressorCurve.Downward(levelDb, slope, threshold, knee)
-            : CompressorCurve.Upward(levelDb, slope, threshold, knee);
+        var compressedDb =
+            type == CompressorType.Downward
+                ? CompressorCurve.Downward(levelDb, slope, threshold, knee)
+                : CompressorCurve.Upward(levelDb, slope, threshold, knee);
         var diff = (levelDb - compressedDb) * amount;
 
         _chunkMaxDiff = _chunkPosition == 0 ? diff : Math.Max(_chunkMaxDiff, diff);

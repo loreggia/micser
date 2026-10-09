@@ -86,7 +86,10 @@ internal sealed class UpdateController : IDisposable
             }
         }
 
-        return PendingUpdate is { } update && version == update.Version.ToString() && !string.IsNullOrWhiteSpace(update.NotesMarkdown)
+        return
+            PendingUpdate is { } update
+            && version == update.Version.ToString()
+            && !string.IsNullOrWhiteSpace(update.NotesMarkdown)
             ? update.NotesMarkdown
             : null;
     }
@@ -125,12 +128,9 @@ internal sealed class UpdateController : IDisposable
             do
             {
                 await CheckAsync();
-            }
-            while (await timer.WaitForNextTickAsync(cancellationToken));
+            } while (await timer.WaitForNextTickAsync(cancellationToken));
         }
-        catch (OperationCanceledException)
-        {
-        }
+        catch (OperationCanceledException) { }
     }
 
     private async Task<UpdateCheckResult> RunCheckAsync()

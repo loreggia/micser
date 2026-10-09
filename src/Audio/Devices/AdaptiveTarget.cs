@@ -22,7 +22,14 @@ internal sealed class AdaptiveTarget
     /// <param name="holdOffBlocks">Dropouts this soon after an increase count as the same incident, since the buffer is still refilling.</param>
     /// <param name="stableBlocks">Blocks without dropouts before the target shrinks.</param>
     /// <param name="initial">The starting target, e.g. one learned earlier; clamped to the minimum and maximum. Default: the minimum.</param>
-    public AdaptiveTarget(double minimum, double step, double maximum, long holdOffBlocks, long stableBlocks, double? initial = null)
+    public AdaptiveTarget(
+        double minimum,
+        double step,
+        double maximum,
+        long holdOffBlocks,
+        long stableBlocks,
+        double? initial = null
+    )
     {
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(minimum);
         ArgumentOutOfRangeException.ThrowIfNegativeOrZero(step);

@@ -12,9 +12,11 @@ namespace Micser.DriverUtility;
 internal static class DriverInstaller
 {
     private const string DisplayName = "Micser Virtual Audio Cable";
-    private const string UninstallKeyPath = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\MicserVirtualAudioCable";
+    private const string UninstallKeyPath =
+        @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\MicserVirtualAudioCable";
 
-    public static string InstallDirectory => Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Micser", "Driver");
+    public static string InstallDirectory =>
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Micser", "Driver");
 
     /// <summary>
     /// Installs the driver with a new device, or updates an existing one. Returns whether a reboot is needed.
@@ -102,7 +104,8 @@ internal static class DriverInstaller
         }
 
         File.Copy(Environment.ProcessPath!, Path.Combine(target, Path.GetFileName(Environment.ProcessPath!)), true);
-        return DriverPackage.Load(target) ?? throw new InvalidOperationException($"No driver package in {target} after copying.");
+        return DriverPackage.Load(target)
+            ?? throw new InvalidOperationException($"No driver package in {target} after copying.");
     }
 
     /// <summary>
@@ -114,8 +117,10 @@ internal static class DriverInstaller
         foreach (var inf in Directory.GetFiles(infDirectory, "oem*.inf"))
         {
             var name = Path.GetFileName(inf);
-            if (string.Equals(name, keep, StringComparison.OrdinalIgnoreCase)
-                || !File.ReadAllText(inf).Contains(VacDevice.HardwareId, StringComparison.OrdinalIgnoreCase))
+            if (
+                string.Equals(name, keep, StringComparison.OrdinalIgnoreCase)
+                || !File.ReadAllText(inf).Contains(VacDevice.HardwareId, StringComparison.OrdinalIgnoreCase)
+            )
             {
                 continue;
             }
@@ -144,14 +149,16 @@ internal static class DriverInstaller
         }
 
         // the running utility can't delete its own folder; ping waits about 3 s (timeout needs console input)
-        Process.Start(new ProcessStartInfo
-        {
-            FileName = "cmd.exe",
-            Arguments = $"/c ping -n 4 127.0.0.1 > nul & rmdir /s /q \"{directory}\"",
-            CreateNoWindow = true,
-            UseShellExecute = false,
-            WorkingDirectory = Path.GetTempPath(),
-        });
+        Process.Start(
+            new ProcessStartInfo
+            {
+                FileName = "cmd.exe",
+                Arguments = $"/c ping -n 4 127.0.0.1 > nul & rmdir /s /q \"{directory}\"",
+                CreateNoWindow = true,
+                UseShellExecute = false,
+                WorkingDirectory = Path.GetTempPath(),
+            }
+        );
     }
 
     private static bool UpdateDriver(DriverPackage package)
@@ -159,9 +166,20 @@ internal static class DriverInstaller
         Log.Info($"Installing the driver {package.Version} from {package.InfPath}");
 
         // forced: every dev build has the same version
-        if (!UpdateDriverForPlugAndPlayDevices(0, VacDevice.HardwareId, package.InfPath, INSTALLFLAG_FORCE, out var needReboot))
+        if (
+            !UpdateDriverForPlugAndPlayDevices(
+                0,
+                VacDevice.HardwareId,
+                package.InfPath,
+                INSTALLFLAG_FORCE,
+                out var needReboot
+            )
+        )
         {
-            throw new Win32Exception(System.Runtime.InteropServices.Marshal.GetLastPInvokeError(), "Installing the driver failed");
+            throw new Win32Exception(
+                System.Runtime.InteropServices.Marshal.GetLastPInvokeError(),
+                "Installing the driver failed"
+            );
         }
 
         using var device = VacDevice.Find();

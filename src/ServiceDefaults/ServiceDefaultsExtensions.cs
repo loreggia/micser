@@ -16,7 +16,8 @@ public static class ServiceDefaultsExtensions
 {
     private const string HealthPath = "/api/health";
 
-    public static TBuilder AddServiceDefaults<TBuilder>(this TBuilder builder) where TBuilder : IHostApplicationBuilder
+    public static TBuilder AddServiceDefaults<TBuilder>(this TBuilder builder)
+        where TBuilder : IHostApplicationBuilder
     {
         builder.Logging.AddOpenTelemetry(logging =>
         {
@@ -24,13 +25,16 @@ public static class ServiceDefaultsExtensions
             logging.IncludeScopes = true;
         });
 
-        var openTelemetry = builder.Services.AddOpenTelemetry()
-            .WithMetrics(metrics => metrics
-                .AddAspNetCoreInstrumentation()
-                .AddRuntimeInstrumentation())
-            .WithTracing(tracing => tracing
-                .AddSource(builder.Environment.ApplicationName)
-                .AddAspNetCoreInstrumentation(options => options.Filter = context => !context.Request.Path.StartsWithSegments(HealthPath)));
+        var openTelemetry = builder
+            .Services.AddOpenTelemetry()
+            .WithMetrics(metrics => metrics.AddAspNetCoreInstrumentation().AddRuntimeInstrumentation())
+            .WithTracing(tracing =>
+                tracing
+                    .AddSource(builder.Environment.ApplicationName)
+                    .AddAspNetCoreInstrumentation(options =>
+                        options.Filter = context => !context.Request.Path.StartsWithSegments(HealthPath)
+                    )
+            );
 
         if (!string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]))
         {
