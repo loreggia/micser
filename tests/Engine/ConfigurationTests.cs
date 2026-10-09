@@ -158,4 +158,45 @@ public class ConfigurationTests
             Directory.Delete(directory, recursive: true);
         }
     }
+
+    [Test]
+    public async Task Configuration_ChannelConnectionsOfUnknownModules_DontLimitTheChannelSettings()
+    {
+        var directory = EngineFactory.CreateTemporaryDirectory();
+        Directory.CreateDirectory(directory);
+        var known = Guid.NewGuid();
+        var unknown = Guid.NewGuid();
+        await File.WriteAllTextAsync(Path.Combine(directory, "config.json"), $$"""
+            {
+              "version": 1,
+              "modules": [
+                { "type": "Removed", "id": "{{unknown}}", "state": {} },
+                { "type": "Gain", "id": "{{known}}", "showChannels": true, "channelCount": 6, "state": { "gain": 0 } }
+              ],
+              "connections": [
+                {
+                  "id": "{{Guid.NewGuid()}}", "sourceModuleId": "{{unknown}}", "sourcePort": "Output", "targetModuleId": "{{known}}",
+                  "targetPort": "Input", "targetChannel": 5
+                }
+              ]
+            }
+            """);
+        try
+        {
+            await using var factory = new EngineFactory(directory);
+            using var client = factory.CreateAuthorizedClient();
+            var gain = (await client.GetFromJsonAsync<ModuleDto>($"/api/modules/{known}", factory.Json))!;
+
+            using var response = await client.PutAsJsonAsync($"/api/modules/{known}", gain with { ShowChannels = false, ChannelCount = 2 }, factory.Json);
+            var updated = await response.Content.ReadFromJsonAsync<ModuleDto>(factory.Json);
+
+            await Assert.That(response.StatusCode).IsEqualTo(System.Net.HttpStatusCode.OK);
+            await Assert.That(updated!.ShowChannels).IsFalse();
+            await Assert.That(updated.ChannelCount).IsEqualTo(2);
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
 }

@@ -67,6 +67,29 @@ public class EngineHubTests
     }
 
     [Test]
+    public async Task PortLayouts_AreEmptyOnceTheEngineStops()
+    {
+        await using var factory = new EngineFactory();
+        using var client = factory.CreateAuthorizedClient();
+        var gain = await factory.AddModuleAsync(client, "Gain");
+        await using var hub = factory.CreateHubConnection();
+        var processed = hub.NextAsync<ModulePortLayoutsDto[]>(
+            "PortLayoutsChanged", layouts => layouts.Any(l => l.ModuleId == gain.Id && l.Outputs["Output"].ChannelCount == 6));
+        await hub.StartAsync();
+        (await client.PutAsJsonAsync($"/api/modules/{gain.Id}", gain with { ChannelCount = 6 }, factory.Json)).EnsureSuccessStatusCode();
+        await processed;
+        var cleared = hub.NextAsync<ModulePortLayoutsDto[]>(
+            "PortLayoutsChanged", layouts => layouts.Any(l => l.ModuleId == gain.Id && l.Outputs["Output"].ChannelCount == 0));
+
+        (await client.PostAsync("/api/engine/stop", null)).EnsureSuccessStatusCode();
+        var listed = (await client.GetFromJsonAsync<ModulePortLayoutsDto[]>("/api/port-layouts", factory.Json))!.Single(l => l.ModuleId == gain.Id);
+        await cleared;
+
+        await Assert.That(listed.Inputs["Input"].ChannelCount).IsEqualTo(0);
+        await Assert.That(listed.Outputs["Output"].ChannelCount).IsEqualTo(0);
+    }
+
+    [Test]
     public async Task Subscribe_DeliversModuleData()
     {
         await using var factory = new EngineFactory();

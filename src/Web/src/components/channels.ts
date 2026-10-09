@@ -25,9 +25,9 @@ export interface PortChannel {
 }
 
 /**
- * The channel connectors of a port: its channels in the last processed block, at least as many as the module's channel count or, on
- * Auto, stereo for inputs that take their layout from their sources (which the engine widens to the channels connected to), and every
- * channel that a connection uses, also one the port doesn't have right now.
+ * The channel connectors of a port: its channels in the last processed block, at least as many as the module's channel count (for inputs,
+ * those it applies to) or, on Auto, stereo for those inputs (which the engine widens to the channels connected to), and every channel
+ * that a connection uses, also one the port doesn't have right now.
  */
 export function portChannels(
   direction: "in" | "out",
@@ -39,7 +39,7 @@ export function portChannels(
 ): PortChannel[] {
   const layout = (direction === "in" ? layouts?.inputs : layouts?.outputs)?.[port];
   let count = layout?.channelCount ?? 0;
-  if (moduleType?.supportsChannelCount) {
+  if (direction === "in" ? moduleType?.channelCountInputs.includes(port) : moduleType?.supportsChannelCount) {
     count = Math.max(count, module.channelCount ?? (direction === "in" ? 2 : 0));
   }
 
@@ -65,12 +65,24 @@ export function hasChannelConnections(moduleId: string, connections: readonly Co
   );
 }
 
-/** The lowest channel count that the connections to single channels of the module's inputs need; 0 without any. */
-export function requiredChannelCount(moduleId: string, connections: readonly ConnectionDto[]) {
+/**
+ * The lowest channel count that the connections to single channels of the module's inputs need, of the inputs the channel count applies
+ * to; 0 without any.
+ */
+export function requiredChannelCount(
+  moduleId: string,
+  moduleType: ModuleTypeDto | undefined,
+  connections: readonly ConnectionDto[]
+) {
   return Math.max(
     0,
     ...connections
-      .filter((c) => c.targetModuleId === moduleId && c.targetChannel != null)
+      .filter(
+        (c) =>
+          c.targetModuleId === moduleId &&
+          c.targetChannel != null &&
+          moduleType?.channelCountInputs.includes(c.targetPort) === true
+      )
       .map((c) => c.targetChannel! + 1)
   );
 }
@@ -106,7 +118,7 @@ export function channelCountName(count: number, t: Translate) {
     case 8:
       return t("channels.surround71");
     default:
-      return t("channels.countName", { count });
+      return t("channels.countName", { number: formatNumber(count) });
   }
 }
 

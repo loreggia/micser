@@ -2225,7 +2225,8 @@
           "outputs",
           "defaultState",
           "supportsBypass",
-          "supportsChannelCount"
+          "supportsChannelCount",
+          "channelCountInputs"
         ],
         "type": "object",
         "properties": {
@@ -2250,6 +2251,12 @@
           },
           "supportsChannelCount": {
             "type": "boolean"
+          },
+          "channelCountInputs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       },

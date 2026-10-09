@@ -190,6 +190,7 @@ describe("useModuleTypeChoices", () => {
       defaultState: {},
       supportsBypass: false,
       supportsChannelCount: false,
+      channelCountInputs: [],
     });
     queryClient.setQueryData(getGetModuleTypesQueryKey(), [
       moduleType("Gain"),

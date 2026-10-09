@@ -49,14 +49,14 @@ public abstract record ModuleDto
     public ModulePosition? Position { get; init; }
 
     /// <summary>
-    /// The subgraph the module belongs to, from <c>GET /api/subgraphs</c>.
-    /// </summary>
-    /// <summary>
-    /// Shows a connector per channel below each port in the UI's graph editor. It can't be turned off while connections to or from single
-    /// channels of the module exist; creating such a connection turns it on.
+    /// Shows a connector per channel below each port in the UI's graph editor. It stays on while connections to or from single channels of
+    /// the module exist (an update turning it off is ignored then); creating such a connection turns it on.
     /// </summary>
     public bool ShowChannels { get; init; }
 
+    /// <summary>
+    /// The subgraph the module belongs to, from <c>GET /api/subgraphs</c>.
+    /// </summary>
     public Guid? SubgraphId { get; init; }
 
     /// <summary>
@@ -107,10 +107,15 @@ public sealed record CreateModuleRequest(
 /// <param name="DefaultState">The state of a new module of this type.</param>
 /// <param name="SupportsBypass">Whether <see cref="ModuleDto.IsBypassed"/> has an effect.</param>
 /// <param name="SupportsChannelCount">Whether <see cref="ModuleDto.ChannelCount"/> has an effect.</param>
+/// <param name="ChannelCountInputs">
+/// The inputs that <see cref="ModuleDto.ChannelCount"/> applies to: those without a fixed layout. Their connections to single channels
+/// limit it.
+/// </param>
 public sealed record ModuleTypeDto(
     string Type,
     IReadOnlyList<string> Inputs,
     IReadOnlyList<string> Outputs,
     object DefaultState,
     bool SupportsBypass,
-    bool SupportsChannelCount);
+    bool SupportsChannelCount,
+    IReadOnlyList<string> ChannelCountInputs);
