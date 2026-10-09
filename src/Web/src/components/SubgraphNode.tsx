@@ -45,6 +45,7 @@ import { Port } from "./ModuleNode";
 import { ModuleTitle } from "./ModuleTitle";
 import { useSubgraphActions } from "./subgraphActions";
 import { frameAround, minSubgraphSize, type ProxyPort } from "./subgraphs";
+import { useHandlesChanged } from "./useHandlesChanged";
 
 export type SubgraphNodeData = {
   subgraph: SubgraphDto;
@@ -164,6 +165,7 @@ export function SubgraphNode({ data, selected }: NodeProps<SubgraphNodeType>) {
     onError: (error) => notifyError(t("subgraph.deleteFailed"), error),
   });
   const { subgraph, inputs, outputs } = data;
+  useHandlesChanged(subgraph.isCollapsed ? [...inputs, ...outputs].map((port) => port.id) : []);
   const colors = palette[subgraph.color];
   const members = modules?.filter((m) => m.subgraphId === subgraph.id) ?? [];
   const template = templates?.find((t) => t.id === subgraph.templateId);

@@ -54,6 +54,7 @@ import { LevelMeter } from "./LevelMeter";
 import { useModuleActions } from "./moduleActions";
 import { ModuleTitle } from "./ModuleTitle";
 import { portHandleId } from "./subgraphs";
+import { useHandlesChanged } from "./useHandlesChanged";
 
 export type ModuleNodeData = {
   module: ModuleDto;
@@ -408,6 +409,7 @@ function ChannelPorts({
       <span className={styles.portRowLabel}>{portName(widget, row.port)}</span>
     );
   const handleId = (row: PortRow) => portHandleId(row.port, row.channel?.index);
+  useHandlesChanged([...inputs.map((row) => `in|${handleId(row)}`), ...outputs.map((row) => `out|${handleId(row)}`)]);
 
   return (
     <div className={styles.channels}>
