@@ -3,7 +3,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "setup": "npm install && npm run allow-scripts:run && husky",
+    "setup": "npm install && npm run allow-scripts:run && dotnet tool restore && dotnet husky install",
     "setup:ci": "npm ci && npm run allow-scripts:run",
     "allow-scripts:auto": "allow-scripts auto && npm exec --no --workspaces -- allow-scripts auto",
     "allow-scripts:run": "allow-scripts run && npm exec --no --workspaces -- allow-scripts run",
@@ -16,8 +16,7 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "fix-line-endings": "node scripts/repair-line-endings.mts",
-    "prepare": "husky"
+    "fix-line-endings": "node scripts/repair-line-endings.mts"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -32,8 +31,6 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.7",
     "globals": "^17.13.0",
-    "husky": "^9.1.7",
-    "lint-staged": "^17.6.0",
     "playwright": "^1.63.0",
     "prettier": "^3.9.9",
     "typescript": "~6.0.3",
@@ -55,16 +52,6 @@
       "@lavamoat/preinstall-always-fail#3.0.0": false,
       "vitest>vite>esbuild#0.28.2": true
     }
-  },
-  "lint-staged": {
-    "**/*": [
-      "node scripts/repair-line-endings.mts",
-      "prettier --write --ignore-unknown"
-    ],
-    "*.{js,jsx,mjs,cjs,ts,tsx,mts,cts}": [
-      "eslint --fix --no-warn-ignored",
-      "prettier --write"
-    ]
   },
   "engines": {
     "node": ">=24"

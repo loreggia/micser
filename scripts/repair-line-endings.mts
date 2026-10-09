@@ -5,7 +5,8 @@
  * only applies the configured ones when it writes a file itself.
  *
  * Without file arguments it checks every tracked file and refreshes the index's stat cache afterwards. With file arguments (from
- * lint-staged) it checks only those and leaves the index alone. Only CRLF and LF are converted; lone CRs stay.
+ * the pre-commit hook) it checks only those, skips untracked ones, and leaves the index alone. Only CRLF and LF are converted; lone
+ * CRs stay.
  *
  * Usage: node scripts/repair-line-endings.mts [--dry-run] [file...]
  */
