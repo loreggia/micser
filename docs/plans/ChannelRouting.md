@@ -51,7 +51,7 @@ Channels are part of a connection, not separate ports. Module types, plugins, `M
 - `GET /api/port-layouts` returns all of them; the hub pushes changes as `PortLayoutsChanged`, checked in the same loop that reads the levels. A device module without an open stream reports zero channels. They're runtime state, not part of `ModuleDto` or the config.
 - Regenerate the API client. The web SDK patches the cached layouts from `PortLayoutsChanged` (and drops a removed module's); `usePortLayouts(moduleId)` reads them.
 
-## Phase 3: UI
+## Phase 3: UI (done)
 
 - The "More" menu gets "Show channels" (checked item, disabled with a tooltip while channel connections exist) and, for modules with `supportsChannelCount`, a "Channels" submenu: Auto, Mono, Stereo, Quad, 5.1, 7.1 and "Custom…" (number field, 1–64). Counts below what the channel connections need are disabled.
 - Ports: with channels shown, each port has its combined connector and a row per channel, labelled from the layout ("1 (L)", "2 (R)", "3"). The rows sit in a fixed row grid instead of being spread over the card's edge, with a minimum node height; collapsed modules keep them too.

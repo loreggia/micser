@@ -18,6 +18,7 @@ import {
   useGetConnections,
   useGetModules,
   useGetModuleTypes,
+  useGetPortLayouts,
   useGetSubgraphs,
   useModuleUpdate,
   usePreferences,
@@ -45,11 +46,20 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "../i18n";
 import { useNotifyError } from "../notifications";
 import { portName, usePluginWidgets } from "../plugins";
+import { channelLabel, isBeyondLayout } from "./channels";
 import { ModuleNode, type ModuleNodeType } from "./ModuleNode";
 import { pendingPlacement, pendingSelection } from "./newModules";
 import { findFreePosition, placementMinimum, placementObstacles } from "./placement";
 import { SubgraphNode, type SubgraphNodeType } from "./SubgraphNode";
-import { frameAround, gridSize, proxyHandleId, resolveHandle, subgraphPadding, type ProxyPort } from "./subgraphs";
+import {
+  frameAround,
+  gridSize,
+  portHandleId,
+  proxyHandleId,
+  resolveHandle,
+  subgraphPadding,
+  type ProxyPort,
+} from "./subgraphs";
 import { TemplatesSubmenu } from "./TemplatesSubmenu";
 import { useAddModule, useInstantiateTemplate, useModuleTypeChoices } from "./useAddModule";
 
@@ -70,6 +80,12 @@ const useStyles = makeStyles({
       fill: tokens.colorNeutralBackground1,
       stroke: tokens.colorBrandStroke1,
       strokeWidth: tokens.strokeWidthThick,
+    },
+  },
+  // a connection to or from a channel the port doesn't have right now, which is silent
+  beyondLayout: {
+    "& .react-flow__edge-path": {
+      strokeDasharray: "6 4",
     },
   },
 });
@@ -123,6 +139,8 @@ interface AddModuleMenu {
   connection?: {
     moduleId: string;
     port: string;
+    /** The port's channel the drag started at, or null for the whole port. */
+    channel: number | null;
     /** Whether the drag started at an output, so the new module connects with its input. */
     fromOutput: boolean;
   };
@@ -153,6 +171,7 @@ export function GraphEditor() {
   const { data: connections } = useGetConnections();
   const { data: moduleTypes } = useGetModuleTypes();
   const { data: subgraphs } = useGetSubgraphs();
+  const { data: portLayouts } = useGetPortLayouts();
   const moduleTypeChoices = useModuleTypeChoices();
   const { widgets, isLoading: isLoadingWidgets } = usePluginWidgets();
   const [preferences] = usePreferences();
@@ -221,14 +240,30 @@ export function GraphEditor() {
     );
   }, [modules, subgraphs]);
 
-  // the ports of collapsed subgraphs: one per module port that a connection from or to the outside uses
+  // the modules that show their channels, as a string that only changes with them (modules change e.g. while a volume is dragged)
+  const channelModuleIds = useMemo(
+    () =>
+      (modules ?? [])
+        .filter((m) => m.showChannels)
+        .map((m) => m.id)
+        .join(","),
+    [modules]
+  );
+
+  // the ports of collapsed subgraphs: one per module port, or channel of one, that a connection from or to the outside uses
   const proxyPorts = useMemo(() => {
     const ports = new Map<string, { inputs: ProxyPort[]; outputs: ProxyPort[] }>();
-    const add = (subgraphId: string, direction: "in" | "out", moduleId: string, port: string) => {
+    const add = (
+      subgraphId: string,
+      direction: "in" | "out",
+      moduleId: string,
+      port: string,
+      channel?: number | null
+    ) => {
       const entry = ports.get(subgraphId) ?? { inputs: [], outputs: [] };
       ports.set(subgraphId, entry);
       const list = direction === "in" ? entry.inputs : entry.outputs;
-      const id = proxyHandleId(direction, moduleId, port);
+      const id = proxyHandleId(direction, moduleId, port, channel);
       if (list.some((p) => p.id === id)) {
         return;
       }
@@ -238,7 +273,14 @@ export function GraphEditor() {
       const widget = module && widgets.get(module.type);
       const title = module?.name || (widget && localize(widget.title)) || module?.type || port;
       const portCount = (direction === "in" ? moduleType?.inputs : moduleType?.outputs)?.length ?? 0;
-      list.push({ id, label: portCount > 1 ? `${title} · ${portName(widget, port)}` : title });
+      const parts = [title, ...(portCount > 1 ? [portName(widget, port)] : [])];
+      if (channel != null) {
+        const layouts = portLayouts?.find((l) => l.moduleId === moduleId);
+        const layout = (direction === "in" ? layouts?.inputs : layouts?.outputs)?.[port];
+        parts.push(channelLabel({ index: channel, speaker: layout?.speakers?.[channel] }, t));
+      }
+
+      list.push({ id, label: parts.join(" · ") });
     };
 
     for (const connection of connections ?? []) {
@@ -249,18 +291,18 @@ export function GraphEditor() {
       }
 
       if (source) {
-        add(source, "out", connection.sourceModuleId, connection.sourcePort);
+        add(source, "out", connection.sourceModuleId, connection.sourcePort, connection.sourceChannel);
       }
 
       if (target) {
-        add(target, "in", connection.targetModuleId, connection.targetPort);
+        add(target, "in", connection.targetModuleId, connection.targetPort, connection.targetChannel);
       }
     }
 
     return ports;
     // the labels change with the language
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [connections, modules, collapsedSubgraphs, typesByName, widgets, language]);
+  }, [connections, modules, collapsedSubgraphs, typesByName, widgets, portLayouts, language]);
 
   useEffect(() => {
     if (!modules || !subgraphs) {
@@ -323,7 +365,10 @@ export function GraphEditor() {
       return;
     }
 
-    // ends inside a collapsed subgraph attach to its proxy ports; connections within one stay between their hidden modules
+    // ends inside a collapsed subgraph attach to its proxy ports; connections within one stay between their hidden modules. Channels
+    // have connectors only while their module shows them; until then (the engine turns that on with the connection), the whole port's
+    // connector stands in.
+    const showsChannels = new Set(channelModuleIds.split(","));
     setEdges((current) =>
       connections.map((connection) => {
         const sourceSubgraph = collapsedSubgraphs.get(connection.sourceModuleId);
@@ -331,22 +376,25 @@ export function GraphEditor() {
         const hidden = sourceSubgraph !== undefined && sourceSubgraph === targetSubgraph;
         const source = hidden ? undefined : sourceSubgraph;
         const target = hidden ? undefined : targetSubgraph;
+        const sourceChannel = showsChannels.has(connection.sourceModuleId) ? connection.sourceChannel : null;
+        const targetChannel = showsChannels.has(connection.targetModuleId) ? connection.targetChannel : null;
         return {
           id: connection.id,
           source: source ?? connection.sourceModuleId,
           sourceHandle: source
-            ? proxyHandleId("out", connection.sourceModuleId, connection.sourcePort)
-            : connection.sourcePort,
+            ? proxyHandleId("out", connection.sourceModuleId, connection.sourcePort, connection.sourceChannel)
+            : portHandleId(connection.sourcePort, sourceChannel),
           target: target ?? connection.targetModuleId,
           targetHandle: target
-            ? proxyHandleId("in", connection.targetModuleId, connection.targetPort)
-            : connection.targetPort,
+            ? proxyHandleId("in", connection.targetModuleId, connection.targetPort, connection.targetChannel)
+            : portHandleId(connection.targetPort, targetChannel),
+          className: isBeyondLayout(connection, portLayouts) ? styles.beyondLayout : undefined,
           hidden,
           selected: current.find((edge) => edge.id === connection.id)?.selected,
         };
       })
     );
-  }, [connections, collapsedSubgraphs, setEdges]);
+  }, [connections, collapsedSubgraphs, channelModuleIds, portLayouts, styles.beyondLayout, setEdges]);
 
   // a new module is placed again once measured, since its size was only estimated
   useEffect(() => {
@@ -507,8 +555,10 @@ export function GraphEditor() {
     return {
       sourceModuleId: source.moduleId,
       sourcePort: source.port,
+      sourceChannel: source.channel,
       targetModuleId: target.moduleId,
       targetPort: target.port,
+      targetChannel: target.channel,
     };
   };
 
@@ -538,10 +588,10 @@ export function GraphEditor() {
     }
 
     const point = "changedTouches" in event ? event.changedTouches[0] : event;
-    const { moduleId, port } = resolveHandle(state.fromNode.id, state.fromHandle.id);
+    const { moduleId, port, channel } = resolveHandle(state.fromNode.id, state.fromHandle.id);
     openMenu(setMenu, {
       point: { x: point.clientX, y: point.clientY },
-      connection: { moduleId, port, fromOutput: state.fromHandle.type === "source" },
+      connection: { moduleId, port, channel, fromOutput: state.fromHandle.type === "source" },
     });
   };
 
@@ -578,6 +628,7 @@ export function GraphEditor() {
         ? {
             sourceModuleId: connection.moduleId,
             sourcePort: connection.port,
+            sourceChannel: connection.channel,
             targetModuleId: module.id,
             targetPort: port,
           }
@@ -586,6 +637,7 @@ export function GraphEditor() {
             sourcePort: port,
             targetModuleId: connection.moduleId,
             targetPort: connection.port,
+            targetChannel: connection.channel,
           },
     });
   };

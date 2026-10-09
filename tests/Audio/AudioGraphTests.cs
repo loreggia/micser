@@ -360,6 +360,22 @@ public class AudioGraphTests
     }
 
     [Test]
+    public async Task Process_WithoutFixedLayout_TakesASourceChannelAsMono()
+    {
+        var graph = new AudioGraph(Format);
+        var source = new ConstantSource(ChannelLayout.Surround71);
+        var sink = new RecordingSink();
+        graph.Add(source);
+        graph.Add(sink);
+        graph.Connect(source.Output, sink.Input, 4);
+
+        graph.Process();
+
+        await Assert.That(sink.Last!.Layout).IsEqualTo(ChannelLayout.Mono);
+        await Assert.That(sink.Last!.GetChannel(0)[0]).IsEqualTo(5f);
+    }
+
+    [Test]
     public async Task Process_WithoutFixedLayout_WidensToTargetChannels()
     {
         var graph = new AudioGraph(Format);

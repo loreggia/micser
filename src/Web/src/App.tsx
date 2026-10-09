@@ -12,6 +12,7 @@ import { ReactFlowProvider } from "@xyflow/react";
 import { useMemo, useState, useSyncExternalStore } from "react";
 import { EngineToolbar } from "./components/EngineToolbar";
 import { GraphEditor } from "./components/GraphEditor";
+import { ModuleActionsProvider } from "./components/ModuleActionsProvider";
 import { SubgraphActionsProvider } from "./components/SubgraphActionsProvider";
 import { toasterId, useErrorNotifications } from "./notifications";
 import { PluginsProvider } from "./PluginsProvider";
@@ -74,10 +75,12 @@ function Shell() {
     <PluginsProvider>
       <ReactFlowProvider>
         <SubgraphActionsProvider>
-          <div className={styles.root}>
-            <EngineToolbar />
-            <GraphEditor />
-          </div>
+          <ModuleActionsProvider>
+            <div className={styles.root}>
+              <EngineToolbar />
+              <GraphEditor />
+            </div>
+          </ModuleActionsProvider>
         </SubgraphActionsProvider>
       </ReactFlowProvider>
     </PluginsProvider>
