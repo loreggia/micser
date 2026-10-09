@@ -3,6 +3,7 @@ import {
   Caption1,
   Card,
   CardHeader,
+  Divider,
   Menu,
   MenuDivider,
   MenuItem,
@@ -104,9 +105,8 @@ const useStyles = makeStyles({
     backgroundColor: tokens.colorBrandBackground,
   },
   channels: {
-    marginTop: tokens.spacingVerticalS,
-    paddingTop: tokens.spacingVerticalXS,
-    borderTop: `${tokens.strokeWidthThin} solid ${tokens.colorNeutralStroke2}`,
+    display: "flex",
+    justifyContent: "space-between",
   },
   // full width, so the connectors sit on the card's edges
   channelRow: {
@@ -125,22 +125,15 @@ const useStyles = makeStyles({
     color: tokens.colorNeutralForeground2,
     fontWeight: tokens.fontWeightSemibold,
   },
-  portLabel: {
-    position: "absolute",
-    top: "-1.4em",
-    whiteSpace: "nowrap",
-    color: tokens.colorNeutralForeground3,
-    fontSize: tokens.fontSizeBase100,
-  },
 });
 
 /**
- * A module on the graph: name, mute, bypass, collapse and a menu (channels, delete), volume (or the Windows volume), level meter, the
- * module type's widget, and the connectors. Collapsed, it shows only the name, mute, bypass and the connectors. While its subgraph is
- * muted or bypassed, the module's own switch shows that and is disabled.
+ * A module on the graph: name, mute, bypass, collapse and a menu (channels, delete), volume (or the Windows volume), the connectors, level
+ * meter and the module type's widget. Collapsed, it shows only the name, mute, bypass and the connectors, at the same height. While its
+ * subgraph is muted or bypassed, the module's own switch shows that and is disabled.
  *
- * With its channels shown, each port has a row for the whole port and one per channel, each with its connector; "Show channels" can't
- * be turned off while connections use single channels of the module.
+ * Each port has a row with its connector; with its channels shown, also one per channel. "Show channels" can't be turned off while
+ * connections use single channels of the module.
  */
 export function ModuleNode({ id, data, selected }: NodeProps<ModuleNodeType>) {
   const styles = useStyles();
@@ -159,19 +152,19 @@ export function ModuleNode({ id, data, selected }: NodeProps<ModuleNodeType>) {
   const bypassedBySubgraph = subgraph?.isBypassed === true;
   const Widget = widget?.component;
   const collapsed = module.isCollapsed;
-  // collapsed, the card is only as high as its header, which would crowd several ports and their labels
-  const portCount = Math.max(moduleType?.inputs.length ?? 0, moduleType?.outputs.length ?? 0);
   const widgetTitle = widget && localize(widget.title);
-  const portLabel = (port: string, ports: string[]) => (ports.length > 1 ? portName(widget, port) : undefined);
+  const ports = (
+    <ChannelPorts
+      module={module}
+      moduleType={moduleType}
+      widget={widget}
+      connections={connections}
+      channelsInUse={channelsInUse}
+    />
+  );
 
   return (
-    <Card
-      className={mergeClasses(styles.card, selected && styles.selected)}
-      style={
-        collapsed && portCount > 1 && !module.showChannels ? { minHeight: `${(portCount + 1) * 24}px` } : undefined
-      }
-      size="small"
-    >
+    <Card className={mergeClasses(styles.card, selected && styles.selected)} size="small">
       <CardHeader
         className={styles.header}
         header={
@@ -307,7 +300,7 @@ export function ModuleNode({ id, data, selected }: NodeProps<ModuleNodeType>) {
           </div>
         }
       />
-      {!collapsed && (
+      {!collapsed ? (
         <>
           <div className={mergeClasses(styles.volume, "nodrag", "nowheel")}>
             <Caption1>{t("module.volume")}</Caption1>
@@ -336,39 +329,21 @@ export function ModuleNode({ id, data, selected }: NodeProps<ModuleNodeType>) {
               />
             </Tooltip>
           </div>
+          <Divider />
+          {ports}
+          <Divider />
           <LevelMeter moduleId={module.id} />
           {Widget && (
-            <div className={mergeClasses(styles.body, "nodrag", "nowheel")}>
-              <Widget module={module} setState={(state) => update({ ...module, state } as ModuleDto)} />
-            </div>
+            <>
+              <Divider />
+              <div className={mergeClasses(styles.body, "nodrag", "nowheel")}>
+                <Widget module={module} setState={(state) => update({ ...module, state } as ModuleDto)} />
+              </div>
+            </>
           )}
         </>
-      )}
-      {module.showChannels ? (
-        <ChannelPorts module={module} moduleType={moduleType} widget={widget} connections={connections} />
       ) : (
-        <>
-          {moduleType?.inputs.map((port, index, ports) => (
-            <Port
-              key={port}
-              type="target"
-              id={port}
-              label={portLabel(port, ports)}
-              index={index}
-              count={ports.length}
-            />
-          ))}
-          {moduleType?.outputs.map((port, index, ports) => (
-            <Port
-              key={port}
-              type="source"
-              id={port}
-              label={portLabel(port, ports)}
-              index={index}
-              count={ports.length}
-            />
-          ))}
-        </>
+        ports
       )}
     </Card>
   );
@@ -380,25 +355,33 @@ interface PortRow {
   channel?: PortChannel;
 }
 
-/** The connectors of a module that shows its channels: per port, a row for the whole port and one per channel. */
+/**
+ * The connectors of a module: the inputs on the left and the outputs on the right, per port a row for the whole port and, with the
+ * channels shown, one per channel. A button between them shows or hides the channels.
+ */
 function ChannelPorts({
   module,
   moduleType,
   widget,
   connections,
+  channelsInUse,
 }: {
   module: ModuleDto;
   moduleType?: ModuleTypeDto;
   widget?: WidgetDefinition;
   connections: ConnectionDto[];
+  channelsInUse: boolean;
 }) {
   const styles = useStyles();
   const { t } = useTranslation();
   const layouts = usePortLayouts(module.id);
+  const update = useModuleUpdate();
   const rowsOf = (direction: "in" | "out", ports: string[] = []) =>
     ports.flatMap((port): PortRow[] => [
       { port },
-      ...portChannels(direction, port, module, moduleType, layouts, connections).map((channel) => ({ port, channel })),
+      ...(module.showChannels
+        ? portChannels(direction, port, module, moduleType, layouts, connections).map((channel) => ({ port, channel }))
+        : []),
     ]);
   const inputs = rowsOf("in", moduleType?.inputs);
   const outputs = rowsOf("out", moduleType?.outputs);
@@ -411,54 +394,44 @@ function ChannelPorts({
   const handleId = (row: PortRow) => portHandleId(row.port, row.channel?.index);
   useHandlesChanged([...inputs.map((row) => `in|${handleId(row)}`), ...outputs.map((row) => `out|${handleId(row)}`)]);
 
+  const renderPorts = (rows: PortRow[], type: "source" | "target") =>
+    rows.map((row) => (
+      <div key={handleId(row)} className={styles.channelRow}>
+        <span>{label(row)}</span>
+        <Port type={type} id={handleId(row)} />
+      </div>
+    ));
+  const toggleLabel = module.showChannels ? t("channels.hide") : t("channels.show");
+
   return (
     <div className={styles.channels}>
-      {Array.from({ length: Math.max(inputs.length, outputs.length) }, (_, index) => {
-        const input = inputs.at(index);
-        const output = outputs.at(index);
-        return (
-          <div key={`${input && handleId(input)}|${output && handleId(output)}`} className={styles.channelRow}>
-            <span>{input && label(input)}</span>
-            <span>{output && label(output)}</span>
-            {input && <Port type="target" id={handleId(input)} index={0} count={1} />}
-            {output && <Port type="source" id={handleId(output)} index={0} count={1} />}
-          </div>
-        );
-      })}
+      <div>{renderPorts(inputs, "target")}</div>
+      <div>
+        {/* disabledFocusable, as a disabled button gets no pointer events and would show no tooltip */}
+        <Tooltip
+          content={channelsInUse ? t("channels.inUse") : toggleLabel}
+          relationship={channelsInUse ? "description" : "label"}
+        >
+          <Button
+            size="small"
+            appearance="subtle"
+            aria-label={toggleLabel}
+            icon={module.showChannels ? <ChevronUpRegular /> : <ChevronDownRegular />}
+            onClick={() => update({ ...module, showChannels: !module.showChannels })}
+            disabledFocusable={channelsInUse}
+          />
+        </Tooltip>
+      </div>
+      <div>{renderPorts(outputs, "source")}</div>
     </div>
   );
 }
 
-/** A connector on the edge of a node, spread evenly with the others on the same side. */
-export function Port({
-  type,
-  id,
-  label,
-  index,
-  count,
-}: {
-  type: "source" | "target";
-  id: string;
-  label?: string;
-  index: number;
-  count: number;
-}) {
+/** A connector on the edge of a node, centered on its row. */
+export function Port({ type, id }: { type: "source" | "target"; id: string }) {
   const styles = useStyles();
-  const top = `${((index + 1) / (count + 1)) * 100}%`;
 
   return (
-    <Handle
-      id={id}
-      type={type}
-      position={type === "target" ? Position.Left : Position.Right}
-      className={styles.port}
-      style={{ top }}
-    >
-      {label && (
-        <span className={styles.portLabel} style={type === "target" ? { left: 0 } : { right: 0 }}>
-          {label}
-        </span>
-      )}
-    </Handle>
+    <Handle id={id} type={type} position={type === "target" ? Position.Left : Position.Right} className={styles.port} />
   );
 }

@@ -43,6 +43,23 @@ test("single channels are shown, connected and hidden again", async ({ graph, en
   await expect(graph.handle(targetNode, "Input:0")).toHaveCount(0);
 });
 
+test("the button between the ports shows and hides the channels", async ({ graph, engine }) => {
+  const module = await engine.addModule("Gain", { x: 0, y: 0 });
+  await graph.open();
+  const node = graph.node(module.id);
+
+  await node.getByRole("button", { name: "Show channels" }).click();
+
+  await expect.poll(async () => (await engine.module(module.id))?.showChannels).toBe(true);
+  await expect(graph.handle(node, "Input:1")).toBeVisible();
+
+  await node.getByRole("button", { name: "Hide channels" }).click();
+
+  await expect.poll(async () => (await engine.module(module.id))?.showChannels).toBe(false);
+  await expect(graph.handle(node, "Input:0")).toHaveCount(0);
+  await expect(graph.handle(node, "Input")).toBeVisible();
+});
+
 test("a channel connector that appears next to another one starts connections", async ({ graph, engine }) => {
   const module = await engine.addModule("Gain", { x: 0, y: 0 });
   await engine.updateModule({ ...module, showChannels: true });

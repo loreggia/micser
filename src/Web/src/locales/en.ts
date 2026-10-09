@@ -122,6 +122,7 @@ export const en = {
   },
   channels: {
     show: "Show channels",
+    hide: "Hide channels",
     inUse: "Remove the connections to single channels first",
     menu: "Channels",
     auto: "Auto",
