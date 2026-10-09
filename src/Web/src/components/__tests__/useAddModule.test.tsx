@@ -1,5 +1,12 @@
 import { Toaster } from "@fluentui/react-components";
-import { getGetModuleTypesQueryKey, type ModuleDto, type ModuleTypeDto, type WidgetDefinition } from "@micser/web-sdk";
+import {
+  getGetModuleTypesQueryKey,
+  getGetPreferencesQueryKey,
+  type ModuleDto,
+  type ModuleTypeDto,
+  type UiPreferencesDto,
+  type WidgetDefinition,
+} from "@micser/web-sdk";
 import { createTestQueryClient, testModule, TestProviders } from "@micser/web-sdk/testing";
 import type { QueryClient } from "@tanstack/react-query";
 import { ReactFlow, ReactFlowProvider, useReactFlow, type Edge, type Node } from "@xyflow/react";
@@ -31,7 +38,7 @@ let queryClient: QueryClient;
 let widgets: Map<string, WidgetDefinition>;
 let nodes: Node[];
 let edges: Edge[];
-let created: { type: string; position: { x: number; y: number }; subgraphId?: string }[];
+let created: { type: string; position: { x: number; y: number }; subgraphId?: string; showChannels: boolean }[];
 let createResponse: (request: (typeof created)[number]) => Response;
 
 function wrapper({ children }: { children: ReactNode }) {
@@ -91,7 +98,7 @@ describe("useAddModule", () => {
 
     await result.current.add("Gain", { x: 0, y: -80 });
 
-    expect(created).toEqual([{ type: "Gain", position: { x: 0, y: -80 } }]);
+    expect(created).toEqual([{ type: "Gain", position: { x: 0, y: -80 }, showChannels: false }]);
   });
 
   test("places a module of a new type with the default size", async () => {
@@ -101,7 +108,7 @@ describe("useAddModule", () => {
     await result.current.add("Compressor", { x: 0, y: -80 });
 
     // 140 px high, plus a grid step above the module
-    expect(created).toEqual([{ type: "Compressor", position: { x: 0, y: -160 } }]);
+    expect(created).toEqual([{ type: "Compressor", position: { x: 0, y: -160 }, showChannels: false }]);
   });
 
   test("places a module in a subgraph below its header, ignoring the modules outside", async () => {
@@ -110,7 +117,22 @@ describe("useAddModule", () => {
 
     await result.current.add("Gain", { x: 0, y: 0 }, "subgraph-1");
 
-    expect(created).toEqual([{ type: "Gain", position: { x: 40, y: 60 }, subgraphId: "subgraph-1" }]);
+    expect(created).toEqual([
+      { type: "Gain", position: { x: 40, y: 60 }, subgraphId: "subgraph-1", showChannels: false },
+    ]);
+  });
+
+  test("shows the channels of the module if the preference says so", async () => {
+    queryClient.setQueryData(getGetPreferencesQueryKey(), {
+      showStreamStatistics: false,
+      snapToGrid: true,
+      showChannelsByDefault: true,
+    } satisfies UiPreferencesDto);
+    const { result } = await renderAddModule();
+
+    await result.current.add("Gain", { x: 0, y: 0 });
+
+    expect(created.map((request) => request.showChannels)).toEqual([true]);
   });
 
   test("adds near the center of the view without a position", async () => {

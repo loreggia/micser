@@ -93,7 +93,13 @@ public sealed record ModuleDto<TState> : ModuleDto
 /// <param name="Type">A module type from <c>GET /api/module-types</c>.</param>
 /// <param name="Position">Relative to the subgraph's position if <paramref name="SubgraphId"/> is set.</param>
 /// <param name="SubgraphId">The subgraph to add the module to.</param>
-public sealed record CreateModuleRequest([Required] string Type, [MaxLength(100)] string? Name = null, ModulePosition? Position = null, Guid? SubgraphId = null);
+/// <param name="ShowChannels">Whether the module shows its channel connectors (<see cref="ModuleDto.ShowChannels"/>).</param>
+public sealed record CreateModuleRequest(
+    [Required] string Type,
+    [MaxLength(100)] string? Name = null,
+    ModulePosition? Position = null,
+    Guid? SubgraphId = null,
+    bool ShowChannels = false);
 
 /// <param name="Type">The name identifying the module type, e.g. "Gain".</param>
 /// <param name="Inputs">Names of the input ports.</param>

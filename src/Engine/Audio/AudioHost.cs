@@ -76,7 +76,9 @@ public sealed class AudioHost : IDisposable
         lock (_lock)
         {
             ThrowIfUnknownSubgraph(request.SubgraphId);
-            var entry = AddModuleCore(Guid.NewGuid(), definition, new ModuleSettings(request.Name, request.Position, 1f, false, false, false, false, request.SubgraphId), null);
+            var settings = new ModuleSettings(
+                request.Name, request.Position, 1f, false, false, false, false, request.SubgraphId, ShowChannels: request.ShowChannels);
+            var entry = AddModuleCore(Guid.NewGuid(), definition, settings, null);
             Persist();
             var dto = ToDto(entry);
             _notifier.ModuleChanged(dto);

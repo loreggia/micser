@@ -36,6 +36,19 @@ public class ModuleApiTests
     }
 
     [Test]
+    public async Task AddModule_ShowsChannelsIfRequested()
+    {
+        await using var factory = new EngineFactory();
+        using var client = factory.CreateAuthorizedClient();
+
+        using var response = await client.PostAsJsonAsync("/api/modules", new CreateModuleRequest("Gain", ShowChannels: true), factory.Json);
+        var module = await response.EnsureSuccessStatusCode().Content.ReadFromJsonAsync<ModuleDto>(factory.Json);
+
+        await Assert.That(module!.ShowChannels).IsTrue();
+        await Assert.That((await factory.AddModuleAsync(client, "Gain")).ShowChannels).IsFalse();
+    }
+
+    [Test]
     public async Task ModuleTypes_ListPortsAndDefaultStates()
     {
         await using var factory = new EngineFactory();

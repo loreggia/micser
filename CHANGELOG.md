@@ -12,7 +12,7 @@ from that section, and the release workflow fails without it.
 
 - Single channels can be routed on their own, e.g. the channels of an audio interface that has them all on one device. "Show channels" in a
   module's "More" menu adds a connector per channel, labelled with its speaker, below each port's connector; a connection can start or end at
-  any of them.
+  any of them. "Show the channels of new modules" in the settings turns it on for every module you add.
 - Effects and the spectrum have a "Channels" setting in their "More" menu: Auto (as before), Mono, Stereo, Quad, 5.1, 7.1 or any number up to 64.
 - A connection to a channel that a device doesn't have right now, e.g. while it's unplugged, is dashed and silent. It works again once the
   device is back.

@@ -50,6 +50,7 @@ export const de: Translations<typeof en> = {
     systemLanguage: "System ({{language}})",
     showStreamStatistics: "Stream-Statistiken anzeigen (Aussetzer und Puffergröße der Gerätemodule)",
     snapToGrid: "Module am Raster ausrichten",
+    showChannelsByDefault: "Kanäle neuer Module anzeigen",
     restartToUpdate: "Neu starten und auf {{version}} aktualisieren",
     checkingForUpdates: "Suche nach Updates…",
     checkForUpdates: "Nach Updates suchen",

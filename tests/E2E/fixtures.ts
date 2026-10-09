@@ -18,7 +18,12 @@ import { startEngine, startWeb } from "./servers";
 
 export { expect };
 
-const defaultPreferences: UiPreferencesDto = { showStreamStatistics: false, snapToGrid: true, language: null };
+const defaultPreferences: UiPreferencesDto = {
+  showStreamStatistics: false,
+  snapToGrid: true,
+  language: null,
+  showChannelsByDefault: false,
+};
 
 /**
  * The engine's API, for setting up and checking what the UI did.

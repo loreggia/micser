@@ -1140,7 +1140,8 @@
       },
       "CreateModuleRequest": {
         "required": [
-          "type"
+          "type",
+          "showChannels"
         ],
         "type": "object",
         "properties": {
@@ -1169,6 +1170,10 @@
               "string"
             ],
             "format": "uuid"
+          },
+          "showChannels": {
+            "type": "boolean",
+            "default": false
           }
         }
       },
@@ -2595,7 +2600,8 @@
       "UiPreferencesDto": {
         "required": [
           "showStreamStatistics",
-          "snapToGrid"
+          "snapToGrid",
+          "showChannelsByDefault"
         ],
         "type": "object",
         "properties": {
@@ -2612,6 +2618,10 @@
               "null",
               "string"
             ]
+          },
+          "showChannelsByDefault": {
+            "type": "boolean",
+            "default": false
           }
         }
       }

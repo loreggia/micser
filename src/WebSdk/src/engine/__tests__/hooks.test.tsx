@@ -73,14 +73,19 @@ test("useEngineConnectionState follows the connection", async () => {
 });
 
 describe("usePreferences", () => {
-  const stored: UiPreferencesDto = { showStreamStatistics: false, snapToGrid: true };
+  const stored: UiPreferencesDto = { showStreamStatistics: false, snapToGrid: true, showChannelsByDefault: false };
 
   test("has the defaults until the preferences are loaded", async () => {
     vi.stubGlobal("fetch", () => new Promise(() => {}));
 
     const { result } = await renderHook(() => usePreferences(), { wrapper });
 
-    expect(result.current[0]).toEqual({ showStreamStatistics: false, snapToGrid: true, language: null });
+    expect(result.current[0]).toEqual({
+      showStreamStatistics: false,
+      snapToGrid: true,
+      language: null,
+      showChannelsByDefault: false,
+    });
   });
 
   test("shows a change right away and saves all preferences", async () => {
@@ -107,7 +112,7 @@ describe("usePreferences", () => {
 });
 
 describe("useLanguagePreference", () => {
-  const stored: UiPreferencesDto = { showStreamStatistics: false, snapToGrid: true };
+  const stored: UiPreferencesDto = { showStreamStatistics: false, snapToGrid: true, showChannelsByDefault: false };
   afterEach(() => i18n.changeLanguage("en"));
 
   test("shows the preferred language", async () => {
