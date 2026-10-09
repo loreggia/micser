@@ -43,6 +43,28 @@ test("single channels are shown, connected and hidden again", async ({ graph, en
   await expect(graph.handle(targetNode, "Input:0")).toHaveCount(0);
 });
 
+test("a channel connector that appears next to another one starts connections", async ({ graph, engine }) => {
+  const module = await engine.addModule("Gain", { x: 0, y: 0 });
+  await engine.updateModule({ ...module, showChannels: true });
+  const first = await engine.addModule("Gain", { x: 500, y: -200 });
+  const second = await engine.addModule("Gain", { x: 500, y: 200 });
+  await graph.open();
+  const node = graph.node(module.id);
+  await expect(graph.handle(node, "Input:1")).toBeVisible();
+  const height = (await node.boundingBox())!.height;
+
+  // the output's channel 2 appears in the row of the input's channel 2, so the node keeps its size
+  await engine.connect(module, first, { sourceChannel: 1 });
+  await expect(graph.handle(node, "Output:1")).toBeVisible();
+  expect((await node.boundingBox())!.height).toBe(height);
+
+  await graph.connect(graph.handle(node, "Output:1"), graph.port(graph.node(second.id), "input"));
+
+  await expect
+    .poll(async () => (await engine.connections()).map((c) => [c.targetModuleId, c.sourceChannel]))
+    .toContainEqual([second.id, 1]);
+});
+
 test("the channel count is chosen from the menu", async ({ graph, engine }) => {
   const module = await engine.addModule("Gain", { x: 0, y: 0 });
   await engine.updateModule({ ...module, showChannels: true });
