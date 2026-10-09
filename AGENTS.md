@@ -1,6 +1,6 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to AI coding agents when working with code in this repository.
 
 Micser is a Windows audio router: a headless engine runs a graph of audio modules, a web UI edits it, and a tray shell hosts the UI. `docs/Architecture.md` describes how it is built (components, layout, dependencies, audio engine, API, UI, plugins, shell, packaging, VAC driver, testing). Read the relevant section before structural changes, and keep it up to date when the architecture changes. This file only holds commands and working rules.
 
