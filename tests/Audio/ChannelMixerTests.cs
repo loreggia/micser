@@ -12,14 +12,20 @@ public class ChannelMixerTests
         var source = new ChannelLayout(4, Speakers.Quad);
         var mixer = new ChannelMixer(source, ChannelLayout.Surround51);
 
-        await Assert.That(mixer.GetGain(source.IndexOf(Speakers.BackLeft), ChannelLayout.Surround51.IndexOf(Speakers.SideLeft))).IsEqualTo(1f);
+        await Assert
+            .That(mixer.GetGain(source.IndexOf(Speakers.BackLeft), ChannelLayout.Surround51.IndexOf(Speakers.SideLeft)))
+            .IsEqualTo(1f);
     }
 
     [Test]
     public async Task Channels_OutsideTheLayouts_AreRejected()
     {
-        await Assert.That(() => new ChannelMixer(ChannelLayout.Stereo, ChannelLayout.Stereo, 2, null)).Throws<ArgumentOutOfRangeException>();
-        await Assert.That(() => new ChannelMixer(ChannelLayout.Stereo, ChannelLayout.Stereo, null, -1)).Throws<ArgumentOutOfRangeException>();
+        await Assert
+            .That(() => new ChannelMixer(ChannelLayout.Stereo, ChannelLayout.Stereo, 2, null))
+            .Throws<ArgumentOutOfRangeException>();
+        await Assert
+            .That(() => new ChannelMixer(ChannelLayout.Stereo, ChannelLayout.Stereo, null, -1))
+            .Throws<ArgumentOutOfRangeException>();
     }
 
     [Test]

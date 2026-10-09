@@ -10,12 +10,18 @@ public sealed class EngineOptions
     /// <summary>
     /// The routing graph and settings.
     /// </summary>
-    public string ConfigPath { get; set; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Micser", "config.json");
+    public string ConfigPath { get; set; } =
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "Micser", "config.json");
 
     /// <summary>
     /// Where the engine publishes its URL and access token for the shell.
     /// </summary>
-    public string DiscoveryPath { get; set; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Micser", "engine.json");
+    public string DiscoveryPath { get; set; } =
+        Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "Micser",
+            "engine.json"
+        );
 
     /// <summary>
     /// Loads the plugins' subgraph templates as built-in templates.
@@ -30,7 +36,8 @@ public sealed class EngineOptions
     /// <summary>
     /// The plugins the user installed. They're kept across updates.
     /// </summary>
-    public string PluginsPath { get; set; } = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Micser", "plugins");
+    public string PluginsPath { get; set; } =
+        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Micser", "plugins");
 
     /// <summary>
     /// Requires the access token on /api and /hubs requests.

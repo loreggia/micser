@@ -29,7 +29,9 @@ const int RebootRequired = 3010;
 var command = args.FirstOrDefault()?.ToLowerInvariant();
 if (command == null)
 {
-    Console.Error.WriteLine("Usage: Micser.DriverUtility status | install [--count <n>] | update | set-count <n> | set-layout <cable> stereo|5.1|7.1 | sync-formats | uninstall");
+    Console.Error.WriteLine(
+        "Usage: Micser.DriverUtility status | install [--count <n>] | update | set-count <n> | set-layout <cable> stereo|5.1|7.1 | sync-formats | uninstall"
+    );
     return InvalidArguments;
 }
 
@@ -131,7 +133,12 @@ try
 
         case "set-count":
         {
-            if (args.Length < 2 || !int.TryParse(args[1], out var count) || count < 1 || count > VacDevice.MaxCableCount)
+            if (
+                args.Length < 2
+                || !int.TryParse(args[1], out var count)
+                || count < 1
+                || count > VacDevice.MaxCableCount
+            )
             {
                 Log.Error($"set-count needs a number from 1 to {VacDevice.MaxCableCount}.");
                 return InvalidArguments;
@@ -165,7 +172,13 @@ try
             }
 
             var cableCount = device.GetCableCount();
-            if (args.Length < 3 || !int.TryParse(args[1], out var cable) || cable < 1 || cable > cableCount || !CableLayouts.TryParse(args[2], out var layout))
+            if (
+                args.Length < 3
+                || !int.TryParse(args[1], out var cable)
+                || cable < 1
+                || cable > cableCount
+                || !CableLayouts.TryParse(args[2], out var layout)
+            )
             {
                 Log.Error($"set-layout needs a cable from 1 to {cableCount} and a layout: stereo, 5.1 or 7.1.");
                 return InvalidArguments;
@@ -216,11 +229,25 @@ static DriverStatus GetStatus()
     }
 
     var installedVersion = device.GetDriverVersion();
-    var updateAvailable = bundled != null && (!Version.TryParse(installedVersion, out var installed) || bundled > installed);
+    var updateAvailable =
+        bundled != null && (!Version.TryParse(installedVersion, out var installed) || bundled > installed);
     var layouts = device.GetCableLayouts();
     var endpoints = CableEndpoints.Find(device.GetInstanceId());
-    var cables = layouts.Select((layout, index) => new CableStatus(layout.GetName(), CableEndpoints.CableMatches(endpoints, index + 1, layout))).ToList();
-    return new DriverStatus(true, device.Problem, installedVersion, bundled?.ToString(), layouts.Count, updateAvailable, cables);
+    var cables = layouts
+        .Select(
+            (layout, index) =>
+                new CableStatus(layout.GetName(), CableEndpoints.CableMatches(endpoints, index + 1, layout))
+        )
+        .ToList();
+    return new DriverStatus(
+        true,
+        device.Problem,
+        installedVersion,
+        bundled?.ToString(),
+        layouts.Count,
+        updateAvailable,
+        cables
+    );
 }
 
 // Sets the cables' endpoints to the format of their layout; they appear a moment after the device restarted.

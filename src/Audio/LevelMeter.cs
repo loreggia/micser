@@ -69,13 +69,17 @@ public sealed class LevelMeter
 
             peak = MathF.Min(peak, float.MaxValue);
             var meanSquare = Volatile.Read(ref _meanSquares[c]);
-            Volatile.Write(ref _meanSquares[c], meanSquare + (_smoothing * ((sumOfSquares / buffer.FrameCount) - meanSquare)));
+            Volatile.Write(
+                ref _meanSquares[c],
+                meanSquare + (_smoothing * ((sumOfSquares / buffer.FrameCount) - meanSquare))
+            );
 
             var bits = BitConverter.SingleToInt32Bits(peak);
             int current;
-            while (bits > (current = Volatile.Read(ref _peakBits[c])) && Interlocked.CompareExchange(ref _peakBits[c], bits, current) != current)
-            {
-            }
+            while (
+                bits > (current = Volatile.Read(ref _peakBits[c]))
+                && Interlocked.CompareExchange(ref _peakBits[c], bits, current) != current
+            ) { }
         }
 
         Volatile.Write(ref _channelCount, channelCount);

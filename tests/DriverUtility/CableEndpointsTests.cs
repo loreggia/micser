@@ -80,7 +80,9 @@ public class CableLayoutsTests
     [Test]
     public async Task TryParse_ReadsTheNames()
     {
-        await Assert.That(CableLayouts.TryParse("7.1", out var surround) && surround == CableLayout.Surround71).IsTrue();
+        await Assert
+            .That(CableLayouts.TryParse("7.1", out var surround) && surround == CableLayout.Surround71)
+            .IsTrue();
         await Assert.That(CableLayouts.TryParse("Stereo", out var stereo) && stereo == CableLayout.Stereo).IsTrue();
         await Assert.That(CableLayouts.TryParse("quad", out _)).IsFalse();
     }

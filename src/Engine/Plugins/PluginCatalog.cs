@@ -7,7 +7,14 @@ namespace Micser.Engine.Plugins;
 /// <param name="Directory">The plugin folder.</param>
 /// <param name="Manifest">Null if the manifest can't be read.</param>
 /// <param name="Error">Why the plugin isn't loaded; null if it is.</param>
-public sealed record PluginInfo(string Id, string Directory, bool IsBuiltIn, PluginManifest? Manifest, string? Error, Exception? Exception = null)
+public sealed record PluginInfo(
+    string Id,
+    string Directory,
+    bool IsBuiltIn,
+    PluginManifest? Manifest,
+    string? Error,
+    Exception? Exception = null
+)
 {
     public bool IsLoaded => Error == null;
 }
@@ -41,11 +48,22 @@ public sealed class PluginCatalog
         {
             if (plugin.IsLoaded)
             {
-                logger.LogInformation("Loaded plugin {Id} {Version} from {Directory}.", plugin.Id, plugin.Manifest!.Version, plugin.Directory);
+                logger.LogInformation(
+                    "Loaded plugin {Id} {Version} from {Directory}.",
+                    plugin.Id,
+                    plugin.Manifest!.Version,
+                    plugin.Directory
+                );
             }
             else
             {
-                logger.LogError(plugin.Exception, "The plugin {Id} in {Directory} isn't loaded: {Error}", plugin.Id, plugin.Directory, plugin.Error);
+                logger.LogError(
+                    plugin.Exception,
+                    "The plugin {Id} in {Directory} isn't loaded: {Error}",
+                    plugin.Id,
+                    plugin.Directory,
+                    plugin.Error
+                );
             }
         }
     }

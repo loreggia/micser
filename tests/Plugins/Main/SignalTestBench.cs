@@ -13,7 +13,12 @@ internal sealed class SignalTestBench
     private readonly Recorder _recorder = new();
     private readonly SineSource _source;
 
-    public SignalTestBench(float frequency, float amplitude, ChannelLayout? layout = null, params EffectModule[] effects)
+    public SignalTestBench(
+        float frequency,
+        float amplitude,
+        ChannelLayout? layout = null,
+        params EffectModule[] effects
+    )
     {
         _source = new SineSource(frequency, amplitude, layout ?? ChannelLayout.Mono);
         _graph.Add(_source);

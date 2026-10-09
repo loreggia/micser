@@ -5,9 +5,17 @@ public class ShellOptionsTests
     [Test]
     public async Task Parse_AllArguments()
     {
-        var options = ShellOptions.Parse(["--engine", @"C:\engine\Micser.Engine.exe", "--ui", "http://localhost:5173", "--minimized"]);
+        var options = ShellOptions.Parse([
+            "--engine",
+            @"C:\engine\Micser.Engine.exe",
+            "--ui",
+            "http://localhost:5173",
+            "--minimized",
+        ]);
 
-        await Assert.That(options).IsEqualTo(new ShellOptions(@"C:\engine\Micser.Engine.exe", new Uri("http://localhost:5173"), true));
+        await Assert
+            .That(options)
+            .IsEqualTo(new ShellOptions(@"C:\engine\Micser.Engine.exe", new Uri("http://localhost:5173"), true));
     }
 
     [Test]

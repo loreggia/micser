@@ -58,21 +58,43 @@ internal static class StreamBuffering
     /// at any phase, so the fill before a read must cover a block plus half a period; at least one period, plus half a block for timer
     /// jitter. It grows by half a period per dropout.
     /// </summary>
-    public static AdaptiveTarget CreateCaptureTarget(MMDevice device, ProcessingFormat format, int deviceSampleRate, double? initialMilliseconds)
+    public static AdaptiveTarget CreateCaptureTarget(
+        MMDevice device,
+        ProcessingFormat format,
+        int deviceSampleRate,
+        double? initialMilliseconds
+    )
     {
         var period = GetDevicePeriod(device);
         var block = format.BlockDuration.TotalSeconds;
-        return CreateTarget(Math.Max(period, block + period / 2) + block / 2, period, format, deviceSampleRate, initialMilliseconds);
+        return CreateTarget(
+            Math.Max(period, block + period / 2) + block / 2,
+            period,
+            format,
+            deviceSampleRate,
+            initialMilliseconds
+        );
     }
 
     /// <summary>
     /// The buffer target of a render stream, in device frames: one device period, because devices take whole periods, plus half an
     /// engine block for timer jitter. It grows by half a period per dropout.
     /// </summary>
-    public static AdaptiveTarget CreateRenderTarget(MMDevice device, ProcessingFormat format, int deviceSampleRate, double? initialMilliseconds)
+    public static AdaptiveTarget CreateRenderTarget(
+        MMDevice device,
+        ProcessingFormat format,
+        int deviceSampleRate,
+        double? initialMilliseconds
+    )
     {
         var period = GetDevicePeriod(device);
-        return CreateTarget(period + format.BlockDuration.TotalSeconds / 2, period, format, deviceSampleRate, initialMilliseconds);
+        return CreateTarget(
+            period + format.BlockDuration.TotalSeconds / 2,
+            period,
+            format,
+            deviceSampleRate,
+            initialMilliseconds
+        );
     }
 
     /// <summary>
@@ -97,7 +119,9 @@ internal static class StreamBuffering
     /// </summary>
     public static bool IsStalled(long openedAt, long lastActivity, long now)
     {
-        return lastActivity == 0 ? now - openedAt > StartTimeoutMilliseconds : now - lastActivity > StallTimeoutMilliseconds;
+        return lastActivity == 0
+            ? now - openedAt > StartTimeoutMilliseconds
+            : now - lastActivity > StallTimeoutMilliseconds;
     }
 
     private static AdaptiveTarget CreateTarget(
@@ -105,7 +129,8 @@ internal static class StreamBuffering
         double periodSeconds,
         ProcessingFormat format,
         int deviceSampleRate,
-        double? initialMilliseconds)
+        double? initialMilliseconds
+    )
     {
         var blocksPerSecond = 1 / format.BlockDuration.TotalSeconds;
         return new AdaptiveTarget(
@@ -114,7 +139,8 @@ internal static class StreamBuffering
             MaxTargetSeconds * deviceSampleRate,
             (long)(HoldOffSeconds * blocksPerSecond),
             (long)(StableSeconds * blocksPerSecond),
-            initialMilliseconds / 1000 * deviceSampleRate);
+            initialMilliseconds / 1000 * deviceSampleRate
+        );
     }
 
     private static double GetDevicePeriod(MMDevice device)

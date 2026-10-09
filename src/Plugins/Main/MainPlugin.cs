@@ -1,6 +1,6 @@
+using Microsoft.Extensions.DependencyInjection;
 using Micser.Audio;
 using Micser.Plugins.Main.Modules;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Micser.Plugins.Main;
 

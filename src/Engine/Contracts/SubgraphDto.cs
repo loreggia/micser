@@ -44,7 +44,8 @@ public sealed record SubgraphDto(
     bool IsMuted = false,
     bool IsBypassed = false,
     Guid? TemplateId = null,
-    int? TemplateRevision = null);
+    int? TemplateRevision = null
+);
 
 /// <param name="Position">The frame's position; the modules' positions are converted to be relative to it.</param>
 /// <param name="ModuleIds">The modules to move into the subgraph, also from other subgraphs.</param>
@@ -53,4 +54,5 @@ public sealed record CreateSubgraphRequest(
     [Required] ModulePosition Position,
     [Required] SubgraphSize Size,
     IReadOnlyList<Guid> ModuleIds,
-    SubgraphColor Color = SubgraphColor.Green);
+    SubgraphColor Color = SubgraphColor.Green
+);

@@ -6,7 +6,12 @@ namespace Micser.DriverUtility;
 /// </summary>
 internal static class Log
 {
-    private static readonly string FilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData), "Micser", "logs", "driver-utility.log");
+    private static readonly string FilePath = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.CommonApplicationData),
+        "Micser",
+        "logs",
+        "driver-utility.log"
+    );
 
     public static void Error(string message)
     {
@@ -33,11 +38,7 @@ internal static class Log
             Directory.CreateDirectory(Path.GetDirectoryName(FilePath)!);
             File.AppendAllText(FilePath, line + Environment.NewLine);
         }
-        catch (IOException)
-        {
-        }
-        catch (UnauthorizedAccessException)
-        {
-        }
+        catch (IOException) { }
+        catch (UnauthorizedAccessException) { }
     }
 }

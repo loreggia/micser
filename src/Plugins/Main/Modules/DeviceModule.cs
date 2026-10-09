@@ -1,6 +1,6 @@
+using Microsoft.Extensions.Logging;
 using Micser.Audio;
 using Micser.Audio.Devices;
-using Microsoft.Extensions.Logging;
 
 namespace Micser.Plugins.Main.Modules;
 
@@ -134,9 +134,7 @@ public abstract class DeviceModule<TStream> : AudioModule, IModuleDataSource
     /// <summary>
     /// Called after the stream changed, before it is used by <see cref="UseStream"/>.
     /// </summary>
-    protected virtual void OnStreamChanged(TStream? stream)
-    {
-    }
+    protected virtual void OnStreamChanged(TStream? stream) { }
 
     /// <param name="bufferMilliseconds">The buffer to start with, or null for the minimum.</param>
     protected abstract TStream OpenStream(string deviceId, double? bufferMilliseconds);
@@ -278,7 +276,12 @@ public abstract class DeviceModule<TStream> : AudioModule, IModuleDataSource
             var replacement = _devices.GetDevices(Direction).FirstOrDefault(d => d.AdapterName == AdapterName);
             if (replacement != null)
             {
-                Logger.LogInformation("Switching from device {OldDevice} to {NewDevice} of adapter {Adapter}.", DeviceId, replacement.Id, AdapterName);
+                Logger.LogInformation(
+                    "Switching from device {OldDevice} to {NewDevice} of adapter {Adapter}.",
+                    DeviceId,
+                    replacement.Id,
+                    AdapterName
+                );
                 DeviceId = replacement.Id;
                 device = replacement;
                 OnStateChanged();
@@ -290,7 +293,12 @@ public abstract class DeviceModule<TStream> : AudioModule, IModuleDataSource
             try
             {
                 stream = OpenStream(device.Id, _bufferMilliseconds);
-                Logger.LogInformation("Opened {Device} ({Layout}, {SampleRate} Hz).", device.Name, stream.Layout, stream.DeviceSampleRate);
+                Logger.LogInformation(
+                    "Opened {Device} ({Layout}, {SampleRate} Hz).",
+                    device.Name,
+                    stream.Layout,
+                    stream.DeviceSampleRate
+                );
             }
             catch (Exception ex)
             {

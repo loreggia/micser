@@ -10,7 +10,13 @@ public sealed class AudioModuleDefinition
     private readonly Func<AudioModule, object> _getState;
     private readonly Action<AudioModule, object> _setState;
 
-    private AudioModuleDefinition(string type, Type moduleType, Type stateType, Func<AudioModule, object> getState, Action<AudioModule, object> setState)
+    private AudioModuleDefinition(
+        string type,
+        Type moduleType,
+        Type stateType,
+        Func<AudioModule, object> getState,
+        Action<AudioModule, object> setState
+    )
     {
         Type = type;
         ModuleType = moduleType;
@@ -39,7 +45,8 @@ public sealed class AudioModuleDefinition
             typeof(TModule),
             typeof(TState),
             module => ((TModule)module).GetState(),
-            (module, state) => ((TModule)module).SetState((TState)state));
+            (module, state) => ((TModule)module).SetState((TState)state)
+        );
     }
 
     /// <summary>

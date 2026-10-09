@@ -25,14 +25,18 @@ internal sealed partial class DriverPackage
     /// </summary>
     public static DriverPackage? Load(string directory)
     {
-        var infPath = System.IO.Directory.Exists(directory) ? System.IO.Directory.GetFiles(directory, "*.inf").FirstOrDefault() : null;
+        var infPath = System.IO.Directory.Exists(directory)
+            ? System.IO.Directory.GetFiles(directory, "*.inf").FirstOrDefault()
+            : null;
         if (infPath == null)
         {
             return null;
         }
 
         var version = ParseDriverVersion(File.ReadAllText(infPath));
-        return version != null ? new DriverPackage(Path.GetFullPath(directory), Path.GetFullPath(infPath), version) : null;
+        return version != null
+            ? new DriverPackage(Path.GetFullPath(directory), Path.GetFullPath(infPath), version)
+            : null;
     }
 
     /// <summary>

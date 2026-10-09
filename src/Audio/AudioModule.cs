@@ -45,7 +45,8 @@ public abstract class AudioModule : IDisposable
     /// <summary>
     /// Available once the module is added to a graph.
     /// </summary>
-    public ProcessingFormat Format => _format ?? throw new InvalidOperationException("The module has not been added to a graph.");
+    public ProcessingFormat Format =>
+        _format ?? throw new InvalidOperationException("The module has not been added to a graph.");
 
     public IReadOnlyList<InputPort> Inputs => _inputs;
 
@@ -72,12 +73,14 @@ public abstract class AudioModule : IDisposable
 
     public InputPort GetInput(string name)
     {
-        return _inputs.Find(p => p.Name == name) ?? throw new ArgumentException($"{GetType().Name} has no input '{name}'.", nameof(name));
+        return _inputs.Find(p => p.Name == name)
+            ?? throw new ArgumentException($"{GetType().Name} has no input '{name}'.", nameof(name));
     }
 
     public OutputPort GetOutput(string name)
     {
-        return _outputs.Find(p => p.Name == name) ?? throw new ArgumentException($"{GetType().Name} has no output '{name}'.", nameof(name));
+        return _outputs.Find(p => p.Name == name)
+            ?? throw new ArgumentException($"{GetType().Name} has no output '{name}'.", nameof(name));
     }
 
     /// <summary>
@@ -173,16 +176,12 @@ public abstract class AudioModule : IDisposable
         _meter?.Measure(buffer);
     }
 
-    protected virtual void Dispose(bool disposing)
-    {
-    }
+    protected virtual void Dispose(bool disposing) { }
 
     /// <summary>
     /// Called when the module is added to a graph; <see cref="Format"/> is available from here on.
     /// </summary>
-    protected virtual void OnAttached()
-    {
-    }
+    protected virtual void OnAttached() { }
 
     protected void OnStateChanged()
     {

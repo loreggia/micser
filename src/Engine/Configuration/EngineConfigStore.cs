@@ -1,7 +1,7 @@
 using System.Text.Json;
+using Microsoft.Extensions.Options;
 using Micser.Engine.Contracts;
 using Micser.Engine.Modules;
-using Microsoft.Extensions.Options;
 
 namespace Micser.Engine.Configuration;
 
@@ -51,7 +51,8 @@ public sealed record SubgraphTemplate(
     IReadOnlyList<ModuleDto> Modules,
     IReadOnlyList<UnavailableModule> UnavailableModules,
     IReadOnlyList<TemplateConnectionDto> Connections,
-    bool IsBuiltIn = false);
+    bool IsBuiltIn = false
+);
 
 /// <summary>
 /// Loads and saves <see cref="EngineConfiguration"/> as JSON. Saves are debounced and written atomically.
@@ -130,7 +131,9 @@ public sealed class EngineConfigStore : IDisposable
         try
         {
             using var stream = File.OpenRead(_path);
-            var file = JsonSerializer.Deserialize<ConfigurationFile>(stream, _json) ?? throw new JsonException("The file is empty.");
+            var file =
+                JsonSerializer.Deserialize<ConfigurationFile>(stream, _json)
+                ?? throw new JsonException("The file is empty.");
             if (file.Version != EngineConfiguration.CurrentVersion)
             {
                 throw new JsonException($"Unsupported version {file.Version}.");
@@ -151,7 +154,12 @@ public sealed class EngineConfigStore : IDisposable
         catch (Exception ex) when (ex is JsonException or IOException or NotSupportedException)
         {
             var backup = $"{_path}.{DateTime.Now:yyyyMMdd-HHmmss}.bak";
-            _logger.LogError(ex, "The configuration at {Path} can't be read; moving it to {Backup} and starting empty.", _path, backup);
+            _logger.LogError(
+                ex,
+                "The configuration at {Path} can't be read; moving it to {Backup} and starting empty.",
+                _path,
+                backup
+            );
             File.Move(_path, backup, overwrite: true);
             return new EngineConfiguration();
         }
@@ -165,7 +173,10 @@ public sealed class EngineConfigStore : IDisposable
     public List<SubgraphTemplate> ReadPluginTemplates(string path)
     {
         using var stream = File.OpenRead(path);
-        return ReadTemplates(JsonSerializer.Deserialize<List<TemplateFile>>(stream, _json) ?? throw new JsonException("The file is empty."));
+        return ReadTemplates(
+            JsonSerializer.Deserialize<List<TemplateFile>>(stream, _json)
+                ?? throw new JsonException("The file is empty.")
+        );
     }
 
     /// <summary>
@@ -191,7 +202,9 @@ public sealed class EngineConfigStore : IDisposable
     /// <summary>
     /// Reads modules, keeping those of unknown types as they are and skipping invalid ones.
     /// </summary>
-    private (List<ModuleDto> Modules, List<UnavailableModule> UnavailableModules) ReadModules(IEnumerable<JsonElement> elements)
+    private (List<ModuleDto> Modules, List<UnavailableModule> UnavailableModules) ReadModules(
+        IEnumerable<JsonElement> elements
+    )
     {
         var modules = new List<ModuleDto>();
         var unavailableModules = new List<UnavailableModule>();
@@ -199,7 +212,11 @@ public sealed class EngineConfigStore : IDisposable
         {
             if (TryReadUnavailable(element) is { } unavailable)
             {
-                _logger.LogWarning("Keeping module {Id} of the unknown type {Type}; its plugin isn't loaded.", unavailable.Id, unavailable.Type);
+                _logger.LogWarning(
+                    "Keeping module {Id} of the unknown type {Type}; its plugin isn't loaded.",
+                    unavailable.Id,
+                    unavailable.Type
+                );
                 unavailableModules.Add(unavailable);
                 continue;
             }
@@ -223,15 +240,33 @@ public sealed class EngineConfigStore : IDisposable
         foreach (var template in templates)
         {
             var (modules, unavailableModules) = ReadModules(template.Modules);
-            result.Add(new SubgraphTemplate(template.Id, template.Name, template.Revision, template.Color, template.Size, modules, unavailableModules, template.Connections));
+            result.Add(
+                new SubgraphTemplate(
+                    template.Id,
+                    template.Name,
+                    template.Revision,
+                    template.Color,
+                    template.Size,
+                    modules,
+                    unavailableModules,
+                    template.Connections
+                )
+            );
         }
 
         return result;
     }
 
-    private List<JsonElement> SerializeModules(IEnumerable<ModuleDto> modules, IEnumerable<UnavailableModule> unavailableModules)
+    private List<JsonElement> SerializeModules(
+        IEnumerable<ModuleDto> modules,
+        IEnumerable<UnavailableModule> unavailableModules
+    )
     {
-        return [.. modules.Select(m => JsonSerializer.SerializeToElement(m, _json)), .. unavailableModules.Select(m => m.Element)];
+        return
+        [
+            .. modules.Select(m => JsonSerializer.SerializeToElement(m, _json)),
+            .. unavailableModules.Select(m => m.Element),
+        ];
     }
 
     /// <summary>
@@ -239,12 +274,16 @@ public sealed class EngineConfigStore : IDisposable
     /// </summary>
     private UnavailableModule? TryReadUnavailable(JsonElement element)
     {
-        return element.ValueKind == JsonValueKind.Object
-            && element.TryGetProperty("type", out var type) && type.ValueKind == JsonValueKind.String
+        return
+            element.ValueKind == JsonValueKind.Object
+            && element.TryGetProperty("type", out var type)
+            && type.ValueKind == JsonValueKind.String
             && _catalog.TryGetDefinition(type.GetString()!) == null
-            && element.TryGetProperty("id", out var id) && id.ValueKind == JsonValueKind.String && id.TryGetGuid(out var guid)
-                ? new UnavailableModule(guid, type.GetString()!, element.Clone())
-                : null;
+            && element.TryGetProperty("id", out var id)
+            && id.ValueKind == JsonValueKind.String
+            && id.TryGetGuid(out var guid)
+            ? new UnavailableModule(guid, type.GetString()!, element.Clone())
+            : null;
     }
 
     private void Write(EngineConfiguration configuration)
@@ -260,16 +299,19 @@ public sealed class EngineConfigStore : IDisposable
                 Preferences = configuration.Preferences,
                 Settings = configuration.Settings,
                 Subgraphs = configuration.Subgraphs,
-                Templates = [.. configuration.Templates.Select(t => new TemplateFile
-                {
-                    Id = t.Id,
-                    Name = t.Name,
-                    Revision = t.Revision,
-                    Color = t.Color,
-                    Size = t.Size,
-                    Modules = SerializeModules(t.Modules, t.UnavailableModules),
-                    Connections = [.. t.Connections],
-                })],
+                Templates =
+                [
+                    .. configuration.Templates.Select(t => new TemplateFile
+                    {
+                        Id = t.Id,
+                        Name = t.Name,
+                        Revision = t.Revision,
+                        Color = t.Color,
+                        Size = t.Size,
+                        Modules = SerializeModules(t.Modules, t.UnavailableModules),
+                        Connections = [.. t.Connections],
+                    }),
+                ],
                 Version = configuration.Version,
             };
 

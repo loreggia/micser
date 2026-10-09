@@ -28,7 +28,11 @@ internal sealed unsafe class ResumeNotification : IDisposable
             Context = GCHandle.ToIntPtr(_self),
         };
 
-        var result = NativeMethods.PowerRegisterSuspendResumeNotification(NativeMethods.DeviceNotifyCallback, _parameters, out _registration);
+        var result = NativeMethods.PowerRegisterSuspendResumeNotification(
+            NativeMethods.DeviceNotifyCallback,
+            _parameters,
+            out _registration
+        );
         if (result != 0)
         {
             Marshal.FreeHGlobal(_parameters);
@@ -53,7 +57,10 @@ internal sealed unsafe class ResumeNotification : IDisposable
     private static uint OnPowerEvent(nint context, uint type, nint setting)
     {
         // sent on every resume, also without user input; the callback must return quickly
-        if (type == NativeMethods.PbtApmResumeAutomatic && GCHandle.FromIntPtr(context).Target is ResumeNotification notification)
+        if (
+            type == NativeMethods.PbtApmResumeAutomatic
+            && GCHandle.FromIntPtr(context).Target is ResumeNotification notification
+        )
         {
             ThreadPool.QueueUserWorkItem(_ => notification._onResumed());
         }

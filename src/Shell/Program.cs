@@ -12,13 +12,19 @@ internal static class Program
     private static int Main(string[] args)
     {
         // first, so Velopack's install, update and uninstall runs exit here
-        VelopackApp.Build()
+        VelopackApp
+            .Build()
             .OnAfterInstallFastCallback(InstallHooks.AfterInstall)
             .OnBeforeUpdateFastCallback(InstallHooks.BeforeUpdate)
             .OnBeforeUninstallFastCallback(InstallHooks.BeforeUninstall)
             .Run();
 
-        using var activation = new EventWaitHandle(false, EventResetMode.AutoReset, ActivationEventName, out var isFirstInstance);
+        using var activation = new EventWaitHandle(
+            false,
+            EventResetMode.AutoReset,
+            ActivationEventName,
+            out var isFirstInstance
+        );
         if (!isFirstInstance)
         {
             activation.Set();
@@ -27,9 +33,15 @@ internal static class Program
 
         Log.Logger = new LoggerConfiguration()
             .WriteTo.File(
-                Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Micser", "logs", "shell-.log"),
+                Path.Combine(
+                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                    "Micser",
+                    "logs",
+                    "shell-.log"
+                ),
                 rollingInterval: RollingInterval.Day,
-                retainedFileCountLimit: 7)
+                retainedFileCountLimit: 7
+            )
             .CreateLogger();
 
         try
@@ -41,7 +53,12 @@ internal static class Program
             }
             catch (Exception ex) when (ex is ArgumentException or UriFormatException)
             {
-                MessageBox.Show(ex.Message + "\n\nUsage: Micser.Shell [--engine <path>] [--ui <url>] [--minimized]", "Micser", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(
+                    ex.Message + "\n\nUsage: Micser.Shell [--engine <path>] [--ui <url>] [--minimized]",
+                    "Micser",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error
+                );
                 return 1;
             }
 
@@ -55,7 +72,11 @@ internal static class Program
 
             using var http = new HttpClient();
             var enginePath = options.EnginePath ?? Path.Combine(AppContext.BaseDirectory, "Micser.Engine.exe");
-            using var supervisor = new EngineSupervisor(new EngineLocator(EngineLocator.DefaultDiscoveryPath, http), http, enginePath);
+            using var supervisor = new EngineSupervisor(
+                new EngineLocator(EngineLocator.DefaultDiscoveryPath, http),
+                http,
+                enginePath
+            );
 
             using var updates = Updater.Create() is { } updater ? new UpdateController(updater, supervisor) : null;
             var driver = DriverController.Create(supervisor);
@@ -71,7 +92,8 @@ internal static class Program
                 string.Format(Strings.Culture, Strings.FatalError, ex.Message),
                 "Micser",
                 MessageBoxButtons.OK,
-                MessageBoxIcon.Error);
+                MessageBoxIcon.Error
+            );
             return 1;
         }
         finally

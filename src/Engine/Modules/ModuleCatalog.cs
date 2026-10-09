@@ -11,7 +11,10 @@ namespace Micser.Engine.Modules;
 /// </summary>
 public sealed class ModuleCatalog
 {
-    private static readonly MethodInfo CreateDtoMethod = typeof(ModuleCatalog).GetMethod(nameof(CreateDtoCore), BindingFlags.NonPublic | BindingFlags.Static)!;
+    private static readonly MethodInfo CreateDtoMethod = typeof(ModuleCatalog).GetMethod(
+        nameof(CreateDtoCore),
+        BindingFlags.NonPublic | BindingFlags.Static
+    )!;
 
     private readonly Dictionary<Type, AudioModuleDefinition> _byDtoType = [];
     private readonly Dictionary<string, AudioModuleDefinition> _byType = new(StringComparer.Ordinal);
@@ -24,15 +27,21 @@ public sealed class ModuleCatalog
             var dtoType = typeof(ModuleDto<>).MakeGenericType(definition.StateType);
             if (!_byType.TryAdd(definition.Type, definition))
             {
-                throw new InvalidOperationException($"The module type '{definition.Type}' is registered more than once.");
+                throw new InvalidOperationException(
+                    $"The module type '{definition.Type}' is registered more than once."
+                );
             }
 
             if (!_byDtoType.TryAdd(dtoType, definition))
             {
-                throw new InvalidOperationException($"The module types '{_byDtoType[dtoType].Type}' and '{definition.Type}' share the state type {definition.StateType.Name}.");
+                throw new InvalidOperationException(
+                    $"The module types '{_byDtoType[dtoType].Type}' and '{definition.Type}' share the state type {definition.StateType.Name}."
+                );
             }
 
-            _dtoFactories[definition.StateType] = CreateDtoMethod.MakeGenericMethod(definition.StateType).CreateDelegate<Func<Guid, ModuleSettings, object, ModuleDto>>();
+            _dtoFactories[definition.StateType] = CreateDtoMethod
+                .MakeGenericMethod(definition.StateType)
+                .CreateDelegate<Func<Guid, ModuleSettings, object, ModuleDto>>();
         }
     }
 
@@ -52,7 +61,12 @@ public sealed class ModuleCatalog
         typeInfo.PolymorphismOptions = new JsonPolymorphismOptions
         {
             TypeDiscriminatorPropertyName = "type",
-            UnknownDerivedTypeHandling = System.Text.Json.Serialization.JsonUnknownDerivedTypeHandling.FailSerialization,
+            UnknownDerivedTypeHandling = System
+                .Text
+                .Json
+                .Serialization
+                .JsonUnknownDerivedTypeHandling
+                .FailSerialization,
         };
 
         foreach (var (dtoType, definition) in _byDtoType)
@@ -115,7 +129,8 @@ public sealed record ModuleSettings(
     Guid? SubgraphId,
     Guid? TemplateModuleId = null,
     bool ShowChannels = false,
-    int? ChannelCount = null)
+    int? ChannelCount = null
+)
 {
     public static ModuleSettings From(ModuleDto dto)
     {
@@ -130,6 +145,7 @@ public sealed record ModuleSettings(
             dto.SubgraphId,
             dto.TemplateModuleId,
             dto.ShowChannels,
-            dto.ChannelCount);
+            dto.ChannelCount
+        );
     }
 }

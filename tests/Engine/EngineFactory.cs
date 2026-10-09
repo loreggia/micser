@@ -1,16 +1,16 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http.Connections;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
 using Micser.Audio.Devices;
 using Micser.Engine.Contracts;
 using Micser.Engine.Modules;
 using Micser.Engine.Security;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http.Connections;
-using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.AspNetCore.TestHost;
-using Microsoft.AspNetCore.SignalR.Client;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Micser.Engine.Tests;
 
@@ -72,13 +72,18 @@ internal sealed class EngineFactory : WebApplicationFactory<Program>
     public HubConnection CreateHubConnection()
     {
         return new HubConnectionBuilder()
-            .WithUrl(new Uri(Server.BaseAddress, "/hubs/engine"), options =>
-            {
-                options.HttpMessageHandlerFactory = _ => Server.CreateHandler();
-                options.Transports = HttpTransportType.LongPolling;
-                options.AccessTokenProvider = () => Task.FromResult<string?>(Token);
-            })
-            .AddJsonProtocol(options => EngineJson.Configure(options.PayloadSerializerOptions, Services.GetRequiredService<ModuleCatalog>()))
+            .WithUrl(
+                new Uri(Server.BaseAddress, "/hubs/engine"),
+                options =>
+                {
+                    options.HttpMessageHandlerFactory = _ => Server.CreateHandler();
+                    options.Transports = HttpTransportType.LongPolling;
+                    options.AccessTokenProvider = () => Task.FromResult<string?>(Token);
+                }
+            )
+            .AddJsonProtocol(options =>
+                EngineJson.Configure(options.PayloadSerializerOptions, Services.GetRequiredService<ModuleCatalog>())
+            )
             .Build();
     }
 
@@ -120,14 +125,17 @@ internal static class HubClientExtensions
     {
         var result = new TaskCompletionSource<T>(TaskCreationOptions.RunContinuationsAsynchronously);
         IDisposable? subscription = null;
-        subscription = connection.On<T>(method, value =>
-        {
-            if (predicate?.Invoke(value) ?? true)
+        subscription = connection.On<T>(
+            method,
+            value =>
             {
-                result.TrySetResult(value);
-                subscription?.Dispose();
+                if (predicate?.Invoke(value) ?? true)
+                {
+                    result.TrySetResult(value);
+                    subscription?.Dispose();
+                }
             }
-        });
+        );
 
         return result.Task.WaitAsync(TimeSpan.FromSeconds(10));
     }

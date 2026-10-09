@@ -67,7 +67,17 @@ internal sealed unsafe class VacDevice : IDisposable
         var device = new VacDevice(deviceInfoSet, new SP_DEVINFO_DATA { cbSize = (uint)sizeof(SP_DEVINFO_DATA) });
         try
         {
-            if (!SetupDiCreateDeviceInfo(deviceInfoSet, new string(className), ref classGuid, null, 0, DICD_GENERATE_ID, ref device._deviceInfoData))
+            if (
+                !SetupDiCreateDeviceInfo(
+                    deviceInfoSet,
+                    new string(className),
+                    ref classGuid,
+                    null,
+                    0,
+                    DICD_GENERATE_ID,
+                    ref device._deviceInfoData
+                )
+            )
             {
                 throw LastError(nameof(SetupDiCreateDeviceInfo));
             }
@@ -76,7 +86,15 @@ internal sealed unsafe class VacDevice : IDisposable
             var hardwareIds = Encoding.Unicode.GetBytes(HardwareId + "\0\0");
             fixed (byte* buffer = hardwareIds)
             {
-                if (!SetupDiSetDeviceRegistryProperty(deviceInfoSet, ref device._deviceInfoData, SPDRP_HARDWAREID, buffer, (uint)hardwareIds.Length))
+                if (
+                    !SetupDiSetDeviceRegistryProperty(
+                        deviceInfoSet,
+                        ref device._deviceInfoData,
+                        SPDRP_HARDWAREID,
+                        buffer,
+                        (uint)hardwareIds.Length
+                    )
+                )
                 {
                     throw LastError(nameof(SetupDiSetDeviceRegistryProperty));
                 }
@@ -88,7 +106,15 @@ internal sealed unsafe class VacDevice : IDisposable
             }
 
             // before the driver starts; the INF keeps an existing value
-            var key = SetupDiCreateDevRegKey(deviceInfoSet, ref device._deviceInfoData, DICS_FLAG_GLOBAL, 0, DIREG_DEV, 0, null);
+            var key = SetupDiCreateDevRegKey(
+                deviceInfoSet,
+                ref device._deviceInfoData,
+                DICS_FLAG_GLOBAL,
+                0,
+                DIREG_DEV,
+                0,
+                null
+            );
             if (key == InvalidHandle)
             {
                 throw LastError(nameof(SetupDiCreateDevRegKey));
@@ -110,13 +136,16 @@ internal sealed unsafe class VacDevice : IDisposable
     public static VacDevice? Find()
     {
         VacDevice? found = null;
-        ForEach(device =>
-        {
-            if (found == null || (!found.IsPresent && device.IsPresent))
+        ForEach(
+            device =>
             {
-                found = device;
-            }
-        }, out var deviceInfoSet);
+                if (found == null || (!found.IsPresent && device.IsPresent))
+                {
+                    found = device;
+                }
+            },
+            out var deviceInfoSet
+        );
 
         if (found == null)
         {
@@ -133,15 +162,18 @@ internal sealed unsafe class VacDevice : IDisposable
     public static bool RemoveAll()
     {
         var needReboot = false;
-        ForEach(device =>
-        {
-            if (!DiUninstallDevice(0, device._deviceInfoSet, ref device._deviceInfoData, 0, out var reboot))
+        ForEach(
+            device =>
             {
-                throw LastError(nameof(DiUninstallDevice));
-            }
+                if (!DiUninstallDevice(0, device._deviceInfoSet, ref device._deviceInfoData, 0, out var reboot))
+                {
+                    throw LastError(nameof(DiUninstallDevice));
+                }
 
-            needReboot |= reboot;
-        }, out var deviceInfoSet);
+                needReboot |= reboot;
+            },
+            out var deviceInfoSet
+        );
 
         SetupDiDestroyDeviceInfoList(deviceInfoSet);
         return needReboot;
@@ -162,7 +194,12 @@ internal sealed unsafe class VacDevice : IDisposable
     /// </summary>
     public IReadOnlyList<CableLayout> GetCableLayouts()
     {
-        return [.. Enumerable.Range(1, GetCableCount()).Select(cable => CableLayouts.FromChannels(ReadValue(GetCableLayoutValue(cable))))];
+        return
+        [
+            .. Enumerable
+                .Range(1, GetCableCount())
+                .Select(cable => CableLayouts.FromChannels(ReadValue(GetCableLayoutValue(cable)))),
+        ];
     }
 
     /// <summary>
@@ -170,7 +207,8 @@ internal sealed unsafe class VacDevice : IDisposable
     /// </summary>
     public string GetInstanceId()
     {
-        return GetStringProperty(InstanceIdKey) ?? throw new InvalidOperationException("The device has no instance ID.");
+        return GetStringProperty(InstanceIdKey)
+            ?? throw new InvalidOperationException("The device has no instance ID.");
     }
 
     /// <summary>
@@ -194,12 +232,23 @@ internal sealed unsafe class VacDevice : IDisposable
     {
         var parameters = new SP_PROPCHANGE_PARAMS
         {
-            ClassInstallHeader = new SP_CLASSINSTALL_HEADER { cbSize = (uint)sizeof(SP_CLASSINSTALL_HEADER), InstallFunction = DIF_PROPERTYCHANGE },
+            ClassInstallHeader = new SP_CLASSINSTALL_HEADER
+            {
+                cbSize = (uint)sizeof(SP_CLASSINSTALL_HEADER),
+                InstallFunction = DIF_PROPERTYCHANGE,
+            },
             StateChange = DICS_PROPCHANGE,
             Scope = DICS_FLAG_GLOBAL,
         };
 
-        if (!SetupDiSetClassInstallParams(_deviceInfoSet, ref _deviceInfoData, ref parameters, (uint)sizeof(SP_PROPCHANGE_PARAMS)))
+        if (
+            !SetupDiSetClassInstallParams(
+                _deviceInfoSet,
+                ref _deviceInfoData,
+                ref parameters,
+                (uint)sizeof(SP_PROPCHANGE_PARAMS)
+            )
+        )
         {
             throw LastError(nameof(SetupDiSetClassInstallParams));
         }
@@ -216,7 +265,14 @@ internal sealed unsafe class VacDevice : IDisposable
 
     public void SetCableCount(int count)
     {
-        var key = SetupDiOpenDevRegKey(_deviceInfoSet, ref _deviceInfoData, DICS_FLAG_GLOBAL, 0, DIREG_DEV, KEY_SET_VALUE);
+        var key = SetupDiOpenDevRegKey(
+            _deviceInfoSet,
+            ref _deviceInfoData,
+            DICS_FLAG_GLOBAL,
+            0,
+            DIREG_DEV,
+            KEY_SET_VALUE
+        );
         if (key == InvalidHandle)
         {
             throw LastError(nameof(SetupDiOpenDevRegKey));
@@ -230,7 +286,14 @@ internal sealed unsafe class VacDevice : IDisposable
     /// </summary>
     public void SetCableLayout(int cable, CableLayout layout)
     {
-        var key = SetupDiOpenDevRegKey(_deviceInfoSet, ref _deviceInfoData, DICS_FLAG_GLOBAL, 0, DIREG_DEV, KEY_SET_VALUE);
+        var key = SetupDiOpenDevRegKey(
+            _deviceInfoSet,
+            ref _deviceInfoData,
+            DICS_FLAG_GLOBAL,
+            0,
+            DIREG_DEV,
+            KEY_SET_VALUE
+        );
         if (key == InvalidHandle)
         {
             throw LastError(nameof(SetupDiOpenDevRegKey));
@@ -302,7 +365,18 @@ internal sealed unsafe class VacDevice : IDisposable
         var buffer = new byte[size];
         fixed (byte* pointer = buffer)
         {
-            if (!SetupDiGetDeviceProperty(_deviceInfoSet, ref _deviceInfoData, propertyKey, out _, pointer, size, out _, 0))
+            if (
+                !SetupDiGetDeviceProperty(
+                    _deviceInfoSet,
+                    ref _deviceInfoData,
+                    propertyKey,
+                    out _,
+                    pointer,
+                    size,
+                    out _,
+                    0
+                )
+            )
             {
                 return null;
             }
@@ -313,7 +387,15 @@ internal sealed unsafe class VacDevice : IDisposable
 
     private bool HasHardwareId()
     {
-        SetupDiGetDeviceRegistryProperty(_deviceInfoSet, ref _deviceInfoData, SPDRP_HARDWAREID, out _, null, 0, out var size);
+        SetupDiGetDeviceRegistryProperty(
+            _deviceInfoSet,
+            ref _deviceInfoData,
+            SPDRP_HARDWAREID,
+            out _,
+            null,
+            0,
+            out var size
+        );
         if (size == 0)
         {
             return false;
@@ -322,7 +404,17 @@ internal sealed unsafe class VacDevice : IDisposable
         var buffer = new byte[size];
         fixed (byte* pointer = buffer)
         {
-            if (!SetupDiGetDeviceRegistryProperty(_deviceInfoSet, ref _deviceInfoData, SPDRP_HARDWAREID, out _, pointer, size, out _))
+            if (
+                !SetupDiGetDeviceRegistryProperty(
+                    _deviceInfoSet,
+                    ref _deviceInfoData,
+                    SPDRP_HARDWAREID,
+                    out _,
+                    pointer,
+                    size,
+                    out _
+                )
+            )
             {
                 return false;
             }

@@ -9,7 +9,12 @@ namespace Micser.Audio;
 /// </summary>
 /// <param name="SourceChannel">The only source channel taken, or null for all.</param>
 /// <param name="TargetChannel">The only target channel added to, or null for all.</param>
-public sealed record Connection(OutputPort Source, InputPort Target, int? SourceChannel = null, int? TargetChannel = null);
+public sealed record Connection(
+    OutputPort Source,
+    InputPort Target,
+    int? SourceChannel = null,
+    int? TargetChannel = null
+);
 
 /// <summary>
 /// The modules and connections that are processed together, one block per <see cref="Process"/> call.
@@ -238,16 +243,17 @@ public sealed class AudioGraph
 
     private void Rebuild()
     {
-        var dependencies = _modules.ToDictionary(m => m, m => _connections.Count(c => c.Target.Module == m && c.Source.Module != m));
+        var dependencies = _modules.ToDictionary(
+            m => m,
+            m => _connections.Count(c => c.Target.Module == m && c.Source.Module != m)
+        );
         var ready = new Queue<AudioModule>(_modules.Where(m => dependencies[m] == 0));
         var steps = new List<Step>(_modules.Count);
 
         while (ready.TryDequeue(out var module))
         {
             var inputs = module.Inputs.ToArray();
-            var sources = inputs
-                .Select(input => _connections.Where(c => c.Target == input).ToArray())
-                .ToArray();
+            var sources = inputs.Select(input => _connections.Where(c => c.Target == input).ToArray()).ToArray();
             steps.Add(new Step(module, inputs, sources));
 
             foreach (var connection in _connections.Where(c => c.Source.Module == module))

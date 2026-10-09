@@ -19,14 +19,16 @@ public static class PluginFiles
                 continue;
             }
 
-            app.UseStaticFiles(new StaticFileOptions
-            {
-                FileProvider = new PhysicalFileProvider(directory),
-                RequestPath = $"/plugins/{plugin.Id}" + (webFolder.Length > 0 ? "/" + webFolder : ""),
+            app.UseStaticFiles(
+                new StaticFileOptions
+                {
+                    FileProvider = new PhysicalFileProvider(directory),
+                    RequestPath = $"/plugins/{plugin.Id}" + (webFolder.Length > 0 ? "/" + webFolder : ""),
 
-                // plugins change with engine restarts, which keep the URL
-                OnPrepareResponse = context => context.Context.Response.Headers.CacheControl = "no-cache",
-            });
+                    // plugins change with engine restarts, which keep the URL
+                    OnPrepareResponse = context => context.Context.Response.Headers.CacheControl = "no-cache",
+                }
+            );
         }
 
         return app;

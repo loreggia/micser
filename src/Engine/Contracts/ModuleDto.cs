@@ -99,7 +99,8 @@ public sealed record CreateModuleRequest(
     [MaxLength(100)] string? Name = null,
     ModulePosition? Position = null,
     Guid? SubgraphId = null,
-    bool ShowChannels = false);
+    bool ShowChannels = false
+);
 
 /// <param name="Type">The name identifying the module type, e.g. "Gain".</param>
 /// <param name="Inputs">Names of the input ports.</param>
@@ -118,4 +119,5 @@ public sealed record ModuleTypeDto(
     object DefaultState,
     bool SupportsBypass,
     bool SupportsChannelCount,
-    IReadOnlyList<string> ChannelCountInputs);
+    IReadOnlyList<string> ChannelCountInputs
+);

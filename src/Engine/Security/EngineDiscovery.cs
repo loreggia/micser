@@ -22,7 +22,13 @@ public sealed class EngineDiscovery : IHostedService
     private readonly IServer _server;
     private bool _written;
 
-    public EngineDiscovery(IServer server, IHostApplicationLifetime lifetime, EngineAccess access, IOptions<EngineOptions> options, ILogger<EngineDiscovery> logger)
+    public EngineDiscovery(
+        IServer server,
+        IHostApplicationLifetime lifetime,
+        EngineAccess access,
+        IOptions<EngineOptions> options,
+        ILogger<EngineDiscovery> logger
+    )
     {
         _server = server;
         _lifetime = lifetime;

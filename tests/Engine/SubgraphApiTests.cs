@@ -1,10 +1,10 @@
 using System.Net;
 using System.Net.Http.Json;
+using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.Extensions.DependencyInjection;
 using Micser.Audio;
 using Micser.Engine.Audio;
 using Micser.Engine.Contracts;
-using Microsoft.AspNetCore.SignalR.Client;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Micser.Engine.Tests;
 
@@ -16,7 +16,11 @@ public class SubgraphApiTests
         await using var factory = new EngineFactory();
         using var client = factory.CreateAuthorizedClient();
 
-        using var response = await client.PostAsJsonAsync("/api/modules", new CreateModuleRequest("Gain", SubgraphId: Guid.NewGuid()), factory.Json);
+        using var response = await client.PostAsJsonAsync(
+            "/api/modules",
+            new CreateModuleRequest("Gain", SubgraphId: Guid.NewGuid()),
+            factory.Json
+        );
 
         await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.BadRequest);
     }
@@ -64,7 +68,8 @@ public class SubgraphApiTests
         using var response = await client.PostAsJsonAsync(
             "/api/subgraphs",
             new CreateSubgraphRequest(null, new ModulePosition(0, 0), new SubgraphSize(100, 100), [Guid.NewGuid()]),
-            factory.Json);
+            factory.Json
+        );
 
         await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.BadRequest);
     }
@@ -76,7 +81,17 @@ public class SubgraphApiTests
         using var client = factory.CreateAuthorizedClient();
         var gain = await AddModuleAtAsync(factory, client, "Gain", new ModulePosition(100, 200));
         var subgraph = await CreateSubgraphAsync(factory, client, new ModulePosition(80, 150), gain.Id);
-        (await client.PutAsJsonAsync($"/api/subgraphs/{subgraph.Id}", subgraph with { Position = new ModulePosition(0, 0), IsMuted = true }, factory.Json)).EnsureSuccessStatusCode();
+        (
+            await client.PutAsJsonAsync(
+                $"/api/subgraphs/{subgraph.Id}",
+                subgraph with
+                {
+                    Position = new ModulePosition(0, 0),
+                    IsMuted = true,
+                },
+                factory.Json
+            )
+        ).EnsureSuccessStatusCode();
         await using var hub = factory.CreateHubConnection();
         var removed = hub.NextAsync<Guid>("SubgraphRemoved");
         await hub.StartAsync();
@@ -100,7 +115,12 @@ public class SubgraphApiTests
         using var client = factory.CreateAuthorizedClient();
         var member = await AddModuleAtAsync(factory, client, "Gain", new ModulePosition(100, 200));
         var outside = await AddModuleAtAsync(factory, client, "Gain", new ModulePosition(600, 200));
-        (await client.PostAsJsonAsync("/api/connections", new CreateConnectionRequest(member.Id, "Output", outside.Id, "Input"))).EnsureSuccessStatusCode();
+        (
+            await client.PostAsJsonAsync(
+                "/api/connections",
+                new CreateConnectionRequest(member.Id, "Output", outside.Id, "Input")
+            )
+        ).EnsureSuccessStatusCode();
         var subgraph = await CreateSubgraphAsync(factory, client, new ModulePosition(80, 150), member.Id);
         await using var hub = factory.CreateHubConnection();
         var moduleRemoved = hub.NextAsync<Guid>("ModuleRemoved");
@@ -131,8 +151,16 @@ public class SubgraphApiTests
                 using var client = factory.CreateAuthorizedClient();
                 gain = await AddModuleAtAsync(factory, client, "Gain", new ModulePosition(100, 200));
                 subgraph = await CreateSubgraphAsync(factory, client, new ModulePosition(80, 150), gain.Id);
-                subgraph = subgraph with { Name = "Mic chain", Color = SubgraphColor.Teal, IsCollapsed = true, IsMuted = true };
-                (await client.PutAsJsonAsync($"/api/subgraphs/{subgraph.Id}", subgraph, factory.Json)).EnsureSuccessStatusCode();
+                subgraph = subgraph with
+                {
+                    Name = "Mic chain",
+                    Color = SubgraphColor.Teal,
+                    IsCollapsed = true,
+                    IsMuted = true,
+                };
+                (
+                    await client.PutAsJsonAsync($"/api/subgraphs/{subgraph.Id}", subgraph, factory.Json)
+                ).EnsureSuccessStatusCode();
             }
 
             await using (var factory = new EngineFactory(directory))
@@ -159,7 +187,14 @@ public class SubgraphApiTests
         using var client = factory.CreateAuthorizedClient();
         var gain = await factory.AddModuleAsync(client, "Gain");
 
-        using var response = await client.PutAsJsonAsync($"/api/modules/{gain.Id}", gain with { SubgraphId = Guid.NewGuid() }, factory.Json);
+        using var response = await client.PutAsJsonAsync(
+            $"/api/modules/{gain.Id}",
+            gain with
+            {
+                SubgraphId = Guid.NewGuid(),
+            },
+            factory.Json
+        );
 
         await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.BadRequest);
     }
@@ -176,7 +211,15 @@ public class SubgraphApiTests
         var changed = hub.NextAsync<SubgraphDto>("SubgraphChanged", s => s.IsMuted);
         await hub.StartAsync();
 
-        using var response = await client.PutAsJsonAsync($"/api/subgraphs/{subgraph.Id}", subgraph with { IsMuted = true, IsBypassed = true }, factory.Json);
+        using var response = await client.PutAsJsonAsync(
+            $"/api/subgraphs/{subgraph.Id}",
+            subgraph with
+            {
+                IsMuted = true,
+                IsBypassed = true,
+            },
+            factory.Json
+        );
         var module = await client.GetFromJsonAsync<ModuleDto>($"/api/modules/{gain.Id}", factory.Json);
         var audioModule = (EffectModule)GetAudioModule(factory, gain.Id);
 
@@ -187,22 +230,42 @@ public class SubgraphApiTests
         await Assert.That(audioModule.IsMuted).IsTrue();
         await Assert.That(audioModule.IsBypassed).IsTrue();
 
-        (await client.PutAsJsonAsync($"/api/subgraphs/{subgraph.Id}", subgraph, factory.Json)).EnsureSuccessStatusCode();
+        (
+            await client.PutAsJsonAsync($"/api/subgraphs/{subgraph.Id}", subgraph, factory.Json)
+        ).EnsureSuccessStatusCode();
 
         await Assert.That(audioModule.IsMuted).IsFalse();
         await Assert.That(audioModule.IsBypassed).IsFalse();
     }
 
-    private static async Task<ModuleDto> AddModuleAtAsync(EngineFactory factory, HttpClient client, string type, ModulePosition position)
+    private static async Task<ModuleDto> AddModuleAtAsync(
+        EngineFactory factory,
+        HttpClient client,
+        string type,
+        ModulePosition position
+    )
     {
-        var response = await client.PostAsJsonAsync("/api/modules", new CreateModuleRequest(type, Position: position), factory.Json);
+        var response = await client.PostAsJsonAsync(
+            "/api/modules",
+            new CreateModuleRequest(type, Position: position),
+            factory.Json
+        );
         response.EnsureSuccessStatusCode();
         return (await response.Content.ReadFromJsonAsync<ModuleDto>(factory.Json))!;
     }
 
-    private static async Task<SubgraphDto> CreateSubgraphAsync(EngineFactory factory, HttpClient client, ModulePosition position, params Guid[] moduleIds)
+    private static async Task<SubgraphDto> CreateSubgraphAsync(
+        EngineFactory factory,
+        HttpClient client,
+        ModulePosition position,
+        params Guid[] moduleIds
+    )
     {
-        var response = await client.PostAsJsonAsync("/api/subgraphs", new CreateSubgraphRequest(null, position, new SubgraphSize(400, 300), moduleIds), factory.Json);
+        var response = await client.PostAsJsonAsync(
+            "/api/subgraphs",
+            new CreateSubgraphRequest(null, position, new SubgraphSize(400, 300), moduleIds),
+            factory.Json
+        );
         response.EnsureSuccessStatusCode();
         return (await response.Content.ReadFromJsonAsync<SubgraphDto>(factory.Json))!;
     }

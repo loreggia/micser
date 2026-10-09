@@ -45,18 +45,26 @@ internal static class CableEndpoints
     {
         var enumerator = CoreAudio.CreateDeviceEnumerator();
         var policy = CoreAudio.CreatePolicyConfig();
-        Marshal.ThrowExceptionForHR(enumerator.EnumAudioEndpoints(CoreAudio.DataFlowAll, CoreAudio.DeviceStateActive, out var devices));
+        Marshal.ThrowExceptionForHR(
+            enumerator.EnumAudioEndpoints(CoreAudio.DataFlowAll, CoreAudio.DeviceStateActive, out var devices)
+        );
         Marshal.ThrowExceptionForHR(devices.GetCount(out var count));
 
         var endpoints = new List<CableEndpoint>();
         for (uint i = 0; i < count; i++)
         {
-            if (devices.Item(i, out var device) != 0 || device.OpenPropertyStore(CoreAudio.StorageRead, out var properties) != 0)
+            if (
+                devices.Item(i, out var device) != 0
+                || device.OpenPropertyStore(CoreAudio.StorageRead, out var properties) != 0
+            )
             {
                 continue;
             }
 
-            if (ReadString(properties, FilterKey) is not { } filter || !TryParseFilterPath(filter, deviceInstanceId, out var cable, out var isCapture))
+            if (
+                ReadString(properties, FilterKey) is not { } filter
+                || !TryParseFilterPath(filter, deviceInstanceId, out var cable, out var isCapture)
+            )
             {
                 continue;
             }
@@ -109,7 +117,9 @@ internal static class CableEndpoints
                 var result = SetDeviceFormat(policy, endpoint.Id, layout);
                 if (result == 0)
                 {
-                    Log.Info($"Set the format of {endpoint.Name} to {layout.GetName()} (was {endpoint.Channels?.ToString() ?? "unknown"} channels)");
+                    Log.Info(
+                        $"Set the format of {endpoint.Name} to {layout.GetName()} (was {endpoint.Channels?.ToString() ?? "unknown"} channels)"
+                    );
                 }
                 else
                 {
@@ -147,7 +157,11 @@ internal static class CableEndpoints
         var reference = value[(separator + 1)..];
         foreach (var (prefix, capture) in new[] { ("waverender", false), ("wavecapture", true) })
         {
-            if (reference.StartsWith(prefix, StringComparison.OrdinalIgnoreCase) && int.TryParse(reference[prefix.Length..], out cable) && cable > 0)
+            if (
+                reference.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)
+                && int.TryParse(reference[prefix.Length..], out cable)
+                && cable > 0
+            )
             {
                 isCapture = capture;
                 return true;

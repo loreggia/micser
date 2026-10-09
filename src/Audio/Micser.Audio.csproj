@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
   <PropertyGroup>
     <TargetFramework>net10.0-windows</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -15,5 +14,4 @@
     <InternalsVisibleTo Include="Micser.Audio.Tests" />
     <InternalsVisibleTo Include="Micser.Plugins.Main.Tests" />
   </ItemGroup>
-
 </Project>

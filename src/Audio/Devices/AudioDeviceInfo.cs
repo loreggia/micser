@@ -28,7 +28,8 @@ public sealed record AudioDeviceInfo(
     DeviceDirection Direction,
     bool IsActive,
     ChannelLayout? Layout,
-    int? SampleRate);
+    int? SampleRate
+);
 
 public sealed class AudioDeviceChangedEventArgs : EventArgs
 {

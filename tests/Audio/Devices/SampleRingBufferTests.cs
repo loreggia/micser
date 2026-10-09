@@ -52,7 +52,9 @@ public class SampleRingBufferTests
         var read = ring.Read(destination);
 
         await Assert.That(read).IsEqualTo(3);
-        await Assert.That(destination).IsEquivalentTo(new float[] { 4, 5, 6 }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert
+            .That(destination)
+            .IsEquivalentTo(new float[] { 4, 5, 6 }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
     }
 
     [Test]

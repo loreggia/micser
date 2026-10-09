@@ -14,7 +14,16 @@ public class SystemVolumeTests
         factory.SystemVolume.Set(new SystemVolumeLevel(0.5f, true));
         var module = await factory.AddModuleAsync(client, "Gain");
 
-        using var response = await client.PutAsJsonAsync($"/api/modules/{module.Id}", module with { UseSystemVolume = true, Volume = 0.2f, IsMuted = false }, factory.Json);
+        using var response = await client.PutAsJsonAsync(
+            $"/api/modules/{module.Id}",
+            module with
+            {
+                UseSystemVolume = true,
+                Volume = 0.2f,
+                IsMuted = false,
+            },
+            factory.Json
+        );
         var updated = await response.Content.ReadFromJsonAsync<ModuleDto>(factory.Json);
 
         await Assert.That(updated!.UseSystemVolume).IsTrue();
@@ -29,7 +38,16 @@ public class SystemVolumeTests
         using var client = factory.CreateAuthorizedClient();
         var following = await factory.AddModuleAsync(client, "Gain");
         var other = await factory.AddModuleAsync(client, "Gain");
-        (await client.PutAsJsonAsync($"/api/modules/{following.Id}", following with { UseSystemVolume = true }, factory.Json)).EnsureSuccessStatusCode();
+        (
+            await client.PutAsJsonAsync(
+                $"/api/modules/{following.Id}",
+                following with
+                {
+                    UseSystemVolume = true,
+                },
+                factory.Json
+            )
+        ).EnsureSuccessStatusCode();
         await using var hub = factory.CreateHubConnection();
         // the change from the PUT above may still be queued for sending when the hub connects
         var changed = hub.NextAsync<ModuleDto>("ModuleChanged", m => m.Id == following.Id && m.Volume == 0.25f);

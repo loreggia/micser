@@ -31,7 +31,10 @@ public class AccessTests
     {
         await using var factory = new EngineFactory();
         using var client = factory.CreateClient();
-        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", "wrong");
+        client.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue(
+            "Bearer",
+            "wrong"
+        );
 
         using var response = await client.GetAsync("/api/modules");
 

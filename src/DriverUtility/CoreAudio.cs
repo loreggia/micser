@@ -20,7 +20,10 @@ internal static partial class CoreAudio
 
     public static IMMDeviceEnumerator CreateDeviceEnumerator()
     {
-        return Create<IMMDeviceEnumerator>(new Guid("bcde0395-e52f-467c-8e3d-c4579291692e"), typeof(IMMDeviceEnumerator).GUID);
+        return Create<IMMDeviceEnumerator>(
+            new Guid("bcde0395-e52f-467c-8e3d-c4579291692e"),
+            typeof(IMMDeviceEnumerator).GUID
+        );
     }
 
     /// <summary>
@@ -53,7 +56,13 @@ internal static partial class CoreAudio
     }
 
     [LibraryImport("ole32.dll")]
-    private static partial int CoCreateInstance(in Guid classId, nint outer, uint context, in Guid interfaceId, out nint instance);
+    private static partial int CoCreateInstance(
+        in Guid classId,
+        nint outer,
+        uint context,
+        in Guid interfaceId,
+        out nint instance
+    );
 
     [LibraryImport("ole32.dll")]
     private static partial int CoInitializeEx(nint reserved, uint coInit);

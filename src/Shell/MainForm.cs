@@ -28,7 +28,14 @@ internal sealed class MainForm : Form
 
     /// <param name="updates">Null if this copy can't update (development).</param>
     /// <param name="driver">Null if this copy has no driver package.</param>
-    public MainForm(EngineSupervisor supervisor, UpdateController? updates, DriverController? driver, ShellLanguage language, Uri? uiUrl, string settingsPath)
+    public MainForm(
+        EngineSupervisor supervisor,
+        UpdateController? updates,
+        DriverController? driver,
+        ShellLanguage language,
+        Uri? uiUrl,
+        string settingsPath
+    )
     {
         _supervisor = supervisor;
         _updates = updates;
@@ -79,7 +86,13 @@ internal sealed class MainForm : Form
     protected override void OnFormClosing(FormClosingEventArgs e)
     {
         var bounds = WindowState == FormWindowState.Normal ? Bounds : RestoreBounds;
-        new WindowSettings(bounds.X, bounds.Y, bounds.Width, bounds.Height, WindowState == FormWindowState.Maximized).Save(_settingsPath);
+        new WindowSettings(
+            bounds.X,
+            bounds.Y,
+            bounds.Width,
+            bounds.Height,
+            WindowState == FormWindowState.Maximized
+        ).Save(_settingsPath);
         base.OnFormClosing(e);
     }
 
@@ -89,7 +102,11 @@ internal sealed class MainForm : Form
 
         try
         {
-            var userDataFolder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Micser", "WebView2");
+            var userDataFolder = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                "Micser",
+                "WebView2"
+            );
             var environment = await CoreWebView2Environment.CreateAsync(userDataFolder: userDataFolder);
             await _webView.EnsureCoreWebView2Async(environment);
         }
@@ -101,7 +118,8 @@ internal sealed class MainForm : Form
                 Strings.WebView2Missing,
                 "Micser",
                 MessageBoxButtons.YesNo,
-                MessageBoxIcon.Warning);
+                MessageBoxIcon.Warning
+            );
             if (answer == DialogResult.Yes)
             {
                 OpenInBrowser(new Uri(WebView2DownloadUrl));
@@ -170,7 +188,11 @@ internal sealed class MainForm : Form
     private async void OnWebMessageReceived(object? sender, CoreWebView2WebMessageReceivedEventArgs e)
     {
         // only the UI the window loaded may control the shell
-        if (_shownUrl == null || !Uri.TryCreate(e.Source, UriKind.Absolute, out var source) || source.GetLeftPart(UriPartial.Authority) != _shownUrl.GetLeftPart(UriPartial.Authority))
+        if (
+            _shownUrl == null
+            || !Uri.TryCreate(e.Source, UriKind.Absolute, out var source)
+            || source.GetLeftPart(UriPartial.Authority) != _shownUrl.GetLeftPart(UriPartial.Authority)
+        )
         {
             return;
         }
@@ -185,11 +207,26 @@ internal sealed class MainForm : Form
         {
             var message = JsonDocument.Parse(e.WebMessageAsJson).RootElement;
             type = message.GetProperty("type").GetString();
-            cableCount = message.TryGetProperty("cableCount", out var count) && count.TryGetInt32(out var value) ? value : 1;
-            cable = message.TryGetProperty("cable", out var cableValue) && cableValue.TryGetInt32(out var number) ? number : 0;
-            layout = message.TryGetProperty("layout", out var layoutValue) && layoutValue.ValueKind == JsonValueKind.String ? layoutValue.GetString() : null;
-            language = message.TryGetProperty("language", out var languageValue) && languageValue.ValueKind == JsonValueKind.String ? languageValue.GetString() : null;
-            version = message.TryGetProperty("version", out var versionValue) && versionValue.ValueKind == JsonValueKind.String ? versionValue.GetString() : null;
+            cableCount =
+                message.TryGetProperty("cableCount", out var count) && count.TryGetInt32(out var value) ? value : 1;
+            cable =
+                message.TryGetProperty("cable", out var cableValue) && cableValue.TryGetInt32(out var number)
+                    ? number
+                    : 0;
+            layout =
+                message.TryGetProperty("layout", out var layoutValue) && layoutValue.ValueKind == JsonValueKind.String
+                    ? layoutValue.GetString()
+                    : null;
+            language =
+                message.TryGetProperty("language", out var languageValue)
+                && languageValue.ValueKind == JsonValueKind.String
+                    ? languageValue.GetString()
+                    : null;
+            version =
+                message.TryGetProperty("version", out var versionValue)
+                && versionValue.ValueKind == JsonValueKind.String
+                    ? versionValue.GetString()
+                    : null;
         }
         catch (Exception ex) when (ex is JsonException or KeyNotFoundException or InvalidOperationException)
         {
@@ -204,7 +241,9 @@ internal sealed class MainForm : Form
                 break;
             case "checkForUpdates" when _updates != null:
                 var result = await _updates.CheckAsync();
-                PostMessage(new { type = "updateCheck", result = JsonNamingPolicy.CamelCase.ConvertName(result.ToString()) });
+                PostMessage(
+                    new { type = "updateCheck", result = JsonNamingPolicy.CamelCase.ConvertName(result.ToString()) }
+                );
                 break;
             case "installUpdate" when _updates != null:
                 await _updates.InstallAsync(minimized: false);
@@ -231,7 +270,14 @@ internal sealed class MainForm : Form
                 _language.SetPreference(language);
                 break;
             case "getReleaseNotes" when version != null:
-                PostMessage(new { type = "releaseNotes", version, notes = _updates?.GetReleaseNotes(version) });
+                PostMessage(
+                    new
+                    {
+                        type = "releaseNotes",
+                        version,
+                        notes = _updates?.GetReleaseNotes(version),
+                    }
+                );
                 break;
         }
     }
@@ -250,16 +296,18 @@ internal sealed class MainForm : Form
     /// </summary>
     private void PostState()
     {
-        PostMessage(new
-        {
-            type = "state",
-            version = _updates?.CurrentVersion.ToString(),
-            canUpdate = _updates != null,
-            isCheckingForUpdates = _updates?.IsChecking ?? false,
-            pendingUpdate = _updates?.PendingUpdate?.Version.ToString(),
-            canRestartEngine = _supervisor.CanStartEngine,
-            driver = _driver == null ? null : new { isBusy = _driver.IsBusy, status = _driver.Status },
-        });
+        PostMessage(
+            new
+            {
+                type = "state",
+                version = _updates?.CurrentVersion.ToString(),
+                canUpdate = _updates != null,
+                isCheckingForUpdates = _updates?.IsChecking ?? false,
+                pendingUpdate = _updates?.PendingUpdate?.Version.ToString(),
+                canRestartEngine = _supervisor.CanStartEngine,
+                driver = _driver == null ? null : new { isBusy = _driver.IsBusy, status = _driver.Status },
+            }
+        );
     }
 
     private void ShowDriverResult(DriverCommandResult result)

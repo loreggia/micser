@@ -7,7 +7,9 @@ public class EngineLocatorTests
     [Test]
     public async Task Find_RunningEngine_ReturnsIt()
     {
-        using var file = new TemporaryFile("""{ "url": "http://127.0.0.1:5000", "token": "secret", "processId": 42 }""");
+        using var file = new TemporaryFile(
+            """{ "url": "http://127.0.0.1:5000", "token": "secret", "processId": 42 }"""
+        );
         using var http = new HttpClient(new FakeHandler(HttpStatusCode.OK));
         var locator = new EngineLocator(file.Path, http, processId => processId == 42);
 
@@ -32,7 +34,9 @@ public class EngineLocatorTests
     public async Task Find_ProcessIsNotAnEngine_ReturnsNull()
     {
         // e.g. the discovery file of a crashed engine whose process ID was reused
-        using var file = new TemporaryFile("""{ "url": "http://127.0.0.1:5000", "token": "secret", "processId": 42 }""");
+        using var file = new TemporaryFile(
+            """{ "url": "http://127.0.0.1:5000", "token": "secret", "processId": 42 }"""
+        );
         using var http = new HttpClient(new FakeHandler(HttpStatusCode.OK));
         var locator = new EngineLocator(file.Path, http, _ => false);
 
@@ -42,7 +46,9 @@ public class EngineLocatorTests
     [Test]
     public async Task Find_HealthCheckFails_ReturnsNull()
     {
-        using var file = new TemporaryFile("""{ "url": "http://127.0.0.1:5000", "token": "secret", "processId": 42 }""");
+        using var file = new TemporaryFile(
+            """{ "url": "http://127.0.0.1:5000", "token": "secret", "processId": 42 }"""
+        );
         using var failing = new HttpClient(new FakeHandler(HttpStatusCode.ServiceUnavailable));
         using var unreachable = new HttpClient(new FakeHandler(null));
 
@@ -66,7 +72,11 @@ public class EngineLocatorTests
     public async Task Find_NoDiscoveryFile_ReturnsNull()
     {
         using var http = new HttpClient(new FakeHandler(HttpStatusCode.OK));
-        var locator = new EngineLocator(Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"), "engine.json"), http, _ => true);
+        var locator = new EngineLocator(
+            Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"), "engine.json"),
+            http,
+            _ => true
+        );
 
         await Assert.That(await locator.FindAsync()).IsNull();
     }
@@ -74,7 +84,9 @@ public class EngineLocatorTests
     [Test]
     public async Task Find_ChecksHealthEndpointOfTheEngine()
     {
-        using var file = new TemporaryFile("""{ "url": "http://127.0.0.1:5000", "token": "secret", "processId": 42 }""");
+        using var file = new TemporaryFile(
+            """{ "url": "http://127.0.0.1:5000", "token": "secret", "processId": 42 }"""
+        );
         var handler = new FakeHandler(HttpStatusCode.OK);
         using var http = new HttpClient(handler);
 
@@ -97,7 +109,10 @@ public class EngineLocatorTests
 
         public Uri? LastRequest { get; private set; }
 
-        protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        protected override Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request,
+            CancellationToken cancellationToken
+        )
         {
             LastRequest = request.RequestUri;
             return _statusCode is { } statusCode

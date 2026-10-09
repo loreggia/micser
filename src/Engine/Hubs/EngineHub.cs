@@ -1,5 +1,5 @@
-using Micser.Engine.Contracts;
 using Microsoft.AspNetCore.SignalR;
+using Micser.Engine.Contracts;
 
 namespace Micser.Engine.Hubs;
 

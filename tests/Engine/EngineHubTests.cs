@@ -1,7 +1,7 @@
 using System.Net.Http.Json;
 using System.Text.Json;
-using Micser.Engine.Contracts;
 using Microsoft.AspNetCore.SignalR.Client;
+using Micser.Engine.Contracts;
 
 namespace Micser.Engine.Tests;
 
@@ -14,14 +14,31 @@ public class EngineHubTests
         using var client = factory.CreateAuthorizedClient();
         await using var hub = factory.CreateHubConnection();
         var events = new List<string>();
-        hub.On<ModuleDto>("ModuleChanged", m => { lock (events) events.Add($"module {m.Id}"); });
-        hub.On<ConnectionDto>("ConnectionAdded", c => { lock (events) events.Add($"connection {c.Id}"); });
+        hub.On<ModuleDto>(
+            "ModuleChanged",
+            m =>
+            {
+                lock (events)
+                    events.Add($"module {m.Id}");
+            }
+        );
+        hub.On<ConnectionDto>(
+            "ConnectionAdded",
+            c =>
+            {
+                lock (events)
+                    events.Add($"connection {c.Id}");
+            }
+        );
         var removed = hub.NextAsync<Guid>("ModuleRemoved");
         await hub.StartAsync();
 
         var first = await factory.AddModuleAsync(client, "Gain");
         var second = await factory.AddModuleAsync(client, "Gain");
-        var response = await client.PostAsJsonAsync("/api/connections", new CreateConnectionRequest(first.Id, "Output", second.Id, "Input"));
+        var response = await client.PostAsJsonAsync(
+            "/api/connections",
+            new CreateConnectionRequest(first.Id, "Output", second.Id, "Input")
+        );
         var connection = await response.Content.ReadFromJsonAsync<ConnectionDto>();
         await client.DeleteAsync($"/api/modules/{first.Id}");
 
@@ -32,9 +49,12 @@ public class EngineHubTests
             received = [.. events];
         }
 
-        await Assert.That(received).IsEquivalentTo(
-            [$"module {first.Id}", $"module {second.Id}", $"connection {connection!.Id}"],
-            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert
+            .That(received)
+            .IsEquivalentTo(
+                [$"module {first.Id}", $"module {second.Id}", $"connection {connection!.Id}"],
+                TUnit.Assertions.Enums.CollectionOrdering.Matching
+            );
     }
 
     [Test]
@@ -45,24 +65,33 @@ public class EngineHubTests
         var gain = await factory.AddModuleAsync(client, "Gain");
         await using var hub = factory.CreateHubConnection();
         var pushed = hub.NextAsync<ModulePortLayoutsDto[]>(
-            "PortLayoutsChanged", layouts => layouts.Any(l => l.ModuleId == gain.Id && l.Outputs["Output"].ChannelCount == 6));
+            "PortLayoutsChanged",
+            layouts => layouts.Any(l => l.ModuleId == gain.Id && l.Outputs["Output"].ChannelCount == 6)
+        );
         await hub.StartAsync();
 
-        (await client.PutAsJsonAsync($"/api/modules/{gain.Id}", gain with { ChannelCount = 6 }, factory.Json)).EnsureSuccessStatusCode();
+        (
+            await client.PutAsJsonAsync($"/api/modules/{gain.Id}", gain with { ChannelCount = 6 }, factory.Json)
+        ).EnsureSuccessStatusCode();
         var layout = (await pushed).Single(l => l.ModuleId == gain.Id);
-        var listed = (await client.GetFromJsonAsync<ModulePortLayoutsDto[]>("/api/port-layouts", factory.Json))!.Single(l => l.ModuleId == gain.Id);
+        var listed = (await client.GetFromJsonAsync<ModulePortLayoutsDto[]>("/api/port-layouts", factory.Json))!.Single(
+            l => l.ModuleId == gain.Id
+        );
 
         await Assert.That(layout.Inputs["Input"].ChannelCount).IsEqualTo(6);
-        await Assert.That(layout.Inputs["Input"].Speakers).IsEquivalentTo(
-            [
-                SpeakerPosition.FrontLeft,
-                SpeakerPosition.FrontRight,
-                SpeakerPosition.FrontCenter,
-                SpeakerPosition.LowFrequency,
-                SpeakerPosition.SideLeft,
-                SpeakerPosition.SideRight,
-            ],
-            TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert
+            .That(layout.Inputs["Input"].Speakers)
+            .IsEquivalentTo(
+                [
+                    SpeakerPosition.FrontLeft,
+                    SpeakerPosition.FrontRight,
+                    SpeakerPosition.FrontCenter,
+                    SpeakerPosition.LowFrequency,
+                    SpeakerPosition.SideLeft,
+                    SpeakerPosition.SideRight,
+                ],
+                TUnit.Assertions.Enums.CollectionOrdering.Matching
+            );
         await Assert.That(listed.Outputs["Output"].ChannelCount).IsEqualTo(6);
     }
 
@@ -74,15 +103,23 @@ public class EngineHubTests
         var gain = await factory.AddModuleAsync(client, "Gain");
         await using var hub = factory.CreateHubConnection();
         var processed = hub.NextAsync<ModulePortLayoutsDto[]>(
-            "PortLayoutsChanged", layouts => layouts.Any(l => l.ModuleId == gain.Id && l.Outputs["Output"].ChannelCount == 6));
+            "PortLayoutsChanged",
+            layouts => layouts.Any(l => l.ModuleId == gain.Id && l.Outputs["Output"].ChannelCount == 6)
+        );
         await hub.StartAsync();
-        (await client.PutAsJsonAsync($"/api/modules/{gain.Id}", gain with { ChannelCount = 6 }, factory.Json)).EnsureSuccessStatusCode();
+        (
+            await client.PutAsJsonAsync($"/api/modules/{gain.Id}", gain with { ChannelCount = 6 }, factory.Json)
+        ).EnsureSuccessStatusCode();
         await processed;
         var cleared = hub.NextAsync<ModulePortLayoutsDto[]>(
-            "PortLayoutsChanged", layouts => layouts.Any(l => l.ModuleId == gain.Id && l.Outputs["Output"].ChannelCount == 0));
+            "PortLayoutsChanged",
+            layouts => layouts.Any(l => l.ModuleId == gain.Id && l.Outputs["Output"].ChannelCount == 0)
+        );
 
         (await client.PostAsync("/api/engine/stop", null)).EnsureSuccessStatusCode();
-        var listed = (await client.GetFromJsonAsync<ModulePortLayoutsDto[]>("/api/port-layouts", factory.Json))!.Single(l => l.ModuleId == gain.Id);
+        var listed = (await client.GetFromJsonAsync<ModulePortLayoutsDto[]>("/api/port-layouts", factory.Json))!.Single(
+            l => l.ModuleId == gain.Id
+        );
         await cleared;
 
         await Assert.That(listed.Inputs["Input"].ChannelCount).IsEqualTo(0);
@@ -97,13 +134,16 @@ public class EngineHubTests
         var spectrum = await factory.AddModuleAsync(client, "Spectrum");
         await using var hub = factory.CreateHubConnection();
         var data = new TaskCompletionSource<JsonElement>(TaskCreationOptions.RunContinuationsAsynchronously);
-        hub.On<Guid, JsonElement>("ModuleData", (id, value) =>
-        {
-            if (id == spectrum.Id)
+        hub.On<Guid, JsonElement>(
+            "ModuleData",
+            (id, value) =>
             {
-                data.TrySetResult(value);
+                if (id == spectrum.Id)
+                {
+                    data.TrySetResult(value);
+                }
             }
-        });
+        );
         await hub.StartAsync();
 
         await hub.InvokeAsync("Subscribe", spectrum.Id);

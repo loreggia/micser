@@ -20,7 +20,12 @@ public class AudioGraphTests
     {
         var sink = new RecordingSink();
 
-        await Assert.That(() => { sink.ChannelCount = channelCount; }).Throws<ArgumentOutOfRangeException>();
+        await Assert
+            .That(() =>
+            {
+                sink.ChannelCount = channelCount;
+            })
+            .Throws<ArgumentOutOfRangeException>();
     }
 
     [Test]
@@ -67,7 +72,9 @@ public class AudioGraphTests
         graph.Connect(source.Output, sink.Input);
 
         await Assert.That(() => graph.Connect(source.Output, sink.Input)).Throws<InvalidOperationException>();
-        await Assert.That(() => graph.Connect(source.Output, new RecordingSink().Input)).Throws<InvalidOperationException>();
+        await Assert
+            .That(() => graph.Connect(source.Output, new RecordingSink().Input))
+            .Throws<InvalidOperationException>();
     }
 
     [Test]
@@ -81,8 +88,12 @@ public class AudioGraphTests
         graph.Add(source);
         graph.Add(sink);
 
-        await Assert.That(() => graph.Connect(source.Output, sink.Input, channel)).Throws<ArgumentOutOfRangeException>();
-        await Assert.That(() => graph.Connect(source.Output, sink.Input, null, channel)).Throws<ArgumentOutOfRangeException>();
+        await Assert
+            .That(() => graph.Connect(source.Output, sink.Input, channel))
+            .Throws<ArgumentOutOfRangeException>();
+        await Assert
+            .That(() => graph.Connect(source.Output, sink.Input, null, channel))
+            .Throws<ArgumentOutOfRangeException>();
         await Assert.That(graph.Connections).IsEmpty();
     }
 
@@ -272,7 +283,12 @@ public class AudioGraphTests
 
         graph.Process();
 
-        await Assert.That(order).IsEquivalentTo(new AudioModule[] { source, effect, sink }, TUnit.Assertions.Enums.CollectionOrdering.Matching);
+        await Assert
+            .That(order)
+            .IsEquivalentTo(
+                new AudioModule[] { source, effect, sink },
+                TUnit.Assertions.Enums.CollectionOrdering.Matching
+            );
         await Assert.That(sink.Last!.GetChannel(1)[0]).IsEqualTo(2f);
     }
 

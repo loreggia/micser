@@ -33,19 +33,27 @@ internal sealed class TrayApplicationContext : ApplicationContext
         UpdateController? updates,
         DriverController? driver,
         ShellLanguage language,
-        EventWaitHandle activation)
+        EventWaitHandle activation
+    )
     {
         _options = options;
         _supervisor = supervisor;
         _updates = updates;
         _driver = driver;
         _language = language;
-        _uiContext = SynchronizationContext.Current ?? throw new InvalidOperationException("Create the tray on the UI thread.");
+        _uiContext =
+            SynchronizationContext.Current ?? throw new InvalidOperationException("Create the tray on the UI thread.");
         _autostart = new Autostart(Application.ExecutablePath);
 
-        _autostartItem = new ToolStripMenuItem("", null, (_, _) => ToggleAutostart()) { Checked = _autostart.IsEnabled };
+        _autostartItem = new ToolStripMenuItem("", null, (_, _) => ToggleAutostart())
+        {
+            Checked = _autostart.IsEnabled,
+        };
         var menu = new ContextMenuStrip();
-        _openItem = new ToolStripMenuItem("", null, (_, _) => ShowMainForm()) { Font = new Font(menu.Font, FontStyle.Bold) };
+        _openItem = new ToolStripMenuItem("", null, (_, _) => ShowMainForm())
+        {
+            Font = new Font(menu.Font, FontStyle.Bold),
+        };
         menu.Items.Add(_openItem);
         menu.Items.Add(new ToolStripSeparator());
         menu.Items.Add(_autostartItem);
@@ -85,7 +93,12 @@ internal sealed class TrayApplicationContext : ApplicationContext
         _supervisor.Start();
 
         _activationRegistration = ThreadPool.RegisterWaitForSingleObject(
-            activation, (_, _) => _uiContext.Post(_ => ShowMainForm(), null), null, Timeout.Infinite, executeOnlyOnce: false);
+            activation,
+            (_, _) => _uiContext.Post(_ => ShowMainForm(), null),
+            null,
+            Timeout.Infinite,
+            executeOnlyOnce: false
+        );
 
         if (!options.StartMinimized)
         {
@@ -122,7 +135,11 @@ internal sealed class TrayApplicationContext : ApplicationContext
         _exitItem.ToolTipText = Strings.TrayExitHint;
         if (_updates != null)
         {
-            _updateItem!.ToolTipText = string.Format(_language.Culture, Strings.TrayInstalledVersion, _updates.CurrentVersion);
+            _updateItem!.ToolTipText = string.Format(
+                _language.Culture,
+                Strings.TrayInstalledVersion,
+                _updates.CurrentVersion
+            );
             UpdateUpdateItem();
         }
 
@@ -148,7 +165,12 @@ internal sealed class TrayApplicationContext : ApplicationContext
         switch (await _updates.CheckAsync())
         {
             case UpdateCheckResult.UpToDate:
-                _notifyIcon.ShowBalloonTip(5000, "Micser", string.Format(_language.Culture, Strings.UpToDate, _updates.CurrentVersion), ToolTipIcon.Info);
+                _notifyIcon.ShowBalloonTip(
+                    5000,
+                    "Micser",
+                    string.Format(_language.Culture, Strings.UpToDate, _updates.CurrentVersion),
+                    ToolTipIcon.Info
+                );
                 break;
             case UpdateCheckResult.Failed:
                 _notifyIcon.ShowBalloonTip(5000, "Micser", Strings.UpdateCheckFailed, ToolTipIcon.Warning);
@@ -168,7 +190,8 @@ internal sealed class TrayApplicationContext : ApplicationContext
                 5000,
                 string.Format(_language.Culture, Strings.UpdateReadyTitle, version),
                 Strings.UpdateReadyText,
-                ToolTipIcon.Info);
+                ToolTipIcon.Info
+            );
         }
 
         _notifiedVersion = version;
@@ -178,7 +201,14 @@ internal sealed class TrayApplicationContext : ApplicationContext
     {
         if (_mainForm == null || _mainForm.IsDisposed)
         {
-            _mainForm = new MainForm(_supervisor, _updates, _driver, _language, _options.UiUrl, WindowSettings.DefaultPath);
+            _mainForm = new MainForm(
+                _supervisor,
+                _updates,
+                _driver,
+                _language,
+                _options.UiUrl,
+                WindowSettings.DefaultPath
+            );
         }
 
         _mainForm.Show();
@@ -196,7 +226,8 @@ internal sealed class TrayApplicationContext : ApplicationContext
         {
             _autostart.SetEnabled(!_autostart.IsEnabled);
         }
-        catch (Exception ex) when (ex is UnauthorizedAccessException or System.Security.SecurityException or IOException)
+        catch (Exception ex)
+            when (ex is UnauthorizedAccessException or System.Security.SecurityException or IOException)
         {
             Log.Error(ex, "Changing the autostart entry failed.");
         }
@@ -221,7 +252,8 @@ internal sealed class TrayApplicationContext : ApplicationContext
                 10000,
                 "Micser",
                 string.Format(_language.Culture, Strings.DriverUpdateAvailable, status.BundledVersion),
-                ToolTipIcon.Info);
+                ToolTipIcon.Info
+            );
         }
     }
 
@@ -240,7 +272,8 @@ internal sealed class TrayApplicationContext : ApplicationContext
     {
         var pending = _updates!.PendingUpdate;
         _updateItem!.Enabled = !_updates.IsChecking;
-        _updateItem.Text = _updates.IsChecking ? Strings.TrayCheckingForUpdates
+        _updateItem.Text =
+            _updates.IsChecking ? Strings.TrayCheckingForUpdates
             : pending != null ? string.Format(_language.Culture, Strings.TrayRestartToUpdate, pending.Version)
             : Strings.TrayCheckForUpdates;
     }

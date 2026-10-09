@@ -21,29 +21,78 @@ public sealed class ChannelMixer
 
     private static readonly Dictionary<Speakers, (Speakers Speaker, float Gain)[][]> Fallbacks = new()
     {
-        [Speakers.FrontCenter] = [[(Speakers.FrontLeft, MinusThreeDb), (Speakers.FrontRight, MinusThreeDb)]],
-        [Speakers.FrontLeftOfCenter] = [[(Speakers.FrontLeft, 1f)]],
-        [Speakers.FrontRightOfCenter] = [[(Speakers.FrontRight, 1f)]],
-        [Speakers.SideLeft] = [[(Speakers.BackLeft, 1f)], [(Speakers.FrontLeft, MinusThreeDb)]],
-        [Speakers.SideRight] = [[(Speakers.BackRight, 1f)], [(Speakers.FrontRight, MinusThreeDb)]],
-        [Speakers.BackLeft] = [[(Speakers.SideLeft, 1f)], [(Speakers.FrontLeft, MinusThreeDb)]],
-        [Speakers.BackRight] = [[(Speakers.SideRight, 1f)], [(Speakers.FrontRight, MinusThreeDb)]],
-        [Speakers.BackCenter] = [[(Speakers.BackLeft, MinusThreeDb), (Speakers.BackRight, MinusThreeDb)], [(Speakers.SideLeft, MinusThreeDb), (Speakers.SideRight, MinusThreeDb)], [(Speakers.FrontLeft, 0.5f), (Speakers.FrontRight, 0.5f)]],
-        [Speakers.TopCenter] = [[(Speakers.FrontLeft, 0.5f), (Speakers.FrontRight, 0.5f)]],
-        [Speakers.TopFrontLeft] = [[(Speakers.FrontLeft, 1f)]],
-        [Speakers.TopFrontCenter] = [[(Speakers.FrontCenter, 1f)]],
-        [Speakers.TopFrontRight] = [[(Speakers.FrontRight, 1f)]],
-        [Speakers.TopBackLeft] = [[(Speakers.BackLeft, 1f)]],
-        [Speakers.TopBackCenter] = [[(Speakers.BackCenter, 1f)]],
-        [Speakers.TopBackRight] = [[(Speakers.BackRight, 1f)]],
+        [Speakers.FrontCenter] =
+        [
+            [(Speakers.FrontLeft, MinusThreeDb), (Speakers.FrontRight, MinusThreeDb)],
+        ],
+        [Speakers.FrontLeftOfCenter] =
+        [
+            [(Speakers.FrontLeft, 1f)],
+        ],
+        [Speakers.FrontRightOfCenter] =
+        [
+            [(Speakers.FrontRight, 1f)],
+        ],
+        [Speakers.SideLeft] =
+        [
+            [(Speakers.BackLeft, 1f)],
+            [(Speakers.FrontLeft, MinusThreeDb)],
+        ],
+        [Speakers.SideRight] =
+        [
+            [(Speakers.BackRight, 1f)],
+            [(Speakers.FrontRight, MinusThreeDb)],
+        ],
+        [Speakers.BackLeft] =
+        [
+            [(Speakers.SideLeft, 1f)],
+            [(Speakers.FrontLeft, MinusThreeDb)],
+        ],
+        [Speakers.BackRight] =
+        [
+            [(Speakers.SideRight, 1f)],
+            [(Speakers.FrontRight, MinusThreeDb)],
+        ],
+        [Speakers.BackCenter] =
+        [
+            [(Speakers.BackLeft, MinusThreeDb), (Speakers.BackRight, MinusThreeDb)],
+            [(Speakers.SideLeft, MinusThreeDb), (Speakers.SideRight, MinusThreeDb)],
+            [(Speakers.FrontLeft, 0.5f), (Speakers.FrontRight, 0.5f)],
+        ],
+        [Speakers.TopCenter] =
+        [
+            [(Speakers.FrontLeft, 0.5f), (Speakers.FrontRight, 0.5f)],
+        ],
+        [Speakers.TopFrontLeft] =
+        [
+            [(Speakers.FrontLeft, 1f)],
+        ],
+        [Speakers.TopFrontCenter] =
+        [
+            [(Speakers.FrontCenter, 1f)],
+        ],
+        [Speakers.TopFrontRight] =
+        [
+            [(Speakers.FrontRight, 1f)],
+        ],
+        [Speakers.TopBackLeft] =
+        [
+            [(Speakers.BackLeft, 1f)],
+        ],
+        [Speakers.TopBackCenter] =
+        [
+            [(Speakers.BackCenter, 1f)],
+        ],
+        [Speakers.TopBackRight] =
+        [
+            [(Speakers.BackRight, 1f)],
+        ],
     };
 
     private readonly Route[] _routes;
 
     public ChannelMixer(ChannelLayout source, ChannelLayout target)
-        : this(source, target, null, null)
-    {
-    }
+        : this(source, target, null, null) { }
 
     /// <summary>
     /// Creates a mixer that takes only one channel of the source, or adds only to one channel of the target. A source channel is mixed in
@@ -56,13 +105,21 @@ public sealed class ChannelMixer
         if (sourceChannel is { } sourceIndex)
         {
             ArgumentOutOfRangeException.ThrowIfNegative(sourceIndex, nameof(sourceChannel));
-            ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(sourceIndex, source.ChannelCount, nameof(sourceChannel));
+            ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(
+                sourceIndex,
+                source.ChannelCount,
+                nameof(sourceChannel)
+            );
         }
 
         if (targetChannel is { } targetIndex)
         {
             ArgumentOutOfRangeException.ThrowIfNegative(targetIndex, nameof(targetChannel));
-            ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(targetIndex, target.ChannelCount, nameof(targetChannel));
+            ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(
+                targetIndex,
+                target.ChannelCount,
+                nameof(targetChannel)
+            );
         }
 
         Source = source;
@@ -179,7 +236,8 @@ public sealed class ChannelMixer
 
     private static void AddMonoTargetRoutes(ChannelLayout source, List<Route> routes)
     {
-        var channels = Enumerable.Range(0, source.ChannelCount)
+        var channels = Enumerable
+            .Range(0, source.ChannelCount)
             .Where(c => source.GetSpeaker(c) != Speakers.LowFrequency)
             .ToArray();
 
@@ -234,7 +292,12 @@ public sealed class ChannelMixer
         return [.. routes];
     }
 
-    private static IEnumerable<(Speakers Speaker, float Gain)> Resolve(Speakers speaker, float gain, ChannelLayout target, int depth)
+    private static IEnumerable<(Speakers Speaker, float Gain)> Resolve(
+        Speakers speaker,
+        float gain,
+        ChannelLayout target,
+        int depth
+    )
     {
         if (target.IndexOf(speaker) >= 0)
         {
@@ -248,9 +311,7 @@ public sealed class ChannelMixer
 
         foreach (var alternative in alternatives)
         {
-            var resolved = alternative
-                .SelectMany(t => Resolve(t.Speaker, gain * t.Gain, target, depth + 1))
-                .ToArray();
+            var resolved = alternative.SelectMany(t => Resolve(t.Speaker, gain * t.Gain, target, depth + 1)).ToArray();
 
             if (resolved.Length > 0)
             {

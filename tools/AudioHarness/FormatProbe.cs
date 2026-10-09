@@ -18,7 +18,8 @@ internal static class FormatProbe
 
     private static readonly Guid IeeeFloatSubFormat = new("00000003-0000-0010-8000-00aa00389b71");
 
-    private static readonly AudioClientStreamFlags ConvertFlags = AudioClientStreamFlags.AutoConvertPcm | AudioClientStreamFlags.SrcDefaultQuality;
+    private static readonly AudioClientStreamFlags ConvertFlags =
+        AudioClientStreamFlags.AutoConvertPcm | AudioClientStreamFlags.SrcDefaultQuality;
 
     private static readonly WaveFormatExtensible[] Formats =
     [
@@ -63,7 +64,9 @@ internal static class FormatProbe
         const AudioClientShareMode shared = AudioClientShareMode.Shared;
         const AudioClientShareMode exclusive = AudioClientShareMode.Exclusive;
 
-        Console.WriteLine("Tone through the endpoints (1 kHz at -20 dBFS peak, -23 dBFS RMS; level and tone share of channel 1 after 0.5 s):");
+        Console.WriteLine(
+            "Tone through the endpoints (1 kHz at -20 dBFS peak, -23 dBFS RMS; level and tone share of channel 1 after 0.5 s):"
+        );
         Transfer(render, Pcm(44100, 16, 1), shared, capture, Pcm(16000, 16, 1), shared);
         Transfer(render, Float(48000, 6), shared, capture, Float(48000, 2), shared);
         Transfer(render, Pcm(44100, 24, 2), shared, capture, Pcm(96000, 24, 2), shared);
@@ -102,17 +105,33 @@ internal static class FormatProbe
     /// Plays a counting sequence at the render format's valid bits on every channel and checks that each captured frame holds the next
     /// value, compared at the smaller of the two formats' valid bits (a conversion to more bits keeps every value).
     /// </summary>
-    private static void BitExact(MMDevice render, WaveFormatExtensible renderFormat, MMDevice capture, WaveFormatExtensible captureFormat)
+    private static void BitExact(
+        MMDevice render,
+        WaveFormatExtensible renderFormat,
+        MMDevice capture,
+        WaveFormatExtensible captureFormat
+    )
     {
         var bits = Math.Min(renderFormat.ValidBitsPerSample, captureFormat.ValidBitsPerSample);
         var label = $"  {Describe(renderFormat)} -> {Describe(captureFormat)}";
-        double Value(long frame, int channel) => ((frame % (1L << bits)) - (1L << (bits - 1))) / (double)(1L << (bits - 1));
+        double Value(long frame, int channel) =>
+            ((frame % (1L << bits)) - (1L << (bits - 1))) / (double)(1L << (bits - 1));
 
         List<double>[] captured;
         try
         {
-            using var renderClient = Initialize(render, renderFormat, AudioClientShareMode.Exclusive, AudioClientStreamFlags.None);
-            using var captureClient = Initialize(capture, captureFormat, AudioClientShareMode.Exclusive, AudioClientStreamFlags.None);
+            using var renderClient = Initialize(
+                render,
+                renderFormat,
+                AudioClientShareMode.Exclusive,
+                AudioClientStreamFlags.None
+            );
+            using var captureClient = Initialize(
+                capture,
+                captureFormat,
+                AudioClientShareMode.Exclusive,
+                AudioClientStreamFlags.None
+            );
             captured = Stream(renderClient, renderFormat, captureClient, captureFormat, Value);
         }
         catch (Exception ex)
@@ -159,22 +178,35 @@ internal static class FormatProbe
     private static void ChannelMap(MMDevice render, WaveFormat renderFormat, MMDevice capture, WaveFormat captureFormat)
     {
         static double Frequency(int channel) => 500 + 200 * channel;
-        double Sample(long frame, int channel) => ToneAmplitude * Math.Sin(2 * Math.PI * Frequency(channel) * frame / renderFormat.SampleRate);
+        double Sample(long frame, int channel) =>
+            ToneAmplitude * Math.Sin(2 * Math.PI * Frequency(channel) * frame / renderFormat.SampleRate);
 
-        Console.WriteLine($"Channel map, {Describe(renderFormat)} shared -> {Describe(captureFormat)} shared (dBFS RMS of each render channel's tone; -23 = unchanged):");
+        Console.WriteLine(
+            $"Channel map, {Describe(renderFormat)} shared -> {Describe(captureFormat)} shared (dBFS RMS of each render channel's tone; -23 = unchanged):"
+        );
         using var renderClient = Initialize(render, renderFormat, AudioClientShareMode.Shared, ConvertFlags);
         using var captureClient = Initialize(capture, captureFormat, AudioClientShareMode.Shared, ConvertFlags);
         var captured = Stream(renderClient, renderFormat, captureClient, captureFormat, Sample);
 
-        Console.WriteLine("  " + "captured".PadRight(10) + string.Concat(Enumerable.Range(0, renderFormat.Channels).Select(c => $"out {c + 1} ({Frequency(c)} Hz)".PadLeft(18))));
+        Console.WriteLine(
+            "  "
+                + "captured".PadRight(10)
+                + string.Concat(
+                    Enumerable
+                        .Range(0, renderFormat.Channels)
+                        .Select(c => $"out {c + 1} ({Frequency(c)} Hz)".PadLeft(18))
+                )
+        );
         for (var channel = 0; channel < captureFormat.Channels; channel++)
         {
             var samples = captured[channel].Skip(captureFormat.SampleRate / 2).ToArray();
-            var levels = Enumerable.Range(0, renderFormat.Channels).Select(c =>
-            {
-                var power = samples.Length > 0 ? TonePower(samples, captureFormat.SampleRate, Frequency(c)) : 0;
-                return power > 1e-9 ? $"{10 * Math.Log10(power),18:0.0}" : "-".PadLeft(18);
-            });
+            var levels = Enumerable
+                .Range(0, renderFormat.Channels)
+                .Select(c =>
+                {
+                    var power = samples.Length > 0 ? TonePower(samples, captureFormat.SampleRate, Frequency(c)) : 0;
+                    return power > 1e-9 ? $"{10 * Math.Log10(power), 18:0.0}" : "-".PadLeft(18);
+                });
             Console.WriteLine("  " + $"in {channel + 1}".PadRight(10) + string.Concat(levels));
         }
 
@@ -183,9 +215,10 @@ internal static class FormatProbe
 
     private static string Describe(WaveFormat format)
     {
-        var bits = format is WaveFormatExtensible { ValidBitsPerSample: var valid } && valid != format.BitsPerSample
-            ? $"{valid}-in-{format.BitsPerSample}-bit"
-            : $"{format.BitsPerSample}-bit";
+        var bits =
+            format is WaveFormatExtensible { ValidBitsPerSample: var valid } && valid != format.BitsPerSample
+                ? $"{valid}-in-{format.BitsPerSample}-bit"
+                : $"{format.BitsPerSample}-bit";
         return $"{format.SampleRate} Hz {format.Channels} ch {bits} {(IsFloat(format) ? "float" : "int")}";
     }
 
@@ -210,7 +243,12 @@ internal static class FormatProbe
     /// <summary>
     /// Opens a stream; exclusive streams use a 100 ms buffer, realigned if the driver asks for it.
     /// </summary>
-    private static AudioClient Initialize(MMDevice device, WaveFormat format, AudioClientShareMode mode, AudioClientStreamFlags flags)
+    private static AudioClient Initialize(
+        MMDevice device,
+        WaveFormat format,
+        AudioClientShareMode mode,
+        AudioClientStreamFlags flags
+    )
     {
         var client = device.CreateAudioClient();
         try
@@ -248,7 +286,9 @@ internal static class FormatProbe
 
     private static bool IsFloat(WaveFormat format)
     {
-        return format is WaveFormatExtensible extensible ? extensible.SubFormat == IeeeFloatSubFormat : format.Encoding == WaveFormatEncoding.IeeeFloat;
+        return format is WaveFormatExtensible extensible
+            ? extensible.SubFormat == IeeeFloatSubFormat
+            : format.Encoding == WaveFormatEncoding.IeeeFloat;
     }
 
     private static int Mask(int channels)
@@ -274,11 +314,13 @@ internal static class FormatProbe
             Console.WriteLine($"{device.FriendlyName} ({device.DataFlow}), mix format {Describe(client.MixFormat)}");
         }
 
-        Console.WriteLine($"  {"format",-28} {"shared",-20} {"shared + convert",-20} exclusive");
+        Console.WriteLine($"  {"format", -28} {"shared", -20} {"shared + convert", -20} exclusive");
         foreach (var format in Formats)
         {
-            Console.WriteLine($"  {Describe(format),-28} {Try(device, format, AudioClientShareMode.Shared, AudioClientStreamFlags.None),-20} " +
-                $"{Try(device, format, AudioClientShareMode.Shared, ConvertFlags),-20} {Try(device, format, AudioClientShareMode.Exclusive, AudioClientStreamFlags.None)}");
+            Console.WriteLine(
+                $"  {Describe(format), -28} {Try(device, format, AudioClientShareMode.Shared, AudioClientStreamFlags.None), -20} "
+                    + $"{Try(device, format, AudioClientShareMode.Shared, ConvertFlags), -20} {Try(device, format, AudioClientShareMode.Exclusive, AudioClientStreamFlags.None)}"
+            );
         }
 
         Console.WriteLine();
@@ -300,14 +342,27 @@ internal static class FormatProbe
     /// <summary>
     /// Plays the tone into <paramref name="render"/> for 2 s and reports what arrives at <paramref name="capture"/>.
     /// </summary>
-    private static void Transfer(MMDevice render, WaveFormat renderFormat, AudioClientShareMode renderMode, MMDevice capture, WaveFormat captureFormat, AudioClientShareMode captureMode)
+    private static void Transfer(
+        MMDevice render,
+        WaveFormat renderFormat,
+        AudioClientShareMode renderMode,
+        MMDevice capture,
+        WaveFormat captureFormat,
+        AudioClientShareMode captureMode
+    )
     {
-        var label = $"  {Describe(renderFormat)} {renderMode.ToString().ToLowerInvariant()} -> {Describe(captureFormat)} {captureMode.ToString().ToLowerInvariant()}";
+        var label =
+            $"  {Describe(renderFormat)} {renderMode.ToString().ToLowerInvariant()} -> {Describe(captureFormat)} {captureMode.ToString().ToLowerInvariant()}";
         AudioClient renderClient;
         AudioClient captureClient;
         try
         {
-            renderClient = Initialize(render, renderFormat, renderMode, renderMode == AudioClientShareMode.Shared ? ConvertFlags : AudioClientStreamFlags.None);
+            renderClient = Initialize(
+                render,
+                renderFormat,
+                renderMode,
+                renderMode == AudioClientShareMode.Shared ? ConvertFlags : AudioClientStreamFlags.None
+            );
         }
         catch (Exception ex)
         {
@@ -319,7 +374,12 @@ internal static class FormatProbe
         {
             try
             {
-                captureClient = Initialize(capture, captureFormat, captureMode, captureMode == AudioClientShareMode.Shared ? ConvertFlags : AudioClientStreamFlags.None);
+                captureClient = Initialize(
+                    capture,
+                    captureFormat,
+                    captureMode,
+                    captureMode == AudioClientShareMode.Shared ? ConvertFlags : AudioClientStreamFlags.None
+                );
             }
             catch (Exception ex)
             {
@@ -329,8 +389,14 @@ internal static class FormatProbe
 
             using (captureClient)
             {
-                var captured = Stream(renderClient, renderFormat, captureClient, captureFormat,
-                    (frame, _) => ToneAmplitude * Math.Sin(2 * Math.PI * ToneFrequency * frame / renderFormat.SampleRate))[0];
+                var captured = Stream(
+                    renderClient,
+                    renderFormat,
+                    captureClient,
+                    captureFormat,
+                    (frame, _) =>
+                        ToneAmplitude * Math.Sin(2 * Math.PI * ToneFrequency * frame / renderFormat.SampleRate)
+                )[0];
                 var skip = captureFormat.SampleRate / 2;
                 if (captured.Count <= skip)
                 {
@@ -344,14 +410,22 @@ internal static class FormatProbe
                 var tonePower = TonePower(samples, captureFormat.SampleRate, ToneFrequency);
                 var crossings = samples.Skip(1).Where((sample, i) => samples[i] < 0 && sample >= 0).Count();
                 var frequency = crossings * (double)captureFormat.SampleRate / samples.Length;
-                Console.WriteLine($"{label}: level {rmsDb,6:0.0} dBFS RMS, tone {(power > 0 ? tonePower / power * 100 : 0),5:0.0}% of the signal, " +
-                    $"{frequency:0} Hz by zero crossings ({captured.Count} frames captured)");
+                Console.WriteLine(
+                    $"{label}: level {rmsDb, 6:0.0} dBFS RMS, tone {(power > 0 ? tonePower / power * 100 : 0), 5:0.0}% of the signal, "
+                        + $"{frequency:0} Hz by zero crossings ({captured.Count} frames captured)"
+                );
             }
         }
     }
 
     /// <param name="sample">The value of a channel in a frame, from -1 to just below 1.</param>
-    private static List<double>[] Stream(AudioClient renderClient, WaveFormat renderFormat, AudioClient captureClient, WaveFormat captureFormat, Func<long, int, double> sample)
+    private static List<double>[] Stream(
+        AudioClient renderClient,
+        WaveFormat renderFormat,
+        AudioClient captureClient,
+        WaveFormat captureFormat,
+        Func<long, int, double> sample
+    )
     {
         var renderOut = renderClient.AudioRenderClient;
         var captureIn = captureClient.AudioCaptureClient;
@@ -375,7 +449,12 @@ internal static class FormatProbe
                     for (var channel = 0; channel < renderFormat.Channels; channel++)
                     {
                         var value = sample(renderedFrames + frame, channel);
-                        WriteSample(bytes, frame * renderFormat.BlockAlign + channel * renderFormat.BitsPerSample / 8, renderFormat, value);
+                        WriteSample(
+                            bytes,
+                            frame * renderFormat.BlockAlign + channel * renderFormat.BitsPerSample / 8,
+                            renderFormat,
+                            value
+                        );
                     }
                 }
 
@@ -395,7 +474,12 @@ internal static class FormatProbe
                     for (var channel = 0; channel < captureFormat.Channels; channel++)
                     {
                         var offset = frame * captureFormat.BlockAlign + channel * captureFormat.BitsPerSample / 8;
-                        captured[channel].Add(flags.HasFlag(AudioClientBufferFlags.Silent) ? 0 : ReadSample(bytes, offset, captureFormat));
+                        captured[channel]
+                            .Add(
+                                flags.HasFlag(AudioClientBufferFlags.Silent)
+                                    ? 0
+                                    : ReadSample(bytes, offset, captureFormat)
+                            );
                     }
                 }
             }
@@ -415,7 +499,8 @@ internal static class FormatProbe
     private static double TonePower(double[] samples, int sampleRate, double frequency)
     {
         var coefficient = 2 * Math.Cos(2 * Math.PI * frequency / sampleRate);
-        double s1 = 0, s2 = 0;
+        double s1 = 0,
+            s2 = 0;
         foreach (var sample in samples)
         {
             var s0 = sample + coefficient * s1 - s2;
@@ -433,7 +518,12 @@ internal static class FormatProbe
     [DllImport("winmm.dll", EntryPoint = "timeEndPeriod")]
     private static extern uint TimeEndPeriod(uint milliseconds);
 
-    private static string Try(MMDevice device, WaveFormat format, AudioClientShareMode mode, AudioClientStreamFlags flags)
+    private static string Try(
+        MMDevice device,
+        WaveFormat format,
+        AudioClientShareMode mode,
+        AudioClientStreamFlags flags
+    )
     {
         try
         {
@@ -452,7 +542,10 @@ internal static class FormatProbe
         switch (format.BitsPerSample)
         {
             case 16:
-                BitConverter.TryWriteBytes(data.AsSpan(offset), (short)Math.Clamp(Math.Round(value * 32768), short.MinValue, short.MaxValue));
+                BitConverter.TryWriteBytes(
+                    data.AsSpan(offset),
+                    (short)Math.Clamp(Math.Round(value * 32768), short.MinValue, short.MaxValue)
+                );
                 break;
             case 24:
                 var sample24 = (int)Math.Clamp(Math.Round(value * 8388608), -8388608, 8388607);
@@ -464,7 +557,10 @@ internal static class FormatProbe
                 BitConverter.TryWriteBytes(data.AsSpan(offset), (float)value);
                 break;
             case 32:
-                BitConverter.TryWriteBytes(data.AsSpan(offset), (int)Math.Clamp(Math.Round(value * 2147483648.0), int.MinValue, int.MaxValue));
+                BitConverter.TryWriteBytes(
+                    data.AsSpan(offset),
+                    (int)Math.Clamp(Math.Round(value * 2147483648.0), int.MinValue, int.MaxValue)
+                );
                 break;
         }
     }

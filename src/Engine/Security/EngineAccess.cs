@@ -11,7 +11,9 @@ namespace Micser.Engine.Security;
 /// </summary>
 public sealed class EngineAccess
 {
-    private readonly byte[] _tokenBytes = Encoding.ASCII.GetBytes(WebEncoders.Base64UrlEncode(RandomNumberGenerator.GetBytes(32)));
+    private readonly byte[] _tokenBytes = Encoding.ASCII.GetBytes(
+        WebEncoders.Base64UrlEncode(RandomNumberGenerator.GetBytes(32))
+    );
 
     public EngineAccess(IOptions<EngineOptions> options)
     {
@@ -42,19 +44,23 @@ public static class EngineAccessMiddleware
             return app;
         }
 
-        return app.Use(async (context, next) =>
-        {
-            var path = context.Request.Path;
-            var isProtected = (path.StartsWithSegments("/api") || path.StartsWithSegments("/hubs")) && !path.StartsWithSegments("/api/health");
-
-            if (isProtected && !access.IsValid(GetToken(context.Request)))
+        return app.Use(
+            async (context, next) =>
             {
-                context.Response.StatusCode = StatusCodes.Status401Unauthorized;
-                return;
-            }
+                var path = context.Request.Path;
+                var isProtected =
+                    (path.StartsWithSegments("/api") || path.StartsWithSegments("/hubs"))
+                    && !path.StartsWithSegments("/api/health");
 
-            await next(context);
-        });
+                if (isProtected && !access.IsValid(GetToken(context.Request)))
+                {
+                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                    return;
+                }
+
+                await next(context);
+            }
+        );
     }
 
     private static string? GetToken(HttpRequest request)

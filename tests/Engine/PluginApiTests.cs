@@ -15,7 +15,20 @@ public class PluginApiTests
 
         var plugins = await client.GetFromJsonAsync<PluginDto[]>("/api/plugins", factory.Json);
 
-        await Assert.That(plugins).IsEquivalentTo([new PluginDto("Main", "Main", "1.0.0", true, true, null, "/plugins/Main/web/index.js", PluginChange.None)]);
+        await Assert
+            .That(plugins)
+            .IsEquivalentTo([
+                new PluginDto(
+                    "Main",
+                    "Main",
+                    "1.0.0",
+                    true,
+                    true,
+                    null,
+                    "/plugins/Main/web/index.js",
+                    PluginChange.None
+                ),
+            ]);
     }
 
     [Test]
@@ -27,7 +40,10 @@ public class PluginApiTests
         var changed = hub.NextAsync<PluginDto[]>("PluginsChanged");
         await hub.StartAsync();
 
-        var response = await client.PostAsync("/api/plugins", CreateUpload(PluginLoaderTests.CopyTestPlugin(factory.Directory, "package")));
+        var response = await client.PostAsync(
+            "/api/plugins",
+            CreateUpload(PluginLoaderTests.CopyTestPlugin(factory.Directory, "package"))
+        );
         response.EnsureSuccessStatusCode();
         var installed = await response.Content.ReadFromJsonAsync<PluginDto>(factory.Json);
 
@@ -46,7 +62,10 @@ public class PluginApiTests
     {
         await using var factory = new EngineFactory();
         using var client = factory.CreateAuthorizedClient();
-        using var content = new MultipartFormDataContent { { new ByteArrayContent([1, 2, 3]), "package", "plugin.zip" } };
+        using var content = new MultipartFormDataContent
+        {
+            { new ByteArrayContent([1, 2, 3]), "package", "plugin.zip" },
+        };
 
         var response = await client.PostAsync("/api/plugins", content);
 
@@ -59,8 +78,12 @@ public class PluginApiTests
         await using var factory = new EngineFactory();
         using var client = factory.CreateAuthorizedClient();
 
-        await Assert.That((await client.DeleteAsync("/api/plugins/Main")).StatusCode).IsEqualTo(HttpStatusCode.BadRequest);
-        await Assert.That((await client.DeleteAsync("/api/plugins/Missing")).StatusCode).IsEqualTo(HttpStatusCode.NotFound);
+        await Assert
+            .That((await client.DeleteAsync("/api/plugins/Main")).StatusCode)
+            .IsEqualTo(HttpStatusCode.BadRequest);
+        await Assert
+            .That((await client.DeleteAsync("/api/plugins/Missing")).StatusCode)
+            .IsEqualTo(HttpStatusCode.NotFound);
     }
 
     [Test]
@@ -70,9 +93,13 @@ public class PluginApiTests
         var directory = PluginLoaderTests.CopyTestPlugin(factory.PluginsPath);
         await File.WriteAllTextAsync(
             Path.Combine(directory, PluginManifest.FileName),
-            """{ "id": "Test", "name": "Test plugin", "version": "1.2.3", "assembly": "Micser.Engine.TestPlugin.dll", "web": "web/index.js" }""");
+            """{ "id": "Test", "name": "Test plugin", "version": "1.2.3", "assembly": "Micser.Engine.TestPlugin.dll", "web": "web/index.js" }"""
+        );
         Directory.CreateDirectory(Path.Combine(directory, "web"));
-        await File.WriteAllTextAsync(Path.Combine(directory, "web", "index.js"), "export default { name: 'Test', widgets: [] };");
+        await File.WriteAllTextAsync(
+            Path.Combine(directory, "web", "index.js"),
+            "export default { name: 'Test', widgets: [] };"
+        );
         using var client = factory.CreateClient();
         using var authorized = factory.CreateAuthorizedClient();
 

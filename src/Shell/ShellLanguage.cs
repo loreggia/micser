@@ -33,7 +33,11 @@ internal sealed class ShellLanguage
     public CultureInfo Culture { get; private set; } = CultureInfo.InvariantCulture;
 
     public static string DefaultPath { get; } =
-        Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Micser", "language.json");
+        Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            "Micser",
+            "language.json"
+        );
 
     /// <summary>
     /// The UI's language preference, e.g. "de"; null follows Windows.
@@ -50,7 +54,9 @@ internal sealed class ShellLanguage
             return preference;
         }
 
-        return SupportedLanguages.Contains(systemCulture.TwoLetterISOLanguageName) ? systemCulture.TwoLetterISOLanguageName : SupportedLanguages[0];
+        return SupportedLanguages.Contains(systemCulture.TwoLetterISOLanguageName)
+            ? systemCulture.TwoLetterISOLanguageName
+            : SupportedLanguages[0];
     }
 
     /// <summary>

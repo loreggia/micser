@@ -19,7 +19,8 @@ internal sealed record DriverStatus(
     string? BundledVersion,
     int CableCount,
     bool UpdateAvailable,
-    IReadOnlyList<CableStatus> Cables);
+    IReadOnlyList<CableStatus> Cables
+);
 
 /// <param name="Layout">"stereo", "5.1" or "7.1".</param>
 /// <param name="FormatsMatch">Whether both endpoints of the cable exist and have its layout's format; "sync-formats" fixes them.</param>

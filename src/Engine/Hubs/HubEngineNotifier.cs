@@ -1,7 +1,7 @@
 using System.Threading.Channels;
+using Microsoft.AspNetCore.SignalR;
 using Micser.Engine.Audio;
 using Micser.Engine.Contracts;
-using Microsoft.AspNetCore.SignalR;
 
 namespace Micser.Engine.Hubs;
 
@@ -12,7 +12,9 @@ public sealed class HubEngineNotifier : IEngineNotifier, IDisposable
 {
     private readonly IHubContext<EngineHub, IEngineClient> _hub;
     private readonly ILogger _logger;
-    private readonly Channel<Func<IEngineClient, Task>> _queue = Channel.CreateUnbounded<Func<IEngineClient, Task>>(new UnboundedChannelOptions { SingleReader = true });
+    private readonly Channel<Func<IEngineClient, Task>> _queue = Channel.CreateUnbounded<Func<IEngineClient, Task>>(
+        new UnboundedChannelOptions { SingleReader = true }
+    );
     private readonly Task _sender;
 
     public HubEngineNotifier(IHubContext<EngineHub, IEngineClient> hub, ILogger<HubEngineNotifier> logger)
