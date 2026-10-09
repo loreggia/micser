@@ -8,7 +8,7 @@ Collect changes under "Unreleased". Before tagging vX.Y.Z, rename that heading t
 from that section, and the release workflow fails without it.
 -->
 
-## Unreleased
+## 0.12.0 - 2026-10-09
 
 - Single channels can be routed on their own, e.g. the channels of an audio interface that has them all on one device. "Show channels" in a
   module's "More" menu, or the arrow between its inputs and outputs, adds a connector per channel, labelled with its speaker, below each
@@ -17,6 +17,7 @@ from that section, and the release workflow fails without it.
 - Effects and the spectrum have a "Channels" setting in their "More" menu: Auto (as before), Mono, Stereo, Quad, 5.1, 7.1 or any number up to 64.
 - A connection to a channel that a device doesn't have right now, e.g. while it's unplugged, is dashed and silent. It works again once the
   device is back.
+- New subgraphs are green, matching the accent colour, instead of blue.
 
 ## 0.11.0 - 2026-10-08
 
