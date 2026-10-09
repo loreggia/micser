@@ -1,0 +1,42 @@
+{
+  "$schema": "https://alirezanet.github.io/Husky.Net/schema.json",
+  "tasks": [
+    {
+      "name": "line-endings",
+      "group": "pre-commit",
+      "command": "node",
+      "args": ["scripts/repair-line-endings.mts", "${staged}"]
+    },
+    {
+      "name": "eslint",
+      "group": "pre-commit",
+      "command": "npx",
+      "args": ["--no", "--", "eslint", "--fix", "--no-warn-ignored", "${staged}"],
+      "include": ["**/*.js", "**/*.jsx", "**/*.mjs", "**/*.cjs", "**/*.ts", "**/*.tsx", "**/*.mts", "**/*.cts"]
+    },
+    {
+      "name": "prettier",
+      "group": "pre-commit",
+      "command": "npx",
+      "args": ["--no", "--", "prettier", "--write", "--ignore-unknown", "${staged}"]
+    },
+    {
+      "name": "csharpier",
+      "group": "pre-commit",
+      "command": "dotnet",
+      "args": ["csharpier", "format", "${staged}"],
+      "include": [
+        "**/*.cs",
+        "**/*.csx",
+        "**/*.csproj",
+        "**/*.props",
+        "**/*.targets",
+        "**/*.slnx",
+        "**/*.xml",
+        "**/*.config",
+        "**/*.xaml",
+        "**/*.axaml"
+      ]
+    }
+  ]
+}

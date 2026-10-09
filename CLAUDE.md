@@ -25,6 +25,7 @@ npm run build && dotnet publish src/Engine -c Release -o artifacts/e2e-engine
 MICSER_E2E_PUBLISHED_ENGINE=artifacts/e2e-engine/Micser.Engine.dll npm run test:e2e
 npm run lint                 # eslint (flat config at the root)
 npm run format:check         # prettier; .prettierignore limits it to the web workspaces
+dotnet csharpier format .    # C#, MSBuild and XML files ("check" instead of "format" as in CI); "dotnet tool restore" once
 npm run fix-line-endings     # rewrites working-tree line endings to what git would check out (.gitattributes, core.autocrlf)
 npm run generate:api -w @micser/web-sdk   # regenerate the API client after engine API changes (build the engine first)
 
@@ -69,7 +70,8 @@ General:
 
 C#:
 
-- C# code is cleaned up with CodeMaid (settings in `CodeMaid.config`). Write new code in its layout so a cleanup run doesn't reshuffle it:
+- C#, MSBuild and XML files are formatted with CSharpier (`.csharpierrc`, print width 120); the pre-commit hook formats staged files and CI runs `dotnet csharpier check .`.
+- Preferred member layout (a guideline, not enforced; keep a file's existing order when it differs):
   - Member order by type: fields, constructors, destructors, delegates, events, properties, indexers, methods, nested enums, interfaces, structs, classes.
   - Within a type group: by access level (public, internal, protected, private), then alphabetically.
   - A blank line before and after single-line properties.

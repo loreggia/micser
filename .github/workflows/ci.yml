@@ -22,6 +22,11 @@ jobs:
         with:
           global-json-file: global.json
 
+      - name: Format
+        run: |
+          dotnet tool restore
+          dotnet csharpier check .
+
       - name: Build
         run: dotnet build Micser.slnx --configuration Release
 

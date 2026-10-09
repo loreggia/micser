@@ -108,4 +108,5 @@ Development and tests
 - [TUnit](https://github.com/thomhurst/TUnit) and [NSubstitute](https://nsubstitute.github.io/) (.NET tests)
 - [Vitest](https://vitest.dev/) and [Playwright](https://playwright.dev/) (web and end-to-end tests)
 - [TypeScript](https://www.typescriptlang.org/), [ESLint](https://eslint.org/) and [Prettier](https://prettier.io/)
+- [CSharpier](https://csharpier.com/) (C# and MSBuild formatting) and [Husky.Net](https://alirezanet.github.io/Husky.Net/) (pre-commit hook)
 - [LavaMoat allow-scripts](https://github.com/LavaMoat/LavaMoat/tree/main/packages/allow-scripts) (npm install script allowlist)
