@@ -94,6 +94,8 @@ public sealed class ModuleCatalog
             UseSystemVolume = settings.UseSystemVolume,
             IsBypassed = settings.IsBypassed,
             IsCollapsed = settings.IsCollapsed,
+            ShowChannels = settings.ShowChannels,
+            ChannelCount = settings.ChannelCount,
             State = (TState)state,
         };
     }
@@ -102,10 +104,32 @@ public sealed class ModuleCatalog
 /// <summary>
 /// The settings every module has, besides its state.
 /// </summary>
-public sealed record ModuleSettings(string? Name, ModulePosition? Position, float Volume, bool IsMuted, bool IsBypassed, bool UseSystemVolume, bool IsCollapsed, Guid? SubgraphId, Guid? TemplateModuleId = null)
+public sealed record ModuleSettings(
+    string? Name,
+    ModulePosition? Position,
+    float Volume,
+    bool IsMuted,
+    bool IsBypassed,
+    bool UseSystemVolume,
+    bool IsCollapsed,
+    Guid? SubgraphId,
+    Guid? TemplateModuleId = null,
+    bool ShowChannels = false,
+    int? ChannelCount = null)
 {
     public static ModuleSettings From(ModuleDto dto)
     {
-        return new ModuleSettings(dto.Name, dto.Position, dto.Volume, dto.IsMuted, dto.IsBypassed, dto.UseSystemVolume, dto.IsCollapsed, dto.SubgraphId, dto.TemplateModuleId);
+        return new ModuleSettings(
+            dto.Name,
+            dto.Position,
+            dto.Volume,
+            dto.IsMuted,
+            dto.IsBypassed,
+            dto.UseSystemVolume,
+            dto.IsCollapsed,
+            dto.SubgraphId,
+            dto.TemplateModuleId,
+            dto.ShowChannels,
+            dto.ChannelCount);
     }
 }

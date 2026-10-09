@@ -88,6 +88,7 @@ public sealed class AudioEngine : IDisposable
             _stopRequested = true;
             _thread.Join();
             _thread = null;
+            _graph.ClearLayouts();
         }
     }
 

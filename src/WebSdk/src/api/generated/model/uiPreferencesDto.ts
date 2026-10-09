@@ -10,4 +10,5 @@ export interface UiPreferencesDto {
   snapToGrid: boolean;
   /** @nullable */
   language?: string | null;
+  showChannelsByDefault: boolean;
 }

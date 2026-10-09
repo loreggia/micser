@@ -11,6 +11,12 @@ import type { SpectrumState } from './spectrumState';
 export interface ModuleDtoSpectrumModule {
   type: ModuleDtoSpectrumModuleType;
   state: SpectrumState;
+  /**
+     * @minimum 1
+     * @maximum 64
+     * @nullable
+     */
+  channelCount?: number | null;
   id: string;
   isBypassed: boolean;
   isCollapsed: boolean;
@@ -21,6 +27,7 @@ export interface ModuleDtoSpectrumModule {
      */
   name?: string | null;
   position?: null | ModulePosition;
+  showChannels: boolean;
   /** @nullable */
   subgraphId?: string | null;
   /** @nullable */

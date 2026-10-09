@@ -34,6 +34,11 @@ public interface IEngineClient
     /// </summary>
     Task PluginsChanged(IReadOnlyList<PluginDto> plugins);
 
+    /// <summary>
+    /// The port layouts of the modules whose layouts changed, checked about 20 times per second.
+    /// </summary>
+    Task PortLayoutsChanged(IReadOnlyList<ModulePortLayoutsDto> layouts);
+
     Task PreferencesChanged(UiPreferencesDto preferences);
 
     Task StatusChanged(EngineStatusDto status);

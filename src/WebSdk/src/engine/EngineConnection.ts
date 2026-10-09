@@ -8,6 +8,7 @@ import {
   getGetModuleQueryKey,
   getGetModulesQueryKey,
   getGetPluginsQueryKey,
+  getGetPortLayoutsQueryKey,
   getGetPreferencesQueryKey,
   getGetSubgraphsQueryKey,
   getGetSubgraphTemplatesQueryKey,
@@ -16,6 +17,7 @@ import {
   type ConnectionDto,
   type EngineStatusDto,
   type ModuleDto,
+  type ModulePortLayoutsDto,
   type PluginDto,
   type SubgraphDto,
   type SubgraphTemplateDto,
@@ -185,6 +187,17 @@ export class EngineConnection {
     });
     this.hub.on("StatusChanged", (status: EngineStatusDto) => {
       this.setData(getGetEngineStatusQueryKey(), status);
+    });
+    this.hub.on("PortLayoutsChanged", (layouts: ModulePortLayoutsDto[]) => {
+      this.setData<ModulePortLayoutsDto[]>(getGetPortLayoutsQueryKey(), (cached) => {
+        if (!cached) {
+          return cached;
+        }
+
+        const changed = new Map(layouts.map((layout) => [layout.moduleId, layout]));
+        const added = layouts.filter((layout) => !cached.some((c) => c.moduleId === layout.moduleId));
+        return [...cached.map((layout) => changed.get(layout.moduleId) ?? layout), ...added];
+      });
     });
     this.hub.on("PreferencesChanged", (preferences: UiPreferencesDto) => {
       this.setData(getGetPreferencesQueryKey(), preferences);
@@ -367,6 +380,9 @@ export class EngineConnection {
     this.moduleUpdates.delete(moduleId);
     this.setData<ModuleDto[]>(getGetModulesQueryKey(), (modules) => modules?.filter((m) => m.id !== moduleId));
     this.queryClient.removeQueries({ queryKey: getGetModuleQueryKey(moduleId) });
+    this.setData<ModulePortLayoutsDto[]>(getGetPortLayoutsQueryKey(), (layouts) =>
+      layouts?.filter((layout) => layout.moduleId !== moduleId)
+    );
   }
 
   private scheduleRetry() {

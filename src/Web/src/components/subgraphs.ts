@@ -28,13 +28,29 @@ export function frameAround(bounds: Rect): { position: XYPosition; size: { width
   };
 }
 
-/** The handle id of a proxy port: the direction, the module and its port. */
-export function proxyHandleId(direction: "in" | "out", moduleId: string, port: string) {
-  return `${direction}:${moduleId}:${port}`;
+/**
+ * The handle id of a module's port, or of one of its channels (0-based) when it shows its channels. Port names ending in ":<digits>" would
+ * be read as a channel.
+ */
+export function portHandleId(port: string, channel?: number | null) {
+  return channel == null ? port : `${port}:${channel}`;
 }
 
-/** The module and port of a handle, which is a proxy port if the node is a collapsed subgraph. */
-export function resolveHandle(nodeId: string, handleId: string | null | undefined): { moduleId: string; port: string } {
-  const match = handleId?.match(/^(?:in|out):([^:]+):(.*)$/);
-  return match ? { moduleId: match[1], port: match[2] } : { moduleId: nodeId, port: handleId ?? "" };
+/** The handle id of a proxy port: the direction, the module and its port or channel. */
+export function proxyHandleId(direction: "in" | "out", moduleId: string, port: string, channel?: number | null) {
+  return `${direction}:${moduleId}:${portHandleId(port, channel)}`;
+}
+
+/** The module, port and channel (null for the whole port) of a handle, which is a proxy port if the node is a collapsed subgraph. */
+export function resolveHandle(
+  nodeId: string,
+  handleId: string | null | undefined
+): { moduleId: string; port: string; channel: number | null } {
+  const proxy = handleId?.match(/^(?:in|out):([^:]+):(.*)$/);
+  const moduleId = proxy ? proxy[1] : nodeId;
+  const portHandle = proxy ? proxy[2] : (handleId ?? "");
+  const channel = portHandle.match(/^(.*):(\d+)$/);
+  return channel
+    ? { moduleId, port: channel[1], channel: Number(channel[2]) }
+    : { moduleId, port: portHandle, channel: null };
 }

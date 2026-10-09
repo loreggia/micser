@@ -88,6 +88,30 @@
         }
       }
     },
+    "/api/port-layouts": {
+      "get": {
+        "tags": [
+          "Modules"
+        ],
+        "description": "The channel layouts of all modules' ports in the last processed block; changes are pushed as PortLayoutsChanged.",
+        "operationId": "GetPortLayouts",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ModulePortLayoutsDto"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/modules": {
       "get": {
         "tags": [
@@ -1058,6 +1082,20 @@
           },
           "targetPort": {
             "type": "string"
+          },
+          "sourceChannel": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "targetChannel": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
           }
         }
       },
@@ -1083,12 +1121,27 @@
           },
           "targetPort": {
             "type": "string"
+          },
+          "sourceChannel": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "targetChannel": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
           }
         }
       },
       "CreateModuleRequest": {
         "required": [
-          "type"
+          "type",
+          "showChannels"
         ],
         "type": "object",
         "properties": {
@@ -1117,6 +1170,10 @@
               "string"
             ],
             "format": "uuid"
+          },
+          "showChannels": {
+            "type": "boolean",
+            "default": false
           }
         }
       },
@@ -1421,6 +1478,7 @@
           "isBypassed",
           "isCollapsed",
           "isMuted",
+          "showChannels",
           "useSystemVolume",
           "volume"
         ],
@@ -1433,6 +1491,15 @@
           },
           "state": {
             "$ref": "#/components/schemas/CompressorState"
+          },
+          "channelCount": {
+            "maximum": 64,
+            "minimum": 1,
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
           },
           "id": {
             "type": "string",
@@ -1463,6 +1530,9 @@
                 "$ref": "#/components/schemas/ModulePosition"
               }
             ]
+          },
+          "showChannels": {
+            "type": "boolean"
           },
           "subgraphId": {
             "type": [
@@ -1496,6 +1566,7 @@
           "isBypassed",
           "isCollapsed",
           "isMuted",
+          "showChannels",
           "useSystemVolume",
           "volume"
         ],
@@ -1508,6 +1579,15 @@
           },
           "state": {
             "$ref": "#/components/schemas/DeviceInputState"
+          },
+          "channelCount": {
+            "maximum": 64,
+            "minimum": 1,
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
           },
           "id": {
             "type": "string",
@@ -1538,6 +1618,9 @@
                 "$ref": "#/components/schemas/ModulePosition"
               }
             ]
+          },
+          "showChannels": {
+            "type": "boolean"
           },
           "subgraphId": {
             "type": [
@@ -1571,6 +1654,7 @@
           "isBypassed",
           "isCollapsed",
           "isMuted",
+          "showChannels",
           "useSystemVolume",
           "volume"
         ],
@@ -1583,6 +1667,15 @@
           },
           "state": {
             "$ref": "#/components/schemas/DeviceOutputState"
+          },
+          "channelCount": {
+            "maximum": 64,
+            "minimum": 1,
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
           },
           "id": {
             "type": "string",
@@ -1613,6 +1706,9 @@
                 "$ref": "#/components/schemas/ModulePosition"
               }
             ]
+          },
+          "showChannels": {
+            "type": "boolean"
           },
           "subgraphId": {
             "type": [
@@ -1646,6 +1742,7 @@
           "isBypassed",
           "isCollapsed",
           "isMuted",
+          "showChannels",
           "useSystemVolume",
           "volume"
         ],
@@ -1658,6 +1755,15 @@
           },
           "state": {
             "$ref": "#/components/schemas/EqualizerState"
+          },
+          "channelCount": {
+            "maximum": 64,
+            "minimum": 1,
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
           },
           "id": {
             "type": "string",
@@ -1688,6 +1794,9 @@
                 "$ref": "#/components/schemas/ModulePosition"
               }
             ]
+          },
+          "showChannels": {
+            "type": "boolean"
           },
           "subgraphId": {
             "type": [
@@ -1721,6 +1830,7 @@
           "isBypassed",
           "isCollapsed",
           "isMuted",
+          "showChannels",
           "useSystemVolume",
           "volume"
         ],
@@ -1733,6 +1843,15 @@
           },
           "state": {
             "$ref": "#/components/schemas/GainState"
+          },
+          "channelCount": {
+            "maximum": 64,
+            "minimum": 1,
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
           },
           "id": {
             "type": "string",
@@ -1763,6 +1882,9 @@
                 "$ref": "#/components/schemas/ModulePosition"
               }
             ]
+          },
+          "showChannels": {
+            "type": "boolean"
           },
           "subgraphId": {
             "type": [
@@ -1796,6 +1918,7 @@
           "isBypassed",
           "isCollapsed",
           "isMuted",
+          "showChannels",
           "useSystemVolume",
           "volume"
         ],
@@ -1808,6 +1931,15 @@
           },
           "state": {
             "$ref": "#/components/schemas/LoopbackInputState"
+          },
+          "channelCount": {
+            "maximum": 64,
+            "minimum": 1,
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
           },
           "id": {
             "type": "string",
@@ -1838,6 +1970,9 @@
                 "$ref": "#/components/schemas/ModulePosition"
               }
             ]
+          },
+          "showChannels": {
+            "type": "boolean"
           },
           "subgraphId": {
             "type": [
@@ -1871,6 +2006,7 @@
           "isBypassed",
           "isCollapsed",
           "isMuted",
+          "showChannels",
           "useSystemVolume",
           "volume"
         ],
@@ -1883,6 +2019,15 @@
           },
           "state": {
             "$ref": "#/components/schemas/PitchState"
+          },
+          "channelCount": {
+            "maximum": 64,
+            "minimum": 1,
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
           },
           "id": {
             "type": "string",
@@ -1913,6 +2058,9 @@
                 "$ref": "#/components/schemas/ModulePosition"
               }
             ]
+          },
+          "showChannels": {
+            "type": "boolean"
           },
           "subgraphId": {
             "type": [
@@ -1946,6 +2094,7 @@
           "isBypassed",
           "isCollapsed",
           "isMuted",
+          "showChannels",
           "useSystemVolume",
           "volume"
         ],
@@ -1958,6 +2107,15 @@
           },
           "state": {
             "$ref": "#/components/schemas/SpectrumState"
+          },
+          "channelCount": {
+            "maximum": 64,
+            "minimum": 1,
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
           },
           "id": {
             "type": "string",
@@ -1989,6 +2147,9 @@
               }
             ]
           },
+          "showChannels": {
+            "type": "boolean"
+          },
           "subgraphId": {
             "type": [
               "null",
@@ -2011,6 +2172,32 @@
             "minimum": 0,
             "type": "number",
             "format": "float"
+          }
+        }
+      },
+      "ModulePortLayoutsDto": {
+        "required": [
+          "moduleId",
+          "inputs",
+          "outputs"
+        ],
+        "type": "object",
+        "properties": {
+          "moduleId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "inputs": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/PortLayoutDto"
+            }
+          },
+          "outputs": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/PortLayoutDto"
+            }
           }
         }
       },
@@ -2037,7 +2224,9 @@
           "inputs",
           "outputs",
           "defaultState",
-          "supportsBypass"
+          "supportsBypass",
+          "supportsChannelCount",
+          "channelCountInputs"
         ],
         "type": "object",
         "properties": {
@@ -2059,6 +2248,15 @@
           "defaultState": { },
           "supportsBypass": {
             "type": "boolean"
+          },
+          "supportsChannelCount": {
+            "type": "boolean"
+          },
+          "channelCountInputs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
           }
         }
       },
@@ -2139,6 +2337,28 @@
           }
         }
       },
+      "PortLayoutDto": {
+        "required": [
+          "channelCount",
+          "speakers"
+        ],
+        "type": "object",
+        "properties": {
+          "channelCount": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "speakers": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/SpeakerPosition"
+            }
+          }
+        }
+      },
       "RenameSubgraphTemplateRequest": {
         "required": [
           "name"
@@ -2172,6 +2392,28 @@
             "format": "uuid"
           }
         }
+      },
+      "SpeakerPosition": {
+        "enum": [
+          "FrontLeft",
+          "FrontRight",
+          "FrontCenter",
+          "LowFrequency",
+          "BackLeft",
+          "BackRight",
+          "FrontLeftOfCenter",
+          "FrontRightOfCenter",
+          "BackCenter",
+          "SideLeft",
+          "SideRight",
+          "TopCenter",
+          "TopFrontLeft",
+          "TopFrontCenter",
+          "TopFrontRight",
+          "TopBackLeft",
+          "TopBackCenter",
+          "TopBackRight"
+        ]
       },
       "Speakers": {
         "type": "string"
@@ -2345,13 +2587,28 @@
           },
           "targetPort": {
             "type": "string"
+          },
+          "sourceChannel": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "targetChannel": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
           }
         }
       },
       "UiPreferencesDto": {
         "required": [
           "showStreamStatistics",
-          "snapToGrid"
+          "snapToGrid",
+          "showChannelsByDefault"
         ],
         "type": "object",
         "properties": {
@@ -2368,6 +2625,10 @@
               "null",
               "string"
             ]
+          },
+          "showChannelsByDefault": {
+            "type": "boolean",
+            "default": false
           }
         }
       }

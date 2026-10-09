@@ -10,4 +10,8 @@ export interface CreateConnectionRequest {
   sourcePort: string;
   targetModuleId: string;
   targetPort: string;
+  /** @nullable */
+  sourceChannel?: number | null;
+  /** @nullable */
+  targetChannel?: number | null;
 }

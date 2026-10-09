@@ -5,9 +5,15 @@ namespace Micser.Audio;
 /// </summary>
 public abstract class AudioModule : IDisposable
 {
+    /// <summary>
+    /// The highest <see cref="ChannelCount"/>.
+    /// </summary>
+    public const int MaxChannelCount = 64;
+
     private readonly List<InputPort> _inputs = [];
     private readonly List<OutputPort> _outputs = [];
     private float _appliedVolume = 1f;
+    private volatile int _channelCount;
     private ProcessingFormat? _format;
     private LevelMeter? _meter;
     private float _volume = 1f;
@@ -17,6 +23,24 @@ public abstract class AudioModule : IDisposable
     /// Not raised for changes made through <see cref="IStatefulModule{TState}.SetState"/>.
     /// </summary>
     public event EventHandler? StateChanged;
+
+    /// <summary>
+    /// The channel count of the inputs without a fixed layout (<see cref="InputPort.Layout"/> null), 1..64; null takes it from their sources.
+    /// </summary>
+    public int? ChannelCount
+    {
+        get => _channelCount == 0 ? null : _channelCount;
+        set
+        {
+            if (value is { } count)
+            {
+                ArgumentOutOfRangeException.ThrowIfLessThan(count, 1);
+                ArgumentOutOfRangeException.ThrowIfGreaterThan(count, MaxChannelCount);
+            }
+
+            _channelCount = value ?? 0;
+        }
+    }
 
     /// <summary>
     /// Available once the module is added to a graph.
@@ -119,6 +143,7 @@ public abstract class AudioModule : IDisposable
             {
                 output.Buffer.ApplyGain(start, end);
                 output.Meter?.Measure(output.Buffer);
+                output.PublishLayout();
             }
         }
     }
