@@ -1380,6 +1380,36 @@
           }
         }
       },
+      "FilterState": {
+        "required": [
+          "type",
+          "frequency",
+          "slope"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/FilterType"
+          },
+          "frequency": {
+            "type": "number",
+            "format": "float",
+            "default": 80
+          },
+          "slope": {
+            "type": "integer",
+            "format": "int32",
+            "default": 12
+          }
+        }
+      },
+      "FilterType": {
+        "enum": [
+          "LowPass",
+          "HighPass"
+        ],
+        "default": "HighPass"
+      },
       "GainState": {
         "required": [
           "gain"
@@ -1473,6 +1503,9 @@
             "$ref": "#/components/schemas/ModuleDtoEqualizerModule"
           },
           {
+            "$ref": "#/components/schemas/ModuleDtoFilterModule"
+          },
+          {
             "$ref": "#/components/schemas/ModuleDtoPitchModule"
           },
           {
@@ -1489,6 +1522,7 @@
             "Gain": "#/components/schemas/ModuleDtoGainModule",
             "Compressor": "#/components/schemas/ModuleDtoCompressorModule",
             "Equalizer": "#/components/schemas/ModuleDtoEqualizerModule",
+            "Filter": "#/components/schemas/ModuleDtoFilterModule",
             "Pitch": "#/components/schemas/ModuleDtoPitchModule",
             "Spectrum": "#/components/schemas/ModuleDtoSpectrumModule"
           }
@@ -1808,6 +1842,104 @@
           },
           "state": {
             "$ref": "#/components/schemas/EqualizerState"
+          },
+          "channelCount": {
+            "maximum": 64,
+            "minimum": 1,
+            "type": [
+              "null",
+              "integer"
+            ],
+            "description": "The channel count of the inputs that otherwise take their layout from their sources, or null to do so. Only modules whose type\r\nbool ModuleTypeDto.SupportsChannelCount have it; it is ignored for all others. It can't be lower than the channels the\r\nmodule's connections to single channels need.",
+            "format": "int32"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "isBypassed": {
+            "type": "boolean",
+            "description": "Passes the audio through unprocessed. Only effect modules support it; it is ignored for all others."
+          },
+          "isCollapsed": {
+            "type": "boolean",
+            "description": "Shows only the name, mute and connectors in the UI's graph editor."
+          },
+          "isMuted": {
+            "type": "boolean"
+          },
+          "name": {
+            "maxLength": 100,
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "A name chosen by the user."
+          },
+          "position": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "Relative to the subgraph's position if Guid? ModuleDto.SubgraphId is set.",
+                "$ref": "#/components/schemas/ModulePosition"
+              }
+            ]
+          },
+          "showChannels": {
+            "type": "boolean",
+            "description": "Shows a connector per channel below each port in the UI's graph editor. It stays on while connections to or from single channels of\r\nthe module exist (an update turning it off is ignored then); creating such a connection turns it on."
+          },
+          "subgraphId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "The subgraph the module belongs to, from `GET /api/subgraphs`.",
+            "format": "uuid"
+          },
+          "templateModuleId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "The module of the subgraph's template that this module was created from or saved as, so an update from the template keeps it.\r\nIt's set by the engine and cleared when the module changes subgraphs; the value sent with an update is ignored.",
+            "format": "uuid"
+          },
+          "useSystemVolume": {
+            "type": "boolean",
+            "description": "Follows the volume and mute of Windows' default output device (its volume slider and keys). The engine then sets\r\nfloat ModuleDto.Volume and bool ModuleDto.IsMuted, and the values sent with an update are ignored."
+          },
+          "volume": {
+            "maximum": 1,
+            "minimum": 0,
+            "type": "number",
+            "description": "Output volume, 0..1.",
+            "format": "float"
+          }
+        }
+      },
+      "ModuleDtoFilterModule": {
+        "required": [
+          "state",
+          "id",
+          "isBypassed",
+          "isCollapsed",
+          "isMuted",
+          "showChannels",
+          "useSystemVolume",
+          "volume"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "Filter"
+            ],
+            "type": "string"
+          },
+          "state": {
+            "$ref": "#/components/schemas/FilterState"
           },
           "channelCount": {
             "maximum": 64,

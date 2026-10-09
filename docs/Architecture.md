@@ -31,7 +31,7 @@ src/
     Main/                     Micser.Plugins.Main: built-in modules, loaded at runtime like any plugin
       plugin.json               the plugin's manifest
       templates.json            its built-in subgraph templates
-      Modules/                  device in/out, loopback, gain, compressor, EQ, pitch, spectrum
+      Modules/                  device in/out, loopback, gain, compressor, EQ, filter, pitch, spectrum
       Dsp/                      DSP helpers not covered by NAudio
       Web/                      @micser/plugin-main: widgets for these modules, built to Web/dist
   Web/                        @micser/web: Vite + React SPA (graph editor, dialogs)
