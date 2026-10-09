@@ -5,6 +5,9 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * A plugin change that's applied at the next engine start.
+ */
 export type PluginChange = typeof PluginChange[keyof typeof PluginChange];
 
 

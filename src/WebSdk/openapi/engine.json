@@ -938,22 +938,26 @@
         "type": "object",
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "description": "The endpoint ID; changes when a device is plugged into a different port."
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "The endpoint's full name, e.g. \"Speakers (Realtek Audio)\"."
           },
           "description": {
             "type": [
               "null",
               "string"
-            ]
+            ],
+            "description": "The endpoint's short name, e.g. \"Speakers\"."
           },
           "adapterName": {
             "type": [
               "null",
               "string"
-            ]
+            ],
+            "description": "The name of the audio adapter, e.g. \"Realtek Audio\". Stable across ports."
           },
           "direction": {
             "$ref": "#/components/schemas/DeviceDirection"
@@ -967,6 +971,7 @@
                 "type": "null"
               },
               {
+                "description": "The shared-mode channel layout, or null if the device isn't active.",
                 "$ref": "#/components/schemas/ChannelLayout"
               }
             ]
@@ -976,6 +981,7 @@
               "null",
               "integer"
             ],
+            "description": "The shared-mode sample rate, or null if the device isn't active.",
             "format": "int32"
           }
         }
@@ -1088,6 +1094,7 @@
               "null",
               "integer"
             ],
+            "description": "The only channel of the source port taken (0-based), or null for all.",
             "format": "int32"
           },
           "targetChannel": {
@@ -1095,6 +1102,7 @@
               "null",
               "integer"
             ],
+            "description": "The only channel of the target port added to (0-based), or null for all.",
             "format": "int32"
           }
         }
@@ -1127,6 +1135,7 @@
               "null",
               "integer"
             ],
+            "description": "The only channel of the source port to take (0-based), or null for all. A channel the port doesn't have right now is silent.",
             "format": "int32"
           },
           "targetChannel": {
@@ -1134,6 +1143,7 @@
               "null",
               "integer"
             ],
+            "description": "The only channel of the target port to add to (0-based), or null for all. With a fixed int? ModuleDto.ChannelCount, it must be\r\nbelow it.",
             "format": "int32"
           }
         }
@@ -1146,7 +1156,8 @@
         "type": "object",
         "properties": {
           "type": {
-            "type": "string"
+            "type": "string",
+            "description": "A module type from `GET /api/module-types`."
           },
           "name": {
             "type": [
@@ -1160,6 +1171,7 @@
                 "type": "null"
               },
               {
+                "description": "Relative to the subgraph's position if SubgraphId is set.",
                 "$ref": "#/components/schemas/ModulePosition"
               }
             ]
@@ -1169,10 +1181,12 @@
               "null",
               "string"
             ],
+            "description": "The subgraph to add the module to.",
             "format": "uuid"
           },
           "showChannels": {
             "type": "boolean",
+            "description": "Whether the module shows its channel connectors (bool ModuleDto.ShowChannels).",
             "default": false
           }
         }
@@ -1194,6 +1208,7 @@
             ]
           },
           "position": {
+            "description": "The frame's position; the modules' positions are converted to be relative to it.",
             "$ref": "#/components/schemas/ModulePosition"
           },
           "size": {
@@ -1204,7 +1219,8 @@
             "items": {
               "type": "string",
               "format": "uuid"
-            }
+            },
+            "description": "The modules to move into the subgraph, also from other subgraphs."
           },
           "color": {
             "$ref": "#/components/schemas/SubgraphColor"
@@ -1282,11 +1298,13 @@
         "properties": {
           "sampleRate": {
             "type": "integer",
+            "description": "The sample rate the graph is processed at, in Hz.",
             "format": "int32",
             "default": 48000
           },
           "frameCount": {
             "type": "integer",
+            "description": "Frames per processing block; smaller blocks lower the latency and raise the CPU load.",
             "format": "int32",
             "default": 240
           }
@@ -1310,14 +1328,17 @@
           },
           "blocks": {
             "type": "integer",
+            "description": "Blocks processed since the engine started.",
             "format": "int64"
           },
           "lateBlocks": {
             "type": "integer",
+            "description": "Times processing fell behind and skipped ahead.",
             "format": "int64"
           },
           "maxProcessingMilliseconds": {
             "type": "number",
+            "description": "Longest time a block took to process since the engine started.",
             "format": "double"
           }
         }
@@ -1394,6 +1415,7 @@
         "type": "object",
         "properties": {
           "position": {
+            "description": "The new subgraph's position.",
             "$ref": "#/components/schemas/ModulePosition"
           }
         }
@@ -1457,6 +1479,7 @@
             "$ref": "#/components/schemas/ModuleDtoSpectrumModule"
           }
         ],
+        "description": "A module and its settings. The concrete type is ModuleDto&lt;TState&gt;; in JSON the `type` property\r\nnames the module type and selects the state schema (registered at runtime by ModuleCatalog).",
         "discriminator": {
           "propertyName": "type",
           "mapping": {
@@ -1499,6 +1522,7 @@
               "null",
               "integer"
             ],
+            "description": "The channel count of the inputs that otherwise take their layout from their sources, or null to do so. Only modules whose type\r\nbool ModuleTypeDto.SupportsChannelCount have it; it is ignored for all others. It can't be lower than the channels the\r\nmodule's connections to single channels need.",
             "format": "int32"
           },
           "id": {
@@ -1506,10 +1530,12 @@
             "format": "uuid"
           },
           "isBypassed": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Passes the audio through unprocessed. Only effect modules support it; it is ignored for all others."
           },
           "isCollapsed": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Shows only the name, mute and connectors in the UI's graph editor."
           },
           "isMuted": {
             "type": "boolean"
@@ -1519,7 +1545,8 @@
             "type": [
               "null",
               "string"
-            ]
+            ],
+            "description": "A name chosen by the user."
           },
           "position": {
             "oneOf": [
@@ -1527,18 +1554,21 @@
                 "type": "null"
               },
               {
+                "description": "Relative to the subgraph's position if Guid? ModuleDto.SubgraphId is set.",
                 "$ref": "#/components/schemas/ModulePosition"
               }
             ]
           },
           "showChannels": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Shows a connector per channel below each port in the UI's graph editor. It stays on while connections to or from single channels of\r\nthe module exist (an update turning it off is ignored then); creating such a connection turns it on."
           },
           "subgraphId": {
             "type": [
               "null",
               "string"
             ],
+            "description": "The subgraph the module belongs to, from `GET /api/subgraphs`.",
             "format": "uuid"
           },
           "templateModuleId": {
@@ -1546,15 +1576,18 @@
               "null",
               "string"
             ],
+            "description": "The module of the subgraph's template that this module was created from or saved as, so an update from the template keeps it.\r\nIt's set by the engine and cleared when the module changes subgraphs; the value sent with an update is ignored.",
             "format": "uuid"
           },
           "useSystemVolume": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Follows the volume and mute of Windows' default output device (its volume slider and keys). The engine then sets\r\nfloat ModuleDto.Volume and bool ModuleDto.IsMuted, and the values sent with an update are ignored."
           },
           "volume": {
             "maximum": 1,
             "minimum": 0,
             "type": "number",
+            "description": "Output volume, 0..1.",
             "format": "float"
           }
         }
@@ -1587,6 +1620,7 @@
               "null",
               "integer"
             ],
+            "description": "The channel count of the inputs that otherwise take their layout from their sources, or null to do so. Only modules whose type\r\nbool ModuleTypeDto.SupportsChannelCount have it; it is ignored for all others. It can't be lower than the channels the\r\nmodule's connections to single channels need.",
             "format": "int32"
           },
           "id": {
@@ -1594,10 +1628,12 @@
             "format": "uuid"
           },
           "isBypassed": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Passes the audio through unprocessed. Only effect modules support it; it is ignored for all others."
           },
           "isCollapsed": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Shows only the name, mute and connectors in the UI's graph editor."
           },
           "isMuted": {
             "type": "boolean"
@@ -1607,7 +1643,8 @@
             "type": [
               "null",
               "string"
-            ]
+            ],
+            "description": "A name chosen by the user."
           },
           "position": {
             "oneOf": [
@@ -1615,18 +1652,21 @@
                 "type": "null"
               },
               {
+                "description": "Relative to the subgraph's position if Guid? ModuleDto.SubgraphId is set.",
                 "$ref": "#/components/schemas/ModulePosition"
               }
             ]
           },
           "showChannels": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Shows a connector per channel below each port in the UI's graph editor. It stays on while connections to or from single channels of\r\nthe module exist (an update turning it off is ignored then); creating such a connection turns it on."
           },
           "subgraphId": {
             "type": [
               "null",
               "string"
             ],
+            "description": "The subgraph the module belongs to, from `GET /api/subgraphs`.",
             "format": "uuid"
           },
           "templateModuleId": {
@@ -1634,15 +1674,18 @@
               "null",
               "string"
             ],
+            "description": "The module of the subgraph's template that this module was created from or saved as, so an update from the template keeps it.\r\nIt's set by the engine and cleared when the module changes subgraphs; the value sent with an update is ignored.",
             "format": "uuid"
           },
           "useSystemVolume": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Follows the volume and mute of Windows' default output device (its volume slider and keys). The engine then sets\r\nfloat ModuleDto.Volume and bool ModuleDto.IsMuted, and the values sent with an update are ignored."
           },
           "volume": {
             "maximum": 1,
             "minimum": 0,
             "type": "number",
+            "description": "Output volume, 0..1.",
             "format": "float"
           }
         }
@@ -1675,6 +1718,7 @@
               "null",
               "integer"
             ],
+            "description": "The channel count of the inputs that otherwise take their layout from their sources, or null to do so. Only modules whose type\r\nbool ModuleTypeDto.SupportsChannelCount have it; it is ignored for all others. It can't be lower than the channels the\r\nmodule's connections to single channels need.",
             "format": "int32"
           },
           "id": {
@@ -1682,10 +1726,12 @@
             "format": "uuid"
           },
           "isBypassed": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Passes the audio through unprocessed. Only effect modules support it; it is ignored for all others."
           },
           "isCollapsed": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Shows only the name, mute and connectors in the UI's graph editor."
           },
           "isMuted": {
             "type": "boolean"
@@ -1695,7 +1741,8 @@
             "type": [
               "null",
               "string"
-            ]
+            ],
+            "description": "A name chosen by the user."
           },
           "position": {
             "oneOf": [
@@ -1703,18 +1750,21 @@
                 "type": "null"
               },
               {
+                "description": "Relative to the subgraph's position if Guid? ModuleDto.SubgraphId is set.",
                 "$ref": "#/components/schemas/ModulePosition"
               }
             ]
           },
           "showChannels": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Shows a connector per channel below each port in the UI's graph editor. It stays on while connections to or from single channels of\r\nthe module exist (an update turning it off is ignored then); creating such a connection turns it on."
           },
           "subgraphId": {
             "type": [
               "null",
               "string"
             ],
+            "description": "The subgraph the module belongs to, from `GET /api/subgraphs`.",
             "format": "uuid"
           },
           "templateModuleId": {
@@ -1722,15 +1772,18 @@
               "null",
               "string"
             ],
+            "description": "The module of the subgraph's template that this module was created from or saved as, so an update from the template keeps it.\r\nIt's set by the engine and cleared when the module changes subgraphs; the value sent with an update is ignored.",
             "format": "uuid"
           },
           "useSystemVolume": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Follows the volume and mute of Windows' default output device (its volume slider and keys). The engine then sets\r\nfloat ModuleDto.Volume and bool ModuleDto.IsMuted, and the values sent with an update are ignored."
           },
           "volume": {
             "maximum": 1,
             "minimum": 0,
             "type": "number",
+            "description": "Output volume, 0..1.",
             "format": "float"
           }
         }
@@ -1763,6 +1816,7 @@
               "null",
               "integer"
             ],
+            "description": "The channel count of the inputs that otherwise take their layout from their sources, or null to do so. Only modules whose type\r\nbool ModuleTypeDto.SupportsChannelCount have it; it is ignored for all others. It can't be lower than the channels the\r\nmodule's connections to single channels need.",
             "format": "int32"
           },
           "id": {
@@ -1770,10 +1824,12 @@
             "format": "uuid"
           },
           "isBypassed": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Passes the audio through unprocessed. Only effect modules support it; it is ignored for all others."
           },
           "isCollapsed": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Shows only the name, mute and connectors in the UI's graph editor."
           },
           "isMuted": {
             "type": "boolean"
@@ -1783,7 +1839,8 @@
             "type": [
               "null",
               "string"
-            ]
+            ],
+            "description": "A name chosen by the user."
           },
           "position": {
             "oneOf": [
@@ -1791,18 +1848,21 @@
                 "type": "null"
               },
               {
+                "description": "Relative to the subgraph's position if Guid? ModuleDto.SubgraphId is set.",
                 "$ref": "#/components/schemas/ModulePosition"
               }
             ]
           },
           "showChannels": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Shows a connector per channel below each port in the UI's graph editor. It stays on while connections to or from single channels of\r\nthe module exist (an update turning it off is ignored then); creating such a connection turns it on."
           },
           "subgraphId": {
             "type": [
               "null",
               "string"
             ],
+            "description": "The subgraph the module belongs to, from `GET /api/subgraphs`.",
             "format": "uuid"
           },
           "templateModuleId": {
@@ -1810,15 +1870,18 @@
               "null",
               "string"
             ],
+            "description": "The module of the subgraph's template that this module was created from or saved as, so an update from the template keeps it.\r\nIt's set by the engine and cleared when the module changes subgraphs; the value sent with an update is ignored.",
             "format": "uuid"
           },
           "useSystemVolume": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Follows the volume and mute of Windows' default output device (its volume slider and keys). The engine then sets\r\nfloat ModuleDto.Volume and bool ModuleDto.IsMuted, and the values sent with an update are ignored."
           },
           "volume": {
             "maximum": 1,
             "minimum": 0,
             "type": "number",
+            "description": "Output volume, 0..1.",
             "format": "float"
           }
         }
@@ -1851,6 +1914,7 @@
               "null",
               "integer"
             ],
+            "description": "The channel count of the inputs that otherwise take their layout from their sources, or null to do so. Only modules whose type\r\nbool ModuleTypeDto.SupportsChannelCount have it; it is ignored for all others. It can't be lower than the channels the\r\nmodule's connections to single channels need.",
             "format": "int32"
           },
           "id": {
@@ -1858,10 +1922,12 @@
             "format": "uuid"
           },
           "isBypassed": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Passes the audio through unprocessed. Only effect modules support it; it is ignored for all others."
           },
           "isCollapsed": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Shows only the name, mute and connectors in the UI's graph editor."
           },
           "isMuted": {
             "type": "boolean"
@@ -1871,7 +1937,8 @@
             "type": [
               "null",
               "string"
-            ]
+            ],
+            "description": "A name chosen by the user."
           },
           "position": {
             "oneOf": [
@@ -1879,18 +1946,21 @@
                 "type": "null"
               },
               {
+                "description": "Relative to the subgraph's position if Guid? ModuleDto.SubgraphId is set.",
                 "$ref": "#/components/schemas/ModulePosition"
               }
             ]
           },
           "showChannels": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Shows a connector per channel below each port in the UI's graph editor. It stays on while connections to or from single channels of\r\nthe module exist (an update turning it off is ignored then); creating such a connection turns it on."
           },
           "subgraphId": {
             "type": [
               "null",
               "string"
             ],
+            "description": "The subgraph the module belongs to, from `GET /api/subgraphs`.",
             "format": "uuid"
           },
           "templateModuleId": {
@@ -1898,15 +1968,18 @@
               "null",
               "string"
             ],
+            "description": "The module of the subgraph's template that this module was created from or saved as, so an update from the template keeps it.\r\nIt's set by the engine and cleared when the module changes subgraphs; the value sent with an update is ignored.",
             "format": "uuid"
           },
           "useSystemVolume": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Follows the volume and mute of Windows' default output device (its volume slider and keys). The engine then sets\r\nfloat ModuleDto.Volume and bool ModuleDto.IsMuted, and the values sent with an update are ignored."
           },
           "volume": {
             "maximum": 1,
             "minimum": 0,
             "type": "number",
+            "description": "Output volume, 0..1.",
             "format": "float"
           }
         }
@@ -1939,6 +2012,7 @@
               "null",
               "integer"
             ],
+            "description": "The channel count of the inputs that otherwise take their layout from their sources, or null to do so. Only modules whose type\r\nbool ModuleTypeDto.SupportsChannelCount have it; it is ignored for all others. It can't be lower than the channels the\r\nmodule's connections to single channels need.",
             "format": "int32"
           },
           "id": {
@@ -1946,10 +2020,12 @@
             "format": "uuid"
           },
           "isBypassed": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Passes the audio through unprocessed. Only effect modules support it; it is ignored for all others."
           },
           "isCollapsed": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Shows only the name, mute and connectors in the UI's graph editor."
           },
           "isMuted": {
             "type": "boolean"
@@ -1959,7 +2035,8 @@
             "type": [
               "null",
               "string"
-            ]
+            ],
+            "description": "A name chosen by the user."
           },
           "position": {
             "oneOf": [
@@ -1967,18 +2044,21 @@
                 "type": "null"
               },
               {
+                "description": "Relative to the subgraph's position if Guid? ModuleDto.SubgraphId is set.",
                 "$ref": "#/components/schemas/ModulePosition"
               }
             ]
           },
           "showChannels": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Shows a connector per channel below each port in the UI's graph editor. It stays on while connections to or from single channels of\r\nthe module exist (an update turning it off is ignored then); creating such a connection turns it on."
           },
           "subgraphId": {
             "type": [
               "null",
               "string"
             ],
+            "description": "The subgraph the module belongs to, from `GET /api/subgraphs`.",
             "format": "uuid"
           },
           "templateModuleId": {
@@ -1986,15 +2066,18 @@
               "null",
               "string"
             ],
+            "description": "The module of the subgraph's template that this module was created from or saved as, so an update from the template keeps it.\r\nIt's set by the engine and cleared when the module changes subgraphs; the value sent with an update is ignored.",
             "format": "uuid"
           },
           "useSystemVolume": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Follows the volume and mute of Windows' default output device (its volume slider and keys). The engine then sets\r\nfloat ModuleDto.Volume and bool ModuleDto.IsMuted, and the values sent with an update are ignored."
           },
           "volume": {
             "maximum": 1,
             "minimum": 0,
             "type": "number",
+            "description": "Output volume, 0..1.",
             "format": "float"
           }
         }
@@ -2027,6 +2110,7 @@
               "null",
               "integer"
             ],
+            "description": "The channel count of the inputs that otherwise take their layout from their sources, or null to do so. Only modules whose type\r\nbool ModuleTypeDto.SupportsChannelCount have it; it is ignored for all others. It can't be lower than the channels the\r\nmodule's connections to single channels need.",
             "format": "int32"
           },
           "id": {
@@ -2034,10 +2118,12 @@
             "format": "uuid"
           },
           "isBypassed": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Passes the audio through unprocessed. Only effect modules support it; it is ignored for all others."
           },
           "isCollapsed": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Shows only the name, mute and connectors in the UI's graph editor."
           },
           "isMuted": {
             "type": "boolean"
@@ -2047,7 +2133,8 @@
             "type": [
               "null",
               "string"
-            ]
+            ],
+            "description": "A name chosen by the user."
           },
           "position": {
             "oneOf": [
@@ -2055,18 +2142,21 @@
                 "type": "null"
               },
               {
+                "description": "Relative to the subgraph's position if Guid? ModuleDto.SubgraphId is set.",
                 "$ref": "#/components/schemas/ModulePosition"
               }
             ]
           },
           "showChannels": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Shows a connector per channel below each port in the UI's graph editor. It stays on while connections to or from single channels of\r\nthe module exist (an update turning it off is ignored then); creating such a connection turns it on."
           },
           "subgraphId": {
             "type": [
               "null",
               "string"
             ],
+            "description": "The subgraph the module belongs to, from `GET /api/subgraphs`.",
             "format": "uuid"
           },
           "templateModuleId": {
@@ -2074,15 +2164,18 @@
               "null",
               "string"
             ],
+            "description": "The module of the subgraph's template that this module was created from or saved as, so an update from the template keeps it.\r\nIt's set by the engine and cleared when the module changes subgraphs; the value sent with an update is ignored.",
             "format": "uuid"
           },
           "useSystemVolume": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Follows the volume and mute of Windows' default output device (its volume slider and keys). The engine then sets\r\nfloat ModuleDto.Volume and bool ModuleDto.IsMuted, and the values sent with an update are ignored."
           },
           "volume": {
             "maximum": 1,
             "minimum": 0,
             "type": "number",
+            "description": "Output volume, 0..1.",
             "format": "float"
           }
         }
@@ -2115,6 +2208,7 @@
               "null",
               "integer"
             ],
+            "description": "The channel count of the inputs that otherwise take their layout from their sources, or null to do so. Only modules whose type\r\nbool ModuleTypeDto.SupportsChannelCount have it; it is ignored for all others. It can't be lower than the channels the\r\nmodule's connections to single channels need.",
             "format": "int32"
           },
           "id": {
@@ -2122,10 +2216,12 @@
             "format": "uuid"
           },
           "isBypassed": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Passes the audio through unprocessed. Only effect modules support it; it is ignored for all others."
           },
           "isCollapsed": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Shows only the name, mute and connectors in the UI's graph editor."
           },
           "isMuted": {
             "type": "boolean"
@@ -2135,7 +2231,8 @@
             "type": [
               "null",
               "string"
-            ]
+            ],
+            "description": "A name chosen by the user."
           },
           "position": {
             "oneOf": [
@@ -2143,18 +2240,21 @@
                 "type": "null"
               },
               {
+                "description": "Relative to the subgraph's position if Guid? ModuleDto.SubgraphId is set.",
                 "$ref": "#/components/schemas/ModulePosition"
               }
             ]
           },
           "showChannels": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Shows a connector per channel below each port in the UI's graph editor. It stays on while connections to or from single channels of\r\nthe module exist (an update turning it off is ignored then); creating such a connection turns it on."
           },
           "subgraphId": {
             "type": [
               "null",
               "string"
             ],
+            "description": "The subgraph the module belongs to, from `GET /api/subgraphs`.",
             "format": "uuid"
           },
           "templateModuleId": {
@@ -2162,15 +2262,18 @@
               "null",
               "string"
             ],
+            "description": "The module of the subgraph's template that this module was created from or saved as, so an update from the template keeps it.\r\nIt's set by the engine and cleared when the module changes subgraphs; the value sent with an update is ignored.",
             "format": "uuid"
           },
           "useSystemVolume": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Follows the volume and mute of Windows' default output device (its volume slider and keys). The engine then sets\r\nfloat ModuleDto.Volume and bool ModuleDto.IsMuted, and the values sent with an update are ignored."
           },
           "volume": {
             "maximum": 1,
             "minimum": 0,
             "type": "number",
+            "description": "Output volume, 0..1.",
             "format": "float"
           }
         }
@@ -2191,15 +2294,18 @@
             "type": "object",
             "additionalProperties": {
               "$ref": "#/components/schemas/PortLayoutDto"
-            }
+            },
+            "description": "The layouts of the input ports, by name."
           },
           "outputs": {
             "type": "object",
             "additionalProperties": {
               "$ref": "#/components/schemas/PortLayoutDto"
-            }
+            },
+            "description": "The layouts of the output ports, by name."
           }
-        }
+        },
+        "description": "The channel layouts of a module's ports while the audio runs."
       },
       "ModulePosition": {
         "required": [
@@ -2216,7 +2322,8 @@
             "type": "number",
             "format": "double"
           }
-        }
+        },
+        "description": "Position of a module in the UI's graph editor."
       },
       "ModuleTypeDto": {
         "required": [
@@ -2231,32 +2338,40 @@
         "type": "object",
         "properties": {
           "type": {
-            "type": "string"
+            "type": "string",
+            "description": "The name identifying the module type, e.g. \"Gain\"."
           },
           "inputs": {
             "type": "array",
             "items": {
               "type": "string"
-            }
+            },
+            "description": "Names of the input ports."
           },
           "outputs": {
             "type": "array",
             "items": {
               "type": "string"
-            }
+            },
+            "description": "Names of the output ports."
           },
-          "defaultState": { },
+          "defaultState": {
+            "description": "The state of a new module of this type."
+          },
           "supportsBypass": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Whether bool ModuleDto.IsBypassed has an effect."
           },
           "supportsChannelCount": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Whether int? ModuleDto.ChannelCount has an effect."
           },
           "channelCountInputs": {
             "type": "array",
             "items": {
               "type": "string"
-            }
+            },
+            "description": "The inputs that int? ModuleDto.ChannelCount applies to: those without a fixed layout. Their connections to single channels\r\nlimit it."
           }
         }
       },
@@ -2284,7 +2399,8 @@
           "None",
           "Install",
           "Remove"
-        ]
+        ],
+        "description": "A plugin change that's applied at the next engine start."
       },
       "PluginDto": {
         "required": [
@@ -2306,7 +2422,8 @@
             "type": [
               "null",
               "string"
-            ]
+            ],
+            "description": "Null if the plugin's manifest can't be read."
           },
           "version": {
             "type": [
@@ -2315,7 +2432,8 @@
             ]
           },
           "isBuiltIn": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Whether the plugin ships with the engine; built-in plugins can't be removed."
           },
           "isLoaded": {
             "type": "boolean"
@@ -2324,18 +2442,22 @@
             "type": [
               "null",
               "string"
-            ]
+            ],
+            "description": "Why the plugin isn't loaded; null if it's loaded or only staged."
           },
           "webUrl": {
             "type": [
               "null",
               "string"
-            ]
+            ],
+            "description": "The URL of the plugin's widget bundle (an ES module), if it's loaded and has widgets."
           },
           "pendingChange": {
+            "description": "A change that's applied when the engine restarts.",
             "$ref": "#/components/schemas/PluginChange"
           }
-        }
+        },
+        "description": "A plugin: loaded at the engine's start, failed to load, or staged for installation."
       },
       "PortLayoutDto": {
         "required": [
@@ -2346,6 +2468,7 @@
         "properties": {
           "channelCount": {
             "type": "integer",
+            "description": "0 while the port carries nothing, e.g. a device output without an open device or a module that isn't processed.",
             "format": "int32"
           },
           "speakers": {
@@ -2355,9 +2478,11 @@
             ],
             "items": {
               "$ref": "#/components/schemas/SpeakerPosition"
-            }
+            },
+            "description": "The speaker of each channel, or null if the channels have no speaker positions or one that SpeakerPosition doesn't name\r\n(the reserved bits of the mask)."
           }
-        }
+        },
+        "description": "The channel layout of a port in the last processed block."
       },
       "RenameSubgraphTemplateRequest": {
         "required": [
@@ -2379,16 +2504,19 @@
         "properties": {
           "subgraphId": {
             "type": "string",
+            "description": "The subgraph to save; it refers to the template afterwards.",
             "format": "uuid"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "description": "Template names are unique, ignoring case."
           },
           "templateId": {
             "type": [
               "null",
               "string"
             ],
+            "description": "The template to save over, keeping its id; a new template if null.",
             "format": "uuid"
           }
         }
@@ -2413,7 +2541,8 @@
           "TopBackLeft",
           "TopBackCenter",
           "TopBackRight"
-        ]
+        ],
+        "description": "The speaker of a channel (WAVEFORMATEXTENSIBLE)."
       },
       "Speakers": {
         "type": "string"
@@ -2432,6 +2561,7 @@
           "Purple",
           "Teal"
         ],
+        "description": "The color of a subgraph's frame; the UI maps it to its theme's palette.",
         "default": "Green"
       },
       "SubgraphDto": {
@@ -2455,7 +2585,8 @@
             "type": [
               "null",
               "string"
-            ]
+            ],
+            "description": "A name chosen by the user."
           },
           "position": {
             "$ref": "#/components/schemas/ModulePosition"
@@ -2468,14 +2599,17 @@
           },
           "isCollapsed": {
             "type": "boolean",
+            "description": "Shows the subgraph as one node with the ports of the connections that cross its border.",
             "default": false
           },
           "isMuted": {
             "type": "boolean",
+            "description": "Mutes all its modules, in addition to their own mute.",
             "default": false
           },
           "isBypassed": {
             "type": "boolean",
+            "description": "Bypasses all its effect modules, in addition to their own bypass.",
             "default": false
           },
           "templateId": {
@@ -2483,6 +2617,7 @@
               "null",
               "string"
             ],
+            "description": "The template the subgraph was created from or last saved as. It's set by the engine; an update can only clear it.",
             "format": "uuid"
           },
           "templateRevision": {
@@ -2490,9 +2625,11 @@
               "null",
               "integer"
             ],
+            "description": "The template's revision the subgraph matches; it's outdated when the template's is higher.",
             "format": "int32"
           }
-        }
+        },
+        "description": "A group of modules in the UI's graph editor. Its modules refer to it with Guid? ModuleDto.SubgraphId, and their\r\npositions are relative to ModulePosition SubgraphDto.Position."
       },
       "SubgraphSize": {
         "required": [
@@ -2509,7 +2646,8 @@
             "type": "number",
             "format": "double"
           }
-        }
+        },
+        "description": "Size of a subgraph's frame in the UI's graph editor."
       },
       "SubgraphTemplateDto": {
         "required": [
@@ -2534,6 +2672,7 @@
           },
           "revision": {
             "type": "integer",
+            "description": "Increases each time the template is saved over; subgraphs with a lower one are outdated.",
             "format": "int32"
           },
           "color": {
@@ -2546,7 +2685,8 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ModuleDto"
-            }
+            },
+            "description": "The modules with template-local ids and positions relative to the subgraph."
           },
           "connections": {
             "type": "array",
@@ -2558,12 +2698,15 @@
             "type": "array",
             "items": {
               "type": "string"
-            }
+            },
+            "description": "The types of modules in the template whose plugin isn't loaded. A template with any can't be used."
           },
           "isBuiltIn": {
-            "type": "boolean"
+            "type": "boolean",
+            "description": "Provided by a plugin and updated with it; it can't be renamed, saved over or removed."
           }
-        }
+        },
+        "description": "A saved subgraph: its frame, modules and the connections between them, to create subgraphs from."
       },
       "TemplateConnectionDto": {
         "required": [
@@ -2602,7 +2745,8 @@
             ],
             "format": "int32"
           }
-        }
+        },
+        "description": "A connection between two modules of a subgraph template, by their template-local ids."
       },
       "UiPreferencesDto": {
         "required": [
@@ -2614,23 +2758,28 @@
         "properties": {
           "showStreamStatistics": {
             "type": "boolean",
+            "description": "Whether device widgets show dropouts and the buffer size.",
             "default": false
           },
           "snapToGrid": {
             "type": "boolean",
+            "description": "Whether modules snap to the grid when moved.",
             "default": true
           },
           "language": {
             "type": [
               "null",
               "string"
-            ]
+            ],
+            "description": "The UI's language, e.g. \"de\"; null follows the system. Languages the UI doesn't have also follow the system."
           },
           "showChannelsByDefault": {
             "type": "boolean",
+            "description": "Whether modules the UI adds show their channel connectors.",
             "default": false
           }
-        }
+        },
+        "description": "Preferences of the web UI. Kept in the engine's configuration, because the UI's origin (the engine's random port) changes on every start,\r\nso browser storage wouldn't keep them."
       }
     }
   },

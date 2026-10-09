@@ -9,14 +9,21 @@ import type { SubgraphColor } from './subgraphColor';
 import type { SubgraphSize } from './subgraphSize';
 import type { TemplateConnectionDto } from './templateConnectionDto';
 
+/**
+ * A saved subgraph: its frame, modules and the connections between them, to create subgraphs from.
+ */
 export interface SubgraphTemplateDto {
   id: string;
   name: string;
+  /** Increases each time the template is saved over; subgraphs with a lower one are outdated. */
   revision: number;
   color: SubgraphColor;
   size: SubgraphSize;
+  /** The modules with template-local ids and positions relative to the subgraph. */
   modules: ModuleDto[];
   connections: TemplateConnectionDto[];
+  /** The types of modules in the template whose plugin isn't loaded. A template with any can't be used. */
   unavailableTypes: string[];
+  /** Provided by a plugin and updated with it; it can't be renamed, saved over or removed. */
   isBuiltIn: boolean;
 }

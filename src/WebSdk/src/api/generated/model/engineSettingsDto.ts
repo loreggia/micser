@@ -6,6 +6,8 @@
  */
 
 export interface EngineSettingsDto {
+  /** The sample rate the graph is processed at, in Hz. */
   sampleRate: number;
+  /** Frames per processing block; smaller blocks lower the latency and raise the CPU load. */
   frameCount: number;
 }

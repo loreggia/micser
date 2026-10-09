@@ -6,8 +6,13 @@
  */
 
 export interface SaveSubgraphTemplateRequest {
+  /** The subgraph to save; it refers to the template afterwards. */
   subgraphId: string;
+  /** Template names are unique, ignoring case. */
   name: string;
-  /** @nullable */
+  /**
+     * The template to save over, keeping its id; a new template if null.
+     * @nullable
+     */
   templateId?: string | null;
 }

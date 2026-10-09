@@ -6,4 +6,7 @@
  */
 import type { PortLayoutDto } from './portLayoutDto';
 
+/**
+ * The layouts of the input ports, by name.
+ */
 export type ModulePortLayoutsDtoInputs = {[key: string]: PortLayoutDto};

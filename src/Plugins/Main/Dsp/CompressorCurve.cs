@@ -12,7 +12,7 @@ internal static class CompressorCurve
     {
         if (knee <= 0f)
         {
-            return level < threshold ? level : threshold + slope * (level - threshold);
+            return level < threshold ? level : threshold + (slope * (level - threshold));
         }
 
         if (level - threshold < -knee / 2f)
@@ -22,11 +22,11 @@ internal static class CompressorCurve
 
         if (Math.Abs(level - threshold) <= knee / 2f)
         {
-            var a = level - threshold + knee / 2f;
-            return level + (slope - 1f) * a * a / (2f * knee);
+            var a = level - threshold + (knee / 2f);
+            return level + ((slope - 1f) * a * a / (2f * knee));
         }
 
-        return threshold + slope * (level - threshold);
+        return threshold + (slope * (level - threshold));
     }
 
     /// <summary>
@@ -36,7 +36,7 @@ internal static class CompressorCurve
     {
         if (knee <= 0f)
         {
-            return level > threshold ? level : threshold + slope * (level - threshold);
+            return level > threshold ? level : threshold + (slope * (level - threshold));
         }
 
         if (level - threshold > knee / 2f)
@@ -46,10 +46,10 @@ internal static class CompressorCurve
 
         if (Math.Abs(level - threshold) <= knee / 2f)
         {
-            var a = -level + threshold + knee / 2f;
-            return level - (slope - 1f) * a * a / (2f * knee);
+            var a = -level + threshold + (knee / 2f);
+            return level - ((slope - 1f) * a * a / (2f * knee));
         }
 
-        return threshold + slope * (level - threshold);
+        return threshold + (slope * (level - threshold));
     }
 }

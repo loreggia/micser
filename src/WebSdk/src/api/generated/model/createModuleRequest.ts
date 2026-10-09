@@ -7,11 +7,16 @@
 import type { ModulePosition } from './modulePosition';
 
 export interface CreateModuleRequest {
+  /** A module type from `GET /api/module-types`. */
   type: string;
   /** @nullable */
   name?: string | null;
   position?: null | ModulePosition;
-  /** @nullable */
+  /**
+     * The subgraph to add the module to.
+     * @nullable
+     */
   subgraphId?: string | null;
+  /** Whether the module shows its channel connectors (bool ModuleDto.ShowChannels). */
   showChannels: boolean;
 }

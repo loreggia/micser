@@ -7,5 +7,6 @@
 import type { ModulePosition } from './modulePosition';
 
 export interface InstantiateSubgraphTemplateRequest {
+  /** The new subgraph's position. */
   position: ModulePosition;
 }

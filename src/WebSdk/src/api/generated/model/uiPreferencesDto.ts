@@ -5,10 +5,20 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * Preferences of the web UI. Kept in the engine's configuration, because the UI's origin (the engine's random port) changes on every start,
+ * so browser storage wouldn't keep them.
+ */
 export interface UiPreferencesDto {
+  /** Whether device widgets show dropouts and the buffer size. */
   showStreamStatistics: boolean;
+  /** Whether modules snap to the grid when moved. */
   snapToGrid: boolean;
-  /** @nullable */
+  /**
+     * The UI's language, e.g. "de"; null follows the system. Languages the UI doesn't have also follow the system.
+     * @nullable
+     */
   language?: string | null;
+  /** Whether modules the UI adds show their channel connectors. */
   showChannelsByDefault: boolean;
 }

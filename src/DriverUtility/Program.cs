@@ -251,10 +251,8 @@ static DriverStatus GetStatus()
 }
 
 // Sets the cables' endpoints to the format of their layout; they appear a moment after the device restarted.
-static bool SyncFormats(VacDevice device)
-{
-    return CableEndpoints.Sync(device.GetInstanceId(), device.GetCableLayouts(), TimeSpan.FromSeconds(15));
-}
+static bool SyncFormats(VacDevice device) =>
+    CableEndpoints.Sync(device.GetInstanceId(), device.GetCableLayouts(), TimeSpan.FromSeconds(15));
 
 static DriverPackage? LoadBundledPackage()
 {

@@ -5,6 +5,9 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * Size of a subgraph's frame in the UI's graph editor.
+ */
 export interface SubgraphSize {
   width: number;
   height: number;

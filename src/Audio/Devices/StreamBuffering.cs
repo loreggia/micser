@@ -68,7 +68,7 @@ internal static class StreamBuffering
         var period = GetDevicePeriod(device);
         var block = format.BlockDuration.TotalSeconds;
         return CreateTarget(
-            Math.Max(period, block + period / 2) + block / 2,
+            Math.Max(period, block + (period / 2)) + (block / 2),
             period,
             format,
             deviceSampleRate,
@@ -89,7 +89,7 @@ internal static class StreamBuffering
     {
         var period = GetDevicePeriod(device);
         return CreateTarget(
-            period + format.BlockDuration.TotalSeconds / 2,
+            period + (format.BlockDuration.TotalSeconds / 2),
             period,
             format,
             deviceSampleRate,

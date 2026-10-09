@@ -11,8 +11,10 @@ import type { SubgraphSize } from './subgraphSize';
 export interface CreateSubgraphRequest {
   /** @nullable */
   name: string | null;
+  /** The frame's position; the modules' positions are converted to be relative to it. */
   position: ModulePosition;
   size: SubgraphSize;
+  /** The modules to move into the subgraph, also from other subgraphs. */
   moduleIds: string[];
   color: SubgraphColor;
 }

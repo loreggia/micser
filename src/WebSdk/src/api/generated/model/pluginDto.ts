@@ -6,17 +6,31 @@
  */
 import type { PluginChange } from './pluginChange';
 
+/**
+ * A plugin: loaded at the engine's start, failed to load, or staged for installation.
+ */
 export interface PluginDto {
   id: string;
-  /** @nullable */
+  /**
+     * Null if the plugin's manifest can't be read.
+     * @nullable
+     */
   name: string | null;
   /** @nullable */
   version: string | null;
+  /** Whether the plugin ships with the engine; built-in plugins can't be removed. */
   isBuiltIn: boolean;
   isLoaded: boolean;
-  /** @nullable */
+  /**
+     * Why the plugin isn't loaded; null if it's loaded or only staged.
+     * @nullable
+     */
   error: string | null;
-  /** @nullable */
+  /**
+     * The URL of the plugin's widget bundle (an ES module), if it's loaded and has widgets.
+     * @nullable
+     */
   webUrl: string | null;
+  /** A change that's applied when the engine restarts. */
   pendingChange: PluginChange;
 }

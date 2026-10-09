@@ -14,17 +14,17 @@ public class SpectrumModuleTests
     [Test]
     public async Task GetSpectrum_ShowsSineAtItsBinWithItsAmplitude()
     {
-        const int bin = 100;
+        const int Bin = 100;
         var spectrum = new SpectrumModule();
-        var frequency = bin * (float)SignalTestBench.Format.SampleRate / SpectrumModule.FftSize;
+        var frequency = Bin * (float)SignalTestBench.Format.SampleRate / SpectrumModule.FftSize;
         var bench = new SignalTestBench(frequency, 0.5f, ChannelLayout.Stereo, spectrum);
         bench.Run(TimeSpan.FromMilliseconds(200));
 
         var result = spectrum.GetSpectrum()!;
 
-        await Assert.That(result.FrequencyResolution).IsEqualTo(frequency / bin).Within(1e-3f);
-        await Assert.That(Array.IndexOf(result.Magnitudes, result.Magnitudes.Max())).IsEqualTo(bin);
-        await Assert.That(result.Magnitudes[bin]).IsEqualTo(0.5f).Within(0.01f);
+        await Assert.That(result.FrequencyResolution).IsEqualTo(frequency / Bin).Within(1e-3f);
+        await Assert.That(Array.IndexOf(result.Magnitudes, result.Magnitudes.Max())).IsEqualTo(Bin);
+        await Assert.That(result.Magnitudes[Bin]).IsEqualTo(0.5f).Within(0.01f);
     }
 
     [Test]

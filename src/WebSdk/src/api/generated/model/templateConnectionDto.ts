@@ -5,6 +5,9 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * A connection between two modules of a subgraph template, by their template-local ids.
+ */
 export interface TemplateConnectionDto {
   sourceModuleId: string;
   sourcePort: string;

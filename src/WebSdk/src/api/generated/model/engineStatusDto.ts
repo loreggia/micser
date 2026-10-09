@@ -9,7 +9,10 @@ import type { EngineSettingsDto } from './engineSettingsDto';
 export interface EngineStatusDto {
   isRunning: boolean;
   settings: EngineSettingsDto;
+  /** Blocks processed since the engine started. */
   blocks: number;
+  /** Times processing fell behind and skipped ahead. */
   lateBlocks: number;
+  /** Longest time a block took to process since the engine started. */
   maxProcessingMilliseconds: number;
 }

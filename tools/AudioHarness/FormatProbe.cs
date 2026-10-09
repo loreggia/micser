@@ -61,22 +61,22 @@ internal static class FormatProbe
         var channels = renderMix.Channels;
         var mask = renderMix is WaveFormatExtensible { ChannelMask: var mixMask } ? mixMask : Mask(channels);
         WaveFormatExtensible Exclusive(int bits, int? validBits = null) => Pcm(48000, bits, channels, validBits, mask);
-        const AudioClientShareMode shared = AudioClientShareMode.Shared;
-        const AudioClientShareMode exclusive = AudioClientShareMode.Exclusive;
+        const AudioClientShareMode SharedMode = AudioClientShareMode.Shared;
+        const AudioClientShareMode ExclusiveMode = AudioClientShareMode.Exclusive;
 
         Console.WriteLine(
             "Tone through the endpoints (1 kHz at -20 dBFS peak, -23 dBFS RMS; level and tone share of channel 1 after 0.5 s):"
         );
-        Transfer(render, Pcm(44100, 16, 1), shared, capture, Pcm(16000, 16, 1), shared);
-        Transfer(render, Float(48000, 6), shared, capture, Float(48000, 2), shared);
-        Transfer(render, Pcm(44100, 24, 2), shared, capture, Pcm(96000, 24, 2), shared);
-        Transfer(render, Exclusive(32), exclusive, capture, Exclusive(32), exclusive);
-        Transfer(render, Exclusive(32), exclusive, capture, Pcm(16000, 16, 1), shared);
-        Transfer(render, Exclusive(16), exclusive, capture, Exclusive(24), exclusive);
-        Transfer(render, Exclusive(24), exclusive, capture, Float(48000, 2), shared);
-        Transfer(render, Float(48000, 2), shared, capture, Exclusive(16), exclusive);
-        Transfer(render, Exclusive(32, 24), exclusive, capture, Pcm(48000, 16, 2), shared);
-        Transfer(render, Pcm(44100, 16, channels, null, mask), exclusive, capture, Float(48000, 2), shared);
+        Transfer(render, Pcm(44100, 16, 1), SharedMode, capture, Pcm(16000, 16, 1), SharedMode);
+        Transfer(render, Float(48000, 6), SharedMode, capture, Float(48000, 2), SharedMode);
+        Transfer(render, Pcm(44100, 24, 2), SharedMode, capture, Pcm(96000, 24, 2), SharedMode);
+        Transfer(render, Exclusive(32), ExclusiveMode, capture, Exclusive(32), ExclusiveMode);
+        Transfer(render, Exclusive(32), ExclusiveMode, capture, Pcm(16000, 16, 1), SharedMode);
+        Transfer(render, Exclusive(16), ExclusiveMode, capture, Exclusive(24), ExclusiveMode);
+        Transfer(render, Exclusive(24), ExclusiveMode, capture, Float(48000, 2), SharedMode);
+        Transfer(render, Float(48000, 2), SharedMode, capture, Exclusive(16), ExclusiveMode);
+        Transfer(render, Exclusive(32, 24), ExclusiveMode, capture, Pcm(48000, 16, 2), SharedMode);
+        Transfer(render, Pcm(44100, 16, channels, null, mask), ExclusiveMode, capture, Float(48000, 2), SharedMode);
         Console.WriteLine();
 
         (WaveFormat Render, WaveFormat Capture)[] maps =
@@ -177,7 +177,7 @@ internal static class FormatProbe
     /// </summary>
     private static void ChannelMap(MMDevice render, WaveFormat renderFormat, MMDevice capture, WaveFormat captureFormat)
     {
-        static double Frequency(int channel) => 500 + 200 * channel;
+        static double Frequency(int channel) => 500 + (200 * channel);
         double Sample(long frame, int channel) =>
             ToneAmplitude * Math.Sin(2 * Math.PI * Frequency(channel) * frame / renderFormat.SampleRate);
 
@@ -261,10 +261,10 @@ internal static class FormatProbe
 
             // the harness polls, so exclusive streams get more than one device period of buffer
             var period = client.DefaultDevicePeriod;
-            const long buffer = 1_000_000;
+            const long BufferDuration = 1_000_000;
             try
             {
-                client.Initialize(mode, flags, buffer, period, format, Guid.Empty);
+                client.Initialize(mode, flags, BufferDuration, period, format, Guid.Empty);
                 return client;
             }
             catch (Exception ex) when ((uint)ex.HResult == 0x88890019)
@@ -272,7 +272,7 @@ internal static class FormatProbe
                 var frames = client.BufferSize;
                 client.Dispose();
                 client = device.CreateAudioClient();
-                var aligned = (long)(10_000_000.0 * frames / format.SampleRate + 0.5);
+                var aligned = (long)((10_000_000.0 * frames / format.SampleRate) + 0.5);
                 client.Initialize(mode, flags, aligned, period, format, Guid.Empty);
                 return client;
             }
@@ -451,7 +451,7 @@ internal static class FormatProbe
                         var value = sample(renderedFrames + frame, channel);
                         WriteSample(
                             bytes,
-                            frame * renderFormat.BlockAlign + channel * renderFormat.BitsPerSample / 8,
+                            (frame * renderFormat.BlockAlign) + (channel * renderFormat.BitsPerSample / 8),
                             renderFormat,
                             value
                         );
@@ -473,7 +473,7 @@ internal static class FormatProbe
                 {
                     for (var channel = 0; channel < captureFormat.Channels; channel++)
                     {
-                        var offset = frame * captureFormat.BlockAlign + channel * captureFormat.BitsPerSample / 8;
+                        var offset = (frame * captureFormat.BlockAlign) + (channel * captureFormat.BitsPerSample / 8);
                         captured[channel]
                             .Add(
                                 flags.HasFlag(AudioClientBufferFlags.Silent)
@@ -503,12 +503,12 @@ internal static class FormatProbe
             s2 = 0;
         foreach (var sample in samples)
         {
-            var s0 = sample + coefficient * s1 - s2;
+            var s0 = sample + (coefficient * s1) - s2;
             s2 = s1;
             s1 = s0;
         }
 
-        var magnitudeSquared = s1 * s1 + s2 * s2 - coefficient * s1 * s2;
+        var magnitudeSquared = (s1 * s1) + (s2 * s2) - (coefficient * s1 * s2);
         return 2 * magnitudeSquared / ((double)samples.Length * samples.Length);
     }
 

@@ -7,8 +7,13 @@
 import type { ModulePortLayoutsDtoInputs } from './modulePortLayoutsDtoInputs';
 import type { ModulePortLayoutsDtoOutputs } from './modulePortLayoutsDtoOutputs';
 
+/**
+ * The channel layouts of a module's ports while the audio runs.
+ */
 export interface ModulePortLayoutsDto {
   moduleId: string;
+  /** The layouts of the input ports, by name. */
   inputs: ModulePortLayoutsDtoInputs;
+  /** The layouts of the output ports, by name. */
   outputs: ModulePortLayoutsDtoOutputs;
 }
