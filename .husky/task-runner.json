@@ -21,6 +21,13 @@
       "args": ["--no", "--", "prettier", "--write", "--ignore-unknown", "${staged}"]
     },
     {
+      "name": "code-style-fix",
+      "group": "pre-commit",
+      "command": "dotnet",
+      "args": ["format", "style", "Micser.slnx", "--severity", "warn", "--no-restore", "--include", "${staged}"],
+      "include": ["**/*.cs"]
+    },
+    {
       "name": "csharpier",
       "group": "pre-commit",
       "command": "dotnet",
@@ -37,6 +44,23 @@
         "**/*.xaml",
         "**/*.axaml"
       ]
+    },
+    {
+      "name": "code-style-check",
+      "group": "pre-commit",
+      "command": "dotnet",
+      "args": [
+        "format",
+        "style",
+        "Micser.slnx",
+        "--severity",
+        "warn",
+        "--no-restore",
+        "--verify-no-changes",
+        "--include",
+        "${staged}"
+      ],
+      "include": ["**/*.cs"]
     }
   ]
 }
