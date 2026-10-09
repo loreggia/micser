@@ -7,7 +7,16 @@ import globals from "globals";
 import tseslint from "typescript-eslint";
 
 export default defineConfig([
-  globalIgnores(["artifacts", "**/dist", "**/bin", "**/obj", "**/node_modules", "**/generated"]),
+  globalIgnores([
+    ".agents",
+    ".claude/skills",
+    "artifacts",
+    "**/dist",
+    "**/bin",
+    "**/obj",
+    "**/node_modules",
+    "**/generated",
+  ]),
   {
     files: ["**/*.{ts,tsx,mts}"],
     extends: [
