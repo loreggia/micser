@@ -69,8 +69,8 @@ public sealed class InputPort : AudioPort
 
     /// <summary>
     /// The layout the connected outputs are mixed into. When null, it is <see cref="AudioModule.ChannelCount"/>'s layout or, if that isn't
-    /// set either, the widest layout of the outputs connected as a whole, widened to the highest target channel of the connections to a
-    /// single channel (at least stereo without outputs connected as a whole).
+    /// set either, the widest layout of the sources added to the whole input (a single source channel counts as mono), widened to the
+    /// highest target channel of the connections to a single channel (at least stereo without sources added to the whole input).
     /// </summary>
     public ChannelLayout? Layout { get; set; }
 
@@ -118,7 +118,7 @@ public sealed class InputPort : AudioPort
             }
 
             hasWholeSources = true;
-            var candidate = source.Source.Buffer.Layout;
+            var candidate = source.SourceChannel == null ? source.Source.Buffer.Layout : ChannelLayout.Mono;
             if (candidate.ChannelCount > layout.ChannelCount ||
                 (candidate.ChannelCount == layout.ChannelCount && candidate.HasSpeakerPositions && !layout.HasSpeakerPositions))
             {

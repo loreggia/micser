@@ -1,5 +1,5 @@
 import { describe, expect, test } from "vitest";
-import { frameAround, minSubgraphSize, proxyHandleId, resolveHandle } from "../subgraphs";
+import { frameAround, minSubgraphSize, portHandleId, proxyHandleId, resolveHandle } from "../subgraphs";
 
 describe("frameAround", () => {
   test("puts the frame on the grid with padding and room for the header", () => {
@@ -27,6 +27,15 @@ describe("proxy handles", () => {
     expect(resolveHandle("subgraph", proxyHandleId("out", "module-1", "Output"))).toEqual({
       moduleId: "module-1",
       port: "Output",
+      channel: null,
+    });
+  });
+
+  test("resolve to the channel of a port", () => {
+    expect(resolveHandle("subgraph", proxyHandleId("in", "module-1", "Input", 3))).toEqual({
+      moduleId: "module-1",
+      port: "Input",
+      channel: 3,
     });
   });
 
@@ -34,11 +43,17 @@ describe("proxy handles", () => {
     expect(resolveHandle("subgraph", proxyHandleId("in", "module-1", "a:b"))).toEqual({
       moduleId: "module-1",
       port: "a:b",
+      channel: null,
     });
   });
 
   test("other handles belong to the node itself", () => {
-    expect(resolveHandle("module-2", "Input")).toEqual({ moduleId: "module-2", port: "Input" });
-    expect(resolveHandle("module-2", null)).toEqual({ moduleId: "module-2", port: "" });
+    expect(resolveHandle("module-2", "Input")).toEqual({ moduleId: "module-2", port: "Input", channel: null });
+    expect(resolveHandle("module-2", portHandleId("Output", 0))).toEqual({
+      moduleId: "module-2",
+      port: "Output",
+      channel: 0,
+    });
+    expect(resolveHandle("module-2", null)).toEqual({ moduleId: "module-2", port: "", channel: null });
   });
 });
