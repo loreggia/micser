@@ -1,0 +1,53 @@
+{
+  "version": 1,
+  "skills": {
+    "aspire": {
+      "source": "microsoft/aspire-skills",
+      "sourceType": "github",
+      "skillPath": "skills/aspire/SKILL.md",
+      "computedHash": "38c2142942eba5756fcd025b63d6ae1e7456ae27e32c2cb8611a0127eb7fe26d"
+    },
+    "aspire-init": {
+      "source": "microsoft/aspire-skills",
+      "sourceType": "github",
+      "skillPath": "skills/aspire-init/SKILL.md",
+      "computedHash": "f9f5fc5805ef8e015a188f2a0f64d82e9cb041b003b1819d74fe23665a7444d1"
+    },
+    "aspire-monitoring": {
+      "source": "microsoft/aspire-skills",
+      "sourceType": "github",
+      "skillPath": "skills/aspire-monitoring/SKILL.md",
+      "computedHash": "9f7fc6e4c81f2ade522e149d132f58701b8252c49dba7cf1aec24a9c396e7d1c"
+    },
+    "aspire-orchestration": {
+      "source": "microsoft/aspire-skills",
+      "sourceType": "github",
+      "skillPath": "skills/aspire-orchestration/SKILL.md",
+      "computedHash": "55cbca160d4b0d91e8d5a7cd3856c81fa7691dd8f4d9f17dee0138d7aea749ba"
+    },
+    "aspire-project-v2-migration": {
+      "source": "microsoft/aspire-skills",
+      "sourceType": "github",
+      "skillPath": "skills/aspire-project-v2-migration/SKILL.md",
+      "computedHash": "45d0e21d3f9838f3439c2868194a05a9339e10bdec31d1dfe44dc3f79c614e94"
+    },
+    "aspireify": {
+      "source": "microsoft/aspire-skills",
+      "sourceType": "github",
+      "skillPath": "skills/aspireify/SKILL.md",
+      "computedHash": "a58f791840b0a7daf4a12613d184d0412ed2f750e6862ae752d62c0a9b942cf1"
+    },
+    "dotnet-inspect": {
+      "source": "richlander/dotnet-skills",
+      "sourceType": "github",
+      "skillPath": "skills/dotnet-inspect/SKILL.md",
+      "computedHash": "3317b56888702005215ffaea6e7ddb6f67a6a10b6b4b2878dbda7ec439275b5a"
+    },
+    "dotnet-trace-collect": {
+      "source": "dotnet/skills",
+      "sourceType": "github",
+      "skillPath": "plugins/dotnet-diag/skills/dotnet-trace-collect/SKILL.md",
+      "computedHash": "0f85e5292974bb2892327da90327b3f20d8341bf82fc6f55b4c4020e41cd6c5c"
+    }
+  }
+}
