@@ -52,14 +52,23 @@ public sealed record ModulePortLayoutsDto(Guid ModuleId, IReadOnlyDictionary<str
 /// The channel layout of a port in the last processed block.
 /// </summary>
 /// <param name="ChannelCount">0 while the port carries nothing, e.g. a device output without an open device or a module that isn't processed.</param>
-/// <param name="Speakers">The speaker of each channel, or null if the channels have no speaker positions.</param>
+/// <param name="Speakers">
+/// The speaker of each channel, or null if the channels have no speaker positions or one that <see cref="SpeakerPosition"/> doesn't name
+/// (the reserved bits of the mask).
+/// </param>
 public sealed record PortLayoutDto(int ChannelCount, IReadOnlyList<SpeakerPosition>? Speakers)
 {
+    /// <summary>
+    /// The speakers that <see cref="SpeakerPosition"/> names.
+    /// </summary>
+    private const uint KnownSpeakers = 0x3FFFF;
+
     public static PortLayoutDto From(ChannelLayout layout)
     {
+        var hasKnownSpeakers = layout.HasSpeakerPositions && ((uint)layout.Speakers & ~KnownSpeakers) == 0;
         return new PortLayoutDto(
             layout.ChannelCount,
-            layout.HasSpeakerPositions ? [.. Enumerable.Range(0, layout.ChannelCount).Select(c => (SpeakerPosition)(uint)layout.GetSpeaker(c))] : null);
+            hasKnownSpeakers ? [.. Enumerable.Range(0, layout.ChannelCount).Select(c => (SpeakerPosition)(uint)layout.GetSpeaker(c))] : null);
     }
 }
 

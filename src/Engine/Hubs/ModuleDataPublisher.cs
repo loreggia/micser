@@ -1,5 +1,5 @@
+using Micser.Audio;
 using Micser.Engine.Audio;
-using Micser.Engine.Contracts;
 using Microsoft.AspNetCore.SignalR;
 
 namespace Micser.Engine.Hubs;
@@ -14,8 +14,8 @@ public sealed class ModuleDataPublisher : BackgroundService
     private readonly AudioHost _host;
     private readonly IHubContext<EngineHub, IEngineClient> _hub;
     private readonly ILogger<ModuleDataPublisher> _logger;
+    private readonly Dictionary<Guid, ChannelLayout[]> _portLayouts = [];
     private readonly ModuleDataSubscriptions _subscriptions;
-    private Dictionary<Guid, ModulePortLayoutsDto> _portLayouts = [];
 
     /// <summary>
     /// Pushes the live data of subscribed modules to their subscribers.
@@ -56,13 +56,6 @@ public sealed class ModuleDataPublisher : BackgroundService
         }
     }
 
-    private static bool HaveSameLayouts(IReadOnlyDictionary<string, PortLayoutDto> ports, IReadOnlyDictionary<string, PortLayoutDto> others)
-    {
-        return ports.Count == others.Count && ports.All(port => others.TryGetValue(port.Key, out var other)
-            && other.ChannelCount == port.Value.ChannelCount
-            && (other.Speakers ?? []).SequenceEqual(port.Value.Speakers ?? []));
-    }
-
     private async Task PublishLevelsAsync()
     {
         try
@@ -84,18 +77,16 @@ public sealed class ModuleDataPublisher : BackgroundService
     {
         try
         {
-            var layouts = _host.GetPortLayouts();
-            ModulePortLayoutsDto[] changed = [.. layouts.Where(layout => !_portLayouts.TryGetValue(layout.ModuleId, out var previous)
-                || !HaveSameLayouts(previous.Inputs, layout.Inputs)
-                || !HaveSameLayouts(previous.Outputs, layout.Outputs))];
-            _portLayouts = layouts.ToDictionary(layout => layout.ModuleId);
-            if (changed.Length > 0)
+            var changed = _host.GetChangedPortLayouts(_portLayouts);
+            if (changed.Count > 0)
             {
                 await _hub.Clients.All.PortLayoutsChanged(changed);
             }
         }
         catch (Exception ex)
         {
+            // sends all layouts again, as clients may have missed these
+            _portLayouts.Clear();
             _logger.LogWarning(ex, "Publishing the port layouts failed.");
         }
     }

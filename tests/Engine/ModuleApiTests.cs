@@ -75,6 +75,8 @@ public class ModuleApiTests
         var supported = types!.Where(t => t.SupportsChannelCount).Select(t => t.Type);
 
         await Assert.That(supported).IsEquivalentTo(["Gain", "Compressor", "Equalizer", "Pitch", "Spectrum"]);
+        await Assert.That(types!.Single(t => t.Type == "Gain").ChannelCountInputs).IsEquivalentTo(["Input"]);
+        await Assert.That(types!.Single(t => t.Type == "DeviceOutput").ChannelCountInputs).IsEmpty();
     }
 
     [Test]
@@ -149,7 +151,7 @@ public class ModuleApiTests
     }
 
     [Test]
-    public async Task UpdateModule_ChannelSettingsInUse_AreBadRequest()
+    public async Task UpdateModule_ChannelsInUse_StayShownAndLimitTheChannelCount()
     {
         await using var factory = new EngineFactory();
         using var client = factory.CreateAuthorizedClient();
@@ -160,20 +162,22 @@ public class ModuleApiTests
         target = (await client.GetFromJsonAsync<ModuleDto>($"/api/modules/{target.Id}", factory.Json))!;
 
         using var hidden = await client.PutAsJsonAsync($"/api/modules/{target.Id}", target with { ShowChannels = false }, factory.Json);
+        var stillShown = await hidden.Content.ReadFromJsonAsync<ModuleDto>(factory.Json);
         using var tooFew = await client.PutAsJsonAsync($"/api/modules/{target.Id}", target with { ChannelCount = 3 }, factory.Json);
         using var enough = await client.PutAsJsonAsync($"/api/modules/{target.Id}", target with { ChannelCount = 4 }, factory.Json);
         (await client.DeleteAsync($"/api/connections/{connection!.Id}")).EnsureSuccessStatusCode();
         using var hiddenWithoutConnections = await client.PutAsJsonAsync($"/api/modules/{target.Id}", target with { ShowChannels = false }, factory.Json);
-        var hiddenErrors = (await hidden.Content.ReadFromJsonAsync<JsonObject>())!["errors"]!.AsObject().Select(e => e.Key);
+        var hiddenAfterwards = await hiddenWithoutConnections.Content.ReadFromJsonAsync<ModuleDto>(factory.Json);
         var tooFewErrors = (await tooFew.Content.ReadFromJsonAsync<JsonObject>())!["errors"]!.AsObject().Select(e => e.Key);
 
         await Assert.That(target.ShowChannels).IsTrue();
-        await Assert.That(hidden.StatusCode).IsEqualTo(HttpStatusCode.BadRequest);
-        await Assert.That(hiddenErrors).IsEquivalentTo(["showChannels"]);
+        await Assert.That(hidden.StatusCode).IsEqualTo(HttpStatusCode.OK);
+        await Assert.That(stillShown!.ShowChannels).IsTrue();
         await Assert.That(tooFew.StatusCode).IsEqualTo(HttpStatusCode.BadRequest);
         await Assert.That(tooFewErrors).IsEquivalentTo(["channelCount"]);
         await Assert.That(enough.StatusCode).IsEqualTo(HttpStatusCode.OK);
         await Assert.That(hiddenWithoutConnections.StatusCode).IsEqualTo(HttpStatusCode.OK);
+        await Assert.That(hiddenAfterwards!.ShowChannels).IsFalse();
     }
 
     [Test]

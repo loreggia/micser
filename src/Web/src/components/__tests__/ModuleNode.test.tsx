@@ -25,6 +25,7 @@ const gainType: ModuleTypeDto = {
   defaultState: { gain: 0 },
   supportsBypass: true,
   supportsChannelCount: true,
+  channelCountInputs: ["Input"],
 };
 const stereo: ModulePortLayoutsDto = {
   moduleId: "Gain-1",

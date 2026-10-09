@@ -161,7 +161,7 @@ export function ModuleNode({ id, data, selected }: NodeProps<ModuleNodeType>) {
   const { data: connections = [] } = useGetConnections();
   const actions = useModuleActions();
   const channelsInUse = hasChannelConnections(module.id, connections);
-  const requiredChannels = requiredChannelCount(module.id, connections);
+  const requiredChannels = requiredChannelCount(module.id, moduleType, connections);
   const channelCounts = [...channelCountPresets, ...(module.channelCount ? [module.channelCount] : [])]
     .filter((count, index, counts) => counts.indexOf(count) === index)
     .toSorted((a, b) => a - b);

@@ -10,8 +10,15 @@ const gainType: ModuleTypeDto = {
   defaultState: {},
   supportsBypass: true,
   supportsChannelCount: true,
+  channelCountInputs: ["Input"],
 };
-const deviceType: ModuleTypeDto = { ...gainType, type: "DeviceOutput", outputs: [], supportsChannelCount: false };
+const deviceType: ModuleTypeDto = {
+  ...gainType,
+  type: "DeviceOutput",
+  outputs: [],
+  supportsChannelCount: false,
+  channelCountInputs: [],
+};
 const gain = testModule("Gain", { gain: 0 });
 const device = testModule("DeviceOutput", { deviceId: null, adapterName: null }, { id: "device-1" });
 
@@ -64,9 +71,12 @@ test("hasChannelConnections counts the end that names a channel", () => {
   expect(hasChannelConnections(gain.id, [connection({ sourceChannel: 1 })])).toBe(true);
 });
 
-test("requiredChannelCount is the highest target channel plus one", () => {
-  expect(requiredChannelCount(device.id, [])).toBe(0);
-  expect(requiredChannelCount(device.id, [connection({ targetChannel: 1 }), connection({ targetChannel: 5 })])).toBe(6);
+test("requiredChannelCount is the highest target channel plus one, of the inputs the channel count applies to", () => {
+  const toGain = (targetChannel: number) => connection({ targetModuleId: gain.id, targetChannel });
+
+  expect(requiredChannelCount(gain.id, gainType, [])).toBe(0);
+  expect(requiredChannelCount(gain.id, gainType, [toGain(1), toGain(5)])).toBe(6);
+  expect(requiredChannelCount(device.id, deviceType, [connection({ targetChannel: 5 })])).toBe(0);
 });
 
 test("isBeyondLayout marks channels the ports don't have right now", () => {

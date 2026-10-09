@@ -175,6 +175,54 @@ public sealed class AudioHost : IDisposable
         }
     }
 
+    /// <summary>
+    /// The port layouts of the modules whose layouts differ from <paramref name="known"/> or aren't in it. It holds each module's layouts
+    /// (inputs, then outputs) and is updated to the current ones; modules no longer in the graph are removed from it.
+    /// </summary>
+    public IReadOnlyList<ModulePortLayoutsDto> GetChangedPortLayouts(Dictionary<Guid, ChannelLayout[]> known)
+    {
+        List<ModulePortLayoutsDto>? changed = null;
+        lock (_lock)
+        {
+            foreach (var entry in _modules.Values)
+            {
+                var module = entry.Module;
+                var isChanged = false;
+                if (!known.TryGetValue(entry.Id, out var layouts))
+                {
+                    layouts = new ChannelLayout[module.Inputs.Count + module.Outputs.Count];
+                    known.Add(entry.Id, layouts);
+                    isChanged = true;
+                }
+
+                for (var i = 0; i < layouts.Length; i++)
+                {
+                    var layout = i < module.Inputs.Count ? module.Inputs[i].LastLayout : module.Outputs[i - module.Inputs.Count].LastLayout;
+                    if (layout != layouts[i])
+                    {
+                        layouts[i] = layout;
+                        isChanged = true;
+                    }
+                }
+
+                if (isChanged)
+                {
+                    (changed ??= []).Add(ToPortLayoutsDto(entry.Id, module));
+                }
+            }
+
+            if (known.Count > _modules.Count)
+            {
+                foreach (var id in known.Keys.Where(id => !_modules.ContainsKey(id)).ToArray())
+                {
+                    known.Remove(id);
+                }
+            }
+        }
+
+        return changed ?? [];
+    }
+
     public IReadOnlyList<ConnectionDto> GetConnections()
     {
         lock (_lock)
@@ -227,7 +275,8 @@ public sealed class AudioHost : IDisposable
                 [.. module.Outputs.Select(p => p.Name)],
                 definition.GetState(module),
                 module is EffectModule,
-                SupportsChannelCount(module));
+                SupportsChannelCount(module),
+                [.. module.Inputs.Where(p => p.Layout == null).Select(p => p.Name)]);
         })];
     }
 
@@ -242,10 +291,7 @@ public sealed class AudioHost : IDisposable
             modules = [.. _modules.Values.Select(entry => (entry.Id, entry.Module))];
         }
 
-        return [.. modules.Select(m => new ModulePortLayoutsDto(
-            m.Id,
-            m.Module.Inputs.ToDictionary(p => p.Name, p => PortLayoutDto.From(p.LastLayout)),
-            m.Module.Outputs.ToDictionary(p => p.Name, p => PortLayoutDto.From(p.LastLayout))))];
+        return [.. modules.Select(m => ToPortLayoutsDto(m.Id, m.Module))];
     }
 
     public UiPreferencesDto GetPreferences()
@@ -680,12 +726,14 @@ public sealed class AudioHost : IDisposable
             }
 
             ThrowIfUnknownSubgraph(dto.SubgraphId);
-            ThrowIfChannelsInUse(entry, dto);
+            ThrowIfChannelCountTooLow(entry, dto);
 
+            // channel connections keep the channels shown, also against an update made from an older copy of the module
             entry.Settings = WithSystemVolume(ModuleSettings.From(dto) with
             {
                 IsBypassed = dto.IsBypassed && entry.Module is EffectModule,
                 TemplateModuleId = dto.SubgraphId == entry.Settings.SubgraphId ? entry.Settings.TemplateModuleId : null,
+                ShowChannels = dto.ShowChannels || GetChannelConnections(entry.Id).Any(),
                 ChannelCount = SupportsChannelCount(entry.Module) ? dto.ChannelCount : null,
             });
             ApplySettings(entry.Module, entry.Settings);
@@ -918,6 +966,14 @@ public sealed class AudioHost : IDisposable
             template.IsBuiltIn);
     }
 
+    private static ModulePortLayoutsDto ToPortLayoutsDto(Guid id, AudioModule module)
+    {
+        return new ModulePortLayoutsDto(
+            id,
+            module.Inputs.ToDictionary(p => p.Name, p => PortLayoutDto.From(p.LastLayout)),
+            module.Outputs.ToDictionary(p => p.Name, p => PortLayoutDto.From(p.LastLayout)));
+    }
+
     /// <summary>
     /// Takes an unavailable module out of the subgraph, converting its position back to an absolute one.
     /// </summary>
@@ -1145,12 +1201,12 @@ public sealed class AudioHost : IDisposable
     }
 
     /// <summary>
-    /// The connections, also of unavailable modules, that take a single channel of the module's outputs or add to a single channel of its inputs.
+    /// The connections that take a single channel of the module's outputs or add to a single channel of its inputs. Those of unavailable
+    /// modules don't count, as the API and UI don't show them; restoring them with their plugin fixes the settings (<see cref="Build"/>).
     /// </summary>
     private IEnumerable<ConnectionDto> GetChannelConnections(Guid moduleId)
     {
         return _connections.Values.Select(c => c.Dto)
-            .Concat(_unavailableConnections)
             .Where(c => (c.SourceModuleId == moduleId && c.SourceChannel != null) || (c.TargetModuleId == moduleId && c.TargetChannel != null));
     }
 
@@ -1385,24 +1441,18 @@ public sealed class AudioHost : IDisposable
     }
 
     /// <summary>
-    /// Rejects an update that hides the channels of a module with connections to or from single channels, or sets a channel count lower
-    /// than they need.
+    /// Rejects an update that sets a channel count lower than the module's connections to single channels need.
     /// </summary>
-    private void ThrowIfChannelsInUse(ModuleEntry entry, ModuleDto dto)
+    private void ThrowIfChannelCountTooLow(ModuleEntry entry, ModuleDto dto)
     {
-        var errors = new Dictionary<string, string[]>();
-        if (!dto.ShowChannels && GetChannelConnections(entry.Id).Any())
-        {
-            errors["showChannels"] = ["Connections to or from single channels of the module exist."];
-        }
-
         if (SupportsChannelCount(entry.Module) && dto.ChannelCount is { } channelCount && GetRequiredChannelCount(entry) is var required
             && channelCount < required)
         {
-            errors["channelCount"] = [$"The module's connections to single channels need {required} channels."];
+            throw EngineRequestException.Invalid(new Dictionary<string, string[]>
+            {
+                ["channelCount"] = [$"The module's connections to single channels need {required} channels."],
+            });
         }
-
-        ThrowIfInvalid(errors);
     }
 
     private void ThrowIfUnknownSubgraph(Guid? id)

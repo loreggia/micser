@@ -45,6 +45,14 @@ public abstract class AudioPort
     }
 
     /// <summary>
+    /// Sets <see cref="LastLayout"/> to <see cref="ChannelLayout.None"/>, e.g. once the graph isn't processed anymore.
+    /// </summary>
+    internal void ClearLayout()
+    {
+        Volatile.Write(ref _publishedLayout, 0);
+    }
+
+    /// <summary>
     /// Makes the buffer's layout the <see cref="LastLayout"/>. Audio thread only.
     /// </summary>
     internal void PublishLayout()

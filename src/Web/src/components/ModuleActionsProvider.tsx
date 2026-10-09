@@ -9,7 +9,14 @@ import {
   Field,
   SpinButton,
 } from "@fluentui/react-components";
-import { useGetConnections, useGetModules, useModuleUpdate, type ModuleDto } from "@micser/web-sdk";
+import {
+  formatNumber,
+  useGetConnections,
+  useGetModules,
+  useGetModuleTypes,
+  useModuleUpdate,
+  type ModuleDto,
+} from "@micser/web-sdk";
 import { useMemo, useState, type ReactNode } from "react";
 import { useTranslation } from "../i18n";
 import { maxChannelCount, requiredChannelCount } from "./channels";
@@ -39,9 +46,11 @@ function ChannelCountDialog({ moduleId, onClose }: { moduleId: string; onClose: 
   const { t } = useTranslation();
   const { data: modules } = useGetModules();
   const { data: connections = [] } = useGetConnections();
+  const { data: moduleTypes } = useGetModuleTypes();
   const update = useModuleUpdate();
   const module = modules?.find((m) => m.id === moduleId);
-  const minimum = Math.max(1, requiredChannelCount(moduleId, connections));
+  const moduleType = moduleTypes?.find((type) => type.type === module?.type);
+  const minimum = Math.max(1, requiredChannelCount(moduleId, moduleType, connections));
   const [count, setCount] = useState(() => Math.max(module?.channelCount ?? 2, minimum));
 
   const submit = () => {
@@ -66,7 +75,7 @@ function ChannelCountDialog({ moduleId, onClose }: { moduleId: string; onClose: 
             <DialogContent>
               <Field
                 label={t("channels.count")}
-                hint={minimum > 1 ? t("channels.minimum", { count: minimum }) : undefined}
+                hint={minimum > 1 ? t("channels.minimum", { number: formatNumber(minimum) }) : undefined}
               >
                 <SpinButton
                   autoFocus

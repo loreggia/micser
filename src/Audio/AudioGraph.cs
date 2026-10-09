@@ -171,6 +171,28 @@ public sealed class AudioGraph
         }
     }
 
+    /// <summary>
+    /// Sets every port's <see cref="AudioPort.LastLayout"/> to <see cref="ChannelLayout.None"/>, once the graph isn't processed anymore.
+    /// </summary>
+    internal void ClearLayouts()
+    {
+        lock (_editLock)
+        {
+            foreach (var module in _modules)
+            {
+                foreach (var input in module.Inputs)
+                {
+                    input.ClearLayout();
+                }
+
+                foreach (var output in module.Outputs)
+                {
+                    output.ClearLayout();
+                }
+            }
+        }
+    }
+
     private static string Describe(Connection connection)
     {
         var source = connection.SourceChannel is { } s ? $"{connection.Source}[{s}]" : connection.Source.ToString();
