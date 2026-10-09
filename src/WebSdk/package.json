@@ -23,7 +23,7 @@
   "devDependencies": {
     "@types/react": "^19.3.0",
     "orval": "^8.40.0",
-    "vite": "^8.3.2"
+    "vite": "^8.3.3"
   },
   "lavamoat": {
     "allowScripts": {
