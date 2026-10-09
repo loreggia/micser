@@ -1,11 +1,11 @@
 import {
+  makeStyles,
   Menu,
   MenuDivider,
   MenuItem,
   MenuList,
   MenuPopover,
   Spinner,
-  makeStyles,
   tokens,
 } from "@fluentui/react-components";
 import {
@@ -459,7 +459,7 @@ export function GraphEditor() {
           name: null,
           ...frameAround(getNodesBounds(members)),
           moduleIds: members.map((node) => node.id),
-          color: "Blue",
+          color: "Green",
         },
       });
     },

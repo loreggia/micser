@@ -10,10 +10,10 @@ import type {
   UiPreferencesDto,
 } from "@micser/web-sdk";
 import { test as base, expect, type APIRequestContext, type Browser, type Locator, type Page } from "@playwright/test";
-import type { ShellState } from "../../src/Web/src/shell";
 import { mkdtempSync, rmSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import type { ShellState } from "../../src/Web/src/shell";
 import { startEngine, startWeb } from "./servers";
 
 export { expect };
@@ -42,7 +42,7 @@ export class EngineApi {
   }
 
   addSubgraph(request: Omit<CreateSubgraphRequest, "color" | "name"> & Partial<CreateSubgraphRequest>) {
-    return this.send<SubgraphDto>("post", "/api/subgraphs", { name: null, color: "Blue", ...request });
+    return this.send<SubgraphDto>("post", "/api/subgraphs", { name: null, color: "Green", ...request });
   }
 
   /** Connects the modules' first ports, or single channels of them. */
