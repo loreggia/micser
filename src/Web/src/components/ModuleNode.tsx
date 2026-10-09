@@ -104,22 +104,39 @@ const useStyles = makeStyles({
     border: `${tokens.strokeWidthThick} solid ${tokens.colorNeutralBackground1}`,
     backgroundColor: tokens.colorBrandBackground,
   },
+  // equally wide sides, so the button between them is centered; long labels are cut off instead of moving it
   channels: {
-    display: "flex",
-    justifyContent: "space-between",
+    display: "grid",
+    gridTemplateColumns: "minmax(0, 1fr) auto minmax(0, 1fr)",
+    alignItems: "start",
+    columnGap: tokens.spacingHorizontalS,
   },
-  // full width, so the connectors sit on the card's edges
+  inputs: {
+    justifySelf: "start",
+    maxWidth: "100%",
+  },
+  outputs: {
+    justifySelf: "end",
+    maxWidth: "100%",
+    textAlign: "end",
+  },
+  // reaching the card's edges, so the connectors sit on them
   channelRow: {
     position: "relative",
     display: "flex",
-    justifyContent: "space-between",
     alignItems: "center",
-    gap: tokens.spacingHorizontalL,
     minHeight: "20px",
     marginInline: "calc(-1 * var(--fui-Card--size))",
     paddingInline: "var(--fui-Card--size)",
     color: tokens.colorNeutralForeground3,
     fontSize: tokens.fontSizeBase200,
+  },
+  rowLabel: {
+    flexGrow: 1,
+    minWidth: 0,
+    overflow: "hidden",
+    textOverflow: "ellipsis",
+    whiteSpace: "nowrap",
   },
   portRowLabel: {
     color: tokens.colorNeutralForeground2,
@@ -397,7 +414,7 @@ function ChannelPorts({
   const renderPorts = (rows: PortRow[], type: "source" | "target") =>
     rows.map((row) => (
       <div key={handleId(row)} className={styles.channelRow}>
-        <span>{label(row)}</span>
+        <span className={styles.rowLabel}>{label(row)}</span>
         <Port type={type} id={handleId(row)} />
       </div>
     ));
@@ -405,24 +422,22 @@ function ChannelPorts({
 
   return (
     <div className={styles.channels}>
-      <div>{renderPorts(inputs, "target")}</div>
-      <div>
-        {/* disabledFocusable, as a disabled button gets no pointer events and would show no tooltip */}
-        <Tooltip
-          content={channelsInUse ? t("channels.inUse") : toggleLabel}
-          relationship={channelsInUse ? "description" : "label"}
-        >
-          <Button
-            size="small"
-            appearance="subtle"
-            aria-label={toggleLabel}
-            icon={module.showChannels ? <ChevronUpRegular /> : <ChevronDownRegular />}
-            onClick={() => update({ ...module, showChannels: !module.showChannels })}
-            disabledFocusable={channelsInUse}
-          />
-        </Tooltip>
-      </div>
-      <div>{renderPorts(outputs, "source")}</div>
+      <div className={styles.inputs}>{renderPorts(inputs, "target")}</div>
+      {/* disabledFocusable, as a disabled button gets no pointer events and would show no tooltip */}
+      <Tooltip
+        content={channelsInUse ? t("channels.inUse") : toggleLabel}
+        relationship={channelsInUse ? "description" : "label"}
+      >
+        <Button
+          size="small"
+          appearance="subtle"
+          aria-label={toggleLabel}
+          icon={module.showChannels ? <ChevronUpRegular /> : <ChevronDownRegular />}
+          onClick={() => update({ ...module, showChannels: !module.showChannels })}
+          disabledFocusable={channelsInUse}
+        />
+      </Tooltip>
+      <div className={styles.outputs}>{renderPorts(outputs, "source")}</div>
     </div>
   );
 }
