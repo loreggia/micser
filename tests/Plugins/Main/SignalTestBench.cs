@@ -24,7 +24,7 @@ internal sealed class SignalTestBench
         _graph.Add(_source);
         _graph.Add(_recorder);
 
-        OutputPort previous = _source.Output;
+        var previous = _source.Output;
         foreach (var effect in effects)
         {
             _graph.Add(effect);

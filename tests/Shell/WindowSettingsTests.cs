@@ -1,5 +1,3 @@
-using System.Drawing;
-
 namespace Micser.Shell.Tests;
 
 public class WindowSettingsTests

@@ -5,6 +5,9 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * The color of a subgraph's frame; the UI maps it to its theme's palette.
+ */
 export type SubgraphColor = typeof SubgraphColor[keyof typeof SubgraphColor];
 
 

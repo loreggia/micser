@@ -186,9 +186,9 @@ public class CompressorModule : EffectModule, IStatefulModule<CompressorState>
 
         var isAttack = type == CompressorType.Downward ? _chunkMaxDiff > _envelope : _chunkMaxDiff < _envelope;
         var alpha = isAttack ? _alphaAttack : _alphaRelease;
-        _envelope = alpha * _envelope + (1f - alpha) * _chunkMaxDiff;
+        _envelope = (alpha * _envelope) + ((1f - alpha) * _chunkMaxDiff);
 
-        return Decibels.ToLinear(makeUpGain * amount - _envelope);
+        return Decibels.ToLinear((makeUpGain * amount) - _envelope);
     }
 
     private void UpdateTiming()

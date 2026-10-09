@@ -190,7 +190,7 @@ public sealed class CaptureStream : IDeviceStream
             var channel = destination.GetChannel(c);
             for (var i = 0; i < channel.Length; i++)
             {
-                channel[i] = _interleaved[i * _channels + c];
+                channel[i] = _interleaved[(i * _channels) + c];
             }
         }
     }

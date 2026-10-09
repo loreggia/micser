@@ -6,11 +6,21 @@
  */
 
 export interface ModuleTypeDto {
+  /** The name identifying the module type, e.g. "Gain". */
   type: string;
+  /** Names of the input ports. */
   inputs: string[];
+  /** Names of the output ports. */
   outputs: string[];
+  /** The state of a new module of this type. */
   defaultState: unknown;
+  /** Whether bool ModuleDto.IsBypassed has an effect. */
   supportsBypass: boolean;
+  /** Whether int? ModuleDto.ChannelCount has an effect. */
   supportsChannelCount: boolean;
+  /**
+     * The inputs that int? ModuleDto.ChannelCount applies to: those without a fixed layout. Their connections to single channels
+     * limit it.
+     */
   channelCountInputs: string[];
 }

@@ -5,6 +5,12 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <!-- the code style rules in .editorconfig; IDE0005 (unnecessary usings) needs the documentation file -->
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <PublishDocumentationFile>false</PublishDocumentationFile>
+    <!-- CS1591: missing XML comment, CS1573: undocumented parameter next to documented ones -->
+    <NoWarn>$(NoWarn);CS1591;CS1573</NoWarn>
     <!-- plugin widget packages (Web/) live inside .NET project folders -->
     <DefaultItemExcludes>$(DefaultItemExcludes);Web/**;node_modules/**</DefaultItemExcludes>
   </PropertyGroup>

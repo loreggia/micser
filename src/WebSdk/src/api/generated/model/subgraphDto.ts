@@ -8,18 +8,34 @@ import type { ModulePosition } from './modulePosition';
 import type { SubgraphColor } from './subgraphColor';
 import type { SubgraphSize } from './subgraphSize';
 
+/**
+ * A group of modules in the UI's graph editor. Its modules refer to it with Guid? ModuleDto.SubgraphId, and their
+ * positions are relative to ModulePosition SubgraphDto.Position.
+ */
 export interface SubgraphDto {
   id: string;
-  /** @nullable */
+  /**
+     * A name chosen by the user.
+     * @nullable
+     */
   name: string | null;
   position: ModulePosition;
   size: SubgraphSize;
   color: SubgraphColor;
+  /** Shows the subgraph as one node with the ports of the connections that cross its border. */
   isCollapsed: boolean;
+  /** Mutes all its modules, in addition to their own mute. */
   isMuted: boolean;
+  /** Bypasses all its effect modules, in addition to their own bypass. */
   isBypassed: boolean;
-  /** @nullable */
+  /**
+     * The template the subgraph was created from or last saved as. It's set by the engine; an update can only clear it.
+     * @nullable
+     */
   templateId?: string | null;
-  /** @nullable */
+  /**
+     * The template's revision the subgraph matches; it's outdated when the template's is higher.
+     * @nullable
+     */
   templateRevision?: number | null;
 }

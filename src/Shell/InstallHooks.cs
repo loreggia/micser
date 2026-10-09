@@ -12,12 +12,12 @@ internal static class InstallHooks
     // fast callbacks are killed after 15 s
     private static readonly TimeSpan EngineStopTimeout = TimeSpan.FromSeconds(10);
 
-    public static void AfterInstall(SemanticVersion version)
+    public static void AfterInstall(SemanticVersion _)
     {
         SetAutostart(true);
     }
 
-    public static void BeforeUninstall(SemanticVersion version)
+    public static void BeforeUninstall(SemanticVersion _)
     {
         SetAutostart(false);
     }
@@ -25,7 +25,7 @@ internal static class InstallHooks
     /// <summary>
     /// Stops the engine gracefully, so it saves its configuration before Velopack ends all processes in the app folder.
     /// </summary>
-    public static void BeforeUpdate(SemanticVersion version)
+    public static void BeforeUpdate(SemanticVersion _)
     {
         try
         {

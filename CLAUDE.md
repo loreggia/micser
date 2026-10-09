@@ -71,6 +71,7 @@ General:
 C#:
 
 - C#, MSBuild and XML files are formatted with CSharpier (`.csharpierrc`, print width 120); the pre-commit hook formats staged files and CI runs `dotnet csharpier check .`.
+- Code style rules (`var`, braces, naming, unused usings, ...) are in `.editorconfig` and enforced in the build, so a violation fails it. `dotnet format style Micser.slnx` applies most fixes.
 - Preferred member layout (a guideline, not enforced; keep a file's existing order when it differs):
   - Member order by type: fields, constructors, destructors, delegates, events, properties, indexers, methods, nested enums, interfaces, structs, classes.
   - Within a type group: by access level (public, internal, protected, private), then alphabetically.

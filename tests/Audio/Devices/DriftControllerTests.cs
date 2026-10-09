@@ -37,8 +37,8 @@ public class DriftControllerTests
         }
 
         await Assert.That(controller.Correction).IsEqualTo(1 + producerOffset).Within(20e-6);
-        await Assert.That(minFill).IsGreaterThan(controller.TargetFill - 1.5 * BlockFrames);
-        await Assert.That(maxFill).IsLessThan(controller.TargetFill + 1.5 * BlockFrames);
+        await Assert.That(minFill).IsGreaterThan(controller.TargetFill - (1.5 * BlockFrames));
+        await Assert.That(maxFill).IsLessThan(controller.TargetFill + (1.5 * BlockFrames));
     }
 
     [Test]

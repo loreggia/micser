@@ -5,6 +5,9 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * The speaker of a channel (WAVEFORMATEXTENSIBLE).
+ */
 export type SpeakerPosition = typeof SpeakerPosition[keyof typeof SpeakerPosition];
 
 

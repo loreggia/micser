@@ -6,8 +6,16 @@
  */
 import type { SpeakerPosition } from './speakerPosition';
 
+/**
+ * The channel layout of a port in the last processed block.
+ */
 export interface PortLayoutDto {
+  /** 0 while the port carries nothing, e.g. a device output without an open device or a module that isn't processed. */
   channelCount: number;
-  /** @nullable */
+  /**
+     * The speaker of each channel, or null if the channels have no speaker positions or one that SpeakerPosition doesn't name
+     * (the reserved bits of the mask).
+     * @nullable
+     */
   speakers: SpeakerPosition[] | null;
 }

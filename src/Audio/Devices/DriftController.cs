@@ -57,9 +57,9 @@ internal sealed class DriftController
         _smoothedFill += Smoothing * (fill - _smoothedFill);
 
         var error = (_smoothedFill - TargetFill) / TargetFill;
-        _integral = Math.Clamp(_integral + IntegralGain * error, -_maxCorrection, _maxCorrection);
+        _integral = Math.Clamp(_integral + (IntegralGain * error), -_maxCorrection, _maxCorrection);
 
-        Correction = 1d + Math.Clamp(ProportionalGain * error + _integral, -_maxCorrection, _maxCorrection);
+        Correction = 1d + Math.Clamp((ProportionalGain * error) + _integral, -_maxCorrection, _maxCorrection);
         return Correction;
     }
 }

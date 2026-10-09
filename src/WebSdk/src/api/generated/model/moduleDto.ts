@@ -13,4 +13,8 @@ import type { ModuleDtoLoopbackInputModule } from './moduleDtoLoopbackInputModul
 import type { ModuleDtoPitchModule } from './moduleDtoPitchModule';
 import type { ModuleDtoSpectrumModule } from './moduleDtoSpectrumModule';
 
+/**
+ * A module and its settings. The concrete type is ModuleDto&lt;TState&gt;; in JSON the `type` property
+ * names the module type and selects the state schema (registered at runtime by ModuleCatalog).
+ */
 export type ModuleDto = ModuleDtoDeviceInputModule | ModuleDtoLoopbackInputModule | ModuleDtoDeviceOutputModule | ModuleDtoGainModule | ModuleDtoCompressorModule | ModuleDtoEqualizerModule | ModuleDtoPitchModule | ModuleDtoSpectrumModule;

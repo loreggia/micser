@@ -19,7 +19,9 @@ public class EngineHubTests
             m =>
             {
                 lock (events)
+                {
                     events.Add($"module {m.Id}");
+                }
             }
         );
         hub.On<ConnectionDto>(
@@ -27,7 +29,9 @@ public class EngineHubTests
             c =>
             {
                 lock (events)
+                {
                     events.Add($"connection {c.Id}");
+                }
             }
         );
         var removed = hub.NextAsync<Guid>("ModuleRemoved");

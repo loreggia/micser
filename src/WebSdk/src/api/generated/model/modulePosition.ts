@@ -5,6 +5,9 @@
  * OpenAPI spec version: 1.0.0
  */
 
+/**
+ * Position of a module in the UI's graph editor.
+ */
 export interface ModulePosition {
   x: number;
   y: number;

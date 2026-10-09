@@ -12,28 +12,50 @@ export interface ModuleDtoPitchModule {
   type: ModuleDtoPitchModuleType;
   state: PitchState;
   /**
+     * The channel count of the inputs that otherwise take their layout from their sources, or null to do so. Only modules whose type
+     * bool ModuleTypeDto.SupportsChannelCount have it; it is ignored for all others. It can't be lower than the channels the
+     * module's connections to single channels need.
      * @minimum 1
      * @maximum 64
      * @nullable
      */
   channelCount?: number | null;
   id: string;
+  /** Passes the audio through unprocessed. Only effect modules support it; it is ignored for all others. */
   isBypassed: boolean;
+  /** Shows only the name, mute and connectors in the UI's graph editor. */
   isCollapsed: boolean;
   isMuted: boolean;
   /**
+     * A name chosen by the user.
      * @maxLength 100
      * @nullable
      */
   name?: string | null;
   position?: null | ModulePosition;
+  /**
+     * Shows a connector per channel below each port in the UI's graph editor. It stays on while connections to or from single channels of
+     * the module exist (an update turning it off is ignored then); creating such a connection turns it on.
+     */
   showChannels: boolean;
-  /** @nullable */
+  /**
+     * The subgraph the module belongs to, from `GET /api/subgraphs`.
+     * @nullable
+     */
   subgraphId?: string | null;
-  /** @nullable */
+  /**
+     * The module of the subgraph's template that this module was created from or saved as, so an update from the template keeps it.
+     * It's set by the engine and cleared when the module changes subgraphs; the value sent with an update is ignored.
+     * @nullable
+     */
   templateModuleId?: string | null;
+  /**
+     * Follows the volume and mute of Windows' default output device (its volume slider and keys). The engine then sets
+     * float ModuleDto.Volume and bool ModuleDto.IsMuted, and the values sent with an update are ignored.
+     */
   useSystemVolume: boolean;
   /**
+     * Output volume, 0..1.
      * @minimum 0
      * @maximum 1
      */

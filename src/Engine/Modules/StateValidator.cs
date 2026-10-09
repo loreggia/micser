@@ -96,7 +96,7 @@ public static class StateValidator
         foreach (var (property, attributes) in GetParameterAttributes(instance.GetType()))
         {
             var context = new ValidationContext(instance) { MemberName = property.Name, DisplayName = property.Name };
-            Validator.TryValidateValue(property.GetValue(instance)!, context, results, attributes);
+            Validator.TryValidateValue(property.GetValue(instance), context, results, attributes);
         }
 
         foreach (var result in results)

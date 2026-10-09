@@ -42,8 +42,8 @@ public class PitchModule : EffectModule, IStatefulModule<PitchState>
     public static (int FftSize, int Oversampling) GetFftSettings(int quality)
     {
         var t = (Math.Clamp(quality, 1, 10) - 1) / 9f;
-        var fftSize = 1 << (int)MathF.Round(8 + 4 * t);
-        var oversampling = (int)MathF.Round(4 + 4 * t);
+        var fftSize = 1 << (int)MathF.Round(8 + (4 * t));
+        var oversampling = (int)MathF.Round(4 + (4 * t));
         return (fftSize, oversampling);
     }
 

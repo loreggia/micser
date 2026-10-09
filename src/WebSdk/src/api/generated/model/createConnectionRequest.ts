@@ -10,8 +10,15 @@ export interface CreateConnectionRequest {
   sourcePort: string;
   targetModuleId: string;
   targetPort: string;
-  /** @nullable */
+  /**
+     * The only channel of the source port to take (0-based), or null for all. A channel the port doesn't have right now is silent.
+     * @nullable
+     */
   sourceChannel?: number | null;
-  /** @nullable */
+  /**
+     * The only channel of the target port to add to (0-based), or null for all. With a fixed int? ModuleDto.ChannelCount, it must be
+     * below it.
+     * @nullable
+     */
   targetChannel?: number | null;
 }

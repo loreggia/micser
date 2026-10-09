@@ -19,7 +19,7 @@ public class SpectrumModule : EffectModule, IStatefulModule<SpectrumState>, IMod
 {
     public const int FftSize = 4096;
 
-    private readonly Complex[] _bins = new Complex[FftSize / 2 + 1];
+    private readonly Complex[] _bins = new Complex[(FftSize / 2) + 1];
     private readonly FftProcessor _fft = new(FftSize, FftWindowType.Hann);
     private readonly Lock _fftLock = new();
     private readonly float[] _history = new float[FftSize];
@@ -59,11 +59,11 @@ public class SpectrumModule : EffectModule, IStatefulModule<SpectrumState>, IMod
 
             // RealForward normalizes by the FFT size; a Hann window halves the amplitude, and a real sine splits
             // its energy between two mirrored bins
-            const float scale = 4f;
+            const float Scale = 4f;
             var magnitudes = new float[_bins.Length];
             for (var i = 0; i < magnitudes.Length; i++)
             {
-                magnitudes[i] = MathF.Sqrt(_bins[i].X * _bins[i].X + _bins[i].Y * _bins[i].Y) * scale;
+                magnitudes[i] = MathF.Sqrt((_bins[i].X * _bins[i].X) + (_bins[i].Y * _bins[i].Y)) * Scale;
             }
 
             return new Spectrum((float)Format.SampleRate / FftSize, magnitudes);

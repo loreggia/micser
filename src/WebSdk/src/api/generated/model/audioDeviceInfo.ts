@@ -8,15 +8,26 @@ import type { ChannelLayout } from './channelLayout';
 import type { DeviceDirection } from './deviceDirection';
 
 export interface AudioDeviceInfo {
+  /** The endpoint ID; changes when a device is plugged into a different port. */
   id: string;
+  /** The endpoint's full name, e.g. "Speakers (Realtek Audio)". */
   name: string;
-  /** @nullable */
+  /**
+     * The endpoint's short name, e.g. "Speakers".
+     * @nullable
+     */
   description: string | null;
-  /** @nullable */
+  /**
+     * The name of the audio adapter, e.g. "Realtek Audio". Stable across ports.
+     * @nullable
+     */
   adapterName: string | null;
   direction: DeviceDirection;
   isActive: boolean;
   layout: null | ChannelLayout;
-  /** @nullable */
+  /**
+     * The shared-mode sample rate, or null if the device isn't active.
+     * @nullable
+     */
   sampleRate: number | null;
 }

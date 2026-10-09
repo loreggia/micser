@@ -53,15 +53,8 @@ internal sealed class MainForm : Form
         Controls.Add(_webView);
 
         _supervisor.Changed += OnEngineChanged;
-        if (_updates != null)
-        {
-            _updates.Changed += OnUpdatesChanged;
-        }
-
-        if (_driver != null)
-        {
-            _driver.Changed += OnUpdatesChanged;
-        }
+        _updates?.Changed += OnUpdatesChanged;
+        _driver?.Changed += OnUpdatesChanged;
     }
 
     protected override void Dispose(bool disposing)
@@ -69,15 +62,8 @@ internal sealed class MainForm : Form
         if (disposing)
         {
             _supervisor.Changed -= OnEngineChanged;
-            if (_updates != null)
-            {
-                _updates.Changed -= OnUpdatesChanged;
-            }
-
-            if (_driver != null)
-            {
-                _driver.Changed -= OnUpdatesChanged;
-            }
+            _updates?.Changed -= OnUpdatesChanged;
+            _driver?.Changed -= OnUpdatesChanged;
         }
 
         base.Dispose(disposing);
@@ -316,7 +302,7 @@ internal sealed class MainForm : Form
         {
             DriverCommandResult.RebootRequired => (Strings.DriverRebootRequired, MessageBoxIcon.Information),
             DriverCommandResult.Failed => (Strings.DriverFailed, MessageBoxIcon.Error),
-            _ => ((string?)null, MessageBoxIcon.None),
+            _ => (null, MessageBoxIcon.None),
         };
 
         if (text != null)

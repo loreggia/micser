@@ -62,7 +62,7 @@ public sealed class RenderStream : IDeviceStream
         _ring.WriteSilence((int)_target.Value * _channels);
         _interleaved = new float[format.FrameCount * _channels];
         _output = new float[
-            (int)Math.Ceiling(format.FrameCount * (double)DeviceSampleRate / format.SampleRate * 1.1 + 64) * _channels
+            (int)Math.Ceiling((format.FrameCount * (double)DeviceSampleRate / format.SampleRate * 1.1) + 64) * _channels
         ];
 
         _resampler = new WdlResampler();
@@ -178,7 +178,7 @@ public sealed class RenderStream : IDeviceStream
             var channel = source.GetChannel(c);
             for (var i = 0; i < channel.Length; i++)
             {
-                _interleaved[i * _channels + c] = Math.Clamp(channel[i], -1f, 1f);
+                _interleaved[(i * _channels) + c] = Math.Clamp(channel[i], -1f, 1f);
             }
         }
 

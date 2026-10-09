@@ -11,8 +11,14 @@ export interface ConnectionDto {
   sourcePort: string;
   targetModuleId: string;
   targetPort: string;
-  /** @nullable */
+  /**
+     * The only channel of the source port taken (0-based), or null for all.
+     * @nullable
+     */
   sourceChannel?: number | null;
-  /** @nullable */
+  /**
+     * The only channel of the target port added to (0-based), or null for all.
+     * @nullable
+     */
   targetChannel?: number | null;
 }
