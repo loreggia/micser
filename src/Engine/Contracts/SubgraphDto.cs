@@ -39,7 +39,7 @@ public sealed record SubgraphDto(
     [MaxLength(100)] string? Name,
     [Required] ModulePosition Position,
     [Required] SubgraphSize Size,
-    SubgraphColor Color = SubgraphColor.Blue,
+    SubgraphColor Color = SubgraphColor.Green,
     bool IsCollapsed = false,
     bool IsMuted = false,
     bool IsBypassed = false,
@@ -53,4 +53,4 @@ public sealed record CreateSubgraphRequest(
     [Required] ModulePosition Position,
     [Required] SubgraphSize Size,
     IReadOnlyList<Guid> ModuleIds,
-    SubgraphColor Color = SubgraphColor.Blue);
+    SubgraphColor Color = SubgraphColor.Green);

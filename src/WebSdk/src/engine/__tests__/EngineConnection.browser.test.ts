@@ -212,7 +212,7 @@ describe("engine events", () => {
     name: "Voice",
     position: { x: 0, y: 0 },
     size: { width: 240, height: 120 },
-    color: "Blue",
+    color: "Green",
     isCollapsed: false,
     isMuted: false,
     isBypassed: false,
