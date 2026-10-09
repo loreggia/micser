@@ -113,6 +113,30 @@ test("without its channels shown, has only the ports' connectors", async () => {
   expect(screen.getByText("1 (L)").query()).toBeNull();
 });
 
+describe("the button between the ports", () => {
+  test("shows and hides the channels", async () => {
+    const update = vi.spyOn(connection, "updateModule").mockImplementation(() => {});
+    const module = testModule("Gain", { gain: 0 });
+    const screen = await renderNode(module);
+
+    await screen.getByRole("button", { name: "Show channels" }).click();
+
+    expect(update).toHaveBeenCalledWith({ ...module, showChannels: true });
+  });
+
+  test("tells why the channels can't be hidden while connections use them", async () => {
+    const update = vi.spyOn(connection, "updateModule").mockImplementation(() => {});
+    const screen = await renderNode(testModule("Gain", { gain: 0 }, { showChannels: true }), [channelConnection({})]);
+    const button = screen.getByRole("button", { name: "Hide channels" });
+
+    await expect.element(button).toHaveAttribute("aria-disabled", "true");
+    await button.hover();
+    await expect.element(page.getByText("Remove the connections to single channels first")).toBeVisible();
+    await button.click({ force: true });
+    expect(update).not.toHaveBeenCalled();
+  });
+});
+
 describe("the menu", () => {
   test("turns showing the channels on", async () => {
     const update = vi.spyOn(connection, "updateModule").mockImplementation(() => {});

@@ -353,8 +353,8 @@ export function SubgraphNode({ data, selected }: NodeProps<SubgraphNodeType>) {
           <div key={`${input?.id}|${output?.id}`} className={styles.proxyRow}>
             <span>{input?.label}</span>
             <span>{output?.label}</span>
-            {input && <Port type="target" id={input.id} index={0} count={1} />}
-            {output && <Port type="source" id={output.id} index={0} count={1} />}
+            {input && <Port type="target" id={input.id} />}
+            {output && <Port type="source" id={output.id} />}
           </div>
         ))}
       </Card>

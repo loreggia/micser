@@ -126,6 +126,7 @@ export const de: Translations<typeof en> = {
   },
   channels: {
     show: "Kanäle zeigen",
+    hide: "Kanäle ausblenden",
     inUse: "Entferne zuerst die Verbindungen einzelner Kanäle",
     menu: "Kanäle",
     auto: "Automatisch",
