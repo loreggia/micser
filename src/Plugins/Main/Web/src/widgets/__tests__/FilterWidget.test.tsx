@@ -1,4 +1,4 @@
-import type { FilterState } from "@micser/web-sdk";
+import type { FilterState, Language } from "@micser/web-sdk";
 import { createTestQueryClient, testModule, TestProviders } from "@micser/web-sdk/testing";
 import { expect, test, vi } from "vitest";
 import { userEvent } from "vitest/browser";
@@ -7,7 +7,7 @@ import { FilterWidget } from "../FilterWidget";
 
 const state: FilterState = { type: "HighPass", frequency: 80, slope: 24 };
 
-async function renderFilter(language?: string) {
+async function renderFilter(language?: Language) {
   const setState = vi.fn();
   const screen = await render(
     <TestProviders queryClient={createTestQueryClient()} language={language}>
