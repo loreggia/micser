@@ -4,6 +4,7 @@ import { i18n, resolveLanguage } from "../i18n/i18n";
 import {
   getGetPreferencesQueryKey,
   updatePreferences,
+  useGetEngineStatus,
   useGetPortLayouts,
   useGetPreferences,
   type ModuleDto,
@@ -77,6 +78,14 @@ const defaultPreferences: UiPreferencesDto = {
  * Returns the UI preferences (defaults until loaded) and a function that changes some of them. Changes show immediately; the engine stores
  * them and pushes them to all clients.
  */
+/**
+ * The engine's sample rate from the cached engine status (which the toolbar keeps up to date), 48 kHz until it's known. Doesn't fetch.
+ */
+export function useSampleRate(): number {
+  const { data } = useGetEngineStatus({ query: { enabled: false, select: (status) => status.settings.sampleRate } });
+  return data ?? 48000;
+}
+
 export function usePreferences(): [UiPreferencesDto, (changes: Partial<UiPreferencesDto>) => void] {
   const queryClient = useQueryClient();
   const { data: preferences = defaultPreferences } = useGetPreferences();

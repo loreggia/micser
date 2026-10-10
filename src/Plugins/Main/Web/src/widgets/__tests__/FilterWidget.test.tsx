@@ -27,6 +27,18 @@ test("shows the parameters with their units", async () => {
   await expect.element(screen.getByText("0.71", { exact: true })).toBeVisible();
 });
 
+test("shows the frequency response", async () => {
+  const { screen } = await renderFilter();
+
+  await expect.element(screen.getByRole("img", { name: "Frequency response" })).toBeVisible();
+});
+
+test("shows the frequency response in German", async () => {
+  const { screen } = await renderFilter("de");
+
+  await expect.element(screen.getByRole("img", { name: "Frequenzgang" })).toBeVisible();
+});
+
 test("changes the type and keeps the other parameters", async () => {
   const { screen, setState } = await renderFilter();
 
