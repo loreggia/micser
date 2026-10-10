@@ -27,6 +27,14 @@ test("shows each band's values", async () => {
   await expect.element(screen.getByText("-3.0 dB")).toBeVisible();
 });
 
+test("shows the frequency response with a marker per band", async () => {
+  const { screen } = await renderEqualizer([low, high]);
+
+  const graph = screen.getByRole("img", { name: "Frequency response" });
+  await expect.element(graph).toBeVisible();
+  expect(graph.element().querySelectorAll("circle")).toHaveLength(2);
+});
+
 test("adds a band at 1 kHz", async () => {
   const { screen, setState } = await renderEqualizer([low]);
 

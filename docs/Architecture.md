@@ -167,6 +167,7 @@ docs/
   - Double-clicking the title renames the module (Enter or leaving the field saves, Escape cancels, an empty name goes back to the type's title). A named module shows the type's title below its name.
   - The level meter (`useModuleLevels`) is studio-style, per channel on a -60..0 dBFS scale: the RMS as a solid bar, the peak as a lighter bar behind it (instant rise, falling at 20 dB/s), and the highest peak as a marker held for 30 updates (about 1.5 s) that turns red at full scale. While a module isn't processed, its meter stays at zero with its last channel count, so the node doesn't change height.
   - Controls inside nodes need the `nodrag`/`nowheel` classes. `ParameterSlider` is the shared parameter control, with linear or logarithmic scales and integer slider positions, so keyboard steps are exact.
+  - `FrequencyResponse` draws a curve (dB over 20 Hz–20 kHz, logarithmic) from a response function, with optional markers, e.g. an equalizer's bands. The equalizer and filter widgets compute theirs from the same biquads as the engine (`peakingEq`, `lowPass`, `highPass`, `biquadResponse` in `biquad.ts`) at the engine's sample rate (`useSampleRate`, from the cached engine status).
 - **Graph editor (`@xyflow/react`):**
   - Nodes and edges follow the engine.
   - Connecting, deleting (Delete key or "Delete" in the node's "More" menu) and moving (the position is saved on drop) go through the API. Rejected connections, e.g. cycles, show a notification.

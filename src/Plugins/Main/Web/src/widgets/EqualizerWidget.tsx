@@ -2,11 +2,15 @@ import { Button, makeStyles, tokens } from "@fluentui/react-components";
 import { AddRegular } from "@fluentui/react-icons/svg/add";
 import { DeleteRegular } from "@fluentui/react-icons/svg/delete";
 import {
+  biquadResponse,
   decibels,
   formatNumber,
+  FrequencyResponse,
   hertz,
   ParameterSlider,
+  peakingEq,
   useDefaultStyles,
+  useSampleRate,
   type EqualizerBand,
   type WidgetProps,
 } from "@micser/web-sdk";
@@ -35,10 +39,19 @@ export function EqualizerWidget({ module, setState }: WidgetProps<"Equalizer">) 
   const styles = useStyles();
   const { t } = useTranslation();
   const bands = module.state.bands;
+  const sampleRate = useSampleRate();
   const setBand = (index: number, band: EqualizerBand) => setState({ bands: bands.with(index, band) });
+  const filters = bands.map((band) => peakingEq(sampleRate, band.frequency, band.q, band.gain));
 
   return (
     <div className={defaultStyles.column}>
+      <FrequencyResponse
+        label={t("equalizer.response")}
+        response={(frequency) => biquadResponse(filters, sampleRate, frequency)}
+        minDecibels={-24}
+        maxDecibels={24}
+        markers={bands.map((band) => band.frequency)}
+      />
       {bands.map((band, index) => (
         <div key={index} className={styles.band}>
           <div className={styles.bandHeader}>
