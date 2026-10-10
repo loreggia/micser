@@ -157,7 +157,7 @@ interface ModuleMenu {
 /**
  * The routing graph: modules as nodes, connections as edges, and subgraphs as frames around their modules (or, collapsed, as nodes
  * with the ports of the connections crossing their border). Changes go to the engine; the graph follows the engine's notifications,
- * except for positions while a node is being dragged and sizes while a subgraph is resized.
+ * except for positions while a node is being dragged and sizes while a node is resized.
  *
  * A selected connection has handles at its ends that drag it to other ports; unselected ones have none, so a drag at a port with
  * several connections can't take the wrong one. A right click on empty space offers to add a module there, and so does a connection
@@ -338,10 +338,17 @@ export function GraphEditor() {
         const data = { module, moduleType: typesByName.get(module.type), widget: widgets.get(module.type), subgraph };
         const position = (node?.dragging ? node.position : module.position) ?? node?.position ?? defaultPosition(index);
         const placement = { parentId: subgraph?.id, hidden: subgraph?.isCollapsed ?? false };
+        // collapsed or without a widget, the height fits the content
+        const size = node?.resizing
+          ? { width: node.width, height: node.height }
+          : {
+              width: module.size?.width,
+              height: (!module.isCollapsed && data.widget && module.size?.height) || undefined,
+            };
 
         return node
-          ? { ...node, measured: measured(node), data, position, ...placement }
-          : { id: module.id, type: "module" as const, position, data, ...placement };
+          ? { ...node, measured: measured(node), data, position, ...placement, ...size }
+          : { id: module.id, type: "module" as const, position, data, ...placement, ...size };
       });
 
       return [...subgraphNodes, ...moduleNodes];

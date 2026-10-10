@@ -109,6 +109,7 @@ public sealed class ModuleCatalog
             IsBypassed = settings.IsBypassed,
             IsCollapsed = settings.IsCollapsed,
             ShowChannels = settings.ShowChannels,
+            Size = settings.Size,
             ChannelCount = settings.ChannelCount,
             State = (TState)state,
         };
@@ -129,7 +130,8 @@ public sealed record ModuleSettings(
     Guid? SubgraphId,
     Guid? TemplateModuleId = null,
     bool ShowChannels = false,
-    int? ChannelCount = null
+    int? ChannelCount = null,
+    ModuleSize? Size = null
 )
 {
     public static ModuleSettings From(ModuleDto dto)
@@ -145,7 +147,8 @@ public sealed record ModuleSettings(
             dto.SubgraphId,
             dto.TemplateModuleId,
             dto.ShowChannels,
-            dto.ChannelCount
+            dto.ChannelCount,
+            dto.Size
         );
     }
 }

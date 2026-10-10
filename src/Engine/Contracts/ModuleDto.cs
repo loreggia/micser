@@ -10,6 +10,12 @@ namespace Micser.Engine.Contracts;
 public sealed record ModulePosition(double X, double Y);
 
 /// <summary>
+/// Size of a module in the UI's graph editor, chosen by the user.
+/// </summary>
+/// <param name="Height">Null to fit the content. The content scrolls when it doesn't fit.</param>
+public sealed record ModuleSize([Range(1, 100000)] double Width, [Range(1, 100000)] double? Height = null);
+
+/// <summary>
 /// A module and its settings. The concrete type is <see cref="ModuleDto{TState}"/>; in JSON the <c>type</c> property
 /// names the module type and selects the state schema (registered at runtime by <see cref="Modules.ModuleCatalog"/>).
 /// </summary>
@@ -53,6 +59,11 @@ public abstract record ModuleDto
     /// the module exist (an update turning it off is ignored then); creating such a connection turns it on.
     /// </summary>
     public bool ShowChannels { get; init; }
+
+    /// <summary>
+    /// The size chosen by the user, or null to fit the content.
+    /// </summary>
+    public ModuleSize? Size { get; init; }
 
     /// <summary>
     /// The subgraph the module belongs to, from <c>GET /api/subgraphs</c>.
