@@ -8,6 +8,5 @@ export const useDefaultStyles = makeStyles({
     display: "flex",
     flexDirection: "column",
     gap: tokens.spacingVerticalS,
-    width: "220px",
   },
 });

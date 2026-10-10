@@ -7,6 +7,7 @@
 import type { EqualizerState } from './equalizerState';
 import type { ModuleDtoEqualizerModuleType } from './moduleDtoEqualizerModuleType';
 import type { ModulePosition } from './modulePosition';
+import type { ModuleSize } from './moduleSize';
 
 export interface ModuleDtoEqualizerModule {
   type: ModuleDtoEqualizerModuleType;
@@ -38,6 +39,7 @@ export interface ModuleDtoEqualizerModule {
      * the module exist (an update turning it off is ignored then); creating such a connection turns it on.
      */
   showChannels: boolean;
+  size?: null | ModuleSize;
   /**
      * The subgraph the module belongs to, from `GET /api/subgraphs`.
      * @nullable

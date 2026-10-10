@@ -28,8 +28,34 @@ test("draws the module's spectrum while shown", async () => {
   push?.({ frequencyResolution: 10, magnitudes: Array.from({ length: 2400 }, (_, bin) => 1 / (bin + 1)) });
 
   await expect.poll(() => stroke.mock.calls.length).toBeGreaterThan(0);
-  expect(canvas.width).toBe(280 * window.devicePixelRatio);
+  // drawn at the canvas's size
+  expect(canvas.clientWidth).toBeGreaterThan(0);
+  expect(Math.abs(canvas.width - canvas.clientWidth * window.devicePixelRatio)).toBeLessThanOrEqual(1);
 
   await screen.unmount();
   expect(unsubscribe).toHaveBeenCalled();
+});
+
+test("fills the height it's given, at least 120 px", async () => {
+  const queryClient = createTestQueryClient();
+  const connection = new EngineConnection(queryClient);
+  vi.spyOn(connection, "subscribe").mockImplementation(() => () => {});
+  const module = testModule("Spectrum", {});
+  const renderIn = (height: number) =>
+    render(
+      <TestProviders queryClient={queryClient} connection={connection}>
+        <div style={{ display: "flex", flexDirection: "column", height, width: 300 }}>
+          <SpectrumWidget module={module} setState={() => {}} />
+        </div>
+      </TestProviders>
+    );
+
+  const tall = await renderIn(300);
+  const canvas = tall.container.querySelector("canvas")!;
+  expect(canvas.clientHeight).toBe(300);
+  await expect.poll(() => canvas.height).toBe(Math.round(300 * window.devicePixelRatio));
+  await tall.unmount();
+
+  const low = await renderIn(50);
+  expect(low.container.querySelector("canvas")!.clientHeight).toBe(120);
 });

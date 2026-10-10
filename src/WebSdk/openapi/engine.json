@@ -1603,6 +1603,17 @@
             "type": "boolean",
             "description": "Shows a connector per channel below each port in the UI's graph editor. It stays on while connections to or from single channels of\r\nthe module exist (an update turning it off is ignored then); creating such a connection turns it on."
           },
+          "size": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "The size chosen by the user, or null to fit the content.",
+                "$ref": "#/components/schemas/ModuleSize"
+              }
+            ]
+          },
           "subgraphId": {
             "type": [
               "null",
@@ -1700,6 +1711,17 @@
           "showChannels": {
             "type": "boolean",
             "description": "Shows a connector per channel below each port in the UI's graph editor. It stays on while connections to or from single channels of\r\nthe module exist (an update turning it off is ignored then); creating such a connection turns it on."
+          },
+          "size": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "The size chosen by the user, or null to fit the content.",
+                "$ref": "#/components/schemas/ModuleSize"
+              }
+            ]
           },
           "subgraphId": {
             "type": [
@@ -1799,6 +1821,17 @@
             "type": "boolean",
             "description": "Shows a connector per channel below each port in the UI's graph editor. It stays on while connections to or from single channels of\r\nthe module exist (an update turning it off is ignored then); creating such a connection turns it on."
           },
+          "size": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "The size chosen by the user, or null to fit the content.",
+                "$ref": "#/components/schemas/ModuleSize"
+              }
+            ]
+          },
           "subgraphId": {
             "type": [
               "null",
@@ -1896,6 +1929,17 @@
           "showChannels": {
             "type": "boolean",
             "description": "Shows a connector per channel below each port in the UI's graph editor. It stays on while connections to or from single channels of\r\nthe module exist (an update turning it off is ignored then); creating such a connection turns it on."
+          },
+          "size": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "The size chosen by the user, or null to fit the content.",
+                "$ref": "#/components/schemas/ModuleSize"
+              }
+            ]
           },
           "subgraphId": {
             "type": [
@@ -1995,6 +2039,17 @@
             "type": "boolean",
             "description": "Shows a connector per channel below each port in the UI's graph editor. It stays on while connections to or from single channels of\r\nthe module exist (an update turning it off is ignored then); creating such a connection turns it on."
           },
+          "size": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "The size chosen by the user, or null to fit the content.",
+                "$ref": "#/components/schemas/ModuleSize"
+              }
+            ]
+          },
           "subgraphId": {
             "type": [
               "null",
@@ -2092,6 +2147,17 @@
           "showChannels": {
             "type": "boolean",
             "description": "Shows a connector per channel below each port in the UI's graph editor. It stays on while connections to or from single channels of\r\nthe module exist (an update turning it off is ignored then); creating such a connection turns it on."
+          },
+          "size": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "The size chosen by the user, or null to fit the content.",
+                "$ref": "#/components/schemas/ModuleSize"
+              }
+            ]
           },
           "subgraphId": {
             "type": [
@@ -2191,6 +2257,17 @@
             "type": "boolean",
             "description": "Shows a connector per channel below each port in the UI's graph editor. It stays on while connections to or from single channels of\r\nthe module exist (an update turning it off is ignored then); creating such a connection turns it on."
           },
+          "size": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "The size chosen by the user, or null to fit the content.",
+                "$ref": "#/components/schemas/ModuleSize"
+              }
+            ]
+          },
           "subgraphId": {
             "type": [
               "null",
@@ -2288,6 +2365,17 @@
           "showChannels": {
             "type": "boolean",
             "description": "Shows a connector per channel below each port in the UI's graph editor. It stays on while connections to or from single channels of\r\nthe module exist (an update turning it off is ignored then); creating such a connection turns it on."
+          },
+          "size": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "The size chosen by the user, or null to fit the content.",
+                "$ref": "#/components/schemas/ModuleSize"
+              }
+            ]
           },
           "subgraphId": {
             "type": [
@@ -2387,6 +2475,17 @@
             "type": "boolean",
             "description": "Shows a connector per channel below each port in the UI's graph editor. It stays on while connections to or from single channels of\r\nthe module exist (an update turning it off is ignored then); creating such a connection turns it on."
           },
+          "size": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "The size chosen by the user, or null to fit the content.",
+                "$ref": "#/components/schemas/ModuleSize"
+              }
+            ]
+          },
           "subgraphId": {
             "type": [
               "null",
@@ -2462,6 +2561,27 @@
           }
         },
         "description": "Position of a module in the UI's graph editor."
+      },
+      "ModuleSize": {
+        "required": [
+          "width"
+        ],
+        "type": "object",
+        "properties": {
+          "width": {
+            "type": "number",
+            "format": "double"
+          },
+          "height": {
+            "type": [
+              "null",
+              "number"
+            ],
+            "description": "Null to fit the content. The content scrolls when it doesn't fit.",
+            "format": "double"
+          }
+        },
+        "description": "Size of a module in the UI's graph editor, chosen by the user."
       },
       "ModuleTypeDto": {
         "required": [
