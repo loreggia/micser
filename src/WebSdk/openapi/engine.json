@@ -1384,7 +1384,8 @@
         "required": [
           "type",
           "frequency",
-          "slope"
+          "slope",
+          "q"
         ],
         "type": "object",
         "properties": {
@@ -1400,6 +1401,11 @@
             "type": "integer",
             "format": "int32",
             "default": 12
+          },
+          "q": {
+            "type": "number",
+            "format": "float",
+            "default": 0.70710677
           }
         }
       },
