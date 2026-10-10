@@ -42,6 +42,7 @@ export const de: Translations<typeof en> = {
     gain: "Verstärkung",
     q: "Güte",
     addBand: "Band hinzufügen",
+    response: "Frequenzgang",
   },
   filter: {
     highPass: "Hochpass",
@@ -50,6 +51,7 @@ export const de: Translations<typeof en> = {
     slope: "Flankensteilheit",
     q: "Güte",
     decibelsPerOctave: "{{value}} dB/Okt.",
+    response: "Frequenzgang",
   },
   gain: {
     gain: "Verstärkung",

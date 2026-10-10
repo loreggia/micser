@@ -39,6 +39,7 @@ export const en = {
     gain: "Gain",
     q: "Q",
     addBand: "Add band",
+    response: "Frequency response",
   },
   filter: {
     highPass: "High-pass",
@@ -47,6 +48,7 @@ export const en = {
     slope: "Slope",
     q: "Q",
     decibelsPerOctave: "{{value}} dB/oct",
+    response: "Frequency response",
   },
   gain: {
     gain: "Gain",

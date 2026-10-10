@@ -1,4 +1,5 @@
 export * from "./api";
+export { FrequencyResponse, type FrequencyResponseProps } from "./controls/FrequencyResponse";
 export { ParameterSlider, type ParameterSliderProps } from "./controls/ParameterSlider";
 export {
   EngineConnection,
@@ -16,6 +17,7 @@ export {
   useLanguagePreference,
   usePortLayouts,
   usePreferences,
+  useSampleRate,
   useSubgraphUpdate,
 } from "./engine/hooks";
 export {
@@ -33,6 +35,7 @@ export {
   type Translations,
   type TranslationValues,
 } from "./i18n/i18n";
+export { biquadResponse, highPass, lowPass, peakingEq, type Biquad } from "./lib/biquad";
 export { decibels, formatNumber, hertz, milliseconds } from "./lib/labels";
 export {
   definePlugin,
