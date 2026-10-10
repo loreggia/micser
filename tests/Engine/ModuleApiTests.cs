@@ -70,6 +70,7 @@ public class ModuleApiTests
                 "Gain",
                 "Compressor",
                 "Equalizer",
+                "Filter",
                 "Pitch",
                 "Spectrum",
             ]);
@@ -90,7 +91,7 @@ public class ModuleApiTests
         var types = await client.GetFromJsonAsync<ModuleTypeDto[]>("/api/module-types");
         var supported = types!.Where(t => t.SupportsChannelCount).Select(t => t.Type);
 
-        await Assert.That(supported).IsEquivalentTo(["Gain", "Compressor", "Equalizer", "Pitch", "Spectrum"]);
+        await Assert.That(supported).IsEquivalentTo(["Gain", "Compressor", "Equalizer", "Filter", "Pitch", "Spectrum"]);
         await Assert.That(types!.Single(t => t.Type == "Gain").ChannelCountInputs).IsEquivalentTo(["Input"]);
         await Assert.That(types!.Single(t => t.Type == "DeviceOutput").ChannelCountInputs).IsEmpty();
     }
@@ -289,6 +290,28 @@ public class ModuleApiTests
 
         await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.BadRequest);
         await Assert.That(errors).IsEquivalentTo(["volume", "state.bands[1].frequency"]);
+    }
+
+    [Test]
+    public async Task UpdateModule_FilterSlopeNotAMultipleOf12_IsBadRequest()
+    {
+        await using var factory = new EngineFactory();
+        using var client = factory.CreateAuthorizedClient();
+        var module = (ModuleDto<FilterState>)await factory.AddModuleAsync(client, "Filter");
+
+        using var response = await client.PutAsJsonAsync<ModuleDto>(
+            $"/api/modules/{module.Id}",
+            module with
+            {
+                State = module.State with { Slope = 30 },
+            },
+            factory.Json
+        );
+        var problem = await response.Content.ReadFromJsonAsync<JsonObject>();
+        var errors = problem!["errors"]!.AsObject().Select(e => e.Key).ToArray();
+
+        await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.BadRequest);
+        await Assert.That(errors).IsEquivalentTo(["state.slope"]);
     }
 
     [Test]

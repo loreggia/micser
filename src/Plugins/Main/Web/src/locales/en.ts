@@ -6,6 +6,7 @@ export const en = {
     gain: "Gain",
     compressor: "Compressor",
     equalizer: "Equalizer",
+    filter: "Filter",
     pitch: "Pitch",
     spectrum: "Spectrum",
   },
@@ -38,6 +39,14 @@ export const en = {
     gain: "Gain",
     q: "Q",
     addBand: "Add band",
+  },
+  filter: {
+    highPass: "High-pass",
+    lowPass: "Low-pass",
+    frequency: "Frequency",
+    slope: "Slope",
+    q: "Q",
+    decibelsPerOctave: "{{value}} dB/oct",
   },
   gain: {
     gain: "Gain",
