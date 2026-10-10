@@ -45,6 +45,7 @@ export const en = {
     lowPass: "Low-pass",
     frequency: "Frequency",
     slope: "Slope",
+    q: "Q",
     decibelsPerOctave: "{{value}} dB/oct",
   },
   gain: {

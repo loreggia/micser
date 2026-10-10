@@ -10,4 +10,5 @@ export interface FilterState {
   type: FilterType;
   frequency: number;
   slope: number;
+  q: number;
 }

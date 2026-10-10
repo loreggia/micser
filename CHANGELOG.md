@@ -11,7 +11,7 @@ from that section, and the release workflow fails without it.
 ## Unreleased
 
 - New "Filter" module: a high-pass or low-pass filter with an adjustable cutoff frequency and a slope of 12 to 48 dB per octave, e.g. to
-  remove rumble from a microphone.
+  remove rumble from a microphone. Its Q setting adds a resonant peak at the cutoff frequency.
 
 ## 0.12.0 - 2026-10-09
 

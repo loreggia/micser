@@ -48,6 +48,7 @@ export const de: Translations<typeof en> = {
     lowPass: "Tiefpass",
     frequency: "Frequenz",
     slope: "Flankensteilheit",
+    q: "Güte",
     decibelsPerOctave: "{{value}} dB/Okt.",
   },
   gain: {

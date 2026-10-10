@@ -26,6 +26,28 @@ public class FilterModuleTests
     }
 
     [Test]
+    [Arguments(FilterType.LowPass, 12, 0.5f)]
+    [Arguments(FilterType.LowPass, 24, 2f)]
+    [Arguments(FilterType.LowPass, 48, 4f)]
+    [Arguments(FilterType.HighPass, 12, 4f)]
+    [Arguments(FilterType.HighPass, 36, 0.5f)]
+    public async Task GainAtCutoff_IsQ(FilterType type, int slope, float q)
+    {
+        var filter = new FilterModule
+        {
+            Type = type,
+            Frequency = 1000,
+            Slope = slope,
+            Q = q,
+        };
+        var bench = new SignalTestBench(1000, 0.1f, null, filter);
+
+        var output = bench.Run(TimeSpan.FromMilliseconds(500));
+
+        await Assert.That(LevelOfLast100Ms(output, 0.1f)).IsEqualTo(Decibels.FromLinear(q)).Within(0.1f);
+    }
+
+    [Test]
     public async Task ChangingFrequency_TakesEffect()
     {
         var filter = new FilterModule { Type = FilterType.LowPass, Frequency = 200 };
@@ -36,6 +58,19 @@ public class FilterModuleTests
         var output = bench.Run(TimeSpan.FromMilliseconds(500));
 
         await Assert.That(LevelOfLast100Ms(output, 0.1f)).IsEqualTo(0f).Within(0.1f);
+    }
+
+    [Test]
+    public async Task ChangingQ_TakesEffect()
+    {
+        var filter = new FilterModule { Type = FilterType.LowPass, Frequency = 1000 };
+        var bench = new SignalTestBench(1000, 0.1f, null, filter);
+        bench.Run(TimeSpan.FromMilliseconds(200));
+
+        filter.Q = 4f;
+        var output = bench.Run(TimeSpan.FromMilliseconds(500));
+
+        await Assert.That(LevelOfLast100Ms(output, 0.1f)).IsEqualTo(Decibels.FromLinear(4f)).Within(0.1f);
     }
 
     [Test]

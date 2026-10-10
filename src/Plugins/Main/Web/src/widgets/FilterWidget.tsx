@@ -37,6 +37,15 @@ export function FilterWidget({ module, setState }: WidgetProps<"Filter">) {
         format={(v) => t("filter.decibelsPerOctave", { value: formatNumber(v) })}
         onChange={(slope) => setState({ ...state, slope })}
       />
+      <ParameterSlider
+        label={t("filter.q")}
+        value={state.q}
+        min={0.1}
+        max={10}
+        logarithmic
+        format={(v) => formatNumber(v, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+        onChange={(q) => setState({ ...state, q })}
+      />
     </div>
   );
 }
