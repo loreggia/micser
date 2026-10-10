@@ -11,6 +11,9 @@ from that section, and the release workflow fails without it.
 ## Unreleased
 
 - The Equalizer and Filter modules show a graph of their frequency response, which follows the settings as you change them.
+- Modules can be resized with the corner at their bottom right. When a module is lower than its controls, they scroll; the Spectrum
+  module's graph grows with the module. "Reset size" in the module's "More" menu returns it to its normal size.
+- Module controls use the full width of the module.
 
 ## 0.13.0 - 2026-10-10
 

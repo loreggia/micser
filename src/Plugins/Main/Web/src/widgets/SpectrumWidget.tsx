@@ -1,5 +1,5 @@
 import { makeStyles, tokens } from "@fluentui/react-components";
-import { useModuleData, type WidgetProps } from "@micser/web-sdk";
+import { useElementSize, useModuleData, type WidgetProps } from "@micser/web-sdk";
 import { useEffect, useRef } from "react";
 
 interface Spectrum {
@@ -7,16 +7,24 @@ interface Spectrum {
   magnitudes: number[];
 }
 
-const width = 280;
-const height = 120;
+const defaultWidth = 280;
+const minHeight = 120;
 const minFrequency = 20;
 const minDecibels = -100;
 
 const useStyles = makeStyles({
+  // the canvas fills the width of the other content without widening it, and the height the module has
+  root: {
+    position: "relative",
+    flexGrow: 1,
+    minHeight: `${minHeight}px`,
+  },
   canvas: {
+    position: "absolute",
+    inset: 0,
     display: "block",
-    width: `${width}px`,
-    height: `${height}px`,
+    width: "100%",
+    height: "100%",
     borderRadius: tokens.borderRadiusMedium,
     backgroundColor: tokens.colorNeutralBackground3,
   },
@@ -27,7 +35,9 @@ const useStyles = makeStyles({
  */
 export function SpectrumWidget({ module }: WidgetProps<"Spectrum">) {
   const styles = useStyles();
+  const rootRef = useRef<HTMLDivElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const { width, height } = useElementSize(rootRef, { width: defaultWidth, height: minHeight });
   const spectrum = useModuleData<Spectrum>(module.id);
 
   useEffect(() => {
@@ -38,8 +48,8 @@ export function SpectrumWidget({ module }: WidgetProps<"Spectrum">) {
     }
 
     const scale = window.devicePixelRatio;
-    canvas.width = width * scale;
-    canvas.height = height * scale;
+    canvas.width = Math.round(width * scale);
+    canvas.height = Math.round(height * scale);
     context.setTransform(scale, 0, 0, scale, 0, 0);
     context.clearRect(0, 0, width, height);
 
@@ -75,7 +85,11 @@ export function SpectrumWidget({ module }: WidgetProps<"Spectrum">) {
     }
 
     context.stroke();
-  }, [spectrum]);
+  }, [spectrum, width, height]);
 
-  return <canvas ref={canvasRef} className={styles.canvas} />;
+  return (
+    <div ref={rootRef} className={styles.root}>
+      <canvas ref={canvasRef} className={styles.canvas} />
+    </div>
+  );
 }

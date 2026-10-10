@@ -65,6 +65,57 @@ test("a moved module keeps its position on the grid", async ({ graph, engine }) 
   expect([x % 20, y % 20]).toEqual([0, 0]);
 });
 
+test("a module is resized with its handle, its widget scrolls, and its size is reset", async ({ graph, engine }) => {
+  const module = await engine.addModule("Compressor", { x: 0, y: 0 });
+  await graph.open();
+  const node = graph.node(module.id);
+  const naturalHeight = await node.evaluate((element: HTMLElement) => element.offsetHeight);
+
+  const handle = (await node.locator(".react-flow__resize-control").boundingBox())!;
+  const nodeBox = (await node.boundingBox())!;
+  const start = { x: handle.x + handle.width / 2, y: handle.y + handle.height / 2 };
+  await graph.page.mouse.move(start.x, start.y);
+  await graph.page.mouse.down();
+  await graph.page.mouse.move(start.x + nodeBox.width / 4, start.y - nodeBox.height / 3, { steps: 10 });
+  await graph.page.mouse.up();
+
+  await expect.poll(async () => (await engine.module(module.id))?.size).toBeTruthy();
+  const size = (await engine.module(module.id))!.size!;
+  expect(size.height).toBeLessThan(naturalHeight);
+  await expect.poll(() => node.evaluate((element: HTMLElement) => element.offsetHeight)).toBe(size.height);
+  // the widget scrolls
+  const scrolls = await node.evaluate((element) =>
+    [...element.querySelectorAll("div")].some(
+      (div) => getComputedStyle(div).overflowY === "auto" && div.scrollHeight > div.clientHeight
+    )
+  );
+  expect(scrolls).toBe(true);
+
+  await node.getByRole("button", { name: "More" }).click();
+  await graph.menu.getByRole("menuitem", { name: "Reset size" }).click();
+
+  await expect.poll(async () => (await engine.module(module.id))?.size).toBeNull();
+  await expect.poll(() => node.evaluate((element: HTMLElement) => element.offsetHeight)).toBe(naturalHeight);
+});
+
+test("a resized module fits its content's height while collapsed", async ({ graph, engine }) => {
+  const sized = await engine.addModule("Compressor", { x: 0, y: 0 });
+  const unsized = await engine.addModule("Compressor", { x: 400, y: 0 });
+  await engine.updateModule({ ...sized, size: { width: 300, height: 400 } });
+  await engine.updateModule({ ...unsized, isCollapsed: true });
+  await graph.open();
+  const node = graph.node(sized.id);
+  const height = (id: string) => graph.node(id).evaluate((element: HTMLElement) => element.offsetHeight);
+  await expect.poll(() => height(sized.id)).toBe(400);
+
+  await node.getByRole("button", { name: "Collapse" }).click();
+  await expect.poll(() => height(sized.id)).toBe(await height(unsized.id));
+  expect(await node.evaluate((element: HTMLElement) => element.offsetWidth)).toBe(300);
+
+  await node.getByRole("button", { name: "Expand" }).click();
+  await expect.poll(() => height(sized.id)).toBe(400);
+});
+
 test("a module is deleted from its menu", async ({ graph, engine }) => {
   const module = await engine.addModule("Gain", { x: 0, y: 0 });
   await graph.open();

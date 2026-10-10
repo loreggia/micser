@@ -7,6 +7,7 @@
 import type { DeviceInputState } from './deviceInputState';
 import type { ModuleDtoDeviceInputModuleType } from './moduleDtoDeviceInputModuleType';
 import type { ModulePosition } from './modulePosition';
+import type { ModuleSize } from './moduleSize';
 
 export interface ModuleDtoDeviceInputModule {
   type: ModuleDtoDeviceInputModuleType;
@@ -38,6 +39,7 @@ export interface ModuleDtoDeviceInputModule {
      * the module exist (an update turning it off is ignored then); creating such a connection turns it on.
      */
   showChannels: boolean;
+  size?: null | ModuleSize;
   /**
      * The subgraph the module belongs to, from `GET /api/subgraphs`.
      * @nullable

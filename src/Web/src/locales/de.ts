@@ -123,6 +123,7 @@ export const de: Translations<typeof en> = {
     followWindowsVolume: "Der Windows-Lautstärke folgen",
     addFailed: "Das Modul konnte nicht hinzugefügt werden",
     updateFailed: "Ein Modul konnte nicht geändert werden",
+    resetSize: "Größe zurücksetzen",
   },
   channels: {
     show: "Kanäle zeigen",

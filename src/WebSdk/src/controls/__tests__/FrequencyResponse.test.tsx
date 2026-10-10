@@ -3,10 +3,12 @@ import { expect, test } from "vitest";
 import { render } from "vitest-browser-react";
 import { FrequencyResponse, type FrequencyResponseProps } from "../FrequencyResponse";
 
-async function renderGraph(props: Partial<FrequencyResponseProps>) {
+async function renderGraph(props: Partial<FrequencyResponseProps>, containerWidth = 300) {
   const screen = await render(
     <FluentProvider theme={webLightTheme}>
-      <FrequencyResponse label="Response" response={() => 0} minDecibels={-24} maxDecibels={24} {...props} />
+      <div style={{ width: containerWidth }}>
+        <FrequencyResponse label="Response" response={() => 0} minDecibels={-24} maxDecibels={24} {...props} />
+      </div>
     </FluentProvider>
   );
 
@@ -21,6 +23,13 @@ test("shows the frequency and dB grid", async () => {
   await expect.element(screen.getByText("1 kHz", { exact: true })).toBeInTheDocument();
   await expect.element(screen.getByText("+12", { exact: true })).toBeInTheDocument();
   await expect.element(screen.getByText("-12", { exact: true })).toBeInTheDocument();
+});
+
+test("fills the width of its container", async () => {
+  const { graph } = await renderGraph({ height: 100 }, 300);
+
+  await expect.poll(() => graph.element().getAttribute("viewBox")).toBe("0 0 300 100");
+  expect(graph.element().clientWidth).toBe(300);
 });
 
 test("draws a flat response on the 0 dB line", async () => {

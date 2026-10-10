@@ -119,6 +119,7 @@ export const en = {
     followWindowsVolume: "Follow the Windows volume",
     addFailed: "Adding the module failed",
     updateFailed: "Updating a module failed",
+    resetSize: "Reset size",
   },
   channels: {
     show: "Show channels",

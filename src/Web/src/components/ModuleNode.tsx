@@ -25,6 +25,7 @@ import { DeleteRegular } from "@fluentui/react-icons/svg/delete";
 import { DesktopSpeakerRegular } from "@fluentui/react-icons/svg/desktop-speaker";
 import { FlashOffRegular } from "@fluentui/react-icons/svg/flash-off";
 import { MoreHorizontalRegular } from "@fluentui/react-icons/svg/more-horizontal";
+import { ArrowAutofitContentRegular } from "@fluentui/react-icons/svg/arrow-autofit-content";
 import { Speaker2Regular } from "@fluentui/react-icons/svg/speaker";
 import { SpeakerMuteRegular } from "@fluentui/react-icons/svg/speaker-mute";
 import {
@@ -39,7 +40,8 @@ import {
   type SubgraphDto,
   type WidgetDefinition,
 } from "@micser/web-sdk";
-import { Handle, Position, useReactFlow, type Node, type NodeProps } from "@xyflow/react";
+import { Handle, NodeResizeControl, Position, useReactFlow, type Node, type NodeProps } from "@xyflow/react";
+import { useLayoutEffect, useRef, useState, type RefObject } from "react";
 import { useTranslation } from "../i18n";
 import { portName } from "../plugins";
 import {
@@ -54,6 +56,7 @@ import {
 import { LevelMeter } from "./LevelMeter";
 import { useModuleActions } from "./moduleActions";
 import { ModuleTitle } from "./ModuleTitle";
+import { resizeHandleStyle } from "./resizeHandle";
 import { portHandleId } from "./subgraphs";
 import { useHandlesChanged } from "./useHandlesChanged";
 
@@ -67,9 +70,16 @@ export type ModuleNodeData = {
 
 export type ModuleNodeType = Node<ModuleNodeData, "module">;
 
+const minModuleWidth = 240;
+
 const useStyles = makeStyles({
+  // fills the node, which has the module's size if it has one
   card: {
-    minWidth: "240px",
+    position: "relative",
+    boxSizing: "border-box",
+    width: "100%",
+    height: "100%",
+    minWidth: `${minModuleWidth}px`,
     boxShadow: tokens.shadow8,
     // the ports sit on the card's edges and would be cut in half
     overflow: "visible",
@@ -95,7 +105,19 @@ const useStyles = makeStyles({
     color: tokens.colorNeutralForeground3,
     fontVariantNumeric: "tabular-nums",
   },
+  // a divider grows by default, which would take the widget's room in a high module
+  divider: {
+    flexGrow: 0,
+    flexShrink: 0,
+  },
+  // scrolls when the module is lower than its content; a widget can grow into the height the module has
   body: {
+    display: "flex",
+    flexDirection: "column",
+    flexGrow: 1,
+    minHeight: 0,
+    overflowY: "auto",
+    scrollbarWidth: "thin",
     cursor: "default",
   },
   port: {
@@ -145,9 +167,52 @@ const useStyles = makeStyles({
 });
 
 /**
- * A module on the graph: name, mute, bypass, collapse and a menu (channels, delete), volume (or the Windows volume), the connectors, level
+ * The smallest size a module can have: the width its content needs, and the height of its content above the widget, which doesn't scroll
+ * (without a widget, the module's height). `hasBody` tells whether the widget is shown, so its element is observed.
+ */
+function useMinSize(card: RefObject<HTMLDivElement | null>, body: RefObject<HTMLDivElement | null>, hasBody: boolean) {
+  const [size, setSize] = useState({ width: minModuleWidth, height: 0 });
+
+  useLayoutEffect(() => {
+    const cardElement = card.current;
+    if (!cardElement) {
+      return;
+    }
+
+    // layout sizes, unaffected by the graph's zoom
+    const measure = () => {
+      const bodyElement = body.current;
+      const width = cardElement.style.getPropertyValue("width");
+      cardElement.style.setProperty("width", "min-content");
+      const minWidth = Math.max(minModuleWidth, Math.ceil(cardElement.offsetWidth));
+      cardElement.style.setProperty("width", width);
+      const minHeight = bodyElement
+        ? Math.ceil(bodyElement.offsetTop + parseFloat(getComputedStyle(cardElement).paddingBottom))
+        : cardElement.offsetHeight;
+      setSize((current) =>
+        current.width === minWidth && current.height === minHeight ? current : { width: minWidth, height: minHeight }
+      );
+    };
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(cardElement);
+    if (body.current) {
+      observer.observe(body.current);
+    }
+
+    return () => observer.disconnect();
+  }, [card, body, hasBody]);
+
+  return size;
+}
+
+/**
+ * A module on the graph: name, mute, bypass, collapse and a menu (channels, reset size, delete), volume (or the Windows volume), the connectors, level
  * meter and the module type's widget. Collapsed, it shows only the name, mute, bypass and the connectors, at the same height. While its
  * subgraph is muted or bypassed, the module's own switch shows that and is disabled.
+ *
+ * The handle at the bottom right resizes the module, down to the width its content needs and the height of its content above the widget;
+ * the widget scrolls when it doesn't fit. Collapsed or without a widget, only the width changes and the height fits the content.
  *
  * Each port has a row with its connector; with its channels shown, also one per channel. "Show channels" can't be turned off while
  * connections use single channels of the module.
@@ -169,6 +234,10 @@ export function ModuleNode({ id, data, selected }: NodeProps<ModuleNodeType>) {
   const bypassedBySubgraph = subgraph?.isBypassed === true;
   const Widget = widget?.component;
   const collapsed = module.isCollapsed;
+  const cardRef = useRef<HTMLDivElement>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
+  const widthOnly = collapsed || !Widget;
+  const minSize = useMinSize(cardRef, bodyRef, !widthOnly);
   const widgetTitle = widget && localize(widget.title);
   const ports = (
     <ChannelPorts
@@ -181,7 +250,13 @@ export function ModuleNode({ id, data, selected }: NodeProps<ModuleNodeType>) {
   );
 
   return (
-    <Card className={mergeClasses(styles.card, selected && styles.selected)} size="small">
+    <Card
+      ref={cardRef}
+      className={mergeClasses(styles.card, selected && styles.selected)}
+      // only the widget scrolls, so the content above it keeps the card from getting lower; without a widget, the card fits its content
+      style={{ minHeight: (!widthOnly && minSize.height) || undefined }}
+      size="small"
+    >
       <CardHeader
         className={styles.header}
         header={
@@ -307,6 +382,11 @@ export function ModuleNode({ id, data, selected }: NodeProps<ModuleNodeType>) {
                       </MenuPopover>
                     </Menu>
                   )}
+                  {module.size && (
+                    <MenuItem icon={<ArrowAutofitContentRegular />} onClick={() => update({ ...module, size: null })}>
+                      {t("module.resetSize")}
+                    </MenuItem>
+                  )}
                   <MenuDivider />
                   <MenuItem icon={<DeleteRegular />} onClick={() => void deleteElements({ nodes: [{ id }] })}>
                     {t("common.delete")}
@@ -346,14 +426,14 @@ export function ModuleNode({ id, data, selected }: NodeProps<ModuleNodeType>) {
               />
             </Tooltip>
           </div>
-          <Divider />
+          <Divider className={styles.divider} />
           {ports}
-          <Divider />
+          <Divider className={styles.divider} />
           <LevelMeter moduleId={module.id} />
           {Widget && (
             <>
-              <Divider />
-              <div className={mergeClasses(styles.body, "nodrag", "nowheel")}>
+              <Divider className={styles.divider} />
+              <div ref={bodyRef} className={mergeClasses(styles.body, "nodrag", "nowheel")}>
                 <Widget module={module} setState={(state) => update({ ...module, state } as ModuleDto)} />
               </div>
             </>
@@ -362,6 +442,24 @@ export function ModuleNode({ id, data, selected }: NodeProps<ModuleNodeType>) {
       ) : (
         ports
       )}
+      {/* React Flow applies the resize direction the control was created with to the node while dragging, so it's created anew */}
+      <NodeResizeControl
+        key={widthOnly ? "width" : "both"}
+        position="bottom-right"
+        style={resizeHandleStyle}
+        minWidth={minSize.width}
+        minHeight={minSize.height}
+        resizeDirection={widthOnly ? "horizontal" : undefined}
+        onResizeEnd={(_, size) =>
+          update({
+            ...module,
+            size: {
+              width: Math.round(size.width),
+              height: widthOnly ? (module.size?.height ?? null) : Math.round(size.height),
+            },
+          })
+        }
+      />
     </Card>
   );
 }

@@ -53,6 +53,7 @@ export * from './modulePortLayoutsDto';
 export * from './modulePortLayoutsDtoInputs';
 export * from './modulePortLayoutsDtoOutputs';
 export * from './modulePosition';
+export * from './moduleSize';
 export * from './moduleTypeDto';
 export * from './pitchState';
 export * from './pluginChange';

@@ -136,6 +136,7 @@ public class ModuleApiTests
                 IsCollapsed = true,
                 State = new GainState(6f),
                 Position = new ModulePosition(10, 20),
+                Size = new ModuleSize(300, 250),
             },
             factory.Json
         );
@@ -150,6 +151,7 @@ public class ModuleApiTests
         await Assert.That(updated.IsCollapsed).IsTrue();
         await Assert.That(updated.Name).IsEqualTo("Boost");
         await Assert.That(updated.Position).IsEqualTo(new ModulePosition(10, 20));
+        await Assert.That(updated.Size).IsEqualTo(new ModuleSize(300, 250));
     }
 
     [Test]
