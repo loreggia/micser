@@ -8,6 +8,7 @@ import type { ModuleDtoCompressorModule } from './moduleDtoCompressorModule';
 import type { ModuleDtoDeviceInputModule } from './moduleDtoDeviceInputModule';
 import type { ModuleDtoDeviceOutputModule } from './moduleDtoDeviceOutputModule';
 import type { ModuleDtoEqualizerModule } from './moduleDtoEqualizerModule';
+import type { ModuleDtoFilterModule } from './moduleDtoFilterModule';
 import type { ModuleDtoGainModule } from './moduleDtoGainModule';
 import type { ModuleDtoLoopbackInputModule } from './moduleDtoLoopbackInputModule';
 import type { ModuleDtoPitchModule } from './moduleDtoPitchModule';
@@ -17,4 +18,4 @@ import type { ModuleDtoSpectrumModule } from './moduleDtoSpectrumModule';
  * A module and its settings. The concrete type is ModuleDto&lt;TState&gt;; in JSON the `type` property
  * names the module type and selects the state schema (registered at runtime by ModuleCatalog).
  */
-export type ModuleDto = ModuleDtoDeviceInputModule | ModuleDtoLoopbackInputModule | ModuleDtoDeviceOutputModule | ModuleDtoGainModule | ModuleDtoCompressorModule | ModuleDtoEqualizerModule | ModuleDtoPitchModule | ModuleDtoSpectrumModule;
+export type ModuleDto = ModuleDtoDeviceInputModule | ModuleDtoLoopbackInputModule | ModuleDtoDeviceOutputModule | ModuleDtoGainModule | ModuleDtoCompressorModule | ModuleDtoEqualizerModule | ModuleDtoFilterModule | ModuleDtoPitchModule | ModuleDtoSpectrumModule;
