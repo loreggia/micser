@@ -6,6 +6,7 @@
  */
 import type { ModuleDtoPitchModuleType } from './moduleDtoPitchModuleType';
 import type { ModulePosition } from './modulePosition';
+import type { ModuleSize } from './moduleSize';
 import type { PitchState } from './pitchState';
 
 export interface ModuleDtoPitchModule {
@@ -38,6 +39,7 @@ export interface ModuleDtoPitchModule {
      * the module exist (an update turning it off is ignored then); creating such a connection turns it on.
      */
   showChannels: boolean;
+  size?: null | ModuleSize;
   /**
      * The subgraph the module belongs to, from `GET /api/subgraphs`.
      * @nullable

@@ -43,6 +43,7 @@ import { useTranslation } from "../i18n";
 import { useNotifyError } from "../notifications";
 import { Port } from "./ModuleNode";
 import { ModuleTitle } from "./ModuleTitle";
+import { resizeHandleStyle } from "./resizeHandle";
 import { useSubgraphActions } from "./subgraphActions";
 import { frameAround, minSubgraphSize, type ProxyPort } from "./subgraphs";
 import { useHandlesChanged } from "./useHandlesChanged";
@@ -127,18 +128,6 @@ const useStyles = makeStyles({
     display: "flex",
   },
 });
-
-// React Flow's handle styles outrank a class; the corner sits inside the frame
-const resizeHandleStyle = {
-  width: "12px",
-  height: "12px",
-  translate: "-100% -100%",
-  backgroundColor: "transparent",
-  border: "none",
-  borderRadius: 0,
-  borderRight: `${tokens.strokeWidthThick} solid ${tokens.colorNeutralStroke1}`,
-  borderBottom: `${tokens.strokeWidthThick} solid ${tokens.colorNeutralStroke1}`,
-};
 
 /**
  * A subgraph on the graph. Expanded, it's a frame in its color behind its modules, with the name, fit to the modules, mute, bypass, collapse

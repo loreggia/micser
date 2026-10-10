@@ -27,7 +27,7 @@ const useStyles = makeStyles({
     gap: tokens.spacingVerticalXS,
   },
   dropdown: {
-    minWidth: "220px",
+    minWidth: 0,
   },
   status: {
     color: tokens.colorNeutralForeground3,

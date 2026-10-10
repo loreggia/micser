@@ -1,10 +1,20 @@
 import { makeStyles, tokens } from "@fluentui/react-components";
+import { useRef } from "react";
 import { useLanguage } from "../i18n/i18n";
 import { formatNumber, hertz } from "../lib/labels";
+import { useElementSize } from "../lib/useElementSize";
 
 const useStyles = makeStyles({
+  // the graph doesn't widen its container: it is as wide as the other content
   root: {
+    position: "relative",
+  },
+  svg: {
+    position: "absolute",
+    inset: 0,
     display: "block",
+    width: "100%",
+    height: "100%",
     borderRadius: tokens.borderRadiusMedium,
     backgroundColor: tokens.colorNeutralBackground3,
   },
@@ -65,13 +75,12 @@ export interface FrequencyResponseProps {
    * Accessible name of the graph.
    */
   label: string;
-  width?: number;
   height?: number;
 }
 
 /**
  * A frequency response curve on a logarithmic frequency axis (20 Hz to 20 kHz) and a linear dB axis. Values outside the dB range are
- * drawn at its edge.
+ * drawn at its edge. It fills the width of its container.
  */
 export function FrequencyResponse({
   response,
@@ -80,10 +89,11 @@ export function FrequencyResponse({
   decibelStep = 12,
   markers = [],
   label,
-  width = 220,
   height = 100,
 }: FrequencyResponseProps) {
   const styles = useStyles();
+  const rootRef = useRef<HTMLDivElement>(null);
+  const { width } = useElementSize(rootRef, { width: 220, height });
   // labels change with the language
   useLanguage();
 
@@ -108,40 +118,35 @@ export function FrequencyResponse({
   }
 
   return (
-    <svg
-      className={styles.root}
-      width={width}
-      height={height}
-      viewBox={`0 0 ${width} ${height}`}
-      role="img"
-      aria-label={label}
-    >
-      {gridFrequencies.map((frequency) => (
-        <g key={frequency}>
-          <line className={styles.grid} x1={x(frequency)} x2={x(frequency)} y1={0} y2={height} />
-          <text className={styles.label} x={x(frequency) - 2} y={height - 3} textAnchor="end">
-            {hertz(frequency)}
-          </text>
-        </g>
-      ))}
-      {gridDecibels.map((decibels) => (
-        <g key={decibels}>
-          <line
-            className={decibels === 0 ? styles.zero : styles.grid}
-            x1={0}
-            x2={width}
-            y1={y(decibels)}
-            y2={y(decibels)}
-          />
-          <text className={styles.label} x={2} y={y(decibels) - 2}>
-            {formatNumber(decibels, { signDisplay: "exceptZero" })}
-          </text>
-        </g>
-      ))}
-      <path className={styles.curve} d={path} />
-      {markers.map((frequency, index) => (
-        <circle key={index} className={styles.marker} cx={x(frequency)} cy={y(response(frequency))} r={3} />
-      ))}
-    </svg>
+    <div ref={rootRef} className={styles.root} style={{ height }}>
+      <svg className={styles.svg} viewBox={`0 0 ${width} ${height}`} role="img" aria-label={label}>
+        {gridFrequencies.map((frequency) => (
+          <g key={frequency}>
+            <line className={styles.grid} x1={x(frequency)} x2={x(frequency)} y1={0} y2={height} />
+            <text className={styles.label} x={x(frequency) - 2} y={height - 3} textAnchor="end">
+              {hertz(frequency)}
+            </text>
+          </g>
+        ))}
+        {gridDecibels.map((decibels) => (
+          <g key={decibels}>
+            <line
+              className={decibels === 0 ? styles.zero : styles.grid}
+              x1={0}
+              x2={width}
+              y1={y(decibels)}
+              y2={y(decibels)}
+            />
+            <text className={styles.label} x={2} y={y(decibels) - 2}>
+              {formatNumber(decibels, { signDisplay: "exceptZero" })}
+            </text>
+          </g>
+        ))}
+        <path className={styles.curve} d={path} />
+        {markers.map((frequency, index) => (
+          <circle key={index} className={styles.marker} cx={x(frequency)} cy={y(response(frequency))} r={3} />
+        ))}
+      </svg>
+    </div>
   );
 }

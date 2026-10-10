@@ -37,6 +37,7 @@ export {
 } from "./i18n/i18n";
 export { biquadResponse, highPass, lowPass, peakingEq, type Biquad } from "./lib/biquad";
 export { decibels, formatNumber, hertz, milliseconds } from "./lib/labels";
+export { useElementSize, type ElementSize } from "./lib/useElementSize";
 export {
   definePlugin,
   defineWidget,

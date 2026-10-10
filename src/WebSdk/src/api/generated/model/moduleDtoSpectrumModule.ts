@@ -6,6 +6,7 @@
  */
 import type { ModuleDtoSpectrumModuleType } from './moduleDtoSpectrumModuleType';
 import type { ModulePosition } from './modulePosition';
+import type { ModuleSize } from './moduleSize';
 import type { SpectrumState } from './spectrumState';
 
 export interface ModuleDtoSpectrumModule {
@@ -38,6 +39,7 @@ export interface ModuleDtoSpectrumModule {
      * the module exist (an update turning it off is ignored then); creating such a connection turns it on.
      */
   showChannels: boolean;
+  size?: null | ModuleSize;
   /**
      * The subgraph the module belongs to, from `GET /api/subgraphs`.
      * @nullable
