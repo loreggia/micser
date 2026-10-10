@@ -8,7 +8,7 @@ Collect changes under "Unreleased". Before tagging vX.Y.Z, rename that heading t
 from that section, and the release workflow fails without it.
 -->
 
-## Unreleased
+## 0.13.0 - 2026-10-10
 
 - New "Filter" module: a high-pass or low-pass filter with an adjustable cutoff frequency and a slope of 12 to 48 dB per octave, e.g. to
   remove rumble from a microphone. Its Q setting adds a resonant peak at the cutoff frequency.
