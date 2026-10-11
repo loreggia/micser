@@ -1,5 +1,6 @@
 import {
   makeStyles,
+  mergeClasses,
   Menu,
   MenuDivider,
   MenuItem,
@@ -82,6 +83,20 @@ const useStyles = makeStyles({
       stroke: tokens.colorBrandStroke1,
       strokeWidth: tokens.strokeWidthThick,
     },
+  },
+  // React Flow's own colors are greys for its light and dark modes
+  highContrast: {
+    "--xy-edge-stroke": tokens.colorNeutralForeground1,
+    "--xy-edge-stroke-selected": tokens.colorBrandStroke1,
+    "--xy-edge-stroke-width": "2",
+    "--xy-connectionline-stroke": tokens.colorNeutralForeground1,
+    "--xy-connectionline-stroke-width": "2",
+    "--xy-background-pattern-dots-color": tokens.colorNeutralStroke1,
+    "--xy-controls-button-background-color": tokens.colorNeutralBackground1,
+    "--xy-controls-button-background-color-hover": tokens.colorNeutralBackground1Hover,
+    "--xy-controls-button-color": tokens.colorNeutralForeground1,
+    "--xy-controls-button-color-hover": tokens.colorNeutralForeground1Hover,
+    "--xy-controls-button-border-color": tokens.colorNeutralStroke1,
   },
   // a connection to or from a channel the port doesn't have right now, which is silent
   beyondLayout: {
@@ -176,7 +191,7 @@ export function GraphEditor() {
   const moduleTypeChoices = useModuleTypeChoices();
   const { widgets, isLoading: isLoadingWidgets } = usePluginWidgets();
   const [preferences] = usePreferences();
-  const { colorMode } = useTheme();
+  const { colorMode, highContrast } = useTheme();
   const [nodes, setNodes, onNodesChange] = useNodesState<GraphNode>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const [menu, setMenu] = useState<AddModuleMenu>();
@@ -664,7 +679,7 @@ export function GraphEditor() {
     <>
       <ReactFlow<GraphNode, Edge>
         nodes={nodes}
-        className={styles.flow}
+        className={mergeClasses(styles.flow, highContrast && styles.highContrast)}
         edges={shownEdges}
         nodeTypes={nodeTypes}
         onNodesChange={onNodesChange}

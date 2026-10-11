@@ -62,20 +62,20 @@ test("the theme applies right away and is kept by the engine", async ({ graph, e
   const colorScheme = () => graph.page.evaluate(() => document.documentElement.style.colorScheme);
 
   await dialog.getByRole("combobox", { name: "Theme" }).click();
-  await graph.page.getByRole("option", { name: "Light" }).click();
-  await expect.poll(async () => (await engine.preferences()).theme).toEqual({ name: "Light", colorMode: "Light" });
-  await expect.poll(colorScheme).toBe("light");
+  await graph.page.getByRole("option", { name: "Default (Dark)" }).click();
+  await expect.poll(async () => (await engine.preferences()).theme).toEqual({ name: "DefaultDark", colorMode: "Dark" });
+  await expect.poll(colorScheme).toBe("dark");
 
   await dialog.getByRole("combobox", { name: "Theme" }).click();
-  await graph.page.getByRole("option", { name: "High contrast" }).click();
+  await graph.page.getByRole("option", { name: "High contrast (Light)" }).click();
   await expect
     .poll(async () => (await engine.preferences()).theme)
-    .toEqual({ name: "HighContrast", colorMode: "Dark" });
-  await expect.poll(colorScheme).toBe("dark");
+    .toEqual({ name: "HighContrastLight", colorMode: "Light" });
+  await expect.poll(colorScheme).toBe("light");
 
   await graph.page.reload();
   await graph.page.getByRole("button", { name: "Settings" }).click();
-  await expect(dialog.getByRole("combobox", { name: "Theme" })).toHaveText("High contrast");
+  await expect(dialog.getByRole("combobox", { name: "Theme" })).toHaveText("High contrast (Light)");
 
   await dialog.getByRole("combobox", { name: "Theme" }).click();
   await graph.page.getByRole("option", { name: "System" }).click();
@@ -87,7 +87,7 @@ test("passes the theme's color mode to the shell", async ({ graph, engine }) => 
   await graph.open();
   await expect.poll(() => shell.colorModes()).toEqual([null]);
 
-  await engine.setPreferences({ theme: { name: "HighContrast", colorMode: "Dark" } });
+  await engine.setPreferences({ theme: { name: "HighContrastDark", colorMode: "Dark" } });
 
   await expect.poll(() => shell.colorModes()).toEqual([null, "Dark"]);
 });
