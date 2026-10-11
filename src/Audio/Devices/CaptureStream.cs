@@ -1,7 +1,5 @@
 using Microsoft.Extensions.Logging;
-using NAudio.CoreAudioApi;
 using NAudio.Dsp;
-using NAudio.Wave;
 
 namespace Micser.Audio.Devices;
 
@@ -10,22 +8,19 @@ namespace Micser.Audio.Devices;
 /// The device thread fills a ring buffer; <see cref="Read"/> drains it on the audio thread through a resampler that
 /// compensates the clock drift between device and engine.
 /// </summary>
-public sealed class CaptureStream : IDeviceStream
+public sealed class CaptureStream : IDeviceStream, ICaptureHandler
 {
     private readonly int _channels;
-    private readonly float[] _convertBuffer;
-    private readonly SampleConverter _converter;
 
     // loopback capture gets no data while nothing plays, so it can't detect stalls
     private readonly bool _detectsStalls;
 
-    private readonly MMDevice _device;
+    private readonly ICaptureDevice _device;
     private readonly DriftController _drift;
     private readonly ProcessingFormat _format;
     private readonly float[] _interleaved;
     private readonly ILogger _logger;
     private readonly long _openedAt = Environment.TickCount64;
-    private readonly WasapiRecorder _recorder;
     private readonly WdlResampler _resampler;
     private readonly SampleRingBuffer _ring;
     private readonly AdaptiveTarget _target;
@@ -39,7 +34,7 @@ public sealed class CaptureStream : IDeviceStream
     private long _underruns;
 
     internal CaptureStream(
-        MMDevice device,
+        ICaptureDevice device,
         bool loopback,
         ProcessingFormat format,
         double? initialTargetMilliseconds,
@@ -51,34 +46,17 @@ public sealed class CaptureStream : IDeviceStream
         _logger = logger;
         _detectsStalls = !loopback;
 
-        var builder = new WasapiRecorderBuilder()
-            .WithDevice(device)
-            .WithSharedMode()
-            .WithEventSync()
-            .WithMmcssThreadPriority("Pro Audio");
-        if (loopback)
-        {
-            builder = builder.WithLoopbackCapture();
-        }
-
-        _recorder = builder.Build();
-        logger.LogInformation(
-            "Capture from {Device}: latency {Latency} ms, low latency {LowLatency} ({Reason}).",
-            device.FriendlyName,
-            _recorder.LatencyMilliseconds,
-            _recorder.LowLatencyActive,
-            _recorder.LowLatencyUnavailableReason
-        );
-
-        var deviceFormat = _recorder.WaveFormat;
-        Layout = ChannelLayout.FromWaveFormat(deviceFormat);
-        DeviceSampleRate = deviceFormat.SampleRate;
-        _channels = deviceFormat.Channels;
-        _converter = new SampleConverter(deviceFormat);
-        _convertBuffer = new float[deviceFormat.SampleRate * _channels];
-        _ring = new SampleRingBuffer(deviceFormat.SampleRate * _channels);
+        Layout = device.Layout;
+        DeviceSampleRate = device.SampleRate;
+        _channels = Layout.ChannelCount;
+        _ring = new SampleRingBuffer(DeviceSampleRate * _channels);
         _interleaved = new float[format.FrameCount * _channels];
-        _target = StreamBuffering.CreateCaptureTarget(device, format, DeviceSampleRate, initialTargetMilliseconds);
+        _target = StreamBuffering.CreateCaptureTarget(
+            device.PeriodSeconds,
+            format,
+            DeviceSampleRate,
+            initialTargetMilliseconds
+        );
         _drift = new DriftController(_target.Value);
 
         _resampler = new WdlResampler();
@@ -86,9 +64,7 @@ public sealed class CaptureStream : IDeviceStream
         _resampler.SetFilterParms();
         _resampler.SetFeedMode(false);
 
-        _recorder.DataAvailable += OnDataAvailable;
-        _recorder.RecordingStopped += OnRecordingStopped;
-        _recorder.StartRecording();
+        device.Start(this);
     }
 
     public int DeviceSampleRate { get; }
@@ -115,9 +91,6 @@ public sealed class CaptureStream : IDeviceStream
 
     public void Dispose()
     {
-        _recorder.DataAvailable -= OnDataAvailable;
-        _recorder.RecordingStopped -= OnRecordingStopped;
-        _recorder.Dispose();
         _device.Dispose();
     }
 
@@ -195,40 +168,33 @@ public sealed class CaptureStream : IDeviceStream
         }
     }
 
-    private void OnDataAvailable(
-        ReadOnlySpan<byte> data,
-        AudioClientBufferFlags flags,
-        long devicePosition,
-        long qpcPosition
-    )
+    void ICaptureHandler.OnData(ReadOnlySpan<float> samples)
     {
         Interlocked.Exchange(ref _lastData, Environment.TickCount64);
-        var samples = data.Length / _converter.BytesPerSample;
-        int written;
+        CountOverrun(_ring.Write(samples), samples.Length);
+    }
 
-        if ((flags & AudioClientBufferFlags.Silent) != 0)
-        {
-            written = _ring.WriteSilence(samples);
-        }
-        else
-        {
-            var converted = _converter.Convert(data, _convertBuffer);
-            written = _ring.Write(_convertBuffer.AsSpan(0, converted));
-        }
+    void ICaptureHandler.OnSilence(int samples)
+    {
+        Interlocked.Exchange(ref _lastData, Environment.TickCount64);
+        CountOverrun(_ring.WriteSilence(samples), samples);
+    }
 
+    void ICaptureHandler.OnStopped(Exception? exception)
+    {
+        _isStopped = true;
+        if (exception != null)
+        {
+            _logger.LogWarning(exception, "Capture from {Device} stopped.", _device.Name);
+        }
+    }
+
+    private void CountOverrun(int written, int samples)
+    {
         // while the engine doesn't read (e.g. audio switched off) the ring buffer fills up; the reader discards the excess when it resumes
         if (written < samples && !StreamBuffering.IsIdle(Interlocked.Read(ref _lastRead), Environment.TickCount64))
         {
             Interlocked.Increment(ref _overruns);
-        }
-    }
-
-    private void OnRecordingStopped(object? sender, StoppedEventArgs e)
-    {
-        _isStopped = true;
-        if (e.Exception != null)
-        {
-            _logger.LogWarning(e.Exception, "Capture from {Device} stopped.", _device.FriendlyName);
         }
     }
 }

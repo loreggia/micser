@@ -1,6 +1,6 @@
 # Architecture
 
-Micser routes audio on Windows through a graph of modules (devices, effects, analyzers) that the user wires up in a web UI.
+Micser routes audio on Windows through a graph of modules (devices, effects, analyzers) that the user wires up in a web UI. The engine and the UI also run on Linux, without audio devices so far; [Linux.md](Linux.md) has the plan for the rest.
 
 ## Overview
 
@@ -8,11 +8,11 @@ Micser routes audio on Windows through a graph of modules (devices, effects, ana
 - **UI** (`src/Web`): a Vite + React + TypeScript SPA, served by the engine. `@xyflow/react` draws the routing graph, Fluent UI React v9 the controls (the theme preference, a name and its light or dark color mode, picks one of the themes in `src/Web/src/theme`; without one, light or dark following the OS), TanStack Query holds engine state, i18next translates.
 - **Shell** (`src/Shell`): a WinForms tray app with a WebView2 window showing the UI. It launches and supervises the engine and runs updates; it has no app logic.
 - **Plugins** provide all module types, the built-in Main plugin included. The engine loads them at runtime, and the UI imports their widget bundles from the engine.
-- **Storage**: one versioned JSON file (`%AppData%\Micser\config.json`) with the modules, connections, subgraphs, templates, settings and UI preferences.
+- **Storage**: one versioned JSON file (`%AppData%\Micser\config.json`, on Linux `~/.config/Micser/config.json`) with the modules, connections, subgraphs, templates, settings and UI preferences.
 - **Packaging**: Velopack, a per-user install without admin rights, with delta updates from GitHub releases.
 - **VAC driver** (`src/Vac`): optional virtual audio cables (PortCls WaveRT), installed machine-wide by `DriverUtility`.
 
-Stack: .NET 10 (`LangVersion latest`, nullable, central package management), `Microsoft.Extensions.Hosting` with the built-in DI, `System.Text.Json`, Serilog behind `Microsoft.Extensions.Logging`, NAudio (WASAPI) for audio I/O. Tests: TUnit and NSubstitute; Vitest and Playwright for the web.
+Stack: .NET 10 (`LangVersion latest`, nullable, central package management), `Microsoft.Extensions.Hosting` with the built-in DI, `System.Text.Json`, Serilog behind `Microsoft.Extensions.Logging`, NAudio (WASAPI) for audio I/O on Windows. Audio, Engine and plugins target `net10.0`; the shell, `DriverUtility` and `AudioHarness` target `net10.0-windows`. Tests: TUnit and NSubstitute; Vitest and Playwright for the web.
 
 ## Layout
 
@@ -25,7 +25,7 @@ Directory.Build.props         also excludes */Web/** and node_modules from .NET 
 Directory.Packages.props
 package.json                  npm workspaces: src/Web, src/WebSdk, src/Plugins/*/Web, tests/E2E
 src/
-  Audio/                      Micser.Audio: graph, module abstractions, plugin contract, NAudio device I/O
+  Audio/                      Micser.Audio: graph, module abstractions, plugin contract, device backends (Devices/Wasapi)
   Engine/                     Micser.Engine: host, HTTP API, SignalR hub, config store, plugin loader
   Plugins/
     Main/                     Micser.Plugins.Main: built-in modules, loaded at runtime like any plugin
@@ -61,7 +61,7 @@ docs/
 
 ## Audio engine
 
-- **Blocks and clock.** `AudioEngine` processes the `AudioGraph` on an MMCSS "Pro Audio" thread, one block per block duration (default 48 kHz, 240 frames = 5 ms), paced by a high-resolution waitable timer against absolute deadlines. If it falls more than 4 blocks behind, it skips ahead instead of catching up.
+- **Blocks and clock.** `AudioEngine` processes the `AudioGraph` on its own thread, one block per block duration (default 48 kHz, 240 frames = 5 ms), against absolute deadlines. `BlockTimer` paces it per platform: on Windows the thread is an MMCSS "Pro Audio" thread and waits on a high-resolution waitable timer; on Linux it gets `SCHED_FIFO` where `RLIMIT_RTPRIO` allows it (a warning otherwise) and waits with `clock_nanosleep`. If it falls more than 4 blocks behind, it skips ahead instead of catching up.
 - **Graph.** Modules have named input and output ports. Each block, modules run in dependency order; every input port first receives the sum of its connected outputs. Cycles are rejected (per module, whatever the channels). Edits swap in a new processing plan under a short lock that the audio thread holds per block, so a module can be disposed as soon as `Remove` returns. A module that throws produces silence for that block.
 - **Channel connections.** A connection can take a single channel of its output (`sourceChannel`) and add to a single channel of its input (`targetChannel`), 0-based, up to 64 channels; without them it carries the whole port. A whole connection and channel connections between the same ports can exist side by side. A single source channel is mixed in like a mono source, a single target channel gets the source mixed down like a mono target, and channel to channel is 1:1 (`ChannelMixer`). A channel the current layout doesn't have (e.g. a device with fewer channels, or none while it's unplugged) is silent; the connection stays.
 - **Buffers and layouts.** Buffers are planar float32 and carry a `ChannelLayout` (channel count + WAVEFORMATEXTENSIBLE speaker mask). Layouts can differ per connection. An input port either has a fixed layout (e.g. a device output uses the device's layout) or takes it from the module's channel count (`AudioModule.ChannelCount`, 1–64; the standard speaker positions for 1, 2, 4, 6 and 8 channels, by index otherwise) or, without one, from its sources: the widest layout of those added to the whole input (a single source channel counts as mono), widened to the highest target channel of the channel connections (at least stereo when there are only channel connections). `ChannelMixer` converts between layouts:
@@ -70,9 +70,10 @@ docs/
   - positional layouts map matching speakers 1:1 and fold missing ones into their neighbours (center into L/R at -3 dB, sides and backs into each other or into the fronts at -3 dB), dropping LFE;
   - everything else maps by index.
 - **Volume.** Every module has `Volume` (0..1) and `IsMuted`, applied to its outputs with a ramp over one block. `EffectModule` adds `IsBypassed`. Samples aren't clamped inside the graph, only at device outputs.
-- **System volume.** A module can follow the volume and mute of Windows' default output device (`useSystemVolume`), so the volume keys control routes into devices that ignore the Windows volume (e.g. a loopback or virtual cable). `SystemVolume` watches the default device's endpoint volume and switches with the default device; `AudioHost` then sets the modules' volume (the device's level in dB as a linear gain, so loudness matches) and mute, persists and broadcasts them. The UI disables the module's volume and mute controls meanwhile.
+- **System volume.** A module can follow the volume and mute of the system's default output device (`useSystemVolume`), so the volume keys control routes into devices that ignore the system volume (e.g. a loopback or virtual cable). `SystemVolume` watches it through the device backend; on Windows (`WasapiSystemVolume`) the default device's endpoint volume, switching with the default device. `AudioHost` then sets the modules' volume (the device's level in dB as a linear gain, so loudness matches) and mute, persists and broadcasts them. The UI disables the module's volume and mute controls meanwhile. Without a backend it has no level, and the modules keep their own volume.
 - **Port layouts.** After each block, every port publishes its buffer's layout (`AudioPort.LastLayout`, one 64-bit volatile write), so other threads can read it without locks. `GET /api/port-layouts` lists them per module (channel count and, for layouts with speaker positions, the speaker of each channel; none if the mask uses reserved bits); the UI draws a module's channel connectors from them. A port that carries nothing, e.g. a device output without an open device or an unprocessed module, has 0 channels; stopping the engine sets all of them to 0 (`AudioGraph.ClearLayouts`).
 - **Levels.** Each output port has a `LevelMeter` that measures the output after volume and mute: per channel, the peak since the last read and the RMS smoothed over 300 ms. A module without outputs measures what it passes to `ApplyVolume` (a device output: what it plays). The audio thread updates the meters with atomics only; `AudioModule.ReadLevels()` reads and resets the peaks.
+- **Device backends.** `AudioDeviceService` (the API plugins use) enumerates devices, reports changes and opens streams through an internal `IAudioBackend`: `WasapiBackend` (NAudio, shared mode, `Devices/Wasapi`) on Windows, `NullAudioBackend` (no devices) elsewhere until the PipeWire backend ([Linux.md](Linux.md)). A backend opens `ICaptureDevice`/`IRenderDevice` endpoints with a layout, sample rate and period that push or pull interleaved floats on their own thread; `CaptureStream` and `RenderStream` add the platform-neutral buffering below. Backend events reach `DeviceChanged` and `SystemResumed` on the thread pool.
 - **Devices.** Each capture and render stream decouples its device clock from the engine clock:
   - A lock-free single-producer/single-consumer ring buffer sits between them. Devices deliver and consume whole periods (10 ms in shared mode), so the initial target fill is:
     - render: one device period plus half an engine block;
@@ -88,7 +89,7 @@ docs/
 - **Device modules** follow their device's state and, when the device ID disappears, switch to another active device of the same adapter (e.g. a USB device plugged into a different port). Setting their state reopens the stream only when the device changes, since every module update (e.g. a volume change) sets the state again.
 - **Stream recovery.** A device stream is faulted when WASAPI stopped it (e.g. the device was invalidated) or when its device delivered or took no data for 2 s (10 s before the first callback, for slow devices like Bluetooth). Loopback capture is exempt from the stall check because it gets no data while nothing plays.
   - A watchdog in each device module (every second) reopens a faulted stream and retries a selected device that isn't open, with a delay of 1 s doubling up to 30 s. The delay resets after a minute of healthy streaming, on device events and on device selection.
-  - `AudioDeviceService.SystemResumed` (a `PowerRegisterSuspendResumeNotification` callback, no window needed) makes all device modules reopen their streams after sleep or hibernation, since streams can look healthy then but play or capture nothing.
+  - `AudioDeviceService.SystemResumed` (on Windows a `PowerRegisterSuspendResumeNotification` callback, no window needed) makes all device modules reopen their streams after sleep or hibernation, since streams can look healthy then but play or capture nothing.
 - **Latency.** The software round trip (render + loopback capture, `AudioHarness latency`) is about 50 ms on a 48 kHz USB interface. Going much lower needs device periods below 10 ms: `IAudioClient3` low-latency mode (NAudio `WithLowLatency`) wasn't available on the tested devices and made loopback capture fail, and exclusive mode takes the device away from other applications. Measuring the ring fill phase-corrected from the device callbacks' timestamps made no measurable difference against the per-block measurement; the scatter comes from the devices.
 
 ## Engine
@@ -131,7 +132,7 @@ docs/
   - `PortLayoutsChanged` goes to all clients too, with the layouts of the modules whose port layouts changed; the publisher of the levels checks them 20 times per second (`AudioHost.GetChangedPortLayouts`, comparing the published layouts, so it allocates only for changes), and sends all of them again after a failed send. It isn't ordered with the other events, so it can name a module that was just removed.
   - `Subscribe(moduleId)` / `Unsubscribe(moduleId)` start and stop `ModuleData` pushes (20 per second) for modules with live data.
   - `SubscribeLevels()` / `UnsubscribeLevels()` start and stop `Levels` pushes (20 per second): the levels of all processed modules in one message (`PortLevelsDto` per port, linear amplitude). Hub payloads aren't in the OpenAPI document, so the web SDK declares `PortLevels` itself.
-- **Configuration** (`%AppData%\Micser\config.json`, `Engine:ConfigPath`):
+- **Configuration** (`%AppData%\Micser\config.json`, on Linux `~/.config/Micser/config.json`; `Engine:ConfigPath`):
   - It's versioned, with saves debounced (500 ms) and written atomically. A file of another version is treated as unreadable (below), so additions stay optional instead of raising the version: e.g. the channels of connections, which an older engine ignores, turning channel connections into whole ones.
   - An unreadable file is moved to `config.json.<timestamp>.bak`, and the engine starts empty.
   - Modules of unknown type (their plugin isn't loaded) are kept in the file as they are, with their connections, but stay out of the graph and the API; they come back with their plugin. Invalid modules and dangling connections are skipped.
@@ -140,18 +141,18 @@ docs/
   - Export and import (`GET` and `PUT /api/configuration`) use the file's format. The export is the current state, the user's templates without the built-in ones. An import (a multipart upload) is rejected (400) unless the store can read it, otherwise it replaces the graph, subgraphs, user templates, settings and preferences like a load at startup (invalid entries skipped, built-in templates kept). The current file is first copied to `config.json.<timestamp>.bak`, the graph is rebuilt, and clients get the removals of the old entries followed by the new ones through the existing hub events, so the UI needs no reload.
 - **Hosting.** `Microsoft.NET.Sdk.Web` (Kestrel). It serves the built SPA from `wwwroot` and falls back to `index.html` for client routes, but not for `/api`, `/hubs`, `/plugins` or files. `dotnet publish src/Engine` copies `src/Web/dist` into `wwwroot` and the built-in plugins' `Web/dist` into `plugins/<id>/web`, so `npm run build` runs first. `AllowedHosts` is limited to `localhost;127.0.0.1` against DNS rebinding.
 - **Discovery and security:**
-  - The engine binds to `127.0.0.1` with a random port and writes `{ url, token, processId }` to `%LocalAppData%\Micser\engine.json` (`Engine:DiscoveryPath`). That folder is private to the user. The file is deleted on a clean shutdown; after a crash it stays, so readers must check that the process is alive.
+  - The engine binds to `127.0.0.1` with a random port and writes `{ url, token, processId }` to `%LocalAppData%\Micser\engine.json` (`Engine:DiscoveryPath`), on Linux to `$XDG_RUNTIME_DIR/micser/engine.json`. Both folders are private to the user; on Linux the engine also creates the folder with mode 0700 and the file with 0600 (`PrivateFiles`). The file is deleted on a clean shutdown; after a crash it stays, so readers must check that the process is alive.
   - `/api` and `/hubs` (except `/api/health`) require `Authorization: Bearer <token>`, or `access_token` in the query for SignalR from browsers.
-  - A named semaphore (`Local\Micser.Engine`) allows one engine per session. `Engine:RequireToken` and `Engine:SingleInstance` turn these off (development, tests).
+  - A named semaphore (`Local\Micser.Engine`) allows one engine per session; on Linux, where named semaphores don't exist, an exclusively opened lock file next to the discovery file (`engine.lock`). `Engine:RequireToken` and `Engine:SingleInstance` turn these off (development, tests).
   - In development, the engine listens on the fixed address `http://127.0.0.1:5080` without requiring the token, and Vite proxies `/api` and `/hubs` to it.
-- **Logging.** Serilog, configured from `appsettings*.json`; the file sink is only enabled in Production.
+- **Logging.** Serilog, configured from `appsettings*.json`; the file sink is only enabled in Production, under `%LOCALAPPDATA%\Micser\logs` (on Linux the engine sets `LOCALAPPDATA` to `~/.local/share`).
 
 ## UI
 
 - **API client:**
   - The engine build writes `src/WebSdk/openapi/engine.json` (`Microsoft.Extensions.ApiDescription.Server`).
   - `npm run generate:api -w @micser/web-sdk` generates the Orval client from it: types, fetch functions and TanStack Query hooks in `src/WebSdk/src/api/generated`.
-  - Both the document and the client are committed. CI fails if either is out of date.
+  - Both the document and the client are committed. CI fails if either is out of date, on Windows and on Linux: a document transformer normalizes the line breaks of descriptions from XML comments to LF, which the generator writes with the platform's line breaks.
   - `engineFetch` adds the access token and throws `EngineApiError` with the problem details.
 - **State:**
   - Engine data lives in the TanStack Query cache, which never goes stale. `EngineConnection` (SignalR) patches it from engine events and refetches everything after connecting, cancelling fetches that started before (they may have missed events). An event that arrives while the same data is being fetched restarts that fetch, whose result could be older than the event. So components neither poll nor invalidate after mutations.
@@ -220,6 +221,7 @@ docs/
   - `ConfigureServices` runs against a separate service collection that's copied over only if it succeeds, so a failing plugin registers nothing. Failures are listed with their error (`GET /api/plugins`, the log), and the engine starts without the plugin.
   - Plugins are fully trusted, in-process code; the install section in the UI says so. A plugin can't be unloaded, so changes take an engine restart.
   - The build-time OpenAPI document only includes the built-in plugins, so the generated client knows Main's module types.
+  - Plugin assemblies target `net10.0`, so a package loads on every platform the engine runs on.
 - **Install and remove** (`PluginInstaller`): a loaded plugin's files are in use. So `POST /api/plugins` (multipart `package`, up to 100 MB) validates the zip and extracts it to `.pending/<id>` in the user plugin folder, and `DELETE /api/plugins/{id}` writes `.pending/<id>.remove` (or cancels a staged install). The next start applies them before loading. Changes are pushed as `PluginsChanged`.
 - **Widget bundles.**
   - The engine serves each loaded plugin's widget folder at `/plugins/<id>/...` without the token (the browser imports them as modules) and with `Cache-Control: no-cache`. The browser loads a module URL once per page, so a changed bundle needs a reload.
@@ -315,6 +317,7 @@ docs/
 
 ## Testing
 
+- **Platforms:** everything but the shell and driver tests also runs on Linux (with `NullAudioBackend`); CI's `linux` job builds the solution, runs the Audio, Engine and Main tests and the end-to-end tests there.
 - **.NET:** TUnit on Microsoft.Testing.Platform, with NSubstitute. Audio tests drive `AudioGraph.Process()` directly with synthetic modules; nothing in `tests/` opens real devices. Engine tests use `EngineFactory` (temp config and user plugin directory, token required) with a real audio engine and no devices selected; Main is loaded from `plugins/Main` in the test output.
 - **Web:** Vitest, from one root `vitest.config.ts` with two projects. `*.test.ts` runs in Node. `*.test.tsx` and `*.browser.test.ts` (DOM, storage, module imports) run in Vitest browser mode on headless Chromium through Playwright, because Fluent UI and React Flow need real layout. Components are rendered with `vitest-browser-react`. `@micser/web-sdk/testing` has the shared helpers: `TestProviders` (theme, query client, an engine connection that is never started), `createTestQueryClient()` (seeded with `setQueryData` under the generated keys, so hooks don't fetch) and `testModule()`. Tests render in English unless they pass `language` to `TestProviders`.
 - **End-to-end:** Playwright Test in `tests/E2E`, Chromium only (the shell's WebView2 is Chromium as well), with the browser locale `en-US`.
@@ -342,4 +345,4 @@ docs/
 - **Commit hook.** `npm run setup` restores the local dotnet tools (`dotnet-tools.json`) and installs the hooks of Husky.Net (`dotnet husky install` points `core.hooksPath` at `.husky`). The pre-commit hook runs the `pre-commit` group of `.husky/task-runner.json` on the staged files, one task after the other: `scripts/repair-line-endings.mts`, `eslint --fix` on JS/TS files, Prettier, `dotnet format style` on C# files, CSharpier on the C# and MSBuild/XML files, and `dotnet format style --verify-no-changes`, which fails the commit on code style violations without a code fix (about 15 s for the two `dotnet format` runs, which load the solution). Husky.Net stages what the tasks change; for a partially staged file it formats a copy of the staged content next to it (`xxxxx_<name>`) and writes that to the index, so unstaged changes stay out of the commit. The Node scripts in `scripts/` are linted and type-checked (`scripts/tsconfig.json`) with the rest.
 - **Line endings.** `.gitattributes` sets LF for the files Prettier formats and the hooks, CRLF for the INX, and leaves the rest to `core.autocrlf`. Git applies them only when it writes a file itself, and some tools write their own line endings; `npm run fix-line-endings` rewrites the working tree to what a checkout would produce (`--dry-run` lists the files).
 - **C# code style.** `.editorconfig` holds the code style and naming rules, and `Directory.Build.props` enforces them in the build (`EnforceCodeStyleInBuild`, so they fail it like other warnings). IDE0005 (unnecessary usings) needs `GenerateDocumentationFile`, which also puts the XML doc comments of the API types into the OpenAPI document and from there into the generated client. Formatting (IDE0055) is left to CSharpier.
-- **CI** (`.github/workflows/ci.yml`) runs the CSharpier check and the .NET build and tests, the driver build and CodeQL, the npm format/lint/typecheck/test/build and the end-to-end tests as separate jobs.
+- **CI** (`.github/workflows/ci.yml`) runs the CSharpier check and the .NET build and tests, the driver build and CodeQL, the npm format/lint/typecheck/test/build and the end-to-end tests as separate jobs on Windows, and the portable .NET tests and end-to-end tests on Linux (`linux`, not required for releases).

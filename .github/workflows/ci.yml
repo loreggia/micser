@@ -198,6 +198,73 @@ jobs:
           path: tests/E2E/playwright-report
           retention-days: 14
 
+  # the portable projects (engine, Audio, plugins) on Linux, where the engine has no audio backend yet; not a release requirement
+  linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      # the Windows-only projects build too (EnableWindowsTargeting), so the solution stays buildable on Linux
+      - name: Build
+        run: dotnet build Micser.slnx --configuration Release
+
+      - name: Check OpenAPI document is up to date
+        run: git diff --exit-code -- src/WebSdk/openapi
+
+      - name: Test
+        run: |
+          dotnet test --project tests/Audio/Micser.Audio.Tests.csproj --configuration Release --no-build
+          dotnet test --project tests/Engine/Micser.Engine.Tests.csproj --configuration Release --no-build
+          dotnet test --project tests/Plugins/Main/Micser.Plugins.Main.Tests.csproj --configuration Release --no-build
+
+      - name: Install
+        uses: ./.github/actions/npm-install
+
+      - name: Get the Playwright version
+        id: playwright
+        run: echo "version=$(npx playwright --version | awk '{print $NF}')" >> "$GITHUB_OUTPUT"
+
+      - name: Cache the Playwright browsers
+        uses: actions/cache@v6
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Build the UI
+        run: npm run build
+
+      - name: Publish the engine
+        run: dotnet publish src/Engine --configuration Release --output artifacts/e2e-engine
+
+      - name: End-to-end tests
+        run: npm run test:e2e
+        env:
+          MICSER_E2E_PUBLISHED_ENGINE: ${{ github.workspace }}/artifacts/e2e-engine/Micser.Engine.dll
+
+      - name: Upload the report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: e2e-report-linux
+          path: tests/E2E/playwright-report
+          retention-days: 14
+
   release:
     needs: [dotnet, vac, vac-codeql, web, e2e]
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')

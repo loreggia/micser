@@ -1211,7 +1211,7 @@
               "null",
               "integer"
             ],
-            "description": "The only channel of the target port to add to (0-based), or null for all. With a fixed int? ModuleDto.ChannelCount, it must be\r\nbelow it.",
+            "description": "The only channel of the target port to add to (0-based), or null for all. With a fixed int? ModuleDto.ChannelCount, it must be\nbelow it.",
             "format": "int32"
           }
         }
@@ -1635,7 +1635,7 @@
             "$ref": "#/components/schemas/ModuleDtoSpectrumModule"
           }
         ],
-        "description": "A module and its settings. The concrete type is ModuleDto&lt;TState&gt;; in JSON the `type` property\r\nnames the module type and selects the state schema (registered at runtime by ModuleCatalog).",
+        "description": "A module and its settings. The concrete type is ModuleDto&lt;TState&gt;; in JSON the `type` property\nnames the module type and selects the state schema (registered at runtime by ModuleCatalog).",
         "discriminator": {
           "propertyName": "type",
           "mapping": {
@@ -1679,7 +1679,7 @@
               "null",
               "integer"
             ],
-            "description": "The channel count of the inputs that otherwise take their layout from their sources, or null to do so. Only modules whose type\r\nbool ModuleTypeDto.SupportsChannelCount have it; it is ignored for all others. It can't be lower than the channels the\r\nmodule's connections to single channels need.",
+            "description": "The channel count of the inputs that otherwise take their layout from their sources, or null to do so. Only modules whose type\nbool ModuleTypeDto.SupportsChannelCount have it; it is ignored for all others. It can't be lower than the channels the\nmodule's connections to single channels need.",
             "format": "int32"
           },
           "id": {
@@ -1718,7 +1718,7 @@
           },
           "showChannels": {
             "type": "boolean",
-            "description": "Shows a connector per channel below each port in the UI's graph editor. It stays on while connections to or from single channels of\r\nthe module exist (an update turning it off is ignored then); creating such a connection turns it on."
+            "description": "Shows a connector per channel below each port in the UI's graph editor. It stays on while connections to or from single channels of\nthe module exist (an update turning it off is ignored then); creating such a connection turns it on."
           },
           "size": {
             "oneOf": [
@@ -1744,12 +1744,12 @@
               "null",
               "string"
             ],
-            "description": "The module of the subgraph's template that this module was created from or saved as, so an update from the template keeps it.\r\nIt's set by the engine and cleared when the module changes subgraphs; the value sent with an update is ignored.",
+            "description": "The module of the subgraph's template that this module was created from or saved as, so an update from the template keeps it.\nIt's set by the engine and cleared when the module changes subgraphs; the value sent with an update is ignored.",
             "format": "uuid"
           },
           "useSystemVolume": {
             "type": "boolean",
-            "description": "Follows the volume and mute of Windows' default output device (its volume slider and keys). The engine then sets\r\nfloat ModuleDto.Volume and bool ModuleDto.IsMuted, and the values sent with an update are ignored."
+            "description": "Follows the volume and mute of Windows' default output device (its volume slider and keys). The engine then sets\nfloat ModuleDto.Volume and bool ModuleDto.IsMuted, and the values sent with an update are ignored."
           },
           "volume": {
             "maximum": 1,
@@ -1788,7 +1788,7 @@
               "null",
               "integer"
             ],
-            "description": "The channel count of the inputs that otherwise take their layout from their sources, or null to do so. Only modules whose type\r\nbool ModuleTypeDto.SupportsChannelCount have it; it is ignored for all others. It can't be lower than the channels the\r\nmodule's connections to single channels need.",
+            "description": "The channel count of the inputs that otherwise take their layout from their sources, or null to do so. Only modules whose type\nbool ModuleTypeDto.SupportsChannelCount have it; it is ignored for all others. It can't be lower than the channels the\nmodule's connections to single channels need.",
             "format": "int32"
           },
           "id": {
@@ -1827,7 +1827,7 @@
           },
           "showChannels": {
             "type": "boolean",
-            "description": "Shows a connector per channel below each port in the UI's graph editor. It stays on while connections to or from single channels of\r\nthe module exist (an update turning it off is ignored then); creating such a connection turns it on."
+            "description": "Shows a connector per channel below each port in the UI's graph editor. It stays on while connections to or from single channels of\nthe module exist (an update turning it off is ignored then); creating such a connection turns it on."
           },
           "size": {
             "oneOf": [
@@ -1853,12 +1853,12 @@
               "null",
               "string"
             ],
-            "description": "The module of the subgraph's template that this module was created from or saved as, so an update from the template keeps it.\r\nIt's set by the engine and cleared when the module changes subgraphs; the value sent with an update is ignored.",
+            "description": "The module of the subgraph's template that this module was created from or saved as, so an update from the template keeps it.\nIt's set by the engine and cleared when the module changes subgraphs; the value sent with an update is ignored.",
             "format": "uuid"
           },
           "useSystemVolume": {
             "type": "boolean",
-            "description": "Follows the volume and mute of Windows' default output device (its volume slider and keys). The engine then sets\r\nfloat ModuleDto.Volume and bool ModuleDto.IsMuted, and the values sent with an update are ignored."
+            "description": "Follows the volume and mute of Windows' default output device (its volume slider and keys). The engine then sets\nfloat ModuleDto.Volume and bool ModuleDto.IsMuted, and the values sent with an update are ignored."
           },
           "volume": {
             "maximum": 1,
@@ -1897,7 +1897,7 @@
               "null",
               "integer"
             ],
-            "description": "The channel count of the inputs that otherwise take their layout from their sources, or null to do so. Only modules whose type\r\nbool ModuleTypeDto.SupportsChannelCount have it; it is ignored for all others. It can't be lower than the channels the\r\nmodule's connections to single channels need.",
+            "description": "The channel count of the inputs that otherwise take their layout from their sources, or null to do so. Only modules whose type\nbool ModuleTypeDto.SupportsChannelCount have it; it is ignored for all others. It can't be lower than the channels the\nmodule's connections to single channels need.",
             "format": "int32"
           },
           "id": {
@@ -1936,7 +1936,7 @@
           },
           "showChannels": {
             "type": "boolean",
-            "description": "Shows a connector per channel below each port in the UI's graph editor. It stays on while connections to or from single channels of\r\nthe module exist (an update turning it off is ignored then); creating such a connection turns it on."
+            "description": "Shows a connector per channel below each port in the UI's graph editor. It stays on while connections to or from single channels of\nthe module exist (an update turning it off is ignored then); creating such a connection turns it on."
           },
           "size": {
             "oneOf": [
@@ -1962,12 +1962,12 @@
               "null",
               "string"
             ],
-            "description": "The module of the subgraph's template that this module was created from or saved as, so an update from the template keeps it.\r\nIt's set by the engine and cleared when the module changes subgraphs; the value sent with an update is ignored.",
+            "description": "The module of the subgraph's template that this module was created from or saved as, so an update from the template keeps it.\nIt's set by the engine and cleared when the module changes subgraphs; the value sent with an update is ignored.",
             "format": "uuid"
           },
           "useSystemVolume": {
             "type": "boolean",
-            "description": "Follows the volume and mute of Windows' default output device (its volume slider and keys). The engine then sets\r\nfloat ModuleDto.Volume and bool ModuleDto.IsMuted, and the values sent with an update are ignored."
+            "description": "Follows the volume and mute of Windows' default output device (its volume slider and keys). The engine then sets\nfloat ModuleDto.Volume and bool ModuleDto.IsMuted, and the values sent with an update are ignored."
           },
           "volume": {
             "maximum": 1,
@@ -2006,7 +2006,7 @@
               "null",
               "integer"
             ],
-            "description": "The channel count of the inputs that otherwise take their layout from their sources, or null to do so. Only modules whose type\r\nbool ModuleTypeDto.SupportsChannelCount have it; it is ignored for all others. It can't be lower than the channels the\r\nmodule's connections to single channels need.",
+            "description": "The channel count of the inputs that otherwise take their layout from their sources, or null to do so. Only modules whose type\nbool ModuleTypeDto.SupportsChannelCount have it; it is ignored for all others. It can't be lower than the channels the\nmodule's connections to single channels need.",
             "format": "int32"
           },
           "id": {
@@ -2045,7 +2045,7 @@
           },
           "showChannels": {
             "type": "boolean",
-            "description": "Shows a connector per channel below each port in the UI's graph editor. It stays on while connections to or from single channels of\r\nthe module exist (an update turning it off is ignored then); creating such a connection turns it on."
+            "description": "Shows a connector per channel below each port in the UI's graph editor. It stays on while connections to or from single channels of\nthe module exist (an update turning it off is ignored then); creating such a connection turns it on."
           },
           "size": {
             "oneOf": [
@@ -2071,12 +2071,12 @@
               "null",
               "string"
             ],
-            "description": "The module of the subgraph's template that this module was created from or saved as, so an update from the template keeps it.\r\nIt's set by the engine and cleared when the module changes subgraphs; the value sent with an update is ignored.",
+            "description": "The module of the subgraph's template that this module was created from or saved as, so an update from the template keeps it.\nIt's set by the engine and cleared when the module changes subgraphs; the value sent with an update is ignored.",
             "format": "uuid"
           },
           "useSystemVolume": {
             "type": "boolean",
-            "description": "Follows the volume and mute of Windows' default output device (its volume slider and keys). The engine then sets\r\nfloat ModuleDto.Volume and bool ModuleDto.IsMuted, and the values sent with an update are ignored."
+            "description": "Follows the volume and mute of Windows' default output device (its volume slider and keys). The engine then sets\nfloat ModuleDto.Volume and bool ModuleDto.IsMuted, and the values sent with an update are ignored."
           },
           "volume": {
             "maximum": 1,
@@ -2115,7 +2115,7 @@
               "null",
               "integer"
             ],
-            "description": "The channel count of the inputs that otherwise take their layout from their sources, or null to do so. Only modules whose type\r\nbool ModuleTypeDto.SupportsChannelCount have it; it is ignored for all others. It can't be lower than the channels the\r\nmodule's connections to single channels need.",
+            "description": "The channel count of the inputs that otherwise take their layout from their sources, or null to do so. Only modules whose type\nbool ModuleTypeDto.SupportsChannelCount have it; it is ignored for all others. It can't be lower than the channels the\nmodule's connections to single channels need.",
             "format": "int32"
           },
           "id": {
@@ -2154,7 +2154,7 @@
           },
           "showChannels": {
             "type": "boolean",
-            "description": "Shows a connector per channel below each port in the UI's graph editor. It stays on while connections to or from single channels of\r\nthe module exist (an update turning it off is ignored then); creating such a connection turns it on."
+            "description": "Shows a connector per channel below each port in the UI's graph editor. It stays on while connections to or from single channels of\nthe module exist (an update turning it off is ignored then); creating such a connection turns it on."
           },
           "size": {
             "oneOf": [
@@ -2180,12 +2180,12 @@
               "null",
               "string"
             ],
-            "description": "The module of the subgraph's template that this module was created from or saved as, so an update from the template keeps it.\r\nIt's set by the engine and cleared when the module changes subgraphs; the value sent with an update is ignored.",
+            "description": "The module of the subgraph's template that this module was created from or saved as, so an update from the template keeps it.\nIt's set by the engine and cleared when the module changes subgraphs; the value sent with an update is ignored.",
             "format": "uuid"
           },
           "useSystemVolume": {
             "type": "boolean",
-            "description": "Follows the volume and mute of Windows' default output device (its volume slider and keys). The engine then sets\r\nfloat ModuleDto.Volume and bool ModuleDto.IsMuted, and the values sent with an update are ignored."
+            "description": "Follows the volume and mute of Windows' default output device (its volume slider and keys). The engine then sets\nfloat ModuleDto.Volume and bool ModuleDto.IsMuted, and the values sent with an update are ignored."
           },
           "volume": {
             "maximum": 1,
@@ -2224,7 +2224,7 @@
               "null",
               "integer"
             ],
-            "description": "The channel count of the inputs that otherwise take their layout from their sources, or null to do so. Only modules whose type\r\nbool ModuleTypeDto.SupportsChannelCount have it; it is ignored for all others. It can't be lower than the channels the\r\nmodule's connections to single channels need.",
+            "description": "The channel count of the inputs that otherwise take their layout from their sources, or null to do so. Only modules whose type\nbool ModuleTypeDto.SupportsChannelCount have it; it is ignored for all others. It can't be lower than the channels the\nmodule's connections to single channels need.",
             "format": "int32"
           },
           "id": {
@@ -2263,7 +2263,7 @@
           },
           "showChannels": {
             "type": "boolean",
-            "description": "Shows a connector per channel below each port in the UI's graph editor. It stays on while connections to or from single channels of\r\nthe module exist (an update turning it off is ignored then); creating such a connection turns it on."
+            "description": "Shows a connector per channel below each port in the UI's graph editor. It stays on while connections to or from single channels of\nthe module exist (an update turning it off is ignored then); creating such a connection turns it on."
           },
           "size": {
             "oneOf": [
@@ -2289,12 +2289,12 @@
               "null",
               "string"
             ],
-            "description": "The module of the subgraph's template that this module was created from or saved as, so an update from the template keeps it.\r\nIt's set by the engine and cleared when the module changes subgraphs; the value sent with an update is ignored.",
+            "description": "The module of the subgraph's template that this module was created from or saved as, so an update from the template keeps it.\nIt's set by the engine and cleared when the module changes subgraphs; the value sent with an update is ignored.",
             "format": "uuid"
           },
           "useSystemVolume": {
             "type": "boolean",
-            "description": "Follows the volume and mute of Windows' default output device (its volume slider and keys). The engine then sets\r\nfloat ModuleDto.Volume and bool ModuleDto.IsMuted, and the values sent with an update are ignored."
+            "description": "Follows the volume and mute of Windows' default output device (its volume slider and keys). The engine then sets\nfloat ModuleDto.Volume and bool ModuleDto.IsMuted, and the values sent with an update are ignored."
           },
           "volume": {
             "maximum": 1,
@@ -2333,7 +2333,7 @@
               "null",
               "integer"
             ],
-            "description": "The channel count of the inputs that otherwise take their layout from their sources, or null to do so. Only modules whose type\r\nbool ModuleTypeDto.SupportsChannelCount have it; it is ignored for all others. It can't be lower than the channels the\r\nmodule's connections to single channels need.",
+            "description": "The channel count of the inputs that otherwise take their layout from their sources, or null to do so. Only modules whose type\nbool ModuleTypeDto.SupportsChannelCount have it; it is ignored for all others. It can't be lower than the channels the\nmodule's connections to single channels need.",
             "format": "int32"
           },
           "id": {
@@ -2372,7 +2372,7 @@
           },
           "showChannels": {
             "type": "boolean",
-            "description": "Shows a connector per channel below each port in the UI's graph editor. It stays on while connections to or from single channels of\r\nthe module exist (an update turning it off is ignored then); creating such a connection turns it on."
+            "description": "Shows a connector per channel below each port in the UI's graph editor. It stays on while connections to or from single channels of\nthe module exist (an update turning it off is ignored then); creating such a connection turns it on."
           },
           "size": {
             "oneOf": [
@@ -2398,12 +2398,12 @@
               "null",
               "string"
             ],
-            "description": "The module of the subgraph's template that this module was created from or saved as, so an update from the template keeps it.\r\nIt's set by the engine and cleared when the module changes subgraphs; the value sent with an update is ignored.",
+            "description": "The module of the subgraph's template that this module was created from or saved as, so an update from the template keeps it.\nIt's set by the engine and cleared when the module changes subgraphs; the value sent with an update is ignored.",
             "format": "uuid"
           },
           "useSystemVolume": {
             "type": "boolean",
-            "description": "Follows the volume and mute of Windows' default output device (its volume slider and keys). The engine then sets\r\nfloat ModuleDto.Volume and bool ModuleDto.IsMuted, and the values sent with an update are ignored."
+            "description": "Follows the volume and mute of Windows' default output device (its volume slider and keys). The engine then sets\nfloat ModuleDto.Volume and bool ModuleDto.IsMuted, and the values sent with an update are ignored."
           },
           "volume": {
             "maximum": 1,
@@ -2442,7 +2442,7 @@
               "null",
               "integer"
             ],
-            "description": "The channel count of the inputs that otherwise take their layout from their sources, or null to do so. Only modules whose type\r\nbool ModuleTypeDto.SupportsChannelCount have it; it is ignored for all others. It can't be lower than the channels the\r\nmodule's connections to single channels need.",
+            "description": "The channel count of the inputs that otherwise take their layout from their sources, or null to do so. Only modules whose type\nbool ModuleTypeDto.SupportsChannelCount have it; it is ignored for all others. It can't be lower than the channels the\nmodule's connections to single channels need.",
             "format": "int32"
           },
           "id": {
@@ -2481,7 +2481,7 @@
           },
           "showChannels": {
             "type": "boolean",
-            "description": "Shows a connector per channel below each port in the UI's graph editor. It stays on while connections to or from single channels of\r\nthe module exist (an update turning it off is ignored then); creating such a connection turns it on."
+            "description": "Shows a connector per channel below each port in the UI's graph editor. It stays on while connections to or from single channels of\nthe module exist (an update turning it off is ignored then); creating such a connection turns it on."
           },
           "size": {
             "oneOf": [
@@ -2507,12 +2507,12 @@
               "null",
               "string"
             ],
-            "description": "The module of the subgraph's template that this module was created from or saved as, so an update from the template keeps it.\r\nIt's set by the engine and cleared when the module changes subgraphs; the value sent with an update is ignored.",
+            "description": "The module of the subgraph's template that this module was created from or saved as, so an update from the template keeps it.\nIt's set by the engine and cleared when the module changes subgraphs; the value sent with an update is ignored.",
             "format": "uuid"
           },
           "useSystemVolume": {
             "type": "boolean",
-            "description": "Follows the volume and mute of Windows' default output device (its volume slider and keys). The engine then sets\r\nfloat ModuleDto.Volume and bool ModuleDto.IsMuted, and the values sent with an update are ignored."
+            "description": "Follows the volume and mute of Windows' default output device (its volume slider and keys). The engine then sets\nfloat ModuleDto.Volume and bool ModuleDto.IsMuted, and the values sent with an update are ignored."
           },
           "volume": {
             "maximum": 1,
@@ -2551,7 +2551,7 @@
               "null",
               "integer"
             ],
-            "description": "The channel count of the inputs that otherwise take their layout from their sources, or null to do so. Only modules whose type\r\nbool ModuleTypeDto.SupportsChannelCount have it; it is ignored for all others. It can't be lower than the channels the\r\nmodule's connections to single channels need.",
+            "description": "The channel count of the inputs that otherwise take their layout from their sources, or null to do so. Only modules whose type\nbool ModuleTypeDto.SupportsChannelCount have it; it is ignored for all others. It can't be lower than the channels the\nmodule's connections to single channels need.",
             "format": "int32"
           },
           "id": {
@@ -2590,7 +2590,7 @@
           },
           "showChannels": {
             "type": "boolean",
-            "description": "Shows a connector per channel below each port in the UI's graph editor. It stays on while connections to or from single channels of\r\nthe module exist (an update turning it off is ignored then); creating such a connection turns it on."
+            "description": "Shows a connector per channel below each port in the UI's graph editor. It stays on while connections to or from single channels of\nthe module exist (an update turning it off is ignored then); creating such a connection turns it on."
           },
           "size": {
             "oneOf": [
@@ -2616,12 +2616,12 @@
               "null",
               "string"
             ],
-            "description": "The module of the subgraph's template that this module was created from or saved as, so an update from the template keeps it.\r\nIt's set by the engine and cleared when the module changes subgraphs; the value sent with an update is ignored.",
+            "description": "The module of the subgraph's template that this module was created from or saved as, so an update from the template keeps it.\nIt's set by the engine and cleared when the module changes subgraphs; the value sent with an update is ignored.",
             "format": "uuid"
           },
           "useSystemVolume": {
             "type": "boolean",
-            "description": "Follows the volume and mute of Windows' default output device (its volume slider and keys). The engine then sets\r\nfloat ModuleDto.Volume and bool ModuleDto.IsMuted, and the values sent with an update are ignored."
+            "description": "Follows the volume and mute of Windows' default output device (its volume slider and keys). The engine then sets\nfloat ModuleDto.Volume and bool ModuleDto.IsMuted, and the values sent with an update are ignored."
           },
           "volume": {
             "maximum": 1,
@@ -2746,7 +2746,7 @@
             "items": {
               "type": "string"
             },
-            "description": "The inputs that int? ModuleDto.ChannelCount applies to: those without a fixed layout. Their connections to single channels\r\nlimit it."
+            "description": "The inputs that int? ModuleDto.ChannelCount applies to: those without a fixed layout. Their connections to single channels\nlimit it."
           }
         }
       },
@@ -2854,7 +2854,7 @@
             "items": {
               "$ref": "#/components/schemas/SpeakerPosition"
             },
-            "description": "The speaker of each channel, or null if the channels have no speaker positions or one that SpeakerPosition doesn't name\r\n(the reserved bits of the mask)."
+            "description": "The speaker of each channel, or null if the channels have no speaker positions or one that SpeakerPosition doesn't name\n(the reserved bits of the mask)."
           }
         },
         "description": "The channel layout of a port in the last processed block."
@@ -3004,7 +3004,7 @@
             "format": "int32"
           }
         },
-        "description": "A group of modules in the UI's graph editor. Its modules refer to it with Guid? ModuleDto.SubgraphId, and their\r\npositions are relative to ModulePosition SubgraphDto.Position."
+        "description": "A group of modules in the UI's graph editor. Its modules refer to it with Guid? ModuleDto.SubgraphId, and their\npositions are relative to ModulePosition SubgraphDto.Position."
       },
       "SubgraphSize": {
         "required": [
@@ -3172,7 +3172,7 @@
             ]
           }
         },
-        "description": "Preferences of the web UI. Kept in the engine's configuration, because the UI's origin (the engine's random port) changes on every start,\r\nso browser storage wouldn't keep them."
+        "description": "Preferences of the web UI. Kept in the engine's configuration, because the UI's origin (the engine's random port) changes on every start,\nso browser storage wouldn't keep them."
       },
       "UiThemeDto": {
         "required": [

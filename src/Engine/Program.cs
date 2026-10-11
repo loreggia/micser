@@ -12,6 +12,15 @@ using Micser.Engine.Security;
 using Micser.ServiceDefaults;
 using Serilog;
 
+// appsettings.Production.json puts the log file under %LOCALAPPDATA%, which only Windows sets
+if (Environment.GetEnvironmentVariable("LOCALAPPDATA") == null)
+{
+    Environment.SetEnvironmentVariable(
+        "LOCALAPPDATA",
+        Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData)
+    );
+}
+
 var builder = WebApplication.CreateBuilder(args);
 
 var engineOptions =

@@ -3,6 +3,8 @@
     <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
+    <!-- builds (but doesn't run) on Linux too -->
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <ApplicationIcon>..\..\gfx\logo.ico</ApplicationIcon>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>

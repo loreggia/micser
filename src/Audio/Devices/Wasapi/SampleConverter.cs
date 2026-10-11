@@ -2,7 +2,7 @@ using System.Buffers.Binary;
 using System.Runtime.InteropServices;
 using NAudio.Wave;
 
-namespace Micser.Audio.Devices;
+namespace Micser.Audio.Devices.Wasapi;
 
 /// <summary>
 /// Converts interleaved device samples (IEEE float or 16/24/32 bit PCM) to interleaved floats.

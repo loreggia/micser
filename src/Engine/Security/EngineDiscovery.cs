@@ -11,7 +11,7 @@ public sealed record DiscoveryInfo(string Url, string? Token, int ProcessId);
 
 /// <summary>
 /// Writes <see cref="DiscoveryInfo"/> to <see cref="EngineOptions.DiscoveryPath"/> once the server listens and deletes
-/// it on shutdown. The file is in the user's local app data folder, which other users can't read.
+/// it on shutdown. Other users can't read it: it's in the user's local app data or runtime folder, and on Unix it's created with mode 0600.
 /// </summary>
 public sealed class EngineDiscovery : IHostedService
 {
@@ -70,8 +70,8 @@ public sealed class EngineDiscovery : IHostedService
         }
 
         var info = new DiscoveryInfo(url, _access.RequireToken ? _access.Token : null, Environment.ProcessId);
-        Directory.CreateDirectory(Path.GetDirectoryName(_path)!);
-        File.WriteAllText(_path, JsonSerializer.Serialize(info, JsonSerializerOptions.Web));
+        PrivateFiles.CreateDirectory(Path.GetDirectoryName(_path)!);
+        PrivateFiles.WriteAllText(_path, JsonSerializer.Serialize(info, JsonSerializerOptions.Web));
         _written = true;
         _logger.LogInformation("Engine listening on {Url}.", url);
     }

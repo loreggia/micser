@@ -10,6 +10,8 @@ Micser is a Windows audio router: a headless engine runs a graph of audio module
 dotnet build Micser.slnx
 dotnet test --solution Micser.slnx                      # TUnit on Microsoft.Testing.Platform (global.json "test.runner")
 dotnet test --project tests/Engine/Micser.Engine.Tests.csproj --treenode-filter "/*/*/HealthEndpointTests/*"
+# on Linux the solution builds, but only the portable test projects run (the shell's and DriverUtility's need Windows):
+dotnet test --project tests/Audio/Micser.Audio.Tests.csproj   # likewise tests/Engine/..., tests/Plugins/Main/...
 
 npm run setup                # root; installs all workspaces, runs the allowed install scripts and installs the pre-commit hook
 npm run allow-scripts:auto   # after dependency changes: adds new packages with install scripts to the allowlists (denied)
@@ -64,6 +66,7 @@ General:
 
 - Keep the folder layout and dependency direction in "Layout" of `docs/Architecture.md`: new projects go into `src/` (shipping), `tests/` (mirroring `src/`) or `tools/` (dev-only).
 - Nothing in `src/` compiles against a plugin, Main included (see "Plugins").
+- Audio, Engine, plugins and their tests target `net10.0` and run on Windows and Linux (see `docs/Linux.md`). Platform code is marked `[SupportedOSPlatform]` and called behind `OperatingSystem.Is*()` (CA1416 fails the build otherwise); device APIs go behind `IAudioBackend`. Only the shell, `DriverUtility` and `AudioHarness` target `net10.0-windows`.
 - Package versions are central in `Directory.Packages.props`, so `PackageReference` items carry no `Version`. `TreatWarningsAsErrors` is on for all projects.
 - Stick to the libraries in "Overview": no Newtonsoft, EF Core, Prism/Unity, xUnit or Moq.
 - npm runs no install scripts; after dependency changes, run `npm run allow-scripts:auto` (CI fails if it changes an allowlist). See "Development" for the npm setup.

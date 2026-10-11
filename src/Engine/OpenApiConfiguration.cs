@@ -1,6 +1,7 @@
 using System.Reflection;
 using System.Text.Json.Serialization.Metadata;
 using Microsoft.AspNetCore.OpenApi;
+using Microsoft.OpenApi;
 using Micser.Engine.Contracts;
 
 namespace Micser.Engine;
@@ -44,6 +45,15 @@ public static class OpenApiConfiguration
                     return Task.CompletedTask;
                 }
             );
+
+            // the XML comment generator writes multi-line descriptions with the platform's line breaks (CRLF on Windows)
+            options.AddDocumentTransformer(
+                (document, _, _) =>
+                {
+                    new OpenApiWalker(new LineEndingNormalizer()).Walk(document);
+                    return Task.CompletedTask;
+                }
+            );
         });
     }
 
@@ -56,5 +66,51 @@ public static class OpenApiConfiguration
 
         return property.AttributeProvider is not PropertyInfo info
             || nullability.Create(info).ReadState != NullabilityState.NotNull;
+    }
+
+    /// <summary>
+    /// Replaces CRLF line breaks in descriptions with LF, so the document is the same whichever platform builds it.
+    /// </summary>
+    private sealed class LineEndingNormalizer : OpenApiVisitorBase
+    {
+        public override void Visit(IOpenApiSchema schema)
+        {
+            Normalize(schema);
+        }
+
+        public override void Visit(OpenApiOperation operation)
+        {
+            Normalize(operation);
+            if (operation.Summary?.Contains('\r') == true)
+            {
+                operation.Summary = operation.Summary.ReplaceLineEndings("\n");
+            }
+        }
+
+        public override void Visit(IOpenApiParameter parameter)
+        {
+            Normalize(parameter);
+        }
+
+        public override void Visit(IOpenApiRequestBody requestBody)
+        {
+            Normalize(requestBody);
+        }
+
+        public override void Visit(IOpenApiResponse response)
+        {
+            Normalize(response);
+        }
+
+        private static void Normalize(object element)
+        {
+            if (
+                element is IOpenApiDescribedElement { Description: { } description } described
+                && description.Contains('\r')
+            )
+            {
+                described.Description = description.ReplaceLineEndings("\n");
+            }
+        }
     }
 }
