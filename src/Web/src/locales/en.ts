@@ -45,6 +45,13 @@ export const en = {
     display: "Display",
     language: "Language",
     systemLanguage: "System ({{language}})",
+    theme: "Theme",
+    themes: {
+      system: "System",
+      light: "Light",
+      dark: "Dark",
+      highContrast: "High contrast",
+    },
     showStreamStatistics: "Show stream statistics (dropouts and buffer size of device modules)",
     snapToGrid: "Snap modules to the grid",
     showChannelsByDefault: "Show the channels of new modules",

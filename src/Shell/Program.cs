@@ -64,8 +64,9 @@ internal static class Program
 
             ApplicationConfiguration.Initialize();
 
-            // dark window background and title bar in dark mode, so the window doesn't flash light before the UI loads
-            Application.SetColorMode(SystemColorMode.System);
+            // the window's background and title bar in the UI's theme, so the window doesn't flash before the UI loads
+            var colorMode = new ShellColorMode(ShellColorMode.DefaultPath);
+            Application.SetColorMode(colorMode.ColorMode);
 
             // async code started before Application.Run (the engine supervisor) must continue on the UI thread
             SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
@@ -82,7 +83,9 @@ internal static class Program
             var driver = DriverController.Create(supervisor);
             var language = new ShellLanguage(ShellLanguage.DefaultPath);
 
-            Application.Run(new TrayApplicationContext(options, supervisor, updates, driver, language, activation));
+            Application.Run(
+                new TrayApplicationContext(options, supervisor, updates, driver, language, colorMode, activation)
+            );
             return 0;
         }
         catch (Exception ex)

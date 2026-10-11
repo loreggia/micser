@@ -48,6 +48,13 @@ export const de: Translations<typeof en> = {
     display: "Anzeige",
     language: "Sprache",
     systemLanguage: "System ({{language}})",
+    theme: "Design",
+    themes: {
+      system: "System",
+      light: "Hell",
+      dark: "Dunkel",
+      highContrast: "Hoher Kontrast",
+    },
     showStreamStatistics: "Stream-Statistiken anzeigen (Aussetzer und Puffergröße der Gerätemodule)",
     snapToGrid: "Module am Raster ausrichten",
     showChannelsByDefault: "Kanäle neuer Module anzeigen",

@@ -46,6 +46,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "../i18n";
 import { useNotifyError } from "../notifications";
 import { portName, usePluginWidgets } from "../plugins";
+import { useTheme } from "../theme";
 import { channelLabel, isBeyondLayout } from "./channels";
 import { ModuleNode, type ModuleNodeType } from "./ModuleNode";
 import { pendingPlacement, pendingSelection } from "./newModules";
@@ -175,6 +176,7 @@ export function GraphEditor() {
   const moduleTypeChoices = useModuleTypeChoices();
   const { widgets, isLoading: isLoadingWidgets } = usePluginWidgets();
   const [preferences] = usePreferences();
+  const { colorMode } = useTheme();
   const [nodes, setNodes, onNodesChange] = useNodesState<GraphNode>([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([]);
   const [menu, setMenu] = useState<AddModuleMenu>();
@@ -726,7 +728,7 @@ export function GraphEditor() {
         deleteKeyCode={["Delete", "Backspace"]}
         snapToGrid={preferences.snapToGrid}
         snapGrid={[gridSize, gridSize]}
-        colorMode="system"
+        colorMode={colorMode}
         ariaLabelConfig={ariaLabelConfig}
         fitView
         minZoom={0.25}

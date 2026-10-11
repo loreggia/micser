@@ -73,4 +73,6 @@ export * from './subgraphDto';
 export * from './subgraphSize';
 export * from './subgraphTemplateDto';
 export * from './templateConnectionDto';
+export * from './uiColorMode';
 export * from './uiPreferencesDto';
+export * from './uiThemeDto';

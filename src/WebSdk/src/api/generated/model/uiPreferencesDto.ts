@@ -4,6 +4,7 @@
  * Micser.Engine | v1
  * OpenAPI spec version: 1.0.0
  */
+import type { UiThemeDto } from './uiThemeDto';
 
 /**
  * Preferences of the web UI. Kept in the engine's configuration, because the UI's origin (the engine's random port) changes on every start,
@@ -21,4 +22,5 @@ export interface UiPreferencesDto {
   language?: string | null;
   /** Whether modules the UI adds show their channel connectors. */
   showChannelsByDefault: boolean;
+  theme?: null | UiThemeDto;
 }

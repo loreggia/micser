@@ -17,6 +17,7 @@ internal sealed class MainForm : Form
 
     private static readonly JsonSerializerOptions MessageJson = new(JsonSerializerDefaults.Web);
 
+    private readonly ShellColorMode _colorMode;
     private readonly DriverController? _driver;
     private readonly ShellLanguage _language;
     private readonly string _settingsPath;
@@ -33,6 +34,7 @@ internal sealed class MainForm : Form
         UpdateController? updates,
         DriverController? driver,
         ShellLanguage language,
+        ShellColorMode colorMode,
         Uri? uiUrl,
         string settingsPath
     )
@@ -41,6 +43,7 @@ internal sealed class MainForm : Form
         _updates = updates;
         _driver = driver;
         _language = language;
+        _colorMode = colorMode;
         _uiUrl = uiUrl;
         _settingsPath = settingsPath;
 
@@ -116,6 +119,7 @@ internal sealed class MainForm : Form
         }
 
         _webView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = false;
+        _webView.CoreWebView2.Profile.PreferredColorScheme = _colorMode.PreferredColorScheme;
         _webView.CoreWebView2.WebMessageReceived += OnWebMessageReceived;
         _webView.CoreWebView2.NewWindowRequested += (_, args) =>
         {
@@ -158,6 +162,26 @@ internal sealed class MainForm : Form
         PostState();
     }
 
+    /// <summary>
+    /// Applies the color mode, which the application has, to the title bar and the web view. WinForms sets the title bar only when it
+    /// creates the window.
+    /// </summary>
+    public void ApplyColorMode()
+    {
+        if (IsHandleCreated)
+        {
+            _ = NativeMethods.DwmSetWindowAttribute(
+                Handle,
+                NativeMethods.DwmwaUseImmersiveDarkMode,
+                Application.IsDarkModeEnabled ? 1 : 0,
+                sizeof(int)
+            );
+            Invalidate(invalidateChildren: true);
+        }
+
+        _webView.CoreWebView2?.Profile.PreferredColorScheme = _colorMode.PreferredColorScheme;
+    }
+
     private void OnUpdatesChanged(object? sender, EventArgs e)
     {
         PostState();
@@ -167,7 +191,7 @@ internal sealed class MainForm : Form
     /// Handles <c>{ "type": ... }</c> messages from the UI: <c>getState</c>, <c>checkForUpdates</c> (answered with an
     /// <c>updateCheck</c> message), <c>installUpdate</c>, <c>restartEngine</c>, and for the driver <c>installDriver</c> and
     /// <c>setCableCount</c> (with <c>cableCount</c>), <c>setCableLayout</c> (with <c>cable</c> and <c>layout</c>), <c>updateDriver</c> and
-    /// <c>uninstallDriver</c>, <c>setLanguage</c> (with the UI's <c>language</c> preference, or null), and <c>getReleaseNotes</c> (with a
+    /// <c>uninstallDriver</c>, <c>setLanguage</c> (with the UI's <c>language</c> preference, or null), <c>setColorMode</c> (with the <c>colorMode</c> of the UI's theme preference, or null), and <c>getReleaseNotes</c> (with a
     /// <c>version</c>; answered with a <c>releaseNotes</c> message with the <c>version</c> and its markdown <c>notes</c>, or null). The
     /// shell answers with <c>state</c> messages (see <see cref="PostState"/>), also whenever the state changes.
     /// </summary>
@@ -188,6 +212,7 @@ internal sealed class MainForm : Form
         int cable;
         string? layout;
         string? language;
+        string? colorMode;
         string? version;
         try
         {
@@ -207,6 +232,11 @@ internal sealed class MainForm : Form
                 message.TryGetProperty("language", out var languageValue)
                 && languageValue.ValueKind == JsonValueKind.String
                     ? languageValue.GetString()
+                    : null;
+            colorMode =
+                message.TryGetProperty("colorMode", out var colorModeValue)
+                && colorModeValue.ValueKind == JsonValueKind.String
+                    ? colorModeValue.GetString()
                     : null;
             version =
                 message.TryGetProperty("version", out var versionValue)
@@ -254,6 +284,9 @@ internal sealed class MainForm : Form
                 break;
             case "setLanguage":
                 _language.SetPreference(language);
+                break;
+            case "setColorMode":
+                _colorMode.SetPreference(colorMode);
                 break;
             case "getReleaseNotes" when version != null:
                 PostMessage(

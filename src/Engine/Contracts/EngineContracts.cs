@@ -129,12 +129,30 @@ public sealed record PortLevelsDto(string? Port, float[] Peak, float[] Rms);
 /// <param name="SnapToGrid">Whether modules snap to the grid when moved.</param>
 /// <param name="Language">The UI's language, e.g. "de"; null follows the system. Languages the UI doesn't have also follow the system.</param>
 /// <param name="ShowChannelsByDefault">Whether modules the UI adds show their channel connectors.</param>
+/// <param name="Theme">The UI's color theme; null follows the system's light or dark mode.</param>
 public sealed record UiPreferencesDto(
     bool ShowStreamStatistics = false,
     bool SnapToGrid = true,
     string? Language = null,
-    bool ShowChannelsByDefault = false
+    bool ShowChannelsByDefault = false,
+    UiThemeDto? Theme = null
 );
+
+/// <summary>
+/// A color theme of the web UI.
+/// </summary>
+/// <param name="Name">The theme's name, e.g. "HighContrast". The UI shows a theme it doesn't have in its plain light or dark theme.</param>
+/// <param name="ColorMode">Whether the theme is light or dark, for what isn't drawn by the UI, e.g. the shell's window.</param>
+public sealed record UiThemeDto(string Name, UiColorMode ColorMode);
+
+/// <summary>
+/// Whether a theme is light or dark.
+/// </summary>
+public enum UiColorMode
+{
+    Light,
+    Dark,
+}
 
 /// <summary>
 /// A plugin: loaded at the engine's start, failed to load, or staged for installation.

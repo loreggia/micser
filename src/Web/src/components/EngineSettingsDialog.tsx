@@ -31,6 +31,7 @@ import { useState } from "react";
 import { useTranslation } from "../i18n";
 import { useNotifyError } from "../notifications";
 import { shell, useShellState, type UpdateCheckResult } from "../shell";
+import { themes, useTheme } from "../theme";
 import { ConfigurationSettings } from "./ConfigurationSettings";
 import { PluginsSettings } from "./PluginsSettings";
 import { ReleaseNotesDialog } from "./ReleaseNotesDialog";
@@ -65,6 +66,9 @@ export interface EngineSettingsDialogProps {
 /** The language preference's value that follows the system. */
 const systemLanguage = "system";
 
+/** The theme option that follows the system; theme names start with a capital letter. */
+const systemTheme = "system";
+
 /**
  * Audio settings (applied with Apply, which rebuilds the graph) and restarts, display preferences and the language (applied right away),
  * configuration export and import, plugins (applied when the engine restarts), and, when running in the desktop shell, the version, updates
@@ -75,6 +79,7 @@ export function EngineSettingsDialog({ open, settings, onClose }: EngineSettings
   const { t } = useTranslation();
   const [draft, setDraft] = useState(settings);
   const [preferences, setPreferences] = usePreferences();
+  const { preference: theme } = useTheme();
   const shellState = useShellState();
   const [checkResult, setCheckResult] = useState<UpdateCheckResult>();
   const [releaseNotesVersion, setReleaseNotesVersion] = useState<string>();
@@ -177,6 +182,23 @@ export function EngineSettingsDialog({ open, settings, onClose }: EngineSettings
                 {languages.map((language) => (
                   <Option key={language.code} value={language.code}>
                     {language.name}
+                  </Option>
+                ))}
+              </Dropdown>
+            </Field>
+            <Field label={t("settings.theme")}>
+              <Dropdown
+                value={theme ? theme.label() : t("settings.themes.system")}
+                selectedOptions={[theme?.name ?? systemTheme]}
+                onOptionSelect={(_, data) => {
+                  const selected = themes.find((option) => option.name === data.optionValue);
+                  setPreferences({ theme: selected ? { name: selected.name, colorMode: selected.colorMode } : null });
+                }}
+              >
+                <Option value={systemTheme}>{t("settings.themes.system")}</Option>
+                {themes.map((option) => (
+                  <Option key={option.name} value={option.name}>
+                    {option.label()}
                   </Option>
                 ))}
               </Dropdown>

@@ -13,6 +13,7 @@ from that section, and the release workflow fails without it.
 - The configuration can be exported to a file and imported again, e.g. as a backup or to move it to another computer: "Configuration" in
   the settings. The file has the modules, connections, subgraphs, your templates, the audio settings and the display preferences, and
   importing one replaces all of them. The configuration it replaces is backed up next to the configuration file.
+- The theme can be chosen in the settings under "Display": System (light or dark like Windows, as before), Light, Dark or High contrast.
 
 ## 0.14.0 - 2026-10-11
 
