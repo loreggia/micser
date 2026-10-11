@@ -1,6 +1,5 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using NAudio.CoreAudioApi;
 
 namespace Micser.Audio.Devices;
 
@@ -9,7 +8,7 @@ namespace Micser.Audio.Devices;
 public readonly record struct SystemVolumeLevel(float Gain, bool IsMuted);
 
 /// <summary>
-/// The volume of the default output device, which Windows' volume slider and keys control.
+/// The volume of the default output device, which the system's volume slider and keys control.
 /// </summary>
 public interface ISystemVolume
 {
@@ -19,132 +18,33 @@ public interface ISystemVolume
     event EventHandler? Changed;
 
     /// <summary>
-    /// The current level, or null if there is no default output device.
+    /// The current level, or null if there is no default output device or the platform's backend can't read it.
     /// </summary>
     SystemVolumeLevel? Level { get; }
 }
 
 /// <summary>
-/// Follows the volume of the default output device through its endpoint volume notifications.
+/// Follows the volume of the default output device through the audio backend of <see cref="AudioDeviceService"/>.
 /// </summary>
 public sealed class SystemVolume : ISystemVolume, IDisposable
 {
-    private readonly AudioDeviceService _devices;
-    private readonly Lock _lock = new();
-    private readonly ILogger _logger;
-    private MMDevice? _device;
-    private SystemVolumeLevel? _level;
+    private readonly IBackendSystemVolume _volume;
 
     public SystemVolume(AudioDeviceService devices, ILogger<SystemVolume>? logger = null)
     {
-        _devices = devices;
-        _logger = logger ?? NullLogger<SystemVolume>.Instance;
-        _devices.DeviceChanged += OnDeviceChanged;
-        Attach();
+        _volume = devices.Backend.CreateSystemVolume(devices, logger ?? NullLogger<SystemVolume>.Instance);
     }
 
-    public event EventHandler? Changed;
-
-    public SystemVolumeLevel? Level
+    public event EventHandler? Changed
     {
-        get
-        {
-            lock (_lock)
-            {
-                return _level;
-            }
-        }
+        add => _volume.Changed += value;
+        remove => _volume.Changed -= value;
     }
+
+    public SystemVolumeLevel? Level => _volume.Level;
 
     public void Dispose()
     {
-        _devices.DeviceChanged -= OnDeviceChanged;
-        lock (_lock)
-        {
-            Detach();
-        }
-    }
-
-    private void Attach()
-    {
-        lock (_lock)
-        {
-            Detach();
-            _device = _devices.TryGetDefaultRenderDevice();
-            if (_device != null)
-            {
-                try
-                {
-                    _device.AudioEndpointVolume.OnVolumeNotification += OnVolumeNotification;
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogWarning(ex, "Can't follow the volume of {Device}.", _device.FriendlyName);
-                }
-            }
-        }
-
-        Update();
-    }
-
-    private void Detach()
-    {
-        if (_device != null)
-        {
-            _device.AudioEndpointVolume.OnVolumeNotification -= OnVolumeNotification;
-            _device.Dispose();
-            _device = null;
-        }
-    }
-
-    private void OnDeviceChanged(object? sender, AudioDeviceChangedEventArgs e)
-    {
-        if (e.Change == AudioDeviceChange.DefaultChanged)
-        {
-            Attach();
-        }
-    }
-
-    private void OnVolumeNotification(AudioVolumeNotificationData data)
-    {
-        // COM notification callbacks must not call back into the device API
-        ThreadPool.QueueUserWorkItem(_ => Update());
-    }
-
-    private void Update()
-    {
-        SystemVolumeLevel? level = null;
-        bool changed;
-        lock (_lock)
-        {
-            if (_device != null)
-            {
-                try
-                {
-                    var volume = _device.AudioEndpointVolume;
-                    var gain = volume.MasterVolumeLevelScalar > 0 ? Decibels.ToLinear(volume.MasterVolumeLevel) : 0f;
-                    level = new SystemVolumeLevel(Math.Clamp(gain, 0f, 1f), volume.Mute);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogWarning(ex, "Reading the system volume failed.");
-                }
-            }
-
-            changed = level != _level;
-            _level = level;
-        }
-
-        if (changed)
-        {
-            try
-            {
-                Changed?.Invoke(this, EventArgs.Empty);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "A system volume handler failed.");
-            }
-        }
+        _volume.Dispose();
     }
 }

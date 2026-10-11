@@ -1,11 +1,13 @@
 using System.ComponentModel;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
-namespace Micser.Audio.Devices;
+namespace Micser.Audio.Devices.Wasapi;
 
 /// <summary>
 /// Calls back when the system resumed from sleep or hibernation. Uses a power callback, so no window or message loop is needed.
 /// </summary>
+[SupportedOSPlatform("windows")]
 internal sealed unsafe class ResumeNotification : IDisposable
 {
     private readonly Action _onResumed;

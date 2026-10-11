@@ -1,7 +1,6 @@
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.Win32.SafeHandles;
 
 namespace Micser.Audio;
 
@@ -11,7 +10,8 @@ namespace Micser.Audio;
 public readonly record struct EngineStatistics(long Blocks, long LateBlocks, TimeSpan MaxProcessingTime);
 
 /// <summary>
-/// Processes the graph on a dedicated MMCSS "Pro Audio" thread, one block per block duration of the engine clock.
+/// Processes the graph on a dedicated thread with a realtime priority where the platform allows it (MMCSS "Pro Audio" on Windows,
+/// <c>SCHED_FIFO</c> on Linux), one block per block duration of the engine clock.
 /// Devices run on their own clocks; their streams compensate the drift.
 /// </summary>
 public sealed class AudioEngine : IDisposable
@@ -94,48 +94,9 @@ public sealed class AudioEngine : IDisposable
         }
     }
 
-    private static void WaitUntil(SafeWaitHandle timer, long deadline)
-    {
-        var remaining = deadline - Stopwatch.GetTimestamp();
-        if (remaining <= 0)
-        {
-            return;
-        }
-
-        if (timer.IsInvalid)
-        {
-            Thread.Sleep(TimeSpan.FromSeconds((double)remaining / Stopwatch.Frequency));
-            return;
-        }
-
-        // negative due time = relative, in 100 ns units
-        var dueTime = -(long)((double)remaining / Stopwatch.Frequency * 10_000_000);
-        if (NativeMethods.SetWaitableTimer(timer, dueTime, 0, 0, 0, false))
-        {
-            NativeMethods.WaitForSingleObject(timer, NativeMethods.Infinite);
-        }
-    }
-
     private void Run()
     {
-        uint taskIndex = 0;
-        var mmcssHandle = NativeMethods.AvSetMmThreadCharacteristics("Pro Audio", ref taskIndex);
-        if (mmcssHandle == 0)
-        {
-            _logger.LogWarning("Could not register the audio thread with MMCSS.");
-        }
-
-        using var timer = NativeMethods.CreateWaitableTimerEx(
-            0,
-            null,
-            NativeMethods.CreateWaitableTimerHighResolution,
-            NativeMethods.TimerAllAccess
-        );
-        if (timer.IsInvalid)
-        {
-            _logger.LogWarning("High resolution timers are not available; block timing will be less precise.");
-        }
-
+        using var timer = BlockTimer.Create(_logger);
         var period = (long)(_graph.Format.BlockDuration.TotalSeconds * Stopwatch.Frequency);
         var deadline = Stopwatch.GetTimestamp();
         _logger.LogInformation(
@@ -166,16 +127,11 @@ public sealed class AudioEngine : IDisposable
                     deadline = now;
                 }
 
-                WaitUntil(timer, deadline);
+                timer.WaitUntil(deadline);
             }
         }
         finally
         {
-            if (mmcssHandle != 0)
-            {
-                NativeMethods.AvRevertMmThreadCharacteristics(mmcssHandle);
-            }
-
             _logger.LogInformation("Audio engine stopped.");
         }
     }

@@ -16,12 +16,7 @@ public sealed class EngineOptions
     /// <summary>
     /// Where the engine publishes its URL and access token for the shell.
     /// </summary>
-    public string DiscoveryPath { get; set; } =
-        Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "Micser",
-            "engine.json"
-        );
+    public string DiscoveryPath { get; set; } = Path.Combine(RuntimeDirectory, "engine.json");
 
     /// <summary>
     /// Loads the plugins' subgraph templates as built-in templates.
@@ -48,4 +43,13 @@ public sealed class EngineOptions
     /// Allows only one engine per user session.
     /// </summary>
     public bool SingleInstance { get; set; } = true;
+
+    /// <summary>
+    /// The folder of the files that only live while the engine runs: <c>$XDG_RUNTIME_DIR/micser</c> where it's set (Linux; private to
+    /// the user and cleared at logout), otherwise <c>%LocalAppData%\Micser</c>.
+    /// </summary>
+    internal static string RuntimeDirectory =>
+        !OperatingSystem.IsWindows() && Environment.GetEnvironmentVariable("XDG_RUNTIME_DIR") is { Length: > 0 } runtime
+            ? Path.Combine(runtime, "micser")
+            : Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "Micser");
 }

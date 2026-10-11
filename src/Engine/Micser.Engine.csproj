@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <TargetFramework>net10.0-windows</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <!-- the OpenAPI document is generated on build; the web SDK generates its API client from it -->
     <OpenApiDocumentsDirectory>$(MSBuildProjectDirectory)\..\WebSdk\openapi</OpenApiDocumentsDirectory>
     <OpenApiGenerateDocumentsOptions>--file-name engine</OpenApiGenerateDocumentsOptions>

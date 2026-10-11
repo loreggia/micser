@@ -1,8 +1,5 @@
-using System.Runtime.InteropServices;
 using Microsoft.Extensions.Logging;
-using NAudio.CoreAudioApi;
 using NAudio.Dsp;
-using NAudio.Wave;
 
 namespace Micser.Audio.Devices;
 
@@ -10,22 +7,16 @@ namespace Micser.Audio.Devices;
 /// Plays blocks at the engine sample rate on a device. <see cref="Write"/> resamples each block on the audio thread
 /// into a ring buffer that the device thread drains; the resampling ratio compensates the clock drift.
 /// </summary>
-public sealed class RenderStream : IDeviceStream
+public sealed class RenderStream : IDeviceStream, IRenderHandler
 {
-    /// <summary>
-    /// The shared-mode device buffer. Windows keeps it at two device periods at least; NAudio's default is 200 ms.
-    /// </summary>
-    private const int DeviceBufferMilliseconds = 20;
-
     private readonly int _channels;
-    private readonly MMDevice _device;
+    private readonly IRenderDevice _device;
     private readonly DriftController _drift;
     private readonly ProcessingFormat _format;
     private readonly float[] _interleaved;
     private readonly ILogger _logger;
     private readonly long _openedAt = Environment.TickCount64;
     private readonly float[] _output;
-    private readonly WasapiPlayer _player;
     private readonly WdlResampler _resampler;
     private readonly SampleRingBuffer _ring;
     private readonly AdaptiveTarget _target;
@@ -40,23 +31,27 @@ public sealed class RenderStream : IDeviceStream
 
     private long _underruns;
 
-    internal RenderStream(MMDevice device, ProcessingFormat format, double? initialTargetMilliseconds, ILogger logger)
+    internal RenderStream(
+        IRenderDevice device,
+        ProcessingFormat format,
+        double? initialTargetMilliseconds,
+        ILogger logger
+    )
     {
         _device = device;
         _format = format;
         _logger = logger;
 
-        WaveFormat mixFormat;
-        using (var client = device.CreateAudioClient())
-        {
-            mixFormat = client.MixFormat;
-        }
+        Layout = device.Layout;
+        DeviceSampleRate = device.SampleRate;
+        _channels = Layout.ChannelCount;
 
-        Layout = ChannelLayout.FromWaveFormat(mixFormat);
-        DeviceSampleRate = mixFormat.SampleRate;
-        _channels = mixFormat.Channels;
-
-        _target = StreamBuffering.CreateRenderTarget(device, format, DeviceSampleRate, initialTargetMilliseconds);
+        _target = StreamBuffering.CreateRenderTarget(
+            device.PeriodSeconds,
+            format,
+            DeviceSampleRate,
+            initialTargetMilliseconds
+        );
         _drift = new DriftController(_target.Value);
         _ring = new SampleRingBuffer(DeviceSampleRate * _channels);
         _ring.WriteSilence((int)_target.Value * _channels);
@@ -70,28 +65,7 @@ public sealed class RenderStream : IDeviceStream
         _resampler.SetFilterParms();
         _resampler.SetFeedMode(true);
 
-        _player = new WasapiPlayerBuilder()
-            .WithDevice(device)
-            .WithSharedMode()
-            .WithEventSync()
-            .WithLatency(DeviceBufferMilliseconds)
-            .WithMmcssThreadPriority("Pro Audio")
-            .Build();
-        logger.LogInformation(
-            "Playback on {Device}: latency {Latency} ms, low latency {LowLatency} ({Reason}).",
-            device.FriendlyName,
-            _player.LatencyMilliseconds,
-            _player.LowLatencyActive,
-            _player.LowLatencyUnavailableReason
-        );
-        _player.PlaybackStopped += OnPlaybackStopped;
-        _player.Init(
-            new RingBufferWaveProvider(
-                this,
-                new WaveFormatExtensible(DeviceSampleRate, 32, _channels, true, 32, (Speakers)GetChannelMask(mixFormat))
-            )
-        );
-        _player.Play();
+        device.Start(this);
     }
 
     public int DeviceSampleRate { get; }
@@ -114,8 +88,6 @@ public sealed class RenderStream : IDeviceStream
 
     public void Dispose()
     {
-        _player.PlaybackStopped -= OnPlaybackStopped;
-        _player.Dispose();
         _device.Dispose();
     }
 
@@ -195,51 +167,25 @@ public sealed class RenderStream : IDeviceStream
         }
     }
 
-    private static int GetChannelMask(WaveFormat format)
+    void IRenderHandler.OnRead(Span<float> samples)
     {
-        if (format is WaveFormatExtensible extensible && extensible.ChannelMask != 0)
+        Interlocked.Exchange(ref _lastRequest, Environment.TickCount64);
+        var read = _ring.Read(samples);
+        if (read < samples.Length)
         {
-            return extensible.ChannelMask;
+            samples[read..].Clear();
+            Interlocked.Increment(ref _pendingUnderruns);
         }
 
-        return (int)ChannelLayout.FromChannelCount(format.Channels).Speakers;
+        _isConsuming = true;
     }
 
-    private void OnPlaybackStopped(object? sender, StoppedEventArgs e)
+    void IRenderHandler.OnStopped(Exception? exception)
     {
         _isStopped = true;
-        if (e.Exception != null)
+        if (exception != null)
         {
-            _logger.LogWarning(e.Exception, "Playback on {Device} stopped.", _device.FriendlyName);
-        }
-    }
-
-    private sealed class RingBufferWaveProvider : IWaveProvider
-    {
-        private readonly RenderStream _stream;
-
-        public RingBufferWaveProvider(RenderStream stream, WaveFormat waveFormat)
-        {
-            _stream = stream;
-            WaveFormat = waveFormat;
-        }
-
-        public WaveFormat WaveFormat { get; }
-
-        public int Read(Span<byte> buffer)
-        {
-            Interlocked.Exchange(ref _stream._lastRequest, Environment.TickCount64);
-            var samples = MemoryMarshal.Cast<byte, float>(buffer);
-            var read = _stream._ring.Read(samples);
-            if (read < samples.Length)
-            {
-                samples[read..].Clear();
-                Interlocked.Increment(ref _stream._pendingUnderruns);
-            }
-
-            _stream._isConsuming = true;
-
-            return buffer.Length;
+            _logger.LogWarning(exception, "Playback on {Device} stopped.", _device.Name);
         }
     }
 }

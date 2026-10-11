@@ -1,5 +1,3 @@
-using NAudio.CoreAudioApi;
-
 namespace Micser.Audio.Devices;
 
 /// <summary>
@@ -59,17 +57,16 @@ internal static class StreamBuffering
     /// jitter. It grows by half a period per dropout.
     /// </summary>
     public static AdaptiveTarget CreateCaptureTarget(
-        MMDevice device,
+        double periodSeconds,
         ProcessingFormat format,
         int deviceSampleRate,
         double? initialMilliseconds
     )
     {
-        var period = GetDevicePeriod(device);
         var block = format.BlockDuration.TotalSeconds;
         return CreateTarget(
-            Math.Max(period, block + (period / 2)) + (block / 2),
-            period,
+            Math.Max(periodSeconds, block + (periodSeconds / 2)) + (block / 2),
+            periodSeconds,
             format,
             deviceSampleRate,
             initialMilliseconds
@@ -81,16 +78,15 @@ internal static class StreamBuffering
     /// engine block for timer jitter. It grows by half a period per dropout.
     /// </summary>
     public static AdaptiveTarget CreateRenderTarget(
-        MMDevice device,
+        double periodSeconds,
         ProcessingFormat format,
         int deviceSampleRate,
         double? initialMilliseconds
     )
     {
-        var period = GetDevicePeriod(device);
         return CreateTarget(
-            period + (format.BlockDuration.TotalSeconds / 2),
-            period,
+            periodSeconds + (format.BlockDuration.TotalSeconds / 2),
+            periodSeconds,
             format,
             deviceSampleRate,
             initialMilliseconds
@@ -141,13 +137,5 @@ internal static class StreamBuffering
             (long)(StableSeconds * blocksPerSecond),
             initialMilliseconds / 1000 * deviceSampleRate
         );
-    }
-
-    private static double GetDevicePeriod(MMDevice device)
-    {
-        using var client = device.CreateAudioClient();
-
-        // 100 ns units
-        return TimeSpan.FromTicks(client.DefaultDevicePeriod).TotalSeconds;
     }
 }

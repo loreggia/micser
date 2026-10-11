@@ -1,8 +1,10 @@
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using Microsoft.Win32.SafeHandles;
 
 namespace Micser.Audio;
 
+[SupportedOSPlatform("windows")]
 internal static partial class NativeMethods
 {
     public const uint CreateWaitableTimerHighResolution = 0x00000002;
