@@ -59,6 +59,7 @@ import { ModuleTitle } from "./ModuleTitle";
 import { resizeHandleStyle } from "./resizeHandle";
 import { portHandleId } from "./subgraphs";
 import { useHandlesChanged } from "./useHandlesChanged";
+import { positionToVolume, volumeToPosition } from "./volume";
 
 export type ModuleNodeData = {
   module: ModuleDto;
@@ -405,13 +406,13 @@ export function ModuleNode({ id, data, selected }: NodeProps<ModuleNodeType>) {
               size="small"
               min={0}
               max={100}
-              value={Math.round(module.volume * 100)}
+              value={volumeToPosition(module.volume)}
               aria-label={t("module.volume")}
               disabled={module.useSystemVolume}
-              onChange={(_, value) => update({ ...module, volume: value.value / 100 })}
+              onChange={(_, value) => update({ ...module, volume: positionToVolume(value.value) })}
             />
             <Caption1 className={styles.volumeValue}>
-              {formatNumber(Math.round(module.volume * 100) / 100, { style: "percent" })}
+              {formatNumber(volumeToPosition(module.volume) / 100, { style: "percent" })}
             </Caption1>
             <Tooltip
               content={module.useSystemVolume ? t("module.followsSystemVolume") : t("module.followSystemVolume")}

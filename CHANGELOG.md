@@ -8,6 +8,12 @@ Collect changes under "Unreleased". Before tagging vX.Y.Z, rename that heading t
 from that section, and the release workflow fails without it.
 -->
 
+## Unreleased
+
+- The volume sliders of modules use the same scale as the system's volume control, which follows loudness: half way is now a quarter of
+  the old level (-18 dB), and the low volumes that used to be squeezed into the first few percent can be set precisely. Saved volumes
+  sound the same as before; only their percentages change.
+
 ## 0.15.0 - 2026-10-11
 
 - The configuration can be exported to a file and imported again, e.g. as a backup or to move it to another computer: "Configuration" in

@@ -30,6 +30,14 @@ test("the node's controls change the module", async ({ graph, engine }) => {
   await graph.page.keyboard.press("Home");
   await expect(node).toContainText("0%");
   await expect.poll(async () => (await engine.module(module.id))?.volume).toBe(0);
+  await graph.page.keyboard.press("End");
+  await expect(node).toContainText("100%");
+  await expect.poll(async () => (await engine.module(module.id))?.volume).toBe(1);
+
+  // the slider is cubic like the desktop's volume control: a gain of 0.125 (-18 dB) is half way
+  await engine.updateModule({ ...(await engine.module(module.id))!, volume: 0.125 });
+  await expect(node).toContainText("50%");
+  await expect(node.getByRole("slider", { name: "Volume" })).toHaveValue("50");
 
   await node.getByRole("button", { name: "Collapse" }).click();
   await expect(node.getByRole("slider")).toHaveCount(0);
