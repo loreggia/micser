@@ -8,7 +8,7 @@ Collect changes under "Unreleased". Before tagging vX.Y.Z, rename that heading t
 from that section, and the release workflow fails without it.
 -->
 
-## Unreleased
+## 0.14.0 - 2026-10-11
 
 - The Equalizer and Filter modules show a graph of their frequency response, which follows the settings as you change them.
 - Modules can be resized with the corner at their bottom right. When a module is lower than its controls, they scroll; the Spectrum
