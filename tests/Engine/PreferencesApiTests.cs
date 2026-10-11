@@ -11,7 +11,7 @@ public class PreferencesApiTests
         await using var factory = new EngineFactory();
         using var client = factory.CreateAuthorizedClient();
 
-        var preferences = await client.GetFromJsonAsync<UiPreferencesDto>("/api/preferences");
+        var preferences = await client.GetFromJsonAsync<UiPreferencesDto>("/api/preferences", factory.Json);
 
         await Assert.That(preferences).IsEqualTo(new UiPreferencesDto(ShowStreamStatistics: false, SnapToGrid: true));
     }
@@ -24,7 +24,8 @@ public class PreferencesApiTests
             ShowStreamStatistics: true,
             SnapToGrid: false,
             Language: "de",
-            ShowChannelsByDefault: true
+            ShowChannelsByDefault: true,
+            Theme: new UiThemeDto("HighContrast", UiColorMode.Dark)
         );
         try
         {
@@ -35,7 +36,7 @@ public class PreferencesApiTests
                 var changed = hub.NextAsync<UiPreferencesDto>("PreferencesChanged");
                 await hub.StartAsync();
 
-                (await client.PutAsJsonAsync("/api/preferences", updated)).EnsureSuccessStatusCode();
+                (await client.PutAsJsonAsync("/api/preferences", updated, factory.Json)).EnsureSuccessStatusCode();
 
                 await Assert.That(await changed).IsEqualTo(updated);
             }
@@ -45,7 +46,7 @@ public class PreferencesApiTests
                 using var client = factory.CreateAuthorizedClient();
 
                 await Assert
-                    .That(await client.GetFromJsonAsync<UiPreferencesDto>("/api/preferences"))
+                    .That(await client.GetFromJsonAsync<UiPreferencesDto>("/api/preferences", factory.Json))
                     .IsEqualTo(updated);
             }
         }

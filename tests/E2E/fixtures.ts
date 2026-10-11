@@ -23,6 +23,7 @@ const defaultPreferences: UiPreferencesDto = {
   snapToGrid: true,
   language: null,
   showChannelsByDefault: false,
+  theme: null,
 };
 
 /**
@@ -265,9 +266,11 @@ export class FakeShell {
     return new FakeShell(page);
   }
 
-  /** The messages the UI posted, except the state requests and the language preference, which the UI sends on its own. */
+  /** The messages the UI posted, except the state requests and the language and the theme's color mode, which the UI sends on its own. */
   async messages() {
-    return (await this.sent()).filter((message) => message.type !== "getState" && message.type !== "setLanguage");
+    return (await this.sent()).filter(
+      (message) => message.type !== "getState" && message.type !== "setLanguage" && message.type !== "setColorMode"
+    );
   }
 
   /** The language preferences the UI passed to the shell, in order. */
@@ -275,6 +278,13 @@ export class FakeShell {
     return (await this.sent())
       .filter((message) => message.type === "setLanguage")
       .map((message) => message.language as string | null);
+  }
+
+  /** The color modes of the theme preferences the UI passed to the shell, in order. */
+  async colorModes() {
+    return (await this.sent())
+      .filter((message) => message.type === "setColorMode")
+      .map((message) => message.colorMode as string | null);
   }
 
   /** Posts a message to the UI, as the shell does. */

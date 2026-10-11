@@ -1,4 +1,4 @@
-import { useGetPreferences } from "@micser/web-sdk";
+import { useGetPreferences, type UiColorMode } from "@micser/web-sdk";
 import { useEffect, useSyncExternalStore } from "react";
 
 /** A cable's channel layout; both sides of the cable use it. */
@@ -128,6 +128,11 @@ export class Shell {
     this.webView.postMessage({ type: "setLanguage", language });
   }
 
+  /** The theme preference's color mode, for the window's title bar and background; null follows the system. */
+  setColorMode(colorMode: UiColorMode | null) {
+    this.webView.postMessage({ type: "setColorMode", colorMode });
+  }
+
   /** Changes a cable's layout (cable 1 is the first); like the other driver changes, it restarts the cables. */
   setCableLayout(cable: number, layout: CableLayout) {
     this.webView.postMessage({ type: "setCableLayout", cable, layout });
@@ -183,6 +188,18 @@ export function useShellLanguage() {
       shell?.setLanguage(language);
     }
   }, [language]);
+}
+
+/** Passes the theme preference's color mode to the shell once it's loaded and whenever it changes. */
+export function useShellColorMode() {
+  const { data: preferences } = useGetPreferences();
+  const colorMode = preferences ? (preferences.theme?.colorMode ?? null) : undefined;
+
+  useEffect(() => {
+    if (colorMode !== undefined) {
+      shell?.setColorMode(colorMode);
+    }
+  }, [colorMode]);
 }
 
 /** The shell's state, or undefined in a browser or until the shell answered. */

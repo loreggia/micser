@@ -3123,6 +3123,13 @@
         },
         "description": "A connection between two modules of a subgraph template, by their template-local ids."
       },
+      "UiColorMode": {
+        "enum": [
+          "Light",
+          "Dark"
+        ],
+        "description": "Whether a theme is light or dark."
+      },
       "UiPreferencesDto": {
         "required": [
           "showStreamStatistics",
@@ -3152,9 +3159,38 @@
             "type": "boolean",
             "description": "Whether modules the UI adds show their channel connectors.",
             "default": false
+          },
+          "theme": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "The UI's color theme; null follows the system's light or dark mode.",
+                "$ref": "#/components/schemas/UiThemeDto"
+              }
+            ]
           }
         },
         "description": "Preferences of the web UI. Kept in the engine's configuration, because the UI's origin (the engine's random port) changes on every start,\r\nso browser storage wouldn't keep them."
+      },
+      "UiThemeDto": {
+        "required": [
+          "name",
+          "colorMode"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The theme's name, e.g. \"HighContrast\". The UI shows a theme it doesn't have in its plain light or dark theme."
+          },
+          "colorMode": {
+            "description": "Whether the theme is light or dark, for what isn't drawn by the UI, e.g. the shell's window.",
+            "$ref": "#/components/schemas/UiColorMode"
+          }
+        },
+        "description": "A color theme of the web UI."
       }
     }
   },

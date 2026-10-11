@@ -73,7 +73,11 @@ test("useEngineConnectionState follows the connection", async () => {
 });
 
 describe("usePreferences", () => {
-  const stored: UiPreferencesDto = { showStreamStatistics: false, snapToGrid: true, showChannelsByDefault: false };
+  const stored: UiPreferencesDto = {
+    showStreamStatistics: false,
+    snapToGrid: true,
+    showChannelsByDefault: false,
+  };
 
   test("has the defaults until the preferences are loaded", async () => {
     vi.stubGlobal("fetch", () => new Promise(() => {}));
@@ -85,6 +89,7 @@ describe("usePreferences", () => {
       snapToGrid: true,
       language: null,
       showChannelsByDefault: false,
+      theme: null,
     });
   });
 
@@ -112,7 +117,11 @@ describe("usePreferences", () => {
 });
 
 describe("useLanguagePreference", () => {
-  const stored: UiPreferencesDto = { showStreamStatistics: false, snapToGrid: true, showChannelsByDefault: false };
+  const stored: UiPreferencesDto = {
+    showStreamStatistics: false,
+    snapToGrid: true,
+    showChannelsByDefault: false,
+  };
   afterEach(() => i18n.changeLanguage("en"));
 
   test("shows the preferred language", async () => {

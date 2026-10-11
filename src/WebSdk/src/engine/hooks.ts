@@ -72,6 +72,7 @@ const defaultPreferences: UiPreferencesDto = {
   snapToGrid: true,
   language: null,
   showChannelsByDefault: false,
+  theme: null,
 };
 
 /**

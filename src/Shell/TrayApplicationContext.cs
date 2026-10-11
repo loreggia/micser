@@ -11,6 +11,7 @@ internal sealed class TrayApplicationContext : ApplicationContext
     private readonly Autostart _autostart;
     private readonly ToolStripMenuItem _autostartItem;
     private readonly ToolStripMenuItem _closeItem;
+    private readonly ShellColorMode _colorMode;
     private readonly DriverController? _driver;
     private readonly ToolStripMenuItem _exitItem;
     private readonly ShellLanguage _language;
@@ -33,6 +34,7 @@ internal sealed class TrayApplicationContext : ApplicationContext
         UpdateController? updates,
         DriverController? driver,
         ShellLanguage language,
+        ShellColorMode colorMode,
         EventWaitHandle activation
     )
     {
@@ -41,6 +43,7 @@ internal sealed class TrayApplicationContext : ApplicationContext
         _updates = updates;
         _driver = driver;
         _language = language;
+        _colorMode = colorMode;
         _uiContext =
             SynchronizationContext.Current ?? throw new InvalidOperationException("Create the tray on the UI thread.");
         _autostart = new Autostart(Application.ExecutablePath);
@@ -89,6 +92,11 @@ internal sealed class TrayApplicationContext : ApplicationContext
 
         ApplyTexts();
         _language.Changed += (_, _) => ApplyTexts();
+        _colorMode.Changed += (_, _) =>
+        {
+            Application.SetColorMode(_colorMode.ColorMode);
+            _mainForm?.ApplyColorMode();
+        };
         _supervisor.Changed += (_, _) => UpdateStatus();
         _supervisor.Start();
 
@@ -206,6 +214,7 @@ internal sealed class TrayApplicationContext : ApplicationContext
                 _updates,
                 _driver,
                 _language,
+                _colorMode,
                 _options.UiUrl,
                 WindowSettings.DefaultPath
             );
