@@ -64,6 +64,12 @@ if (args[0] == "latency")
 
 if (args[0] == "formats")
 {
+    if (!OperatingSystem.IsWindows())
+    {
+        Console.Error.WriteLine("\"formats\" probes WASAPI formats and runs on Windows only.");
+        return 1;
+    }
+
     var render = ResolveDevice(args.Length > 1 ? args[1] : "default", DeviceDirection.Output, outputs);
     var capture = ResolveDevice(args.Length > 2 ? args[2] : "default", DeviceDirection.Input, inputs);
     if (render == null || capture == null)

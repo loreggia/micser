@@ -77,7 +77,7 @@ public abstract record ModuleDto
     public Guid? TemplateModuleId { get; init; }
 
     /// <summary>
-    /// Follows the volume and mute of Windows' default output device (its volume slider and keys). The engine then sets
+    /// Follows the volume and mute of the system's default output device (its volume slider and keys). The engine then sets
     /// <see cref="Volume"/> and <see cref="IsMuted"/>, and the values sent with an update are ignored.
     /// </summary>
     public bool UseSystemVolume { get; init; }

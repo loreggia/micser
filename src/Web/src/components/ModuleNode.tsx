@@ -59,6 +59,7 @@ import { ModuleTitle } from "./ModuleTitle";
 import { resizeHandleStyle } from "./resizeHandle";
 import { portHandleId } from "./subgraphs";
 import { useHandlesChanged } from "./useHandlesChanged";
+import { positionToVolume, volumeToPosition } from "./volume";
 
 export type ModuleNodeData = {
   module: ModuleDto;
@@ -207,7 +208,7 @@ function useMinSize(card: RefObject<HTMLDivElement | null>, body: RefObject<HTML
 }
 
 /**
- * A module on the graph: name, mute, bypass, collapse and a menu (channels, reset size, delete), volume (or the Windows volume), the connectors, level
+ * A module on the graph: name, mute, bypass, collapse and a menu (channels, reset size, delete), volume (or the system volume), the connectors, level
  * meter and the module type's widget. Collapsed, it shows only the name, mute, bypass and the connectors, at the same height. While its
  * subgraph is muted or bypassed, the module's own switch shows that and is disabled.
  *
@@ -296,7 +297,7 @@ export function ModuleNode({ id, data, selected }: NodeProps<ModuleNodeType>) {
                 mutedBySubgraph
                   ? t("module.mutedBySubgraph")
                   : module.useSystemVolume
-                    ? t("module.mutedWithWindows")
+                    ? t("module.mutedWithSystem")
                     : module.isMuted
                       ? t("common.unmute")
                       : t("common.mute")
@@ -405,16 +406,16 @@ export function ModuleNode({ id, data, selected }: NodeProps<ModuleNodeType>) {
               size="small"
               min={0}
               max={100}
-              value={Math.round(module.volume * 100)}
+              value={volumeToPosition(module.volume)}
               aria-label={t("module.volume")}
               disabled={module.useSystemVolume}
-              onChange={(_, value) => update({ ...module, volume: value.value / 100 })}
+              onChange={(_, value) => update({ ...module, volume: positionToVolume(value.value) })}
             />
             <Caption1 className={styles.volumeValue}>
-              {formatNumber(Math.round(module.volume * 100) / 100, { style: "percent" })}
+              {formatNumber(volumeToPosition(module.volume) / 100, { style: "percent" })}
             </Caption1>
             <Tooltip
-              content={module.useSystemVolume ? t("module.followsWindowsVolume") : t("module.followWindowsVolume")}
+              content={module.useSystemVolume ? t("module.followsSystemVolume") : t("module.followSystemVolume")}
               relationship="label"
             >
               <ToggleButton

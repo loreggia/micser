@@ -12,6 +12,8 @@ dotnet test --solution Micser.slnx                      # TUnit on Microsoft.Tes
 dotnet test --project tests/Engine/Micser.Engine.Tests.csproj --treenode-filter "/*/*/HealthEndpointTests/*"
 # on Linux the solution builds, but only the portable test projects run (the shell's and DriverUtility's need Windows):
 dotnet test --project tests/Audio/Micser.Audio.Tests.csproj   # likewise tests/Engine/..., tests/Plugins/Main/...
+# the PipeWire backend tests start a private daemon with virtual devices; they need pipewire, wireplumber 0.4 and dbus-run-session
+dotnet test --project tests/Audio/Micser.Audio.Tests.csproj --treenode-filter "/*/*/PipeWireBackendTests/*"
 
 npm run setup                # root; installs all workspaces, runs the allowed install scripts and installs the pre-commit hook
 npm run allow-scripts:auto   # after dependency changes: adds new packages with install scripts to the allowlists (denied)
@@ -39,7 +41,7 @@ dotnet run --project src/Shell -- --ui http://localhost:5173   # tray + WebView2
 dotnet run --project tools/AudioHarness -- list                    # audio devices
 dotnet run --project tools/AudioHarness -- 1 2 --gain -100         # input 1 -> gain -> output 2, prints buffer stats
 dotnet run --project tools/AudioHarness -- latency 2               # round-trip latency of output 2 via loopback (plays -40 dB noise bursts)
-dotnet run --project tools/AudioHarness -- formats 2 1             # formats output 2 and input 1 accept, then -20 dB tones from 2 to 1, per channel too (run in the VM)
+dotnet run --project tools/AudioHarness -- formats 2 1             # formats output 2 and input 1 accept, then -20 dB tones from 2 to 1, per channel too (run in the VM; Windows only)
 ```
 
 ```sh
@@ -66,7 +68,7 @@ General:
 
 - Keep the folder layout and dependency direction in "Layout" of `docs/Architecture.md`: new projects go into `src/` (shipping), `tests/` (mirroring `src/`) or `tools/` (dev-only).
 - Nothing in `src/` compiles against a plugin, Main included (see "Plugins").
-- Audio, Engine, plugins and their tests target `net10.0` and run on Windows and Linux (see `docs/Linux.md`). Platform code is marked `[SupportedOSPlatform]` and called behind `OperatingSystem.Is*()` (CA1416 fails the build otherwise); device APIs go behind `IAudioBackend`. Only the shell, `DriverUtility` and `AudioHarness` target `net10.0-windows`.
+- Audio, Engine, plugins and their tests target `net10.0` and run on Windows and Linux (see `docs/Linux.md`). Platform code is marked `[SupportedOSPlatform]` and called behind `OperatingSystem.Is*()` (CA1416 fails the build otherwise); device APIs go behind `IAudioBackend`. Only the shell and `DriverUtility` target `net10.0-windows`.
 - Package versions are central in `Directory.Packages.props`, so `PackageReference` items carry no `Version`. `TreatWarningsAsErrors` is on for all projects.
 - Stick to the libraries in "Overview": no Newtonsoft, EF Core, Prism/Unity, xUnit or Moq.
 - npm runs no install scripts; after dependency changes, run `npm run allow-scripts:auto` (CI fails if it changes an allowlist). See "Development" for the npm setup.
@@ -86,7 +88,8 @@ Audio (`src/Audio`, see "Audio engine"):
 
 - `Process` methods run on the audio thread. Don't allocate, lock (except the existing per-block locks) or log there on the normal path.
 - Module parameters are plain properties written from other threads. A parameter set that must change atomically is replaced as a whole (see `EqualizerModule.Bands`).
-- Nothing in `tests/` opens real devices.
+- Nothing in `tests/` opens real devices. The PipeWire tests use `PipeWireTestDaemon`'s virtual devices, never the session's PipeWire.
+- PipeWire callbacks (`[UnmanagedCallersOnly]`) must not let exceptions out, and calls into PipeWire outside them hold the backend's loop lock (`PipeWireBackend.Lock`). Struct layouts and constants in `PipeWireNative` follow the 1.0 headers (`libpipewire-0.3-dev`); check changes against them.
 
 Engine (`src/Engine`, see "Engine"):
 

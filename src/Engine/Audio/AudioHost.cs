@@ -1661,6 +1661,7 @@ public sealed class AudioHost : IDisposable
                 }
             }
 
+            _logger.LogDebug("System volume {Level} applied to {Count} modules.", _systemVolume.Level, changed.Count);
             if (changed.Count > 0)
             {
                 Persist();

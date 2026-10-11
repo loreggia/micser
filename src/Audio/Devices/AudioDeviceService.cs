@@ -1,12 +1,13 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Micser.Audio.Devices.PipeWire;
 using Micser.Audio.Devices.Wasapi;
 
 namespace Micser.Audio.Devices;
 
 /// <summary>
-/// Enumerates audio endpoints, reports changes and opens streams on them, through the platform's audio backend (WASAPI on Windows; none
-/// elsewhere yet, so there are no devices).
+/// Enumerates audio endpoints, reports changes and opens streams on them, through the platform's audio backend: WASAPI on Windows,
+/// PipeWire on Linux, none (no devices) elsewhere or when PipeWire isn't available.
 /// </summary>
 public sealed class AudioDeviceService : IDisposable
 {
@@ -19,12 +20,27 @@ public sealed class AudioDeviceService : IDisposable
         {
             Backend = new WasapiBackend(_logger);
         }
+        else if (OperatingSystem.IsLinux() && PipeWireBackend.TryCreate(_logger) is { } pipeWire)
+        {
+            Backend = pipeWire;
+        }
         else
         {
-            _logger.LogWarning("There is no audio backend for this platform yet; no audio devices are available.");
+            _logger.LogWarning("There is no audio backend; no audio devices are available.");
             Backend = new NullAudioBackend();
         }
 
+        Backend.DeviceChanged += OnDeviceChanged;
+        Backend.SystemResumed += OnSystemResumed;
+    }
+
+    /// <summary>
+    /// Uses <paramref name="backend"/>, which it disposes, e.g. one connected to a test instance of PipeWire.
+    /// </summary>
+    internal AudioDeviceService(IAudioBackend backend, ILogger<AudioDeviceService>? logger = null)
+    {
+        _logger = logger ?? NullLogger<AudioDeviceService>.Instance;
+        Backend = backend;
         Backend.DeviceChanged += OnDeviceChanged;
         Backend.SystemResumed += OnSystemResumed;
     }
