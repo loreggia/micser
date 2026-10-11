@@ -8,7 +8,7 @@ Collect changes under "Unreleased". Before tagging vX.Y.Z, rename that heading t
 from that section, and the release workflow fails without it.
 -->
 
-## Unreleased
+## 0.15.0 - 2026-10-11
 
 - The configuration can be exported to a file and imported again, e.g. as a backup or to move it to another computer: "Configuration" in
   the settings. The file has the modules, connections, subgraphs, your templates, the audio settings and the display preferences, and
