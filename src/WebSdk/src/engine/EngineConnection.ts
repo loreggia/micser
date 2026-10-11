@@ -51,7 +51,7 @@ const updateDelay = 80;
 
 /**
  * Updates of one kind of engine resource: applied to the cache right away and sent to the engine debounced, the last value
- * winning. The engine's answer to the last update is applied when it arrives.
+ * winning. The engine's answer to the last update is applied when it arrives; until then, fetches don't replace them.
  */
 class PendingUpdates<T extends { id: string }> {
   private readonly onFailed: (error: unknown) => void;
@@ -71,6 +71,13 @@ class PendingUpdates<T extends { id: string }> {
 
   has(id: string) {
     return this.pending.has(id);
+  }
+
+  /** Shows the pending values in the cache again, e.g. after a fetch that read the engine's state before they were sent. */
+  reapply() {
+    for (const { value } of this.pending.values()) {
+      this.setInCache(value);
+    }
   }
 
   update(value: T) {
@@ -154,6 +161,14 @@ export class EngineConnection {
       })
       .configureLogging(LogLevel.Warning)
       .build();
+
+    // a fetch, e.g. the one after connecting, may have read the engine's state before local updates were sent
+    queryClient.getQueryCache().subscribe((event) => {
+      if (event.type === "updated" && event.action.type === "success" && !event.action.manual) {
+        this.moduleUpdates.reapply();
+        this.subgraphUpdates.reapply();
+      }
+    });
 
     this.hub.on("ModuleChanged", (module: ModuleDto) => this.onModuleChanged(module));
     this.hub.on("ModuleRemoved", (moduleId: string) => this.onModuleRemoved(moduleId));

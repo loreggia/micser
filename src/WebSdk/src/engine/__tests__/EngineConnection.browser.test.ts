@@ -1,5 +1,5 @@
 import { HubConnectionState } from "@microsoft/signalr";
-import type { QueryClient } from "@tanstack/react-query";
+import { QueryObserver, type QueryClient } from "@tanstack/react-query";
 import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 import { createTestQueryClient, testModule } from "../../../testing";
 import {
@@ -183,6 +183,30 @@ describe("module updates", () => {
     expect(cachedGain()).toBe(2);
     expect(send).toHaveBeenCalledTimes(2);
     expect(send).toHaveBeenLastCalledWith(original.id, withGain(2));
+  });
+
+  test("aren't replaced by a fetch that read the engine's state before they were sent", async () => {
+    const observer = new QueryObserver(queryClient, {
+      queryKey: getGetModulesQueryKey(),
+      // the engine before the update; a fetch in progress is started again on a cache change
+      queryFn: () => new Promise<ModuleDto[]>((resolve) => setTimeout(() => resolve([original]), 10)),
+    });
+    const unsubscribe = observer.subscribe(() => {});
+    void observer.refetch();
+
+    connection.updateModule(withGain(3));
+    await vi.advanceTimersByTimeAsync(10);
+
+    expect(queryClient.isFetching()).toBe(0);
+    expect(cachedGain()).toBe(3);
+    expect(observer.getCurrentResult().data?.[0]).toEqual(withGain(3));
+
+    // after the engine's answer, fetches apply again
+    await vi.advanceTimersByTimeAsync(70);
+    void observer.refetch();
+    await vi.advanceTimersByTimeAsync(10);
+    expect(cachedGain()).toBe(0);
+    unsubscribe();
   });
 
   test("report a failure and reload the modules", async () => {
