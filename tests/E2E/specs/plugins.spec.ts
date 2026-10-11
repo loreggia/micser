@@ -20,7 +20,7 @@ test("installs a plugin package, which loads with its widget after a restart", a
   await graph.open();
   let dialog = await openSettings(graph);
 
-  await dialog.locator("input[type=file]").setInputFiles(packagePath());
+  await dialog.locator('input[type="file"][accept=".zip"]').setInputFiles(packagePath());
 
   await expect(pluginRow(dialog, "Test plugin")).toContainText("Installed when the engine restarts");
   // without the shell, the engine is restarted by hand
@@ -62,7 +62,7 @@ test("in the shell, the settings offer to restart the engine to apply plugin cha
   await graph.open();
   const dialog = await openSettings(graph);
 
-  await dialog.locator("input[type=file]").setInputFiles(packagePath());
+  await dialog.locator('input[type="file"][accept=".zip"]').setInputFiles(packagePath());
   await expect(pluginRow(dialog, "Test plugin")).toContainText("Installed when the engine restarts");
   await dialog.getByRole("button", { name: "Restart engine to apply" }).click();
 
@@ -74,7 +74,7 @@ test("a file that isn't a plugin package is rejected", async ({ graph, engine })
   await graph.open();
   const dialog = await openSettings(graph);
 
-  await dialog.locator("input[type=file]").setInputFiles({
+  await dialog.locator('input[type="file"][accept=".zip"]').setInputFiles({
     name: "plugin.zip",
     mimeType: "application/zip",
     buffer: Buffer.from("not a zip"),
