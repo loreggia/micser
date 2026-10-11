@@ -60,3 +60,40 @@ test("lists the loaded plugins", async ({ graph }) => {
   // a built-in plugin can't be removed
   await expect(dialog.getByRole("button", { name: "Remove Main" })).toHaveCount(0);
 });
+
+test("exports the configuration and imports it again", async ({ graph, engine }) => {
+  const module = await engine.addModule("Gain", { x: 0, y: 0 }, { name: "Exported" });
+  const dialog = await openSettings(graph);
+
+  const downloading = graph.page.waitForEvent("download");
+  await dialog.getByRole("button", { name: "Export…" }).click();
+  const download = await downloading;
+  expect(download.suggestedFilename()).toMatch(/^micser-config-\d{4}-\d{2}-\d{2}\.json$/);
+  const file = await download.path();
+
+  await engine.deleteModule(module.id);
+  await engine.addModule("Gain", { x: 200, y: 0 }, { name: "Replaced" });
+  await dialog.locator('input[type="file"][accept*="json"]').setInputFiles(file);
+  await expect(dialog.getByText(/Replace the current configuration with/)).toBeVisible();
+  await dialog.getByRole("button", { name: "Replace", exact: true }).click();
+
+  await expect(dialog).toBeHidden();
+  await expect.poll(async () => (await engine.modules()).map((m) => [m.id, m.name])).toEqual([[module.id, "Exported"]]);
+  await expect(graph.node(module.id)).toBeVisible();
+  await expect(graph.page.getByText("Replaced")).toHaveCount(0);
+});
+
+test("rejects importing a file that isn't a configuration", async ({ graph, engine }) => {
+  const module = await engine.addModule("Gain", { x: 0, y: 0 });
+  const dialog = await openSettings(graph);
+
+  await dialog.locator('input[type="file"][accept*="json"]').setInputFiles({
+    name: "other.json",
+    mimeType: "application/json",
+    buffer: Buffer.from('{ "version": 99 }'),
+  });
+  await dialog.getByRole("button", { name: "Replace", exact: true }).click();
+
+  await expect(graph.page.getByText("Importing the configuration failed", { exact: true })).toBeVisible();
+  expect((await engine.modules()).map((m) => m.id)).toEqual([module.id]);
+});

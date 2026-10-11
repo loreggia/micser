@@ -1,7 +1,9 @@
+using System.Text.Json;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Micser.Audio.Devices;
 using Micser.Engine.Audio;
+using Micser.Engine.Configuration;
 using Micser.Engine.Contracts;
 using Micser.Engine.Plugins;
 
@@ -12,6 +14,11 @@ public sealed record HealthResponse(string Status);
 public static class ApiEndpoints
 {
     /// <summary>
+    /// The largest configuration file the API accepts.
+    /// </summary>
+    public const long MaxConfigurationUploadBytes = 20L * 1024 * 1024;
+
+    /// <summary>
     /// The largest plugin package the API accepts.
     /// </summary>
     public const long MaxPluginUploadBytes = 100L * 1024 * 1024;
@@ -20,6 +27,7 @@ public static class ApiEndpoints
     {
         var api = app.MapGroup("/api").AddEndpointFilter(HandleEngineRequestException);
 
+        MapConfiguration(api);
         MapHealth(api);
         MapModuleTypes(api);
         MapModules(api);
@@ -52,6 +60,60 @@ public static class ApiEndpoints
         {
             return TypedResults.Problem(ex.Message, statusCode: ex.StatusCode);
         }
+    }
+
+    private static void MapConfiguration(RouteGroupBuilder api)
+    {
+        var configuration = api.MapGroup("/configuration").WithTags("Configuration");
+
+        configuration
+            .MapGet(
+                "",
+                (AudioHost host, EngineConfigStore store) =>
+                    TypedResults.Bytes(store.Serialize(host.GetConfiguration()), "application/json")
+            )
+            .WithName("ExportConfiguration")
+            .WithDescription(
+                "The configuration as the engine saves it: modules, connections, subgraphs, the user's templates, settings and preferences."
+            )
+            .Produces<JsonElement>(StatusCodes.Status200OK, "application/json");
+
+        // the token protects the API, so there's no antiforgery token for the upload
+        configuration
+            .MapPut(
+                "",
+                async Task<Results<Ok<EngineStatusDto>, ValidationProblem>> (
+                    IFormFile file,
+                    AudioHost host,
+                    EngineConfigStore store
+                ) =>
+                {
+                    EngineConfiguration imported;
+                    try
+                    {
+                        await using var stream = new MemoryStream();
+                        await file.CopyToAsync(stream);
+                        stream.Position = 0;
+                        imported = store.Deserialize(stream);
+                    }
+                    catch (JsonException ex)
+                    {
+                        return TypedResults.ValidationProblem(
+                            new Dictionary<string, string[]> { ["file"] = [ex.Message] },
+                            "The file isn't a Micser configuration."
+                        );
+                    }
+
+                    return TypedResults.Ok(host.ImportConfiguration(imported));
+                }
+            )
+            .WithName("ImportConfiguration")
+            .WithDescription(
+                "Replaces the configuration with an exported one, after backing up the current one next to the configuration file. "
+                    + "Invalid entries are skipped."
+            )
+            .DisableAntiforgery()
+            .WithMetadata(new RequestSizeLimitAttribute(MaxConfigurationUploadBytes));
     }
 
     private static void MapConnections(RouteGroupBuilder api)

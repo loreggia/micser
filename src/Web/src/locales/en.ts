@@ -67,6 +67,18 @@ export const en = {
     loading: "Loading the release notes…",
     none: "There are no release notes for this version.",
   },
+  configuration: {
+    title: "Configuration",
+    description:
+      "Export saves the modules, connections, subgraphs, your templates, the audio settings and the display preferences to a file. Importing one replaces all of them; the current configuration is backed up next to it.",
+    export: "Export…",
+    import: "Import…",
+    confirmImport: "Replace the current configuration with {{file}}?",
+    replace: "Replace",
+    importing: "Importing…",
+    exportFailed: "Exporting the configuration failed",
+    importFailed: "Importing the configuration failed",
+  },
   plugins: {
     title: "Plugins",
     builtIn: "built in",

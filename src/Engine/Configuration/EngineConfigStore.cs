@@ -117,6 +117,58 @@ public sealed class EngineConfigStore : IDisposable
     }
 
     /// <summary>
+    /// Copies the configuration file, with pending changes written first, to <c>config.json.&lt;timestamp&gt;.bak</c>.
+    /// </summary>
+    public void Backup()
+    {
+        Flush();
+        lock (_writeLock)
+        {
+            if (File.Exists(_path))
+            {
+                File.Copy(_path, $"{_path}.{DateTime.Now:yyyyMMdd-HHmmss}.bak", overwrite: true);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Reads a configuration in the file's format, e.g. an exported one.
+    /// Modules of unknown types are kept as <see cref="EngineConfiguration.UnavailableModules"/>; invalid entries are skipped.
+    /// </summary>
+    /// <exception cref="JsonException">It isn't a configuration of the current version.</exception>
+    public EngineConfiguration Deserialize(Stream stream)
+    {
+        ConfigurationFile file;
+        try
+        {
+            file =
+                JsonSerializer.Deserialize<ConfigurationFile>(stream, _json)
+                ?? throw new JsonException("The file is empty.");
+        }
+        catch (NotSupportedException ex)
+        {
+            throw new JsonException(ex.Message, ex);
+        }
+
+        if (file.Version != EngineConfiguration.CurrentVersion)
+        {
+            throw new JsonException($"Unsupported version {file.Version}.");
+        }
+
+        var (modules, unavailableModules) = ReadModules(file.Modules);
+        return new EngineConfiguration
+        {
+            Settings = file.Settings ?? new EngineSettingsDto(),
+            Preferences = file.Preferences ?? new UiPreferencesDto(),
+            Modules = modules,
+            Subgraphs = file.Subgraphs ?? [],
+            Templates = ReadTemplates(file.Templates ?? []),
+            UnavailableModules = unavailableModules,
+            Connections = file.Connections ?? [],
+        };
+    }
+
+    /// <summary>
     /// Reads the configuration. A missing file yields an empty configuration; an unreadable one is backed up first.
     /// Modules of unknown types are kept as <see cref="EngineConfiguration.UnavailableModules"/>; invalid entries are skipped.
     /// </summary>
@@ -131,27 +183,9 @@ public sealed class EngineConfigStore : IDisposable
         try
         {
             using var stream = File.OpenRead(_path);
-            var file =
-                JsonSerializer.Deserialize<ConfigurationFile>(stream, _json)
-                ?? throw new JsonException("The file is empty.");
-            if (file.Version != EngineConfiguration.CurrentVersion)
-            {
-                throw new JsonException($"Unsupported version {file.Version}.");
-            }
-
-            var (modules, unavailableModules) = ReadModules(file.Modules);
-            return new EngineConfiguration
-            {
-                Settings = file.Settings ?? new EngineSettingsDto(),
-                Preferences = file.Preferences ?? new UiPreferencesDto(),
-                Modules = modules,
-                Subgraphs = file.Subgraphs ?? [],
-                Templates = ReadTemplates(file.Templates ?? []),
-                UnavailableModules = unavailableModules,
-                Connections = file.Connections ?? [],
-            };
+            return Deserialize(stream);
         }
-        catch (Exception ex) when (ex is JsonException or IOException or NotSupportedException)
+        catch (Exception ex) when (ex is JsonException or IOException)
         {
             var backup = $"{_path}.{DateTime.Now:yyyyMMdd-HHmmss}.bak";
             _logger.LogError(
@@ -177,6 +211,14 @@ public sealed class EngineConfigStore : IDisposable
             JsonSerializer.Deserialize<List<TemplateFile>>(stream, _json)
                 ?? throw new JsonException("The file is empty.")
         );
+    }
+
+    /// <summary>
+    /// Writes a configuration in the file's format, e.g. for an export.
+    /// </summary>
+    public byte[] Serialize(EngineConfiguration configuration)
+    {
+        return JsonSerializer.SerializeToUtf8Bytes(ToFile(configuration), _json);
     }
 
     /// <summary>
@@ -286,38 +328,41 @@ public sealed class EngineConfigStore : IDisposable
             : null;
     }
 
+    private ConfigurationFile ToFile(EngineConfiguration configuration)
+    {
+        return new ConfigurationFile
+        {
+            Connections = configuration.Connections,
+            Modules = SerializeModules(configuration.Modules, configuration.UnavailableModules),
+            Preferences = configuration.Preferences,
+            Settings = configuration.Settings,
+            Subgraphs = configuration.Subgraphs,
+            Templates =
+            [
+                .. configuration.Templates.Select(t => new TemplateFile
+                {
+                    Id = t.Id,
+                    Name = t.Name,
+                    Revision = t.Revision,
+                    Color = t.Color,
+                    Size = t.Size,
+                    Modules = SerializeModules(t.Modules, t.UnavailableModules),
+                    Connections = [.. t.Connections],
+                }),
+            ],
+            Version = configuration.Version,
+        };
+    }
+
     private void Write(EngineConfiguration configuration)
     {
         try
         {
             Directory.CreateDirectory(System.IO.Path.GetDirectoryName(_path)!);
             var temporary = _path + ".tmp";
-            var file = new ConfigurationFile
-            {
-                Connections = configuration.Connections,
-                Modules = SerializeModules(configuration.Modules, configuration.UnavailableModules),
-                Preferences = configuration.Preferences,
-                Settings = configuration.Settings,
-                Subgraphs = configuration.Subgraphs,
-                Templates =
-                [
-                    .. configuration.Templates.Select(t => new TemplateFile
-                    {
-                        Id = t.Id,
-                        Name = t.Name,
-                        Revision = t.Revision,
-                        Color = t.Color,
-                        Size = t.Size,
-                        Modules = SerializeModules(t.Modules, t.UnavailableModules),
-                        Connections = [.. t.Connections],
-                    }),
-                ],
-                Version = configuration.Version,
-            };
-
             using (var stream = File.Create(temporary))
             {
-                JsonSerializer.Serialize(stream, file, _json);
+                JsonSerializer.Serialize(stream, ToFile(configuration), _json);
             }
 
             File.Move(temporary, _path, overwrite: true);

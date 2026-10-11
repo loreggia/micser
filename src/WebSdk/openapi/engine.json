@@ -5,6 +5,74 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/api/configuration": {
+      "get": {
+        "tags": [
+          "Configuration"
+        ],
+        "description": "The configuration as the engine saves it: modules, connections, subgraphs, the user's templates, settings and preferences.",
+        "operationId": "ExportConfiguration",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JsonElement"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Configuration"
+        ],
+        "description": "Replaces the configuration with an exported one, after backing up the current one next to the configuration file. Invalid entries are skipped.",
+        "operationId": "ImportConfiguration",
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "required": [
+                  "file"
+                ],
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "$ref": "#/components/schemas/IFormFile"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EngineStatusDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/health": {
       "get": {
         "tags": [
@@ -1440,6 +1508,54 @@
           }
         }
       },
+      "HttpValidationProblemDetails": {
+        "required": [
+          "errors"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "title": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "detail": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "instance": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
       "IFormFile": {
         "type": "string",
         "format": "binary"
@@ -1456,6 +1572,7 @@
           }
         }
       },
+      "JsonElement": { },
       "LoopbackInputState": {
         "required": [
           "deviceId",
@@ -3042,6 +3159,9 @@
     }
   },
   "tags": [
+    {
+      "name": "Configuration"
+    },
     {
       "name": "Engine"
     },
