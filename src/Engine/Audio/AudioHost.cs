@@ -376,6 +376,88 @@ public sealed class AudioHost : IDisposable
     }
 
     /// <summary>
+    /// The configuration as it's saved, for an export.
+    /// </summary>
+    public EngineConfiguration GetConfiguration()
+    {
+        lock (_lock)
+        {
+            return CreateConfiguration();
+        }
+    }
+
+    /// <summary>
+    /// Replaces the graph, subgraphs, user templates, settings and preferences with an imported configuration, after backing up the current
+    /// one. Invalid entries are skipped as at startup. Clients get the removals of the current entries and then the imported ones.
+    /// </summary>
+    public EngineStatusDto ImportConfiguration(EngineConfiguration configuration)
+    {
+        lock (_lock)
+        {
+            _store.Backup();
+            _logger.LogInformation("Importing a configuration.");
+
+            Guid[] connectionIds = [.. _connections.Keys];
+            Guid[] moduleIds = [.. _modules.Keys];
+            Guid[] subgraphIds = [.. _subgraphs.Keys];
+            var wasRunning = Engine.IsRunning;
+
+            TearDown();
+            _subgraphs.Clear();
+            foreach (var template in _templates.Values.Where(t => !t.IsBuiltIn).ToArray())
+            {
+                _templates.Remove(template.Id);
+            }
+
+            _unavailableModules.Clear();
+            _unavailableConnections.Clear();
+            Load(configuration);
+            if (wasRunning)
+            {
+                Engine.Start();
+            }
+
+            Persist();
+
+            foreach (var id in connectionIds)
+            {
+                _notifier.ConnectionRemoved(id);
+            }
+
+            foreach (var id in moduleIds)
+            {
+                _notifier.ModuleRemoved(id);
+            }
+
+            foreach (var id in subgraphIds)
+            {
+                _notifier.SubgraphRemoved(id);
+            }
+
+            foreach (var subgraph in _subgraphs.Values)
+            {
+                _notifier.SubgraphChanged(subgraph);
+            }
+
+            foreach (var entry in _modules.Values)
+            {
+                _notifier.ModuleChanged(ToDto(entry));
+            }
+
+            foreach (var connection in _connections.Values)
+            {
+                _notifier.ConnectionAdded(connection.Dto);
+            }
+
+            _notifier.TemplatesChanged([.. _templates.Values.Select(ToDto)]);
+            _notifier.PreferencesChanged(_preferences);
+            var status = CreateStatus();
+            _notifier.StatusChanged(status);
+            return status;
+        }
+    }
+
+    /// <summary>
     /// Loads the configuration, builds the graph and starts processing.
     /// </summary>
     public void Initialize()
@@ -384,56 +466,12 @@ public sealed class AudioHost : IDisposable
 
         lock (_lock)
         {
-            var settingsErrors = StateValidator.Validate(configuration.Settings);
-            if (settingsErrors.Count > 0)
-            {
-                _logger.LogWarning("Invalid engine settings in the configuration; using the defaults.");
-            }
-
-            _settings = settingsErrors.Count == 0 ? configuration.Settings : new EngineSettingsDto();
-            _preferences = configuration.Preferences;
             if (_options.LoadPluginTemplates)
             {
                 LoadPluginTemplates();
             }
 
-            foreach (var template in configuration.Templates)
-            {
-                if (
-                    string.IsNullOrWhiteSpace(template.Name)
-                    || !_templates.TryAdd(template.Id, template with { IsBuiltIn = false })
-                )
-                {
-                    _logger.LogWarning("Skipping invalid subgraph template {Id}.", template.Id);
-                }
-            }
-
-            var renamedTemplates = RenameTemplatesNamedLikeBuiltIns();
-
-            foreach (var subgraph in configuration.Subgraphs)
-            {
-                // a missing template's reference is kept: it may be a built-in one whose plugin isn't loaded (removing a template clears them)
-                var errors = StateValidator.Validate(subgraph);
-                if (errors.Count > 0 || !_subgraphs.TryAdd(subgraph.Id, subgraph))
-                {
-                    _logger.LogWarning("Skipping invalid subgraph {Id}: {Errors}", subgraph.Id, errors);
-                }
-            }
-
-            // modules whose plugin isn't loaded and their connections stay in the configuration only
-            var unavailableIds = configuration.UnavailableModules.Select(m => m.Id).ToHashSet();
-            _unavailableModules.AddRange(configuration.UnavailableModules);
-            _unavailableConnections.AddRange(
-                configuration.Connections.Where(c =>
-                    unavailableIds.Contains(c.SourceModuleId) || unavailableIds.Contains(c.TargetModuleId)
-                )
-            );
-
-            var modules = configuration.Modules.Select(m =>
-                m.SubgraphId is { } id && !_subgraphs.ContainsKey(id) ? m with { SubgraphId = null } : m
-            );
-            Build(modules, configuration.Connections.Except(_unavailableConnections));
-            if (renamedTemplates)
+            if (Load(configuration))
             {
                 Persist();
             }
@@ -1331,6 +1369,20 @@ public sealed class AudioHost : IDisposable
         return created;
     }
 
+    private EngineConfiguration CreateConfiguration()
+    {
+        return new EngineConfiguration
+        {
+            Settings = _settings,
+            Preferences = _preferences,
+            Modules = [.. _modules.Values.Select(ToDto)],
+            Subgraphs = [.. _subgraphs.Values],
+            Templates = [.. _templates.Values.Where(t => !t.IsBuiltIn)],
+            UnavailableModules = [.. _unavailableModules],
+            Connections = [.. _connections.Values.Select(c => c.Dto), .. _unavailableConnections],
+        };
+    }
+
     private EngineStatusDto CreateStatus()
     {
         var statistics = Engine.Statistics;
@@ -1471,6 +1523,60 @@ public sealed class AudioHost : IDisposable
     }
 
     /// <summary>
+    /// Takes the settings, preferences, user templates, subgraphs and modules of a configuration, skipping invalid ones, and builds the graph.
+    /// Expects an empty graph and no user templates. Call while holding the lock.
+    /// </summary>
+    /// <returns>Whether templates were renamed, so the configuration needs saving.</returns>
+    private bool Load(EngineConfiguration configuration)
+    {
+        var settingsErrors = StateValidator.Validate(configuration.Settings);
+        if (settingsErrors.Count > 0)
+        {
+            _logger.LogWarning("Invalid engine settings in the configuration; using the defaults.");
+        }
+
+        _settings = settingsErrors.Count == 0 ? configuration.Settings : new EngineSettingsDto();
+        _preferences = configuration.Preferences;
+        foreach (var template in configuration.Templates)
+        {
+            if (
+                string.IsNullOrWhiteSpace(template.Name)
+                || !_templates.TryAdd(template.Id, template with { IsBuiltIn = false })
+            )
+            {
+                _logger.LogWarning("Skipping invalid subgraph template {Id}.", template.Id);
+            }
+        }
+
+        var renamedTemplates = RenameTemplatesNamedLikeBuiltIns();
+
+        foreach (var subgraph in configuration.Subgraphs)
+        {
+            // a missing template's reference is kept: it may be a built-in one whose plugin isn't loaded (removing a template clears them)
+            var errors = StateValidator.Validate(subgraph);
+            if (errors.Count > 0 || !_subgraphs.TryAdd(subgraph.Id, subgraph))
+            {
+                _logger.LogWarning("Skipping invalid subgraph {Id}: {Errors}", subgraph.Id, errors);
+            }
+        }
+
+        // modules whose plugin isn't loaded and their connections stay in the configuration only
+        var unavailableIds = configuration.UnavailableModules.Select(m => m.Id).ToHashSet();
+        _unavailableModules.AddRange(configuration.UnavailableModules);
+        _unavailableConnections.AddRange(
+            configuration.Connections.Where(c =>
+                unavailableIds.Contains(c.SourceModuleId) || unavailableIds.Contains(c.TargetModuleId)
+            )
+        );
+
+        var modules = configuration.Modules.Select(m =>
+            m.SubgraphId is { } id && !_subgraphs.ContainsKey(id) ? m with { SubgraphId = null } : m
+        );
+        Build(modules, configuration.Connections.Except(_unavailableConnections));
+        return renamedTemplates;
+    }
+
+    /// <summary>
     /// Adds the loaded plugins' templates as built-in ones. An invalid one, or one whose id or name another plugin's template has, is skipped.
     /// </summary>
     private void LoadPluginTemplates()
@@ -1568,18 +1674,7 @@ public sealed class AudioHost : IDisposable
 
     private void Persist()
     {
-        _store.Save(
-            new EngineConfiguration
-            {
-                Settings = _settings,
-                Preferences = _preferences,
-                Modules = [.. _modules.Values.Select(ToDto)],
-                Subgraphs = [.. _subgraphs.Values],
-                Templates = [.. _templates.Values.Where(t => !t.IsBuiltIn)],
-                UnavailableModules = [.. _unavailableModules],
-                Connections = [.. _connections.Values.Select(c => c.Dto), .. _unavailableConnections],
-            }
-        );
+        _store.Save(CreateConfiguration());
     }
 
     /// <summary>

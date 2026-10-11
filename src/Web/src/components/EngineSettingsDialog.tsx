@@ -31,6 +31,7 @@ import { useState } from "react";
 import { useTranslation } from "../i18n";
 import { useNotifyError } from "../notifications";
 import { shell, useShellState, type UpdateCheckResult } from "../shell";
+import { ConfigurationSettings } from "./ConfigurationSettings";
 import { PluginsSettings } from "./PluginsSettings";
 import { ReleaseNotesDialog } from "./ReleaseNotesDialog";
 import { VirtualCablesSettings } from "./VirtualCablesSettings";
@@ -66,8 +67,8 @@ const systemLanguage = "system";
 
 /**
  * Audio settings (applied with Apply, which rebuilds the graph) and restarts, display preferences and the language (applied right away),
- * plugins (applied when the engine restarts), and, when running in the desktop shell, the version, updates and virtual
- * audio cables.
+ * configuration export and import, plugins (applied when the engine restarts), and, when running in the desktop shell, the version, updates
+ * and virtual audio cables.
  */
 export function EngineSettingsDialog({ open, settings, onClose }: EngineSettingsDialogProps) {
   const styles = useStyles();
@@ -195,6 +196,8 @@ export function EngineSettingsDialog({ open, settings, onClose }: EngineSettings
               checked={preferences.showChannelsByDefault}
               onChange={(_, data) => setPreferences({ showChannelsByDefault: data.checked })}
             />
+            <Divider />
+            <ConfigurationSettings onImported={onClose} />
             <Divider />
             <PluginsSettings />
             {shellState?.canUpdate && (

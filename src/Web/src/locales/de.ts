@@ -70,6 +70,18 @@ export const de: Translations<typeof en> = {
     loading: "Versionshinweise werden geladen…",
     none: "Für diese Version gibt es keine Versionshinweise.",
   },
+  configuration: {
+    title: "Konfiguration",
+    description:
+      "Der Export speichert die Module, Verbindungen, Subgraphen, deine Vorlagen, die Audioeinstellungen und die Anzeigeeinstellungen in einer Datei. Ein Import ersetzt sie alle; die aktuelle Konfiguration wird daneben gesichert.",
+    export: "Exportieren…",
+    import: "Importieren…",
+    confirmImport: "Die aktuelle Konfiguration durch {{file}} ersetzen?",
+    replace: "Ersetzen",
+    importing: "Wird importiert…",
+    exportFailed: "Die Konfiguration konnte nicht exportiert werden",
+    importFailed: "Die Konfiguration konnte nicht importiert werden",
+  },
   plugins: {
     title: "Plugins",
     builtIn: "integriert",
