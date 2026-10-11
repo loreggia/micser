@@ -52,7 +52,7 @@ export interface ModuleDtoLoopbackInputModule {
      */
   templateModuleId?: string | null;
   /**
-     * Follows the volume and mute of Windows' default output device (its volume slider and keys). The engine then sets
+     * Follows the volume and mute of the system's default output device (its volume slider and keys). The engine then sets
      * float ModuleDto.Volume and bool ModuleDto.IsMuted, and the values sent with an update are ignored.
      */
   useSystemVolume: boolean;

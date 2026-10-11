@@ -1,6 +1,6 @@
 # Architecture
 
-Micser routes audio on Windows through a graph of modules (devices, effects, analyzers) that the user wires up in a web UI. The engine and the UI also run on Linux, without audio devices so far; [Linux.md](Linux.md) has the plan for the rest.
+Micser routes audio on Windows through a graph of modules (devices, effects, analyzers) that the user wires up in a web UI. The engine and the UI also run on Linux, with PipeWire for audio; [Linux.md](Linux.md) has the plan for the rest (virtual cables, shell, packaging).
 
 ## Overview
 
@@ -12,7 +12,7 @@ Micser routes audio on Windows through a graph of modules (devices, effects, ana
 - **Packaging**: Velopack, a per-user install without admin rights, with delta updates from GitHub releases.
 - **VAC driver** (`src/Vac`): optional virtual audio cables (PortCls WaveRT), installed machine-wide by `DriverUtility`.
 
-Stack: .NET 10 (`LangVersion latest`, nullable, central package management), `Microsoft.Extensions.Hosting` with the built-in DI, `System.Text.Json`, Serilog behind `Microsoft.Extensions.Logging`, NAudio (WASAPI) for audio I/O on Windows. Audio, Engine and plugins target `net10.0`; the shell, `DriverUtility` and `AudioHarness` target `net10.0-windows`. Tests: TUnit and NSubstitute; Vitest and Playwright for the web.
+Stack: .NET 10 (`LangVersion latest`, nullable, central package management), `Microsoft.Extensions.Hosting` with the built-in DI, `System.Text.Json`, Serilog behind `Microsoft.Extensions.Logging`, NAudio (WASAPI) for audio I/O on Windows, PipeWire's native API (`libpipewire-0.3`, own bindings) on Linux. Audio, Engine, plugins and `AudioHarness` target `net10.0`; the shell and `DriverUtility` target `net10.0-windows`. Tests: TUnit and NSubstitute; Vitest and Playwright for the web.
 
 ## Layout
 
@@ -25,7 +25,7 @@ Directory.Build.props         also excludes */Web/** and node_modules from .NET 
 Directory.Packages.props
 package.json                  npm workspaces: src/Web, src/WebSdk, src/Plugins/*/Web, tests/E2E
 src/
-  Audio/                      Micser.Audio: graph, module abstractions, plugin contract, device backends (Devices/Wasapi)
+  Audio/                      Micser.Audio: graph, module abstractions, plugin contract, device backends (Devices/Wasapi, Devices/PipeWire)
   Engine/                     Micser.Engine: host, HTTP API, SignalR hub, config store, plugin loader
   Plugins/
     Main/                     Micser.Plugins.Main: built-in modules, loaded at runtime like any plugin
@@ -73,7 +73,7 @@ docs/
 - **System volume.** A module can follow the volume and mute of the system's default output device (`useSystemVolume`), so the volume keys control routes into devices that ignore the system volume (e.g. a loopback or virtual cable). `SystemVolume` watches it through the device backend; on Windows (`WasapiSystemVolume`) the default device's endpoint volume, switching with the default device. `AudioHost` then sets the modules' volume (the device's level in dB as a linear gain, so loudness matches) and mute, persists and broadcasts them. The UI disables the module's volume and mute controls meanwhile. Without a backend it has no level, and the modules keep their own volume.
 - **Port layouts.** After each block, every port publishes its buffer's layout (`AudioPort.LastLayout`, one 64-bit volatile write), so other threads can read it without locks. `GET /api/port-layouts` lists them per module (channel count and, for layouts with speaker positions, the speaker of each channel; none if the mask uses reserved bits); the UI draws a module's channel connectors from them. A port that carries nothing, e.g. a device output without an open device or an unprocessed module, has 0 channels; stopping the engine sets all of them to 0 (`AudioGraph.ClearLayouts`).
 - **Levels.** Each output port has a `LevelMeter` that measures the output after volume and mute: per channel, the peak since the last read and the RMS smoothed over 300 ms. A module without outputs measures what it passes to `ApplyVolume` (a device output: what it plays). The audio thread updates the meters with atomics only; `AudioModule.ReadLevels()` reads and resets the peaks.
-- **Device backends.** `AudioDeviceService` (the API plugins use) enumerates devices, reports changes and opens streams through an internal `IAudioBackend`: `WasapiBackend` (NAudio, shared mode, `Devices/Wasapi`) on Windows, `NullAudioBackend` (no devices) elsewhere until the PipeWire backend ([Linux.md](Linux.md)). A backend opens `ICaptureDevice`/`IRenderDevice` endpoints with a layout, sample rate and period that push or pull interleaved floats on their own thread; `CaptureStream` and `RenderStream` add the platform-neutral buffering below. Backend events reach `DeviceChanged` and `SystemResumed` on the thread pool.
+- **Device backends.** `AudioDeviceService` (the API plugins use) enumerates devices, reports changes and opens streams through an internal `IAudioBackend`: `WasapiBackend` (NAudio, shared mode, `Devices/Wasapi`) on Windows, `PipeWireBackend` (`Devices/PipeWire`, see [Linux.md](Linux.md#phase-2-pipewire-backend-done)) on Linux, and `NullAudioBackend` (no devices) elsewhere or when there's no PipeWire daemon. A backend opens `ICaptureDevice`/`IRenderDevice` endpoints with a layout, sample rate and period that push or pull interleaved floats on their own thread; `CaptureStream` and `RenderStream` add the platform-neutral buffering below. Backend events reach `DeviceChanged` and `SystemResumed` on the thread pool.
 - **Devices.** Each capture and render stream decouples its device clock from the engine clock:
   - A lock-free single-producer/single-consumer ring buffer sits between them. Devices deliver and consume whole periods (10 ms in shared mode), so the initial target fill is:
     - render: one device period plus half an engine block;
@@ -89,7 +89,7 @@ docs/
 - **Device modules** follow their device's state and, when the device ID disappears, switch to another active device of the same adapter (e.g. a USB device plugged into a different port). Setting their state reopens the stream only when the device changes, since every module update (e.g. a volume change) sets the state again.
 - **Stream recovery.** A device stream is faulted when WASAPI stopped it (e.g. the device was invalidated) or when its device delivered or took no data for 2 s (10 s before the first callback, for slow devices like Bluetooth). Loopback capture is exempt from the stall check because it gets no data while nothing plays.
   - A watchdog in each device module (every second) reopens a faulted stream and retries a selected device that isn't open, with a delay of 1 s doubling up to 30 s. The delay resets after a minute of healthy streaming, on device events and on device selection.
-  - `AudioDeviceService.SystemResumed` (on Windows a `PowerRegisterSuspendResumeNotification` callback, no window needed) makes all device modules reopen their streams after sleep or hibernation, since streams can look healthy then but play or capture nothing.
+  - `AudioDeviceService.SystemResumed` (on Windows a `PowerRegisterSuspendResumeNotification` callback, no window needed; PipeWire suspends and resumes devices itself) makes all device modules reopen their streams after sleep or hibernation, since streams can look healthy then but play or capture nothing.
 - **Latency.** The software round trip (render + loopback capture, `AudioHarness latency`) is about 50 ms on a 48 kHz USB interface. Going much lower needs device periods below 10 ms: `IAudioClient3` low-latency mode (NAudio `WithLowLatency`) wasn't available on the tested devices and made loopback capture fail, and exclusive mode takes the device away from other applications. Measuring the ring fill phase-corrected from the device callbacks' timestamps made no measurable difference against the per-block measurement; the scatter comes from the devices.
 
 ## Engine
@@ -317,7 +317,7 @@ docs/
 
 ## Testing
 
-- **Platforms:** everything but the shell and driver tests also runs on Linux (with `NullAudioBackend`); CI's `linux` job builds the solution, runs the Audio, Engine and Main tests and the end-to-end tests there.
+- **Platforms:** everything but the shell and driver tests also runs on Linux; CI's `linux` job builds the solution, runs the Audio, Engine and Main tests and the end-to-end tests there. The PipeWire backend tests run against a private PipeWire daemon with virtual devices only (`PipeWireTestDaemon`), which they start themselves and skip without; the engine there finds no daemon and has no devices.
 - **.NET:** TUnit on Microsoft.Testing.Platform, with NSubstitute. Audio tests drive `AudioGraph.Process()` directly with synthetic modules; nothing in `tests/` opens real devices. Engine tests use `EngineFactory` (temp config and user plugin directory, token required) with a real audio engine and no devices selected; Main is loaded from `plugins/Main` in the test output.
 - **Web:** Vitest, from one root `vitest.config.ts` with two projects. `*.test.ts` runs in Node. `*.test.tsx` and `*.browser.test.ts` (DOM, storage, module imports) run in Vitest browser mode on headless Chromium through Playwright, because Fluent UI and React Flow need real layout. Components are rendered with `vitest-browser-react`. `@micser/web-sdk/testing` has the shared helpers: `TestProviders` (theme, query client, an engine connection that is never started), `createTestQueryClient()` (seeded with `setQueryData` under the generated keys, so hooks don't fetch) and `testModule()`. Tests render in English unless they pass `language` to `TestProviders`.
 - **End-to-end:** Playwright Test in `tests/E2E`, Chromium only (the shell's WebView2 is Chromium as well), with the browser locale `en-US`.

@@ -198,7 +198,8 @@ jobs:
           path: tests/E2E/playwright-report
           retention-days: 14
 
-  # the portable projects (engine, Audio, plugins) on Linux, where the engine has no audio backend yet; not a release requirement
+  # the portable projects (engine, Audio, plugins) on Linux: the PipeWire backend tests start their own daemon, the engine finds none
+  # and has no devices; not a release requirement
   linux:
     runs-on: ubuntu-latest
 
@@ -223,6 +224,10 @@ jobs:
 
       - name: Check OpenAPI document is up to date
         run: git diff --exit-code -- src/WebSdk/openapi
+
+      # the PipeWire backend tests start their own daemon with virtual devices (PipeWireTestDaemon)
+      - name: Install PipeWire
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends pipewire pipewire-bin wireplumber dbus
 
       - name: Test
         run: |

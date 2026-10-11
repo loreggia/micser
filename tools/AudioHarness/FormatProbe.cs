@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
 
@@ -11,6 +12,7 @@ namespace Micser.AudioHarness;
 /// Then it plays a different tone per channel and shows where each one arrives, between the mix formats and stereo, 5.1 and the mix formats.
 /// Finally it plays a counting sequence in exclusive mode at 16, 24 and 32 bits and checks that it arrives bit-exact.
 /// </summary>
+[SupportedOSPlatform("windows")]
 internal static class FormatProbe
 {
     private const double ToneAmplitude = 0.1;
