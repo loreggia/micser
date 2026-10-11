@@ -154,7 +154,7 @@ docs/
   - `engineFetch` adds the access token and throws `EngineApiError` with the problem details.
 - **State:**
   - Engine data lives in the TanStack Query cache, which never goes stale. `EngineConnection` (SignalR) patches it from engine events and refetches everything after connecting, cancelling fetches that started before (they may have missed events). An event that arrives while the same data is being fetched restarts that fetch, whose result could be older than the event. So components neither poll nor invalidate after mutations.
-  - Module and subgraph updates (`useModuleUpdate`, `useSubgraphUpdate`) show immediately and go to the engine debounced (80 ms, last value wins). Engine echoes are ignored while an update is pending, so controls don't jump back.
+  - Module and subgraph updates (`useModuleUpdate`, `useSubgraphUpdate`) show immediately and go to the engine debounced (80 ms, last value wins). Engine echoes are ignored while an update is pending, and pending values are applied again over fetch results (e.g. the refetch after connecting, which may have read the engine before they were sent), so controls don't jump back.
   - `useModuleData(moduleId)` subscribes to live data (spectrum, stream statistics).
   - `usePortLayouts(moduleId)` reads a module's port layouts from the cache, which `PortLayoutsChanged` patches and `ModuleRemoved` cleans up.
   - UI preferences come from the engine (`usePreferences`), not from browser storage (see `preferences` under [Engine](#engine)).
