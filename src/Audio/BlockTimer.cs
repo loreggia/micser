@@ -3,6 +3,7 @@ using System.Runtime.InteropServices;
 using System.Runtime.Versioning;
 using Microsoft.Extensions.Logging;
 using Microsoft.Win32.SafeHandles;
+using Tmds.DBus.Protocol;
 
 namespace Micser.Audio;
 
@@ -111,13 +112,16 @@ internal abstract class BlockTimer : IDisposable
 
     /// <summary>
     /// <c>clock_nanosleep</c> on the monotonic clock, with the thread on <c>SCHED_FIFO</c> if the user may use realtime priorities
-    /// (<c>RLIMIT_RTPRIO</c>, e.g. through PipeWire's or JACK's limits for the audio group).
+    /// (<c>RLIMIT_RTPRIO</c>, e.g. through PipeWire's or JACK's limits for the audio group), otherwise through RTKit, as PipeWire's
+    /// threads.
     /// </summary>
     [SupportedOSPlatform("linux")]
     private sealed class LinuxBlockTimer : BlockTimer
     {
         // below the realtime threads of PipeWire, which feed the device streams
         private const int RealtimePriority = 20;
+
+        private static readonly TimeSpan RealtimeKitTimeout = TimeSpan.FromSeconds(2);
 
         public LinuxBlockTimer(ILogger logger)
         {
@@ -127,12 +131,45 @@ internal abstract class BlockTimer : IDisposable
                     0,
                     LinuxNativeMethods.SchedFifo | LinuxNativeMethods.SchedResetOnFork,
                     parameters
-                ) != 0
+                ) == 0
             )
+            {
+                return;
+            }
+
+            var error = Marshal.GetLastPInvokeError();
+            if (error != LinuxNativeMethods.ErrorNotPermitted)
             {
                 logger.LogWarning(
                     "Could not give the audio thread a realtime priority (error {Error}); block timing may suffer under load.",
-                    Marshal.GetLastPInvokeError()
+                    error
+                );
+                return;
+            }
+
+            var result = RealtimeKit.Acquire(
+                DBusAddress.System!,
+                LinuxNativeMethods.GetTid(),
+                RealtimePriority,
+                RealtimeKitTimeout
+            );
+            if (result.Priority is { } priority)
+            {
+                logger.LogInformation("The audio thread has realtime priority {Priority} through RTKit.", priority);
+            }
+            else if (result.Nice is { } nice)
+            {
+                logger.LogWarning(
+                    "RTKit gave the audio thread a raised priority (nice {Nice}), but no realtime priority ({Error}); block timing may suffer under load.",
+                    nice,
+                    result.Error
+                );
+            }
+            else
+            {
+                logger.LogWarning(
+                    "Could not give the audio thread a realtime priority, neither directly nor through RTKit ({Error}); block timing may suffer under load.",
+                    result.Error
                 );
             }
         }

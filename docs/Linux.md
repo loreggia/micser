@@ -12,7 +12,7 @@ Decisions so far: PipeWire's native API for audio, a cross-platform shell (tray 
 | Device list, hot-plug, default device | `MMDeviceEnumerator`, notification client             | PipeWire registry, `default` metadata                                     | 2            |
 | System volume (`useSystemVolume`)     | endpoint volume of the default render device          | `Props` of the default sink node                                          | 2            |
 | Resume after sleep                    | `PowerRegisterSuspendResumeNotification`              | stall watchdog; logind `PrepareForSleep` (D-Bus) if needed                | 2            |
-| Audio thread                          | MMCSS "Pro Audio", high-resolution waitable timer     | `SCHED_FIFO` (`RLIMIT_RTPRIO`) or RTKit, `clock_nanosleep`                | 1 (RTKit: 2) |
+| Audio thread                          | MMCSS "Pro Audio", high-resolution waitable timer     | `SCHED_FIFO` (`RLIMIT_RTPRIO`) or RTKit, `clock_nanosleep`                | 1, 2 (RTKit) |
 | One engine per session                | named semaphore `Local\Micser.Engine`                 | lock file in `$XDG_RUNTIME_DIR/micser`                                    | 1            |
 | Discovery file                        | `%LocalAppData%\Micser\engine.json` (private folder)  | `$XDG_RUNTIME_DIR/micser/engine.json`, mode 0600                          | 1            |
 | Configuration, user plugins, logs     | `%AppData%`, `%LocalAppData%`                         | `~/.config/Micser`, `~/.local/share/Micser` (`Environment.SpecialFolder`) | 1            |
@@ -27,7 +27,7 @@ The graph, the DSP (NAudio's `Dsp` namespace is in the portable `NAudio.Core`), 
 - `Micser.Audio`, `Micser.Engine`, `Micser.Plugins.Main` and their tests target `net10.0`. NAudio comes as `NAudio.Core` + `NAudio.Wasapi` (both `net9.0`), not the metapackage. NAudio marks the WASAPI API `[SupportedOSPlatform("windows")]`, so the platform analyzer (CA1416, an error with `TreatWarningsAsErrors`) keeps every WASAPI call behind a Windows check.
 - Plugins are platform-neutral assemblies; the same plugin package loads on both.
 - **Backends.** `AudioDeviceService` keeps its public API and delegates to an internal `IAudioBackend`: `WasapiBackend` on Windows, `NullAudioBackend` (no devices) elsewhere. A backend opens `ICaptureDevice`/`IRenderDevice` endpoints (layout, sample rate, period; capture pushes interleaved floats, render pulls them). `CaptureStream` and `RenderStream` keep the platform-neutral part: ring buffer, adaptive target, drift control and resampling. `SystemVolume` delegates to the backend's implementation.
-- **Audio thread.** `BlockTimer` per platform: MMCSS and the waitable timer on Windows; on Linux `SCHED_FIFO` (priority 20, with `SCHED_RESET_ON_FORK`) if `RLIMIT_RTPRIO` allows it, otherwise a warning, and `clock_nanosleep` on the monotonic clock.
+- **Audio thread.** `BlockTimer` per platform: MMCSS and the waitable timer on Windows; on Linux `SCHED_FIFO` (priority 20, with `SCHED_RESET_ON_FORK`) if `RLIMIT_RTPRIO` allows it, otherwise RTKit (phase 2), and `clock_nanosleep` on the monotonic clock.
 - **Engine hosting.** The discovery file and the lock file go to `$XDG_RUNTIME_DIR/micser` (0700); the discovery file is 0600 (`PrivateFiles`). The log path `%LOCALAPPDATA%` in `appsettings.Production.json` is set by the engine where the OS doesn't set it.
 - **Build and CI.** `Micser.slnx` builds on Linux, `DriverUtility` (`net10.0-windows`, without WinForms or WPF) included. CI's `linux` job builds the solution, runs the portable .NET and shell tests, checks the OpenAPI document and runs the end-to-end tests against a published engine. Releases need it (since phase 5).
 - Findings on the way:
@@ -67,9 +67,15 @@ The graph, the DSP (NAudio's `Dsp` namespace is in the portable `NAudio.Core`), 
 - `PipeWireBackendTests` run against `PipeWireTestDaemon`: a private `pipewire` and WirePlumber (on a private D-Bus session from `dbus-run-session`) with their own runtime, configuration and state folders and without device monitors, so they only see virtual sinks and sources and never touch the session's audio. They cover listing, playing to a sink and capturing its monitor, surround channel order, hot-plug with faulting streams, the system volume and a daemon restart. They're skipped where `pipewire`, `wireplumber` 0.4 (Lua configuration), `dbus-run-session` or `pw-cli` are missing; CI's `linux` job installs them.
 - `tools/AudioHarness` targets `net10.0`: `list`, routing and `latency` work on both platforms, `formats` (WASAPI formats) on Windows only.
 
+**Realtime priority** (`RealtimeKit`): `RLIMIT_RTPRIO` is 0 for users outside PipeWire's or JACK's realtime group, so `sched_setscheduler` fails there. The audio thread then asks RTKit (`org.freedesktop.RealtimeKit1` on the system bus, D-Bus through `Tmds.DBus.Protocol`), as PipeWire does for its own threads:
+
+- It first lowers the process's `RLIMIT_RTTIME` to RTKit's `RTTimeUSecMax` (200 ms by default), which RTKit requires: a realtime thread that runs that long without blocking gets the process killed. The audio thread blocks for every block, so only a hung graph would, and the shell then starts a new engine.
+- It asks for priority 20, but at most one below RTKit's maximum (`MaxRealtimePriority`, 20 by default, which PipeWire's data thread gets), so PipeWire's device threads stay above it: `SCHED_RR` 19 on a default system.
+- If RTKit refuses, the thread gets nice -11 (`MakeThreadHighPriority`, at least RTKit's `MinNiceLevel`), like PipeWire's main thread; the log says which of these it got.
+- Tests (`RealtimeKitTests`) run against a fake RTKit on a private `dbus-daemon`, so no thread's priority changes.
+
 **Open:**
 
-- Realtime priority through RTKit (D-Bus `org.freedesktop.RealtimeKit1.MakeThreadRealtime`) when `RLIMIT_RTPRIO` is 0, the default for users outside PipeWire's or JACK's realtime group; the engine thread then runs at normal priority.
 - Resume after sleep: PipeWire suspends and resumes devices itself and the stall watchdog covers streams that stop; logind's `PrepareForSleep` (D-Bus) only if streams turn out to look healthy but be silent, as on Windows.
 - WirePlumber 0.5 (SPA-JSON configuration) for the test daemon, for distributions that ship it.
 - The engine as a PipeWire filter node, driven by the graph clock instead of its own timer: for PipeWire devices that removes the ring buffers, resampling and drift correction and most of the latency, but changes the engine's clocking model.

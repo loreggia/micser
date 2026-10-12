@@ -8,6 +8,11 @@ Collect changes under "Unreleased". Before tagging vX.Y.Z, rename that heading t
 from that section, and the release workflow fails without it.
 -->
 
+## Unreleased
+
+- On Linux, the audio engine now runs with a realtime priority on standard systems too (through RTKit, like PipeWire), so audio is less
+  likely to drop out while the computer is busy. Before, it only got one where the user was allowed realtime priorities.
+
 ## 0.16.0 - 2026-10-13
 
 - Micser runs on Linux: download `Micser.AppImage` from the release, make it executable and start it. It routes audio through PipeWire,
