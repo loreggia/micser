@@ -23,6 +23,7 @@ internal sealed class MainWindow : Window
     private static readonly JsonSerializerOptions MessageJson = new(JsonSerializerDefaults.Web);
 
     private readonly ShellColorMode _colorMode;
+    private readonly DesktopIntegration _desktop;
     private readonly DriverController? _driver;
     private readonly string _settingsPath;
     private readonly ShellLanguage _language;
@@ -40,6 +41,7 @@ internal sealed class MainWindow : Window
         EngineSupervisor supervisor,
         UpdateController? updates,
         DriverController? driver,
+        DesktopIntegration desktop,
         ShellLanguage language,
         ShellColorMode colorMode,
         Uri? uiUrl,
@@ -49,6 +51,7 @@ internal sealed class MainWindow : Window
         _supervisor = supervisor;
         _updates = updates;
         _driver = driver;
+        _desktop = desktop;
         _language = language;
         _colorMode = colorMode;
         _uiUrl = uiUrl;
@@ -79,6 +82,7 @@ internal sealed class MainWindow : Window
         _supervisor.Changed += OnEngineChanged;
         _updates?.Changed += OnStateChanged;
         _driver?.Changed += OnStateChanged;
+        _desktop.Changed += OnStateChanged;
         Opened += (_, _) => ApplyWindowSettings(WindowSettings.Load(settingsPath));
         PositionChanged += (_, _) => RememberNormalBounds();
         Resized += (_, _) => RememberNormalBounds();
@@ -101,6 +105,7 @@ internal sealed class MainWindow : Window
         _supervisor.Changed -= OnEngineChanged;
         _updates?.Changed -= OnStateChanged;
         _driver?.Changed -= OnStateChanged;
+        _desktop.Changed -= OnStateChanged;
         base.OnClosed(e);
     }
 
@@ -276,7 +281,8 @@ internal sealed class MainWindow : Window
     /// <c>setCableCount</c> (with <c>cableCount</c>), <c>setCableLayout</c> (with <c>cable</c> and <c>layout</c>), <c>updateDriver</c>
     /// and <c>uninstallDriver</c>, <c>setLanguage</c> (with the UI's <c>language</c> preference, or null), <c>setColorMode</c> (with the
     /// <c>colorMode</c> of the UI's theme preference, or null), and <c>getReleaseNotes</c> (with a <c>version</c>; answered with a
-    /// <c>releaseNotes</c> message with the <c>version</c> and its markdown <c>notes</c>, or null). The shell answers with <c>state</c>
+    /// <c>releaseNotes</c> message with the <c>version</c> and its markdown <c>notes</c>, or null), <c>setAutostart</c> and
+    /// <c>setMenuEntry</c> (with <c>enabled</c>). The shell answers with <c>state</c>
     /// messages (see <see cref="PostState"/>), also whenever the state changes.
     /// </summary>
     private async void OnWebMessageReceived(object? sender, WebMessageReceivedEventArgs e)
@@ -298,6 +304,7 @@ internal sealed class MainWindow : Window
         string? language;
         string? colorMode;
         string? version;
+        bool enabled;
         try
         {
             var message = JsonDocument.Parse(e.Body ?? "").RootElement;
@@ -312,6 +319,8 @@ internal sealed class MainWindow : Window
             language = GetString(message, "language");
             colorMode = GetString(message, "colorMode");
             version = GetString(message, "version");
+            enabled =
+                message.TryGetProperty("enabled", out var enabledValue) && enabledValue.ValueKind == JsonValueKind.True;
         }
         catch (Exception ex) when (ex is JsonException or KeyNotFoundException or InvalidOperationException)
         {
@@ -351,6 +360,12 @@ internal sealed class MainWindow : Window
             case "uninstallDriver" when _driver != null:
                 await ShowDriverResultAsync(await _driver.UninstallAsync());
                 break;
+            case "setAutostart" when _updates != null:
+                _desktop.SetAutostart(enabled);
+                break;
+            case "setMenuEntry":
+                _desktop.SetMenuEntry(enabled);
+                break;
             case "setLanguage":
                 _language.SetPreference(language);
                 break;
@@ -388,8 +403,9 @@ internal sealed class MainWindow : Window
     }
 
     /// <summary>
-    /// Sends <c>{ type: "state", version, canUpdate, isCheckingForUpdates, pendingUpdate, canRestartEngine, driver }</c> to the UI.
-    /// <c>driver</c> is null without a driver package, else <c>{ isBusy, status }</c> with the utility's status (or null).
+    /// Sends <c>{ type: "state", version, canUpdate, isCheckingForUpdates, pendingUpdate, canRestartEngine, driver, autostart,
+    /// menuEntry }</c> to the UI. <c>driver</c> is null without a driver package, else <c>{ isBusy, status }</c> with the utility's status
+    /// (or null). <c>autostart</c> and <c>menuEntry</c> are whether they're on, or null if the settings don't offer them.
     /// </summary>
     private void PostState()
     {
@@ -403,6 +419,9 @@ internal sealed class MainWindow : Window
                 pendingUpdate = _updates?.PendingUpdate?.Version.ToString(),
                 canRestartEngine = _supervisor.CanStartEngine,
                 driver = _driver == null ? null : new { isBusy = _driver.IsBusy, status = _driver.Status },
+                // the settings offer autostart in an installed copy only, like the other controls of the shell
+                autostart = _updates == null ? (bool?)null : _desktop.IsAutostartEnabled,
+                menuEntry = _desktop.IsMenuEntryEnabled,
             }
         );
     }

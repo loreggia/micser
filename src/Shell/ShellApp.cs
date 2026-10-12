@@ -16,7 +16,7 @@ internal sealed class ShellApp : Application
 {
     private readonly ShellInstance _instance;
     private readonly ShellOptions _options;
-    private IAutostart _autostart = null!;
+    private DesktopIntegration _desktop = null!;
     private NativeMenuItem _autostartItem = null!;
     private NativeMenuItem _closeItem = null!;
     private ShellColorMode _colorMode = null!;
@@ -69,12 +69,8 @@ internal sealed class ShellApp : Application
         );
         _updates = Updater.Create() is { } updater ? new UpdateController(updater, _supervisor) : null;
         _driver = DriverController.Create(_supervisor);
-        var appImagePath = OperatingSystem.IsLinux() ? AppImageIntegration.CurrentAppImagePath : null;
-        _autostart = Autostart.Create(appImagePath ?? Environment.ProcessPath!);
-        if (appImagePath != null)
-        {
-            AppImageIntegration.Create(appImagePath).Apply(_autostart, File.Exists(XdgAutostart.DefaultPath));
-        }
+        _desktop = DesktopIntegration.Create();
+        _desktop.Changed += (_, _) => _autostartItem.IsChecked = _desktop.IsAutostartEnabled;
 
         CreateTrayIcon();
         _language.Changed += (_, _) => ApplyTexts();
@@ -140,9 +136,9 @@ internal sealed class ShellApp : Application
         _autostartItem = new NativeMenuItem
         {
             ToggleType = MenuItemToggleType.CheckBox,
-            IsChecked = _autostart.IsEnabled,
+            IsChecked = _desktop.IsAutostartEnabled,
         };
-        _autostartItem.Click += (_, _) => ToggleAutostart();
+        _autostartItem.Click += (_, _) => _desktop.SetAutostart(!_desktop.IsAutostartEnabled);
         var menu = new NativeMenu();
         menu.Items.Add(_openItem);
         menu.Items.Add(new NativeMenuItemSeparator());
@@ -239,6 +235,7 @@ internal sealed class ShellApp : Application
                 _supervisor,
                 _updates,
                 _driver,
+                _desktop,
                 _language,
                 _colorMode,
                 _options.UiUrl,
@@ -254,21 +251,6 @@ internal sealed class ShellApp : Application
         }
 
         _mainWindow.Activate();
-    }
-
-    private void ToggleAutostart()
-    {
-        try
-        {
-            _autostart.SetEnabled(!_autostart.IsEnabled);
-        }
-        catch (Exception ex)
-            when (ex is UnauthorizedAccessException or System.Security.SecurityException or IOException)
-        {
-            Log.Error(ex, "Changing the autostart entry failed.");
-        }
-
-        _autostartItem.IsChecked = _autostart.IsEnabled;
     }
 
     private void UpdateStatus()

@@ -46,6 +46,8 @@ test("a development shell shows none of its controls either", async ({ graph }) 
   await expect(dialog.getByRole("button", { name: "Install", exact: true })).toHaveCount(0);
   await expect(dialog.getByRole("button", { name: "Uninstall", exact: true })).toHaveCount(0);
   await expect(dialog.getByText("Driver", { exact: false })).toHaveCount(0);
+  await expect(dialog.getByRole("switch", { name: "Start Micser when you log in" })).toHaveCount(0);
+  await expect(dialog.getByRole("switch", { name: "Show Micser in the app menu" })).toHaveCount(0);
   expect(await shell.messages()).toEqual([]);
 });
 
@@ -139,6 +141,36 @@ test("the settings restart the engine process", async ({ graph }) => {
   await dialog.getByRole("button", { name: "Restart engine process" }).click();
 
   expect(await shell.messages()).toEqual([{ type: "restartEngine" }]);
+});
+
+test("the settings switch autostart and the app menu entry, and follow the shell", async ({ graph }) => {
+  const shell = await FakeShell.install(graph.page, { ...developmentShell, autostart: false, menuEntry: true });
+  const dialog = await openSettings(graph);
+  const autostart = dialog.getByRole("switch", { name: "Start Micser when you log in" });
+  const menuEntry = dialog.getByRole("switch", { name: "Show Micser in the app menu" });
+  await expect(autostart).not.toBeChecked();
+  await expect(menuEntry).toBeChecked();
+
+  await autostart.click();
+  await menuEntry.click();
+
+  expect(await shell.messages()).toEqual([
+    { type: "setAutostart", enabled: true },
+    { type: "setMenuEntry", enabled: false },
+  ]);
+
+  // e.g. the tray menu's toggle
+  await shell.setState({ ...developmentShell, autostart: true, menuEntry: false });
+  await expect(autostart).toBeChecked();
+  await expect(menuEntry).not.toBeChecked();
+});
+
+test("without an AppImage, the settings offer autostart only", async ({ graph }) => {
+  await FakeShell.install(graph.page, { ...developmentShell, autostart: true });
+  const dialog = await openSettings(graph);
+
+  await expect(dialog.getByRole("switch", { name: "Start Micser when you log in" })).toBeChecked();
+  await expect(dialog.getByRole("switch", { name: "Show Micser in the app menu" })).toHaveCount(0);
 });
 
 test.describe("virtual audio cables", () => {
