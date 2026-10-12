@@ -11,6 +11,8 @@
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.12" />
     <PackageVersion Include="NAudio.Core" Version="3.1.0" />
     <PackageVersion Include="NAudio.Wasapi" Version="3.1.0" />
+    <!-- RTKit on Linux; Avalonia's version, since engine and shell are published into one folder -->
+    <PackageVersion Include="Tmds.DBus.Protocol" Version="0.94.1" />
   </ItemGroup>
   <ItemGroup Label="Engine">
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.12" />
