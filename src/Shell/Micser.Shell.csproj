@@ -1,19 +1,29 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
-    <TargetFramework>net10.0-windows</TargetFramework>
-    <UseWindowsForms>true</UseWindowsForms>
-    <!-- builds (but doesn't run) on Linux too -->
-    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <TargetFramework>net10.0</TargetFramework>
     <ApplicationIcon>..\..\gfx\logo.ico</ApplicationIcon>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <!-- Windows: a supported OS list, without which the web view's child window can't be created -->
+    <ApplicationManifest>app.manifest</ApplicationManifest>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Avalonia" />
+    <PackageReference Include="Avalonia.Controls.WebView" />
+    <PackageReference Include="Avalonia.Desktop" />
+    <PackageReference Include="Avalonia.Themes.Fluent" />
+    <!-- the CoreWebView2 behind Avalonia's web view on Windows, for its settings -->
     <PackageReference Include="Microsoft.Web.WebView2" />
     <PackageReference Include="Serilog" />
     <PackageReference Include="Serilog.Sinks.File" />
     <PackageReference Include="Velopack" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- the tray and window icon -->
+    <!-- square, for the window and the tray (logo.png is wider than high) -->
+    <EmbeddedResource Include="..\..\gfx\icon.png" LogicalName="Micser.Shell.icon.png" />
   </ItemGroup>
 
   <ItemGroup>
@@ -29,4 +39,14 @@
       <StronglyTypedFileName>$(IntermediateOutputPath)Strings.Designer.cs</StronglyTypedFileName>
     </EmbeddedResource>
   </ItemGroup>
+
+  <!-- the symbols of the native libraries (SkiaSharp, HarfBuzz: about 100 MB on Windows) stay out of the publish -->
+  <Target Name="RemoveNativeSymbolsFromPublish" AfterTargets="ComputeResolvedFilesToPublishList">
+    <ItemGroup>
+      <ResolvedFileToPublish
+        Remove="@(ResolvedFileToPublish)"
+        Condition="'%(Extension)' == '.pdb' and '%(ResolvedFileToPublish.NuGetPackageId)' != ''"
+      />
+    </ItemGroup>
+  </Target>
 </Project>

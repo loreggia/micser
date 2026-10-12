@@ -47,9 +47,20 @@ export interface ShellState {
 
 export type UpdateCheckResult = "upToDate" | "updateReady" | "failed";
 
-export interface WebView {
-  postMessage(message: unknown): void;
-  addEventListener(type: "message", listener: (event: MessageEvent) => void): void;
+/**
+ * How the UI and the shell exchange messages. In the shell's web view (Avalonia's, WebView2 or WebKitGTK), messages go to the shell
+ * through `invokeCSharpAction(json)`, and the shell calls `window.micserShell.receive(message)`.
+ */
+export interface ShellTransport {
+  send(message: unknown): void;
+  /** Calls the listener with each message from the shell. */
+  onReceive(listener: (message: unknown) => void): void;
+}
+
+/** The functions the shell's web view provides and calls. */
+export interface ShellWindow {
+  invokeCSharpAction?: (body: string) => void;
+  micserShell?: { receive(message: unknown): void };
 }
 
 type ShellMessage =
@@ -58,19 +69,19 @@ type ShellMessage =
   | { type: "releaseNotes"; version: string; notes: string | null };
 
 /**
- * The desktop shell, when the UI runs in its WebView2 window. Messages go both ways through WebView2 web messages.
+ * The desktop shell, when the UI runs in its window. Messages go both ways through a {@link ShellTransport}.
  */
 export class Shell {
   private readonly listeners = new Set<() => void>();
   private readonly pendingChecks: ((result: UpdateCheckResult) => void)[] = [];
   private readonly pendingReleaseNotes = new Map<string, ((notes: string | null) => void)[]>();
-  private readonly webView: WebView;
+  private readonly transport: ShellTransport;
   private current?: ShellState;
 
-  constructor(webView: WebView) {
-    this.webView = webView;
-    webView.addEventListener("message", (event) => this.onMessage(event.data as ShellMessage));
-    webView.postMessage({ type: "getState" });
+  constructor(transport: ShellTransport) {
+    this.transport = transport;
+    transport.onReceive((message) => this.onMessage(message as ShellMessage));
+    transport.send({ type: "getState" });
   }
 
   get state() {
@@ -81,7 +92,7 @@ export class Shell {
   checkForUpdates() {
     return new Promise<UpdateCheckResult>((resolve) => {
       this.pendingChecks.push(resolve);
-      this.webView.postMessage({ type: "checkForUpdates" });
+      this.transport.send({ type: "checkForUpdates" });
     });
   }
 
@@ -96,19 +107,19 @@ export class Shell {
         waiting.push(resolve);
       } else {
         this.pendingReleaseNotes.set(version, [resolve]);
-        this.webView.postMessage({ type: "getReleaseNotes", version });
+        this.transport.send({ type: "getReleaseNotes", version });
       }
     });
   }
 
   /** Stops the engine and restarts Micser into the downloaded update. */
   installUpdate() {
-    this.webView.postMessage({ type: "installUpdate" });
+    this.transport.send({ type: "installUpdate" });
   }
 
   /** Stops the engine process; the shell starts a new one, and the window reloads with it. */
   restartEngine() {
-    this.webView.postMessage({ type: "restartEngine" });
+    this.transport.send({ type: "restartEngine" });
   }
 
   /**
@@ -116,34 +127,34 @@ export class Shell {
    * failure or a needed reboot itself.
    */
   installDriver(cableCount: number) {
-    this.webView.postMessage({ type: "installDriver", cableCount });
+    this.transport.send({ type: "installDriver", cableCount });
   }
 
   setCableCount(cableCount: number) {
-    this.webView.postMessage({ type: "setCableCount", cableCount });
+    this.transport.send({ type: "setCableCount", cableCount });
   }
 
   /** The language preference, for the tray menu; null follows the system. */
   setLanguage(language: string | null) {
-    this.webView.postMessage({ type: "setLanguage", language });
+    this.transport.send({ type: "setLanguage", language });
   }
 
   /** The theme preference's color mode, for the window's title bar and background; null follows the system. */
   setColorMode(colorMode: UiColorMode | null) {
-    this.webView.postMessage({ type: "setColorMode", colorMode });
+    this.transport.send({ type: "setColorMode", colorMode });
   }
 
   /** Changes a cable's layout (cable 1 is the first); like the other driver changes, it restarts the cables. */
   setCableLayout(cable: number, layout: CableLayout) {
-    this.webView.postMessage({ type: "setCableLayout", cable, layout });
+    this.transport.send({ type: "setCableLayout", cable, layout });
   }
 
   updateDriver() {
-    this.webView.postMessage({ type: "updateDriver" });
+    this.transport.send({ type: "updateDriver" });
   }
 
   uninstallDriver() {
-    this.webView.postMessage({ type: "uninstallDriver" });
+    this.transport.send({ type: "uninstallDriver" });
   }
 
   subscribe(listener: () => void) {
@@ -173,10 +184,29 @@ export class Shell {
   }
 }
 
-const webView = (window as { chrome?: { webview?: WebView } }).chrome?.webview;
+/** The shell's transport, if the UI runs in its web view, which provides `invokeCSharpAction` before the UI loads. */
+export function createTransport(target: ShellWindow): ShellTransport | undefined {
+  if (!target.invokeCSharpAction) {
+    return undefined;
+  }
+
+  const listeners: ((message: unknown) => void)[] = [];
+  target.micserShell = { receive: (message) => listeners.forEach((listener) => listener(message)) };
+  return {
+    send: (message) => target.invokeCSharpAction?.(JSON.stringify(message)),
+    onReceive: (listener) => listeners.push(listener),
+  };
+}
+
+const transport = createTransport(window as ShellWindow);
 
 /** The desktop shell, or undefined in a browser (e.g. the Vite dev server). */
-export const shell = webView ? new Shell(webView) : undefined;
+export const shell = transport ? new Shell(transport) : undefined;
+
+if (shell) {
+  // like an app's window, the shell has no browser context menu (WebView2 turns it off, WebKitGTK can't)
+  document.addEventListener("contextmenu", (event) => event.preventDefault());
+}
 
 /** Passes the language preference to the shell once it's loaded and whenever it changes. */
 export function useShellLanguage() {

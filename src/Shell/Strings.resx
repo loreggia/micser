@@ -18,6 +18,15 @@
   <data name="TrayStartWithWindows" xml:space="preserve">
     <value>Start with Windows</value>
   </data>
+  <data name="TrayStartAtLogin" xml:space="preserve">
+    <value>Start at login</value>
+  </data>
+  <data name="DialogYes" xml:space="preserve">
+    <value>Yes</value>
+  </data>
+  <data name="DialogNo" xml:space="preserve">
+    <value>No</value>
+  </data>
   <data name="TrayClose" xml:space="preserve">
     <value>Close</value>
   </data>
@@ -59,21 +68,6 @@
   </data>
   <data name="StatusStopping" xml:space="preserve">
     <value>Micser – stopping</value>
-  </data>
-  <data name="UpToDate" xml:space="preserve">
-    <value>Micser {0} is up to date.</value>
-  </data>
-  <data name="UpdateCheckFailed" xml:space="preserve">
-    <value>Checking for updates failed.</value>
-  </data>
-  <data name="UpdateReadyTitle" xml:space="preserve">
-    <value>Micser {0} is ready</value>
-  </data>
-  <data name="UpdateReadyText" xml:space="preserve">
-    <value>Choose "Restart to update" in the tray menu to install it.</value>
-  </data>
-  <data name="DriverUpdateAvailable" xml:space="preserve">
-    <value>A new virtual audio cable driver ({0}) is available. Install it in Micser's settings.</value>
   </data>
   <data name="DriverRebootRequired" xml:space="preserve">
     <value>Restart Windows to finish changing the virtual audio cables.</value>

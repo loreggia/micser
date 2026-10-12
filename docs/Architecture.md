@@ -1,18 +1,18 @@
 # Architecture
 
-Micser routes audio on Windows through a graph of modules (devices, effects, analyzers) that the user wires up in a web UI. The engine and the UI also run on Linux, with PipeWire for audio; [Linux.md](Linux.md) has the plan for the rest (shell, packaging).
+Micser routes audio on Windows through a graph of modules (devices, effects, analyzers) that the user wires up in a web UI. The engine, the UI and the shell also run on Linux, with PipeWire for audio; [Linux.md](Linux.md) has the plan for the rest (packaging).
 
 ## Overview
 
 - **Engine** (`src/Engine`): a headless per-user process, started at login by the shell. It runs the audio graph, so audio keeps running while the UI is closed. ASP.NET Core minimal APIs and SignalR on loopback (127.0.0.1, random port, per-session token) serve the UI; the OpenAPI document generates the UI's TypeScript client.
 - **UI** (`src/Web`): a Vite + React + TypeScript SPA, served by the engine. `@xyflow/react` draws the routing graph, Fluent UI React v9 the controls (the theme preference, a name and its light or dark color mode, picks one of the themes in `src/Web/src/theme`; without one, light or dark following the OS), TanStack Query holds engine state, i18next translates.
-- **Shell** (`src/Shell`): a WinForms tray app with a WebView2 window showing the UI. It launches and supervises the engine and runs updates; it has no app logic.
+- **Shell** (`src/Shell`): an Avalonia tray app with a web view window showing the UI (WebView2 on Windows, WebKitGTK on Linux). It launches and supervises the engine and runs updates; it has no app logic.
 - **Plugins** provide all module types, the built-in Main plugin included. The engine loads them at runtime, and the UI imports their widget bundles from the engine.
 - **Storage**: one versioned JSON file (`%AppData%\Micser\config.json`, on Linux `~/.config/Micser/config.json`) with the modules, connections, subgraphs, templates, settings and UI preferences.
 - **Packaging**: Velopack, a per-user install without admin rights, with delta updates from GitHub releases.
 - **VAC driver** (`src/Vac`): optional virtual audio cables (PortCls WaveRT), installed machine-wide by `DriverUtility`. On Linux the engine creates the cables itself as PipeWire devices ([Linux.md](Linux.md#phase-3-virtual-cables-done)).
 
-Stack: .NET 10 (`LangVersion latest`, nullable, central package management), `Microsoft.Extensions.Hosting` with the built-in DI, `System.Text.Json`, Serilog behind `Microsoft.Extensions.Logging`, NAudio (WASAPI) for audio I/O on Windows, PipeWire's native API (`libpipewire-0.3`, own bindings) on Linux. Audio, Engine, plugins and `AudioHarness` target `net10.0`; the shell and `DriverUtility` target `net10.0-windows`. Tests: TUnit and NSubstitute; Vitest and Playwright for the web.
+Stack: .NET 10 (`LangVersion latest`, nullable, central package management), `Microsoft.Extensions.Hosting` with the built-in DI, `System.Text.Json`, Serilog behind `Microsoft.Extensions.Logging`, NAudio (WASAPI) for audio I/O on Windows, PipeWire's native API (`libpipewire-0.3`, own bindings) on Linux. Audio, Engine, plugins, the shell and `AudioHarness` target `net10.0`; only `DriverUtility` targets `net10.0-windows`. The shell uses Avalonia (code only, no XAML) with `Avalonia.Controls.WebView`. Tests: TUnit and NSubstitute; Vitest and Playwright for the web.
 
 ## Layout
 
@@ -36,7 +36,7 @@ src/
       Web/                      @micser/plugin-main: widgets for these modules, built to Web/dist
   Web/                        @micser/web: Vite + React SPA (graph editor, dialogs)
   WebSdk/                     @micser/web-sdk: widget contract, shared controls, API client, test helpers
-  Shell/                      Micser.Shell: tray + WebView2 window, engine launcher, updates
+  Shell/                      Micser.Shell: tray + web view window (Avalonia), engine launcher, updates
   ServiceDefaults/            Micser.ServiceDefaults: OpenTelemetry setup, exported only when run from the AppHost
   DriverUtility/              Micser.DriverUtility: VAC driver install/config CLI (standalone)
   Vac/                        Micser.Vac: VAC driver (C++), built by scripts/build-vac.ps1, not in Micser.slnx
@@ -208,7 +208,7 @@ docs/
   - A widget's `title` and `portLabels` are `LocalizedText`: a string or a function that translates it (`() => t("modules.gain")`), resolved with `localize()` when shown. Port labels default to the engine's port names.
   - Numbers follow the language (`formatNumber`, and the `decibels`, `hertz` and `milliseconds` labels), e.g. with a decimal comma in German. `ParameterSlider` re-renders when the language changes.
   - Text from the engine stays as it is: problem details, built-in template names and the names of their modules, device names.
-- **Shell bridge** (`src/Web/src/shell.ts`): inside the shell's WebView2, the UI exchanges web messages with the shell (`chrome.webview`, see [Shell](#shell)). In a plain browser it's absent, and the shell-only controls are hidden.
+- **Shell bridge** (`src/Web/src/shell.ts`): inside the shell's web view, the UI exchanges JSON messages with the shell: it sends through `window.invokeCSharpAction`, which the web view injects before the page's scripts run, and the shell calls `window.micserShell.receive` (see [Shell](#shell)). In a plain browser it's absent, and the shell-only controls are hidden. In the shell, the UI turns off the browser's context menu.
 - **Access token:** the SPA reads `#token=...` once, keeps it in `sessionStorage` and removes it from the address. The shell opens `{url}/#token={token}` from the discovery file.
 - **Build.** The build splits the libraries into their own chunks (React, Fluent UI, Fluent icons, React Flow, other dependencies), so a release only changes the small app chunk and the libraries stay cached. Icons are imported per icon (`@fluentui/react-icons/svg/<name>`); the package index would make Vite load all icons (17 MB) on every page load in development.
 
@@ -235,28 +235,36 @@ docs/
 
 ## Shell
 
-- **Engine discovery:** `EngineLocator` reads the discovery file and trusts it only if its process is a running `Micser.Engine` that answers `/api/health`.
+The shell runs on Windows and Linux with Avalonia (`ShellApp`, code only, no XAML; `ShutdownMode.OnExplicitShutdown`, so it lives on in the tray). Windows-only parts (registry autostart, the driver, WebView2 settings) are behind `OperatingSystem.IsWindows()`. Its local data (logs, `shell.json`, `language.json`, `color-mode.json`, the web view's data) is in `%LocalAppData%\Micser` (`~/.local/share/Micser` on Linux), its runtime files in `ShellInstance.RuntimeDirectory`: `$XDG_RUNTIME_DIR/micser` on Linux, like the engine's, otherwise the same local data folder.
+
+- **Engine discovery:** `EngineLocator` reads the engine's discovery file in the runtime folder and trusts it only if its process is a running `Micser.Engine` that answers `/api/health`.
 - **Supervision:** `EngineSupervisor` polls the engine (every 2 s, or 0.5 s while there is none).
-  - It starts `Micser.Engine.exe` from the shell's folder (or `--engine <path>`) when none is running. The engine is started detached, so it keeps running when the shell exits.
+  - It starts `Micser.Engine.exe` (`Micser.Engine` on Linux) from the shell's folder (or `--engine <path>`) when none is running. The engine is started detached, so it keeps running when the shell exits.
   - It restarts a crashed engine, at most 3 times per minute.
   - It reports address and token changes to the window.
   - Without an engine executable, it only waits for a running engine (development).
   - `RestartEngineAsync` stops the engine gracefully and lets supervision start a new one; it doesn't count toward the crash restart limit. `RunWithoutEngineAsync` pauses the engine while the driver is changed. Both are only available when the shell can start the engine (not in development).
-- **Tray:**
-  - The menu has Open, "Start with Windows" (`HKCU\...\Run` value `Micser` = `"<shell>" --minimized`), Close and Exit Micser.
+- **Tray** (Avalonia's `TrayIcon`: a notification area icon on Windows, a StatusNotifierItem with a D-Bus menu on Linux):
+  - The menu has Open, the autostart toggle, the update item (installed builds only), Close and Exit Micser. Clicking the icon opens the window.
+  - Autostart (`IAutostart`): "Start with Windows" is the `HKCU\...\Run` value `Micser` = `"<shell>" --minimized` (`WindowsAutostart`); "Start at login" on Linux is the desktop entry `~/.config/autostart/micser.desktop` (`XdgAutostart`).
   - "Close" exits the shell only, and the audio keeps running. "Exit Micser" stops the engine via `POST /api/engine/shutdown` and waits for it to exit.
-  - A second shell start signals the first through a named event (`Local\Micser.Shell`), which shows its window.
-- **Language.** The tray menu, notifications and the window's message boxes and status page come from `Strings.resx` and `Strings.de.resx` (the `Strings` class is generated at build time; German is a satellite assembly in `de/`). `ShellLanguage` picks the language like the UI: the UI's language preference, which the UI passes on with a `setLanguage` message and the shell keeps in `%LocalAppData%\Micser\language.json` for the next start, otherwise the Windows display language if the shell has it, otherwise English. The tray menu changes right away.
-- **Color mode.** `ShellColorMode` follows the color mode (light or dark) of the UI's theme preference, which the UI passes on with a `setColorMode` message and the shell keeps in `%LocalAppData%\Micser\color-mode.json`, otherwise Windows' light or dark mode. The shell doesn't know the themes themselves. At startup it sets the WinForms color mode (`Application.SetColorMode`), which WinForms applies fully only to what it creates afterwards; a change sets it again, sets the main window's title bar through DWM and sets the web view's `PreferredColorScheme`, which the status page and the UI without a theme preference follow.
-- **Window:**
-  - It's created on demand and disposed on close, which frees the WebView2 processes.
-  - Position, size and maximized state are kept in `%LocalAppData%\Micser\shell.json`.
-  - It shows `{engine url}/#token={token}`, or the `--ui <url>` override with the engine's token (Vite in development), and re-navigates when the engine changes. While no engine is available, a status page is shown.
-  - Links that open new windows go to the default browser. A missing WebView2 runtime leads to a download prompt.
-  - The browser's default context menu is off.
-- **Web messages** (`MainForm` ↔ `src/Web/src/shell.ts`), accepted only from the loaded UI's origin: `getState`, `checkForUpdates` (answered with `updateCheck`), `installUpdate`, `getReleaseNotes` (answered with `releaseNotes`), `restartEngine`, `setLanguage`, `setColorMode`, and for the driver `installDriver`, `setCableCount`, `setCableLayout`, `updateDriver` and `uninstallDriver`. The shell sends `state` (version, whether it can update, a running check, the pending update, whether it can restart the engine, the driver's status) on request and whenever it changes.
+  - There are no desktop notifications. The update item shows a downloaded update ("Restart to update"); the UI shows updates and the driver's status.
+- **Single instance** (`ShellInstance`): a second start asks the first to show its window and exits. Windows uses a named event (`Local\Micser.Shell`); Linux a lock file (`shell.lock`) and a Unix socket (`shell.sock`) in the runtime folder, which only the user can access.
+- **Language.** The tray menu and the window's message boxes and status page come from `Strings.resx` and `Strings.de.resx` (the `Strings` class is generated at build time; German is a satellite assembly in `de/`). `ShellLanguage` picks the language like the UI: the UI's language preference, which the UI passes on with a `setLanguage` message and the shell keeps in `language.json` for the next start, otherwise the system's display language if the shell has it, otherwise English. The tray menu changes right away.
+- **Color mode.** `ShellColorMode` follows the color mode (light or dark) of the UI's theme preference, which the UI passes on with a `setColorMode` message and the shell keeps in `color-mode.json`, otherwise the system's. The shell doesn't know the themes themselves. It sets the app's `RequestedThemeVariant` (title bars, dialogs; Avalonia reads the desktop's mode, on Linux from the portal's `color-scheme`). The web view gets the app's effective mode, which the status page and the UI without a theme preference follow: on Windows as WebView2's `PreferredColorScheme`, on Linux as GTK's "prefer dark theme" setting (`GtkColorScheme`), since WebKitGTK doesn't follow the desktop's dark mode itself.
+- **Window** (`MainWindow`, a `NativeWebView`: WebView2 on Windows, WebKitGTK 4.1 on Linux):
+  - It's created on demand and closed with its web view, which frees the web engine's processes.
+  - Position, size and maximized state are kept in `shell.json` (in pixels), and checked against the screens' work areas.
+  - Its icon and the tray's are `gfx/icon.png` (the logo on a square). On X11, `X11WindowIcon` sets the taskbar icon (`_NET_WM_ICON`) itself, as a 64 px image with straight alpha. Avalonia's 128 px image with premultiplied colors gets dark, hard edges in the panel: the window manager reads the colors as straight alpha, and the panel scales the largest image it's given down to about 32 px.
+  - It shows `{engine url}/#token={token}`, or the `--ui <url>` override with the engine's token (Vite in development), and re-navigates when the engine changes. While no engine is available, a status page is shown (`NavigateToString`).
+  - The web view's data is in `WebView2` (Windows) or `webkit` (Linux) in the local data folder, WebKit's cache in `~/.cache/Micser/webkit`.
+  - Links that open new windows go to the default browser (http and https only). A missing WebView2 runtime leads to a download prompt.
+  - On Windows, WebView2's default context menu is off; on both, the UI suppresses it.
+- **Web messages** (`MainWindow` ↔ `src/Web/src/shell.ts`): the web view's message event has no origin, so a message counts only while the web view shows the loaded UI's origin. They are `getState`, `checkForUpdates` (answered with `updateCheck`), `installUpdate`, `getReleaseNotes` (answered with `releaseNotes`), `restartEngine`, `setLanguage`, `setColorMode`, and for the driver `installDriver`, `setCableCount`, `setCableLayout`, `updateDriver` and `uninstallDriver`. The shell sends `state` (version, whether it can update, a running check, the pending update, whether it can restart the engine, the driver's status) on request and whenever it changes, through `InvokeScript`.
+- **Dialogs** (`Dialogs`): small Avalonia windows with OK or Yes/No, for driver results, the missing WebView2 runtime and fatal errors.
 - **Updates** are run by `UpdateController` (see [Packaging and updates](#packaging-and-updates)), shared by the tray and the window.
-- **Logs:** `%LocalAppData%\Micser\logs\shell-*.log` (Serilog). Fatal startup errors also show a message box.
+- **Logs:** `logs/shell-*.log` in the local data folder (Serilog). Fatal startup errors also show a dialog.
+- **Publishing:** the native libraries' symbol files (SkiaSharp, HarfBuzz: about 100 MB on Windows) are left out of the publish (`RemoveNativeSymbolsFromPublish` in the project), and, as for all projects, documentation files (`Directory.Build.props`). On Windows, `app.manifest` declares the supported OS versions; without it the web view's child window can't be created.
 
 ## Packaging and updates
 
@@ -319,10 +327,10 @@ docs/
 
 ## Testing
 
-- **Platforms:** everything but the shell and driver tests also runs on Linux; CI's `linux` job builds the solution, runs the Audio, Engine and Main tests and the end-to-end tests there. The PipeWire backend tests run against a private PipeWire daemon with virtual devices only (`PipeWireTestDaemon`), which they start themselves and skip without; the engine there finds no daemon and has no devices.
+- **Platforms:** everything but the driver tests also runs on Linux (the shell's registry autostart tests are Windows-only, its single-instance tests Linux-only); CI's `linux` job builds the solution, runs the Audio, Engine, Main and shell tests and the end-to-end tests there. The PipeWire backend tests run against a private PipeWire daemon with virtual devices only (`PipeWireTestDaemon`), which they start themselves and skip without; the engine there finds no daemon and has no devices.
 - **.NET:** TUnit on Microsoft.Testing.Platform, with NSubstitute. Audio tests drive `AudioGraph.Process()` directly with synthetic modules; nothing in `tests/` opens real devices. Engine tests use `EngineFactory` (temp config and user plugin directory, token required) with a real audio engine and no devices selected; Main is loaded from `plugins/Main` in the test output.
 - **Web:** Vitest, from one root `vitest.config.ts` with two projects. `*.test.ts` runs in Node. `*.test.tsx` and `*.browser.test.ts` (DOM, storage, module imports) run in Vitest browser mode on headless Chromium through Playwright, because Fluent UI and React Flow need real layout. Components are rendered with `vitest-browser-react`. `@micser/web-sdk/testing` has the shared helpers: `TestProviders` (theme, query client, an engine connection that is never started), `createTestQueryClient()` (seeded with `setQueryData` under the generated keys, so hooks don't fetch) and `testModule()`. Tests render in English unless they pass `language` to `TestProviders`.
-- **End-to-end:** Playwright Test in `tests/E2E`, Chromium only (the shell's WebView2 is Chromium as well), with the browser locale `en-US`.
+- **End-to-end:** Playwright Test in `tests/E2E`, in Chromium (the Windows shell's WebView2 is Chromium as well), with the browser locale `en-US`. On Linux, a `webkit` project also runs the smoke specs (app, connections, modules, settings, shell, subgraphs) in Playwright's WebKit, since the Linux shell renders with WebKitGTK; it needs `npx playwright install --with-deps webkit`.
   - `globalSetup.ts` builds the engine once (Release in CI), and a plugin package: the engine tests' plugin (module type "Test") with the hand-written widget bundle in `tests/E2E/plugin/web`, which imports `react` through the UI's import map like a real plugin bundle.
   - Each worker starts its own engine from the build output and its own Vite dev server, both on free ports (`servers.ts`, the worker-scoped `servers` fixture), so the tests run in parallel.
     - The engine listens on port 0 and is ready once it has written its discovery file, which has the port. It gets a temporary config and user plugin folder, with no token and no single-instance check.
@@ -332,7 +340,7 @@ docs/
   - A worker's tests share its engine, and each starts from an empty graph: the `engine` fixture deletes subgraphs, modules and templates and restores the default preferences (`EngineApi.reset()`).
     - Tests that change more, e.g. the plugins, get an engine and Vite server of their own (`test.use({ ownEngine: true })`). The `app` fixture's `restartEngine()` stops that engine gracefully (`POST /api/engine/shutdown`) and starts it at the same address, as the shell does.
   - `EngineApi` sets up state and checks results through the HTTP API; `Graph` wraps the React Flow DOM (nodes by `data-id`, ports, connections, menus, notifications).
-  - `FakeShell` injects `chrome.webview` before the UI loads: it answers `getState` with a given `ShellState`, records the messages the UI posts and sends the shell's messages, so the shell-only controls are tested without WebView2. The shell's own side of the web messages (`MainForm`) isn't covered.
+  - `FakeShell` injects `window.invokeCSharpAction` before the UI loads: it answers `getState` with a given `ShellState`, records the messages the UI posts and sends the shell's messages through `window.micserShell.receive`, so the shell-only controls are tested without the shell. The shell's own side of the web messages (`MainWindow`) isn't covered.
 
 ## Development
 

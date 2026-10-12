@@ -1,8 +1,12 @@
+using System.Runtime.Versioning;
 using Microsoft.Win32;
+using TUnit.Core.Enums;
 
 namespace Micser.Shell.Tests;
 
-public class AutostartTests
+[RunOn(OS.Windows)]
+[SupportedOSPlatform("windows")]
+public class WindowsAutostartTests
 {
     [Test]
     public async Task SetEnabled_AddsAndRemovesTheEntry()
@@ -10,7 +14,11 @@ public class AutostartTests
         var keyPath = $@"Software\Micser.Tests.{Guid.NewGuid():N}";
         try
         {
-            var autostart = new Autostart(@"C:\Program Files\Micser\Micser.Shell.exe", Registry.CurrentUser, keyPath);
+            var autostart = new WindowsAutostart(
+                @"C:\Program Files\Micser\Micser.Shell.exe",
+                Registry.CurrentUser,
+                keyPath
+            );
 
             var initially = autostart.IsEnabled;
             autostart.SetEnabled(true);
@@ -40,10 +48,10 @@ public class AutostartTests
         var keyPath = $@"Software\Micser.Tests.{Guid.NewGuid():N}";
         try
         {
-            new Autostart(@"C:\Old\Micser.Shell.exe", Registry.CurrentUser, keyPath).SetEnabled(true);
+            new WindowsAutostart(@"C:\Old\Micser.Shell.exe", Registry.CurrentUser, keyPath).SetEnabled(true);
 
             await Assert
-                .That(new Autostart(@"C:\New\Micser.Shell.exe", Registry.CurrentUser, keyPath).IsEnabled)
+                .That(new WindowsAutostart(@"C:\New\Micser.Shell.exe", Registry.CurrentUser, keyPath).IsEnabled)
                 .IsFalse();
         }
         finally

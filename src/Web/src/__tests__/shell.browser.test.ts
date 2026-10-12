@@ -1,6 +1,14 @@
 import { expect, test, vi } from "vitest";
 import { renderHook } from "vitest-browser-react";
-import { Shell, shell, useShellState, type ShellState, type WebView } from "../shell";
+import {
+  createTransport,
+  Shell,
+  shell,
+  useShellState,
+  type ShellState,
+  type ShellTransport,
+  type ShellWindow,
+} from "../shell";
 
 const state: ShellState = {
   version: "1.2.0",
@@ -11,30 +19,30 @@ const state: ShellState = {
   driver: null,
 };
 
-function createWebView() {
-  let listener: ((event: MessageEvent) => void) | undefined;
-  const webView = {
-    postMessage: vi.fn<(message: unknown) => void>(),
-    addEventListener: (_: "message", added: (event: MessageEvent) => void) => {
+function createFakeTransport() {
+  let listener: ((message: unknown) => void) | undefined;
+  const transport = {
+    send: vi.fn<(message: unknown) => void>(),
+    onReceive: (added: (message: unknown) => void) => {
       listener = added;
     },
-  } satisfies WebView;
+  } satisfies ShellTransport;
 
-  const receive = (message: unknown) => listener?.(new MessageEvent("message", { data: message }));
-  return { webView, receive };
+  const receive = (message: unknown) => listener?.(message);
+  return { transport, receive };
 }
 
 test("asks the shell for its state", () => {
-  const { webView } = createWebView();
+  const { transport } = createFakeTransport();
 
-  new Shell(webView);
+  new Shell(transport);
 
-  expect(webView.postMessage).toHaveBeenCalledWith({ type: "getState" });
+  expect(transport.send).toHaveBeenCalledWith({ type: "getState" });
 });
 
 test("keeps the reported state and tells the subscribers", () => {
-  const { webView, receive } = createWebView();
-  const shell = new Shell(webView);
+  const { transport, receive } = createFakeTransport();
+  const shell = new Shell(transport);
   const listener = vi.fn();
   shell.subscribe(listener);
 
@@ -45,8 +53,8 @@ test("keeps the reported state and tells the subscribers", () => {
 });
 
 test("stops telling a subscriber after it unsubscribed", () => {
-  const { webView, receive } = createWebView();
-  const shell = new Shell(webView);
+  const { transport, receive } = createFakeTransport();
+  const shell = new Shell(transport);
   const listener = vi.fn();
   shell.subscribe(listener)();
 
@@ -56,12 +64,12 @@ test("stops telling a subscriber after it unsubscribed", () => {
 });
 
 test("an update check resolves all waiting checks with the shell's result", async () => {
-  const { webView, receive } = createWebView();
-  const shell = new Shell(webView);
+  const { transport, receive } = createFakeTransport();
+  const shell = new Shell(transport);
 
   const first = shell.checkForUpdates();
   const second = shell.checkForUpdates();
-  expect(webView.postMessage).toHaveBeenLastCalledWith({ type: "checkForUpdates" });
+  expect(transport.send).toHaveBeenLastCalledWith({ type: "checkForUpdates" });
 
   receive({ type: "updateCheck", result: "updateReady" });
 
@@ -70,13 +78,13 @@ test("an update check resolves all waiting checks with the shell's result", asyn
 });
 
 test("asks for a version's release notes once and resolves the waiting requests with the answer for that version", async () => {
-  const { webView, receive } = createWebView();
-  const shell = new Shell(webView);
+  const { transport, receive } = createFakeTransport();
+  const shell = new Shell(transport);
 
   const first = shell.getReleaseNotes("2.0.0");
   const second = shell.getReleaseNotes("2.0.0");
   const other = shell.getReleaseNotes("1.2.0");
-  expect(webView.postMessage.mock.calls.slice(1).map(([message]) => message)).toEqual([
+  expect(transport.send.mock.calls.slice(1).map(([message]) => message)).toEqual([
     { type: "getReleaseNotes", version: "2.0.0" },
     { type: "getReleaseNotes", version: "1.2.0" },
   ]);
@@ -90,8 +98,8 @@ test("asks for a version's release notes once and resolves the waiting requests 
 });
 
 test("sends the commands with their arguments", () => {
-  const { webView } = createWebView();
-  const shell = new Shell(webView);
+  const { transport } = createFakeTransport();
+  const shell = new Shell(transport);
 
   shell.installUpdate();
   shell.restartEngine();
@@ -101,7 +109,7 @@ test("sends the commands with their arguments", () => {
   shell.updateDriver();
   shell.uninstallDriver();
 
-  expect(webView.postMessage.mock.calls.slice(1).map(([message]) => message)).toEqual([
+  expect(transport.send.mock.calls.slice(1).map(([message]) => message)).toEqual([
     { type: "installUpdate" },
     { type: "restartEngine" },
     { type: "installDriver", cableCount: 2 },
@@ -117,4 +125,21 @@ test("there is no shell in a plain browser", async () => {
 
   expect(shell).toBeUndefined();
   expect(result.current).toBeUndefined();
+});
+
+test("talks to the shell's web view through invokeCSharpAction and micserShell.receive", () => {
+  const target: ShellWindow = { invokeCSharpAction: vi.fn<(body: string) => void>() };
+  const transport = createTransport(target)!;
+  const listener = vi.fn();
+  transport.onReceive(listener);
+
+  transport.send({ type: "getState" });
+  target.micserShell!.receive({ type: "state" });
+
+  expect(target.invokeCSharpAction).toHaveBeenCalledWith('{"type":"getState"}');
+  expect(listener).toHaveBeenCalledWith({ type: "state" });
+});
+
+test("has no transport without the shell's web view", () => {
+  expect(createTransport({})).toBeUndefined();
 });
