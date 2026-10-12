@@ -31,7 +31,7 @@ export interface DriverState {
   status: DriverStatus | null;
 }
 
-/** What the desktop shell reports about itself (see the shell's MainForm.PostState). */
+/** What the desktop shell reports about itself (see the shell's MainWindow.PostState). */
 export interface ShellState {
   /** The installed version, or null in development. */
   version: string | null;
@@ -43,6 +43,10 @@ export interface ShellState {
   canRestartEngine: boolean;
   /** Null if this copy of Micser has no driver package (development, or no signed driver yet). */
   driver: DriverState | null;
+  /** Whether Micser starts when the user logs in; null if the settings don't offer it (development). */
+  autostart: boolean | null;
+  /** Whether Micser has an entry in the app menu; null unless it runs as an AppImage (Linux), which has no install step. */
+  menuEntry: boolean | null;
 }
 
 export type UpdateCheckResult = "upToDate" | "updateReady" | "failed";
@@ -134,6 +138,14 @@ export class Shell {
     this.transport.send({ type: "setCableCount", cableCount });
   }
 
+  setAutostart(enabled: boolean) {
+    this.transport.send({ type: "setAutostart", enabled });
+  }
+
+  setMenuEntry(enabled: boolean) {
+    this.transport.send({ type: "setMenuEntry", enabled });
+  }
+
   /** The language preference, for the tray menu; null follows the system. */
   setLanguage(language: string | null) {
     this.transport.send({ type: "setLanguage", language });
@@ -173,6 +185,8 @@ export class Shell {
         pendingUpdate: message.pendingUpdate,
         canRestartEngine: message.canRestartEngine,
         driver: message.driver,
+        autostart: message.autostart ?? null,
+        menuEntry: message.menuEntry ?? null,
       };
       this.listeners.forEach((listener) => listener());
     } else if (message.type === "updateCheck") {

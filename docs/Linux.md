@@ -18,7 +18,7 @@ Decisions so far: PipeWire's native API for audio, a cross-platform shell (tray 
 | Configuration, user plugins, logs     | `%AppData%`, `%LocalAppData%`                         | `~/.config/Micser`, `~/.local/share/Micser` (`Environment.SpecialFolder`) | 1            |
 | Virtual cables                        | PortCls kernel driver, `DriverUtility` (elevated)     | PipeWire loopback modules, created by the engine                          | 3            |
 | Shell                                 | Avalonia: tray, WebView2, `HKCU\...\Run`, named event | Avalonia: StatusNotifierItem tray, WebKitGTK, XDG autostart, Unix socket  | 4            |
-| Packaging and updates                 | Velopack, `Setup.exe`                                 | Velopack AppImage; the shell adds the menu entry and autostart            | 5            |
+| Packaging and updates                 | Velopack, `Setup.exe`                                 | Velopack AppImage; menu entry and autostart switched in the settings      | 5            |
 
 The graph, the DSP (NAudio's `Dsp` namespace is in the portable `NAudio.Core`), ring buffers, drift control and resampling, the API, the configuration, the plugin loader and the web UI need no changes.
 
@@ -138,12 +138,12 @@ Compared on paper (2026-10-12; sizes from documentation and package data, so les
 
 - **Velopack AppImage:** `scripts/pack.ps1` on Linux packs `Micser.AppImage` (about 64 MB) and the update packages for the `linux` channel; the release workflow's `linux` job adds them to the same GitHub release as Windows. The shell's updater works as on Windows: an update replaces the AppImage file and restarts it.
 - **Runtime:** Velopack's AppImage runtime is static and mounts with `fusermount` (fuse or fuse3), so it runs without `libfuse2` on current distributions. Engine and shell run from the mount, which stays while the engine runs after the shell closed.
-- **Desktop integration** (`AppImageIntegration`): AppImages have no install step and Velopack's install hooks are Windows-only, so the shell writes the menu entry and icon on every start and turns autostart on at the first start, all pointing to the AppImage file (`$APPIMAGE`) rather than the mount. The window class is "Micser", like the entry's `StartupWMClass`.
-- **Tested** on Linux Mint 22 (Cinnamon, X11) with isolated XDG folders: first start (menu entry, icon, autostart), the engine outliving a closed shell, an update from a local feed (0.0.1 → 0.0.2, with a delta) and Exit.
+- **Desktop integration** (`DesktopIntegration`, `AppImageMenuEntry`): AppImages have no install step and Velopack's install hooks are Windows-only. The settings have switches for the app menu entry (with the icon) and autostart, both off until turned on; they point to the AppImage file (`$APPIMAGE`) rather than the mount, and follow it when it's moved. The window class is "Micser", like the entry's `StartupWMClass`.
+- **Tested** on Linux Mint 22 (Cinnamon, X11) with isolated XDG folders: the menu entry, icon and autostart pointing to the AppImage file, the engine outliving a closed shell, an update from a local feed (0.0.1 → 0.0.2, with a delta) and Exit.
 - **Later:**
   - **Flatpak** (Flathub), where Linux desktop apps are expected: it needs `--filesystem=xdg-run/pipewire-0` for PipeWire and `--talk-name=org.kde.StatusNotifierWatcher` for the tray, and updates through Flatpak instead of Velopack.
   - Distribution packages (AUR, .deb) are optional.
-  - Removing the menu entry and autostart when the AppImage is deleted (only by hand now).
+  - Removing the menu entry and autostart when the AppImage is deleted (only by turning them off before, or by hand).
 
 ## Positioning
 

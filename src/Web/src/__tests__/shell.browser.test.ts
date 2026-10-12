@@ -17,6 +17,8 @@ const state: ShellState = {
   pendingUpdate: null,
   canRestartEngine: true,
   driver: null,
+  autostart: true,
+  menuEntry: null,
 };
 
 function createFakeTransport() {

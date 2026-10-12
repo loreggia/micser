@@ -72,8 +72,8 @@ const systemTheme = "system";
 
 /**
  * Audio settings (applied with Apply, which rebuilds the graph) and restarts, display preferences and the language (applied right away),
- * configuration export and import, plugins (applied when the engine restarts), and, when running in the desktop shell, the version, updates
- * and virtual audio cables.
+ * configuration export and import, plugins (applied when the engine restarts), and, when running in the desktop shell, autostart and the
+ * app menu entry, the version, updates and virtual audio cables.
  */
 export function EngineSettingsDialog({ open, settings, onClose }: EngineSettingsDialogProps) {
   const styles = useStyles();
@@ -220,6 +220,26 @@ export function EngineSettingsDialog({ open, settings, onClose }: EngineSettings
               checked={preferences.showChannelsByDefault}
               onChange={(_, data) => setPreferences({ showChannelsByDefault: data.checked })}
             />
+            {(shellState?.autostart != null || shellState?.menuEntry != null) && (
+              <>
+                <Divider />
+                <Subtitle2>{t("settings.desktop")}</Subtitle2>
+                {shellState.autostart != null && (
+                  <Switch
+                    label={t("settings.autostart")}
+                    checked={shellState.autostart}
+                    onChange={(_, data) => shell?.setAutostart(data.checked)}
+                  />
+                )}
+                {shellState.menuEntry != null && (
+                  <Switch
+                    label={t("settings.menuEntry")}
+                    checked={shellState.menuEntry}
+                    onChange={(_, data) => shell?.setMenuEntry(data.checked)}
+                  />
+                )}
+              </>
+            )}
             <Divider />
             <ConfigurationSettings onImported={onClose} />
             <Divider />

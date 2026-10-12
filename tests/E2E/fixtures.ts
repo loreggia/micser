@@ -311,6 +311,8 @@ export const developmentShell: ShellState = {
   pendingUpdate: null,
   canRestartEngine: false,
   driver: null,
+  autostart: null,
+  menuEntry: null,
 };
 
 interface Servers {
