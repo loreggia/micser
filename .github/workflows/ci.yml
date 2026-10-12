@@ -1,7 +1,10 @@
 name: micser CI
 
+# pushes to main and release tags; other branches run through their pull request, so a PR's commits aren't built twice
 on:
   push:
+    branches: [main]
+    tags: ["v*"]
   pull_request:
 
 # a newer push to the same branch or PR cancels the run of the older one
