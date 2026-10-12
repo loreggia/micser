@@ -255,7 +255,12 @@ internal sealed class EngineSupervisor : IDisposable
                     if (_launchedAt != null)
                     {
                         Log.Error(
-                            "The engine didn't start or keeps stopping; see its log in %LOCALAPPDATA%\\Micser\\logs."
+                            "The engine didn't start or keeps stopping; see its log in {Folder}.",
+                            Path.Combine(
+                                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+                                "Micser",
+                                "logs"
+                            )
                         );
                         _launchedAt = null;
                     }

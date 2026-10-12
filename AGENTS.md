@@ -10,8 +10,8 @@ Micser is a Windows audio router: a headless engine runs a graph of audio module
 dotnet build Micser.slnx
 dotnet test --solution Micser.slnx                      # TUnit on Microsoft.Testing.Platform (global.json "test.runner")
 dotnet test --project tests/Engine/Micser.Engine.Tests.csproj --treenode-filter "/*/*/HealthEndpointTests/*"
-# on Linux the solution builds, but only the portable test projects run (the shell's and DriverUtility's need Windows):
-dotnet test --project tests/Audio/Micser.Audio.Tests.csproj   # likewise tests/Engine/..., tests/Plugins/Main/...
+# on Linux the solution builds, and all test projects but DriverUtility's run:
+dotnet test --project tests/Audio/Micser.Audio.Tests.csproj   # likewise tests/Engine/..., tests/Plugins/Main/..., tests/Shell/...
 # the PipeWire backend tests start a private daemon with virtual devices; they need pipewire, wireplumber 0.4 and dbus-run-session
 dotnet test --project tests/Audio/Micser.Audio.Tests.csproj --treenode-filter "/*/*/PipeWireBackendTests/*"
 
@@ -24,6 +24,7 @@ npm test                     # Vitest: unit project (Node) and browser project (
 npx vitest run src/Plugins/Main/Web/src/widgets/__tests__/GainWidget.test.tsx
 npm run test:e2e             # Playwright (tests/E2E): builds the engine, then each worker runs its own engine and Vite on free ports
 npm run test:e2e -- specs/subgraphs.spec.ts --headed
+npm run test:e2e -- --project=webkit   # on Linux: the smoke specs in WebKit, like the Linux shell ("npx playwright install --with-deps webkit" once)
 # as in CI: against a published engine, which serves the built UI (no Vite)
 npm run build && dotnet publish src/Engine -c Release -o artifacts/e2e-engine
 MICSER_E2E_PUBLISHED_ENGINE=artifacts/e2e-engine/Micser.Engine.dll npm run test:e2e
@@ -36,7 +37,7 @@ npm run generate:api -w @micser/web-sdk   # regenerate the API client after engi
 aspire start                        # AppHost (tools/AppHost): engine + Vite, shell on demand, dashboard; "aspire stop" ends it
 dotnet run --project src/Engine     # http://127.0.0.1:5080
 npm run dev                         # Vite on http://localhost:5173, proxies /api and /hubs to the engine
-dotnet run --project src/Shell -- --ui http://localhost:5173   # tray + WebView2 showing Vite; uses the running dev engine
+dotnet run --project src/Shell -- --ui http://localhost:5173   # tray + web view showing Vite; uses the running dev engine
 
 dotnet run --project tools/AudioHarness -- list                    # audio devices
 dotnet run --project tools/AudioHarness -- 1 2 --gain -100         # input 1 -> gain -> output 2, prints buffer stats
@@ -68,7 +69,7 @@ General:
 
 - Keep the folder layout and dependency direction in "Layout" of `docs/Architecture.md`: new projects go into `src/` (shipping), `tests/` (mirroring `src/`) or `tools/` (dev-only).
 - Nothing in `src/` compiles against a plugin, Main included (see "Plugins").
-- Audio, Engine, plugins and their tests target `net10.0` and run on Windows and Linux (see `docs/Linux.md`). Platform code is marked `[SupportedOSPlatform]` and called behind `OperatingSystem.Is*()` (CA1416 fails the build otherwise); device APIs go behind `IAudioBackend`. Only the shell and `DriverUtility` target `net10.0-windows`.
+- Audio, Engine, plugins, the shell and their tests target `net10.0` and run on Windows and Linux (see `docs/Linux.md`). Platform code is marked `[SupportedOSPlatform]` and called behind `OperatingSystem.Is*()` (CA1416 fails the build otherwise); device APIs go behind `IAudioBackend`. Only `DriverUtility` targets `net10.0-windows`.
 - Package versions are central in `Directory.Packages.props`, so `PackageReference` items carry no `Version`. `TreatWarningsAsErrors` is on for all projects.
 - Stick to the libraries in "Overview": no Newtonsoft, EF Core, Prism/Unity, xUnit or Moq.
 - npm runs no install scripts; after dependency changes, run `npm run allow-scripts:auto` (CI fails if it changes an allowlist). See "Development" for the npm setup.
@@ -96,6 +97,11 @@ Engine (`src/Engine`, see "Engine"):
 - A new module type needs its own state record (data annotations on the record's parameters, as in ASP.NET Core), `IStatefulModule<TState>`, and a registration in its plugin's `ConfigureServices`. The engine, API, config file and OpenAPI pick it up from there.
 - Graph changes go through `AudioHost`.
 - When changing a plugin's built-in template (`templates.json`), increase its `revision` and keep its id and its modules' ids.
+
+Shell (`src/Shell`, see "Shell"):
+
+- Avalonia in code, no XAML, and no WinForms or WPF. Windows-only parts (registry, driver, WebView2 settings) stay behind `OperatingSystem.IsWindows()`, so the shell runs on Linux too.
+- The UI and the shell talk only through the web messages (`shell.ts` ↔ `MainWindow`), which must work in both WebView2 and WebKitGTK.
 
 Web UI (see "UI"):
 

@@ -15,5 +15,30 @@ export default defineConfig({
     // the UI follows the browser's language; tests that need another one set it
     locale: "en-US",
   },
-  projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"], viewport: { width: 1600, height: 900 } } }],
+  projects: [
+    { name: "chromium", use: { ...devices["Desktop Chrome"], viewport: { width: 1600, height: 900 } } },
+    // the Linux shell renders with WebKitGTK, so on Linux the smoke specs also run in Playwright's WebKit
+    ...(process.platform === "linux"
+      ? [
+          {
+            name: "webkit",
+            testMatch: [
+              "app.spec.ts",
+              "connections.spec.ts",
+              "modules.spec.ts",
+              "settings.spec.ts",
+              "shell.spec.ts",
+              "subgraphs.spec.ts",
+            ],
+            // Playwright's WebKit claims macOS, which makes React Flow expect Meta instead of Control; WebKitGTK says Linux
+            use: {
+              browserName: "webkit",
+              viewport: { width: 1600, height: 900 },
+              userAgent:
+                "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6 Safari/605.1.15",
+            },
+          },
+        ]
+      : []),
+  ],
 });

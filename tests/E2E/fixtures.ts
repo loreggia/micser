@@ -232,8 +232,9 @@ export class Graph {
 }
 
 /**
- * The desktop shell, as the UI sees it in WebView2: `chrome.webview`, injected before the UI loads. It records the messages the UI
- * posts and answers `getState` with the state it was installed with.
+ * The desktop shell, as the UI sees it in the shell's web view: `invokeCSharpAction`, injected before the UI loads, and the
+ * UI's `micserShell.receive` for the shell's messages. It records the messages the UI posts and answers `getState` with the
+ * state it was installed with.
  */
 export class FakeShell {
   private readonly page: Page;
@@ -244,22 +245,18 @@ export class FakeShell {
 
   static async install(page: Page, state: ShellState) {
     await page.addInitScript((initialState) => {
-      const listeners: ((event: MessageEvent) => void)[] = [];
-      const shell = {
-        sent: [] as unknown[],
-        receive: (data: unknown) => listeners.forEach((listener) => listener(new MessageEvent("message", { data }))),
+      const target = window as unknown as {
+        invokeCSharpAction(body: string): void;
+        micserShell?: { receive(message: unknown): void };
+        fakeShellSent: unknown[];
       };
-      const target = window as unknown as { chrome?: Record<string, unknown>; micserShell: typeof shell };
-      target.micserShell = shell;
-      target.chrome ??= {};
-      target.chrome.webview = {
-        postMessage: (message: { type: string }) => {
-          shell.sent.push(message);
-          if (message.type === "getState") {
-            setTimeout(() => shell.receive({ type: "state", ...initialState }));
-          }
-        },
-        addEventListener: (_: string, listener: (event: MessageEvent) => void) => listeners.push(listener),
+      target.fakeShellSent = [];
+      target.invokeCSharpAction = (body) => {
+        const message = JSON.parse(body) as { type: string };
+        target.fakeShellSent.push(message);
+        if (message.type === "getState") {
+          setTimeout(() => target.micserShell?.receive({ type: "state", ...initialState }));
+        }
       };
     }, state);
 
@@ -290,7 +287,7 @@ export class FakeShell {
   /** Posts a message to the UI, as the shell does. */
   async send(message: { type: string } & Record<string, unknown>) {
     await this.page.evaluate(
-      (data) => (window as unknown as { micserShell: { receive(data: unknown): void } }).micserShell.receive(data),
+      (data) => (window as unknown as { micserShell: { receive(message: unknown): void } }).micserShell.receive(data),
       message
     );
   }
@@ -301,9 +298,7 @@ export class FakeShell {
 
   private sent() {
     return this.page.evaluate(
-      () =>
-        (window as unknown as { micserShell: { sent: ({ type: string } & Record<string, unknown>)[] } }).micserShell
-          .sent
+      () => (window as unknown as { fakeShellSent: ({ type: string } & Record<string, unknown>)[] }).fakeShellSent
     );
   }
 }

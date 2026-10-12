@@ -18,6 +18,15 @@
   <data name="TrayStartWithWindows" xml:space="preserve">
     <value>Mit Windows starten</value>
   </data>
+  <data name="TrayStartAtLogin" xml:space="preserve">
+    <value>Beim Anmelden starten</value>
+  </data>
+  <data name="DialogYes" xml:space="preserve">
+    <value>Ja</value>
+  </data>
+  <data name="DialogNo" xml:space="preserve">
+    <value>Nein</value>
+  </data>
   <data name="TrayClose" xml:space="preserve">
     <value>Schließen</value>
   </data>
@@ -59,21 +68,6 @@
   </data>
   <data name="StatusStopping" xml:space="preserve">
     <value>Micser – wird beendet</value>
-  </data>
-  <data name="UpToDate" xml:space="preserve">
-    <value>Micser {0} ist auf dem neuesten Stand.</value>
-  </data>
-  <data name="UpdateCheckFailed" xml:space="preserve">
-    <value>Die Suche nach Updates ist fehlgeschlagen.</value>
-  </data>
-  <data name="UpdateReadyTitle" xml:space="preserve">
-    <value>Micser {0} ist bereit</value>
-  </data>
-  <data name="UpdateReadyText" xml:space="preserve">
-    <value>Wähle „Neu starten und aktualisieren“ im Menü des Infobereichs, um es zu installieren.</value>
-  </data>
-  <data name="DriverUpdateAvailable" xml:space="preserve">
-    <value>Ein neuer Treiber für die virtuellen Audiokabel ({0}) ist verfügbar. Installiere ihn in den Einstellungen von Micser.</value>
   </data>
   <data name="DriverRebootRequired" xml:space="preserve">
     <value>Starte Windows neu, um die Änderung der virtuellen Audiokabel abzuschließen.</value>

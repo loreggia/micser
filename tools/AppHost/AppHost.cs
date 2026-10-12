@@ -16,18 +16,15 @@ var web = builder
     .WithBrowserLogs();
 #pragma warning restore ASPIREBROWSERLOGS001
 
-// the shell finds the engine through its discovery file and shows the Vite UI; it's Windows-only (WinForms, WebView2)
-if (OperatingSystem.IsWindows())
-{
-    builder
-        .AddProject<Projects.Micser_Shell>("shell")
-        .WithArgs(context =>
-        {
-            context.Args.Add("--ui");
-            context.Args.Add(web.GetEndpoint("http"));
-        })
-        .WaitFor(web)
-        .WithExplicitStart();
-}
+// the shell finds the engine through its discovery file and shows the Vite UI
+builder
+    .AddProject<Projects.Micser_Shell>("shell")
+    .WithArgs(context =>
+    {
+        context.Args.Add("--ui");
+        context.Args.Add(web.GetEndpoint("http"));
+    })
+    .WaitFor(web)
+    .WithExplicitStart();
 
 builder.Build().Run();

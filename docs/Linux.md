@@ -1,24 +1,24 @@
 # Linux
 
-Micser runs on Windows. This document maps what it takes to run it on Linux as well, and the plan for doing so. The engine, the audio graph, the plugins, the web UI and all tests are portable (phase 1), on Linux the engine routes audio through PipeWire (phase 2) and creates the virtual cables itself (phase 3). The rest is a cross-platform shell and packaging.
+Micser runs on Windows. This document maps what it takes to run it on Linux as well, and the plan for doing so. The engine, the audio graph, the plugins, the web UI and all tests are portable (phase 1), on Linux the engine routes audio through PipeWire (phase 2) and creates the virtual cables itself (phase 3), and the shell runs on both platforms with Avalonia (phase 4). The rest is packaging.
 
 Decisions so far: PipeWire's native API for audio, a cross-platform shell (tray + embedded web view) instead of browser-only, and one engine that targets `net10.0` on both platforms.
 
 ## Windows dependencies
 
-| Area                                  | Windows                                              | Linux                                                                     | Phase        |
-| ------------------------------------- | ---------------------------------------------------- | ------------------------------------------------------------------------- | ------------ |
-| Device I/O                            | WASAPI through NAudio (`Devices/Wasapi`)             | PipeWire streams (`pw_stream`)                                            | 2            |
-| Device list, hot-plug, default device | `MMDeviceEnumerator`, notification client            | PipeWire registry, `default` metadata                                     | 2            |
-| System volume (`useSystemVolume`)     | endpoint volume of the default render device         | `Props` of the default sink node                                          | 2            |
-| Resume after sleep                    | `PowerRegisterSuspendResumeNotification`             | stall watchdog; logind `PrepareForSleep` (D-Bus) if needed                | 2            |
-| Audio thread                          | MMCSS "Pro Audio", high-resolution waitable timer    | `SCHED_FIFO` (`RLIMIT_RTPRIO`) or RTKit, `clock_nanosleep`                | 1 (RTKit: 2) |
-| One engine per session                | named semaphore `Local\Micser.Engine`                | lock file in `$XDG_RUNTIME_DIR/micser`                                    | 1            |
-| Discovery file                        | `%LocalAppData%\Micser\engine.json` (private folder) | `$XDG_RUNTIME_DIR/micser/engine.json`, mode 0600                          | 1            |
-| Configuration, user plugins, logs     | `%AppData%`, `%LocalAppData%`                        | `~/.config/Micser`, `~/.local/share/Micser` (`Environment.SpecialFolder`) | 1            |
-| Virtual cables                        | PortCls kernel driver, `DriverUtility` (elevated)    | PipeWire loopback modules, created by the engine                          | 3            |
-| Shell                                 | WinForms tray, WebView2, `HKCU\...\Run`, named event | cross-platform shell (see below), XDG autostart                           | 4            |
-| Packaging and updates                 | Velopack, `Setup.exe`                                | Velopack AppImage, later Flatpak                                          | 5            |
+| Area                                  | Windows                                               | Linux                                                                     | Phase        |
+| ------------------------------------- | ----------------------------------------------------- | ------------------------------------------------------------------------- | ------------ |
+| Device I/O                            | WASAPI through NAudio (`Devices/Wasapi`)              | PipeWire streams (`pw_stream`)                                            | 2            |
+| Device list, hot-plug, default device | `MMDeviceEnumerator`, notification client             | PipeWire registry, `default` metadata                                     | 2            |
+| System volume (`useSystemVolume`)     | endpoint volume of the default render device          | `Props` of the default sink node                                          | 2            |
+| Resume after sleep                    | `PowerRegisterSuspendResumeNotification`              | stall watchdog; logind `PrepareForSleep` (D-Bus) if needed                | 2            |
+| Audio thread                          | MMCSS "Pro Audio", high-resolution waitable timer     | `SCHED_FIFO` (`RLIMIT_RTPRIO`) or RTKit, `clock_nanosleep`                | 1 (RTKit: 2) |
+| One engine per session                | named semaphore `Local\Micser.Engine`                 | lock file in `$XDG_RUNTIME_DIR/micser`                                    | 1            |
+| Discovery file                        | `%LocalAppData%\Micser\engine.json` (private folder)  | `$XDG_RUNTIME_DIR/micser/engine.json`, mode 0600                          | 1            |
+| Configuration, user plugins, logs     | `%AppData%`, `%LocalAppData%`                         | `~/.config/Micser`, `~/.local/share/Micser` (`Environment.SpecialFolder`) | 1            |
+| Virtual cables                        | PortCls kernel driver, `DriverUtility` (elevated)     | PipeWire loopback modules, created by the engine                          | 3            |
+| Shell                                 | Avalonia: tray, WebView2, `HKCU\...\Run`, named event | Avalonia: StatusNotifierItem tray, WebKitGTK, XDG autostart, Unix socket  | 4            |
+| Packaging and updates                 | Velopack, `Setup.exe`                                 | Velopack AppImage, later Flatpak                                          | 5            |
 
 The graph, the DSP (NAudio's `Dsp` namespace is in the portable `NAudio.Core`), ring buffers, drift control and resampling, the API, the configuration, the plugin loader and the web UI need no changes.
 
@@ -85,28 +85,58 @@ On Linux the engine creates the cables itself, as PipeWire devices; no kernel dr
 - **UI:** the settings show the engine's cables (count and a layout per cable, applied right away) where the engine creates them and the shell has no driver; on Windows the shell's driver section stays as it is.
 - **Tests:** `PipeWireCableTests` against the test daemon: devices and names, audio from input to output, surround channel order, changes and removal, a daemon restart, removal with the backend. `CablesApiTests` for the API with a fake; a component test for the settings.
 
-## Phase 4: cross-platform shell
+## Phase 4: cross-platform shell (done)
 
-What the shell must do (see [Shell](Architecture.md#shell)): tray with menu, a window with a web view showing the engine's UI, the web message bridge (`shell.ts`), links to the default browser, no default context menu, color mode and language, autostart, single instance, engine supervision and updates.
+The shell (`src/Shell`, see [Shell](Architecture.md#shell)) is one Avalonia app for Windows and Linux: tray with menu, a window with a web view showing the engine's UI, the web message bridge (`shell.ts`), links to the default browser, no default context menu, color mode and language, autostart, single instance, engine supervision and updates.
 
-Options:
-
-1. **Avalonia 12** (recommended, behind a spike). `TrayIcon` uses StatusNotifierItem over D-Bus on Linux. For the web view: Avalonia's WebView or the MIT [`NativeWebView`](https://www.nuget.org/packages/NativeWebView) package (WebView2 on Windows, WebKitGTK on Linux). One shell for both platforms; the spike checks the web view's bridge, context menu and color scheme APIs, Linux maturity and licensing.
-2. **WinForms on Windows plus a GTK shell on Linux** (GirCore: GTK 4 + WebKitGTK 6, SNI tray through Tmds.DBus). Keeps the Windows shell as it is at the cost of two shells.
-3. **Photino / Rustino.NET** (WebView2 / WebKitGTK windows). Photino has no tray; its development has slowed down.
-
-Either way:
-
-- `shell.ts` gets a transport interface over `chrome.webview` (WebView2) and the Linux web view's message API, and `FakeShell` keeps testing the UI side.
-- WebKitGTK isn't Chromium: the UI needs a Playwright WebKit project (smoke tests at least) to cover the Linux shell's engine.
-- GNOME shows no tray icons without the AppIndicator extension (Ubuntu ships it, Fedora doesn't), so everything must also work from the window and the app launcher; closing the window keeps the engine running there as well.
-- Autostart: an XDG autostart entry (`~/.config/autostart/micser.desktop`). Single instance: the shell's own lock file plus a D-Bus or socket message to show the first instance's window. Color mode: the `color-scheme` setting of xdg-desktop-portal. Language: `LANG`/`LC_MESSAGES`.
-- Engine supervision as on Windows. A systemd user unit (`Restart=on-failure`) would be the native alternative, but supervision through the shell keeps both platforms alike.
+- **Toolkit:** Avalonia 12.1 with `Avalonia.Controls.WebView` (WebView2 on Windows, WebKitGTK 4.1 on Linux), code only. The WinForms shell and its Windows Desktop runtime are gone.
+- **Bridge:** the page sends through `window.invokeCSharpAction`, the shell answers through `InvokeScript` and `window.micserShell.receive`; the same on both web engines. `FakeShell` follows it.
+- **Linux specifics:** the tray is a StatusNotifierItem with a D-Bus menu, autostart an XDG desktop entry (`~/.config/autostart/micser.desktop`), the single instance a lock file and a Unix socket in `$XDG_RUNTIME_DIR/micser`, where the shell also finds the engine's discovery file.
+- **Notifications:** none, on either platform. Avalonia's `TrayIcon` has no balloon or notification API, and `Avalonia.Labs.Notifications` 12.0.2 fails on Linux with Avalonia 12.1 (its D-Bus code calls `DBusConnection.AsConnection()`, which the `Tmds.DBus.Protocol` version Avalonia 12.1 ships no longer has). The WinForms shell's balloon tips (update downloaded, the result of a check from the tray, a newer driver) are dropped; the tray's update item and the UI show the same states.
+- **Tests:** `tests/Shell` targets `net10.0` and runs on Linux CI (the registry autostart tests only on Windows, the socket single-instance tests only elsewhere). The UI's end-to-end smoke specs also run on Playwright's WebKit, since the Linux shell renders with WebKitGTK.
+- **Not covered:** GNOME shows no tray icons without the AppIndicator extension (Ubuntu ships it, Fedora doesn't), so there the shell is reached through the window and a second start. Packaging (a desktop entry and icon for the app launcher) is phase 5.
 - Never pass the token on a command line: `/proc/<pid>/cmdline` is readable by other users. The shell loads `{url}/#token=…` in its own web view; "open in browser" would need a 0600 redirect file in the runtime folder.
+
+### Evaluation: Avalonia and Photino.NET
+
+Two prototypes (2026-10-12, on Linux Mint 22 / Cinnamon on X11, WebKitGTK 2.52) loaded the built UI from an engine, exchanged messages with the page and, for Avalonia, showed a tray icon. Sizes are publish output without debug symbols, framework-dependent: the .NET runtime is shared with the engine in the bundle, so this is what the shell adds.
+
+|                                                            | Avalonia 12.1 + `Avalonia.Controls.WebView` 12.1                                       | Photino.NET 4.0.16 (Photino.Native 4.0.22)                                        |
+| ---------------------------------------------------------- | -------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| License                                                    | MIT (the WebView is open source now)                                                   | Apache-2.0                                                                        |
+| Maintenance                                                | Active; WebView 12.1.1 released 2026-10-12                                             | Last release January 2025; targets net8/net9 (runs on net10)                      |
+| Web engine                                                 | WebView2 / WebKitGTK 4.1 (WPE WebKit where installed, not on Ubuntu)                   | WebView2 / WebKitGTK 4.1                                                          |
+| Added to the bundle, Linux                                 | 23.5 MB (Skia 10.7, HarfBuzz 2.7, Avalonia ~8)                                         | 0.4 MB                                                                            |
+| Added to the bundle, Windows                               | 28.3 MB (today's WinForms shell: 33 MB, of which 31 MB is the Windows Desktop runtime) | 0.7 MB                                                                            |
+| Tray                                                       | Built in: Win32 and StatusNotifierItem (registered with Cinnamon's tray)               | None: needs our own SNI (D-Bus) and Win32 tray                                    |
+| Running with only the tray (window closed)                 | Built in (application lifetime, explicit shutdown)                                     | Its loop ends with the window; a tray-only state needs our own loop per platform  |
+| Bridge                                                     | `invokeCSharpAction(...)` → `WebMessageReceived`; `InvokeScript`                       | `window.external.sendMessage`/`receiveMessage`; `SendWebMessage`                  |
+| Default context menu off                                   | Not in the API (platform handle or the page)                                           | `SetContextMenuEnabled(false)`                                                    |
+| Native UI besides the web view                             | Full toolkit (status page, dialogs)                                                    | Message boxes and file dialogs only                                               |
+| Window shown / page loaded                                 | 0.4 s / 0.7 s                                                                          | 0.13 s / about the same                                                           |
+| App process memory (RSS, WebKit processes alike, ≈ 360 MB) | 270 MB                                                                                 | 177 MB                                                                            |
+| Problems found                                             | None                                                                                   | `SetSize` before the window exists is ignored on Linux (set it once it's created) |
+
+Both rendered the UI identically (same WebKitGTK) and closed cleanly.
+
+### Other options
+
+Compared on paper (2026-10-12; sizes from documentation and package data, so less certain than the measurements above). MAUI has no Linux support, WPF and WinUI are Windows-only.
+
+| Option                           | Linux web engine                                      | Tray / notifications                           | Added size (Linux / Windows)                                       | Maintenance                       | Effort and risk for Micser                                                  |
+| -------------------------------- | ----------------------------------------------------- | ---------------------------------------------- | ------------------------------------------------------------------ | --------------------------------- | --------------------------------------------------------------------------- |
+| Rustino.NET 0.3.9                | WebKitGTK 4.1 (through wry, Tauri's web view library) | Both built in                                  | A Rust native library, a few MB per platform                       | Young (2026), one maintainer, 0.x | Small, with Photino's API and a tray; any bug means patching a Rust library |
+| Eto.Forms 2.12                   | GTK3; whether it binds WebKitGTK 4.1 is unclear       | Both built in                                  | A few MB on Linux; on Windows it keeps the Windows Desktop runtime | Active                            | The web view on current distributions would need a prototype first          |
+| Uno Platform 6                   | WebKitGTK 6 (GTK4), embedded in a Skia app            | No tray                                        | Likely more than Avalonia                                          | Very active                       | A full app platform for a tray and a web view; the tray still missing       |
+| WinForms + a GTK shell (GirCore) | WebKitGTK 6                                           | Windows as before; on Linux our own D-Bus code | 5–10 MB / unchanged (33 MB)                                        | GirCore is active                 | Two shells to maintain                                                      |
+| Tauri 2 (Rust)                   | WebKitGTK 4.1                                         | Built in, plus an updater                      | A few MB                                                           | Very active                       | The shell rewritten in Rust (supervision, updates, driver), two languages   |
+| Electron                         | Bundled Chromium                                      | Built in                                       | 100–150 MB                                                         | Very active                       | Heaviest by far, and the shell in JavaScript                                |
+
+**Decision: Avalonia.** It adds about 23 MB on Linux and makes the Windows bundle slightly smaller than before; the tray, the tray-only state and native dialogs come built in for both platforms, and it's actively maintained. Photino's size advantage would come with two tray implementations, our own application loops and an unmaintained native library; Rustino.NET is too young, the others either keep two shells or change the stack.
 
 ## Phase 5: packaging
 
-- **Velopack AppImage** first: the same `vpk` pipeline (`linux-x64`, self-contained), the same GitHub releases and the updater the shell already uses. Check which install hooks run on Linux; otherwise the shell sets up autostart on its first start.
+- **Velopack AppImage** first: the same `vpk` pipeline (`linux-x64`, self-contained), the same GitHub releases and the updater the shell already uses. Velopack's install hooks are Windows-only, so on Linux the shell would set up autostart on its first start.
 - **Flatpak** (Flathub) later, where Linux desktop apps are expected: it needs `--filesystem=xdg-run/pipewire-0` for PipeWire and `--talk-name=org.kde.StatusNotifierWatcher` for the tray.
 - Distribution packages (AUR, .deb) are optional.
 

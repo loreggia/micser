@@ -1,13 +1,13 @@
 using System.Text.Json;
-using Microsoft.Web.WebView2.Core;
+using Avalonia.Styling;
 using Serilog;
 
 namespace Micser.Shell;
 
 /// <summary>
 /// The color mode of the shell's windows and of the web view. It follows the color mode of the UI's theme preference, which the UI passes
-/// on and which is kept here for the next start, so the window and the tray menu have it before the UI loads (WinForms applies a color mode
-/// fully only to what is created after it's set). Without a preference, or with one the shell doesn't know, it follows Windows.
+/// on and which is kept here for the next start, so the window has it before the UI loads. Without a preference, or with one the shell
+/// doesn't know, it follows the system.
 /// </summary>
 internal sealed class ShellColorMode
 {
@@ -21,8 +21,6 @@ internal sealed class ShellColorMode
 
     public event EventHandler? Changed;
 
-    public SystemColorMode ColorMode => Resolve(Preference);
-
     public static string DefaultPath { get; } =
         Path.Combine(
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
@@ -31,28 +29,22 @@ internal sealed class ShellColorMode
         );
 
     /// <summary>
-    /// The color scheme the web view reports to pages (<c>prefers-color-scheme</c>).
-    /// </summary>
-    public CoreWebView2PreferredColorScheme PreferredColorScheme =>
-        ColorMode switch
-        {
-            SystemColorMode.Classic => CoreWebView2PreferredColorScheme.Light,
-            SystemColorMode.Dark => CoreWebView2PreferredColorScheme.Dark,
-            _ => CoreWebView2PreferredColorScheme.Auto,
-        };
-
-    /// <summary>
-    /// The color mode of the UI's theme preference, "Light" or "Dark"; null follows Windows.
+    /// The color mode of the UI's theme preference, "Light" or "Dark"; null follows the system.
     /// </summary>
     public string? Preference { get; private set; }
 
-    public static SystemColorMode Resolve(string? preference)
+    /// <summary>
+    /// The theme variant of the shell's windows; <see cref="ThemeVariant.Default"/> follows the system.
+    /// </summary>
+    public ThemeVariant ThemeVariant => Resolve(Preference);
+
+    public static ThemeVariant Resolve(string? preference)
     {
         return preference switch
         {
-            "Light" => SystemColorMode.Classic,
-            "Dark" => SystemColorMode.Dark,
-            _ => SystemColorMode.System,
+            "Light" => ThemeVariant.Light,
+            "Dark" => ThemeVariant.Dark,
+            _ => ThemeVariant.Default,
         };
     }
 
@@ -66,10 +58,10 @@ internal sealed class ShellColorMode
             return;
         }
 
-        var previous = ColorMode;
+        var previous = ThemeVariant;
         Preference = preference;
         Save();
-        if (ColorMode != previous)
+        if (ThemeVariant != previous)
         {
             Changed?.Invoke(this, EventArgs.Empty);
         }

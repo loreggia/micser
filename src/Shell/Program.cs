@@ -1,3 +1,6 @@
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Themes.Fluent;
 using Serilog;
 using Velopack;
 
@@ -5,29 +8,24 @@ namespace Micser.Shell;
 
 internal static class Program
 {
-    // "Local\" scopes the name to the session; the event shows the window of the running shell
-    private const string ActivationEventName = @"Local\Micser.Shell";
-
     [STAThread]
     private static int Main(string[] args)
     {
-        // first, so Velopack's install, update and uninstall runs exit here
-        VelopackApp
-            .Build()
-            .OnAfterInstallFastCallback(InstallHooks.AfterInstall)
-            .OnBeforeUpdateFastCallback(InstallHooks.BeforeUpdate)
-            .OnBeforeUninstallFastCallback(InstallHooks.BeforeUninstall)
-            .Run();
-
-        using var activation = new EventWaitHandle(
-            false,
-            EventResetMode.AutoReset,
-            ActivationEventName,
-            out var isFirstInstance
-        );
-        if (!isFirstInstance)
+        // first, so Velopack's install, update and uninstall runs exit here; it has hooks on Windows only
+        var velopack = VelopackApp.Build();
+        if (OperatingSystem.IsWindows())
         {
-            activation.Set();
+            velopack = velopack
+                .OnAfterInstallFastCallback(InstallHooks.AfterInstall)
+                .OnBeforeUpdateFastCallback(InstallHooks.BeforeUpdate)
+                .OnBeforeUninstallFastCallback(InstallHooks.BeforeUninstall);
+        }
+
+        velopack.Run();
+
+        using var instance = ShellInstance.TryAcquire();
+        if (instance == null)
+        {
             return 0;
         }
 
@@ -53,55 +51,63 @@ internal static class Program
             }
             catch (Exception ex) when (ex is ArgumentException or UriFormatException)
             {
-                MessageBox.Show(
-                    ex.Message + "\n\nUsage: Micser.Shell [--engine <path>] [--ui <url>] [--minimized]",
-                    "Micser",
-                    MessageBoxButtons.OK,
-                    MessageBoxIcon.Error
-                );
+                var usage = ex.Message + "\n\nUsage: Micser.Shell [--engine <path>] [--ui <url>] [--minimized]";
+                Console.Error.WriteLine(usage);
+                ShowError(usage);
                 return 1;
             }
 
-            ApplicationConfiguration.Initialize();
-
-            // the window's background and title bar in the UI's theme, so the window doesn't flash before the UI loads
-            var colorMode = new ShellColorMode(ShellColorMode.DefaultPath);
-            Application.SetColorMode(colorMode.ColorMode);
-
-            // async code started before Application.Run (the engine supervisor) must continue on the UI thread
-            SynchronizationContext.SetSynchronizationContext(new WindowsFormsSynchronizationContext());
-
-            using var http = new HttpClient();
-            var enginePath = options.EnginePath ?? Path.Combine(AppContext.BaseDirectory, "Micser.Engine.exe");
-            using var supervisor = new EngineSupervisor(
-                new EngineLocator(EngineLocator.DefaultDiscoveryPath, http),
-                http,
-                enginePath
-            );
-
-            using var updates = Updater.Create() is { } updater ? new UpdateController(updater, supervisor) : null;
-            var driver = DriverController.Create(supervisor);
-            var language = new ShellLanguage(ShellLanguage.DefaultPath);
-
-            Application.Run(
-                new TrayApplicationContext(options, supervisor, updates, driver, language, colorMode, activation)
-            );
-            return 0;
+            return AppBuilder
+                .Configure(() => new ShellApp(options, instance))
+                .UsePlatformDetect()
+                .LogToTrace()
+                .StartWithClassicDesktopLifetime(args, ShutdownMode.OnExplicitShutdown);
         }
         catch (Exception ex)
         {
+            // e.g. no display; errors while the shell runs are shown by ShellApp
             Log.Fatal(ex, "The shell failed.");
-            MessageBox.Show(
-                string.Format(Strings.Culture, Strings.FatalError, ex.Message),
-                "Micser",
-                MessageBoxButtons.OK,
-                MessageBoxIcon.Error
-            );
+            Console.Error.WriteLine(ex);
             return 1;
         }
         finally
         {
             Log.CloseAndFlush();
+        }
+    }
+
+    /// <summary>
+    /// Shows an error before the shell started, in an app of its own.
+    /// </summary>
+    private static void ShowError(string message)
+    {
+        try
+        {
+            AppBuilder
+                .Configure<ErrorApp>()
+                .UsePlatformDetect()
+                .AfterSetup(_ => ErrorApp.Message = message)
+                .StartWithClassicDesktopLifetime([], ShutdownMode.OnLastWindowClose);
+        }
+        catch (Exception ex)
+        {
+            Log.Error(ex, "Could not show an error.");
+        }
+    }
+
+    private sealed class ErrorApp : Application
+    {
+        public static string Message { get; set; } = "";
+
+        public override void Initialize()
+        {
+            Styles.Add(new FluentTheme());
+        }
+
+        public override void OnFrameworkInitializationCompleted()
+        {
+            _ = Dialogs.ShowAsync(null, Message);
+            base.OnFrameworkInitializationCompleted();
         }
     }
 }

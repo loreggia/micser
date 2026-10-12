@@ -50,7 +50,7 @@ internal static class InstallHooks
     {
         try
         {
-            var autostart = new Autostart(Environment.ProcessPath!);
+            var autostart = Autostart.Create(Environment.ProcessPath!);
             if (enabled || autostart.IsEnabled)
             {
                 autostart.SetEnabled(enabled);

@@ -25,12 +25,7 @@ internal sealed class EngineLocator
         _isEngineProcess = isEngineProcess ?? IsEngineProcess;
     }
 
-    public static string DefaultDiscoveryPath { get; } =
-        Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-            "Micser",
-            "engine.json"
-        );
+    public static string DefaultDiscoveryPath { get; } = Path.Combine(ShellInstance.RuntimeDirectory, "engine.json");
 
     public string DiscoveryPath { get; }
 

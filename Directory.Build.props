@@ -9,6 +9,8 @@
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <PublishDocumentationFile>false</PublishDocumentationFile>
+    <!-- nor those of referenced packages and projects (e.g. WebView2, NAudio) -->
+    <PublishReferencesDocumentationFiles>false</PublishReferencesDocumentationFiles>
     <!-- CS1591: missing XML comment, CS1573: undocumented parameter next to documented ones -->
     <NoWarn>$(NoWarn);CS1591;CS1573</NoWarn>
     <!-- plugin widget packages (Web/) live inside .NET project folders -->
