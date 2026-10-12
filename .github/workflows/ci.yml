@@ -221,7 +221,7 @@ jobs:
           node-version: 24
           cache: npm
 
-      # the Windows-only DriverUtility builds too (EnableWindowsTargeting), so the solution stays buildable on Linux
+      # the Windows-only DriverUtility (net10.0-windows) builds on Linux too, so the solution stays buildable here
       - name: Build
         run: dotnet build Micser.slnx --configuration Release
 

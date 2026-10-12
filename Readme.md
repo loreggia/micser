@@ -1,12 +1,14 @@
 # Micser
 
-Micser is a modular audio routing application for Microsoft Windows.
+Micser is a modular audio routing application for Windows and Linux.
 
 The application consists of:
 
 - an audio engine that runs as a background process in the user's session and exposes a local HTTP API
-- a web UI (React) for routing audio graphically using widgets, hosted in a small tray application (WebView2)
-- a virtual audio cable driver with a configurable number of devices (WIP, still requires an extended validation code signing certificate)
+- a web UI (React) for routing audio graphically using widgets, hosted in a small tray application (Avalonia, with WebView2 on Windows
+  and WebKitGTK on Linux)
+- virtual audio cables with a configurable number of devices: on Windows a driver (WIP, still requires an extended validation code signing
+  certificate), on Linux PipeWire devices that the engine creates itself
 
 [![micser CI](https://github.com/loreggia/micser/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/loreggia/micser/actions/workflows/ci.yml?query=branch%3Amain)
 
@@ -14,7 +16,13 @@ The application consists of:
 
 Grab the latest release from the [Releases](https://github.com/loreggia/micser/releases) page.
 
-Download either `Micser-win-Setup.exe` for the installer (installs for the current user) or `Micser-win-Portable.zip` for the portable version.
+- **Windows:** download either `Micser-win-Setup.exe` for the installer (installs for the current user) or `Micser-win-Portable.zip` for the
+  portable version.
+- **Linux:** download `Micser.AppImage`, make it executable (`chmod +x Micser.AppImage`) and start it. It needs PipeWire, WebKitGTK 4.1
+  (`libwebkit2gtk-4.1-0` on Debian and Ubuntu) and `fusermount`. The app menu entry and starting at login can be turned on in the settings
+  ("Desktop"). On GNOME, the tray icon needs the AppIndicator extension.
+
+Both update themselves from the GitHub releases.
 
 ## Building
 
@@ -22,7 +30,8 @@ Download either `Micser-win-Setup.exe` for the installer (installs for the curre
 
 - .NET SDK 10.0.100 or later (see `global.json`)
 - Node.js 24 or later (npm enforces it); with [Volta](https://volta.sh), the pinned version in `package.json` is used
-- WebView2 Runtime (included in Windows 11)
+- Windows: WebView2 Runtime (included in Windows 11)
+- Linux: PipeWire and WebKitGTK 4.1 to run the engine and the shell; [PowerShell](https://learn.microsoft.com/powershell/scripting/install/install-ubuntu) for `scripts/pack.ps1`
 
 ### Commands
 
@@ -49,7 +58,7 @@ dotnet run --project src/Shell -- --ui http://localhost:5173   # optional: the t
 ### Packaging
 
 ```powershell
-./scripts/pack.ps1 -Version 0.1.0   # Velopack setup and update packages in artifacts/releases
+./scripts/pack.ps1 -Version 0.1.0   # Velopack packages in artifacts/releases: Setup.exe on Windows, Micser.AppImage on Linux
 ```
 
 Pushing a tag `vX.Y.Z` builds the release on GitHub Actions and publishes it as a GitHub release, which installed copies update from.
@@ -79,11 +88,13 @@ This project uses the following libraries and tools:
 
 Engine and shell
 
-- [NAudio](https://github.com/naudio/NAudio) (audio I/O and resampling)
+- [NAudio](https://github.com/naudio/NAudio) (audio I/O on Windows, resampling)
+- [PipeWire](https://pipewire.org/) (audio I/O and virtual cables on Linux)
 - [ASP.NET Core](https://github.com/dotnet/aspnetcore) and [SignalR](https://learn.microsoft.com/aspnet/core/signalr/) (engine API)
 - [Serilog](https://serilog.net/) (logging)
 - [OpenTelemetry .NET](https://github.com/open-telemetry/opentelemetry-dotnet) (telemetry in development)
-- [WebView2](https://learn.microsoft.com/microsoft-edge/webview2/) (shell window)
+- [Avalonia](https://avaloniaui.net/) and [Avalonia WebView](https://github.com/AvaloniaUI/Avalonia.Controls.WebView) (shell: tray, window, dialogs)
+- [WebView2](https://learn.microsoft.com/microsoft-edge/webview2/) and [WebKitGTK](https://webkitgtk.org/) (the shell's web view on Windows and Linux)
 - [Velopack](https://velopack.io) (installer and updates)
 
 Web UI

@@ -8,7 +8,7 @@ Collect changes under "Unreleased". Before tagging vX.Y.Z, rename that heading t
 from that section, and the release workflow fails without it.
 -->
 
-## Unreleased
+## 0.16.0 - 2026-10-13
 
 - Micser runs on Linux: download `Micser.AppImage` from the release, make it executable and start it. It routes audio through PipeWire,
   creates the virtual audio cables itself (set their number and channel layouts in the settings), and updates itself as on Windows. In the
