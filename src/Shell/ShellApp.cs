@@ -69,7 +69,12 @@ internal sealed class ShellApp : Application
         );
         _updates = Updater.Create() is { } updater ? new UpdateController(updater, _supervisor) : null;
         _driver = DriverController.Create(_supervisor);
-        _autostart = Autostart.Create(Environment.ProcessPath!);
+        var appImagePath = OperatingSystem.IsLinux() ? AppImageIntegration.CurrentAppImagePath : null;
+        _autostart = Autostart.Create(appImagePath ?? Environment.ProcessPath!);
+        if (appImagePath != null)
+        {
+            AppImageIntegration.Create(appImagePath).Apply(_autostart, File.Exists(XdgAutostart.DefaultPath));
+        }
 
         CreateTrayIcon();
         _language.Changed += (_, _) => ApplyTexts();

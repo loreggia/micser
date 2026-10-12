@@ -10,6 +10,11 @@ from that section, and the release workflow fails without it.
 
 ## Unreleased
 
+- Micser runs on Linux: download `Micser.AppImage` from the release, make it executable and start it. It routes audio through PipeWire,
+  creates the virtual audio cables itself (set their number and channel layouts in the settings), and updates itself as on Windows. Its
+  first start adds Micser to the app menu and turns on "Start at login".
+- The tray icon no longer shows notifications. A downloaded update is shown in the tray menu ("Restart to update") and in Micser, as
+  before.
 - The volume sliders of modules use the same scale as the system's volume control, which follows loudness: half way is now a quarter of
   the old level (-18 dB), and the low volumes that used to be squeezed into the first few percent can be set precisely. Saved volumes
   sound the same as before; only their percentages change.

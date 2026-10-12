@@ -2,7 +2,7 @@
 
 This file provides guidance to AI coding agents when working with code in this repository.
 
-Micser is a Windows audio router: a headless engine runs a graph of audio modules, a web UI edits it, and a tray shell hosts the UI. `docs/Architecture.md` describes how it is built (components, layout, dependencies, audio engine, API, UI, plugins, shell, packaging, VAC driver, testing). Read the relevant section before structural changes, and keep it up to date when the architecture changes. This file only holds commands and working rules.
+Micser is an audio router for Windows and Linux: a headless engine runs a graph of audio modules, a web UI edits it, and a tray shell hosts the UI. `docs/Architecture.md` describes how it is built (components, layout, dependencies, audio engine, API, UI, plugins, shell, packaging, VAC driver, testing). Read the relevant section before structural changes, and keep it up to date when the architecture changes. This file only holds commands and working rules.
 
 ## Commands
 
@@ -52,7 +52,7 @@ dotnet run --project tools/AudioHarness -- formats 2 1             # formats out
 ```
 
 ```sh
-./scripts/pack.ps1 -Version 0.1.0   # Velopack release (Setup.exe, packages) in artifacts/releases; tags vX.Y.Z publish via .github/workflows/release.yml
+./scripts/pack.ps1 -Version 0.1.0   # Velopack release in artifacts/releases: Setup.exe on Windows, Micser.AppImage on Linux (pwsh); tags vX.Y.Z publish both via .github/workflows/release.yml
                                     # release notes: the "## 0.1.0" section of CHANGELOG.md (rename "Unreleased" before tagging)
 ```
 

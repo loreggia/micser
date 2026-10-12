@@ -1,13 +1,14 @@
 name: micser release
 
-# Called by CI for a pushed tag like v0.2.0 once all CI jobs passed: builds the Velopack release and publishes it as a GitHub
-# release, which installed copies update from. Versions with a suffix (v0.2.0-beta.1) become pre-releases, which installed
+# Called by CI for a pushed tag like v0.2.0 once all CI jobs passed: builds the Velopack releases and publishes them as one GitHub
+# release, which installed copies update from: Windows (channel "win") first, then Linux (channel "linux", the AppImage), which is
+# merged into it. vpk packs for the OS it runs on. Versions with a suffix (v0.2.0-beta.1) become pre-releases, which installed
 # copies ignore.
 on:
   workflow_call:
 
 jobs:
-  release:
+  windows:
     runs-on: windows-latest
 
     permissions:
@@ -51,3 +52,51 @@ jobs:
 
       - name: Publish
         run: dotnet vpk upload github --repoUrl ${{ github.server_url }}/${{ github.repository }} --channel win --outputDir artifacts/releases --token ${{ secrets.GITHUB_TOKEN }} --tag ${{ github.ref_name }} --releaseName "Micser ${{ steps.version.outputs.version }}" --publish ${{ steps.version.outputs.pre }}
+
+  linux:
+    needs: windows
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install
+        uses: ./.github/actions/npm-install
+
+      - name: Version
+        id: version
+        shell: pwsh
+        run: |
+          $version = "${{ github.ref_name }}".TrimStart("v")
+          "version=$version" >> $env:GITHUB_OUTPUT
+          "pre=$(if ($version.Contains('-')) { '--pre' })" >> $env:GITHUB_OUTPUT
+
+      # the previous release is the base for delta packages
+      - name: Download previous release
+        shell: pwsh
+        run: |
+          dotnet tool restore
+          dotnet vpk download github --repoUrl ${{ github.server_url }}/${{ github.repository }} --channel linux --outputDir artifacts/releases --token ${{ secrets.GITHUB_TOKEN }} ${{ steps.version.outputs.pre }}
+
+      - name: Pack
+        shell: pwsh
+        run: ./scripts/pack.ps1 -Version ${{ steps.version.outputs.version }} -RequireReleaseNotes
+
+      # into the release the windows job published
+      - name: Publish
+        run: dotnet vpk upload github --repoUrl ${{ github.server_url }}/${{ github.repository }} --channel linux --outputDir artifacts/releases --token ${{ secrets.GITHUB_TOKEN }} --tag ${{ github.ref_name }} --releaseName "Micser ${{ steps.version.outputs.version }}" --publish --merge ${{ steps.version.outputs.pre }}
