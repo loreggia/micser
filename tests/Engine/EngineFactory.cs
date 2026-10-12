@@ -48,6 +48,11 @@ internal sealed class EngineFactory : WebApplicationFactory<Program>
     /// </summary>
     public FakeSystemVolume SystemVolume { get; } = new();
 
+    /// <summary>
+    /// Replaces the cables in the machine's PipeWire; supported unless a test says otherwise.
+    /// </summary>
+    public FakeVirtualCables VirtualCables { get; } = new();
+
     public string Token => Services.GetRequiredService<EngineAccess>().Token;
 
     public static string CreateTemporaryDirectory()
@@ -112,7 +117,11 @@ internal sealed class EngineFactory : WebApplicationFactory<Program>
         builder.UseSetting("Engine:SingleInstance", "false");
         builder.UseSetting("Engine:RequireToken", "true");
         builder.UseSetting("Engine:LoadPluginTemplates", _pluginTemplates ? "true" : "false");
-        builder.ConfigureTestServices(services => services.AddSingleton<ISystemVolume>(SystemVolume));
+        builder.ConfigureTestServices(services =>
+        {
+            services.AddSingleton<ISystemVolume>(SystemVolume);
+            services.AddSingleton<IVirtualCables>(VirtualCables);
+        });
     }
 }
 

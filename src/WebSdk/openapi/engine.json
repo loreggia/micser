@@ -5,6 +5,56 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/api/cables": {
+      "get": {
+        "tags": [
+          "Cables"
+        ],
+        "description": "The virtual audio cables the engine creates, and whether it creates them on this platform.",
+        "operationId": "GetCables",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VirtualCablesDto"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Cables"
+        ],
+        "description": "Creates, changes and removes the virtual audio cables and saves them; 400 where the engine doesn't create them (Windows).",
+        "operationId": "UpdateCables",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCablesRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VirtualCablesDto"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/configuration": {
       "get": {
         "tags": [
@@ -1053,6 +1103,26 @@
             "format": "int32"
           }
         }
+      },
+      "CableDto": {
+        "required": [
+          "layout"
+        ],
+        "type": "object",
+        "properties": {
+          "layout": {
+            "$ref": "#/components/schemas/CableLayout"
+          }
+        },
+        "description": "A virtual audio cable: an output device that apps play to (\"Micser Cable N Input\"), whose sound comes out of an input device that\napps record from (\"Micser Cable N Output\")."
+      },
+      "CableLayout": {
+        "enum": [
+          "Stereo",
+          "Surround51",
+          "Surround71"
+        ],
+        "description": "The channel layout of a virtual audio cable; both of its sides use it."
       },
       "ChannelLayout": {
         "type": "object",
@@ -3191,10 +3261,49 @@
           }
         },
         "description": "A color theme of the web UI."
+      },
+      "UpdateCablesRequest": {
+        "required": [
+          "cables"
+        ],
+        "type": "object",
+        "properties": {
+          "cables": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CableDto"
+            },
+            "description": "The cables in order, cable 1 first; none removes all."
+          }
+        }
+      },
+      "VirtualCablesDto": {
+        "required": [
+          "isSupported",
+          "cables"
+        ],
+        "type": "object",
+        "properties": {
+          "isSupported": {
+            "type": "boolean",
+            "description": "Whether the engine creates cables on this platform (Linux with PipeWire). On Windows a driver provides\n    them, which the shell installs; the engine then keeps Cables but doesn't apply them."
+          },
+          "cables": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CableDto"
+            },
+            "description": "The cables in order, cable 1 first."
+          }
+        },
+        "description": "The virtual audio cables the engine creates."
       }
     }
   },
   "tags": [
+    {
+      "name": "Cables"
+    },
     {
       "name": "Configuration"
     },

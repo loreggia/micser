@@ -2,6 +2,7 @@ import { HubConnection, HubConnectionBuilder, HubConnectionState, LogLevel } fro
 import type { QueryClient, QueryKey, Updater } from "@tanstack/react-query";
 import {
   getAccessToken,
+  getGetCablesQueryKey,
   getGetConnectionsQueryKey,
   getGetDevicesQueryKey,
   getGetEngineStatusQueryKey,
@@ -22,6 +23,7 @@ import {
   type SubgraphDto,
   type SubgraphTemplateDto,
   type UiPreferencesDto,
+  type VirtualCablesDto,
 } from "../api";
 
 export type EngineConnectionState = "connecting" | "connected" | "reconnecting" | "disconnected";
@@ -219,6 +221,9 @@ export class EngineConnection {
     });
     this.hub.on("PluginsChanged", (plugins: PluginDto[]) => {
       this.setData(getGetPluginsQueryKey(), plugins);
+    });
+    this.hub.on("CablesChanged", (cables: VirtualCablesDto) => {
+      this.setData(getGetCablesQueryKey(), cables);
     });
     this.hub.on("ModuleData", (moduleId: string, data: unknown) => {
       this.dataListeners.get(moduleId)?.forEach((listener) => listener(data));

@@ -1,6 +1,6 @@
 # Linux
 
-Micser runs on Windows. This document maps what it takes to run it on Linux as well, and the plan for doing so. The engine, the audio graph, the plugins, the web UI and all tests are portable (phase 1), and on Linux the engine routes audio through PipeWire (phase 2). The rest is virtual cables, a cross-platform shell and packaging.
+Micser runs on Windows. This document maps what it takes to run it on Linux as well, and the plan for doing so. The engine, the audio graph, the plugins, the web UI and all tests are portable (phase 1), on Linux the engine routes audio through PipeWire (phase 2) and creates the virtual cables itself (phase 3). The rest is a cross-platform shell and packaging.
 
 Decisions so far: PipeWire's native API for audio, a cross-platform shell (tray + embedded web view) instead of browser-only, and one engine that targets `net10.0` on both platforms.
 
@@ -16,7 +16,7 @@ Decisions so far: PipeWire's native API for audio, a cross-platform shell (tray 
 | One engine per session                | named semaphore `Local\Micser.Engine`                | lock file in `$XDG_RUNTIME_DIR/micser`                                    | 1            |
 | Discovery file                        | `%LocalAppData%\Micser\engine.json` (private folder) | `$XDG_RUNTIME_DIR/micser/engine.json`, mode 0600                          | 1            |
 | Configuration, user plugins, logs     | `%AppData%`, `%LocalAppData%`                        | `~/.config/Micser`, `~/.local/share/Micser` (`Environment.SpecialFolder`) | 1            |
-| Virtual cables                        | PortCls kernel driver, `DriverUtility` (elevated)    | PipeWire null-audio-sink nodes, created by the engine                     | 3            |
+| Virtual cables                        | PortCls kernel driver, `DriverUtility` (elevated)    | PipeWire loopback modules, created by the engine                          | 3            |
 | Shell                                 | WinForms tray, WebView2, `HKCU\...\Run`, named event | cross-platform shell (see below), XDG autostart                           | 4            |
 | Packaging and updates                 | Velopack, `Setup.exe`                                | Velopack AppImage, later Flatpak                                          | 5            |
 
@@ -74,13 +74,16 @@ The graph, the DSP (NAudio's `Dsp` namespace is in the portable `NAudio.Core`), 
 - WirePlumber 0.5 (SPA-JSON configuration) for the test daemon, for distributions that ship it.
 - The engine as a PipeWire filter node, driven by the graph clock instead of its own timer: for PipeWire devices that removes the ring buffers, resampling and drift correction and most of the latency, but changes the engine's clocking model.
 
-## Phase 3: virtual cables
+## Phase 3: virtual cables (done)
 
-PipeWire creates virtual devices without a kernel driver:
+On Linux the engine creates the cables itself, as PipeWire devices; no kernel driver, elevation, signing or reboot.
 
-- The engine creates a node per cable side with the `support.null-audio-sink` factory: "Cable N Input" (`Audio/Sink`) and "Cable N Output" (`Audio/Source/Virtual`), linked by the engine or a loopback, with the cable's layout as `audio.position`. Nodes live as long as the engine's connection unless `object.linger` is set; lingering nodes survive engine restarts, which matches the driver's behaviour.
-- No elevation, signing or reboot: the settings section talks to a new engine API (`/api/cables`) instead of the shell's `DriverUtility` messages. The UI picks the API on Linux and the shell bridge on Windows (a capability in `GET /api/engine` or the shell state).
-- Surround layouts need no device format workaround (`IPolicyConfig`); the node's format is its declared position list.
+- **Cables** (`PipeWireCable`): one `libpipewire-module-loopback` per cable, loaded into the engine's PipeWire context. Its capture side is a virtual sink, "Micser Cable N Input" (`micser_cable_N_input`), which apps play to; its playback side is a virtual source, "Micser Cable N Output" (`micser_cable_N_output`), which apps record from. Both use the cable's layout: stereo, 5.1 (side speakers) or 7.1, as with the Windows driver. Micser lists them like any other device.
+- **Lifetime:** the cables exist while the engine runs. When the engine exits, apps playing to a cable move to another device. The module opens a PipeWire connection of its own (with the backend's `remote.name`) and destroys itself when that breaks; a destroy listener notices, so the backend never destroys it twice and loads it again after reconnecting.
+- **Changes** (`PipeWireBackend.SetCables`): cables beyond the new count or with another layout are unloaded, missing ones loaded. The call waits until their devices are listed (the module connects its two streams one after the other), at most 3 s. Other audio isn't interrupted; a stream on a changed cable faults and its device module reopens it.
+- **Engine:** `IVirtualCables` (`VirtualCables`, at most 16) is what the engine uses; the engine tests replace it, so they never create cables. The cables are part of the configuration (`cables`, the layouts in order), applied at startup and on import, and changed through `GET`/`PUT /api/cables`, which also says whether the engine creates cables on this platform (`isSupported`). `CablesChanged` on the hub patches the UI's cache.
+- **UI:** the settings show the engine's cables (count and a layout per cable, applied right away) where the engine creates them and the shell has no driver; on Windows the shell's driver section stays as it is.
+- **Tests:** `PipeWireCableTests` against the test daemon: devices and names, audio from input to output, surround channel order, changes and removal, a daemon restart, removal with the backend. `CablesApiTests` for the API with a fake; a component test for the settings.
 
 ## Phase 4: cross-platform shell
 

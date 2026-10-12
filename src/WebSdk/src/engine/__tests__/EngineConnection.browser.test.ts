@@ -8,6 +8,7 @@ import {
   getGetEngineStatusQueryKey,
   getGetModuleQueryKey,
   getGetModulesQueryKey,
+  getGetCablesQueryKey,
   getGetPluginsQueryKey,
   getGetPortLayoutsQueryKey,
   getGetPreferencesQueryKey,
@@ -255,6 +256,7 @@ describe("engine events", () => {
       ["StatusChanged", {}],
       ["PreferencesChanged", {}],
       ["PluginsChanged", []],
+      ["CablesChanged", {}],
       ["PortLayoutsChanged", []],
       ["ModuleData", original.id, {}],
       ["Levels", {}],
@@ -389,6 +391,7 @@ describe("engine events", () => {
     ["StatusChanged", getGetEngineStatusQueryKey(), { isRunning: true }],
     ["PreferencesChanged", getGetPreferencesQueryKey(), { showStreamStatistics: true, snapToGrid: false }],
     ["PluginsChanged", getGetPluginsQueryKey(), [{ id: "Main" }]],
+    ["CablesChanged", getGetCablesQueryKey(), { isSupported: true, cables: [{ layout: "Stereo" }] }],
   ])("%s replaces the cached value", (event, queryKey, value) => {
     receive(event, value);
 

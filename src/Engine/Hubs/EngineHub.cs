@@ -41,6 +41,8 @@ public interface IEngineClient
 
     Task PreferencesChanged(UiPreferencesDto preferences);
 
+    Task CablesChanged(VirtualCablesDto cables);
+
     Task StatusChanged(EngineStatusDto status);
 
     Task SubgraphChanged(SubgraphDto subgraph);

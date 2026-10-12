@@ -130,6 +130,11 @@ export const de: Translations<typeof en> = {
     notApplied: "Noch nicht übernommen; starte Windows neu, falls es danach gefragt hat.",
     surroundHint:
       "Surround-Kabel geben alle Kanäle an Micser weiter. Apps, die ein Surround-Kabel in Stereo aufnehmen, erhalten den Downmix von Windows, der viel leiser ist; verwende daher Stereo für Kabel, die solche Apps aufnehmen.",
+    engineDescription:
+      "Jedes Kabel ist ein Wiedergabegerät („Micser Cable N Input“), dessen Ton aus einem Aufnahmegerät („Micser Cable N Output“) kommt, z. B. um die Ausgabe von Micser in anderen Apps als Mikrofon zu verwenden. Die Kabel bestehen, solange Micser läuft, und Änderungen gelten sofort.",
+    engineSurroundHint:
+      "Surround-Kabel geben alle Kanäle an Micser weiter. Apps, die ein Surround-Kabel in Stereo aufnehmen, erhalten einen Downmix; verwende daher Stereo für Kabel, die solche Apps aufnehmen.",
+    changeFailed: "Die virtuellen Audiokabel konnten nicht geändert werden",
     layouts: {
       stereo: "Stereo",
       "5.1": "5.1-Surround",

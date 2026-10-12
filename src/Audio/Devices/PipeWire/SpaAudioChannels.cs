@@ -72,6 +72,23 @@ internal static class SpaAudioChannels
     }
 
     /// <summary>
+    /// The position names (e.g. <c>FL</c>) of a layout with speaker positions, in its channel order; <c>AUX0</c>… otherwise.
+    /// </summary>
+    public static string[] ToNames(ChannelLayout layout)
+    {
+        if (!layout.HasSpeakerPositions)
+        {
+            return Enumerable.Range(0, layout.ChannelCount).Select(i => $"AUX{i}").ToArray();
+        }
+
+        return Channels
+            .Where(channel => channel.Speaker != Speakers.None && (layout.Speakers & channel.Speaker) != 0)
+            .OrderBy(channel => (uint)channel.Speaker)
+            .Select(channel => channel.Name)
+            .ToArray();
+    }
+
+    /// <summary>
     /// Parses <c>audio.position</c>, e.g. <c>FL,FR</c> or <c>[ FL, FR ]</c>.
     /// </summary>
     public static IReadOnlyList<string> ParsePositions(string? value)

@@ -37,9 +37,16 @@ internal sealed class NullAudioBackend : IAudioBackend
         return null;
     }
 
+    public bool SupportsCables => false;
+
     public IReadOnlyList<AudioDeviceInfo> GetDevices(DeviceDirection direction, bool includeInactive)
     {
         return [];
+    }
+
+    public void SetCables(IReadOnlyList<ChannelLayout> layouts)
+    {
+        throw new NotSupportedException("There are no virtual cables without an audio backend.");
     }
 
     public ICaptureDevice OpenCapture(string id, bool loopback)

@@ -33,6 +33,7 @@ internal sealed unsafe class PipeWireBackend : IAudioBackend, PipeWireBackend.IC
     private static readonly RegistryEvents* RegistryEventTable = CreateRegistryEvents();
     private static bool s_isInitialized;
 
+    private readonly List<PipeWireCable> _cables = [];
     private readonly Dictionary<uint, string> _deviceDescriptions = [];
     private readonly List<PipeWireStreamDevice> _endpoints = [];
     private readonly ILogger _logger;
@@ -52,6 +53,7 @@ internal sealed unsafe class PipeWireBackend : IAudioBackend, PipeWireBackend.IC
     private int _forcedRate;
     private int _graphRate = DefaultGraphRate;
     private nint _loop;
+    private IReadOnlyList<ChannelLayout> _cableLayouts = [];
     private TimeSpan _reconnectDelay = TimeSpan.FromSeconds(1);
     private nint _registry;
     private readonly SpaHook* _registryHook;
@@ -144,6 +146,8 @@ internal sealed unsafe class PipeWireBackend : IAudioBackend, PipeWireBackend.IC
 
     PipeWireBackend ICallbackTarget.Backend => this;
 
+    public bool SupportsCables => true;
+
     internal nint Core => _core;
 
     internal ILogger Logger => _logger;
@@ -206,6 +210,12 @@ internal sealed unsafe class PipeWireBackend : IAudioBackend, PipeWireBackend.IC
         {
             Lock();
             Disconnect();
+            foreach (var cable in _cables)
+            {
+                cable.Dispose();
+            }
+
+            _cables.Clear();
             Unlock();
             ThreadLoopStop(_loop);
         }
@@ -274,6 +284,28 @@ internal sealed unsafe class PipeWireBackend : IAudioBackend, PipeWireBackend.IC
 
             // the loudest channel, as pipewire-pulse shows a sink's volume
             return new SystemVolumeLevel(Math.Clamp(volumes.Max(), 0f, 1f), node.Mute ?? false);
+        }
+    }
+
+    /// <summary>
+    /// Creates, changes and removes cables (see <see cref="PipeWireCable"/>), and waits until their devices are listed. While the
+    /// connection is lost, the cables are created once it's back.
+    /// </summary>
+    public void SetCables(IReadOnlyList<ChannelLayout> layouts)
+    {
+        Lock();
+        try
+        {
+            _cableLayouts = [.. layouts];
+            if (!_isDisconnected && !_isDisposed)
+            {
+                ApplyCables();
+                WaitForCableDevices();
+            }
+        }
+        finally
+        {
+            Unlock();
         }
     }
 
@@ -587,6 +619,39 @@ internal sealed unsafe class PipeWireBackend : IAudioBackend, PipeWireBackend.IC
         // the first roundtrip announces the globals, the second delivers the bound nodes' info and the metadata
         Roundtrip();
         Roundtrip();
+
+        if (_cableLayouts.Count > 0)
+        {
+            ApplyCables();
+            Roundtrip();
+            Roundtrip();
+        }
+    }
+
+    /// <summary>
+    /// Makes the loaded cables match <see cref="_cableLayouts"/>: removes those beyond the count or with another layout, and loads
+    /// missing ones. Loop lock held.
+    /// </summary>
+    private void ApplyCables()
+    {
+        for (var i = _cables.Count - 1; i >= 0; i--)
+        {
+            if (i >= _cableLayouts.Count || _cables[i].Layout != _cableLayouts[i])
+            {
+                _cables[i].Dispose();
+                _cables.RemoveAt(i);
+            }
+        }
+
+        for (var i = 0; i < _cableLayouts.Count; i++)
+        {
+            if (i == _cables.Count || _cables[i].Number != i + 1)
+            {
+                _cables.Insert(i, new PipeWireCable(i + 1, _cableLayouts[i], _logger));
+            }
+
+            _cables[i].Load(_context, _remote);
+        }
     }
 
     private AudioDeviceInfo Describe(Node node)
@@ -619,10 +684,15 @@ internal sealed unsafe class PipeWireBackend : IAudioBackend, PipeWireBackend.IC
             endpoints = [.. _endpoints];
         }
 
-        // the streams belong to the core, so they go first; their devices dispose them later
+        // the streams and cables belong to the core, so they go first; the streams' devices dispose them later
         foreach (var endpoint in endpoints)
         {
             endpoint.DestroyStream();
+        }
+
+        foreach (var cable in _cables)
+        {
+            cable.Unload();
         }
 
         lock (_stateLock)
@@ -741,6 +811,36 @@ internal sealed unsafe class PipeWireBackend : IAudioBackend, PipeWireBackend.IC
                 _reconnectTimer.Change(_reconnectDelay, Timeout.InfiniteTimeSpan);
             }
         }
+    }
+
+    /// <summary>
+    /// Waits until the devices of the loaded cables are listed, at most 3 s: the loopback module connects its streams one after the
+    /// other, so a roundtrip isn't enough. Loop lock held, not on the loop thread.
+    /// </summary>
+    private void WaitForCableDevices()
+    {
+        Roundtrip();
+        var names = _cables
+            .Where(cable => cable.IsLoaded)
+            .SelectMany(cable =>
+                new[] { PipeWireCable.InputName(cable.Number), PipeWireCable.OutputName(cable.Number) }
+            )
+            .ToArray();
+        var deadline = Environment.TickCount64 + 3000;
+        while (!_isDisconnected && Environment.TickCount64 < deadline)
+        {
+            lock (_stateLock)
+            {
+                if (names.All(name => FindNode(name) != null))
+                {
+                    return;
+                }
+            }
+
+            ThreadLoopTimedWait(_loop, 1);
+        }
+
+        _logger.LogWarning("The virtual cables' devices didn't all appear.");
     }
 
     private void Raise(string deviceId, AudioDeviceChange change)
@@ -924,6 +1024,9 @@ internal sealed unsafe class PipeWireBackend : IAudioBackend, PipeWireBackend.IC
         if (node.IsReady)
         {
             Raise(node.Name!, wasReady ? AudioDeviceChange.StateChanged : AudioDeviceChange.Added);
+
+            // for WaitForCableDevices
+            ThreadLoopSignal(_loop, false);
         }
     }
 

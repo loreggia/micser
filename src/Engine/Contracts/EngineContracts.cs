@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Micser.Audio;
+using Micser.Audio.Devices;
 using Micser.Engine.Plugins;
 
 namespace Micser.Engine.Contracts;
@@ -153,6 +154,41 @@ public enum UiColorMode
     Light,
     Dark,
 }
+
+/// <summary>
+/// The channel layout of a virtual audio cable; both of its sides use it.
+/// </summary>
+public enum CableLayout
+{
+    Stereo,
+
+    /// <summary>
+    /// 5.1 with side speakers.
+    /// </summary>
+    Surround51,
+
+    /// <summary>
+    /// 7.1 with back and side speakers.
+    /// </summary>
+    Surround71,
+}
+
+/// <summary>
+/// A virtual audio cable: an output device that apps play to ("Micser Cable N Input"), whose sound comes out of an input device that
+/// apps record from ("Micser Cable N Output").
+/// </summary>
+public sealed record CableDto([EnumDataType(typeof(CableLayout))] CableLayout Layout);
+
+/// <summary>
+/// The virtual audio cables the engine creates.
+/// </summary>
+/// <param name="IsSupported">Whether the engine creates cables on this platform (Linux with PipeWire). On Windows a driver provides
+/// them, which the shell installs; the engine then keeps <paramref name="Cables"/> but doesn't apply them.</param>
+/// <param name="Cables">The cables in order, cable 1 first.</param>
+public sealed record VirtualCablesDto(bool IsSupported, IReadOnlyList<CableDto> Cables);
+
+/// <param name="Cables">The cables in order, cable 1 first; none removes all.</param>
+public sealed record UpdateCablesRequest([MaxLength(VirtualCables.MaxCount)] IReadOnlyList<CableDto> Cables);
 
 /// <summary>
 /// A plugin: loaded at the engine's start, failed to load, or staged for installation.

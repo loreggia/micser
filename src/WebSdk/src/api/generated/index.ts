@@ -1,3 +1,4 @@
+export * from './cables/cables';
 export * from './configuration/configuration';
 export * from './connections/connections';
 export * from './devices/devices';

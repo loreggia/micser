@@ -12,6 +12,11 @@ public sealed class EngineConfiguration
 {
     public const int CurrentVersion = 1;
 
+    /// <summary>
+    /// The virtual audio cables the engine creates where it supports them (Linux), cable 1 first.
+    /// </summary>
+    public List<CableDto> Cables { get; init; } = [];
+
     public List<ConnectionDto> Connections { get; init; } = [];
 
     public List<ModuleDto> Modules { get; init; } = [];
@@ -160,6 +165,7 @@ public sealed class EngineConfigStore : IDisposable
         {
             Settings = file.Settings ?? new EngineSettingsDto(),
             Preferences = file.Preferences ?? new UiPreferencesDto(),
+            Cables = file.Cables ?? [],
             Modules = modules,
             Subgraphs = file.Subgraphs ?? [],
             Templates = ReadTemplates(file.Templates ?? []),
@@ -332,6 +338,7 @@ public sealed class EngineConfigStore : IDisposable
     {
         return new ConfigurationFile
         {
+            Cables = configuration.Cables,
             Connections = configuration.Connections,
             Modules = SerializeModules(configuration.Modules, configuration.UnavailableModules),
             Preferences = configuration.Preferences,
@@ -375,6 +382,8 @@ public sealed class EngineConfigStore : IDisposable
 
     private sealed class ConfigurationFile
     {
+        public List<CableDto>? Cables { get; init; }
+
         public List<ConnectionDto>? Connections { get; init; }
 
         public List<JsonElement> Modules { get; init; } = [];
