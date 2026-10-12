@@ -32,7 +32,7 @@ export default defineConfig({
             ],
             // Playwright's WebKit claims macOS, which makes React Flow expect Meta instead of Control; WebKitGTK says Linux
             use: {
-              browserName: "webkit",
+              browserName: "webkit" as const,
               viewport: { width: 1600, height: 900 },
               userAgent:
                 "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/26.6 Safari/605.1.15",
