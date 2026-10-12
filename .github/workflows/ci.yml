@@ -7,6 +7,9 @@ on:
     tags: ["v*"]
   pull_request:
 
+permissions:
+  contents: read
+
 # a newer push to the same branch or PR cancels the run of the older one
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
