@@ -193,7 +193,7 @@ public class RealtimeKitTests
 
         private static void ReplyEmpty(MethodContext context)
         {
-            using var writer = context.CreateReplyWriter(null!);
+            using var writer = context.CreateReplyWriter(null);
             context.Reply(writer.CreateMessage());
         }
 
