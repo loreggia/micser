@@ -23,6 +23,7 @@ import {
   getUpdateEngineSettingsMutationOptions,
   languages,
   resolveLanguage,
+  useGetCables,
   usePreferences,
   type EngineSettingsDto,
 } from "@micser/web-sdk";
@@ -35,7 +36,7 @@ import { themes, useTheme } from "../theme";
 import { ConfigurationSettings } from "./ConfigurationSettings";
 import { PluginsSettings } from "./PluginsSettings";
 import { ReleaseNotesDialog } from "./ReleaseNotesDialog";
-import { VirtualCablesSettings } from "./VirtualCablesSettings";
+import { EngineCablesSettings, VirtualCablesSettings } from "./VirtualCablesSettings";
 
 const sampleRates = [44100, 48000, 96000];
 const frameCounts = [128, 240, 480, 960];
@@ -81,6 +82,7 @@ export function EngineSettingsDialog({ open, settings, onClose }: EngineSettings
   const [preferences, setPreferences] = usePreferences();
   const { preference: theme } = useTheme();
   const shellState = useShellState();
+  const { data: cables } = useGetCables();
   const [checkResult, setCheckResult] = useState<UpdateCheckResult>();
   const [releaseNotesVersion, setReleaseNotesVersion] = useState<string>();
   const notifyError = useNotifyError();
@@ -266,11 +268,18 @@ export function EngineSettingsDialog({ open, settings, onClose }: EngineSettings
                 )}
               </>
             )}
-            {shellState?.driver && (
+            {shellState?.driver ? (
               <>
                 <Divider />
                 <VirtualCablesSettings driver={shellState.driver} />
               </>
+            ) : (
+              cables?.isSupported && (
+                <>
+                  <Divider />
+                  <EngineCablesSettings cables={cables} />
+                </>
+              )
             )}
           </DialogContent>
           <DialogActions>

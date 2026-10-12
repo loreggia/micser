@@ -126,6 +126,11 @@ export const en = {
     notApplied: "Not applied yet; restart Windows if it asked for it.",
     surroundHint:
       "Surround cables pass all channels to Micser. Apps that record a surround cable in stereo get Windows' downmix, which is much quieter, so use stereo for cables that such apps record.",
+    engineDescription:
+      'Each cable is a playback device ("Micser Cable N Input") whose sound comes out of a recording device ("Micser Cable N Output"), e.g. to use Micser\'s output as a microphone in other apps. The cables exist while Micser runs, and changes apply right away.',
+    engineSurroundHint:
+      "Surround cables pass all channels to Micser. Apps that record a surround cable in stereo get a downmix, so use stereo for cables that such apps record.",
+    changeFailed: "Changing the virtual audio cables failed",
     layouts: {
       stereo: "Stereo",
       "5.1": "5.1 surround",

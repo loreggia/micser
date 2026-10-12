@@ -1,3 +1,4 @@
+export * from "./generated/cables/cables";
 export * from "./generated/configuration/configuration";
 export * from "./generated/connections/connections";
 export * from "./generated/devices/devices";

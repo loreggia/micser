@@ -52,6 +52,7 @@ builder.Services.AddEngineOpenApi();
 
 builder.Services.AddSingleton<AudioDeviceService>();
 builder.Services.AddSingleton<ISystemVolume, SystemVolume>();
+builder.Services.AddSingleton<IVirtualCables, VirtualCables>();
 
 // the engine's folder also while the build-time OpenAPI generator runs it; the document only describes the built-in plugins
 var engineDirectory = Path.GetDirectoryName(typeof(EngineOptions).Assembly.Location) ?? AppContext.BaseDirectory;

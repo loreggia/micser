@@ -30,6 +30,18 @@ internal interface IAudioBackend : IDisposable
 
     IReadOnlyList<AudioDeviceInfo> GetDevices(DeviceDirection direction, bool includeInactive);
 
+    /// <summary>
+    /// Whether the backend creates virtual audio cables itself (<see cref="SetCables"/>). On Windows a driver provides them, outside
+    /// the engine.
+    /// </summary>
+    bool SupportsCables { get; }
+
+    /// <summary>
+    /// Creates, changes and removes the backend's cables to match <paramref name="layouts"/> (cable 1 first).
+    /// </summary>
+    /// <exception cref="NotSupportedException">The backend doesn't create cables.</exception>
+    void SetCables(IReadOnlyList<ChannelLayout> layouts);
+
     /// <param name="loopback">Capture what is played on an output device instead of an input.</param>
     /// <exception cref="InvalidOperationException">The device doesn't exist or isn't active in that direction.</exception>
     ICaptureDevice OpenCapture(string id, bool loopback);

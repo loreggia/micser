@@ -49,6 +49,17 @@ internal static unsafe partial class PipeWireNative
     [LibraryImport(Library, EntryPoint = "pw_context_destroy")]
     public static partial void ContextDestroy(nint context);
 
+    /// <summary>
+    /// Loads a module into the client's context, e.g. <c>libpipewire-module-loopback</c>; 0 if that failed. Loop lock held.
+    /// </summary>
+    [LibraryImport(
+        Library,
+        EntryPoint = "pw_context_load_module",
+        SetLastError = true,
+        StringMarshalling = StringMarshalling.Utf8
+    )]
+    public static partial nint ContextLoadModule(nint context, string name, string args, nint properties);
+
     [LibraryImport(Library, EntryPoint = "pw_context_new")]
     public static partial nint ContextNew(nint mainLoop, nint properties, nuint userDataSize);
 
@@ -60,6 +71,12 @@ internal static unsafe partial class PipeWireNative
 
     [LibraryImport(Library, EntryPoint = "pw_init")]
     public static partial void Init(nint argc, nint argv);
+
+    [LibraryImport(Library, EntryPoint = "pw_impl_module_add_listener")]
+    public static partial void ImplModuleAddListener(nint module, SpaHook* listener, nint events, nint data);
+
+    [LibraryImport(Library, EntryPoint = "pw_impl_module_destroy")]
+    public static partial void ImplModuleDestroy(nint module);
 
     [LibraryImport(Library, EntryPoint = "pw_properties_new_dict")]
     public static partial nint PropertiesNewDict(SpaDict* dict);
@@ -457,6 +474,19 @@ internal static unsafe partial class PipeWireNative
         public uint Version;
         public delegate* unmanaged<nint, PwNodeInfo*, void> Info;
         public delegate* unmanaged<nint, int, uint, uint, uint, nint, void> Param;
+    }
+
+    /// <summary>
+    /// <c>struct pw_impl_module_events</c>.
+    /// </summary>
+    [StructLayout(LayoutKind.Sequential)]
+    public struct ImplModuleEvents
+    {
+        public uint Version;
+        public delegate* unmanaged<nint, void> Destroy;
+        public nint Free;
+        public nint Initialized;
+        public nint Registered;
     }
 
     [StructLayout(LayoutKind.Sequential)]

@@ -42,6 +42,11 @@ internal sealed class WasapiBackend : IAudioBackend
 
     public event EventHandler? SystemResumed;
 
+    /// <summary>
+    /// The VAC driver provides the cables on Windows; the shell installs and changes it.
+    /// </summary>
+    public bool SupportsCables => false;
+
     public IBackendSystemVolume CreateSystemVolume(AudioDeviceService devices, ILogger logger)
     {
         return new WasapiSystemVolume(this, devices, logger);
@@ -99,6 +104,11 @@ internal sealed class WasapiBackend : IAudioBackend
             loopback,
             _logger
         );
+    }
+
+    public void SetCables(IReadOnlyList<ChannelLayout> layouts)
+    {
+        throw new NotSupportedException("On Windows, the virtual cables come from the driver.");
     }
 
     public IRenderDevice OpenRender(string id)

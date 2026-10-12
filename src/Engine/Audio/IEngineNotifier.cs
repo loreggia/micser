@@ -21,6 +21,8 @@ public interface IEngineNotifier
 
     void PreferencesChanged(UiPreferencesDto preferences);
 
+    void CablesChanged(VirtualCablesDto cables);
+
     void StatusChanged(EngineStatusDto status);
 
     void SubgraphChanged(SubgraphDto subgraph);

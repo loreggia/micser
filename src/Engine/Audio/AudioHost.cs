@@ -38,6 +38,8 @@ public sealed class AudioHost : IDisposable
     private IReadOnlyList<ModuleTypeDto>? _moduleTypes;
     private UiPreferencesDto _preferences = new();
     private EngineSettingsDto _settings = new();
+    private readonly IVirtualCables _virtualCables;
+    private List<CableDto> _cables = [];
 
     public AudioHost(
         IServiceProvider services,
@@ -45,6 +47,7 @@ public sealed class AudioHost : IDisposable
         EngineConfigStore store,
         AudioDeviceService devices,
         ISystemVolume systemVolume,
+        IVirtualCables virtualCables,
         IEngineNotifier notifier,
         PluginCatalog plugins,
         IOptions<EngineOptions> options,
@@ -58,6 +61,7 @@ public sealed class AudioHost : IDisposable
         _store = store;
         _devices = devices;
         _systemVolume = systemVolume;
+        _virtualCables = virtualCables;
         _notifier = notifier;
         _loggerFactory = loggerFactory;
         _logger = loggerFactory.CreateLogger<AudioHost>();
@@ -343,6 +347,14 @@ public sealed class AudioHost : IDisposable
         return [.. modules.Select(m => ToPortLayoutsDto(m.Id, m.Module))];
     }
 
+    public VirtualCablesDto GetCables()
+    {
+        lock (_lock)
+        {
+            return CreateCablesDto();
+        }
+    }
+
     public UiPreferencesDto GetPreferences()
     {
         lock (_lock)
@@ -451,6 +463,7 @@ public sealed class AudioHost : IDisposable
 
             _notifier.TemplatesChanged([.. _templates.Values.Select(ToDto)]);
             _notifier.PreferencesChanged(_preferences);
+            _notifier.CablesChanged(CreateCablesDto());
             var status = CreateStatus();
             _notifier.StatusChanged(status);
             return status;
@@ -894,6 +907,31 @@ public sealed class AudioHost : IDisposable
             Persist();
             _notifier.PreferencesChanged(preferences);
             return preferences;
+        }
+    }
+
+    /// <summary>
+    /// Creates, changes and removes the virtual cables (where the engine creates them), and saves them.
+    /// </summary>
+    public VirtualCablesDto UpdateCables(UpdateCablesRequest request)
+    {
+        ThrowIfInvalid(StateValidator.Validate(request));
+        if (!_virtualCables.IsSupported)
+        {
+            throw new EngineRequestException(
+                StatusCodes.Status400BadRequest,
+                "The engine doesn't create virtual cables on this platform; on Windows, the driver provides them."
+            );
+        }
+
+        lock (_lock)
+        {
+            _cables = [.. request.Cables];
+            ApplyCables();
+            Persist();
+            var cables = CreateCablesDto();
+            _notifier.CablesChanged(cables);
+            return cables;
         }
     }
 
@@ -1369,12 +1407,48 @@ public sealed class AudioHost : IDisposable
         return created;
     }
 
+    private static ChannelLayout ToChannelLayout(CableLayout layout)
+    {
+        return layout switch
+        {
+            CableLayout.Surround51 => ChannelLayout.Surround51,
+            CableLayout.Surround71 => ChannelLayout.Surround71,
+            _ => ChannelLayout.Stereo,
+        };
+    }
+
+    /// <summary>
+    /// Makes the backend's cables match <see cref="_cables"/>, where the engine creates them. Call while holding the lock.
+    /// </summary>
+    private void ApplyCables()
+    {
+        if (!_virtualCables.IsSupported)
+        {
+            return;
+        }
+
+        try
+        {
+            _virtualCables.Set([.. _cables.Select(cable => ToChannelLayout(cable.Layout))]);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Creating the virtual cables failed.");
+        }
+    }
+
+    private VirtualCablesDto CreateCablesDto()
+    {
+        return new VirtualCablesDto(_virtualCables.IsSupported, [.. _cables]);
+    }
+
     private EngineConfiguration CreateConfiguration()
     {
         return new EngineConfiguration
         {
             Settings = _settings,
             Preferences = _preferences,
+            Cables = [.. _cables],
             Modules = [.. _modules.Values.Select(ToDto)],
             Subgraphs = [.. _subgraphs.Values],
             Templates = [.. _templates.Values.Where(t => !t.IsBuiltIn)],
@@ -1537,6 +1611,13 @@ public sealed class AudioHost : IDisposable
 
         _settings = settingsErrors.Count == 0 ? configuration.Settings : new EngineSettingsDto();
         _preferences = configuration.Preferences;
+        _cables =
+        [
+            .. configuration
+                .Cables.Where(cable => StateValidator.Validate(cable).Count == 0)
+                .Take(VirtualCables.MaxCount),
+        ];
+        ApplyCables();
         foreach (var template in configuration.Templates)
         {
             if (

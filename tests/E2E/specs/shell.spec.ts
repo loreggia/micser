@@ -30,7 +30,10 @@ test("in a browser, the shell's controls are hidden", async ({ graph }) => {
   await expect(dialog.getByText("Plugins", { exact: true })).toBeVisible();
   await expect(dialog.getByRole("button", { name: "Restart engine process" })).toHaveCount(0);
   await expect(dialog.getByRole("button", { name: "Check for updates" })).toHaveCount(0);
-  await expect(dialog.getByText("Virtual audio cables")).toHaveCount(0);
+  // the driver's controls; on Linux with PipeWire the engine's own cables have a section of their own
+  await expect(dialog.getByRole("button", { name: "Install", exact: true })).toHaveCount(0);
+  await expect(dialog.getByRole("button", { name: "Uninstall", exact: true })).toHaveCount(0);
+  await expect(dialog.getByText("Driver", { exact: false })).toHaveCount(0);
 });
 
 test("a development shell shows none of its controls either", async ({ graph }) => {
@@ -39,7 +42,10 @@ test("a development shell shows none of its controls either", async ({ graph }) 
 
   await expect(dialog.getByRole("button", { name: "Restart engine process" })).toHaveCount(0);
   await expect(dialog.getByRole("button", { name: "Check for updates" })).toHaveCount(0);
-  await expect(dialog.getByText("Virtual audio cables")).toHaveCount(0);
+  // the driver's controls; on Linux with PipeWire the engine's own cables have a section of their own
+  await expect(dialog.getByRole("button", { name: "Install", exact: true })).toHaveCount(0);
+  await expect(dialog.getByRole("button", { name: "Uninstall", exact: true })).toHaveCount(0);
+  await expect(dialog.getByText("Driver", { exact: false })).toHaveCount(0);
   expect(await shell.messages()).toEqual([]);
 });
 

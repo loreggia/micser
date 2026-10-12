@@ -27,6 +27,7 @@ public static class ApiEndpoints
     {
         var api = app.MapGroup("/api").AddEndpointFilter(HandleEngineRequestException);
 
+        MapCables(api);
         MapConfiguration(api);
         MapHealth(api);
         MapModuleTypes(api);
@@ -289,6 +290,24 @@ public static class ApiEndpoints
             .WithTags("Modules")
             .WithDescription(
                 "The channel layouts of all modules' ports in the last processed block; changes are pushed as PortLayoutsChanged."
+            );
+    }
+
+    private static void MapCables(RouteGroupBuilder api)
+    {
+        var cables = api.MapGroup("/cables").WithTags("Cables");
+
+        cables
+            .MapGet("", (AudioHost host) => TypedResults.Ok(host.GetCables()))
+            .WithName("GetCables")
+            .WithDescription(
+                "The virtual audio cables the engine creates, and whether it creates them on this platform."
+            );
+        cables
+            .MapPut("", (UpdateCablesRequest request, AudioHost host) => TypedResults.Ok(host.UpdateCables(request)))
+            .WithName("UpdateCables")
+            .WithDescription(
+                "Creates, changes and removes the virtual audio cables and saves them; 400 where the engine doesn't create them (Windows)."
             );
     }
 

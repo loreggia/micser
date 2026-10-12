@@ -6,6 +6,8 @@
  */
 
 export * from './audioDeviceInfo';
+export * from './cableDto';
+export * from './cableLayout';
 export * from './channelLayout';
 export * from './compressorState';
 export * from './compressorType';
@@ -76,3 +78,5 @@ export * from './templateConnectionDto';
 export * from './uiColorMode';
 export * from './uiPreferencesDto';
 export * from './uiThemeDto';
+export * from './updateCablesRequest';
+export * from './virtualCablesDto';

@@ -24,6 +24,11 @@ public sealed class HubEngineNotifier : IEngineNotifier, IDisposable
         _sender = Task.Run(SendAllAsync);
     }
 
+    public void CablesChanged(VirtualCablesDto cables)
+    {
+        Send(c => c.CablesChanged(cables));
+    }
+
     public void ConnectionAdded(ConnectionDto connection)
     {
         Send(c => c.ConnectionAdded(connection));
