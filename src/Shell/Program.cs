@@ -60,6 +60,8 @@ internal static class Program
             return AppBuilder
                 .Configure(() => new ShellApp(options, instance))
                 .UsePlatformDetect()
+                // the window class of the menu entry (AppImageIntegration) and of Velopack's AppImage
+                .With(new X11PlatformOptions { WmClass = "Micser" })
                 .LogToTrace()
                 .StartWithClassicDesktopLifetime(args, ShutdownMode.OnExplicitShutdown);
         }

@@ -1,6 +1,6 @@
 # Architecture
 
-Micser routes audio on Windows through a graph of modules (devices, effects, analyzers) that the user wires up in a web UI. The engine, the UI and the shell also run on Linux, with PipeWire for audio; [Linux.md](Linux.md) has the plan for the rest (packaging).
+Micser routes audio on Windows through a graph of modules (devices, effects, analyzers) that the user wires up in a web UI. The engine, the UI and the shell also run on Linux, with PipeWire for audio, packaged as an AppImage; [Linux.md](Linux.md) has the details and what's left.
 
 ## Overview
 
@@ -268,21 +268,24 @@ The shell runs on Windows and Linux with Avalonia (`ShellApp`, code only, no XAM
 
 ## Packaging and updates
 
-- **Build:** `scripts/pack.ps1 -Version x.y.z` builds the web UI, publishes engine and shell self-contained (win-x64) into one folder, and packs it with `vpk` (a local dotnet tool) into `artifacts/releases`.
-  - The output is `Micser-win-Setup.exe`, a portable zip, and full and delta packages.
+- **Build:** `scripts/pack.ps1 -Version x.y.z` builds the web UI, publishes engine and shell self-contained into one folder, and packs it with `vpk` (a local dotnet tool) into `artifacts/releases`. `vpk` packs for the OS it runs on: on Windows win-x64 (channel `win`), on Linux linux-x64 (channel `linux`).
+  - On Windows the output is `Micser-win-Setup.exe`, a portable zip, and full and delta packages; on Linux `Micser.AppImage` and the packages.
   - Both apps use the same runtime, so its files are shared.
   - Nothing is code-signed yet, so SmartScreen warns on the first run. Signing would go through `vpk pack --signParams`.
 - **Release:** pushing a tag `vX.Y.Z` runs CI, which calls `.github/workflows/release.yml` once all its jobs passed.
-  - It downloads the previous release (the base for deltas), packs, and publishes a GitHub release.
+  - Its `windows` job downloads the previous release (the base for deltas), packs, and publishes a GitHub release; its `linux` job then does the same for the AppImage and merges it into that release (`vpk upload github --merge`).
   - Tags with a suffix (`v0.2.0-beta.1`) become pre-releases, which installed copies ignore.
 - **Release notes** are written by hand in `CHANGELOG.md`, for users: changes collect under "Unreleased", which is renamed to `## X.Y.Z` before tagging.
   - `scripts/pack.ps1` takes the version's section and passes it to `vpk pack --releaseNotes`, which embeds it in the package; `vpk upload github` makes it the GitHub release body. It also ships it as `ReleaseNotes.md` in the app folder. The release workflow fails without a section (`-RequireReleaseNotes`).
   - The shell provides the notes of the installed version (`ReleaseNotes.md`) and of a downloaded update (`VelopackAsset.NotesMarkdown`, from its package). An update that skips versions shows only the target version's notes.
-- **Install:**
+- **Install (Windows):**
   - The install goes to `%LocalAppData%\Micser`: the stub `Micser.exe`, `Update.exe`, `current\` (the app) and `packages\`. The shell's local data (logs, `engine.json`, `shell.json`, WebView2) lives in the same folder.
   - Uninstalling removes the whole folder. The configuration in `%AppData%\Micser` stays.
   - Shortcuts go to the Start menu and the desktop.
-- **Hooks** (`InstallHooks`; `VelopackApp.Run()` is the first call in the shell):
+- **Install (Linux):** the AppImage is the installation: it runs from wherever the user puts it, mounted (FUSE, `fusermount`; the runtime is static, so `libfuse2` isn't needed) at a path that changes with every start. Engine and shell run from the mount; the runtime keeps it while either runs, so the engine outlives a closed shell as on Windows.
+  - There's no install step, so the shell does what the installer does (`AppImageIntegration`, whenever `$APPIMAGE` is set): on every start it writes the menu entry `~/.local/share/applications/micser.desktop` (`StartupWMClass=Micser`, the window's class) and the icon `~/.local/share/icons/hicolor/256x256/apps/micser.png`, and moves an existing autostart entry to the AppImage's current path; on the first start (no `~/.local/share/Micser/appimage-installed` yet) it turns autostart on. All of them point to the AppImage file, not to the mount.
+  - Deleting the AppImage leaves these entries behind; they are removed by hand.
+- **Hooks** (Windows; `InstallHooks`; `VelopackApp.Run()` is the first call in the shell):
   - After install, autostart is enabled; it points to `current\Micser.Shell.exe`, which stays the same across updates.
   - Before an update, the old shell stops the engine gracefully, so it saves its configuration. Velopack then ends all remaining processes in the app folder.
   - Before uninstall, autostart is removed. Velopack ends the processes before this hook, so the engine is killed.
@@ -291,7 +294,8 @@ The shell runs on Windows and Linux with Avalonia (`ShellApp`, code only, no XAM
   - The tray menu shows "Check for updates", or "Restart to update to x.y.z" once one is downloaded; that stops the engine and restarts into the new version.
   - A downloaded update is also applied on the next shell start.
   - `MICSER_UPDATE_SOURCE` points the shell at another feed (a local folder or URL) for testing.
-  - Velopack logs to `%LocalAppData%\velopack\velopack_Micser.log`.
+  - On Linux, an update replaces the AppImage file in place (with `pkexec` if its folder isn't writable) and restarts it.
+  - Velopack logs to `%LocalAppData%\velopack\velopack_Micser.log`, on Linux to `/tmp/velopack_Micser.log`.
 - **Driver:** Velopack can't run elevated steps, so the VAC driver isn't part of the app's installation. `scripts/pack.ps1 -DriverPackage <dir>` puts the driver and `DriverUtility` in the release's `driver` folder, and the shell installs and changes the driver from the settings by running `DriverUtility` elevated (see [VAC driver](#vac-driver)). The release workflow doesn't bundle it until the driver is attestation-signed (EV certificate); without a driver package the app hides the driver settings.
 
 ## VAC driver

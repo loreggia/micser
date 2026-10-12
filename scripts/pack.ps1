@@ -1,4 +1,5 @@
-# Builds the web UI, publishes engine and shell into one folder and packs a Velopack release into artifacts/releases.
+# Builds the web UI, publishes engine and shell into one folder and packs a Velopack release into artifacts/releases: on Windows for
+# win-x64 (Setup.exe, the "win" channel), on Linux for linux-x64 (Micser.AppImage, the "linux" channel); vpk packs for the OS it runs on.
 # With -DriverPackage (a folder with the signed driver's INF, SYS and CAT), the release also carries the virtual audio cable driver and
 # DriverUtility in its driver folder; without it, the app hides the driver settings.
 # The version's section in CHANGELOG.md ("## X.Y.Z") becomes the release notes: in the package (vpk upload github uses them as the GitHub
@@ -6,14 +7,17 @@
 # Without a section, the release has no notes, unless -RequireReleaseNotes makes that an error.
 param(
     [Parameter(Mandatory)][string]$Version,
-    [string]$Runtime = "win-x64",
-    [string]$Channel = "win",
+    [string]$Runtime = $(if ($IsLinux) { "linux-x64" } else { "win-x64" }),
+    [string]$Channel = $(if ($Runtime -like "linux-*") { "linux" } else { "win" }),
     [string]$DriverPackage,
     [switch]$RequireReleaseNotes
 )
 
 $ErrorActionPreference = "Stop"
 $PSNativeCommandUseErrorActionPreference = $true
+
+$isLinuxRuntime = $Runtime -like "linux-*"
+if ($isLinuxRuntime -and $DriverPackage) { throw "The driver is Windows-only." }
 
 $root = Split-Path $PSScriptRoot -Parent
 $publishDir = Join-Path $root "artifacts/publish"
@@ -69,6 +73,14 @@ try {
         $notesArgs = "--releaseNotes", $notesPath
     }
 
+    # Linux: the AppImage's menu entry (inside it; AppImageIntegration writes the user's) needs a PNG icon
+    $platformArgs = if ($isLinuxRuntime) {
+        "--mainExe", "Micser.Shell", "--icon", "gfx/icon.png", "--categories", "AudioVideo;Audio"
+    }
+    else {
+        "--mainExe", "Micser.Shell.exe", "--icon", "gfx/logo.ico"
+    }
+
     dotnet tool restore
     dotnet vpk pack `
         --packId Micser `
@@ -76,11 +88,10 @@ try {
         --packTitle Micser `
         --packAuthors "Lucas Loreggia" `
         --packDir $publishDir `
-        --mainExe Micser.Shell.exe `
         --runtime $Runtime `
-        --icon gfx/logo.ico `
         --channel $Channel `
         --outputDir $releasesDir `
+        @platformArgs `
         @notesArgs
 }
 finally {
