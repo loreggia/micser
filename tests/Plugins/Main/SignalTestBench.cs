@@ -49,6 +49,17 @@ internal sealed class SignalTestBench
 
     public ChannelLayout OutputLayout => _recorder.Layout;
 
+    /// <summary>
+    /// Adds another sine source connected to <paramref name="target"/>, e.g. an effect's sidechain.
+    /// </summary>
+    public SineSource AddSource(InputPort target, float frequency, float amplitude, ChannelLayout? layout = null)
+    {
+        var source = new SineSource(frequency, amplitude, layout ?? ChannelLayout.Mono);
+        _graph.Add(source);
+        _graph.Connect(source.Output, target);
+        return source;
+    }
+
     public static float Peak(ReadOnlySpan<float> samples)
     {
         var peak = 0f;
@@ -98,7 +109,7 @@ internal sealed class SignalTestBench
         }
     }
 
-    private sealed class SineSource : AudioModule
+    public sealed class SineSource : AudioModule
     {
         private readonly ChannelLayout _layout;
         private double _phase;

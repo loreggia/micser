@@ -3,6 +3,7 @@ import { createElement } from "react";
 import { t } from "./i18n";
 import { CompressorWidget } from "./widgets/CompressorWidget";
 import { DeviceWidget } from "./widgets/DeviceWidget";
+import { DuckerWidget } from "./widgets/DuckerWidget";
 import { EqualizerWidget } from "./widgets/EqualizerWidget";
 import { FilterWidget } from "./widgets/FilterWidget";
 import { GainWidget } from "./widgets/GainWidget";
@@ -31,6 +32,7 @@ export default definePlugin({
     defineWidget({ moduleType: "Gain", title: () => t("modules.gain"), component: GainWidget }),
     defineWidget({ moduleType: "Compressor", title: () => t("modules.compressor"), component: CompressorWidget }),
     defineWidget({ moduleType: "NoiseGate", title: () => t("modules.noiseGate"), component: NoiseGateWidget }),
+    defineWidget({ moduleType: "Ducker", title: () => t("modules.ducker"), component: DuckerWidget }),
     defineWidget({ moduleType: "Equalizer", title: () => t("modules.equalizer"), component: EqualizerWidget }),
     defineWidget({ moduleType: "Filter", title: () => t("modules.filter"), component: FilterWidget }),
     defineWidget({ moduleType: "Pitch", title: () => t("modules.pitch"), component: PitchWidget }),

@@ -9,6 +9,7 @@ export const de: Translations<typeof en> = {
     gain: "Verstärkung",
     compressor: "Kompressor",
     noiseGate: "Noise Gate",
+    ducker: "Ducker",
     equalizer: "Equalizer",
     filter: "Filter",
     pitch: "Tonhöhe",
@@ -43,6 +44,13 @@ export const de: Translations<typeof en> = {
     hold: "Hold",
     release: "Release",
     hysteresis: "Hysterese",
+  },
+  ducker: {
+    threshold: "Schwelle",
+    depth: "Absenkung",
+    attack: "Attack",
+    hold: "Hold",
+    release: "Release",
   },
   equalizer: {
     band: "Band {{number}}",

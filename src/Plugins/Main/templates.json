@@ -97,6 +97,57 @@
     ]
   },
   {
+    "id": "2e96c1d5-cda9-49ff-8321-ff21d62d8c08",
+    "name": "Music ducking",
+    "revision": 1,
+    "color": "Orange",
+    "size": {
+      "width": 700,
+      "height": 540
+    },
+    "modules": [
+      {
+        "type": "Filter",
+        "id": "067a3f21-7f9c-4218-bcaf-d6206bd15678",
+        "name": "Voice filter",
+        "position": {
+          "x": 40,
+          "y": 60
+        },
+        "state": {
+          "type": "HighPass",
+          "frequency": 150,
+          "slope": 24,
+          "q": 0.70710677
+        }
+      },
+      {
+        "type": "Ducker",
+        "id": "1edb57b5-6c49-43b3-b18c-64d5de434b6a",
+        "name": "Ducker",
+        "position": {
+          "x": 380,
+          "y": 60
+        },
+        "state": {
+          "threshold": -40,
+          "depth": -15,
+          "attack": 0.01,
+          "hold": 0.3,
+          "release": 0.5
+        }
+      }
+    ],
+    "connections": [
+      {
+        "sourceModuleId": "067a3f21-7f9c-4218-bcaf-d6206bd15678",
+        "sourcePort": "Output",
+        "targetModuleId": "1edb57b5-6c49-43b3-b18c-64d5de434b6a",
+        "targetPort": "Sidechain"
+      }
+    ]
+  },
+  {
     "id": "a9730f66-d8fb-4bcb-aec0-ea9f5bf2a2a1",
     "name": "Night mode",
     "revision": 1,

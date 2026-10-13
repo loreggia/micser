@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Micser.Audio;
+using Micser.Plugins.Main.Dsp;
 
 namespace Micser.Plugins.Main.Modules;
 
@@ -24,18 +25,8 @@ public sealed record NoiseGateState(
 /// </summary>
 public class NoiseGateModule : EffectModule, IStatefulModule<NoiseGateState>
 {
-    // decay of the peak detector, so that the level doesn't drop between the peaks of low frequencies
-    private const float DetectorRelease = 0.02f;
-
-    private float _alphaAttack;
-    private float _alphaDetector;
-    private float _alphaRelease;
-    private float _gainDb;
+    private readonly GateEnvelope _envelope = new();
     private float[] _gains = [];
-    private int _holdRemaining;
-    private bool _isOpen;
-    private float _level;
-    private (float Attack, float Release) _timing = (float.NaN, float.NaN);
 
     /// <summary>
     /// Time in seconds the gate takes to open.
@@ -87,85 +78,22 @@ public class NoiseGateModule : EffectModule, IStatefulModule<NoiseGateState>
     protected override void OnAttached()
     {
         _gains = new float[Format.FrameCount];
-        _alphaDetector = MathF.Exp(-1f / (Format.SampleRate * DetectorRelease));
+        _envelope.Reset(Format.SampleRate);
     }
 
     protected override void Process(AudioBuffer buffer)
     {
-        var openLevel = Decibels.ToLinear(Threshold);
-        var closeLevel = Decibels.ToLinear(Threshold - Math.Max(Hysteresis, 0f));
         var range = Math.Min(Range, 0f);
-        var holdFrames = (int)(Math.Max(Hold, 0f) * Format.SampleRate);
-
-        UpdateTiming();
+        _envelope.Configure(Threshold, Hysteresis, Hold, Attack, Release);
 
         var gains = _gains.AsSpan();
-        gains.Clear();
-
-        for (var c = 0; c < buffer.ChannelCount; c++)
-        {
-            var channel = buffer.GetChannel(c);
-            for (var i = 0; i < channel.Length; i++)
-            {
-                gains[i] = Math.Max(gains[i], Math.Abs(channel[i]));
-            }
-        }
+        buffer.ComputePeaks(gains);
 
         for (var i = 0; i < gains.Length; i++)
         {
-            gains[i] = ComputeGain(gains[i], openLevel, closeLevel, range, holdFrames);
+            gains[i] = _envelope.Next(gains[i], 0f, range);
         }
 
-        for (var c = 0; c < buffer.ChannelCount; c++)
-        {
-            var channel = buffer.GetChannel(c);
-            for (var i = 0; i < channel.Length; i++)
-            {
-                channel[i] *= gains[i];
-            }
-        }
-    }
-
-    private float ComputeGain(float peak, float openLevel, float closeLevel, float range, int holdFrames)
-    {
-        _level = peak > _level ? peak : _level * _alphaDetector;
-
-        if (_level >= openLevel || (_isOpen && _level >= closeLevel))
-        {
-            _isOpen = true;
-            _holdRemaining = holdFrames;
-        }
-        else if (_holdRemaining > 0)
-        {
-            _holdRemaining--;
-        }
-        else
-        {
-            _isOpen = false;
-        }
-
-        // the gain is smoothed in dB, like the compressor's envelope
-        var target = _isOpen ? 0f : range;
-        var alpha = target > _gainDb ? _alphaAttack : _alphaRelease;
-        _gainDb = (alpha * _gainDb) + ((1f - alpha) * target);
-        if (Math.Abs(_gainDb - target) < 0.001f)
-        {
-            _gainDb = target;
-        }
-
-        return _gainDb == 0f ? 1f : Decibels.ToLinear(_gainDb);
-    }
-
-    private void UpdateTiming()
-    {
-        var timing = (Attack, Release);
-        if (timing == _timing)
-        {
-            return;
-        }
-
-        _timing = timing;
-        _alphaAttack = MathF.Exp(-1f / (Format.SampleRate * Math.Max(timing.Attack, 1e-5f)));
-        _alphaRelease = MathF.Exp(-1f / (Format.SampleRate * Math.Max(timing.Release, 1e-5f)));
+        buffer.ApplyGains(gains);
     }
 }

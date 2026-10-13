@@ -132,30 +132,14 @@ public class CompressorModule : EffectModule, IStatefulModule<CompressorState>
 
         var slope = 1f / ratio;
         var gains = _gains.AsSpan();
-        gains.Clear();
-
-        for (var c = 0; c < buffer.ChannelCount; c++)
-        {
-            var channel = buffer.GetChannel(c);
-            for (var i = 0; i < channel.Length; i++)
-            {
-                gains[i] = Math.Max(gains[i], Math.Abs(channel[i]));
-            }
-        }
+        buffer.ComputePeaks(gains);
 
         for (var i = 0; i < gains.Length; i++)
         {
             gains[i] = ComputeGain(gains[i], type, slope, threshold, knee, amount, makeUpGain);
         }
 
-        for (var c = 0; c < buffer.ChannelCount; c++)
-        {
-            var channel = buffer.GetChannel(c);
-            for (var i = 0; i < channel.Length; i++)
-            {
-                channel[i] *= gains[i];
-            }
-        }
+        buffer.ApplyGains(gains);
     }
 
     private float ComputeGain(
