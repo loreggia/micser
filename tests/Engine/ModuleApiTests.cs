@@ -71,6 +71,7 @@ public class ModuleApiTests
                 "Compressor",
                 "NoiseGate",
                 "Ducker",
+                "Delay",
                 "Equalizer",
                 "Filter",
                 "Pitch",
@@ -95,7 +96,17 @@ public class ModuleApiTests
 
         await Assert
             .That(supported)
-            .IsEquivalentTo(["Gain", "Compressor", "NoiseGate", "Ducker", "Equalizer", "Filter", "Pitch", "Spectrum"]);
+            .IsEquivalentTo([
+                "Gain",
+                "Compressor",
+                "NoiseGate",
+                "Ducker",
+                "Delay",
+                "Equalizer",
+                "Filter",
+                "Pitch",
+                "Spectrum",
+            ]);
         await Assert.That(types!.Single(t => t.Type == "Gain").ChannelCountInputs).IsEquivalentTo(["Input"]);
         await Assert.That(types!.Single(t => t.Type == "DeviceOutput").ChannelCountInputs).IsEmpty();
     }

@@ -21,6 +21,9 @@ from that section, and the release workflow fails without it.
   comes back.
 - New "Music ducking" template: a ducker whose sidechain goes through a high-pass filter, so that low rumble from a microphone doesn't
   lower the music. Connect the music to the ducker's input and the microphone or voice chat to the filter.
+- New "Delay" module: it delays the audio by up to 2 seconds, e.g. to line up a Bluetooth and a wired output, or a microphone with
+  a game capture for streaming. "Per channel" adds up to 100 ms more to single channels, e.g. to align speakers at different distances.
+  Changing a delay fades over to the new one instead of clicking.
 
 ## 0.16.0 - 2026-10-13
 

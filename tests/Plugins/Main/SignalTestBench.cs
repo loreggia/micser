@@ -50,6 +50,15 @@ internal sealed class SignalTestBench
     public ChannelLayout OutputLayout => _recorder.Layout;
 
     /// <summary>
+    /// The channel of the output that <see cref="Run"/> returns.
+    /// </summary>
+    public int RecordedChannel
+    {
+        get => _recorder.Channel;
+        set => _recorder.Channel = value;
+    }
+
+    /// <summary>
     /// Adds another sine source connected to <paramref name="target"/>, e.g. an effect's sidechain.
     /// </summary>
     public SineSource AddSource(InputPort target, float frequency, float amplitude, ChannelLayout? layout = null)
@@ -72,7 +81,7 @@ internal sealed class SignalTestBench
     }
 
     /// <summary>
-    /// Processes blocks for the given duration and returns channel 0 of the recorded output.
+    /// Processes blocks for the given duration and returns <see cref="RecordedChannel"/> of the recorded output.
     /// </summary>
     public float[] Run(TimeSpan duration)
     {
@@ -93,6 +102,8 @@ internal sealed class SignalTestBench
             Input = AddInput("Input");
         }
 
+        public int Channel { get; set; }
+
         public InputPort Input { get; }
 
         public ChannelLayout Layout { get; private set; }
@@ -102,9 +113,9 @@ internal sealed class SignalTestBench
         protected override void Process()
         {
             Layout = Input.Buffer.Layout;
-            if (Layout.ChannelCount > 0)
+            if (Layout.ChannelCount > Channel)
             {
-                Samples.AddRange(Input.Buffer.GetChannel(0));
+                Samples.AddRange(Input.Buffer.GetChannel(Channel));
             }
         }
     }

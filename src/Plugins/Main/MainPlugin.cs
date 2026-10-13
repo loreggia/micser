@@ -19,6 +19,7 @@ public sealed class MainPlugin : IAudioPlugin
             .AddAudioModule<CompressorModule, CompressorState>("Compressor")
             .AddAudioModule<NoiseGateModule, NoiseGateState>("NoiseGate")
             .AddAudioModule<DuckerModule, DuckerState>("Ducker")
+            .AddAudioModule<DelayModule, DelayState>("Delay")
             .AddAudioModule<EqualizerModule, EqualizerState>("Equalizer")
             .AddAudioModule<FilterModule, FilterState>("Filter")
             .AddAudioModule<PitchModule, PitchState>("Pitch")
