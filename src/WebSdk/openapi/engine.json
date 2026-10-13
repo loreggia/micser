@@ -2516,7 +2516,7 @@
               "null",
               "integer"
             ],
-            "description": "The channel count of the inputs that otherwise take their layout from their sources, or null to do so. Only modules whose type\r\nbool ModuleTypeDto.SupportsChannelCount have it; it is ignored for all others. It can't be lower than the channels the\r\nmodule's connections to single channels need.",
+            "description": "The channel count of the inputs that otherwise take their layout from their sources, or null to do so. Only modules whose type\nbool ModuleTypeDto.SupportsChannelCount have it; it is ignored for all others. It can't be lower than the channels the\nmodule's connections to single channels need.",
             "format": "int32"
           },
           "id": {
@@ -2555,7 +2555,7 @@
           },
           "showChannels": {
             "type": "boolean",
-            "description": "Shows a connector per channel below each port in the UI's graph editor. It stays on while connections to or from single channels of\r\nthe module exist (an update turning it off is ignored then); creating such a connection turns it on."
+            "description": "Shows a connector per channel below each port in the UI's graph editor. It stays on while connections to or from single channels of\nthe module exist (an update turning it off is ignored then); creating such a connection turns it on."
           },
           "size": {
             "oneOf": [
@@ -2581,12 +2581,12 @@
               "null",
               "string"
             ],
-            "description": "The module of the subgraph's template that this module was created from or saved as, so an update from the template keeps it.\r\nIt's set by the engine and cleared when the module changes subgraphs; the value sent with an update is ignored.",
+            "description": "The module of the subgraph's template that this module was created from or saved as, so an update from the template keeps it.\nIt's set by the engine and cleared when the module changes subgraphs; the value sent with an update is ignored.",
             "format": "uuid"
           },
           "useSystemVolume": {
             "type": "boolean",
-            "description": "Follows the volume and mute of Windows' default output device (its volume slider and keys). The engine then sets\r\nfloat ModuleDto.Volume and bool ModuleDto.IsMuted, and the values sent with an update are ignored."
+            "description": "Follows the volume and mute of the system's default output device (its volume slider and keys). The engine then sets\nfloat ModuleDto.Volume and bool ModuleDto.IsMuted, and the values sent with an update are ignored."
           },
           "volume": {
             "maximum": 1,
