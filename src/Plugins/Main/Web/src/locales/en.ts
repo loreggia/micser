@@ -6,6 +6,7 @@ export const en = {
     gain: "Gain",
     compressor: "Compressor",
     noiseGate: "Noise gate",
+    ducker: "Ducker",
     equalizer: "Equalizer",
     filter: "Filter",
     pitch: "Pitch",
@@ -40,6 +41,13 @@ export const en = {
     hold: "Hold",
     release: "Release",
     hysteresis: "Hysteresis",
+  },
+  ducker: {
+    threshold: "Threshold",
+    depth: "Depth",
+    attack: "Attack",
+    hold: "Hold",
+    release: "Release",
   },
   equalizer: {
     band: "Band {{number}}",

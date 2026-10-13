@@ -16,6 +16,11 @@ from that section, and the release workflow fails without it.
   room noise between words from a microphone. Attack, hold and release set how fast it opens and closes, and the hysteresis keeps it
   from flickering at the threshold.
 - The "Voice chat mic" template has a noise gate before its compressor. Subgraphs created from it can be updated to the new revision.
+- New "Ducker" module: it lowers its input while the audio connected to its second input, "Sidechain", is above a threshold, e.g. music
+  or game audio while you or a voice chat speaks. Depth sets how far it goes down; attack, hold and release how fast it goes down and
+  comes back.
+- New "Music ducking" template: a ducker whose sidechain goes through a high-pass filter, so that low rumble from a microphone doesn't
+  lower the music. Connect the music to the ducker's input and the microphone or voice chat to the filter.
 
 ## 0.16.0 - 2026-10-13
 

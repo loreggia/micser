@@ -72,7 +72,7 @@ public class SubgraphTemplateApiTests
 
                 await Assert
                     .That(templates.Select(t => t.Name))
-                    .IsEquivalentTo(["Footstep boost", "Night mode", "Voice chat mic"]);
+                    .IsEquivalentTo(["Footstep boost", "Music ducking", "Night mode", "Voice chat mic"]);
                 await Assert.That(templates.All(t => t.IsBuiltIn)).IsTrue();
                 subgraph = (await client.GetFromJsonAsync<SubgraphDto[]>("/api/subgraphs", factory.Json))!.First();
             }
@@ -144,7 +144,7 @@ public class SubgraphTemplateApiTests
                     .That(templates!.Single(t => t.Id == footsteps.Id).Name)
                     .IsEqualTo("footstep BOOST (custom)");
                 await Assert.That(templates!.Single(t => t.Id == night.Id).Name).IsEqualTo("Night mode (custom 2)");
-                await Assert.That(templates!.Count(t => t.IsBuiltIn)).IsEqualTo(3);
+                await Assert.That(templates!.Count(t => t.IsBuiltIn)).IsEqualTo(4);
             }
 
             // the new names are saved
