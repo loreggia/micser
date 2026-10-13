@@ -8,7 +8,7 @@ Collect changes under "Unreleased". Before tagging vX.Y.Z, rename that heading t
 from that section, and the release workflow fails without it.
 -->
 
-## Unreleased
+## 0.17.0 - 2026-10-14
 
 - On Linux, the audio engine now runs with a realtime priority on standard systems too (through RTKit, like PipeWire), so audio is less
   likely to drop out while the computer is busy. Before, it only got one where the user was allowed realtime priorities.
