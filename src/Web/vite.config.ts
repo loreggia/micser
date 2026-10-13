@@ -1,4 +1,5 @@
 import react from "@vitejs/plugin-react";
+import { Agent } from "node:http";
 import { resolve } from "node:path";
 import { defineConfig } from "vite";
 import { sharedModulesPlugin } from "./vite/sharedModules.ts";
@@ -6,6 +7,8 @@ import { workspacePluginsPlugin } from "./vite/workspacePlugins.ts";
 
 // In development the engine runs separately (see src/Engine/appsettings.json for its address).
 const engineUrl = process.env.MICSER_ENGINE_URL ?? "http://127.0.0.1:5080";
+// without an agent the proxy sends "Connection: close", so every request opens a new connection to the engine
+const engineAgent = new Agent({ keepAlive: true });
 
 export default defineConfig({
   plugins: [react(), sharedModulesPlugin(), workspacePluginsPlugin(resolve(import.meta.dirname, "../Plugins"))],
@@ -31,10 +34,10 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      "/api": engineUrl,
+      "/api": { target: engineUrl, agent: engineAgent },
       "/hubs": { target: engineUrl, ws: true },
       // widget bundles of plugins outside this repository
-      "/plugins": engineUrl,
+      "/plugins": { target: engineUrl, agent: engineAgent },
     },
   },
 });
