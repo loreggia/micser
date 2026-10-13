@@ -16,9 +16,10 @@ import type { ModuleDtoLoopbackInputModule } from './moduleDtoLoopbackInputModul
 import type { ModuleDtoNoiseGateModule } from './moduleDtoNoiseGateModule';
 import type { ModuleDtoPitchModule } from './moduleDtoPitchModule';
 import type { ModuleDtoSpectrumModule } from './moduleDtoSpectrumModule';
+import type { ModuleDtoStereoToolsModule } from './moduleDtoStereoToolsModule';
 
 /**
  * A module and its settings. The concrete type is ModuleDto&lt;TState&gt;; in JSON the `type` property
  * names the module type and selects the state schema (registered at runtime by ModuleCatalog).
  */
-export type ModuleDto = ModuleDtoDeviceInputModule | ModuleDtoLoopbackInputModule | ModuleDtoDeviceOutputModule | ModuleDtoGainModule | ModuleDtoCompressorModule | ModuleDtoNoiseGateModule | ModuleDtoDuckerModule | ModuleDtoDelayModule | ModuleDtoEqualizerModule | ModuleDtoFilterModule | ModuleDtoPitchModule | ModuleDtoSpectrumModule;
+export type ModuleDto = ModuleDtoDeviceInputModule | ModuleDtoLoopbackInputModule | ModuleDtoDeviceOutputModule | ModuleDtoGainModule | ModuleDtoCompressorModule | ModuleDtoNoiseGateModule | ModuleDtoDuckerModule | ModuleDtoDelayModule | ModuleDtoStereoToolsModule | ModuleDtoEqualizerModule | ModuleDtoFilterModule | ModuleDtoPitchModule | ModuleDtoSpectrumModule;
