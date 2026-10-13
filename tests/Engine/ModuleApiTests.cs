@@ -69,6 +69,7 @@ public class ModuleApiTests
                 "DeviceOutput",
                 "Gain",
                 "Compressor",
+                "NoiseGate",
                 "Equalizer",
                 "Filter",
                 "Pitch",
@@ -91,7 +92,9 @@ public class ModuleApiTests
         var types = await client.GetFromJsonAsync<ModuleTypeDto[]>("/api/module-types");
         var supported = types!.Where(t => t.SupportsChannelCount).Select(t => t.Type);
 
-        await Assert.That(supported).IsEquivalentTo(["Gain", "Compressor", "Equalizer", "Filter", "Pitch", "Spectrum"]);
+        await Assert
+            .That(supported)
+            .IsEquivalentTo(["Gain", "Compressor", "NoiseGate", "Equalizer", "Filter", "Pitch", "Spectrum"]);
         await Assert.That(types!.Single(t => t.Type == "Gain").ChannelCountInputs).IsEquivalentTo(["Input"]);
         await Assert.That(types!.Single(t => t.Type == "DeviceOutput").ChannelCountInputs).IsEmpty();
     }

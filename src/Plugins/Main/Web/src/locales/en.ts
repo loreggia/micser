@@ -5,6 +5,7 @@ export const en = {
     deviceOutput: "Output device",
     gain: "Gain",
     compressor: "Compressor",
+    noiseGate: "Noise gate",
     equalizer: "Equalizer",
     filter: "Filter",
     pitch: "Pitch",
@@ -31,6 +32,14 @@ export const en = {
     knee: "Knee",
     makeUpGain: "Make-up gain",
     amount: "Amount",
+  },
+  noiseGate: {
+    threshold: "Threshold",
+    range: "Range",
+    attack: "Attack",
+    hold: "Hold",
+    release: "Release",
+    hysteresis: "Hysteresis",
   },
   equalizer: {
     band: "Band {{number}}",

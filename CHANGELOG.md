@@ -12,6 +12,10 @@ from that section, and the release workflow fails without it.
 
 - On Linux, the audio engine now runs with a realtime priority on standard systems too (through RTKit, like PipeWire), so audio is less
   likely to drop out while the computer is busy. Before, it only got one where the user was allowed realtime priorities.
+- New "Noise gate" module: it lowers the audio by an adjustable range while it stays below a threshold, e.g. to remove keyboard and
+  room noise between words from a microphone. Attack, hold and release set how fast it opens and closes, and the hysteresis keeps it
+  from flickering at the threshold.
+- The "Voice chat mic" template has a noise gate before its compressor. Subgraphs created from it can be updated to the new revision.
 
 ## 0.16.0 - 2026-10-13
 
