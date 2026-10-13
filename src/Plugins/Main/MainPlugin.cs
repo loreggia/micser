@@ -20,6 +20,7 @@ public sealed class MainPlugin : IAudioPlugin
             .AddAudioModule<NoiseGateModule, NoiseGateState>("NoiseGate")
             .AddAudioModule<DuckerModule, DuckerState>("Ducker")
             .AddAudioModule<DelayModule, DelayState>("Delay")
+            .AddAudioModule<StereoToolsModule, StereoToolsState>("StereoTools")
             .AddAudioModule<EqualizerModule, EqualizerState>("Equalizer")
             .AddAudioModule<FilterModule, FilterState>("Filter")
             .AddAudioModule<PitchModule, PitchState>("Pitch")

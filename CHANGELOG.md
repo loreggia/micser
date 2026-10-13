@@ -24,6 +24,9 @@ from that section, and the release workflow fails without it.
 - New "Delay" module: it delays the audio by up to 2 seconds, e.g. to line up a Bluetooth and a wired output, or a microphone with
   a game capture for streaming. "Per channel" adds up to 100 ms more to single channels, e.g. to align speakers at different distances.
   Changing a delay fades over to the new one instead of clicking.
+- New "Stereo tools" module for the left and right channel: swap them, put one of them or their average on both sides (e.g. for a
+  microphone that only uses the left channel), make the stereo image narrower or wider, shift the balance, and invert the polarity of
+  either side.
 
 ## 0.16.0 - 2026-10-13
 
