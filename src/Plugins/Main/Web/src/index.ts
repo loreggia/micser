@@ -8,6 +8,7 @@ import { DuckerWidget } from "./widgets/DuckerWidget";
 import { EqualizerWidget } from "./widgets/EqualizerWidget";
 import { FilterWidget } from "./widgets/FilterWidget";
 import { GainWidget } from "./widgets/GainWidget";
+import { LimiterWidget } from "./widgets/LimiterWidget";
 import { NoiseGateWidget } from "./widgets/NoiseGateWidget";
 import { PitchWidget } from "./widgets/PitchWidget";
 import { SpectrumWidget } from "./widgets/SpectrumWidget";
@@ -37,6 +38,7 @@ export default definePlugin({
     defineWidget({ moduleType: "Ducker", title: () => t("modules.ducker"), component: DuckerWidget }),
     defineWidget({ moduleType: "Delay", title: () => t("modules.delay"), component: DelayWidget }),
     defineWidget({ moduleType: "StereoTools", title: () => t("modules.stereoTools"), component: StereoToolsWidget }),
+    defineWidget({ moduleType: "Limiter", title: () => t("modules.limiter"), component: LimiterWidget }),
     defineWidget({ moduleType: "Equalizer", title: () => t("modules.equalizer"), component: EqualizerWidget }),
     defineWidget({ moduleType: "Filter", title: () => t("modules.filter"), component: FilterWidget }),
     defineWidget({ moduleType: "Pitch", title: () => t("modules.pitch"), component: PitchWidget }),

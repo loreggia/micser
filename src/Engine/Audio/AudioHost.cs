@@ -988,7 +988,9 @@ public sealed class AudioHost : IDisposable
     /// <summary>
     /// Makes a subgraph match its template's current revision. Modules created from the template keep their ids and outside connections and
     /// take the template's settings and state, the others are removed, missing ones are added, and the connections between the modules
-    /// become the template's. The subgraph keeps its name, position, collapse, mute and bypass, and takes the template's color and size.
+    /// become the template's. A template module whose type changed replaces the module created from it, and the new module takes over its
+    /// outside connections on ports of the same name. The subgraph keeps its name, position, collapse, mute and bypass, and takes the
+    /// template's color and size.
     /// </summary>
     public SubgraphDto UpdateSubgraphFromTemplate(Guid id)
     {
@@ -1007,6 +1009,7 @@ public sealed class AudioHost : IDisposable
             var template = GetUsableTemplate(templateId);
             var members = _modules.Values.Where(m => m.Settings.SubgraphId == id).ToList();
             var moduleIds = new Dictionary<Guid, Guid>();
+            var replacements = new Dictionary<Guid, Guid>();
             var changed = new List<ModuleEntry>();
             foreach (var dto in template.Modules)
             {
@@ -1018,6 +1021,10 @@ public sealed class AudioHost : IDisposable
                 if (entry == null)
                 {
                     entry = AddModuleCore(Guid.NewGuid(), definition, settings, dto.StateObject);
+                    if (members.FirstOrDefault(m => m.Settings.TemplateModuleId == dto.Id) is { } replaced)
+                    {
+                        replacements[replaced.Id] = entry.Id;
+                    }
                 }
                 else
                 {
@@ -1082,6 +1089,7 @@ public sealed class AudioHost : IDisposable
             }
 
             var addedConnections = ConnectTemplate([.. wanted], memberIds.ToDictionary(m => m));
+            addedConnections.AddRange(MoveOutsideConnections(removedConnections, replacements, id));
             foreach (var entry in changed)
             {
                 FixChannelSettings(entry);
@@ -1374,6 +1382,46 @@ public sealed class AudioHost : IDisposable
     /// Creates template connections between the modules the ids map to. Connections the graph rejects (e.g. a cycle through modules outside
     /// the subgraph) are skipped.
     /// </summary>
+    /// <summary>
+    /// Connects the replacements of removed modules like the modules they replace were connected to modules outside the subgraph. Connections
+    /// on ports the replacement doesn't have are skipped.
+    /// </summary>
+    private List<ConnectionEntry> MoveOutsideConnections(
+        IEnumerable<ConnectionEntry> removed,
+        Dictionary<Guid, Guid> replacements,
+        Guid subgraphId
+    )
+    {
+        bool IsOutside(Guid moduleId) =>
+            _modules.TryGetValue(moduleId, out var module) && module.Settings.SubgraphId != subgraphId;
+
+        var moduleIds = new Dictionary<Guid, Guid>(replacements);
+        var connections = new List<TemplateConnectionDto>();
+        foreach (var dto in removed.Select(c => c.Dto))
+        {
+            if (
+                (replacements.ContainsKey(dto.SourceModuleId) && IsOutside(dto.TargetModuleId))
+                || (replacements.ContainsKey(dto.TargetModuleId) && IsOutside(dto.SourceModuleId))
+            )
+            {
+                moduleIds.TryAdd(dto.SourceModuleId, dto.SourceModuleId);
+                moduleIds.TryAdd(dto.TargetModuleId, dto.TargetModuleId);
+                connections.Add(
+                    new TemplateConnectionDto(
+                        dto.SourceModuleId,
+                        dto.SourcePort,
+                        dto.TargetModuleId,
+                        dto.TargetPort,
+                        dto.SourceChannel,
+                        dto.TargetChannel
+                    )
+                );
+            }
+        }
+
+        return ConnectTemplate(connections, moduleIds);
+    }
+
     private List<ConnectionEntry> ConnectTemplate(
         IReadOnlyList<TemplateConnectionDto> connections,
         Dictionary<Guid, Guid> moduleIds

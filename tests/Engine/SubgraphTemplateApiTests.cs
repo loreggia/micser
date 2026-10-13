@@ -601,6 +601,87 @@ public class SubgraphTemplateApiTests
     }
 
     [Test]
+    public async Task UpdateSubgraphFromTemplate_ModuleOfAnotherType_TakesOverTheOutsideConnections()
+    {
+        var directory = EngineFactory.CreateTemporaryDirectory();
+        try
+        {
+            // "Night mode" revision 2 has a limiter where revision 1 had a compressor with the same template module id
+            var limiterId = Guid.Parse("be845eee-81e6-4e30-9741-d68d86c30779");
+            Guid subgraphId;
+            Guid outsideId;
+            Guid oldId;
+            await using (var factory = new EngineFactory(directory, pluginTemplates: true))
+            {
+                using var client = factory.CreateAuthorizedClient();
+                var templates = await client.GetFromJsonAsync<SubgraphTemplateDto[]>(
+                    "/api/subgraph-templates",
+                    factory.Json
+                );
+                var instance = await InstantiateAsync(
+                    factory,
+                    client,
+                    templates!.Single(t => t.Name == "Night mode").Id,
+                    new ModulePosition(0, 0)
+                );
+                var limiter = (await GetMembersAsync(factory, client, instance.Id)).Single(m =>
+                    m.TemplateModuleId == limiterId
+                );
+                var outside = await factory.AddModuleAsync(client, "Gain");
+                (
+                    await client.PostAsJsonAsync(
+                        "/api/connections",
+                        new CreateConnectionRequest(limiter.Id, "Output", outside.Id, "Input")
+                    )
+                ).EnsureSuccessStatusCode();
+                (subgraphId, outsideId, oldId) = (instance.Id, outside.Id, limiter.Id);
+            }
+
+            var config = JsonNode.Parse(await File.ReadAllTextAsync(Path.Combine(directory, "config.json")))!;
+            var module = config["modules"]!.AsArray().Single(m => m!["id"]!.GetValue<Guid>() == oldId)!;
+            module["type"] = "Compressor";
+            module["state"] = new JsonObject
+            {
+                ["type"] = "Downward",
+                ["ratio"] = 20,
+                ["threshold"] = -3,
+            };
+            config["subgraphs"]!.AsArray().Single(s => s!["id"]!.GetValue<Guid>() == subgraphId)!["templateRevision"] =
+                1;
+            await File.WriteAllTextAsync(Path.Combine(directory, "config.json"), config.ToJsonString());
+
+            await using (var factory = new EngineFactory(directory, pluginTemplates: true))
+            {
+                using var client = factory.CreateAuthorizedClient();
+                using var response = await client.PostAsync($"/api/subgraphs/{subgraphId}/update-from-template", null);
+                var members = await GetMembersAsync(factory, client, subgraphId);
+                var connections = await client.GetFromJsonAsync<ConnectionDto[]>("/api/connections");
+
+                await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.OK);
+                var replacement = members.Single(m => m.TemplateModuleId == limiterId);
+                await Assert.That(replacement).IsTypeOf<ModuleDto<LimiterState>>();
+                await Assert.That(replacement.Id).IsNotEqualTo(oldId);
+                await Assert
+                    .That(
+                        connections!.Count(c =>
+                            c.SourceModuleId == replacement.Id
+                            && c.SourcePort == "Output"
+                            && c.TargetModuleId == outsideId
+                        )
+                    )
+                    .IsEqualTo(1);
+                await Assert
+                    .That(connections!.Any(c => c.SourceModuleId == oldId || c.TargetModuleId == oldId))
+                    .IsFalse();
+            }
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    [Test]
     public async Task UpdateSubgraphFromTemplate_WithoutTemplate_IsBadRequest()
     {
         await using var factory = new EngineFactory();

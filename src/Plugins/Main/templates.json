@@ -2,7 +2,7 @@
   {
     "id": "4ddaac11-6f2b-4a01-8b1e-5b9970704db3",
     "name": "Footstep boost",
-    "revision": 1,
+    "revision": 2,
     "color": "Green",
     "size": {
       "width": 1040,
@@ -62,7 +62,7 @@
         }
       },
       {
-        "type": "Compressor",
+        "type": "Limiter",
         "id": "a6afebe0-b693-400c-a9c6-02bb4bff0bae",
         "name": "Limiter",
         "position": {
@@ -70,14 +70,9 @@
           "y": 60
         },
         "state": {
-          "type": "Downward",
-          "amount": 1,
-          "attack": 0.001,
-          "release": 0.08,
-          "ratio": 20,
-          "threshold": -3,
-          "knee": 2,
-          "makeUpGain": 0
+          "ceiling": -1,
+          "gain": 0,
+          "release": 0.08
         }
       }
     ],
@@ -150,7 +145,7 @@
   {
     "id": "a9730f66-d8fb-4bcb-aec0-ea9f5bf2a2a1",
     "name": "Night mode",
-    "revision": 1,
+    "revision": 2,
     "color": "Purple",
     "size": {
       "width": 700,
@@ -177,7 +172,7 @@
         }
       },
       {
-        "type": "Compressor",
+        "type": "Limiter",
         "id": "be845eee-81e6-4e30-9741-d68d86c30779",
         "name": "Limiter",
         "position": {
@@ -185,14 +180,9 @@
           "y": 60
         },
         "state": {
-          "type": "Downward",
-          "amount": 1,
-          "attack": 0.001,
-          "release": 0.08,
-          "ratio": 20,
-          "threshold": -3,
-          "knee": 2,
-          "makeUpGain": 0
+          "ceiling": -1,
+          "gain": 0,
+          "release": 0.08
         }
       }
     ],
