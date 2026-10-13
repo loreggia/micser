@@ -31,7 +31,7 @@ src/
     Main/                     Micser.Plugins.Main: built-in modules, loaded at runtime like any plugin
       plugin.json               the plugin's manifest
       templates.json            its built-in subgraph templates
-      Modules/                  device in/out, loopback, gain, compressor, noise gate, ducker, delay, stereo tools, EQ, filter, pitch, spectrum
+      Modules/                  device in/out, loopback, gain, compressor, noise gate, ducker, delay, stereo tools, limiter, EQ, filter, pitch, spectrum
       Dsp/                      DSP helpers not covered by NAudio
       Web/                      @micser/plugin-main: widgets for these modules, built to Web/dist
   Web/                        @micser/web: Vite + React SPA (graph editor, dialogs)
@@ -116,7 +116,7 @@ docs/
 - **Subgraph templates** (`SubgraphTemplateDto`) are saved subgraphs: name, color, size, modules (with template-local ids and relative positions) and the connections between them, with their channels. Names are unique, ignoring case (409 otherwise).
   - Saving a subgraph (`POST /api/subgraph-templates`) creates a template or, with `templateId`, saves over one, keeping its id and increasing its `revision`. The subgraph then refers to it (`templateId`, `templateRevision`), and its modules get `templateModuleId`s, the template-local ids. Ids that modules already have are kept, so subgraphs created from an earlier revision still match.
   - Instantiating (`POST /api/subgraph-templates/{id}/instantiate`) creates a subgraph with new modules and their connections, named after the template.
-  - Subgraphs are never updated automatically: one whose `templateRevision` is lower than the template's is outdated. `POST /api/subgraphs/{id}/update-from-template` matches modules by `templateModuleId` and type: matched ones keep their id and outside connections and take the template's settings and state, unmatched ones are removed, missing ones added, and the connections between the modules become the template's (unchanged ones stay). The subgraph keeps its name, position, collapse, mute and bypass, and takes the template's color and size.
+  - Subgraphs are never updated automatically: one whose `templateRevision` is lower than the template's is outdated. `POST /api/subgraphs/{id}/update-from-template` matches modules by `templateModuleId` and type: matched ones keep their id and outside connections and take the template's settings and state, unmatched ones are removed, missing ones added (one that replaces a module of another type with the same `templateModuleId` takes over its outside connections on ports of the same name), and the connections between the modules become the template's (unchanged ones stay). The subgraph keeps its name, position, collapse, mute and bypass, and takes the template's color and size.
   - Only the engine sets `templateId` and `templateModuleId`: a subgraph update can only clear the reference (detach), and a module's `templateModuleId` is cleared when it changes subgraphs. Removing a template clears the references of its subgraphs. Renaming is `PUT /api/subgraph-templates/{id}/name`.
   - Template modules of unknown types are kept as they are, like the graph's; such a template is listed with `unavailableTypes` and can't be instantiated or used for updates (400).
   - **Built-in templates** come with plugins (`templates` in `plugin.json`), so app and plugin updates can add and change them (`isBuiltIn`):

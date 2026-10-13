@@ -12,6 +12,7 @@ export const de: Translations<typeof en> = {
     ducker: "Ducker",
     delay: "Verzögerung",
     stereoTools: "Stereo-Werkzeuge",
+    limiter: "Limiter",
     equalizer: "Equalizer",
     filter: "Filter",
     pitch: "Tonhöhe",
@@ -75,6 +76,12 @@ export const de: Translations<typeof en> = {
     right: "Rechts {{value}}",
     invertLeft: "Polarität links umkehren",
     invertRight: "Polarität rechts umkehren",
+  },
+  limiter: {
+    ceiling: "Obergrenze",
+    gain: "Verstärkung",
+    release: "Release",
+    latency: "Verzögert um {{value}}",
   },
   equalizer: {
     band: "Band {{number}}",

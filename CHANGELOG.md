@@ -27,6 +27,11 @@ from that section, and the release workflow fails without it.
 - New "Stereo tools" module for the left and right channel: swap them, put one of them or their average on both sides (e.g. for a
   microphone that only uses the left channel), make the stereo image narrower or wider, shift the balance, and invert the polarity of
   either side.
+- New "Limiter" module: it keeps the audio below a ceiling without clipping it, e.g. at the end of a chain that raises the level. It
+  looks 5 ms ahead to catch peaks before they arrive, so it delays the audio by 5 ms. Gain raises the audio before limiting.
+- The "Footstep boost" and "Night mode" templates end in the new limiter instead of a compressor, so their peaks no longer clip. When a
+  subgraph is updated to a template's new revision and one of its modules changed type, the new module keeps the old one's connections
+  to the rest of the graph.
 
 ## 0.16.0 - 2026-10-13
 

@@ -9,6 +9,7 @@ export const en = {
     ducker: "Ducker",
     delay: "Delay",
     stereoTools: "Stereo tools",
+    limiter: "Limiter",
     equalizer: "Equalizer",
     filter: "Filter",
     pitch: "Pitch",
@@ -72,6 +73,12 @@ export const en = {
     right: "Right {{value}}",
     invertLeft: "Invert left polarity",
     invertRight: "Invert right polarity",
+  },
+  limiter: {
+    ceiling: "Ceiling",
+    gain: "Gain",
+    release: "Release",
+    latency: "Adds {{value}} latency",
   },
   equalizer: {
     band: "Band {{number}}",

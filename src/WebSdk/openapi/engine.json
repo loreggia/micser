@@ -1711,6 +1711,31 @@
         }
       },
       "JsonElement": { },
+      "LimiterState": {
+        "required": [
+          "ceiling",
+          "gain",
+          "release"
+        ],
+        "type": "object",
+        "properties": {
+          "ceiling": {
+            "type": "number",
+            "format": "float",
+            "default": -1
+          },
+          "gain": {
+            "type": "number",
+            "format": "float",
+            "default": 0
+          },
+          "release": {
+            "type": "number",
+            "format": "float",
+            "default": 0.1
+          }
+        }
+      },
       "LoopbackInputState": {
         "required": [
           "deviceId",
@@ -1773,6 +1798,9 @@
             "$ref": "#/components/schemas/ModuleDtoStereoToolsModule"
           },
           {
+            "$ref": "#/components/schemas/ModuleDtoLimiterModule"
+          },
+          {
             "$ref": "#/components/schemas/ModuleDtoEqualizerModule"
           },
           {
@@ -1798,6 +1826,7 @@
             "Ducker": "#/components/schemas/ModuleDtoDuckerModule",
             "Delay": "#/components/schemas/ModuleDtoDelayModule",
             "StereoTools": "#/components/schemas/ModuleDtoStereoToolsModule",
+            "Limiter": "#/components/schemas/ModuleDtoLimiterModule",
             "Equalizer": "#/components/schemas/ModuleDtoEqualizerModule",
             "Filter": "#/components/schemas/ModuleDtoFilterModule",
             "Pitch": "#/components/schemas/ModuleDtoPitchModule",
@@ -2588,6 +2617,115 @@
           },
           "state": {
             "$ref": "#/components/schemas/GainState"
+          },
+          "channelCount": {
+            "maximum": 64,
+            "minimum": 1,
+            "type": [
+              "null",
+              "integer"
+            ],
+            "description": "The channel count of the inputs that otherwise take their layout from their sources, or null to do so. Only modules whose type\nbool ModuleTypeDto.SupportsChannelCount have it; it is ignored for all others. It can't be lower than the channels the\nmodule's connections to single channels need.",
+            "format": "int32"
+          },
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "isBypassed": {
+            "type": "boolean",
+            "description": "Passes the audio through unprocessed. Only effect modules support it; it is ignored for all others."
+          },
+          "isCollapsed": {
+            "type": "boolean",
+            "description": "Shows only the name, mute and connectors in the UI's graph editor."
+          },
+          "isMuted": {
+            "type": "boolean"
+          },
+          "name": {
+            "maxLength": 100,
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "A name chosen by the user."
+          },
+          "position": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "Relative to the subgraph's position if Guid? ModuleDto.SubgraphId is set.",
+                "$ref": "#/components/schemas/ModulePosition"
+              }
+            ]
+          },
+          "showChannels": {
+            "type": "boolean",
+            "description": "Shows a connector per channel below each port in the UI's graph editor. It stays on while connections to or from single channels of\nthe module exist (an update turning it off is ignored then); creating such a connection turns it on."
+          },
+          "size": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "description": "The size chosen by the user, or null to fit the content.",
+                "$ref": "#/components/schemas/ModuleSize"
+              }
+            ]
+          },
+          "subgraphId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "The subgraph the module belongs to, from `GET /api/subgraphs`.",
+            "format": "uuid"
+          },
+          "templateModuleId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "description": "The module of the subgraph's template that this module was created from or saved as, so an update from the template keeps it.\nIt's set by the engine and cleared when the module changes subgraphs; the value sent with an update is ignored.",
+            "format": "uuid"
+          },
+          "useSystemVolume": {
+            "type": "boolean",
+            "description": "Follows the volume and mute of the system's default output device (its volume slider and keys). The engine then sets\nfloat ModuleDto.Volume and bool ModuleDto.IsMuted, and the values sent with an update are ignored."
+          },
+          "volume": {
+            "maximum": 1,
+            "minimum": 0,
+            "type": "number",
+            "description": "Output volume, 0..1.",
+            "format": "float"
+          }
+        }
+      },
+      "ModuleDtoLimiterModule": {
+        "required": [
+          "state",
+          "id",
+          "isBypassed",
+          "isCollapsed",
+          "isMuted",
+          "showChannels",
+          "useSystemVolume",
+          "volume"
+        ],
+        "properties": {
+          "type": {
+            "enum": [
+              "Limiter"
+            ],
+            "type": "string"
+          },
+          "state": {
+            "$ref": "#/components/schemas/LimiterState"
           },
           "channelCount": {
             "maximum": 64,
