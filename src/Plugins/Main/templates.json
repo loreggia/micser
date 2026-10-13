@@ -157,10 +157,10 @@
   {
     "id": "92101771-10f9-45cf-bce1-eb0d7f469ef0",
     "name": "Voice chat mic",
-    "revision": 1,
+    "revision": 2,
     "color": "Blue",
     "size": {
-      "width": 1040,
+      "width": 1380,
       "height": 780
     },
     "modules": [
@@ -193,11 +193,28 @@
         }
       },
       {
+        "type": "NoiseGate",
+        "id": "fc3e2781-02d2-4e58-92eb-ad7202f2310f",
+        "name": "Noise gate",
+        "position": {
+          "x": 380,
+          "y": 60
+        },
+        "state": {
+          "threshold": -50,
+          "hysteresis": 4,
+          "range": -40,
+          "attack": 0.002,
+          "hold": 0.15,
+          "release": 0.2
+        }
+      },
+      {
         "type": "Compressor",
         "id": "9b9398c4-437b-4a2c-82ab-301d590d27ac",
         "name": "Compressor",
         "position": {
-          "x": 380,
+          "x": 720,
           "y": 60
         },
         "state": {
@@ -216,7 +233,7 @@
         "id": "89747d02-4f95-4f39-8e11-ad8c09631a2d",
         "name": "Output",
         "position": {
-          "x": 720,
+          "x": 1060,
           "y": 60
         },
         "state": {
@@ -227,6 +244,12 @@
     "connections": [
       {
         "sourceModuleId": "2fea2c6c-52cf-4d55-bac7-2ceef061a78c",
+        "sourcePort": "Output",
+        "targetModuleId": "fc3e2781-02d2-4e58-92eb-ad7202f2310f",
+        "targetPort": "Input"
+      },
+      {
+        "sourceModuleId": "fc3e2781-02d2-4e58-92eb-ad7202f2310f",
         "sourcePort": "Output",
         "targetModuleId": "9b9398c4-437b-4a2c-82ab-301d590d27ac",
         "targetPort": "Input"

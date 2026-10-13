@@ -8,6 +8,7 @@ export const de: Translations<typeof en> = {
     deviceOutput: "Ausgabegerät",
     gain: "Verstärkung",
     compressor: "Kompressor",
+    noiseGate: "Noise Gate",
     equalizer: "Equalizer",
     filter: "Filter",
     pitch: "Tonhöhe",
@@ -34,6 +35,14 @@ export const de: Translations<typeof en> = {
     knee: "Knie",
     makeUpGain: "Make-up-Gain",
     amount: "Anteil",
+  },
+  noiseGate: {
+    threshold: "Schwelle",
+    range: "Absenkung",
+    attack: "Attack",
+    hold: "Hold",
+    release: "Release",
+    hysteresis: "Hysterese",
   },
   equalizer: {
     band: "Band {{number}}",
