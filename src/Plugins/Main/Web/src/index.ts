@@ -2,6 +2,7 @@ import { definePlugin, defineWidget } from "@micser/web-sdk";
 import { createElement } from "react";
 import { t } from "./i18n";
 import { CompressorWidget } from "./widgets/CompressorWidget";
+import { DelayWidget } from "./widgets/DelayWidget";
 import { DeviceWidget } from "./widgets/DeviceWidget";
 import { DuckerWidget } from "./widgets/DuckerWidget";
 import { EqualizerWidget } from "./widgets/EqualizerWidget";
@@ -33,6 +34,7 @@ export default definePlugin({
     defineWidget({ moduleType: "Compressor", title: () => t("modules.compressor"), component: CompressorWidget }),
     defineWidget({ moduleType: "NoiseGate", title: () => t("modules.noiseGate"), component: NoiseGateWidget }),
     defineWidget({ moduleType: "Ducker", title: () => t("modules.ducker"), component: DuckerWidget }),
+    defineWidget({ moduleType: "Delay", title: () => t("modules.delay"), component: DelayWidget }),
     defineWidget({ moduleType: "Equalizer", title: () => t("modules.equalizer"), component: EqualizerWidget }),
     defineWidget({ moduleType: "Filter", title: () => t("modules.filter"), component: FilterWidget }),
     defineWidget({ moduleType: "Pitch", title: () => t("modules.pitch"), component: PitchWidget }),

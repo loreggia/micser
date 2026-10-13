@@ -5,6 +5,7 @@
  * OpenAPI spec version: 1.0.0
  */
 import type { ModuleDtoCompressorModule } from './moduleDtoCompressorModule';
+import type { ModuleDtoDelayModule } from './moduleDtoDelayModule';
 import type { ModuleDtoDeviceInputModule } from './moduleDtoDeviceInputModule';
 import type { ModuleDtoDeviceOutputModule } from './moduleDtoDeviceOutputModule';
 import type { ModuleDtoDuckerModule } from './moduleDtoDuckerModule';
@@ -20,4 +21,4 @@ import type { ModuleDtoSpectrumModule } from './moduleDtoSpectrumModule';
  * A module and its settings. The concrete type is ModuleDto&lt;TState&gt;; in JSON the `type` property
  * names the module type and selects the state schema (registered at runtime by ModuleCatalog).
  */
-export type ModuleDto = ModuleDtoDeviceInputModule | ModuleDtoLoopbackInputModule | ModuleDtoDeviceOutputModule | ModuleDtoGainModule | ModuleDtoCompressorModule | ModuleDtoNoiseGateModule | ModuleDtoDuckerModule | ModuleDtoEqualizerModule | ModuleDtoFilterModule | ModuleDtoPitchModule | ModuleDtoSpectrumModule;
+export type ModuleDto = ModuleDtoDeviceInputModule | ModuleDtoLoopbackInputModule | ModuleDtoDeviceOutputModule | ModuleDtoGainModule | ModuleDtoCompressorModule | ModuleDtoNoiseGateModule | ModuleDtoDuckerModule | ModuleDtoDelayModule | ModuleDtoEqualizerModule | ModuleDtoFilterModule | ModuleDtoPitchModule | ModuleDtoSpectrumModule;

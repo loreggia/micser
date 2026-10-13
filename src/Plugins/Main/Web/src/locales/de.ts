@@ -10,6 +10,7 @@ export const de: Translations<typeof en> = {
     compressor: "Kompressor",
     noiseGate: "Noise Gate",
     ducker: "Ducker",
+    delay: "Verzögerung",
     equalizer: "Equalizer",
     filter: "Filter",
     pitch: "Tonhöhe",
@@ -51,6 +52,11 @@ export const de: Translations<typeof en> = {
     attack: "Attack",
     hold: "Hold",
     release: "Release",
+  },
+  delay: {
+    time: "Verzögerung",
+    perChannel: "Pro Kanal",
+    channel: "Kanal {{number}}",
   },
   equalizer: {
     band: "Band {{number}}",

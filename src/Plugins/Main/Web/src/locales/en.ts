@@ -7,6 +7,7 @@ export const en = {
     compressor: "Compressor",
     noiseGate: "Noise gate",
     ducker: "Ducker",
+    delay: "Delay",
     equalizer: "Equalizer",
     filter: "Filter",
     pitch: "Pitch",
@@ -48,6 +49,11 @@ export const en = {
     attack: "Attack",
     hold: "Hold",
     release: "Release",
+  },
+  delay: {
+    time: "Delay",
+    perChannel: "Per channel",
+    channel: "Channel {{number}}",
   },
   equalizer: {
     band: "Band {{number}}",
