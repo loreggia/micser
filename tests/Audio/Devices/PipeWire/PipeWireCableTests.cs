@@ -116,12 +116,15 @@ public class PipeWireCableTests
         using var devices = CreateDevices();
         new VirtualCables(devices).Set([ChannelLayout.Stereo]);
         var removed = WaitForChange(devices, "micser_cable_1_input", AudioDeviceChange.Removed);
-        var added = WaitForChange(devices, "micser_cable_1_input", AudioDeviceChange.Added);
+        // the loopback's two nodes come back as separate registry globals
+        var inputAdded = WaitForChange(devices, "micser_cable_1_input", AudioDeviceChange.Added);
+        var outputAdded = WaitForChange(devices, "micser_cable_1_output", AudioDeviceChange.Added);
 
         await _daemon.RestartAsync();
         await removed.WaitAsync(EventTimeout);
-        await added.WaitAsync(TimeSpan.FromSeconds(15));
+        await Task.WhenAll(inputAdded, outputAdded).WaitAsync(TimeSpan.FromSeconds(15));
 
+        await Assert.That(devices.GetDevice("micser_cable_1_input")).IsNotNull();
         await Assert.That(devices.GetDevice("micser_cable_1_output")).IsNotNull();
     }
 
