@@ -8,7 +8,7 @@ Collect changes under "Unreleased". Before tagging vX.Y.Z, rename that heading t
 from that section, and the release workflow fails without it.
 -->
 
-## Unreleased
+## 0.17.1 - 2026-10-14
 
 - The settings show the version, the update buttons and the desktop options right after Micser starts. Before, they only appeared
   after the first update check, half a minute later.
