@@ -1553,7 +1553,8 @@
         "required": [
           "frequency",
           "gain",
-          "q"
+          "q",
+          "type"
         ],
         "type": "object",
         "properties": {
@@ -1569,12 +1570,26 @@
             "type": "number",
             "format": "float",
             "default": 1.41
+          },
+          "type": {
+            "$ref": "#/components/schemas/EqualizerBandType"
           }
         }
       },
+      "EqualizerBandType": {
+        "enum": [
+          "Peaking",
+          "LowShelf",
+          "HighShelf",
+          "LowPass",
+          "HighPass"
+        ],
+        "default": "Peaking"
+      },
       "EqualizerState": {
         "required": [
-          "bands"
+          "bands",
+          "preamp"
         ],
         "type": "object",
         "properties": {
@@ -1583,6 +1598,11 @@
             "items": {
               "$ref": "#/components/schemas/EqualizerBand"
             }
+          },
+          "preamp": {
+            "type": "number",
+            "format": "float",
+            "default": 0
           }
         }
       },

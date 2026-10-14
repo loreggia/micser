@@ -88,6 +88,22 @@ export const en = {
     q: "Q",
     addBand: "Add band",
     response: "Frequency response",
+    preamp: "Preamp",
+    type: "Type of band {{number}}",
+    types: {
+      Peaking: "Peaking",
+      LowShelf: "Low shelf",
+      HighShelf: "High shelf",
+      LowPass: "Low-pass",
+      HighPass: "High-pass",
+    },
+    import: "Import…",
+    importHint:
+      "Replaces the bands and the preamp with the filters of an Equalizer APO configuration, e.g. a headphone correction from AutoEQ (ParametricEQ.txt).",
+    imported_one: "Imported {{count}} band.",
+    imported_other: "Imported {{count}} bands.",
+    importedSkipped: "{{imported}} Left out (other filter types or single channels): {{skipped}}",
+    importFailed: "The file has no filters in the Equalizer APO format.",
   },
   filter: {
     highPass: "High-pass",

@@ -25,6 +25,7 @@ export * from './duckerState';
 export * from './engineSettingsDto';
 export * from './engineStatusDto';
 export * from './equalizerBand';
+export * from './equalizerBandType';
 export * from './equalizerState';
 export * from './filterState';
 export * from './filterType';

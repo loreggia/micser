@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { biquadResponse, highPass, lowPass, peakingEq } from "../biquad";
+import { biquadResponse, highPass, highShelf, lowPass, lowShelf, peakingEq } from "../biquad";
 
 const sampleRate = 48000;
 
@@ -31,4 +31,15 @@ test("a high-pass passes high frequencies and has the Q as its gain at the cutof
   expect(biquadResponse(filter, sampleRate, 10000)).toBeCloseTo(0, 2);
   expect(biquadResponse(filter, sampleRate, 100)).toBeCloseTo(20 * Math.log10(2), 1);
   expect(biquadResponse(filter, sampleRate, 25)).toBeLessThan(-20);
+});
+
+test("shelves change one side of their frequency, by half their gain at it", () => {
+  const low = [lowShelf(sampleRate, 1000, Math.SQRT1_2, 6)];
+  const high = [highShelf(sampleRate, 1000, Math.SQRT1_2, 6)];
+
+  expect(biquadResponse(low, sampleRate, 30)).toBeCloseTo(6, 1);
+  expect(biquadResponse(low, sampleRate, 1000)).toBeCloseTo(3, 1);
+  expect(biquadResponse(low, sampleRate, 15000)).toBeCloseTo(0, 1);
+  expect(biquadResponse(high, sampleRate, 30)).toBeCloseTo(0, 1);
+  expect(biquadResponse(high, sampleRate, 15000)).toBeCloseTo(6, 0);
 });
