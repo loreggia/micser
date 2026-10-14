@@ -47,6 +47,40 @@ export function highPass(sampleRate: number, frequency: number, q: number): Biqu
 }
 
 /**
+ * Low shelf with a Q (Audio EQ Cookbook), as the Equalizer module's LowShelf bands.
+ */
+export function lowShelf(sampleRate: number, frequency: number, q: number, gainDecibels: number): Biquad {
+  const { cos, sin } = omega(sampleRate, frequency);
+  const a = Math.pow(10, gainDecibels / 40);
+  const shelf = 2 * Math.sqrt(a) * (sin / (2 * q));
+  return normalize(
+    a * (a + 1 - (a - 1) * cos + shelf),
+    2 * a * (a - 1 - (a + 1) * cos),
+    a * (a + 1 - (a - 1) * cos - shelf),
+    a + 1 + (a - 1) * cos + shelf,
+    -2 * (a - 1 + (a + 1) * cos),
+    a + 1 + (a - 1) * cos - shelf
+  );
+}
+
+/**
+ * High shelf with a Q (Audio EQ Cookbook), as the Equalizer module's HighShelf bands.
+ */
+export function highShelf(sampleRate: number, frequency: number, q: number, gainDecibels: number): Biquad {
+  const { cos, sin } = omega(sampleRate, frequency);
+  const a = Math.pow(10, gainDecibels / 40);
+  const shelf = 2 * Math.sqrt(a) * (sin / (2 * q));
+  return normalize(
+    a * (a + 1 + (a - 1) * cos + shelf),
+    -2 * a * (a - 1 + (a + 1) * cos),
+    a * (a + 1 + (a - 1) * cos - shelf),
+    a + 1 - (a - 1) * cos + shelf,
+    2 * (a - 1 - (a + 1) * cos),
+    a + 1 - (a - 1) * cos - shelf
+  );
+}
+
+/**
  * The gain in dB of the biquads in series at the frequency.
  */
 export function biquadResponse(biquads: readonly Biquad[], sampleRate: number, frequency: number) {

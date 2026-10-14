@@ -91,6 +91,22 @@ export const de: Translations<typeof en> = {
     q: "Güte",
     addBand: "Band hinzufügen",
     response: "Frequenzgang",
+    preamp: "Vorverstärkung",
+    type: "Typ von Band {{number}}",
+    types: {
+      Peaking: "Glocke",
+      LowShelf: "Low-Shelf",
+      HighShelf: "High-Shelf",
+      LowPass: "Tiefpass",
+      HighPass: "Hochpass",
+    },
+    import: "Importieren…",
+    importHint:
+      "Ersetzt die Bänder und die Vorverstärkung durch die Filter einer Equalizer-APO-Konfiguration, z. B. eine Kopfhörerkorrektur von AutoEQ (ParametricEQ.txt).",
+    imported_one: "{{count}} Band importiert.",
+    imported_other: "{{count}} Bänder importiert.",
+    importedSkipped: "{{imported}} Ausgelassen (andere Filtertypen oder einzelne Kanäle): {{skipped}}",
+    importFailed: "Die Datei enthält keine Filter im Equalizer-APO-Format.",
   },
   filter: {
     highPass: "Hochpass",

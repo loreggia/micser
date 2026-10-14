@@ -8,4 +8,5 @@ import type { EqualizerBand } from './equalizerBand';
 
 export interface EqualizerState {
   bands: EqualizerBand[];
+  preamp: number;
 }

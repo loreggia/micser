@@ -137,6 +137,42 @@ public class ConfigurationTests
     }
 
     [Test]
+    public async Task Configuration_WithEqualizerBandsWithoutType_LoadsThemAsPeaking()
+    {
+        var directory = EngineFactory.CreateTemporaryDirectory();
+        Directory.CreateDirectory(directory);
+        var id = Guid.NewGuid();
+        await File.WriteAllTextAsync(
+            Path.Combine(directory, "config.json"),
+            $$"""
+            {
+              "version": 1,
+              "modules": [
+                { "type": "Equalizer", "id": "{{id}}", "state": { "bands": [{ "frequency": 100, "gain": 3, "q": 0.7 }] } }
+              ]
+            }
+            """
+        );
+        try
+        {
+            await using var factory = new EngineFactory(directory);
+            using var client = factory.CreateAuthorizedClient();
+
+            var modules = await client.GetFromJsonAsync<ModuleDto[]>("/api/modules", factory.Json);
+
+            var state = ((ModuleDto<EqualizerState>)modules!.Single(m => m.Id == id)).State;
+            await Assert.That(state.Preamp).IsEqualTo(0f);
+            await Assert
+                .That(state.Bands)
+                .IsEquivalentTo([new EqualizerBand(100, 3f, 0.7f, EqualizerBandType.Peaking)]);
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    [Test]
     public async Task Configuration_KeepsUnknownModulesAndTheirConnectionsOutOfTheGraph()
     {
         var directory = EngineFactory.CreateTemporaryDirectory();
@@ -185,9 +221,7 @@ public class ConfigurationTests
                 ).EnsureSuccessStatusCode();
             }
 
-            var saved = System.Text.Json.Nodes.JsonNode.Parse(
-                await File.ReadAllTextAsync(Path.Combine(directory, "config.json"))
-            )!;
+            var saved = JsonNode.Parse(await File.ReadAllTextAsync(Path.Combine(directory, "config.json")))!;
             var savedModules = saved["modules"]!.AsArray();
 
             await Assert.That(savedModules.Select(m => (string)m!["type"]!)).IsEquivalentTo(["Gain", "Removed"]);

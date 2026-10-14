@@ -4,9 +4,11 @@
  * Micser.Engine | v1
  * OpenAPI spec version: 1.0.0
  */
+import type { EqualizerBandType } from './equalizerBandType';
 
 export interface EqualizerBand {
   frequency: number;
   gain: number;
   q: number;
+  type: EqualizerBandType;
 }

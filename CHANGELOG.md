@@ -8,6 +8,12 @@ Collect changes under "Unreleased". Before tagging vX.Y.Z, rename that heading t
 from that section, and the release workflow fails without it.
 -->
 
+## Unreleased
+
+- The Equalizer's bands can be low shelves, high shelves, low-pass and high-pass filters besides peaking bands, and a preamp sets the
+  level before the bands. "Import…" reads an Equalizer APO configuration, e.g. a headphone correction from AutoEQ ("ParametricEQ.txt"),
+  and replaces the bands and the preamp with its filters.
+
 ## 0.17.1 - 2026-10-14
 
 - The settings show the version, the update buttons and the desktop options right after Micser starts. Before, they only appeared
