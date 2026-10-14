@@ -69,6 +69,8 @@ internal sealed class MainWindow : Window
         _webView.EnvironmentRequested += OnEnvironmentRequested;
         _webView.AdapterCreated += OnAdapterCreated;
         _webView.WebMessageReceived += OnWebMessageReceived;
+        // the UI's getState can arrive before the web view reports the new source, which drops it, so the loaded page gets the state too
+        _webView.NavigationCompleted += (_, _) => PostState();
         _webView.NewWindowRequested += (_, e) =>
         {
             e.Handled = true;
