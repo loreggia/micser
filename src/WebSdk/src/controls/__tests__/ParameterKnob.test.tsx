@@ -204,3 +204,13 @@ test("a disabled knob can't be focused, dragged or edited", async () => {
   expect(onChange).not.toHaveBeenCalled();
   await expect.element(screen.getByRole("textbox")).not.toBeInTheDocument();
 });
+
+test("an inline knob works like a stacked one", async () => {
+  const { screen, knob, onChange } = await renderKnob({ value: 0, unit: "dB", inline: true });
+
+  await expect.element(screen.getByText("0 dB")).toBeVisible();
+  knob.element().focus();
+  await press("ArrowUp");
+
+  expect(onChange).toHaveBeenLastCalledWith(0.5);
+});

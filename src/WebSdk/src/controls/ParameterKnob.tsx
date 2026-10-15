@@ -22,6 +22,15 @@ const useStyles = makeStyles({
       outlineOffset: `calc(-1 * ${tokens.strokeWidthThin})`,
     },
   },
+  /** Label, knob and value in one row. */
+  inline: {
+    gridRow: "auto",
+    // as wide as its content, so the focus outline wraps only the control
+    width: "fit-content",
+    display: "flex",
+    alignItems: "center",
+    gap: tokens.spacingHorizontalXS,
+  },
   label: {
     alignSelf: "end",
     textAlign: "center",
@@ -36,6 +45,20 @@ const useStyles = makeStyles({
     touchAction: "none",
     userSelect: "none",
     outline: "none",
+  },
+  inlineLabel: {
+    alignSelf: "center",
+    textAlign: "start",
+  },
+  inlineKnob: {
+    flexShrink: 0,
+    width: "32px",
+    height: "32px",
+  },
+  inlineValue: {
+    alignSelf: "center",
+    minWidth: "3.5em",
+    textAlign: "start",
   },
   knobDisabled: {
     cursor: "default",
@@ -97,6 +120,10 @@ const useStyles = makeStyles({
     fontVariantNumeric: "tabular-nums",
     textAlign: "center",
     outline: "none",
+  },
+  /** As wide as the value, instead of the knob's column. */
+  inlineInput: {
+    width: "5em",
   },
   invalid: {
     borderBottomColor: tokens.colorPaletteRedBorder2,
@@ -168,6 +195,11 @@ export interface ParameterKnobProps {
    * Dimmed and unchangeable, e.g. a parameter that doesn't apply in the current mode. It keeps its place, so a row of knobs doesn't shift.
    */
   disabled?: boolean;
+
+  /**
+   * Label, a smaller knob and the value in one row, e.g. for a control in a header row.
+   */
+  inline?: boolean;
   onChange: (value: number) => void;
 }
 
@@ -190,6 +222,7 @@ export function ParameterKnob({
   parse = parseNumber,
   unit,
   disabled,
+  inline,
   onChange,
 }: ParameterKnobProps) {
   const styles = useStyles();
@@ -307,7 +340,7 @@ export function ParameterKnob({
 
   return (
     <div
-      className={styles.root}
+      className={mergeClasses(styles.root, inline && styles.inline)}
       onPointerDown={(event) => {
         // the label and the value focus the knob too; the info button and the input keep their own focus
         if (!disabled && event.target instanceof Element && !event.target.closest("button, input, [role=slider]")) {
@@ -316,7 +349,7 @@ export function ParameterKnob({
         }
       }}
     >
-      <div className={styles.label}>
+      <div className={mergeClasses(styles.label, inline && styles.inlineLabel)}>
         <ParameterLabel info={info} disabled={disabled}>
           {label}
         </ParameterLabel>
@@ -332,7 +365,7 @@ export function ParameterKnob({
         aria-valuenow={value}
         aria-valuetext={text}
         // "nokey": the graph's delete shortcut ignores keys pressed here
-        className={mergeClasses(styles.knob, disabled && styles.knobDisabled, "nokey")}
+        className={mergeClasses(styles.knob, inline && styles.inlineKnob, disabled && styles.knobDisabled, "nokey")}
         onPointerDown={startDrag}
         onDoubleClick={(event) => {
           event.stopPropagation();
@@ -364,12 +397,12 @@ export function ParameterKnob({
           initial={text}
           parse={parse}
           onDone={finishEditing}
-          inputClassName={styles.input}
+          inputClassName={mergeClasses(styles.input, inline && styles.inlineInput)}
           invalidClassName={styles.invalid}
         />
       ) : (
         <span
-          className={mergeClasses(styles.value, disabled && styles.valueDisabled)}
+          className={mergeClasses(styles.value, inline && styles.inlineValue, disabled && styles.valueDisabled)}
           onDoubleClick={(event) => {
             event.stopPropagation();
             startEditing();

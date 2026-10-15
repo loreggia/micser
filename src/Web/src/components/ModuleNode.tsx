@@ -12,7 +12,6 @@ import {
   MenuList,
   MenuPopover,
   MenuTrigger,
-  Slider,
   ToggleButton,
   Tooltip,
   makeStyles,
@@ -32,6 +31,7 @@ import {
   formatNumber,
   InfoTip,
   localize,
+  ParameterKnob,
   useGetConnections,
   useModuleUpdate,
   usePortLayouts,
@@ -42,7 +42,7 @@ import {
   type WidgetDefinition,
 } from "@micser/web-sdk";
 import { Handle, NodeResizeControl, Position, useReactFlow, type Node, type NodeProps } from "@xyflow/react";
-import { useLayoutEffect, useRef, useState, type RefObject } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type RefObject } from "react";
 import { useTranslation } from "../i18n";
 import { portName } from "../plugins";
 import {
@@ -103,15 +103,9 @@ const useStyles = makeStyles({
   },
   volume: {
     display: "grid",
-    gridTemplateColumns: "auto 1fr auto auto",
+    gridTemplateColumns: "1fr auto",
     alignItems: "center",
     gap: tokens.spacingHorizontalXS,
-  },
-  volumeValue: {
-    width: "3.5em",
-    textAlign: "right",
-    color: tokens.colorNeutralForeground3,
-    fontVariantNumeric: "tabular-nums",
   },
   // a divider grows by default, which would take the widget's room in a high module
   divider: {
@@ -175,7 +169,7 @@ const useStyles = makeStyles({
 });
 
 /**
- * The smallest size a module can have: the width its content needs, and the height of its content above the widget, which doesn't scroll
+ * The smallest size a module can have: the width its content needs (with the widget's scrollbar while it scrolls), and the height of its content above the widget, which doesn't scroll
  * (without a widget, the module's height). `hasBody` tells whether the widget is shown, so its element is observed.
  */
 function useMinSize(card: RefObject<HTMLDivElement | null>, body: RefObject<HTMLDivElement | null>, hasBody: boolean) {
@@ -192,8 +186,11 @@ function useMinSize(card: RefObject<HTMLDivElement | null>, body: RefObject<HTML
       const bodyElement = body.current;
       const width = cardElement.style.getPropertyValue("width");
       cardElement.style.setProperty("width", "min-content");
-      const minWidth = Math.max(minModuleWidth, Math.ceil(cardElement.offsetWidth));
+      const contentWidth = cardElement.offsetWidth;
       cardElement.style.setProperty("width", width);
+      // the widget's scrollbar, while it scrolls, isn't part of the content's min-content width
+      const scrollbarWidth = bodyElement ? bodyElement.offsetWidth - bodyElement.clientWidth : 0;
+      const minWidth = Math.max(minModuleWidth, Math.ceil(contentWidth + scrollbarWidth));
       const minHeight = bodyElement
         ? Math.ceil(bodyElement.offsetTop + parseFloat(getComputedStyle(cardElement).paddingBottom))
         : cardElement.offsetHeight;
@@ -246,6 +243,13 @@ export function ModuleNode({ id, data, selected }: NodeProps<ModuleNodeType>) {
   const bodyRef = useRef<HTMLDivElement>(null);
   const widthOnly = collapsed || !Widget;
   const minSize = useMinSize(cardRef, bodyRef, !widthOnly);
+  // A stored width below what the content needs grows to it, e.g. once the widget scrolls or after a layout change in an update.
+  // The resize handle keeps the module at its minimum only while it's dragged.
+  useEffect(() => {
+    if (module.size?.width != null && module.size.width < minSize.width) {
+      update({ ...module, size: { ...module.size, width: minSize.width } });
+    }
+  }, [module, minSize.width, update]);
   const widgetTitle = widget && localize(widget.title);
   const widgetDescription = widget?.description && localize(widget.description);
   const ports = (
@@ -416,19 +420,17 @@ export function ModuleNode({ id, data, selected }: NodeProps<ModuleNodeType>) {
       {!collapsed ? (
         <>
           <div className={mergeClasses(styles.volume, "nodrag", "nowheel")}>
-            <Caption1>{t("module.volume")}</Caption1>
-            <Slider
-              size="small"
+            <ParameterKnob
+              inline
+              label={t("module.volume")}
+              value={volumeToPosition(module.volume)}
               min={0}
               max={100}
-              value={volumeToPosition(module.volume)}
-              aria-label={t("module.volume")}
+              step={1}
+              format={(position) => formatNumber(position / 100, { style: "percent" })}
               disabled={module.useSystemVolume}
-              onChange={(_, value) => update({ ...module, volume: positionToVolume(value.value) })}
+              onChange={(position) => update({ ...module, volume: positionToVolume(position) })}
             />
-            <Caption1 className={styles.volumeValue}>
-              {formatNumber(volumeToPosition(module.volume) / 100, { style: "percent" })}
-            </Caption1>
             <Tooltip
               content={module.useSystemVolume ? t("module.followsSystemVolume") : t("module.followSystemVolume")}
               relationship="label"
