@@ -1,7 +1,7 @@
 import { formatNumber, ParameterKnob, parseNumber, useDefaultStyles, type WidgetProps } from "@micser/web-sdk";
 import { useTranslation } from "../i18n";
 
-export function PitchWidget({ module, setState }: WidgetProps<"Pitch">) {
+export function PitchWidget({ module, setState, defaultState }: WidgetProps<"Pitch">) {
   const styles = useDefaultStyles();
   const { t } = useTranslation();
   const state = module.state;
@@ -23,6 +23,7 @@ export function PitchWidget({ module, setState }: WidgetProps<"Pitch">) {
             const semitones = parseNumber(text);
             return semitones === undefined ? undefined : semitones / 12;
           }}
+          defaultValue={defaultState?.pitch}
           onChange={(pitch) => setState({ ...state, pitch })}
         />
         <ParameterKnob
@@ -33,6 +34,7 @@ export function PitchWidget({ module, setState }: WidgetProps<"Pitch">) {
           max={10}
           step={1}
           format={(v) => String(v)}
+          defaultValue={defaultState?.quality}
           onChange={(quality) => setState({ ...state, quality })}
         />
       </div>

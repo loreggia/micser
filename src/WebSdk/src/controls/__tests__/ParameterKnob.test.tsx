@@ -214,3 +214,22 @@ test("an inline knob works like a stacked one", async () => {
 
   expect(onChange).toHaveBeenLastCalledWith(0.5);
 });
+
+test("Delete resets the knob to its default value", async () => {
+  const { knob, onChange } = await renderKnob({ value: 0, defaultValue: -6 });
+
+  knob.element().focus();
+  await press("ArrowUp");
+  await press("Delete");
+
+  expect(onChange).toHaveBeenLastCalledWith(-6);
+});
+
+test("Delete does nothing without a default value", async () => {
+  const { knob, onChange } = await renderKnob({ value: 0 });
+
+  knob.element().focus();
+  await press("Delete");
+
+  expect(onChange).not.toHaveBeenCalled();
+});

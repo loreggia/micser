@@ -427,6 +427,7 @@ export function ModuleNode({ id, data, selected }: NodeProps<ModuleNodeType>) {
               min={0}
               max={100}
               step={1}
+              defaultValue={100}
               format={(position) => formatNumber(position / 100, { style: "percent" })}
               disabled={module.useSystemVolume}
               onChange={(position) => update({ ...module, volume: positionToVolume(position) })}
@@ -452,7 +453,11 @@ export function ModuleNode({ id, data, selected }: NodeProps<ModuleNodeType>) {
             <>
               <Divider className={styles.divider} />
               <div ref={bodyRef} className={mergeClasses(styles.body, "nodrag", "nowheel")}>
-                <Widget module={module} setState={(state) => update({ ...module, state } as ModuleDto)} />
+                <Widget
+                  module={module}
+                  setState={(state) => update({ ...module, state } as ModuleDto)}
+                  defaultState={moduleType?.defaultState as ModuleDto["state"] | undefined}
+                />
               </div>
             </>
           )}

@@ -14,7 +14,7 @@ const modes: StereoMode[] = ["Stereo", "Swap", "LeftToBoth", "RightToBoth", "Mon
 
 const percent = (value: number) => formatNumber(value, { style: "percent", maximumFractionDigits: 0 });
 
-export function StereoToolsWidget({ module, setState }: WidgetProps<"StereoTools">) {
+export function StereoToolsWidget({ module, setState, defaultState }: WidgetProps<"StereoTools">) {
   const styles = useDefaultStyles();
   const { t } = useTranslation();
   const state = module.state;
@@ -53,6 +53,7 @@ export function StereoToolsWidget({ module, setState }: WidgetProps<"StereoTools
           step={0.01}
           format={percent}
           parse={parsePercent}
+          defaultValue={defaultState?.width}
           onChange={(width) => setState({ ...state, width })}
         />
         <ParameterKnob
@@ -65,6 +66,7 @@ export function StereoToolsWidget({ module, setState }: WidgetProps<"StereoTools
           format={balanceLabel}
           // negative values are to the left
           parse={parsePercent}
+          defaultValue={defaultState?.balance}
           onChange={(balance) => setState({ ...state, balance })}
         />
       </div>

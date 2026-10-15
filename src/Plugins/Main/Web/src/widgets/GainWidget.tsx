@@ -1,7 +1,7 @@
 import { decibels, ParameterKnob, useDefaultStyles, type WidgetProps } from "@micser/web-sdk";
 import { useTranslation } from "../i18n";
 
-export function GainWidget({ module, setState }: WidgetProps<"Gain">) {
+export function GainWidget({ module, setState, defaultState }: WidgetProps<"Gain">) {
   const styles = useDefaultStyles();
   const { t } = useTranslation();
   return (
@@ -15,6 +15,7 @@ export function GainWidget({ module, setState }: WidgetProps<"Gain">) {
           max={24}
           step={0.5}
           format={decibels}
+          defaultValue={defaultState?.gain}
           onChange={(gain) => setState({ gain })}
         />
       </div>

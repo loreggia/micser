@@ -68,6 +68,9 @@ const useStyles = makeStyles({
 
 const bandTypes: EqualizerBandType[] = ["Peaking", "LowShelf", "HighShelf", "LowPass", "HighPass"];
 
+/** A band "Add band" adds, also the values Delete resets a band's knobs to. */
+const newBand: EqualizerBand = { type: "Peaking", frequency: 1000, gain: 0, q: 1.41 };
+
 /** Whether the band's gain applies: not to low-pass and high-pass bands. */
 const hasGain = (type: EqualizerBandType) => type !== "LowPass" && type !== "HighPass";
 
@@ -90,7 +93,7 @@ function bandBiquad(sampleRate: number, band: EqualizerBand): Biquad {
 
 type ImportResult = { error: true } | { error: false; bands: number; skipped: number };
 
-export function EqualizerWidget({ module, setState }: WidgetProps<"Equalizer">) {
+export function EqualizerWidget({ module, setState, defaultState }: WidgetProps<"Equalizer">) {
   const defaultStyles = useDefaultStyles();
   const styles = useStyles();
   const { t } = useTranslation();
@@ -132,6 +135,7 @@ export function EqualizerWidget({ module, setState }: WidgetProps<"Equalizer">) 
           max={24}
           step={0.1}
           format={decibels}
+          defaultValue={defaultState?.preamp}
           onChange={(preamp) => setState({ ...state, preamp })}
         />
       </div>
@@ -172,6 +176,7 @@ export function EqualizerWidget({ module, setState }: WidgetProps<"Equalizer">) 
               logarithmic
               format={hertz}
               parse={parseHertz}
+              defaultValue={newBand.frequency}
               onChange={(frequency) => setBand(index, { ...band, frequency })}
             />
             <ParameterKnob
@@ -183,6 +188,7 @@ export function EqualizerWidget({ module, setState }: WidgetProps<"Equalizer">) 
               step={0.5}
               format={decibels}
               disabled={!hasGain(band.type)}
+              defaultValue={newBand.gain}
               onChange={(gain) => setBand(index, { ...band, gain })}
             />
             <ParameterKnob
@@ -193,6 +199,7 @@ export function EqualizerWidget({ module, setState }: WidgetProps<"Equalizer">) 
               max={20}
               logarithmic
               format={(v) => formatNumber(v, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              defaultValue={newBand.q}
               onChange={(q) => setBand(index, { ...band, q })}
             />
           </div>
@@ -203,9 +210,7 @@ export function EqualizerWidget({ module, setState }: WidgetProps<"Equalizer">) 
           size="small"
           icon={<AddRegular />}
           disabled={bands.length >= maxBands}
-          onClick={() =>
-            setState({ ...state, bands: [...bands, { type: "Peaking", frequency: 1000, gain: 0, q: 1.41 }] })
-          }
+          onClick={() => setState({ ...state, bands: [...bands, newBand] })}
         >
           {t("equalizer.addBand")}
         </Button>

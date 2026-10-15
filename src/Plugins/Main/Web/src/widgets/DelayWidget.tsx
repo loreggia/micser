@@ -18,7 +18,7 @@ const maxChannelTime = 0.1;
 const milliseconds = (seconds: number) =>
   `${formatNumber(seconds * 1000, { minimumFractionDigits: 1, maximumFractionDigits: 1 })} ms`;
 
-export function DelayWidget({ module, setState }: WidgetProps<"Delay">) {
+export function DelayWidget({ module, setState, defaultState }: WidgetProps<"Delay">) {
   const styles = useDefaultStyles();
   const { t } = useTranslation();
   const state = module.state;
@@ -47,6 +47,7 @@ export function DelayWidget({ module, setState }: WidgetProps<"Delay">) {
           step={0.0001}
           format={milliseconds}
           parse={parseMilliseconds}
+          defaultValue={defaultState?.time}
           onChange={(time) => setState({ ...state, time })}
         />
       </div>
@@ -76,6 +77,7 @@ export function DelayWidget({ module, setState }: WidgetProps<"Delay">) {
               step={0.0001}
               format={(seconds) => `+${milliseconds(seconds)}`}
               parse={parseMilliseconds}
+              defaultValue={0}
               onChange={(time) => setChannel(index, time)}
             />
           ))}

@@ -8,7 +8,7 @@ import {
 } from "@micser/web-sdk";
 import { useTranslation } from "../i18n";
 
-export function DuckerWidget({ module, setState }: WidgetProps<"Ducker">) {
+export function DuckerWidget({ module, setState, defaultState }: WidgetProps<"Ducker">) {
   const styles = useDefaultStyles();
   const { t } = useTranslation();
   const state = module.state;
@@ -24,6 +24,7 @@ export function DuckerWidget({ module, setState }: WidgetProps<"Ducker">) {
           max={0}
           step={0.5}
           format={decibels}
+          defaultValue={defaultState?.threshold}
           onChange={(threshold) => setState({ ...state, threshold })}
         />
         <ParameterKnob
@@ -34,6 +35,7 @@ export function DuckerWidget({ module, setState }: WidgetProps<"Ducker">) {
           max={0}
           step={0.5}
           format={decibels}
+          defaultValue={defaultState?.depth}
           onChange={(depth) => setState({ ...state, depth })}
         />
         <ParameterKnob
@@ -45,6 +47,7 @@ export function DuckerWidget({ module, setState }: WidgetProps<"Ducker">) {
           logarithmic
           format={milliseconds}
           parse={parseMilliseconds}
+          defaultValue={defaultState?.attack}
           onChange={(attack) => setState({ ...state, attack })}
         />
         <ParameterKnob
@@ -56,6 +59,7 @@ export function DuckerWidget({ module, setState }: WidgetProps<"Ducker">) {
           step={0.01}
           format={milliseconds}
           parse={parseMilliseconds}
+          defaultValue={defaultState?.hold}
           onChange={(hold) => setState({ ...state, hold })}
         />
         <ParameterKnob
@@ -67,6 +71,7 @@ export function DuckerWidget({ module, setState }: WidgetProps<"Ducker">) {
           logarithmic
           format={milliseconds}
           parse={parseMilliseconds}
+          defaultValue={defaultState?.release}
           onChange={(release) => setState({ ...state, release })}
         />
       </div>

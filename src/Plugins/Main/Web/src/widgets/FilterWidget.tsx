@@ -31,7 +31,7 @@ function filterStages({ type, frequency, slope, q }: FilterState, sampleRate: nu
   });
 }
 
-export function FilterWidget({ module, setState }: WidgetProps<"Filter">) {
+export function FilterWidget({ module, setState, defaultState }: WidgetProps<"Filter">) {
   const styles = useDefaultStyles();
   const { t } = useTranslation();
   const state = module.state;
@@ -70,6 +70,7 @@ export function FilterWidget({ module, setState }: WidgetProps<"Filter">) {
           logarithmic
           format={hertz}
           parse={parseHertz}
+          defaultValue={defaultState?.frequency}
           onChange={(frequency) => setState({ ...state, frequency })}
         />
         <ParameterKnob
@@ -80,6 +81,7 @@ export function FilterWidget({ module, setState }: WidgetProps<"Filter">) {
           max={48}
           step={12}
           format={(v) => t("filter.decibelsPerOctave", { value: formatNumber(v) })}
+          defaultValue={defaultState?.slope}
           onChange={(slope) => setState({ ...state, slope })}
         />
         <ParameterKnob
@@ -90,6 +92,7 @@ export function FilterWidget({ module, setState }: WidgetProps<"Filter">) {
           max={10}
           logarithmic
           format={(v) => formatNumber(v, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          defaultValue={defaultState?.q}
           onChange={(q) => setState({ ...state, q })}
         />
       </div>

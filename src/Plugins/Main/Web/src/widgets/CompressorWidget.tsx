@@ -12,7 +12,7 @@ import {
 } from "@micser/web-sdk";
 import { useTranslation } from "../i18n";
 
-export function CompressorWidget({ module, setState }: WidgetProps<"Compressor">) {
+export function CompressorWidget({ module, setState, defaultState }: WidgetProps<"Compressor">) {
   const styles = useDefaultStyles();
   const { t } = useTranslation();
   const state = module.state;
@@ -42,6 +42,7 @@ export function CompressorWidget({ module, setState }: WidgetProps<"Compressor">
           max={0}
           step={0.5}
           format={decibels}
+          defaultValue={defaultState?.threshold}
           onChange={(threshold) => setState({ ...state, threshold })}
         />
         <ParameterKnob
@@ -52,6 +53,7 @@ export function CompressorWidget({ module, setState }: WidgetProps<"Compressor">
           max={20}
           logarithmic
           format={(v) => `${formatNumber(v, { minimumFractionDigits: 1, maximumFractionDigits: 1 })}:1`}
+          defaultValue={defaultState?.ratio}
           onChange={(ratio) => setState({ ...state, ratio })}
         />
         <ParameterKnob
@@ -63,6 +65,7 @@ export function CompressorWidget({ module, setState }: WidgetProps<"Compressor">
           logarithmic
           format={milliseconds}
           parse={parseMilliseconds}
+          defaultValue={defaultState?.attack}
           onChange={(attack) => setState({ ...state, attack })}
         />
         <ParameterKnob
@@ -74,6 +77,7 @@ export function CompressorWidget({ module, setState }: WidgetProps<"Compressor">
           logarithmic
           format={milliseconds}
           parse={parseMilliseconds}
+          defaultValue={defaultState?.release}
           onChange={(release) => setState({ ...state, release })}
         />
         <ParameterKnob
@@ -84,6 +88,7 @@ export function CompressorWidget({ module, setState }: WidgetProps<"Compressor">
           max={24}
           step={0.5}
           unit="dB"
+          defaultValue={defaultState?.knee}
           onChange={(knee) => setState({ ...state, knee })}
         />
         <ParameterKnob
@@ -94,6 +99,7 @@ export function CompressorWidget({ module, setState }: WidgetProps<"Compressor">
           max={24}
           step={0.5}
           format={decibels}
+          defaultValue={defaultState?.makeUpGain}
           onChange={(makeUpGain) => setState({ ...state, makeUpGain })}
         />
         <ParameterKnob
@@ -105,6 +111,7 @@ export function CompressorWidget({ module, setState }: WidgetProps<"Compressor">
           step={0.01}
           format={(v) => formatNumber(v, { style: "percent", maximumFractionDigits: 0 })}
           parse={parsePercent}
+          defaultValue={defaultState?.amount}
           onChange={(amount) => setState({ ...state, amount })}
         />
       </div>

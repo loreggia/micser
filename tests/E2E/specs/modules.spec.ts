@@ -18,6 +18,21 @@ test("a widget's change reaches the engine", async ({ graph, engine }) => {
   await expect.poll(async () => (await state(engine, module))?.state.gain).toBe(1);
 });
 
+test("Delete resets a knob to the module type's default and keeps the module", async ({ graph, engine }) => {
+  const module = (await engine.addModule("Gain", { x: 0, y: 0 })) as ModuleDto & { type: "Gain" };
+  await graph.open();
+  const node = graph.node(module.id);
+
+  await node.getByRole("slider", { name: "Gain" }).focus();
+  await graph.page.keyboard.press("ArrowRight");
+  await expect.poll(async () => (await state(engine, module))?.state.gain).toBe(0.5);
+  await graph.page.keyboard.press("Delete");
+
+  await expect(node).toContainText("0.0 dB");
+  await expect.poll(async () => (await state(engine, module))?.state.gain).toBe(0);
+  expect(await engine.module(module.id)).toBeDefined();
+});
+
 test("the node's controls change the module", async ({ graph, engine }) => {
   const module = await engine.addModule("Gain", { x: 0, y: 0 });
   await graph.open();

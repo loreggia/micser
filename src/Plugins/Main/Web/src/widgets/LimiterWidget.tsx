@@ -18,7 +18,7 @@ const useStyles = makeStyles({
   },
 });
 
-export function LimiterWidget({ module, setState }: WidgetProps<"Limiter">) {
+export function LimiterWidget({ module, setState, defaultState }: WidgetProps<"Limiter">) {
   const defaultStyles = useDefaultStyles();
   const styles = useStyles();
   const { t } = useTranslation();
@@ -35,6 +35,7 @@ export function LimiterWidget({ module, setState }: WidgetProps<"Limiter">) {
           max={0}
           step={0.1}
           format={decibels}
+          defaultValue={defaultState?.ceiling}
           onChange={(ceiling) => setState({ ...state, ceiling })}
         />
         <ParameterKnob
@@ -45,6 +46,7 @@ export function LimiterWidget({ module, setState }: WidgetProps<"Limiter">) {
           max={24}
           step={0.5}
           format={decibels}
+          defaultValue={defaultState?.gain}
           onChange={(gain) => setState({ ...state, gain })}
         />
         <ParameterKnob
@@ -56,6 +58,7 @@ export function LimiterWidget({ module, setState }: WidgetProps<"Limiter">) {
           logarithmic
           format={milliseconds}
           parse={parseMilliseconds}
+          defaultValue={defaultState?.release}
           onChange={(release) => setState({ ...state, release })}
         />
       </div>

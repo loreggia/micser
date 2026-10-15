@@ -12,7 +12,7 @@ from that section, and the release workflow fails without it.
 
 - Module settings are knobs instead of sliders, side by side, so modules like the Equalizer and the Compressor take much less
   room. Drag a knob up or down to change it, with Shift held for fine steps, or double-click it to type a value, e.g. "2.5k" for a
-  frequency: Enter or clicking elsewhere applies it, Escape cancels.
+  frequency: Enter or clicking elsewhere applies it, Escape cancels. Delete sets a selected knob back to its default.
 - The Equalizer's bands can be low shelves, high shelves, low-pass and high-pass filters besides peaking bands, and a preamp sets the
   level before the bands. "Import…" reads an Equalizer APO configuration, e.g. a headphone correction from AutoEQ ("ParametricEQ.txt"),
   and replaces the bands and the preamp with its filters.

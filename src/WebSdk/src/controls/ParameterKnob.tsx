@@ -197,6 +197,11 @@ export interface ParameterKnobProps {
   disabled?: boolean;
 
   /**
+   * The value Delete resets the knob to, e.g. from the module type's default state (`WidgetProps.defaultState`).
+   */
+  defaultValue?: number;
+
+  /**
    * Label, a smaller knob and the value in one row, e.g. for a control in a header row.
    */
   inline?: boolean;
@@ -205,7 +210,8 @@ export interface ParameterKnobProps {
 
 /**
  * A labeled knob for a module parameter. Dragging up or down changes the value (Shift for fine steps), and double-clicking it or
- * pressing Enter opens an input for a typed value: Enter or leaving the input applies it, Escape cancels.
+ * pressing Enter opens an input for a typed value: Enter or leaving the input applies it, Escape cancels. Delete resets it to its
+ * `defaultValue`.
  *
  * Put several into a `useDefaultStyles().knobs` grid to have them side by side. Inside graph nodes, wrap controls in an element
  * with the `nodrag` class.
@@ -222,6 +228,7 @@ export function ParameterKnob({
   parse = parseNumber,
   unit,
   disabled,
+  defaultValue,
   inline,
   onChange,
 }: ParameterKnobProps) {
@@ -303,6 +310,10 @@ export function ParameterKnob({
       setPosition(position + move);
     } else if (event.key === "Enter") {
       setEditing(true);
+    } else if (event.key === "Delete" && defaultValue !== undefined) {
+      if (defaultValue !== value) {
+        onChange(defaultValue);
+      }
     } else {
       return;
     }

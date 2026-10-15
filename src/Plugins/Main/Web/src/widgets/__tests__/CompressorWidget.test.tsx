@@ -20,7 +20,11 @@ async function renderCompressor() {
   const setState = vi.fn();
   const screen = await render(
     <TestProviders queryClient={createTestQueryClient()}>
-      <CompressorWidget module={testModule("Compressor", state)} setState={setState} />
+      <CompressorWidget
+        module={testModule("Compressor", state)}
+        setState={setState}
+        defaultState={{ ...state, threshold: -10, ratio: 2 }}
+      />
     </TestProviders>
   );
 
@@ -51,6 +55,15 @@ test("changes one parameter and keeps the others", async () => {
   await userEvent.keyboard("{ArrowLeft}");
 
   expect(setState).toHaveBeenLastCalledWith({ ...state, threshold: -20.5 });
+});
+
+test("Delete resets a parameter to the module type's default", async () => {
+  const { screen, setState } = await renderCompressor();
+
+  screen.getByRole("slider", { name: "Ratio" }).element().focus();
+  await userEvent.keyboard("{Delete}");
+
+  expect(setState).toHaveBeenLastCalledWith({ ...state, ratio: 2 });
 });
 
 test("explains the type and the parameters behind info buttons", async () => {
