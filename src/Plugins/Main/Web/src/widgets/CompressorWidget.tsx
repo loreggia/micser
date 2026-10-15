@@ -1,7 +1,8 @@
-import { Dropdown, Option } from "@fluentui/react-components";
+import { Dropdown, mergeClasses, Option } from "@fluentui/react-components";
 import {
   decibels,
   formatNumber,
+  InfoTip,
   milliseconds,
   ParameterSlider,
   useDefaultStyles,
@@ -16,18 +17,23 @@ export function CompressorWidget({ module, setState }: WidgetProps<"Compressor">
 
   return (
     <div className={styles.column}>
-      <Dropdown
-        className={styles.dropdown}
-        size="small"
-        value={state.type === "Downward" ? t("compressor.downward") : t("compressor.upward")}
-        selectedOptions={[state.type]}
-        onOptionSelect={(_, data) => setState({ ...state, type: data.optionValue as typeof state.type })}
-      >
-        <Option value="Downward">{t("compressor.downward")}</Option>
-        <Option value="Upward">{t("compressor.upward")}</Option>
-      </Dropdown>
+      <div className={styles.withInfo}>
+        <Dropdown
+          className={mergeClasses(styles.dropdown, styles.fill)}
+          size="small"
+          aria-label={t("compressor.type")}
+          value={state.type === "Downward" ? t("compressor.downward") : t("compressor.upward")}
+          selectedOptions={[state.type]}
+          onOptionSelect={(_, data) => setState({ ...state, type: data.optionValue as typeof state.type })}
+        >
+          <Option value="Downward">{t("compressor.downward")}</Option>
+          <Option value="Upward">{t("compressor.upward")}</Option>
+        </Dropdown>
+        <InfoTip info={t("compressor.info.type")} label={t("compressor.type")} />
+      </div>
       <ParameterSlider
         label={t("compressor.threshold")}
+        info={t("compressor.info.threshold")}
         value={state.threshold}
         min={-80}
         max={0}
@@ -37,6 +43,7 @@ export function CompressorWidget({ module, setState }: WidgetProps<"Compressor">
       />
       <ParameterSlider
         label={t("compressor.ratio")}
+        info={t("compressor.info.ratio")}
         value={state.ratio}
         min={1}
         max={20}
@@ -46,6 +53,7 @@ export function CompressorWidget({ module, setState }: WidgetProps<"Compressor">
       />
       <ParameterSlider
         label={t("compressor.attack")}
+        info={t("compressor.info.attack")}
         value={state.attack}
         min={0.0001}
         max={1}
@@ -55,6 +63,7 @@ export function CompressorWidget({ module, setState }: WidgetProps<"Compressor">
       />
       <ParameterSlider
         label={t("compressor.release")}
+        info={t("compressor.info.release")}
         value={state.release}
         min={0.001}
         max={5}
@@ -64,6 +73,7 @@ export function CompressorWidget({ module, setState }: WidgetProps<"Compressor">
       />
       <ParameterSlider
         label={t("compressor.knee")}
+        info={t("compressor.info.knee")}
         value={state.knee}
         min={0}
         max={24}
@@ -73,6 +83,7 @@ export function CompressorWidget({ module, setState }: WidgetProps<"Compressor">
       />
       <ParameterSlider
         label={t("compressor.makeUpGain")}
+        info={t("compressor.info.makeUpGain")}
         value={state.makeUpGain}
         min={-24}
         max={24}
@@ -82,6 +93,7 @@ export function CompressorWidget({ module, setState }: WidgetProps<"Compressor">
       />
       <ParameterSlider
         label={t("compressor.amount")}
+        info={t("compressor.info.amount")}
         value={state.amount}
         min={0}
         max={1}

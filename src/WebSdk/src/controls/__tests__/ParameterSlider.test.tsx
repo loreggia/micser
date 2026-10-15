@@ -64,3 +64,12 @@ test("a logarithmic scale puts the geometric mean in the middle", async () => {
 
   await expect.element(slider).toHaveValue("500");
 });
+
+test("explains the parameter in the popover of an info button after the label", async () => {
+  const { screen, slider } = await renderSlider({ info: "How much louder the audio gets." });
+
+  await expect.element(slider).toBeVisible();
+  await screen.getByRole("button", { name: "Gain information" }).click();
+
+  await expect.element(screen.getByText("How much louder the audio gets.")).toBeVisible();
+});

@@ -50,6 +50,7 @@ import { portName, usePluginWidgets } from "../plugins";
 import { useTheme } from "../theme";
 import { channelLabel, isBeyondLayout } from "./channels";
 import { ModuleNode, type ModuleNodeType } from "./ModuleNode";
+import { ModuleTypeMenuItem } from "./ModuleTypeMenuItem";
 import { pendingPlacement, pendingSelection } from "./newModules";
 import { findFreePosition, placementMinimum, placementObstacles } from "./placement";
 import { SubgraphNode, type SubgraphNodeType } from "./SubgraphNode";
@@ -764,9 +765,12 @@ export function GraphEditor() {
                   !menu?.connection || (menu.connection.fromOutput ? type.inputs.length > 0 : type.outputs.length > 0)
               )
               .map((type) => (
-                <MenuItem key={type.type} onClick={() => void addFromMenu(type.type)}>
-                  {type.title}
-                </MenuItem>
+                <ModuleTypeMenuItem
+                  key={type.type}
+                  title={type.title}
+                  description={type.description}
+                  onClick={() => void addFromMenu(type.type)}
+                />
               ))}
             {menu && !menu.connection && !menu.subgraph && (
               <>

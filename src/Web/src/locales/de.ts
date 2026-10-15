@@ -63,6 +63,7 @@ export const de: Translations<typeof en> = {
     showStreamStatistics: "Stream-Statistiken anzeigen (Aussetzer und Puffergröße der Gerätemodule)",
     snapToGrid: "Module am Raster ausrichten",
     showChannelsByDefault: "Kanäle neuer Module anzeigen",
+    showHelp: "Module und ihre Einstellungen erklären (Info-Schaltflächen)",
     desktop: "Desktop",
     autostart: "Micser beim Anmelden starten",
     menuEntry: "Micser im Anwendungsmenü anzeigen",

@@ -1,5 +1,12 @@
-import { Dropdown, Option, Switch } from "@fluentui/react-components";
-import { formatNumber, ParameterSlider, useDefaultStyles, type StereoMode, type WidgetProps } from "@micser/web-sdk";
+import { Dropdown, mergeClasses, Option, Switch } from "@fluentui/react-components";
+import {
+  formatNumber,
+  InfoTip,
+  ParameterSlider,
+  useDefaultStyles,
+  type StereoMode,
+  type WidgetProps,
+} from "@micser/web-sdk";
 import { useTranslation } from "../i18n";
 
 const modes: StereoMode[] = ["Stereo", "Swap", "LeftToBoth", "RightToBoth", "Mono"];
@@ -18,22 +25,26 @@ export function StereoToolsWidget({ module, setState }: WidgetProps<"StereoTools
 
   return (
     <div className={styles.column}>
-      <Dropdown
-        className={styles.dropdown}
-        size="small"
-        aria-label={t("stereoTools.mode")}
-        value={modeLabel(state.mode)}
-        selectedOptions={[state.mode]}
-        onOptionSelect={(_, data) => setState({ ...state, mode: data.optionValue as StereoMode })}
-      >
-        {modes.map((mode) => (
-          <Option key={mode} value={mode}>
-            {modeLabel(mode)}
-          </Option>
-        ))}
-      </Dropdown>
+      <div className={styles.withInfo}>
+        <Dropdown
+          className={mergeClasses(styles.dropdown, styles.fill)}
+          size="small"
+          aria-label={t("stereoTools.mode")}
+          value={modeLabel(state.mode)}
+          selectedOptions={[state.mode]}
+          onOptionSelect={(_, data) => setState({ ...state, mode: data.optionValue as StereoMode })}
+        >
+          {modes.map((mode) => (
+            <Option key={mode} value={mode}>
+              {modeLabel(mode)}
+            </Option>
+          ))}
+        </Dropdown>
+        <InfoTip info={t("stereoTools.info.mode")} label={t("stereoTools.mode")} />
+      </div>
       <ParameterSlider
         label={t("stereoTools.width")}
+        info={t("stereoTools.info.width")}
         value={state.width}
         min={0}
         max={2}
@@ -43,6 +54,7 @@ export function StereoToolsWidget({ module, setState }: WidgetProps<"StereoTools
       />
       <ParameterSlider
         label={t("stereoTools.balance")}
+        info={t("stereoTools.info.balance")}
         value={state.balance}
         min={-1}
         max={1}
@@ -50,16 +62,22 @@ export function StereoToolsWidget({ module, setState }: WidgetProps<"StereoTools
         format={balanceLabel}
         onChange={(balance) => setState({ ...state, balance })}
       />
-      <Switch
-        label={t("stereoTools.invertLeft")}
-        checked={state.invertLeft}
-        onChange={(_, data) => setState({ ...state, invertLeft: data.checked })}
-      />
-      <Switch
-        label={t("stereoTools.invertRight")}
-        checked={state.invertRight}
-        onChange={(_, data) => setState({ ...state, invertRight: data.checked })}
-      />
+      <div className={styles.withInfo}>
+        <Switch
+          label={t("stereoTools.invertLeft")}
+          checked={state.invertLeft}
+          onChange={(_, data) => setState({ ...state, invertLeft: data.checked })}
+        />
+        <InfoTip info={t("stereoTools.info.invertLeft")} label={t("stereoTools.invertLeft")} />
+      </div>
+      <div className={styles.withInfo}>
+        <Switch
+          label={t("stereoTools.invertRight")}
+          checked={state.invertRight}
+          onChange={(_, data) => setState({ ...state, invertRight: data.checked })}
+        />
+        <InfoTip info={t("stereoTools.info.invertRight")} label={t("stereoTools.invertRight")} />
+      </div>
     </div>
   );
 }

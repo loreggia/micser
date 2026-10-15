@@ -52,3 +52,13 @@ test("changes one parameter and keeps the others", async () => {
 
   expect(setState).toHaveBeenLastCalledWith({ ...state, threshold: -20.5 });
 });
+
+test("explains the type and the parameters behind info buttons", async () => {
+  const { screen } = await renderCompressor();
+
+  await screen.getByRole("button", { name: "About Type" }).click();
+  await expect.element(screen.getByText(/^Downward makes the parts above the threshold quieter/)).toBeVisible();
+
+  await screen.getByRole("button", { name: "Ratio information" }).click();
+  await expect.element(screen.getByText(/^How strongly levels beyond the threshold are changed/)).toBeVisible();
+});

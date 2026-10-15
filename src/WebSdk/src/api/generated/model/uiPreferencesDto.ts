@@ -23,4 +23,6 @@ export interface UiPreferencesDto {
   /** Whether modules the UI adds show their channel connectors. */
   showChannelsByDefault: boolean;
   theme?: null | UiThemeDto;
+  /** Whether info buttons explain modules and their parameters. */
+  showHelp: boolean;
 }

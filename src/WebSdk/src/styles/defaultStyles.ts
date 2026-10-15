@@ -9,4 +9,15 @@ export const useDefaultStyles = makeStyles({
     flexDirection: "column",
     gap: tokens.spacingVerticalS,
   },
+  /** A control followed by its `InfoTip`. */
+  withInfo: {
+    display: "flex",
+    alignItems: "center",
+    gap: tokens.spacingHorizontalXS,
+  },
+  /** A control that takes the rest of a `withInfo` row, e.g. a dropdown. */
+  fill: {
+    flexGrow: 1,
+    minWidth: 0,
+  },
 });

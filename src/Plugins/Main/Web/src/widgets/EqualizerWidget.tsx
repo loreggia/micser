@@ -18,6 +18,7 @@ import {
   FrequencyResponse,
   hertz,
   highPass,
+  InfoTip,
   highShelf,
   lowPass,
   lowShelf,
@@ -119,6 +120,7 @@ export function EqualizerWidget({ module, setState }: WidgetProps<"Equalizer">) 
       />
       <ParameterSlider
         label={t("equalizer.preamp")}
+        info={t("equalizer.info.preamp")}
         value={state.preamp}
         min={-24}
         max={24}
@@ -138,22 +140,26 @@ export function EqualizerWidget({ module, setState }: WidgetProps<"Equalizer">) 
               onClick={() => setState({ ...state, bands: bands.toSpliced(index, 1) })}
             />
           </div>
-          <Dropdown
-            className={defaultStyles.dropdown}
-            size="small"
-            aria-label={t("equalizer.type", { number: index + 1 })}
-            value={typeLabel(band.type)}
-            selectedOptions={[band.type]}
-            onOptionSelect={(_, data) => setBand(index, { ...band, type: data.optionValue as EqualizerBandType })}
-          >
-            {bandTypes.map((type) => (
-              <Option key={type} value={type}>
-                {typeLabel(type)}
-              </Option>
-            ))}
-          </Dropdown>
+          <div className={defaultStyles.withInfo}>
+            <Dropdown
+              className={mergeClasses(defaultStyles.dropdown, defaultStyles.fill)}
+              size="small"
+              aria-label={t("equalizer.type", { number: index + 1 })}
+              value={typeLabel(band.type)}
+              selectedOptions={[band.type]}
+              onOptionSelect={(_, data) => setBand(index, { ...band, type: data.optionValue as EqualizerBandType })}
+            >
+              {bandTypes.map((type) => (
+                <Option key={type} value={type}>
+                  {typeLabel(type)}
+                </Option>
+              ))}
+            </Dropdown>
+            <InfoTip info={t("equalizer.info.type")} label={t("equalizer.type", { number: index + 1 })} />
+          </div>
           <ParameterSlider
             label={t("equalizer.frequency")}
+            info={t("equalizer.info.frequency")}
             value={band.frequency}
             min={20}
             max={20000}
@@ -164,6 +170,7 @@ export function EqualizerWidget({ module, setState }: WidgetProps<"Equalizer">) 
           {hasGain(band.type) && (
             <ParameterSlider
               label={t("equalizer.gain")}
+              info={t("equalizer.info.gain")}
               value={band.gain}
               min={-24}
               max={24}
@@ -174,6 +181,7 @@ export function EqualizerWidget({ module, setState }: WidgetProps<"Equalizer">) 
           )}
           <ParameterSlider
             label={t("equalizer.q")}
+            info={t("equalizer.info.q")}
             value={band.q}
             min={0.1}
             max={20}

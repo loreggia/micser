@@ -1,10 +1,11 @@
-import { Dropdown, Option } from "@fluentui/react-components";
+import { Dropdown, mergeClasses, Option } from "@fluentui/react-components";
 import {
   biquadResponse,
   formatNumber,
   FrequencyResponse,
   hertz,
   highPass,
+  InfoTip,
   lowPass,
   ParameterSlider,
   useDefaultStyles,
@@ -44,18 +45,23 @@ export function FilterWidget({ module, setState }: WidgetProps<"Filter">) {
         minDecibels={-48}
         maxDecibels={24}
       />
-      <Dropdown
-        className={styles.dropdown}
-        size="small"
-        value={state.type === "LowPass" ? t("filter.lowPass") : t("filter.highPass")}
-        selectedOptions={[state.type]}
-        onOptionSelect={(_, data) => setState({ ...state, type: data.optionValue as typeof state.type })}
-      >
-        <Option value="HighPass">{t("filter.highPass")}</Option>
-        <Option value="LowPass">{t("filter.lowPass")}</Option>
-      </Dropdown>
+      <div className={styles.withInfo}>
+        <Dropdown
+          className={mergeClasses(styles.dropdown, styles.fill)}
+          size="small"
+          aria-label={t("filter.type")}
+          value={state.type === "LowPass" ? t("filter.lowPass") : t("filter.highPass")}
+          selectedOptions={[state.type]}
+          onOptionSelect={(_, data) => setState({ ...state, type: data.optionValue as typeof state.type })}
+        >
+          <Option value="HighPass">{t("filter.highPass")}</Option>
+          <Option value="LowPass">{t("filter.lowPass")}</Option>
+        </Dropdown>
+        <InfoTip info={t("filter.info.type")} label={t("filter.type")} />
+      </div>
       <ParameterSlider
         label={t("filter.frequency")}
+        info={t("filter.info.frequency")}
         value={state.frequency}
         min={20}
         max={20000}
@@ -65,6 +71,7 @@ export function FilterWidget({ module, setState }: WidgetProps<"Filter">) {
       />
       <ParameterSlider
         label={t("filter.slope")}
+        info={t("filter.info.slope")}
         value={state.slope}
         min={12}
         max={48}
@@ -74,6 +81,7 @@ export function FilterWidget({ module, setState }: WidgetProps<"Filter">) {
       />
       <ParameterSlider
         label={t("filter.q")}
+        info={t("filter.info.q")}
         value={state.q}
         min={0.1}
         max={10}

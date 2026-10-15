@@ -10,6 +10,7 @@ export function DuckerWidget({ module, setState }: WidgetProps<"Ducker">) {
     <div className={styles.column}>
       <ParameterSlider
         label={t("ducker.threshold")}
+        info={t("ducker.info.threshold")}
         value={state.threshold}
         min={-80}
         max={0}
@@ -19,6 +20,7 @@ export function DuckerWidget({ module, setState }: WidgetProps<"Ducker">) {
       />
       <ParameterSlider
         label={t("ducker.depth")}
+        info={t("ducker.info.depth")}
         value={state.depth}
         min={-60}
         max={0}
@@ -28,6 +30,7 @@ export function DuckerWidget({ module, setState }: WidgetProps<"Ducker">) {
       />
       <ParameterSlider
         label={t("ducker.attack")}
+        info={t("ducker.info.attack")}
         value={state.attack}
         min={0.0001}
         max={1}
@@ -37,6 +40,7 @@ export function DuckerWidget({ module, setState }: WidgetProps<"Ducker">) {
       />
       <ParameterSlider
         label={t("ducker.hold")}
+        info={t("ducker.info.hold")}
         value={state.hold}
         min={0}
         max={2}
@@ -46,6 +50,7 @@ export function DuckerWidget({ module, setState }: WidgetProps<"Ducker">) {
       />
       <ParameterSlider
         label={t("ducker.release")}
+        info={t("ducker.info.release")}
         value={state.release}
         min={0.001}
         max={5}

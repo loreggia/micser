@@ -25,6 +25,11 @@ export interface WidgetDefinition {
   component: ComponentType<WidgetProps>;
 
   /**
+   * What the module does, in a sentence or two for users new to audio processing, e.g. in the "add module" menu and the node's header.
+   */
+  description?: LocalizedText;
+
+  /**
    * The engine's module type name. Module types of plugins outside this repository aren't in the generated API types.
    */
   moduleType: string;
@@ -43,6 +48,7 @@ export interface WidgetDefinition {
 
 export function defineWidget<T extends ModuleType>(definition: {
   component: ComponentType<WidgetProps<T>>;
+  description?: LocalizedText;
   moduleType: T;
   portLabels?: Record<string, LocalizedText>;
   title: LocalizedText;

@@ -77,6 +77,7 @@ describe("usePreferences", () => {
     showStreamStatistics: false,
     snapToGrid: true,
     showChannelsByDefault: false,
+    showHelp: true,
   };
 
   test("has the defaults until the preferences are loaded", async () => {
@@ -89,6 +90,7 @@ describe("usePreferences", () => {
       snapToGrid: true,
       language: null,
       showChannelsByDefault: false,
+      showHelp: true,
       theme: null,
     });
   });
@@ -121,6 +123,7 @@ describe("useLanguagePreference", () => {
     showStreamStatistics: false,
     snapToGrid: true,
     showChannelsByDefault: false,
+    showHelp: true,
   };
   afterEach(() => i18n.changeLanguage("en"));
 

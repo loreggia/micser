@@ -19,6 +19,7 @@ test("display preferences apply right away and are kept by the engine", async ({
       snapToGrid: false,
       language: null,
       showChannelsByDefault: false,
+      showHelp: true,
       theme: null,
     });
 
@@ -55,6 +56,32 @@ test("new modules show their channels if the preference is on", async ({ graph, 
   await expect.poll(async () => (await engine.modules()).map((module) => module.showChannels)).toEqual([true]);
   const [module] = await engine.modules();
   await expect(graph.handle(graph.node(module.id), "Input:1")).toBeVisible();
+});
+
+test("info buttons explain modules and their parameters until the preference is turned off", async ({
+  graph,
+  engine,
+}) => {
+  const module = await engine.addModule("Compressor", { x: 100, y: 100 });
+  await graph.open();
+  const node = graph.node(module.id);
+
+  await node.getByRole("button", { name: "About Compressor" }).click();
+  await expect(graph.page.getByText(/^Evens out the volume/)).toBeVisible();
+  await graph.page.keyboard.press("Escape");
+  await node.getByRole("button", { name: "Threshold information" }).click();
+  await expect(graph.page.getByText(/^The level where compression starts/)).toBeVisible();
+  await graph.page.keyboard.press("Escape");
+
+  await graph.page.getByRole("button", { name: "Settings" }).click();
+  const dialog = graph.page.getByRole("dialog", { name: "Settings" });
+  await dialog.getByRole("switch", { name: /Explain modules/ }).click();
+  await expect.poll(async () => (await engine.preferences()).showHelp).toBe(false);
+  await dialog.getByRole("button", { name: "Close" }).click();
+
+  await expect(node.getByRole("slider", { name: "Threshold" })).toBeVisible();
+  await expect(node.getByRole("button", { name: "About Compressor" })).toHaveCount(0);
+  await expect(node.getByRole("button", { name: "Threshold information" })).toHaveCount(0);
 });
 
 test("the theme applies right away and is kept by the engine", async ({ graph, engine }) => {

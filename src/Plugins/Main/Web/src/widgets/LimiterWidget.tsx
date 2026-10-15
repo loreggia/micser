@@ -21,6 +21,7 @@ export function LimiterWidget({ module, setState }: WidgetProps<"Limiter">) {
     <div className={defaultStyles.column}>
       <ParameterSlider
         label={t("limiter.ceiling")}
+        info={t("limiter.info.ceiling")}
         value={state.ceiling}
         min={-24}
         max={0}
@@ -30,6 +31,7 @@ export function LimiterWidget({ module, setState }: WidgetProps<"Limiter">) {
       />
       <ParameterSlider
         label={t("limiter.gain")}
+        info={t("limiter.info.gain")}
         value={state.gain}
         min={0}
         max={24}
@@ -39,6 +41,7 @@ export function LimiterWidget({ module, setState }: WidgetProps<"Limiter">) {
       />
       <ParameterSlider
         label={t("limiter.release")}
+        info={t("limiter.info.release")}
         value={state.release}
         min={0.001}
         max={2}

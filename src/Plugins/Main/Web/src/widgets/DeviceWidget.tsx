@@ -1,6 +1,8 @@
-import { Caption1, Dropdown, Option, makeStyles, tokens } from "@fluentui/react-components";
+import { Caption1, Dropdown, Option, makeStyles, mergeClasses, tokens } from "@fluentui/react-components";
 import {
   formatNumber,
+  InfoTip,
+  useDefaultStyles,
   useGetDevices,
   useModuleData,
   usePreferences,
@@ -50,6 +52,7 @@ export function DeviceWidget({
   direction,
 }: WidgetProps<DeviceModuleType> & { direction: DeviceDirection }) {
   const styles = useStyles();
+  const defaultStyles = useDefaultStyles();
   const { t, language } = useTranslation();
   const { data: devices = [] } = useGetDevices({ direction, includeInactive: true });
   const [preferences] = usePreferences();
@@ -70,28 +73,32 @@ export function DeviceWidget({
 
   return (
     <div className={styles.root}>
-      <Dropdown
-        className={styles.dropdown}
-        size="small"
-        value={label}
-        selectedOptions={[state.deviceId ?? none]}
-        onOptionSelect={(_, data) => {
-          const device = devices.find((d) => d.id === data.optionValue);
-          // a newly selected device learns its buffer from scratch
-          setState({
-            deviceId: device?.id ?? null,
-            adapterName: device?.adapterName ?? null,
-            bufferMilliseconds: null,
-          });
-        }}
-      >
-        <Option value={none}>{t("device.none")}</Option>
-        {availableDevices.map((device) => (
-          <Option key={device.id} value={device.id} disabled={!device.isActive}>
-            {device.isActive ? device.name : t("device.deviceUnavailable", { name: device.name })}
-          </Option>
-        ))}
-      </Dropdown>
+      <div className={defaultStyles.withInfo}>
+        <Dropdown
+          className={mergeClasses(styles.dropdown, defaultStyles.fill)}
+          size="small"
+          aria-label={t("device.device")}
+          value={label}
+          selectedOptions={[state.deviceId ?? none]}
+          onOptionSelect={(_, data) => {
+            const device = devices.find((d) => d.id === data.optionValue);
+            // a newly selected device learns its buffer from scratch
+            setState({
+              deviceId: device?.id ?? null,
+              adapterName: device?.adapterName ?? null,
+              bufferMilliseconds: null,
+            });
+          }}
+        >
+          <Option value={none}>{t("device.none")}</Option>
+          {availableDevices.map((device) => (
+            <Option key={device.id} value={device.id} disabled={!device.isActive}>
+              {device.isActive ? device.name : t("device.deviceUnavailable", { name: device.name })}
+            </Option>
+          ))}
+        </Dropdown>
+        <InfoTip info={t(`device.info.${module.type as DeviceModuleType}`)} label={t("device.device")} />
+      </div>
       {preferences.showStreamStatistics && state.deviceId && <StreamStatus moduleId={module.id} />}
     </div>
   );

@@ -1,6 +1,7 @@
 import { Switch } from "@fluentui/react-components";
 import {
   formatNumber,
+  InfoTip,
   ParameterSlider,
   useDefaultStyles,
   usePortLayouts,
@@ -37,6 +38,7 @@ export function DelayWidget({ module, setState }: WidgetProps<"Delay">) {
     <div className={styles.column}>
       <ParameterSlider
         label={t("delay.time")}
+        info={t("delay.info.time")}
         value={state.time}
         min={0}
         max={maxTime}
@@ -44,21 +46,25 @@ export function DelayWidget({ module, setState }: WidgetProps<"Delay">) {
         format={milliseconds}
         onChange={(time) => setState({ ...state, time })}
       />
-      <Switch
-        label={t("delay.perChannel")}
-        checked={perChannel}
-        onChange={(_, data) =>
-          setState({
-            ...state,
-            channels: data.checked ? Array.from({ length: channelCount }, () => ({ time: 0 })) : [],
-          })
-        }
-      />
+      <div className={styles.withInfo}>
+        <Switch
+          label={t("delay.perChannel")}
+          checked={perChannel}
+          onChange={(_, data) =>
+            setState({
+              ...state,
+              channels: data.checked ? Array.from({ length: channelCount }, () => ({ time: 0 })) : [],
+            })
+          }
+        />
+        <InfoTip info={t("delay.info.perChannel")} label={t("delay.perChannel")} />
+      </div>
       {perChannel &&
         Array.from({ length: shownChannels }, (_, index) => (
           <ParameterSlider
             key={index}
             label={t("delay.channel", { number: index + 1 })}
+            info={t("delay.info.channel")}
             value={state.channels[index]?.time ?? 0}
             min={0}
             max={maxChannelTime}
