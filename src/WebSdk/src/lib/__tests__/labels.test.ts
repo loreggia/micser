@@ -1,6 +1,15 @@
 import { afterEach, expect, test } from "vitest";
 import { i18n } from "../../i18n/i18n";
-import { decibels, formatNumber, hertz, milliseconds } from "../labels";
+import {
+  decibels,
+  formatNumber,
+  hertz,
+  milliseconds,
+  parseHertz,
+  parseMilliseconds,
+  parseNumber,
+  parsePercent,
+} from "../labels";
 
 afterEach(() => i18n.changeLanguage("en"));
 
@@ -29,4 +38,32 @@ test("numbers follow the current language", async () => {
   expect(decibels(-6.04)).toBe("-6,0 dB");
   expect(hertz(12345)).toBe("12,3 kHz");
   expect(formatNumber(1234.5)).toBe("1234,5");
+});
+
+test("typed numbers take a decimal point or comma and ignore the unit", () => {
+  expect(parseNumber("-3.5 dB")).toBe(-3.5);
+  expect(parseNumber("1,25")).toBe(1.25);
+  expect(parseNumber("+6")).toBe(6);
+  expect(parseNumber("−12")).toBe(-12);
+  expect(parseNumber(".5")).toBe(0.5);
+  expect(parseNumber("4:1")).toBe(4);
+  expect(parseNumber("dB")).toBeUndefined();
+  expect(parseNumber("")).toBeUndefined();
+});
+
+test("typed frequencies take kilohertz", () => {
+  expect(parseHertz("250 Hz")).toBe(250);
+  expect(parseHertz("1,5k")).toBe(1500);
+  expect(parseHertz("2.4 kHz")).toBe(2400);
+});
+
+test("typed times are milliseconds unless they end in seconds", () => {
+  expect(parseMilliseconds("10")).toBe(0.01);
+  expect(parseMilliseconds("250 ms")).toBe(0.25);
+  expect(parseMilliseconds("0,2 s")).toBe(0.2);
+});
+
+test("typed percentages are fractions", () => {
+  expect(parsePercent("80 %")).toBe(0.8);
+  expect(parsePercent("-50")).toBe(-0.5);
 });

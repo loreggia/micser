@@ -9,6 +9,13 @@ export const useDefaultStyles = makeStyles({
     flexDirection: "column",
     gap: tokens.spacingVerticalS,
   },
+  /** `ParameterKnob`s side by side, wrapping into rows. */
+  knobs: {
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fill, minmax(76px, 1fr))",
+    columnGap: tokens.spacingHorizontalXS,
+    rowGap: tokens.spacingVerticalM,
+  },
   /** A control followed by its `InfoTip`. */
   withInfo: {
     display: "flex",

@@ -58,6 +58,8 @@ test("explains the type and the parameters behind info buttons", async () => {
 
   await screen.getByRole("button", { name: "About Type" }).click();
   await expect.element(screen.getByText(/^Downward makes the parts above the threshold quieter/)).toBeVisible();
+  // the popover covers the knobs below the dropdown
+  await userEvent.keyboard("{Escape}");
 
   await screen.getByRole("button", { name: "Ratio information" }).click();
   await expect.element(screen.getByText(/^How strongly levels beyond the threshold are changed/)).toBeVisible();

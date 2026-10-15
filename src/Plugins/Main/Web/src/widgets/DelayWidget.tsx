@@ -2,7 +2,8 @@ import { Switch } from "@fluentui/react-components";
 import {
   formatNumber,
   InfoTip,
-  ParameterSlider,
+  ParameterKnob,
+  parseMilliseconds,
   useDefaultStyles,
   usePortLayouts,
   type DelayChannel,
@@ -36,16 +37,19 @@ export function DelayWidget({ module, setState }: WidgetProps<"Delay">) {
 
   return (
     <div className={styles.column}>
-      <ParameterSlider
-        label={t("delay.time")}
-        info={t("delay.info.time")}
-        value={state.time}
-        min={0}
-        max={maxTime}
-        step={0.0001}
-        format={milliseconds}
-        onChange={(time) => setState({ ...state, time })}
-      />
+      <div className={styles.knobs}>
+        <ParameterKnob
+          label={t("delay.time")}
+          info={t("delay.info.time")}
+          value={state.time}
+          min={0}
+          max={maxTime}
+          step={0.0001}
+          format={milliseconds}
+          parse={parseMilliseconds}
+          onChange={(time) => setState({ ...state, time })}
+        />
+      </div>
       <div className={styles.withInfo}>
         <Switch
           label={t("delay.perChannel")}
@@ -59,20 +63,24 @@ export function DelayWidget({ module, setState }: WidgetProps<"Delay">) {
         />
         <InfoTip info={t("delay.info.perChannel")} label={t("delay.perChannel")} />
       </div>
-      {perChannel &&
-        Array.from({ length: shownChannels }, (_, index) => (
-          <ParameterSlider
-            key={index}
-            label={t("delay.channel", { number: index + 1 })}
-            info={t("delay.info.channel")}
-            value={state.channels[index]?.time ?? 0}
-            min={0}
-            max={maxChannelTime}
-            step={0.0001}
-            format={(seconds) => `+${milliseconds(seconds)}`}
-            onChange={(time) => setChannel(index, time)}
-          />
-        ))}
+      {perChannel && (
+        <div className={styles.knobs}>
+          {Array.from({ length: shownChannels }, (_, index) => (
+            <ParameterKnob
+              key={index}
+              label={t("delay.channel", { number: index + 1 })}
+              info={t("delay.info.channel")}
+              value={state.channels[index]?.time ?? 0}
+              min={0}
+              max={maxChannelTime}
+              step={0.0001}
+              format={(seconds) => `+${milliseconds(seconds)}`}
+              parse={parseMilliseconds}
+              onChange={(time) => setChannel(index, time)}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
 }

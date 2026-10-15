@@ -74,10 +74,12 @@ test("changes a band's type", async () => {
   expect(setState).toHaveBeenCalledWith({ bands: [low, { ...high, type: "HighShelf" }], preamp: 0 });
 });
 
-test("hides the gain of low-pass and high-pass bands", async () => {
+test("disables the gain of low-pass and high-pass bands", async () => {
   const { screen } = await renderEqualizer([{ ...low, type: "HighPass" }, high]);
 
-  expect(screen.getByRole("slider", { name: "Gain" }).elements()).toHaveLength(1);
+  const gains = screen.getByRole("slider", { name: "Gain" });
+  await expect.element(gains.nth(0)).toHaveAttribute("aria-disabled", "true");
+  await expect.element(gains.nth(1)).not.toHaveAttribute("aria-disabled");
 });
 
 test("changes the preamp", async () => {
