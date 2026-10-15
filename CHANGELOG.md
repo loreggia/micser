@@ -13,6 +13,9 @@ from that section, and the release workflow fails without it.
 - The Equalizer's bands can be low shelves, high shelves, low-pass and high-pass filters besides peaking bands, and a preamp sets the
   level before the bands. "Import…" reads an Equalizer APO configuration, e.g. a headphone correction from AutoEQ ("ParametricEQ.txt"),
   and replaces the bands and the preamp with its filters.
+- Modules and their settings explain themselves: the info button next to a module's name or a setting's label tells what it does,
+  in plain words and with examples, and the "Add module" menu describes each module. "Explain modules and their settings" in the
+  settings turns the info buttons off.
 
 ## 0.17.1 - 2026-10-14
 

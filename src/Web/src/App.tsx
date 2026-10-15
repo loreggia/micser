@@ -1,5 +1,5 @@
 import { FluentProvider, Toaster, makeStyles, tokens } from "@fluentui/react-components";
-import { EngineProvider, useLanguagePreference } from "@micser/web-sdk";
+import { EngineProvider, ShowHelpContext, useLanguagePreference, usePreferences } from "@micser/web-sdk";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactFlowProvider } from "@xyflow/react";
 import { useEffect, useState } from "react";
@@ -56,23 +56,26 @@ function ThemeProvider() {
 
 function Shell() {
   const styles = useStyles();
+  const [preferences] = usePreferences();
   useErrorNotifications();
   useLanguagePreference();
   useShellLanguage();
   useShellColorMode();
 
   return (
-    <PluginsProvider>
-      <ReactFlowProvider>
-        <SubgraphActionsProvider>
-          <ModuleActionsProvider>
-            <div className={styles.root}>
-              <EngineToolbar />
-              <GraphEditor />
-            </div>
-          </ModuleActionsProvider>
-        </SubgraphActionsProvider>
-      </ReactFlowProvider>
-    </PluginsProvider>
+    <ShowHelpContext.Provider value={preferences.showHelp}>
+      <PluginsProvider>
+        <ReactFlowProvider>
+          <SubgraphActionsProvider>
+            <ModuleActionsProvider>
+              <div className={styles.root}>
+                <EngineToolbar />
+                <GraphEditor />
+              </div>
+            </ModuleActionsProvider>
+          </SubgraphActionsProvider>
+        </ReactFlowProvider>
+      </PluginsProvider>
+    </ShowHelpContext.Provider>
   );
 }

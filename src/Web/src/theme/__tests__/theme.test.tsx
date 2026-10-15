@@ -18,6 +18,7 @@ function seed(theme: UiThemeDto | null) {
     showStreamStatistics: false,
     snapToGrid: true,
     showChannelsByDefault: false,
+    showHelp: true,
     theme,
   });
 }

@@ -131,12 +131,14 @@ public sealed record PortLevelsDto(string? Port, float[] Peak, float[] Rms);
 /// <param name="Language">The UI's language, e.g. "de"; null follows the system. Languages the UI doesn't have also follow the system.</param>
 /// <param name="ShowChannelsByDefault">Whether modules the UI adds show their channel connectors.</param>
 /// <param name="Theme">The UI's color theme; null follows the system's light or dark mode.</param>
+/// <param name="ShowHelp">Whether info buttons explain modules and their parameters.</param>
 public sealed record UiPreferencesDto(
     bool ShowStreamStatistics = false,
     bool SnapToGrid = true,
     string? Language = null,
     bool ShowChannelsByDefault = false,
-    UiThemeDto? Theme = null
+    UiThemeDto? Theme = null,
+    bool ShowHelp = true
 );
 
 /// <summary>

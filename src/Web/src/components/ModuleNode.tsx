@@ -30,6 +30,7 @@ import { Speaker2Regular } from "@fluentui/react-icons/svg/speaker";
 import { SpeakerMuteRegular } from "@fluentui/react-icons/svg/speaker-mute";
 import {
   formatNumber,
+  InfoTip,
   localize,
   useGetConnections,
   useModuleUpdate,
@@ -90,6 +91,12 @@ const useStyles = makeStyles({
   },
   header: {
     cursor: "grab",
+  },
+  title: {
+    display: "flex",
+    alignItems: "center",
+    gap: tokens.spacingHorizontalXS,
+    minWidth: 0,
   },
   actions: {
     display: "flex",
@@ -240,6 +247,7 @@ export function ModuleNode({ id, data, selected }: NodeProps<ModuleNodeType>) {
   const widthOnly = collapsed || !Widget;
   const minSize = useMinSize(cardRef, bodyRef, !widthOnly);
   const widgetTitle = widget && localize(widget.title);
+  const widgetDescription = widget?.description && localize(widget.description);
   const ports = (
     <ChannelPorts
       module={module}
@@ -261,12 +269,19 @@ export function ModuleNode({ id, data, selected }: NodeProps<ModuleNodeType>) {
       <CardHeader
         className={styles.header}
         header={
-          <ModuleTitle
-            name={module.name ?? null}
-            fallback={widgetTitle || module.type}
-            label={t("module.name")}
-            onRename={(name) => update({ ...module, name } as ModuleDto)}
-          />
+          <div className={styles.title}>
+            <ModuleTitle
+              name={module.name ?? null}
+              fallback={widgetTitle || module.type}
+              label={t("module.name")}
+              onRename={(name) => update({ ...module, name } as ModuleDto)}
+            />
+            {widgetDescription && (
+              <span className="nodrag">
+                <InfoTip info={widgetDescription} label={widgetTitle || module.type} />
+              </span>
+            )}
+          </div>
         }
         description={module.name && widget && !collapsed ? <Caption1>{widgetTitle}</Caption1> : undefined}
         action={

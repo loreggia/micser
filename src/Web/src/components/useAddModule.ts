@@ -119,16 +119,20 @@ export function useInstantiateTemplate() {
 }
 
 /**
- * The module types with their widget titles in the current language, sorted by title, for menus.
+ * The module types with their widget titles and descriptions in the current language, sorted by title, for menus.
  */
-export function useModuleTypeChoices(): (ModuleTypeDto & { title: string })[] {
+export function useModuleTypeChoices(): (ModuleTypeDto & { title: string; description?: string })[] {
   const { data: moduleTypes = [] } = useGetModuleTypes();
   const { widgets } = usePluginWidgets();
   const language = useLanguage();
   return moduleTypes
     .map((type) => {
       const widget = widgets.get(type.type);
-      return { ...type, title: widget ? localize(widget.title) : type.type };
+      return {
+        ...type,
+        title: widget ? localize(widget.title) : type.type,
+        description: widget?.description && localize(widget.description),
+      };
     })
     .sort((a, b) => a.title.localeCompare(b.title, language));
 }

@@ -3968,7 +3968,8 @@
         "required": [
           "showStreamStatistics",
           "snapToGrid",
-          "showChannelsByDefault"
+          "showChannelsByDefault",
+          "showHelp"
         ],
         "type": "object",
         "properties": {
@@ -4004,6 +4005,11 @@
                 "$ref": "#/components/schemas/UiThemeDto"
               }
             ]
+          },
+          "showHelp": {
+            "type": "boolean",
+            "description": "Whether info buttons explain modules and their parameters.",
+            "default": true
           }
         },
         "description": "Preferences of the web UI. Kept in the engine's configuration, because the UI's origin (the engine's random port) changes on every start,\nso browser storage wouldn't keep them."

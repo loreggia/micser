@@ -10,6 +10,7 @@ export function PitchWidget({ module, setState }: WidgetProps<"Pitch">) {
     <div className={styles.column}>
       <ParameterSlider
         label={t("pitch.pitch")}
+        info={t("pitch.info.pitch")}
         value={state.pitch}
         min={-1}
         max={1}
@@ -19,6 +20,7 @@ export function PitchWidget({ module, setState }: WidgetProps<"Pitch">) {
       />
       <ParameterSlider
         label={t("pitch.quality")}
+        info={t("pitch.info.quality")}
         value={state.quality}
         min={1}
         max={10}

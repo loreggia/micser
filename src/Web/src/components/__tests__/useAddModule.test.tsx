@@ -127,6 +127,7 @@ describe("useAddModule", () => {
       showStreamStatistics: false,
       snapToGrid: true,
       showChannelsByDefault: true,
+      showHelp: true,
     } satisfies UiPreferencesDto);
     const { result } = await renderAddModule();
 

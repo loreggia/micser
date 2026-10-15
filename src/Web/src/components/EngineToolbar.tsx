@@ -33,6 +33,7 @@ import { useTranslation } from "../i18n";
 import { useNotifyError } from "../notifications";
 import { shell, useShellState } from "../shell";
 import { EngineSettingsDialog } from "./EngineSettingsDialog";
+import { ModuleTypeMenuItem } from "./ModuleTypeMenuItem";
 import { ReleaseNotesDialog } from "./ReleaseNotesDialog";
 import { TemplatesSubmenu } from "./TemplatesSubmenu";
 import { useAddModule, useInstantiateTemplate, useModuleTypeChoices } from "./useAddModule";
@@ -99,9 +100,12 @@ export function EngineToolbar() {
         <MenuPopover>
           <MenuList>
             {moduleTypes.map((type) => (
-              <MenuItem key={type.type} onClick={() => void addModule(type.type)}>
-                {type.title}
-              </MenuItem>
+              <ModuleTypeMenuItem
+                key={type.type}
+                title={type.title}
+                description={type.description}
+                onClick={() => void addModule(type.type)}
+              />
             ))}
             <MenuDivider />
             <TemplatesSubmenu onInstantiate={(templateId) => instantiateTemplate(templateId)} />

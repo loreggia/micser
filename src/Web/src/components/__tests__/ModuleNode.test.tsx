@@ -6,6 +6,8 @@ import {
   type ModuleDto,
   type ModulePortLayoutsDto,
   type ModuleTypeDto,
+  ShowHelpContext,
+  type WidgetDefinition,
 } from "@micser/web-sdk";
 import { createTestQueryClient, testModule, TestProviders } from "@micser/web-sdk/testing";
 import type { QueryClient } from "@tanstack/react-query";
@@ -43,7 +45,11 @@ beforeEach(() => {
   connection = new EngineConnection(queryClient);
 });
 
-async function renderNode(module: ModuleDto, connections: ConnectionDto[] = []) {
+async function renderNode(
+  module: ModuleDto,
+  connections: ConnectionDto[] = [],
+  { widget, showHelp = true }: { widget?: WidgetDefinition; showHelp?: boolean } = {}
+) {
   queryClient.setQueryData(getGetConnectionsQueryKey(), connections);
   // with a size, React Flow shows the node before measuring it, which doesn't always happen in these tests
   const node: ModuleNodeType = {
@@ -52,17 +58,19 @@ async function renderNode(module: ModuleDto, connections: ConnectionDto[] = []) 
     position: { x: 100, y: 100 },
     width: 300,
     height: 400,
-    data: { module, moduleType: gainType },
+    data: { module, moduleType: gainType, widget },
   };
   return render(
     <TestProviders queryClient={queryClient} connection={connection}>
-      <ModuleActionsProvider>
-        <ReactFlowProvider>
-          <div style={{ width: 800, height: 800 }}>
-            <ReactFlow defaultNodes={[node]} nodeTypes={nodeTypes} onError={() => {}} />
-          </div>
-        </ReactFlowProvider>
-      </ModuleActionsProvider>
+      <ShowHelpContext.Provider value={showHelp}>
+        <ModuleActionsProvider>
+          <ReactFlowProvider>
+            <div style={{ width: 800, height: 800 }}>
+              <ReactFlow defaultNodes={[node]} nodeTypes={nodeTypes} onError={() => {}} />
+            </div>
+          </ReactFlowProvider>
+        </ModuleActionsProvider>
+      </ShowHelpContext.Provider>
     </TestProviders>
   );
 }
@@ -190,5 +198,29 @@ describe("the menu", () => {
     await page.getByRole("button", { name: "Apply" }).click();
 
     expect(update).toHaveBeenCalledWith({ ...module, channelCount: 12 });
+  });
+});
+
+describe("the module's description", () => {
+  const widget: WidgetDefinition = {
+    moduleType: "Gain",
+    title: "Gain",
+    description: "Makes the audio louder or quieter.",
+    component: () => null,
+  };
+
+  test("is behind an info button in the header", async () => {
+    await renderNode(testModule("Gain", { gain: 0 }), [], { widget });
+
+    await page.getByRole("button", { name: "About Gain" }).click();
+
+    await expect.element(page.getByText("Makes the audio louder or quieter.")).toBeVisible();
+  });
+
+  test("isn't shown while help is hidden", async () => {
+    await renderNode(testModule("Gain", { gain: 0 }), [], { widget, showHelp: false });
+
+    await expect.element(page.getByText("Gain", { exact: true })).toBeVisible();
+    await expect.element(page.getByRole("button", { name: "About Gain" })).not.toBeInTheDocument();
   });
 });

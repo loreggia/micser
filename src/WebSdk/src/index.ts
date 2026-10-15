@@ -1,5 +1,8 @@
 export * from "./api";
 export { FrequencyResponse, type FrequencyResponseProps } from "./controls/FrequencyResponse";
+export { InfoTip, type InfoTipProps } from "./controls/InfoTip";
+export { ParameterLabel, type ParameterLabelProps } from "./controls/ParameterLabel";
+export { ShowHelpContext, useShowHelp } from "./controls/showHelp";
 export { ParameterSlider, type ParameterSliderProps } from "./controls/ParameterSlider";
 export {
   EngineConnection,

@@ -25,7 +25,8 @@ public class PreferencesApiTests
             SnapToGrid: false,
             Language: "de",
             ShowChannelsByDefault: true,
-            Theme: new UiThemeDto("HighContrast", UiColorMode.Dark)
+            Theme: new UiThemeDto("HighContrast", UiColorMode.Dark),
+            ShowHelp: false
         );
         try
         {

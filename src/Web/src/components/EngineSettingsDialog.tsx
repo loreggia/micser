@@ -220,6 +220,11 @@ export function EngineSettingsDialog({ open, settings, onClose }: EngineSettings
               checked={preferences.showChannelsByDefault}
               onChange={(_, data) => setPreferences({ showChannelsByDefault: data.checked })}
             />
+            <Switch
+              label={t("settings.showHelp")}
+              checked={preferences.showHelp}
+              onChange={(_, data) => setPreferences({ showHelp: data.checked })}
+            />
             {(shellState?.autostart != null || shellState?.menuEntry != null) && (
               <>
                 <Divider />

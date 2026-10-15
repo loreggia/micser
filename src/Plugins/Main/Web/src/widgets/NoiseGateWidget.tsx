@@ -10,6 +10,7 @@ export function NoiseGateWidget({ module, setState }: WidgetProps<"NoiseGate">) 
     <div className={styles.column}>
       <ParameterSlider
         label={t("noiseGate.threshold")}
+        info={t("noiseGate.info.threshold")}
         value={state.threshold}
         min={-100}
         max={0}
@@ -19,6 +20,7 @@ export function NoiseGateWidget({ module, setState }: WidgetProps<"NoiseGate">) 
       />
       <ParameterSlider
         label={t("noiseGate.range")}
+        info={t("noiseGate.info.range")}
         value={state.range}
         min={-100}
         max={0}
@@ -28,6 +30,7 @@ export function NoiseGateWidget({ module, setState }: WidgetProps<"NoiseGate">) 
       />
       <ParameterSlider
         label={t("noiseGate.attack")}
+        info={t("noiseGate.info.attack")}
         value={state.attack}
         min={0.0001}
         max={1}
@@ -37,6 +40,7 @@ export function NoiseGateWidget({ module, setState }: WidgetProps<"NoiseGate">) 
       />
       <ParameterSlider
         label={t("noiseGate.hold")}
+        info={t("noiseGate.info.hold")}
         value={state.hold}
         min={0}
         max={2}
@@ -46,6 +50,7 @@ export function NoiseGateWidget({ module, setState }: WidgetProps<"NoiseGate">) 
       />
       <ParameterSlider
         label={t("noiseGate.release")}
+        info={t("noiseGate.info.release")}
         value={state.release}
         min={0.001}
         max={5}
@@ -55,6 +60,7 @@ export function NoiseGateWidget({ module, setState }: WidgetProps<"NoiseGate">) 
       />
       <ParameterSlider
         label={t("noiseGate.hysteresis")}
+        info={t("noiseGate.info.hysteresis")}
         value={state.hysteresis}
         min={0}
         max={20}

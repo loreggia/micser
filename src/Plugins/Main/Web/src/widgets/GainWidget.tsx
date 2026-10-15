@@ -8,6 +8,7 @@ export function GainWidget({ module, setState }: WidgetProps<"Gain">) {
     <div className={styles.column}>
       <ParameterSlider
         label={t("gain.gain")}
+        info={t("gain.info.gain")}
         value={module.state.gain}
         min={-60}
         max={24}

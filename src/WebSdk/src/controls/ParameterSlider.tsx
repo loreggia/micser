@@ -1,6 +1,7 @@
-import { Label, Slider, makeStyles, tokens, useId } from "@fluentui/react-components";
+import { Slider, makeStyles, tokens, useId } from "@fluentui/react-components";
 import { useLanguage } from "../i18n/i18n";
 import { formatNumber } from "../lib/labels";
+import { ParameterLabel } from "./ParameterLabel";
 
 const useStyles = makeStyles({
   root: {
@@ -44,6 +45,11 @@ export interface ParameterSliderProps {
   logarithmic?: boolean;
 
   /**
+   * What the parameter does, in a sentence or two for users new to audio processing; shown behind an info button after the label.
+   */
+  info?: string;
+
+  /**
    * Formats the value shown next to the label; default: the value with its unit.
    */
   format?: (value: number) => string;
@@ -61,6 +67,7 @@ export function ParameterSlider({
   max,
   step,
   logarithmic,
+  info,
   format,
   unit,
   onChange,
@@ -83,9 +90,9 @@ export function ParameterSlider({
 
   return (
     <div className={styles.root}>
-      <Label htmlFor={id} size="small">
+      <ParameterLabel htmlFor={id} info={info}>
         {label}
-      </Label>
+      </ParameterLabel>
       <span className={styles.value}>{text}</span>
       <Slider
         id={id}

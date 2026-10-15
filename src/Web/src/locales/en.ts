@@ -60,6 +60,7 @@ export const en = {
     showStreamStatistics: "Show stream statistics (dropouts and buffer size of device modules)",
     snapToGrid: "Snap modules to the grid",
     showChannelsByDefault: "Show the channels of new modules",
+    showHelp: "Explain modules and their settings (info buttons)",
     desktop: "Desktop",
     autostart: "Start Micser when you log in",
     menuEntry: "Show Micser in the app menu",
