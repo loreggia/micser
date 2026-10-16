@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@fluentui/react-components": "^9.74.9",
-    "@fluentui/react-icons": "^2.0.343",
+    "@fluentui/react-icons": "^2.0.344",
     "@microsoft/signalr": "^10.0.11",
     "@micser/web-sdk": "*",
     "@tanstack/react-query": "^5.104.2",
