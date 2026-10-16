@@ -100,3 +100,59 @@ jobs:
       # into the release the windows job published
       - name: Publish
         run: dotnet vpk upload github --repoUrl ${{ github.server_url }}/${{ github.repository }} --channel linux --outputDir artifacts/releases --token ${{ secrets.GITHUB_TOKEN }} --tag ${{ github.ref_name }} --releaseName "Micser ${{ steps.version.outputs.version }}" --publish --merge ${{ steps.version.outputs.pre }}
+
+  # the plugin SDK packages, with the app's version: Micser.Audio on nuget.org, @micser/web-sdk on npmjs. Both registries trust this
+  # workflow (OIDC, no stored keys); npm adds provenance.
+  packages:
+    needs: windows
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+
+      # npm 11.5.1 or later (Node 24) for trusted publishing
+      - name: Setup Node.js
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          registry-url: https://registry.npmjs.org
+
+      - name: Install
+        uses: ./.github/actions/npm-install
+
+      - name: Version
+        id: version
+        shell: pwsh
+        run: |
+          $version = "${{ github.ref_name }}".TrimStart("v")
+          "version=$version" >> $env:GITHUB_OUTPUT
+          "npm-tag=$(if ($version.Contains('-')) { 'next' } else { 'latest' })" >> $env:GITHUB_OUTPUT
+
+      - name: Pack
+        run: |
+          dotnet pack src/Audio --configuration Release -p:Version=${{ steps.version.outputs.version }} --output artifacts/packages
+          npm run build:package -w @micser/web-sdk -- ${{ steps.version.outputs.version }}
+
+      - name: NuGet login
+        id: nuget-login
+        uses: NuGet/login@v1
+        with:
+          user: ${{ secrets.NUGET_USER }}
+
+      # also pushes the symbol package next to it
+      - name: Publish to nuget.org
+        run: dotnet nuget push "artifacts/packages/*.nupkg" --source https://api.nuget.org/v3/index.json --api-key ${{ steps.nuget-login.outputs.NUGET_API_KEY }} --skip-duplicate
+
+      - name: Publish to npmjs
+        run: npm publish src/WebSdk/dist --tag ${{ steps.version.outputs.npm-tag }}

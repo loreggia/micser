@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "noEmit": false,
+    "declaration": true,
+    "emitDeclarationOnly": true,
+    "rootDir": ".",
+    "outDir": "dist/types"
+  },
+  "include": ["src", "testing", "vite"],
+  "exclude": ["**/__tests__"]
+}

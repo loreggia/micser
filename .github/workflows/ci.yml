@@ -42,6 +42,10 @@ jobs:
       - name: Test
         run: dotnet test --solution Micser.slnx --configuration Release --no-build
 
+      # the plugin SDK package the release publishes
+      - name: Pack
+        run: dotnet pack src/Audio --configuration Release --no-build --output artifacts/packages
+
   vac:
     # the WDK NuGet packages need the WDK component of Visual Studio, which this image has
     runs-on: windows-2025-vs2026
@@ -143,6 +147,10 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      # the plugin SDK package the release publishes
+      - name: Pack
+        run: npm run build:package -w @micser/web-sdk -- 0.0.0-ci
 
   e2e:
     runs-on: windows-latest
@@ -282,7 +290,9 @@ jobs:
     needs: [dotnet, vac, vac-codeql, web, e2e, linux]
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
 
+    # id-token for publishing the SDK packages (trusted publishing on nuget.org and npmjs)
     permissions:
       contents: write
+      id-token: write
 
     uses: ./.github/workflows/release.yml

@@ -1,4 +1,4 @@
-import i18next from "i18next";
+import i18next, { type i18n as I18n } from "i18next";
 import { initReactI18next, useTranslation as useI18nextTranslation } from "react-i18next";
 
 /**
@@ -40,7 +40,7 @@ export function resolveLanguage(preference?: string | null): Language {
 /**
  * The i18next instance shared by the UI and the plugins' widgets (through the shared `@micser/web-sdk` module).
  */
-export const i18n = i18next.createInstance();
+export const i18n: I18n = i18next.createInstance();
 
 i18n.on("languageChanged", (language) => {
   if (typeof document !== "undefined") {

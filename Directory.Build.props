@@ -16,4 +16,21 @@
     <!-- plugin widget packages (Web/) live inside .NET project folders -->
     <DefaultItemExcludes>$(DefaultItemExcludes);Web/**;node_modules/**</DefaultItemExcludes>
   </PropertyGroup>
+
+  <!-- NuGet packages: only the plugin SDK (Micser.Audio) is packable -->
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+    <Authors>Lucas Loreggia</Authors>
+    <Copyright>Copyright © Lucas Loreggia</Copyright>
+    <PackageLicenseExpression>Apache-2.0</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/loreggia/micser</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/loreggia/micser</RepositoryUrl>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(GITHUB_ACTIONS)' == 'true'">
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  </PropertyGroup>
 </Project>

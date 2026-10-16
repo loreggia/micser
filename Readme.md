@@ -76,6 +76,10 @@ The virtual audio cable driver (`src/Vac`) is not part of `Micser.slnx`. It need
 
 Audio modules are provided by plugins. Each plugin consists of a .NET project and a web package with the widgets for its modules. The main modules (device input/output, gain, compressor, ...) are provided by `src/Plugins/Main`, which also serves as an example of how to implement a plugin.
 
+Plugins outside this repository build against the SDK packages, released with each version of Micser:
+[`Micser.Audio`](https://www.nuget.org/packages/Micser.Audio) (NuGet) for the modules and
+[`@micser/web-sdk`](https://www.npmjs.com/package/@micser/web-sdk) (npm) for the widgets.
+
 ## Architecture
 
 The architecture is described in [docs/Architecture.md](docs/Architecture.md).

@@ -54,6 +54,8 @@ dotnet run --project tools/AudioHarness -- formats 2 1             # formats out
 ```sh
 ./scripts/pack.ps1 -Version 0.1.0   # Velopack release in artifacts/releases: Setup.exe on Windows, Micser.AppImage on Linux (pwsh); tags vX.Y.Z publish both via .github/workflows/release.yml
                                     # release notes: the "## 0.1.0" section of CHANGELOG.md (rename "Unreleased" before tagging)
+dotnet pack src/Audio -c Release -p:Version=0.1.0 -o artifacts/packages   # plugin SDK packages, as the release publishes them
+npm run build:package -w @micser/web-sdk -- 0.1.0                         # in src/WebSdk/dist; "npm publish src/WebSdk/dist" publishes it
 ```
 
 The harness opens real devices: use a very low gain (as above) unless audible output is intended.

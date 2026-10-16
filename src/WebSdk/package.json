@@ -10,7 +10,8 @@
   },
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "generate:api": "orval"
+    "generate:api": "orval",
+    "build:package": "vite build -c vite.package.config.ts && tsc -p tsconfig.package.json && node ../../scripts/pack-web-sdk.mts"
   },
   "peerDependencies": {
     "@fluentui/react-components": "^9.74.9",
