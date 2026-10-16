@@ -8,7 +8,7 @@ Collect changes under "Unreleased". Before tagging vX.Y.Z, rename that heading t
 from that section, and the release workflow fails without it.
 -->
 
-## Unreleased
+## 0.18.0 - 2026-10-16
 
 - Module settings are knobs instead of sliders, side by side, so modules like the Equalizer and the Compressor take much less
   room. Drag a knob up or down to change it, with Shift held for fine steps, or double-click it to type a value, e.g. "2.5k" for a
