@@ -7,7 +7,8 @@ import {
   highPass,
   InfoTip,
   lowPass,
-  ParameterSlider,
+  ParameterKnob,
+  parseHertz,
   useDefaultStyles,
   useSampleRate,
   type FilterState,
@@ -30,7 +31,7 @@ function filterStages({ type, frequency, slope, q }: FilterState, sampleRate: nu
   });
 }
 
-export function FilterWidget({ module, setState }: WidgetProps<"Filter">) {
+export function FilterWidget({ module, setState, defaultState }: WidgetProps<"Filter">) {
   const styles = useDefaultStyles();
   const { t } = useTranslation();
   const state = module.state;
@@ -59,36 +60,42 @@ export function FilterWidget({ module, setState }: WidgetProps<"Filter">) {
         </Dropdown>
         <InfoTip info={t("filter.info.type")} label={t("filter.type")} />
       </div>
-      <ParameterSlider
-        label={t("filter.frequency")}
-        info={t("filter.info.frequency")}
-        value={state.frequency}
-        min={20}
-        max={20000}
-        logarithmic
-        format={hertz}
-        onChange={(frequency) => setState({ ...state, frequency })}
-      />
-      <ParameterSlider
-        label={t("filter.slope")}
-        info={t("filter.info.slope")}
-        value={state.slope}
-        min={12}
-        max={48}
-        step={12}
-        format={(v) => t("filter.decibelsPerOctave", { value: formatNumber(v) })}
-        onChange={(slope) => setState({ ...state, slope })}
-      />
-      <ParameterSlider
-        label={t("filter.q")}
-        info={t("filter.info.q")}
-        value={state.q}
-        min={0.1}
-        max={10}
-        logarithmic
-        format={(v) => formatNumber(v, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-        onChange={(q) => setState({ ...state, q })}
-      />
+      <div className={styles.knobs}>
+        <ParameterKnob
+          label={t("filter.frequency")}
+          info={t("filter.info.frequency")}
+          value={state.frequency}
+          min={20}
+          max={20000}
+          logarithmic
+          format={hertz}
+          parse={parseHertz}
+          defaultValue={defaultState?.frequency}
+          onChange={(frequency) => setState({ ...state, frequency })}
+        />
+        <ParameterKnob
+          label={t("filter.slope")}
+          info={t("filter.info.slope")}
+          value={state.slope}
+          min={12}
+          max={48}
+          step={12}
+          format={(v) => t("filter.decibelsPerOctave", { value: formatNumber(v) })}
+          defaultValue={defaultState?.slope}
+          onChange={(slope) => setState({ ...state, slope })}
+        />
+        <ParameterKnob
+          label={t("filter.q")}
+          info={t("filter.info.q")}
+          value={state.q}
+          min={0.1}
+          max={10}
+          logarithmic
+          format={(v) => formatNumber(v, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          defaultValue={defaultState?.q}
+          onChange={(q) => setState({ ...state, q })}
+        />
+      </div>
     </div>
   );
 }

@@ -20,7 +20,11 @@ async function renderCompressor() {
   const setState = vi.fn();
   const screen = await render(
     <TestProviders queryClient={createTestQueryClient()}>
-      <CompressorWidget module={testModule("Compressor", state)} setState={setState} />
+      <CompressorWidget
+        module={testModule("Compressor", state)}
+        setState={setState}
+        defaultState={{ ...state, threshold: -10, ratio: 2 }}
+      />
     </TestProviders>
   );
 
@@ -53,11 +57,22 @@ test("changes one parameter and keeps the others", async () => {
   expect(setState).toHaveBeenLastCalledWith({ ...state, threshold: -20.5 });
 });
 
+test("Delete resets a parameter to the module type's default", async () => {
+  const { screen, setState } = await renderCompressor();
+
+  screen.getByRole("slider", { name: "Ratio" }).element().focus();
+  await userEvent.keyboard("{Delete}");
+
+  expect(setState).toHaveBeenLastCalledWith({ ...state, ratio: 2 });
+});
+
 test("explains the type and the parameters behind info buttons", async () => {
   const { screen } = await renderCompressor();
 
   await screen.getByRole("button", { name: "About Type" }).click();
   await expect.element(screen.getByText(/^Downward makes the parts above the threshold quieter/)).toBeVisible();
+  // the popover covers the knobs below the dropdown
+  await userEvent.keyboard("{Escape}");
 
   await screen.getByRole("button", { name: "Ratio information" }).click();
   await expect.element(screen.getByText(/^How strongly levels beyond the threshold are changed/)).toBeVisible();

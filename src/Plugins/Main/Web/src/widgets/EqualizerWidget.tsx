@@ -22,7 +22,8 @@ import {
   highShelf,
   lowPass,
   lowShelf,
-  ParameterSlider,
+  ParameterKnob,
+  parseHertz,
   peakingEq,
   useDefaultStyles,
   useSampleRate,
@@ -39,15 +40,19 @@ const useStyles = makeStyles({
   band: {
     display: "flex",
     flexDirection: "column",
-    gap: tokens.spacingVerticalXS,
+    gap: tokens.spacingVerticalS,
     paddingBottom: tokens.spacingVerticalS,
     borderBottom: `${tokens.strokeWidthThin} solid ${tokens.colorNeutralStroke2}`,
   },
   bandHeader: {
     display: "flex",
-    justifyContent: "space-between",
     alignItems: "center",
+    gap: tokens.spacingHorizontalXS,
     color: tokens.colorNeutralForeground2,
+  },
+  bandName: {
+    flexShrink: 0,
+    marginInlineEnd: tokens.spacingHorizontalXS,
   },
   actions: {
     display: "flex",
@@ -62,6 +67,9 @@ const useStyles = makeStyles({
 });
 
 const bandTypes: EqualizerBandType[] = ["Peaking", "LowShelf", "HighShelf", "LowPass", "HighPass"];
+
+/** A band "Add band" adds, also the values Delete resets a band's knobs to. */
+const newBand: EqualizerBand = { type: "Peaking", frequency: 1000, gain: 0, q: 1.41 };
 
 /** Whether the band's gain applies: not to low-pass and high-pass bands. */
 const hasGain = (type: EqualizerBandType) => type !== "LowPass" && type !== "HighPass";
@@ -85,7 +93,7 @@ function bandBiquad(sampleRate: number, band: EqualizerBand): Biquad {
 
 type ImportResult = { error: true } | { error: false; bands: number; skipped: number };
 
-export function EqualizerWidget({ module, setState }: WidgetProps<"Equalizer">) {
+export function EqualizerWidget({ module, setState, defaultState }: WidgetProps<"Equalizer">) {
   const defaultStyles = useDefaultStyles();
   const styles = useStyles();
   const { t } = useTranslation();
@@ -118,29 +126,23 @@ export function EqualizerWidget({ module, setState }: WidgetProps<"Equalizer">) 
         maxDecibels={24}
         markers={bands.map((band) => band.frequency)}
       />
-      <ParameterSlider
-        label={t("equalizer.preamp")}
-        info={t("equalizer.info.preamp")}
-        value={state.preamp}
-        min={-24}
-        max={24}
-        step={0.1}
-        format={decibels}
-        onChange={(preamp) => setState({ ...state, preamp })}
-      />
+      <div className={defaultStyles.knobs}>
+        <ParameterKnob
+          label={t("equalizer.preamp")}
+          info={t("equalizer.info.preamp")}
+          value={state.preamp}
+          min={-24}
+          max={24}
+          step={0.1}
+          format={decibels}
+          defaultValue={defaultState?.preamp}
+          onChange={(preamp) => setState({ ...state, preamp })}
+        />
+      </div>
       {bands.map((band, index) => (
         <div key={index} className={styles.band}>
           <div className={styles.bandHeader}>
-            <span>{t("equalizer.band", { number: index + 1 })}</span>
-            <Button
-              size="small"
-              appearance="subtle"
-              icon={<DeleteRegular />}
-              aria-label={t("equalizer.removeBand", { number: index + 1 })}
-              onClick={() => setState({ ...state, bands: bands.toSpliced(index, 1) })}
-            />
-          </div>
-          <div className={defaultStyles.withInfo}>
+            <span className={styles.bandName}>{t("equalizer.band", { number: index + 1 })}</span>
             <Dropdown
               className={mergeClasses(defaultStyles.dropdown, defaultStyles.fill)}
               size="small"
@@ -156,19 +158,28 @@ export function EqualizerWidget({ module, setState }: WidgetProps<"Equalizer">) 
               ))}
             </Dropdown>
             <InfoTip info={t("equalizer.info.type")} label={t("equalizer.type", { number: index + 1 })} />
+            <Button
+              size="small"
+              appearance="subtle"
+              icon={<DeleteRegular />}
+              aria-label={t("equalizer.removeBand", { number: index + 1 })}
+              onClick={() => setState({ ...state, bands: bands.toSpliced(index, 1) })}
+            />
           </div>
-          <ParameterSlider
-            label={t("equalizer.frequency")}
-            info={t("equalizer.info.frequency")}
-            value={band.frequency}
-            min={20}
-            max={20000}
-            logarithmic
-            format={hertz}
-            onChange={(frequency) => setBand(index, { ...band, frequency })}
-          />
-          {hasGain(band.type) && (
-            <ParameterSlider
+          <div className={defaultStyles.knobs}>
+            <ParameterKnob
+              label={t("equalizer.frequency")}
+              info={t("equalizer.info.frequency")}
+              value={band.frequency}
+              min={20}
+              max={20000}
+              logarithmic
+              format={hertz}
+              parse={parseHertz}
+              defaultValue={newBand.frequency}
+              onChange={(frequency) => setBand(index, { ...band, frequency })}
+            />
+            <ParameterKnob
               label={t("equalizer.gain")}
               info={t("equalizer.info.gain")}
               value={band.gain}
@@ -176,19 +187,22 @@ export function EqualizerWidget({ module, setState }: WidgetProps<"Equalizer">) 
               max={24}
               step={0.5}
               format={decibels}
+              disabled={!hasGain(band.type)}
+              defaultValue={newBand.gain}
               onChange={(gain) => setBand(index, { ...band, gain })}
             />
-          )}
-          <ParameterSlider
-            label={t("equalizer.q")}
-            info={t("equalizer.info.q")}
-            value={band.q}
-            min={0.1}
-            max={20}
-            logarithmic
-            format={(v) => formatNumber(v, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-            onChange={(q) => setBand(index, { ...band, q })}
-          />
+            <ParameterKnob
+              label={t("equalizer.q")}
+              info={t("equalizer.info.q")}
+              value={band.q}
+              min={0.1}
+              max={20}
+              logarithmic
+              format={(v) => formatNumber(v, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              defaultValue={newBand.q}
+              onChange={(q) => setBand(index, { ...band, q })}
+            />
+          </div>
         </div>
       ))}
       <div className={styles.actions}>
@@ -196,9 +210,7 @@ export function EqualizerWidget({ module, setState }: WidgetProps<"Equalizer">) 
           size="small"
           icon={<AddRegular />}
           disabled={bands.length >= maxBands}
-          onClick={() =>
-            setState({ ...state, bands: [...bands, { type: "Peaking", frequency: 1000, gain: 0, q: 1.41 }] })
-          }
+          onClick={() => setState({ ...state, bands: [...bands, newBand] })}
         >
           {t("equalizer.addBand")}
         </Button>

@@ -1,9 +1,9 @@
 export * from "./api";
 export { FrequencyResponse, type FrequencyResponseProps } from "./controls/FrequencyResponse";
 export { InfoTip, type InfoTipProps } from "./controls/InfoTip";
+export { ParameterKnob, type ParameterKnobProps } from "./controls/ParameterKnob";
 export { ParameterLabel, type ParameterLabelProps } from "./controls/ParameterLabel";
 export { ShowHelpContext, useShowHelp } from "./controls/showHelp";
-export { ParameterSlider, type ParameterSliderProps } from "./controls/ParameterSlider";
 export {
   EngineConnection,
   type EngineConnectionState,
@@ -39,7 +39,16 @@ export {
   type TranslationValues,
 } from "./i18n/i18n";
 export { biquadResponse, highPass, highShelf, lowPass, lowShelf, peakingEq, type Biquad } from "./lib/biquad";
-export { decibels, formatNumber, hertz, milliseconds } from "./lib/labels";
+export {
+  decibels,
+  formatNumber,
+  hertz,
+  milliseconds,
+  parseHertz,
+  parseMilliseconds,
+  parseNumber,
+  parsePercent,
+} from "./lib/labels";
 export { useElementSize, type ElementSize } from "./lib/useElementSize";
 export {
   definePlugin,

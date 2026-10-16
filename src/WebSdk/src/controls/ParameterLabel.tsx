@@ -11,18 +11,19 @@ export interface ParameterLabelProps {
    * What the parameter does, in a sentence or two for users new to audio processing. Shown in a popover of an info button after the label.
    */
   info?: string;
+  disabled?: boolean;
 }
 
 /**
  * A small label for a module parameter, with an info button if it has an explanation and help is shown.
  */
-export function ParameterLabel({ children, htmlFor, info }: ParameterLabelProps) {
+export function ParameterLabel({ children, htmlFor, info, disabled }: ParameterLabelProps) {
   const showHelp = useShowHelp();
   const { t } = useTranslation();
 
   if (!info || !showHelp) {
     return (
-      <Label htmlFor={htmlFor} size="small">
+      <Label htmlFor={htmlFor} size="small" disabled={disabled}>
         {children}
       </Label>
     );
@@ -32,6 +33,7 @@ export function ParameterLabel({ children, htmlFor, info }: ParameterLabelProps)
     <InfoLabel
       htmlFor={htmlFor}
       size="small"
+      disabled={disabled}
       info={info}
       // on a portal: inside a graph node the popover would scale with the zoom and be cut off where the widget scrolls
       infoButton={{ inline: false, "aria-label": t("information") }}

@@ -2,7 +2,8 @@ import { Dropdown, mergeClasses, Option, Switch } from "@fluentui/react-componen
 import {
   formatNumber,
   InfoTip,
-  ParameterSlider,
+  ParameterKnob,
+  parsePercent,
   useDefaultStyles,
   type StereoMode,
   type WidgetProps,
@@ -13,7 +14,7 @@ const modes: StereoMode[] = ["Stereo", "Swap", "LeftToBoth", "RightToBoth", "Mon
 
 const percent = (value: number) => formatNumber(value, { style: "percent", maximumFractionDigits: 0 });
 
-export function StereoToolsWidget({ module, setState }: WidgetProps<"StereoTools">) {
+export function StereoToolsWidget({ module, setState, defaultState }: WidgetProps<"StereoTools">) {
   const styles = useDefaultStyles();
   const { t } = useTranslation();
   const state = module.state;
@@ -42,26 +43,33 @@ export function StereoToolsWidget({ module, setState }: WidgetProps<"StereoTools
         </Dropdown>
         <InfoTip info={t("stereoTools.info.mode")} label={t("stereoTools.mode")} />
       </div>
-      <ParameterSlider
-        label={t("stereoTools.width")}
-        info={t("stereoTools.info.width")}
-        value={state.width}
-        min={0}
-        max={2}
-        step={0.01}
-        format={percent}
-        onChange={(width) => setState({ ...state, width })}
-      />
-      <ParameterSlider
-        label={t("stereoTools.balance")}
-        info={t("stereoTools.info.balance")}
-        value={state.balance}
-        min={-1}
-        max={1}
-        step={0.01}
-        format={balanceLabel}
-        onChange={(balance) => setState({ ...state, balance })}
-      />
+      <div className={styles.knobs}>
+        <ParameterKnob
+          label={t("stereoTools.width")}
+          info={t("stereoTools.info.width")}
+          value={state.width}
+          min={0}
+          max={2}
+          step={0.01}
+          format={percent}
+          parse={parsePercent}
+          defaultValue={defaultState?.width}
+          onChange={(width) => setState({ ...state, width })}
+        />
+        <ParameterKnob
+          label={t("stereoTools.balance")}
+          info={t("stereoTools.info.balance")}
+          value={state.balance}
+          min={-1}
+          max={1}
+          step={0.01}
+          format={balanceLabel}
+          // negative values are to the left
+          parse={parsePercent}
+          defaultValue={defaultState?.balance}
+          onChange={(balance) => setState({ ...state, balance })}
+        />
+      </div>
       <div className={styles.withInfo}>
         <Switch
           label={t("stereoTools.invertLeft")}

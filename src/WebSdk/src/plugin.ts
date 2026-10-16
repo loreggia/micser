@@ -16,6 +16,12 @@ export interface WidgetProps<T extends ModuleType = ModuleType> {
    * Replaces the module's state. The change shows immediately and is sent to the engine.
    */
   setState: (state: ModuleOfType<T>["state"]) => void;
+
+  /**
+   * The state of a new module of this type, from the engine's module types, e.g. for the `defaultValue` of knobs; undefined until the
+   * module types are loaded.
+   */
+  defaultState?: ModuleOfType<T>["state"];
 }
 
 /**
