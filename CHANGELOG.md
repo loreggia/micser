@@ -8,6 +8,11 @@ Collect changes under "Unreleased". Before tagging vX.Y.Z, rename that heading t
 from that section, and the release workflow fails without it.
 -->
 
+## 0.19.0-beta.1 - 2026-10-17
+
+- For plugin developers: the plugin SDK is published as packages, `Micser.Audio` on NuGet for audio modules and `@micser/web-sdk`
+  on npm for their widgets.
+
 ## 0.18.1 - 2026-10-16
 
 - Package / security updates
