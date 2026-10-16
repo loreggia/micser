@@ -21,9 +21,9 @@
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@lavamoat/allow-scripts": "^5.1.0",
-    "@lavamoat/preinstall-always-fail": "^3.0.0",
+    "@lavamoat/preinstall-always-fail": "^3.0.1",
     "@playwright/test": "^1.63.0",
-    "@types/node": "^24.19.1",
+    "@types/node": "^24.19.2",
     "@vitejs/plugin-react": "^6.1.2",
     "@vitest/browser-playwright": "^5.0.3",
     "eslint": "^10.12.0",
@@ -32,9 +32,9 @@
     "eslint-plugin-react-refresh": "^0.5.7",
     "globals": "^17.13.0",
     "playwright": "^1.63.0",
-    "prettier": "^3.9.9",
+    "prettier": "^3.9.10",
     "typescript": "~6.0.3",
-    "typescript-eslint": "^8.71.1",
+    "typescript-eslint": "^8.71.2",
     "vitest": "^5.0.3",
     "vitest-browser-react": "^2.3.0"
   },
@@ -49,7 +49,7 @@
   ],
   "lavamoat": {
     "allowScripts": {
-      "@lavamoat/preinstall-always-fail#3.0.0": false,
+      "@lavamoat/preinstall-always-fail#3.0.1": false,
       "vitest>vite>esbuild#0.28.2": true
     }
   },
