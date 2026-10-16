@@ -296,3 +296,5 @@ jobs:
       id-token: write
 
     uses: ./.github/workflows/release.yml
+    # NUGET_USER for publishing the SDK package; a called workflow only gets the secrets passed to it
+    secrets: inherit
