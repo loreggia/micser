@@ -49,7 +49,7 @@
   ],
   "lavamoat": {
     "allowScripts": {
-      "@lavamoat/preinstall-always-fail#3.0.0": false,
+      "@lavamoat/preinstall-always-fail#3.0.1": false,
       "vitest>vite>esbuild#0.28.2": true
     }
   },
