@@ -8,6 +8,10 @@ Collect changes under "Unreleased". Before tagging vX.Y.Z, rename that heading t
 from that section, and the release workflow fails without it.
 -->
 
+## 0.18.1 - 2026-10-16
+
+- Package / security updates
+
 ## 0.18.0 - 2026-10-16
 
 - Module settings are knobs instead of sliders, side by side, so modules like the Equalizer and the Compressor take much less
