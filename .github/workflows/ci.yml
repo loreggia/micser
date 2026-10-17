@@ -16,8 +16,15 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # dotnet, web and e2e run on Windows and on Linux. On Linux the PipeWire backend tests start their own daemon, the engine finds
+  # none and has no devices. The static checks (formatting, lint) don't depend on the platform and run on Linux only.
   dotnet:
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
 
     steps:
       - name: Checkout
@@ -29,18 +36,35 @@ jobs:
           global-json-file: global.json
 
       - name: Format
+        if: runner.os == 'Linux'
         run: |
           dotnet tool restore
           dotnet csharpier check .
 
+      # the Windows-only DriverUtility (net10.0-windows) builds on Linux too, so the solution stays buildable there
       - name: Build
         run: dotnet build Micser.slnx --configuration Release
 
       - name: Check OpenAPI document is up to date
         run: git diff --exit-code -- src/WebSdk/openapi
 
+      # the PipeWire backend tests start their own daemon with virtual devices (PipeWireTestDaemon)
+      - name: Install PipeWire
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends pipewire pipewire-bin wireplumber dbus
+
       - name: Test
+        if: runner.os == 'Windows'
         run: dotnet test --solution Micser.slnx --configuration Release --no-build
+
+      # all test projects but DriverUtility's
+      - name: Test
+        if: runner.os == 'Linux'
+        run: |
+          dotnet test --project tests/Audio/Micser.Audio.Tests.csproj --configuration Release --no-build
+          dotnet test --project tests/Engine/Micser.Engine.Tests.csproj --configuration Release --no-build
+          dotnet test --project tests/Plugins/Main/Micser.Plugins.Main.Tests.csproj --configuration Release --no-build
+          dotnet test --project tests/Shell/Micser.Shell.Tests.csproj --configuration Release --no-build
 
       # the plugin SDK package the release publishes
       - name: Pack
@@ -95,7 +119,12 @@ jobs:
           if-no-files-found: ignore
 
   web:
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, ubuntu-latest]
 
     steps:
       - name: Checkout
@@ -110,6 +139,7 @@ jobs:
       - name: Install
         uses: ./.github/actions/npm-install
 
+      # on both platforms: packages with install scripts can be platform-specific optional dependencies
       - name: Check the install script allowlist is up to date
         run: |
           npm run allow-scripts:auto
@@ -117,21 +147,24 @@ jobs:
 
       - name: Get the Playwright version
         id: playwright
+        shell: pwsh
         run: '"version=$((npx playwright --version).Split('' '')[-1])" >> $env:GITHUB_OUTPUT'
 
       - name: Cache the Playwright browsers
         uses: actions/cache@v6
         with:
-          path: ~/AppData/Local/ms-playwright
+          path: ${{ runner.os == 'Windows' && '~/AppData/Local/ms-playwright' || '~/.cache/ms-playwright' }}
           key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
 
       - name: Install Chromium for the browser tests
-        run: npx playwright install chromium
+        run: npx playwright install ${{ runner.os == 'Linux' && '--with-deps' || '' }} chromium
 
       - name: Format
+        if: runner.os == 'Linux'
         run: npm run format:check
 
       - name: Lint
+        if: runner.os == 'Linux'
         run: npm run lint
 
       - name: Type check
@@ -153,11 +186,12 @@ jobs:
         run: npm run build:package -w @micser/web-sdk -- 0.0.0-ci
 
   e2e:
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: false
       matrix:
+        os: [windows-latest, ubuntu-latest]
         shard: [1, 2]
 
     steps:
@@ -180,16 +214,23 @@ jobs:
 
       - name: Get the Playwright version
         id: playwright
+        shell: pwsh
         run: '"version=$((npx playwright --version).Split('' '')[-1])" >> $env:GITHUB_OUTPUT'
 
       - name: Cache the Playwright browsers
         uses: actions/cache@v6
         with:
-          path: ~/AppData/Local/ms-playwright
+          path: ${{ runner.os == 'Windows' && '~/AppData/Local/ms-playwright' || '~/.cache/ms-playwright' }}
           key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
 
       - name: Install Chromium
+        if: runner.os == 'Windows'
         run: npx playwright install chromium
+
+      # WebKit for the smoke specs: the Linux shell renders with WebKitGTK
+      - name: Install Chromium and WebKit
+        if: runner.os == 'Linux'
+        run: npx playwright install --with-deps chromium webkit
 
       # the published engine serves the built UI and plugin widgets, as in a release
       - name: Build the UI
@@ -208,86 +249,12 @@ jobs:
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v7
         with:
-          name: e2e-report-${{ matrix.shard }}
-          path: tests/E2E/playwright-report
-          retention-days: 14
-
-  # the portable projects (engine, Audio, plugins, shell) on Linux: the PipeWire backend tests start their own daemon, the engine finds none
-  # and has no devices
-  linux:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v7
-
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v6
-        with:
-          global-json-file: global.json
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v7
-        with:
-          node-version: 24
-          cache: npm
-
-      # the Windows-only DriverUtility (net10.0-windows) builds on Linux too, so the solution stays buildable here
-      - name: Build
-        run: dotnet build Micser.slnx --configuration Release
-
-      - name: Check OpenAPI document is up to date
-        run: git diff --exit-code -- src/WebSdk/openapi
-
-      # the PipeWire backend tests start their own daemon with virtual devices (PipeWireTestDaemon)
-      - name: Install PipeWire
-        run: sudo apt-get update && sudo apt-get install -y --no-install-recommends pipewire pipewire-bin wireplumber dbus
-
-      - name: Test
-        run: |
-          dotnet test --project tests/Audio/Micser.Audio.Tests.csproj --configuration Release --no-build
-          dotnet test --project tests/Engine/Micser.Engine.Tests.csproj --configuration Release --no-build
-          dotnet test --project tests/Plugins/Main/Micser.Plugins.Main.Tests.csproj --configuration Release --no-build
-          dotnet test --project tests/Shell/Micser.Shell.Tests.csproj --configuration Release --no-build
-
-      - name: Install
-        uses: ./.github/actions/npm-install
-
-      - name: Get the Playwright version
-        id: playwright
-        run: echo "version=$(npx playwright --version | awk '{print $NF}')" >> "$GITHUB_OUTPUT"
-
-      - name: Cache the Playwright browsers
-        uses: actions/cache@v6
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
-
-      # WebKit for the smoke tests: the Linux shell renders with WebKitGTK
-      - name: Install Chromium and WebKit
-        run: npx playwright install --with-deps chromium webkit
-
-      - name: Build the UI
-        run: npm run build
-
-      - name: Publish the engine
-        run: dotnet publish src/Engine --configuration Release --output artifacts/e2e-engine
-
-      - name: End-to-end tests
-        run: npm run test:e2e
-        env:
-          MICSER_E2E_PUBLISHED_ENGINE: ${{ github.workspace }}/artifacts/e2e-engine/Micser.Engine.dll
-
-      - name: Upload the report
-        if: ${{ !cancelled() }}
-        uses: actions/upload-artifact@v7
-        with:
-          name: e2e-report-linux
+          name: e2e-report-${{ runner.os }}-${{ matrix.shard }}
           path: tests/E2E/playwright-report
           retention-days: 14
 
   release:
-    needs: [dotnet, vac, vac-codeql, web, e2e, linux]
+    needs: [dotnet, vac, vac-codeql, web, e2e]
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
 
     # id-token for publishing the SDK packages (trusted publishing on nuget.org and npmjs)
