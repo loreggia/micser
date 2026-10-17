@@ -154,6 +154,7 @@ public class AudioGraphTests
     }
 
     [Test]
+    [NotInParallel]
     public async Task Process_AfterSeeingTheLayouts_DoesNotAllocate()
     {
         var graph = new AudioGraph(Format);
@@ -189,11 +190,9 @@ public class AudioGraphTests
         }
 
         Run();
-        var allocated = GC.GetAllocatedBytesForCurrentThread();
-        Run();
-        allocated = GC.GetAllocatedBytesForCurrentThread() - allocated;
+        var allocated = Allocations.Measure(Run);
 
-        await Assert.That(allocated).IsEqualTo(0);
+        await Assert.That(allocated.Bytes).IsEqualTo(0).Because(allocated.ToString());
     }
 
     [Test]

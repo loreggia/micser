@@ -12,6 +12,8 @@ from that section, and the release workflow fails without it.
 
 - The Equalizer, Filter and Pitch modules no longer allocate memory while processing audio, which could make the audio drop out,
   especially when changing the Pitch module's quality or the layout of its input.
+- Device inputs, loopback inputs and device outputs no longer allocate memory on every block while converting between the device's
+  and Micser's sample rate.
 
 ## 0.19.0 - 2026-10-17
 
