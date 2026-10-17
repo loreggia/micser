@@ -94,7 +94,7 @@ public class SubgraphApiTests
         ).EnsureSuccessStatusCode();
         await using var hub = factory.CreateHubConnection();
         var removed = hub.NextAsync<Guid>("SubgraphRemoved");
-        await hub.StartAsync();
+        await hub.StartReceivingAsync();
 
         using var response = await client.DeleteAsync($"/api/subgraphs/{subgraph.Id}");
         var module = await client.GetFromJsonAsync<ModuleDto>($"/api/modules/{gain.Id}", factory.Json);
@@ -124,7 +124,7 @@ public class SubgraphApiTests
         var subgraph = await CreateSubgraphAsync(factory, client, new ModulePosition(80, 150), member.Id);
         await using var hub = factory.CreateHubConnection();
         var moduleRemoved = hub.NextAsync<Guid>("ModuleRemoved");
-        await hub.StartAsync();
+        await hub.StartReceivingAsync();
 
         using var response = await client.DeleteAsync($"/api/subgraphs/{subgraph.Id}?deleteModules=true");
         var modules = await client.GetFromJsonAsync<ModuleDto[]>("/api/modules", factory.Json);
@@ -202,7 +202,7 @@ public class SubgraphApiTests
         await using var hub = factory.CreateHubConnection();
         // the change from creating the subgraph may still be queued for sending when the hub connects
         var changed = hub.NextAsync<SubgraphDto>("SubgraphChanged", s => s.IsMuted);
-        await hub.StartAsync();
+        await hub.StartReceivingAsync();
 
         using var response = await client.PutAsJsonAsync(
             $"/api/subgraphs/{subgraph.Id}",

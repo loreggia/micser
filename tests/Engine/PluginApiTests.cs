@@ -38,7 +38,7 @@ public class PluginApiTests
         using var client = factory.CreateAuthorizedClient();
         await using var hub = factory.CreateHubConnection();
         var changed = hub.NextAsync<PluginDto[]>("PluginsChanged");
-        await hub.StartAsync();
+        await hub.StartReceivingAsync();
 
         var response = await client.PostAsync(
             "/api/plugins",
@@ -93,6 +93,7 @@ public class PluginApiTests
         var directory = PluginLoaderTests.CopyTestPlugin(factory.PluginsPath);
         await File.WriteAllTextAsync(
             Path.Combine(directory, PluginManifest.FileName),
+            /*lang=json,strict*/
             """{ "id": "Test", "name": "Test plugin", "version": "1.2.3", "assembly": "Micser.Engine.TestPlugin.dll", "web": "web/index.js" }"""
         );
         Directory.CreateDirectory(Path.Combine(directory, "web"));

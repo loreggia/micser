@@ -34,7 +34,7 @@ public class PreferencesApiTests
             using var client = factory.CreateAuthorizedClient();
             await using var hub = factory.CreateHubConnection();
             var changed = hub.NextAsync<UiPreferencesDto>("PreferencesChanged");
-            await hub.StartAsync();
+            await hub.StartReceivingAsync();
 
             (await client.PutAsJsonAsync("/api/preferences", updated, factory.Json)).EnsureSuccessStatusCode();
 

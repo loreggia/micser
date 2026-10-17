@@ -51,7 +51,7 @@ public class SystemVolumeTests
         await using var hub = factory.CreateHubConnection();
         // the change from the PUT above may still be queued for sending when the hub connects
         var changed = hub.NextAsync<ModuleDto>("ModuleChanged", m => m.Id == following.Id && m.Volume == 0.25f);
-        await hub.StartAsync();
+        await hub.StartReceivingAsync();
 
         factory.SystemVolume.Set(new SystemVolumeLevel(0.25f, false));
         var pushed = await changed;
