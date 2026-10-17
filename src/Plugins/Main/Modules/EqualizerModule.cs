@@ -58,7 +58,10 @@ public class EqualizerModule : EffectModule, IStatefulModule<EqualizerState>
     public const int MaxBands = 32;
 
     private IReadOnlyList<EqualizerBand>? _appliedBands;
+    private int _appliedChannels;
     private float _appliedPreamp = float.NaN;
+
+    // MaxBands per channel, grown with the channel count
     private Biquad[][] _filters = [];
 
     /// <summary>
@@ -88,42 +91,70 @@ public class EqualizerModule : EffectModule, IStatefulModule<EqualizerState>
         _appliedPreamp = preamp;
 
         var bands = Bands;
-        UpdateFilters(bands, buffer.ChannelCount);
+        var bandCount = Math.Min(bands.Count, MaxBands);
+        UpdateFilters(bands, bandCount, buffer.ChannelCount);
 
         for (var c = 0; c < buffer.ChannelCount; c++)
         {
             var channel = buffer.GetChannel(c);
-            foreach (var filter in _filters[c])
+            var filters = _filters[c];
+            for (var b = 0; b < bandCount; b++)
             {
-                filter.Process(channel);
+                filters[b].Process(channel);
             }
         }
     }
 
-    private void UpdateFilters(IReadOnlyList<EqualizerBand> bands, int channelCount)
+    /// <summary>
+    /// Makes room for the channels. Allocates only when the channel count grows beyond all earlier ones.
+    /// </summary>
+    private void EnsureChannels(int channelCount)
     {
-        if (_filters.Length == channelCount && ReferenceEquals(bands, _appliedBands))
+        if (_filters.Length >= channelCount)
         {
             return;
         }
 
-        if (_filters.Length != channelCount || _appliedBands?.Count != bands.Count)
+        var filters = new Biquad[channelCount][];
+        _filters.CopyTo(filters, 0);
+        for (var c = _filters.Length; c < channelCount; c++)
         {
-            _filters = Enumerable
-                .Range(0, channelCount)
-                .Select(_ => bands.Select(_ => new Biquad()).ToArray())
-                .ToArray();
+            filters[c] = new Biquad[MaxBands];
+            for (var b = 0; b < MaxBands; b++)
+            {
+                filters[c][b] = new Biquad();
+            }
         }
 
-        foreach (var channelFilters in _filters)
+        _filters = filters;
+    }
+
+    private void UpdateFilters(IReadOnlyList<EqualizerBand> bands, int bandCount, int channelCount)
+    {
+        if (channelCount == _appliedChannels && ReferenceEquals(bands, _appliedBands))
         {
-            for (var i = 0; i < bands.Count; i++)
+            return;
+        }
+
+        // a new channel or band count starts from a clear state; new settings of the same bands keep it
+        var reset = channelCount != _appliedChannels || _appliedBands?.Count != bands.Count;
+        EnsureChannels(channelCount);
+        for (var c = 0; c < channelCount; c++)
+        {
+            for (var b = 0; b < bandCount; b++)
             {
-                var band = bands[i];
-                channelFilters[i].Set(band.Type, Format.SampleRate, band.Frequency, band.Q, band.Gain);
+                var band = bands[b];
+                var filter = _filters[c][b];
+                if (reset)
+                {
+                    filter.Reset();
+                }
+
+                filter.Set(band.Type, Format.SampleRate, band.Frequency, band.Q, band.Gain);
             }
         }
 
         _appliedBands = bands;
+        _appliedChannels = channelCount;
     }
 }

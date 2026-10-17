@@ -12,6 +12,7 @@ using Serilog.Extensions.Logging;
 //   Micser.AudioHarness <input> <output> [--gain <dB>] [--loopback]
 //   Micser.AudioHarness latency <output> [<input>] [--seconds <n>]
 //   Micser.AudioHarness formats <output> <input>
+//   Micser.AudioHarness alloc [<module type>...] [--blocks <n>] [--seed <n>] [--types]
 //
 // <input>/<output> are a device number from "list", a device ID, part of a device name or "default". With --loopback, <input> is an output
 // device whose playback is captured.
@@ -24,6 +25,9 @@ using Serilog.Extensions.Logging;
 // exclusive mode), then plays a 1 kHz tone at -20 dBFS into <output> in a few formats and measures it at <input>, e.g. the two sides of a
 // virtual cable. Finally it plays a different tone per channel and prints where each one arrives at which level (channel maps).
 // The environment variable MICSER_BLOCK overrides the engine block size (frames) for this measurement.
+// "alloc" runs all module types of the Main plugin (or the given ones) without devices and prints what each allocates on the audio thread:
+// with a fixed layout and state (steady), after layout changes and after random state changes. --types also lists the allocated types,
+// sampled by the runtime. It exits with 1 if anything allocated in the steady phases. The route above prints the engine's allocations too.
 
 Log.Logger = new LoggerConfiguration().MinimumLevel.Debug().WriteTo.Console().CreateLogger();
 using var loggerFactory = new SerilogLoggerFactory(Log.Logger);
@@ -60,6 +64,24 @@ if (args[0] == "latency")
         positional.Length > 1 ? positional[1] : "default",
         positional.Length > 2 ? positional[2] : null
     );
+}
+
+if (args[0] == "alloc")
+{
+    var blocksIndex = Array.IndexOf(args, "--blocks");
+    var seedIndex = Array.IndexOf(args, "--seed");
+    var options = new[] { blocksIndex, blocksIndex + 1, seedIndex, seedIndex + 1 };
+    var types = args.Skip(1)
+        .Where((a, i) => !a.StartsWith("--", StringComparison.Ordinal) && !options.Contains(i + 1))
+        .ToArray();
+    var clean = AllocationProbe.Run(
+        devices,
+        types,
+        blocksIndex >= 0 ? int.Parse(args[blocksIndex + 1]) : 2000,
+        seedIndex >= 0 ? int.Parse(args[seedIndex + 1]) : 4711,
+        args.Contains("--types")
+    );
+    return clean ? 0 : 1;
 }
 
 if (args[0] == "formats")
@@ -132,7 +154,7 @@ try
         var stats = engine.Statistics;
         engine.ResetMaxProcessingTime();
         Console.WriteLine(
-            $"blocks {stats.Blocks, 6} late {stats.LateBlocks, 3} max {stats.MaxProcessingTime.TotalMilliseconds, 5:0.00} ms | "
+            $"blocks {stats.Blocks, 6} late {stats.LateBlocks, 3} max {stats.MaxProcessingTime.TotalMilliseconds, 5:0.00} ms alloc {stats.AllocatedBytes, 6} B | "
                 + $"in {Format(inputModule.Statistics)} | out {Format(outputModule.Statistics)}"
         );
     }

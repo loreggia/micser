@@ -8,6 +8,11 @@ Collect changes under "Unreleased". Before tagging vX.Y.Z, rename that heading t
 from that section, and the release workflow fails without it.
 -->
 
+## Unreleased
+
+- The Equalizer, Filter and Pitch modules no longer allocate memory while processing audio, which could make the audio drop out,
+  especially when changing the Pitch module's quality or the layout of its input.
+
 ## 0.19.0 - 2026-10-17
 
 - For plugin developers: the plugin SDK is published as packages, `Micser.Audio` on NuGet for audio modules and `@micser/web-sdk`

@@ -78,6 +78,10 @@ if (!isGeneratingDocument)
     builder.Services.AddHostedService<AudioHostService>();
     builder.Services.AddHostedService<EngineDiscovery>();
     builder.Services.AddHostedService<ModuleDataPublisher>();
+    if (engineOptions.TrackAllocations)
+    {
+        builder.Services.AddHostedService<AllocationMonitor>();
+    }
 }
 
 builder

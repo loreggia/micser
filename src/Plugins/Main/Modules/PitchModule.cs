@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Micser.Audio;
-using NAudio.Dsp;
+using Micser.Plugins.Main.Dsp;
 
 namespace Micser.Plugins.Main.Modules;
 
@@ -13,8 +13,11 @@ public sealed record PitchState([Range(-1f, 1f)] float Pitch = 0f, [Range(1, 10)
 /// </summary>
 public class PitchModule : EffectModule, IStatefulModule<PitchState>
 {
-    private (int Channels, int FftSize) _appliedSettings;
-    private SmbPitchShifter[] _shifters = [];
+    private const int MaxFftSize = 4096;
+    private int _appliedChannels;
+
+    // one per channel, grown with the channel count
+    private PitchShifter[] _shifters = [];
 
     /// <summary>
     /// -1 (one octave down) .. 0 (unchanged) .. 1 (one octave up).
@@ -64,17 +67,43 @@ public class PitchModule : EffectModule, IStatefulModule<PitchState>
         }
 
         var (fftSize, oversampling) = GetFftSettings(Quality);
-        if (_appliedSettings != (buffer.ChannelCount, fftSize))
+        var channelCount = buffer.ChannelCount;
+        EnsureChannels(channelCount);
+
+        // the shifters reset themselves when the FFT size changes
+        if (channelCount != _appliedChannels)
         {
-            _appliedSettings = (buffer.ChannelCount, fftSize);
-            _shifters = Enumerable.Range(0, buffer.ChannelCount).Select(_ => new SmbPitchShifter()).ToArray();
+            _appliedChannels = channelCount;
+            for (var c = 0; c < channelCount; c++)
+            {
+                _shifters[c].Reset();
+            }
         }
 
         var factor = GetPitchFactor(pitch);
-        for (var c = 0; c < buffer.ChannelCount; c++)
+        for (var c = 0; c < channelCount; c++)
         {
-            _shifters[c]
-                .PitchShift(factor, buffer.FrameCount, fftSize, oversampling, Format.SampleRate, buffer.GetChannel(c));
+            _shifters[c].Process(factor, fftSize, oversampling, Format.SampleRate, buffer.GetChannel(c));
         }
+    }
+
+    /// <summary>
+    /// Makes room for the channels. Allocates only when the channel count grows beyond all earlier ones.
+    /// </summary>
+    private void EnsureChannels(int channelCount)
+    {
+        if (_shifters.Length >= channelCount)
+        {
+            return;
+        }
+
+        var shifters = new PitchShifter[channelCount];
+        _shifters.CopyTo(shifters, 0);
+        for (var c = _shifters.Length; c < channelCount; c++)
+        {
+            shifters[c] = new PitchShifter(MaxFftSize);
+        }
+
+        _shifters = shifters;
     }
 }

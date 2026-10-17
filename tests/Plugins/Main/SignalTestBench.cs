@@ -122,14 +122,13 @@ internal sealed class SignalTestBench
 
     public sealed class SineSource : AudioModule
     {
-        private readonly ChannelLayout _layout;
         private double _phase;
 
         public SineSource(float frequency, float amplitude, ChannelLayout layout)
         {
             Frequency = frequency;
             Amplitude = amplitude;
-            _layout = layout;
+            Layout = layout;
             Output = AddOutput("Output");
         }
 
@@ -137,12 +136,14 @@ internal sealed class SignalTestBench
 
         public float Frequency { get; set; }
 
+        public ChannelLayout Layout { get; set; }
+
         public OutputPort Output { get; }
 
         protected override void Process()
         {
             var buffer = Output.Buffer;
-            buffer.SetLayout(_layout);
+            buffer.SetLayout(Layout);
             var increment = 2 * Math.PI * Frequency / Format.SampleRate;
 
             var first = buffer.GetChannel(0);

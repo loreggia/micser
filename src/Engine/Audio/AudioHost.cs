@@ -551,6 +551,28 @@ public sealed class AudioHost : IDisposable
     /// Reads the levels of all modules (see <see cref="AudioModule.ReadLevels"/>) and resets their peaks. Modules that weren't processed
     /// since the previous call are left out. Call from one thread only.
     /// </summary>
+    /// <summary>
+    /// The engine's statistics and the bytes each module allocated on the audio thread so far, counted while
+    /// <see cref="EngineOptions.TrackAllocations"/> is on.
+    /// </summary>
+    public (EngineStatistics Engine, ModuleAllocations[] Modules) GetAllocations()
+    {
+        lock (_lock)
+        {
+            return (
+                Engine.Statistics,
+                [
+                    .. _modules.Values.Select(entry => new ModuleAllocations(
+                        entry.Id,
+                        entry.Definition.Type,
+                        entry.Settings.Name,
+                        entry.Module.AllocatedBytes
+                    )),
+                ]
+            );
+        }
+    }
+
     public Dictionary<Guid, PortLevelsDto[]> ReadLevels()
     {
         (Guid Id, AudioModule Module)[] modules;
@@ -1289,7 +1311,10 @@ public sealed class AudioHost : IDisposable
         _graph = new AudioGraph(
             new ProcessingFormat(_settings.SampleRate, _settings.FrameCount),
             _loggerFactory.CreateLogger<AudioGraph>()
-        );
+        )
+        {
+            TrackAllocations = _options.TrackAllocations,
+        };
         _engine = new AudioEngine(_graph, _loggerFactory.CreateLogger<AudioEngine>());
 
         foreach (var dto in modules)

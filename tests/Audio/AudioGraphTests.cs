@@ -154,6 +154,70 @@ public class AudioGraphTests
     }
 
     [Test]
+    public async Task Process_AfterSeeingTheLayouts_DoesNotAllocate()
+    {
+        var graph = new AudioGraph(Format);
+        var stereo = new ConstantSource(ChannelLayout.Stereo);
+        var surround = new ConstantSource(ChannelLayout.Surround51);
+        var effect = new HalvingEffect();
+        var flexible = new RecordingSink();
+        var mono = new RecordingSink(ChannelLayout.Mono);
+        graph.Add(stereo);
+        graph.Add(surround);
+        graph.Add(effect);
+        graph.Add(flexible);
+        graph.Add(mono);
+        graph.Connect(stereo.Output, effect.Input);
+        graph.Connect(surround.Output, effect.Input, 4, 1);
+        graph.Connect(effect.Output, flexible.Input);
+        graph.Connect(surround.Output, flexible.Input);
+        graph.Connect(surround.Output, mono.Input);
+        graph.Connect(stereo.Output, mono.Input, 1, 0);
+
+        ChannelLayout[] layouts = [ChannelLayout.Stereo, ChannelLayout.Mono, ChannelLayout.Surround71];
+        void Run()
+        {
+            foreach (var layout in layouts)
+            {
+                stereo.Layout = layout;
+                effect.Volume = effect.Volume == 1f ? 0.5f : 1f;
+                for (var i = 0; i < 10; i++)
+                {
+                    graph.Process();
+                }
+            }
+        }
+
+        Run();
+        var allocated = GC.GetAllocatedBytesForCurrentThread();
+        Run();
+        allocated = GC.GetAllocatedBytesForCurrentThread() - allocated;
+
+        await Assert.That(allocated).IsEqualTo(0);
+    }
+
+    [Test]
+    public async Task Process_TrackAllocations_CountsPerModule()
+    {
+        var graph = new AudioGraph(Format);
+        var allocating = new ConstantSource(ChannelLayout.Stereo) { OnProcess = _ => GC.KeepAlive(new byte[1000]) };
+        var sink = new VolumeSink();
+        graph.Add(allocating);
+        graph.Add(sink);
+        graph.Connect(allocating.Output, sink.Input);
+
+        graph.Process();
+        var untracked = allocating.AllocatedBytes;
+        graph.TrackAllocations = true;
+        graph.Process();
+        graph.Process();
+
+        await Assert.That(untracked).IsEqualTo(0);
+        await Assert.That(allocating.AllocatedBytes).IsGreaterThanOrEqualTo(2000);
+        await Assert.That(sink.AllocatedBytes).IsEqualTo(0);
+    }
+
+    [Test]
     public async Task Process_ChannelCount_SetsTheLayoutOfInputsWithoutFixedLayout()
     {
         var graph = new AudioGraph(Format);

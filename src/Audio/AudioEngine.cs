@@ -7,7 +7,15 @@ namespace Micser.Audio;
 /// <param name="Blocks">Blocks processed since the engine started.</param>
 /// <param name="LateBlocks">Times the engine fell more than <see cref="AudioEngine.MaxLagBlocks"/> behind and skipped ahead.</param>
 /// <param name="MaxProcessingTime">Longest time a single block took to process.</param>
-public readonly record struct EngineStatistics(long Blocks, long LateBlocks, TimeSpan MaxProcessingTime);
+/// <param name="AllocatedBytes">Bytes the audio thread allocated while processing and waiting for the next block.</param>
+/// <param name="AllocatingBlocks">Blocks during which the audio thread allocated.</param>
+public readonly record struct EngineStatistics(
+    long Blocks,
+    long LateBlocks,
+    TimeSpan MaxProcessingTime,
+    long AllocatedBytes = 0,
+    long AllocatingBlocks = 0
+);
 
 /// <summary>
 /// Processes the graph on a dedicated thread with a realtime priority where the platform allows it (MMCSS "Pro Audio" on Windows,
@@ -24,6 +32,8 @@ public sealed class AudioEngine : IDisposable
     private readonly AudioGraph _graph;
     private readonly ILogger _logger;
     private readonly Lock _stateLock = new();
+    private long _allocatedBytes;
+    private long _allocatingBlocks;
     private long _blocks;
     private long _lateBlocks;
     private long _maxProcessingTicks;
@@ -42,7 +52,9 @@ public sealed class AudioEngine : IDisposable
         new(
             Interlocked.Read(ref _blocks),
             Interlocked.Read(ref _lateBlocks),
-            TimeSpan.FromSeconds((double)Interlocked.Read(ref _maxProcessingTicks) / Stopwatch.Frequency)
+            TimeSpan.FromSeconds((double)Interlocked.Read(ref _maxProcessingTicks) / Stopwatch.Frequency),
+            Interlocked.Read(ref _allocatedBytes),
+            Interlocked.Read(ref _allocatingBlocks)
         );
 
     public void Dispose()
@@ -109,6 +121,7 @@ public sealed class AudioEngine : IDisposable
         {
             while (!_stopRequested)
             {
+                var allocated = GC.GetAllocatedBytesForCurrentThread();
                 var start = Stopwatch.GetTimestamp();
                 _graph.Process();
                 var elapsed = Stopwatch.GetTimestamp() - start;
@@ -128,6 +141,13 @@ public sealed class AudioEngine : IDisposable
                 }
 
                 timer.WaitUntil(deadline);
+
+                allocated = GC.GetAllocatedBytesForCurrentThread() - allocated;
+                if (allocated > 0)
+                {
+                    Interlocked.Add(ref _allocatedBytes, allocated);
+                    Interlocked.Increment(ref _allocatingBlocks);
+                }
             }
         }
         finally
