@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Micser.Audio.Devices;
 using Micser.Engine.Contracts;
+using Micser.Engine.Hubs;
 using Micser.Engine.Modules;
 using Micser.Engine.Security;
 using Micser.Tests.Common;
@@ -138,5 +139,15 @@ internal static class HubClientExtensions
         );
 
         return result.Task.WaitAsync(TimeSpan.FromSeconds(10));
+    }
+
+    /// <summary>
+    /// Starts the connection and waits until it receives broadcasts. SignalR completes the handshake before it adds the connection to
+    /// all clients, so a broadcast right after <see cref="HubConnection.StartAsync"/> can miss it; invocations are handled after that.
+    /// </summary>
+    public static async Task StartReceivingAsync(this HubConnection connection)
+    {
+        await connection.StartAsync();
+        await connection.InvokeAsync(nameof(EngineHub.UnsubscribeLevels));
     }
 }

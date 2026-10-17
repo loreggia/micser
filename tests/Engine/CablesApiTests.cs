@@ -32,7 +32,7 @@ public class CablesApiTests
             using var client = factory.CreateAuthorizedClient();
             await using var hub = factory.CreateHubConnection();
             var changed = hub.NextAsync<VirtualCablesDto>("CablesChanged");
-            await hub.StartAsync();
+            await hub.StartReceivingAsync();
 
             var response = await client.PutAsJsonAsync("/api/cables", new UpdateCablesRequest(cables), factory.Json);
             response.EnsureSuccessStatusCode();
@@ -111,7 +111,7 @@ public class CablesApiTests
         ).EnsureSuccessStatusCode();
         await using var hub = factory.CreateHubConnection();
         var changed = hub.NextAsync<VirtualCablesDto>("CablesChanged");
-        await hub.StartAsync();
+        await hub.StartReceivingAsync();
 
         var content = /*lang=json,strict*/
             """{ "version": 1, "modules": [], "cables": [ { "layout": "Surround51" } ] }""";

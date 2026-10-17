@@ -35,7 +35,7 @@ public class EngineHubTests
             }
         );
         var removed = hub.NextAsync<Guid>("ModuleRemoved");
-        await hub.StartAsync();
+        await hub.StartReceivingAsync();
 
         var first = await factory.AddModuleAsync(client, "Gain");
         var second = await factory.AddModuleAsync(client, "Gain");
@@ -72,7 +72,7 @@ public class EngineHubTests
             "PortLayoutsChanged",
             layouts => layouts.Any(l => l.ModuleId == gain.Id && l.Outputs["Output"].ChannelCount == 6)
         );
-        await hub.StartAsync();
+        await hub.StartReceivingAsync();
 
         (
             await client.PutAsJsonAsync($"/api/modules/{gain.Id}", gain with { ChannelCount = 6 }, factory.Json)
@@ -110,7 +110,7 @@ public class EngineHubTests
             "PortLayoutsChanged",
             layouts => layouts.Any(l => l.ModuleId == gain.Id && l.Outputs["Output"].ChannelCount == 6)
         );
-        await hub.StartAsync();
+        await hub.StartReceivingAsync();
         (
             await client.PutAsJsonAsync($"/api/modules/{gain.Id}", gain with { ChannelCount = 6 }, factory.Json)
         ).EnsureSuccessStatusCode();
@@ -148,7 +148,7 @@ public class EngineHubTests
                 }
             }
         );
-        await hub.StartAsync();
+        await hub.StartReceivingAsync();
 
         await hub.InvokeAsync("Subscribe", spectrum.Id);
         var value = await data.Task.WaitAsync(TimeSpan.FromSeconds(10));
@@ -164,7 +164,7 @@ public class EngineHubTests
         var module = await factory.AddModuleAsync(client, "Gain");
         await using var hub = factory.CreateHubConnection();
         var status = hub.NextAsync<EngineStatusDto>("StatusChanged");
-        await hub.StartAsync();
+        await hub.StartReceivingAsync();
 
         using var response = await client.PostAsync("/api/engine/restart-audio", null);
         var modules = await client.GetFromJsonAsync<ModuleDto[]>("/api/modules", factory.Json);
@@ -180,7 +180,7 @@ public class EngineHubTests
         await using var factory = new EngineFactory();
         await using var hub = factory.CreateHubConnection();
         var levels = hub.NextAsync<Dictionary<Guid, PortLevelsDto[]>>("Levels");
-        await hub.StartAsync();
+        await hub.StartReceivingAsync();
 
         await hub.InvokeAsync("SubscribeLevels");
 
@@ -196,7 +196,7 @@ public class EngineHubTests
         var module = await factory.AddModuleAsync(client, "Gain");
         await using var hub = factory.CreateHubConnection();
         var status = hub.NextAsync<EngineStatusDto>("StatusChanged");
-        await hub.StartAsync();
+        await hub.StartReceivingAsync();
 
         using var response = await client.PutAsJsonAsync("/api/engine/settings", new EngineSettingsDto(44100, 128));
         var modules = await client.GetFromJsonAsync<ModuleDto[]>("/api/modules", factory.Json);

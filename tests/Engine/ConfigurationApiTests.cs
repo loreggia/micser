@@ -57,7 +57,7 @@ public class ConfigurationApiTests
         await using var hub = target.CreateHubConnection();
         var removed = hub.NextAsync<Guid>("ModuleRemoved");
         var preferencesChanged = hub.NextAsync<UiPreferencesDto>("PreferencesChanged");
-        await hub.StartAsync();
+        await hub.StartReceivingAsync();
 
         var response = await targetClient.PutAsync("/api/configuration", CreateUpload(exported));
 
