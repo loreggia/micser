@@ -34,6 +34,14 @@ internal sealed class Biquad
     }
 
     /// <summary>
+    /// Clears the state, e.g. when the filter is used for another signal.
+    /// </summary>
+    public void Reset()
+    {
+        (_z1, _z2) = (0, 0);
+    }
+
+    /// <summary>
     /// Sets the coefficients and keeps the state. The frequency is limited to below the Nyquist frequency.
     /// </summary>
     public void Set(EqualizerBandType type, int sampleRate, float frequency, float q, float gainDecibels)

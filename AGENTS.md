@@ -43,6 +43,7 @@ dotnet run --project tools/AudioHarness -- list                    # audio devic
 dotnet run --project tools/AudioHarness -- 1 2 --gain -100         # input 1 -> gain -> output 2, prints buffer stats
 dotnet run --project tools/AudioHarness -- latency 2               # round-trip latency of output 2 via loopback (plays -40 dB noise bursts)
 dotnet run --project tools/AudioHarness -- formats 2 1             # formats output 2 and input 1 accept, then -20 dB tones from 2 to 1, per channel too (run in the VM; Windows only)
+dotnet run --project tools/AudioHarness -- alloc [Pitch ...] [--types]   # what each Main module allocates on the audio thread, no devices; exit code 1 if any in steady state
 ```
 
 ```sh
@@ -89,7 +90,7 @@ C#:
 
 Audio (`src/Audio`, see "Audio engine"):
 
-- `Process` methods run on the audio thread. Don't allocate, lock (except the existing per-block locks) or log there on the normal path.
+- `Process` methods run on the audio thread. Don't allocate, lock (except the existing per-block locks) or log there on the normal path; that includes layout and parameter changes once seen, and lambdas capturing locals in the method. Check with `AudioHarness alloc` (see "Allocations").
 - Module parameters are plain properties written from other threads. A parameter set that must change atomically is replaced as a whole (see `EqualizerModule.Bands`).
 - Nothing in `tests/` opens real devices. The PipeWire tests use `PipeWireTestDaemon`'s virtual devices, never the session's PipeWire.
 - PipeWire callbacks (`[UnmanagedCallersOnly]`) must not let exceptions out, and calls into PipeWire outside them hold the backend's loop lock (`PipeWireBackend.Lock`). Struct layouts and constants in `PipeWireNative` follow the 1.0 headers (`libpipewire-0.3-dev`); check changes against them.

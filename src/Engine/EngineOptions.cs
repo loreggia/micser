@@ -40,6 +40,12 @@ public sealed class EngineOptions
     public bool RequireToken { get; set; } = true;
 
     /// <summary>
+    /// Counts what each module allocates on the audio thread and logs it every 10 seconds when the audio thread allocated, to profile the
+    /// modules with real devices and plugins (<c>Engine__TrackAllocations=true</c>).
+    /// </summary>
+    public bool TrackAllocations { get; set; }
+
+    /// <summary>
     /// Allows only one engine per user session.
     /// </summary>
     public bool SingleInstance { get; set; } = true;

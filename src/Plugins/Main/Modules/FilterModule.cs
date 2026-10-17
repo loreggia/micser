@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using Micser.Audio;
-using NAudio.Dsp;
+using Micser.Plugins.Main.Dsp;
 
 namespace Micser.Plugins.Main.Modules;
 
@@ -41,10 +41,14 @@ public class FilterModule : EffectModule, IStatefulModule<FilterState>
     public const float ButterworthQ = 0.70710677f;
 
     private const int MaxStages = 4;
+    private int _appliedChannels;
     private float _appliedFrequency;
     private float _appliedQ;
+    private int _appliedStages;
     private FilterType _appliedType;
-    private BiQuadFilter[][] _filters = [];
+
+    // MaxStages per channel, grown with the channel count
+    private Biquad[][] _filters = [];
 
     /// <summary>
     /// Cutoff frequency in Hz, limited to below the Nyquist frequency.
@@ -84,9 +88,10 @@ public class FilterModule : EffectModule, IStatefulModule<FilterState>
         for (var c = 0; c < buffer.ChannelCount; c++)
         {
             var channel = buffer.GetChannel(c);
-            foreach (var filter in _filters[c])
+            var filters = _filters[c];
+            for (var s = 0; s < stageCount; s++)
             {
-                filter.Transform(channel, channel);
+                filters[s].Process(channel);
             }
         }
     }
@@ -101,44 +106,57 @@ public class FilterModule : EffectModule, IStatefulModule<FilterState>
         return (float)(stage == stageCount - 1 ? butterworth * q / ButterworthQ : butterworth);
     }
 
-    private void UpdateFilters(FilterType type, float frequency, float q, int stageCount, int channelCount)
+    /// <summary>
+    /// Makes room for the channels. Allocates only when the channel count grows beyond all earlier ones.
+    /// </summary>
+    private void EnsureChannels(int channelCount)
     {
-        var sampleRate = Format.SampleRate;
-        if (_filters.Length != channelCount || _filters[0].Length != stageCount)
+        if (_filters.Length >= channelCount)
         {
-            _filters = Enumerable
-                .Range(0, channelCount)
-                .Select(_ =>
-                    Enumerable
-                        .Range(0, stageCount)
-                        .Select(s =>
-                            type == FilterType.LowPass
-                                ? BiQuadFilter.LowPassFilter(sampleRate, frequency, StageQ(s, stageCount, q))
-                                : BiQuadFilter.HighPassFilter(sampleRate, frequency, StageQ(s, stageCount, q))
-                        )
-                        .ToArray()
-                )
-                .ToArray();
+            return;
         }
-        else if (type != _appliedType || frequency != _appliedFrequency || q != _appliedQ)
+
+        var filters = new Biquad[channelCount][];
+        _filters.CopyTo(filters, 0);
+        for (var c = _filters.Length; c < channelCount; c++)
         {
-            // Retuning keeps the filter state, so moving the cutoff or the resonance doesn't click.
-            foreach (var channelFilters in _filters)
+            filters[c] = new Biquad[MaxStages];
+            for (var s = 0; s < MaxStages; s++)
             {
-                for (var s = 0; s < stageCount; s++)
-                {
-                    if (type == FilterType.LowPass)
-                    {
-                        channelFilters[s].UpdateLowPassFilter(sampleRate, frequency, StageQ(s, stageCount, q));
-                    }
-                    else
-                    {
-                        channelFilters[s].UpdateHighPassFilter(sampleRate, frequency, StageQ(s, stageCount, q));
-                    }
-                }
+                filters[c][s] = new Biquad();
             }
         }
 
+        _filters = filters;
+    }
+
+    private void UpdateFilters(FilterType type, float frequency, float q, int stageCount, int channelCount)
+    {
+        // A new channel count or slope starts from a clear state. Retuning keeps it, so moving the cutoff or the resonance doesn't click.
+        var reset = channelCount != _appliedChannels || stageCount != _appliedStages;
+        if (!reset && type == _appliedType && frequency == _appliedFrequency && q == _appliedQ)
+        {
+            return;
+        }
+
+        EnsureChannels(channelCount);
+        var bandType = type == FilterType.LowPass ? EqualizerBandType.LowPass : EqualizerBandType.HighPass;
+        for (var c = 0; c < channelCount; c++)
+        {
+            for (var s = 0; s < stageCount; s++)
+            {
+                var filter = _filters[c][s];
+                if (reset)
+                {
+                    filter.Reset();
+                }
+
+                filter.Set(bandType, Format.SampleRate, frequency, StageQ(s, stageCount, q), 0f);
+            }
+        }
+
+        _appliedChannels = channelCount;
+        _appliedStages = stageCount;
         _appliedType = type;
         _appliedFrequency = frequency;
         _appliedQ = q;

@@ -52,6 +52,11 @@ public sealed class AudioGraph
 
     public ProcessingFormat Format { get; }
 
+    /// <summary>
+    /// Counts what each module allocates on the audio thread (<see cref="AudioModule.AllocatedBytes"/>), e.g. to profile the modules.
+    /// </summary>
+    public bool TrackAllocations { get; set; }
+
     public IReadOnlyList<AudioModule> Modules
     {
         get
@@ -127,8 +132,10 @@ public sealed class AudioGraph
     {
         lock (_processLock)
         {
+            var trackAllocations = TrackAllocations;
             foreach (var step in _steps)
             {
+                var allocated = trackAllocations ? GC.GetAllocatedBytesForCurrentThread() : 0;
                 try
                 {
                     for (var i = 0; i < step.Inputs.Length; i++)
@@ -142,16 +149,22 @@ public sealed class AudioGraph
                 }
                 catch (Exception ex)
                 {
-                    foreach (var output in step.Module.Outputs)
+                    var outputs = step.Module.Outputs;
+                    for (var i = 0; i < outputs.Count; i++)
                     {
-                        output.Buffer.SetLayout(ChannelLayout.None);
-                        output.PublishLayout();
+                        outputs[i].Buffer.SetLayout(ChannelLayout.None);
+                        outputs[i].PublishLayout();
                     }
 
                     if (_failingModules.Add(step.Module))
                     {
                         _logger.LogError(ex, "{Module} failed to process a block.", step.Module.GetType().Name);
                     }
+                }
+
+                if (trackAllocations)
+                {
+                    step.Module.AddAllocatedBytes(GC.GetAllocatedBytesForCurrentThread() - allocated);
                 }
             }
         }

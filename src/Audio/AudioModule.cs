@@ -12,6 +12,7 @@ public abstract class AudioModule : IDisposable
 
     private readonly List<InputPort> _inputs = [];
     private readonly List<OutputPort> _outputs = [];
+    private long _allocatedBytes;
     private float _appliedVolume = 1f;
     private volatile int _channelCount;
     private ProcessingFormat? _format;
@@ -23,6 +24,12 @@ public abstract class AudioModule : IDisposable
     /// Not raised for changes made through <see cref="IStatefulModule{TState}.SetState"/>.
     /// </summary>
     public event EventHandler? StateChanged;
+
+    /// <summary>
+    /// The bytes the audio thread allocated while mixing the module's inputs and processing it, counted while
+    /// <see cref="AudioGraph.TrackAllocations"/> is on. Readable from any thread.
+    /// </summary>
+    public long AllocatedBytes => Interlocked.Read(ref _allocatedBytes);
 
     /// <summary>
     /// The channel count of the inputs without a fixed layout (<see cref="InputPort.Layout"/> null), 1..64; null takes it from their sources.
@@ -105,6 +112,14 @@ public abstract class AudioModule : IDisposable
         }
 
         return [.. levels];
+    }
+
+    internal void AddAllocatedBytes(long bytes)
+    {
+        if (bytes > 0)
+        {
+            Interlocked.Add(ref _allocatedBytes, bytes);
+        }
     }
 
     internal void Attach(ProcessingFormat format)
