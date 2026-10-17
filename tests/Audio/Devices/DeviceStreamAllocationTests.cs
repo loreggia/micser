@@ -43,9 +43,7 @@ public class DeviceStreamAllocationTests
 
         long position = 0;
         Run(2000, ref position);
-        var allocated = GC.GetAllocatedBytesForCurrentThread();
-        Run(2000, ref position);
-        allocated = GC.GetAllocatedBytesForCurrentThread() - allocated;
+        var allocated = Allocations.Measure(() => Run(2000, ref position));
 
         await Assert.That(buffer.Layout).IsEqualTo(ChannelLayout.Stereo);
         await Assert.That(allocated).IsEqualTo(0);
@@ -80,9 +78,7 @@ public class DeviceStreamAllocationTests
 
         long position = 0;
         Run(2000, ref position);
-        var allocated = GC.GetAllocatedBytesForCurrentThread();
-        Run(2000, ref position);
-        allocated = GC.GetAllocatedBytesForCurrentThread() - allocated;
+        var allocated = Allocations.Measure(() => Run(2000, ref position));
 
         await Assert.That(allocated).IsEqualTo(0);
     }

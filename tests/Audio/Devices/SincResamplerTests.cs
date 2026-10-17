@@ -82,9 +82,7 @@ public class SincResamplerTests
         }
 
         Run();
-        var allocated = GC.GetAllocatedBytesForCurrentThread();
-        Run();
-        allocated = GC.GetAllocatedBytesForCurrentThread() - allocated;
+        var allocated = Allocations.Measure(Run);
 
         await Assert.That(allocated).IsEqualTo(0);
     }

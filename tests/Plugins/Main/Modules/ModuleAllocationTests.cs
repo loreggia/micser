@@ -64,10 +64,12 @@ public class ModuleAllocationTests
         object[] states = [definition.GetState(module), .. States.GetValueOrDefault(definition.StateType, [])];
 
         Run(graph, source, definition, module, states);
-        var warmedUp = module.AllocatedBytes;
-        Run(graph, source, definition, module, states);
+        var allocated = Allocations.Measure(
+            () => Run(graph, source, definition, module, states),
+            () => module.AllocatedBytes
+        );
 
-        await Assert.That(module.AllocatedBytes - warmedUp).IsEqualTo(0);
+        await Assert.That(allocated).IsEqualTo(0);
     }
 
     private static AudioModuleDefinition[] GetDefinitions()
