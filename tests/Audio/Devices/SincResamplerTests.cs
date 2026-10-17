@@ -63,6 +63,7 @@ public class SincResamplerTests
     }
 
     [Test]
+    [NotInParallel]
     [Arguments(false)]
     [Arguments(true)]
     public async Task Resample_WithDriftingRates_DoesNotAllocateAfterWarmUp(bool inputDriven)
@@ -84,6 +85,6 @@ public class SincResamplerTests
         Run();
         var allocated = Allocations.Measure(Run);
 
-        await Assert.That(allocated).IsEqualTo(0);
+        await Assert.That(allocated.Bytes).IsEqualTo(0).Because(allocated.ToString());
     }
 }

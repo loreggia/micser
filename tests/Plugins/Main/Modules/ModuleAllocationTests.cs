@@ -11,6 +11,7 @@ namespace Micser.Plugins.Main.Tests.Modules;
 /// The modules must not allocate on the audio thread once they have seen a layout and state (see <c>AudioHarness alloc</c> for a profile
 /// with random states).
 /// </summary>
+[NotInParallel]
 public class ModuleAllocationTests
 {
     private static readonly ChannelLayout[] Layouts =
@@ -69,7 +70,7 @@ public class ModuleAllocationTests
             () => module.AllocatedBytes
         );
 
-        await Assert.That(allocated).IsEqualTo(0);
+        await Assert.That(allocated.Bytes).IsEqualTo(0).Because(allocated.ToString());
     }
 
     private static AudioModuleDefinition[] GetDefinitions()

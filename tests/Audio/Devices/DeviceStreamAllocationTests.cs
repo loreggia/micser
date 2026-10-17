@@ -7,6 +7,7 @@ namespace Micser.Audio.Tests.Devices;
 /// The streams run their engine side on the audio thread, which must not allocate. The fake devices deliver and take whole 10 ms periods
 /// as real ones do, so the fill and with it the drift correction's resampling ratio move from block to block.
 /// </summary>
+[NotInParallel]
 public class DeviceStreamAllocationTests
 {
     private static readonly ProcessingFormat Format = new(48000, 240);
@@ -46,7 +47,7 @@ public class DeviceStreamAllocationTests
         var allocated = Allocations.Measure(() => Run(2000, ref position));
 
         await Assert.That(buffer.Layout).IsEqualTo(ChannelLayout.Stereo);
-        await Assert.That(allocated).IsEqualTo(0);
+        await Assert.That(allocated.Bytes).IsEqualTo(0).Because(allocated.ToString());
     }
 
     [Test]
@@ -80,7 +81,7 @@ public class DeviceStreamAllocationTests
         Run(2000, ref position);
         var allocated = Allocations.Measure(() => Run(2000, ref position));
 
-        await Assert.That(allocated).IsEqualTo(0);
+        await Assert.That(allocated.Bytes).IsEqualTo(0).Because(allocated.ToString());
     }
 
     private abstract class FakeDevice : IDeviceEndpoint
