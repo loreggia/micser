@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Micser.Audio;
 using Micser.Engine.Audio;
 using Micser.Engine.Contracts;
+using Micser.Tests.Common;
 
 namespace Micser.Engine.Tests;
 
@@ -140,42 +141,35 @@ public class SubgraphApiTests
     [Test]
     public async Task Subgraphs_AreRestoredAfterRestart()
     {
-        var directory = EngineFactory.CreateTemporaryDirectory();
-        try
+        using var directory = new TempDirectory();
+        ModuleDto gain;
+        SubgraphDto subgraph;
+        await using (var factory = new EngineFactory(directory.Path))
         {
-            ModuleDto gain;
-            SubgraphDto subgraph;
-            await using (var factory = new EngineFactory(directory))
+            using var client = factory.CreateAuthorizedClient();
+            gain = await AddModuleAtAsync(factory, client, "Gain", new ModulePosition(100, 200));
+            subgraph = await CreateSubgraphAsync(factory, client, new ModulePosition(80, 150), gain.Id);
+            subgraph = subgraph with
             {
-                using var client = factory.CreateAuthorizedClient();
-                gain = await AddModuleAtAsync(factory, client, "Gain", new ModulePosition(100, 200));
-                subgraph = await CreateSubgraphAsync(factory, client, new ModulePosition(80, 150), gain.Id);
-                subgraph = subgraph with
-                {
-                    Name = "Mic chain",
-                    Color = SubgraphColor.Teal,
-                    IsCollapsed = true,
-                    IsMuted = true,
-                };
-                (
-                    await client.PutAsJsonAsync($"/api/subgraphs/{subgraph.Id}", subgraph, factory.Json)
-                ).EnsureSuccessStatusCode();
-            }
-
-            await using (var factory = new EngineFactory(directory))
-            {
-                using var client = factory.CreateAuthorizedClient();
-                var subgraphs = await client.GetFromJsonAsync<SubgraphDto[]>("/api/subgraphs", factory.Json);
-                var module = await client.GetFromJsonAsync<ModuleDto>($"/api/modules/{gain.Id}", factory.Json);
-
-                await Assert.That(subgraphs).IsEquivalentTo([subgraph]);
-                await Assert.That(module!.SubgraphId).IsEqualTo(subgraph.Id);
-                await Assert.That(GetAudioModule(factory, gain.Id).IsMuted).IsTrue();
-            }
+                Name = "Mic chain",
+                Color = SubgraphColor.Teal,
+                IsCollapsed = true,
+                IsMuted = true,
+            };
+            (
+                await client.PutAsJsonAsync($"/api/subgraphs/{subgraph.Id}", subgraph, factory.Json)
+            ).EnsureSuccessStatusCode();
         }
-        finally
+
+        await using (var factory = new EngineFactory(directory.Path))
         {
-            Directory.Delete(directory, recursive: true);
+            using var client = factory.CreateAuthorizedClient();
+            var subgraphs = await client.GetFromJsonAsync<SubgraphDto[]>("/api/subgraphs", factory.Json);
+            var module = await client.GetFromJsonAsync<ModuleDto>($"/api/modules/{gain.Id}", factory.Json);
+
+            await Assert.That(subgraphs).IsEquivalentTo([subgraph]);
+            await Assert.That(module!.SubgraphId).IsEqualTo(subgraph.Id);
+            await Assert.That(GetAudioModule(factory, gain.Id).IsMuted).IsTrue();
         }
     }
 

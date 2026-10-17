@@ -70,7 +70,7 @@ The harness opens real devices: use a very low gain (as above) unless audible ou
 
 General:
 
-- Keep the folder layout and dependency direction in "Layout" of `docs/Architecture.md`: new projects go into `src/` (shipping), `tests/` (mirroring `src/`) or `tools/` (dev-only).
+- Keep the folder layout and dependency direction in "Layout" of `docs/Architecture.md`: new projects go into `src/` (shipping), `tests/` (mirroring `src/`) or `tools/` (dev-only). Code that several .NET test projects need goes into `tests/Common` (`Micser.Tests.Common`).
 - Nothing in `src/` compiles against a plugin, Main included (see "Plugins").
 - Audio, Engine, plugins, the shell and their tests target `net10.0` and run on Windows and Linux (see `docs/Linux.md`). Platform code is marked `[SupportedOSPlatform]` and called behind `OperatingSystem.Is*()` (CA1416 fails the build otherwise); device APIs go behind `IAudioBackend`. Only `DriverUtility` targets `net10.0-windows`.
 - Package versions are central in `Directory.Packages.props`, so `PackageReference` items carry no `Version`. `TreatWarningsAsErrors` is on for all projects.
@@ -121,6 +121,7 @@ Web UI (see "UI"):
 Tests (see "Testing"):
 
 - Web tests sit in a `__tests__` folder next to the code they test. Render widgets inside `TestProviders` and seed the query client instead of fetching. A dependency that a browser test newly imports goes into `optimizeDeps.include` in `vitest.config.ts`: a second optimizer pass reloads the tests and can load React twice.
+- .NET tests put temporary files in a `TempDirectory` (`Micser.Tests.Common`), which deletes them on dispose.
 - End-to-end tests set up state through `EngineApi` and check results there, not only in the DOM. A test that changes what `reset()` doesn't undo (plugins) uses `test.use({ ownEngine: true })`. Shell-only controls are tested with `FakeShell`.
 
 Driver (`src/Vac`, see "VAC driver"):

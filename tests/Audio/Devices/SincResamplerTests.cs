@@ -1,4 +1,5 @@
 using Micser.Audio.Devices;
+using Micser.Tests.Common;
 using NAudio.Dsp;
 
 namespace Micser.Audio.Tests.Devices;

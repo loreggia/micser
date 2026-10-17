@@ -4,6 +4,7 @@ using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Micser.Audio;
 using Micser.Engine.Contracts;
+using Micser.Tests.Common;
 
 namespace Micser.Engine.Tests;
 
@@ -24,49 +25,38 @@ public class CablesApiTests
     [Test]
     public async Task UpdateCables_AppliesBroadcastsAndPersists()
     {
-        var directory = EngineFactory.CreateTemporaryDirectory();
+        using var directory = new TempDirectory();
         CableDto[] cables = [new(CableLayout.Stereo), new(CableLayout.Surround71)];
-        try
+        await using (var factory = new EngineFactory(directory.Path))
         {
-            await using (var factory = new EngineFactory(directory))
-            {
-                using var client = factory.CreateAuthorizedClient();
-                await using var hub = factory.CreateHubConnection();
-                var changed = hub.NextAsync<VirtualCablesDto>("CablesChanged");
-                await hub.StartAsync();
+            using var client = factory.CreateAuthorizedClient();
+            await using var hub = factory.CreateHubConnection();
+            var changed = hub.NextAsync<VirtualCablesDto>("CablesChanged");
+            await hub.StartAsync();
 
-                var response = await client.PutAsJsonAsync(
-                    "/api/cables",
-                    new UpdateCablesRequest(cables),
-                    factory.Json
-                );
-                response.EnsureSuccessStatusCode();
+            var response = await client.PutAsJsonAsync("/api/cables", new UpdateCablesRequest(cables), factory.Json);
+            response.EnsureSuccessStatusCode();
 
-                await Assert
-                    .That((await response.Content.ReadFromJsonAsync<VirtualCablesDto>(factory.Json))!.Cables)
-                    .IsEquivalentTo(cables);
-                await Assert.That((await changed).Cables).IsEquivalentTo(cables);
-                await Assert
-                    .That(factory.VirtualCables.Layouts)
-                    .IsEquivalentTo((ChannelLayout[])[ChannelLayout.Stereo, ChannelLayout.Surround71]);
-            }
-
-            // the next start creates them again
-            await using (var factory = new EngineFactory(directory))
-            {
-                using var client = factory.CreateAuthorizedClient();
-
-                var restored = await client.GetFromJsonAsync<VirtualCablesDto>("/api/cables", factory.Json);
-
-                await Assert.That(restored!.Cables).IsEquivalentTo(cables);
-                await Assert
-                    .That(factory.VirtualCables.Layouts)
-                    .IsEquivalentTo((ChannelLayout[])[ChannelLayout.Stereo, ChannelLayout.Surround71]);
-            }
+            await Assert
+                .That((await response.Content.ReadFromJsonAsync<VirtualCablesDto>(factory.Json))!.Cables)
+                .IsEquivalentTo(cables);
+            await Assert.That((await changed).Cables).IsEquivalentTo(cables);
+            await Assert
+                .That(factory.VirtualCables.Layouts)
+                .IsEquivalentTo((ChannelLayout[])[ChannelLayout.Stereo, ChannelLayout.Surround71]);
         }
-        finally
+
+        // the next start creates them again
+        await using (var factory = new EngineFactory(directory.Path))
         {
-            Directory.Delete(directory, recursive: true);
+            using var client = factory.CreateAuthorizedClient();
+
+            var restored = await client.GetFromJsonAsync<VirtualCablesDto>("/api/cables", factory.Json);
+
+            await Assert.That(restored!.Cables).IsEquivalentTo(cables);
+            await Assert
+                .That(factory.VirtualCables.Layouts)
+                .IsEquivalentTo((ChannelLayout[])[ChannelLayout.Stereo, ChannelLayout.Surround71]);
         }
     }
 

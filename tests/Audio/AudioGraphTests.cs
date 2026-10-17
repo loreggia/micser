@@ -1,3 +1,5 @@
+using Micser.Tests.Common;
+
 namespace Micser.Audio.Tests;
 
 public class AudioGraphTests

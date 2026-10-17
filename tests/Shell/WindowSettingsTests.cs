@@ -1,4 +1,5 @@
 using System.Drawing;
+using Micser.Tests.Common;
 
 namespace Micser.Shell.Tests;
 
@@ -24,24 +25,20 @@ public class WindowSettingsTests
     [Test]
     public async Task SaveAndLoad_RoundTrips()
     {
-        var path = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"), "shell.json");
-        try
-        {
-            var settings = new WindowSettings(10, 20, 1280, 800, true);
+        using var directory = new TempDirectory();
+        var path = directory.Combine("shell.json");
+        var settings = new WindowSettings(10, 20, 1280, 800, true);
 
-            settings.Save(path);
+        settings.Save(path);
 
-            await Assert.That(WindowSettings.Load(path)).IsEqualTo(settings);
-        }
-        finally
-        {
-            Directory.Delete(Path.GetDirectoryName(path)!, recursive: true);
-        }
+        await Assert.That(WindowSettings.Load(path)).IsEqualTo(settings);
     }
 
     [Test]
     public async Task Load_MissingFile_ReturnsNull()
     {
-        await Assert.That(WindowSettings.Load(Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N")))).IsNull();
+        using var directory = new TempDirectory();
+
+        await Assert.That(WindowSettings.Load(directory.Combine("shell.json"))).IsNull();
     }
 }

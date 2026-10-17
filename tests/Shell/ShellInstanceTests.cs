@@ -1,4 +1,5 @@
 using System.Runtime.Versioning;
+using Micser.Tests.Common;
 using TUnit.Core.Enums;
 
 namespace Micser.Shell.Tests;
@@ -10,64 +11,42 @@ public class ShellInstanceTests
     [Test]
     public async Task TryAcquire_SecondStart_ActivatesTheFirstAndReturnsNull()
     {
-        var directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
-        try
-        {
-            using var first = ShellInstance.TryAcquire(directory);
-            var activated = new TaskCompletionSource();
-            first!.ActivationRequested += (_, _) => activated.TrySetResult();
+        using var directory = new TempDirectory();
+        using var first = ShellInstance.TryAcquire(directory.Path);
+        var activated = new TaskCompletionSource();
+        first!.ActivationRequested += (_, _) => activated.TrySetResult();
 
-            var second = ShellInstance.TryAcquire(directory);
+        var second = ShellInstance.TryAcquire(directory.Path);
 
-            await Assert.That(second).IsNull();
-            await activated.Task.WaitAsync(TimeSpan.FromSeconds(5));
-            await Assert
-                .That(File.GetUnixFileMode(directory))
-                .IsEqualTo(UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
-        }
-        finally
-        {
-            Directory.Delete(directory, recursive: true);
-        }
+        await Assert.That(second).IsNull();
+        await activated.Task.WaitAsync(TimeSpan.FromSeconds(5));
+        await Assert
+            .That(File.GetUnixFileMode(directory.Path))
+            .IsEqualTo(UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
     }
 
     [Test]
     public async Task TryAcquire_AfterTheFirstExited_BecomesTheShell()
     {
-        var directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
-        try
-        {
-            ShellInstance.TryAcquire(directory)!.Dispose();
+        using var directory = new TempDirectory();
+        ShellInstance.TryAcquire(directory.Path)!.Dispose();
 
-            using var next = ShellInstance.TryAcquire(directory);
+        using var next = ShellInstance.TryAcquire(directory.Path);
 
-            await Assert.That(next).IsNotNull();
-        }
-        finally
-        {
-            Directory.Delete(directory, recursive: true);
-        }
+        await Assert.That(next).IsNotNull();
     }
 
     [Test]
     public async Task TryAcquire_SocketOfACrashedShell_BecomesTheShell()
     {
-        var directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
-        Directory.CreateDirectory(directory);
-        try
-        {
-            await File.WriteAllTextAsync(Path.Combine(directory, "shell.sock"), "");
+        using var directory = TempDirectory.Create();
+        await File.WriteAllTextAsync(directory.Combine("shell.sock"), "");
 
-            using var instance = ShellInstance.TryAcquire(directory);
-            var activated = new TaskCompletionSource();
-            instance!.ActivationRequested += (_, _) => activated.TrySetResult();
+        using var instance = ShellInstance.TryAcquire(directory.Path);
+        var activated = new TaskCompletionSource();
+        instance!.ActivationRequested += (_, _) => activated.TrySetResult();
 
-            await Assert.That(ShellInstance.TryAcquire(directory)).IsNull();
-            await activated.Task.WaitAsync(TimeSpan.FromSeconds(5));
-        }
-        finally
-        {
-            Directory.Delete(directory, recursive: true);
-        }
+        await Assert.That(ShellInstance.TryAcquire(directory.Path)).IsNull();
+        await activated.Task.WaitAsync(TimeSpan.FromSeconds(5));
     }
 }

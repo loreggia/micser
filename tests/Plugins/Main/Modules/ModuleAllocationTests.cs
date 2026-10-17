@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Micser.Audio;
 using Micser.Audio.Devices;
 using Micser.Plugins.Main.Modules;
+using Micser.Tests.Common;
 
 namespace Micser.Plugins.Main.Tests.Modules;
 

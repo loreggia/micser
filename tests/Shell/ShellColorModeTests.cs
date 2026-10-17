@@ -1,4 +1,5 @@
 using Avalonia.Styling;
+using Micser.Tests.Common;
 
 namespace Micser.Shell.Tests;
 
@@ -17,45 +18,33 @@ public class ShellColorModeTests
     [Test]
     public async Task SetPreference_ChangesTheColorModeAndPersists()
     {
-        var path = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"), "color-mode.json");
-        try
-        {
-            var colorMode = new ShellColorMode(path);
-            var changes = 0;
-            colorMode.Changed += (_, _) => changes++;
+        using var directory = new TempDirectory();
+        var path = directory.Combine("color-mode.json");
+        var colorMode = new ShellColorMode(path);
+        var changes = 0;
+        colorMode.Changed += (_, _) => changes++;
 
-            await Assert.That(colorMode.ThemeVariant).IsEqualTo(ThemeVariant.Default);
+        await Assert.That(colorMode.ThemeVariant).IsEqualTo(ThemeVariant.Default);
 
-            colorMode.SetPreference("Dark");
+        colorMode.SetPreference("Dark");
 
-            await Assert.That(changes).IsEqualTo(1);
-            await Assert.That(colorMode.ThemeVariant).IsEqualTo(ThemeVariant.Dark);
-            await Assert.That(new ShellColorMode(path).Preference).IsEqualTo("Dark");
-        }
-        finally
-        {
-            Directory.Delete(Path.GetDirectoryName(path)!, recursive: true);
-        }
+        await Assert.That(changes).IsEqualTo(1);
+        await Assert.That(colorMode.ThemeVariant).IsEqualTo(ThemeVariant.Dark);
+        await Assert.That(new ShellColorMode(path).Preference).IsEqualTo("Dark");
     }
 
     [Test]
     public async Task SetPreference_SameColorMode_DoesNotRaiseChanged()
     {
-        var path = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"), "color-mode.json");
-        try
-        {
-            var colorMode = new ShellColorMode(path);
-            var changes = 0;
-            colorMode.Changed += (_, _) => changes++;
+        using var directory = new TempDirectory();
+        var path = directory.Combine("color-mode.json");
+        var colorMode = new ShellColorMode(path);
+        var changes = 0;
+        colorMode.Changed += (_, _) => changes++;
 
-            colorMode.SetPreference("Sepia");
+        colorMode.SetPreference("Sepia");
 
-            await Assert.That(changes).IsEqualTo(0);
-            await Assert.That(new ShellColorMode(path).Preference).IsEqualTo("Sepia");
-        }
-        finally
-        {
-            Directory.Delete(Path.GetDirectoryName(path)!, recursive: true);
-        }
+        await Assert.That(changes).IsEqualTo(0);
+        await Assert.That(new ShellColorMode(path).Preference).IsEqualTo("Sepia");
     }
 }

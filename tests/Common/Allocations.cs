@@ -1,8 +1,8 @@
-namespace Micser.Plugins.Main.Tests;
+namespace Micser.Tests.Common;
 
 /// <param name="Bytes">The bytes allocated in the last run.</param>
 /// <param name="Collections">The GCs during the last run.</param>
-internal readonly record struct Allocation(long Bytes, int Collections)
+public readonly record struct Allocation(long Bytes, int Collections)
 {
     public override string ToString()
     {
@@ -10,7 +10,7 @@ internal readonly record struct Allocation(long Bytes, int Collections)
     }
 }
 
-internal static class Allocations
+public static class Allocations
 {
     /// <summary>
     /// Returns what <paramref name="run"/> allocates, by default on the current thread. Tests that measure run alone

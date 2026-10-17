@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using Micser.Audio.Devices;
+using Micser.Tests.Common;
 
 namespace Micser.Audio.Tests.Devices;
 

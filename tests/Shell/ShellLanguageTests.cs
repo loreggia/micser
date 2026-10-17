@@ -1,4 +1,5 @@
 using System.Globalization;
+using Micser.Tests.Common;
 
 namespace Micser.Shell.Tests;
 
@@ -22,7 +23,8 @@ public class ShellLanguageTests
     [Test]
     public async Task SetPreference_TranslatesAndPersists()
     {
-        var path = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"), "language.json");
+        using var directory = new TempDirectory();
+        var path = directory.Combine("language.json");
         try
         {
             var language = new ShellLanguage(path, English);
@@ -40,14 +42,14 @@ public class ShellLanguageTests
         finally
         {
             Strings.Culture = null;
-            Directory.Delete(Path.GetDirectoryName(path)!, recursive: true);
         }
     }
 
     [Test]
     public async Task SetPreference_SameLanguage_DoesNotRaiseChanged()
     {
-        var path = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"), "language.json");
+        using var directory = new TempDirectory();
+        var path = directory.Combine("language.json");
         try
         {
             var language = new ShellLanguage(path, German);
@@ -62,10 +64,6 @@ public class ShellLanguageTests
         finally
         {
             Strings.Culture = null;
-            if (Directory.Exists(Path.GetDirectoryName(path)))
-            {
-                Directory.Delete(Path.GetDirectoryName(path)!, recursive: true);
-            }
         }
     }
 }

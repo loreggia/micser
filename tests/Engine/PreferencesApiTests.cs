@@ -1,5 +1,6 @@
 using System.Net.Http.Json;
 using Micser.Engine.Contracts;
+using Micser.Tests.Common;
 
 namespace Micser.Engine.Tests;
 
@@ -19,7 +20,7 @@ public class PreferencesApiTests
     [Test]
     public async Task UpdatePreferences_BroadcastsAndPersists()
     {
-        var directory = EngineFactory.CreateTemporaryDirectory();
+        using var directory = new TempDirectory();
         var updated = new UiPreferencesDto(
             ShowStreamStatistics: true,
             SnapToGrid: false,
@@ -28,32 +29,25 @@ public class PreferencesApiTests
             Theme: new UiThemeDto("HighContrast", UiColorMode.Dark),
             ShowHelp: false
         );
-        try
+        await using (var factory = new EngineFactory(directory.Path))
         {
-            await using (var factory = new EngineFactory(directory))
-            {
-                using var client = factory.CreateAuthorizedClient();
-                await using var hub = factory.CreateHubConnection();
-                var changed = hub.NextAsync<UiPreferencesDto>("PreferencesChanged");
-                await hub.StartAsync();
+            using var client = factory.CreateAuthorizedClient();
+            await using var hub = factory.CreateHubConnection();
+            var changed = hub.NextAsync<UiPreferencesDto>("PreferencesChanged");
+            await hub.StartAsync();
 
-                (await client.PutAsJsonAsync("/api/preferences", updated, factory.Json)).EnsureSuccessStatusCode();
+            (await client.PutAsJsonAsync("/api/preferences", updated, factory.Json)).EnsureSuccessStatusCode();
 
-                await Assert.That(await changed).IsEqualTo(updated);
-            }
-
-            await using (var factory = new EngineFactory(directory))
-            {
-                using var client = factory.CreateAuthorizedClient();
-
-                await Assert
-                    .That(await client.GetFromJsonAsync<UiPreferencesDto>("/api/preferences", factory.Json))
-                    .IsEqualTo(updated);
-            }
+            await Assert.That(await changed).IsEqualTo(updated);
         }
-        finally
+
+        await using (var factory = new EngineFactory(directory.Path))
         {
-            Directory.Delete(directory, recursive: true);
+            using var client = factory.CreateAuthorizedClient();
+
+            await Assert
+                .That(await client.GetFromJsonAsync<UiPreferencesDto>("/api/preferences", factory.Json))
+                .IsEqualTo(updated);
         }
     }
 }

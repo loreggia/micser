@@ -12,5 +12,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Shell\Micser.Shell.csproj" />
+    <ProjectReference Include="..\Common\Micser.Tests.Common.csproj" />
   </ItemGroup>
 </Project>

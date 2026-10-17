@@ -42,6 +42,7 @@ src/
   Vac/                        Micser.Vac: VAC driver (C++), built by scripts/build-vac.ps1, not in Micser.slnx
 tests/                        mirrors src/
   Audio/, DriverUtility/, Engine/, Plugins/Main/, Shell/
+  Common/                     Micser.Tests.Common: code shared by the .NET test projects (TempDirectory, Allocations.Measure), not a test project itself
   Engine/TestPlugin/          a plugin for the plugin loader tests
   E2E/                        @micser/e2e: Playwright tests of the UI against a real engine
 tools/                        dev-only programs, in Micser.slnx but never shipped
