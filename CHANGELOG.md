@@ -8,7 +8,7 @@ Collect changes under "Unreleased". Before tagging vX.Y.Z, rename that heading t
 from that section, and the release workflow fails without it.
 -->
 
-## Unreleased
+## 0.20.0 - 2026-10-18
 
 - The Equalizer, Filter and Pitch modules no longer allocate memory while processing audio, which could make the audio drop out,
   especially when changing the Pitch module's quality or the layout of its input.
