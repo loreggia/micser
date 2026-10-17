@@ -45,7 +45,11 @@ public sealed class AllocationMonitor : BackgroundService
                     .Select(m => (Module: m, Bytes: m.Bytes - previousModules.GetValueOrDefault(m.Id)))
                     .Where(m => m.Bytes > 0)
                     .OrderByDescending(m => m.Bytes)
-                    .Select(m => $"{m.Module.Type} \"{m.Module.Name}\" ({m.Module.Id}): {m.Bytes:N0} B")
+                    .Select(m =>
+                        string.IsNullOrEmpty(m.Module.Name)
+                            ? $"{m.Module.Type} ({m.Module.Id}): {m.Bytes:N0} B"
+                            : $"{m.Module.Type} \"{m.Module.Name}\" ({m.Module.Id}): {m.Bytes:N0} B"
+                    )
                     .ToArray();
                 previousModules = modules.ToDictionary(m => m.Id, m => m.Bytes);
 

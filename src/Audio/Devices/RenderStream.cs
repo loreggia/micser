@@ -1,5 +1,4 @@
 using Microsoft.Extensions.Logging;
-using NAudio.Dsp;
 
 namespace Micser.Audio.Devices;
 
@@ -17,7 +16,7 @@ public sealed class RenderStream : IDeviceStream, IRenderHandler
     private readonly ILogger _logger;
     private readonly long _openedAt = Environment.TickCount64;
     private readonly float[] _output;
-    private readonly WdlResampler _resampler;
+    private readonly SincResampler _resampler;
     private readonly SampleRingBuffer _ring;
     private readonly AdaptiveTarget _target;
     private volatile bool _isConsuming;
@@ -60,10 +59,7 @@ public sealed class RenderStream : IDeviceStream, IRenderHandler
             (int)Math.Ceiling((format.FrameCount * (double)DeviceSampleRate / format.SampleRate * 1.1) + 64) * _channels
         ];
 
-        _resampler = new WdlResampler();
-        _resampler.SetMode(true, 0, true);
-        _resampler.SetFilterParms();
-        _resampler.SetFeedMode(true);
+        _resampler = new SincResampler(_channels, inputDriven: true);
 
         device.Start(this);
     }
@@ -157,9 +153,9 @@ public sealed class RenderStream : IDeviceStream, IRenderHandler
         var correction = _drift.Update(fill);
         _resampler.SetRates(_format.SampleRate, DeviceSampleRate / correction);
 
-        var inputFrames = _resampler.ResamplePrepare(source.FrameCount, _channels, out var input);
+        var inputFrames = _resampler.Prepare(source.FrameCount, out var input);
         _interleaved.AsSpan(0, inputFrames * _channels).CopyTo(input);
-        var produced = _resampler.ResampleOut(_output, inputFrames, _output.Length / _channels, _channels);
+        var produced = _resampler.Resample(_output, inputFrames, _output.Length / _channels);
 
         if (_ring.Write(_output.AsSpan(0, produced * _channels)) < produced * _channels)
         {
