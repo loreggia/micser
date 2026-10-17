@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Micser.Audio;
 using Micser.Audio.Devices;
 using Micser.Plugins.Main.Modules;
+using Micser.Tests.Common;
 
 namespace Micser.Plugins.Main.Tests.Modules;
 
@@ -11,6 +12,7 @@ namespace Micser.Plugins.Main.Tests.Modules;
 /// The modules must not allocate on the audio thread once they have seen a layout and state (see <c>AudioHarness alloc</c> for a profile
 /// with random states).
 /// </summary>
+[NotInParallel]
 public class ModuleAllocationTests
 {
     private static readonly ChannelLayout[] Layouts =
@@ -64,10 +66,12 @@ public class ModuleAllocationTests
         object[] states = [definition.GetState(module), .. States.GetValueOrDefault(definition.StateType, [])];
 
         Run(graph, source, definition, module, states);
-        var warmedUp = module.AllocatedBytes;
-        Run(graph, source, definition, module, states);
+        var allocated = Allocations.Measure(
+            () => Run(graph, source, definition, module, states),
+            () => module.AllocatedBytes
+        );
 
-        await Assert.That(module.AllocatedBytes - warmedUp).IsEqualTo(0);
+        await Assert.That(allocated.Bytes).IsEqualTo(0).Because(allocated.ToString());
     }
 
     private static AudioModuleDefinition[] GetDefinitions()

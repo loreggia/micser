@@ -3,6 +3,7 @@ using System.Runtime.Loader;
 using Microsoft.Extensions.DependencyInjection;
 using Micser.Audio;
 using Micser.Engine.Plugins;
+using Micser.Tests.Common;
 
 namespace Micser.Engine.Tests;
 
@@ -11,27 +12,20 @@ public sealed class PluginLoaderTests : IDisposable
     private static readonly string TestPluginOutput = Path.Combine(AppContext.BaseDirectory, "TestPlugin");
 
     private readonly string _builtInPath;
-    private readonly string _directory = EngineFactory.CreateTemporaryDirectory();
+    private readonly TempDirectory _directory = new();
     private readonly string _userPath;
 
     public PluginLoaderTests()
     {
-        _builtInPath = Path.Combine(_directory, "builtin");
-        _userPath = Path.Combine(_directory, "user");
+        _builtInPath = _directory.Combine("builtin");
+        _userPath = _directory.Combine("user");
         Directory.CreateDirectory(_builtInPath);
         Directory.CreateDirectory(_userPath);
     }
 
     public void Dispose()
     {
-        try
-        {
-            Directory.Delete(_directory, recursive: true);
-        }
-        catch (UnauthorizedAccessException)
-        {
-            // loaded plugin assemblies stay locked until the process exits
-        }
+        _directory.Dispose();
     }
 
     [Test]
@@ -66,6 +60,7 @@ public sealed class PluginLoaderTests : IDisposable
         var directory = CopyTestPlugin(_userPath);
         await File.WriteAllTextAsync(
             Path.Combine(directory, PluginManifest.FileName),
+            /*lang=json,strict*/
             """{ "id": "Test", "name": "Test", "version": "1", "assembly": "..\\x.dll" }"""
         );
 
@@ -119,7 +114,7 @@ public sealed class PluginLoaderTests : IDisposable
             PluginLoader.Load(new ServiceCollection(), _builtInPath, _userPath)
         );
 
-        using (var package = CreatePackage(CopyTestPlugin(_directory)))
+        using (var package = CreatePackage(CopyTestPlugin(_directory.Path)))
         {
             var manifest = installer.StageInstall(package);
             await Assert.That(manifest.Id).IsEqualTo("Test");
@@ -145,7 +140,7 @@ public sealed class PluginLoaderTests : IDisposable
             _userPath,
             PluginLoader.Load(new ServiceCollection(), _builtInPath, _userPath)
         );
-        using var package = CreatePackage(CopyTestPlugin(_directory));
+        using var package = CreatePackage(CopyTestPlugin(_directory.Path));
 
         await Assert.That(() => installer.StageInstall(package)).Throws<InvalidDataException>();
         await Assert.That(installer.GetPendingInstalls()).IsEmpty();

@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\Engine\Micser.Engine.csproj" />
+    <ProjectReference Include="..\Common\Micser.Tests.Common.csproj" />
     <!-- referenced for its types; also copied to plugins/Main, where the engine loads it from (sharing the referenced assembly) -->
     <ProjectReference
       Include="..\..\src\Plugins\Main\Micser.Plugins.Main.csproj"

@@ -10,5 +10,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\DriverUtility\Micser.DriverUtility.csproj" />
+    <ProjectReference Include="..\Common\Micser.Tests.Common.csproj" />
   </ItemGroup>
 </Project>

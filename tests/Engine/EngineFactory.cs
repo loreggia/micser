@@ -11,6 +11,7 @@ using Micser.Audio.Devices;
 using Micser.Engine.Contracts;
 using Micser.Engine.Modules;
 using Micser.Engine.Security;
+using Micser.Tests.Common;
 
 namespace Micser.Engine.Tests;
 
@@ -19,16 +20,21 @@ namespace Micser.Engine.Tests;
 /// </summary>
 internal sealed class EngineFactory : WebApplicationFactory<Program>
 {
-    private readonly bool _ownsDirectory;
+    private readonly TempDirectory? _ownDirectory;
     private readonly bool _pluginTemplates;
 
     /// <param name="directory">The configuration directory; a new temporary one (deleted on dispose) if null.</param>
     /// <param name="pluginTemplates">Loads the plugins' templates, e.g. Main's, as built-in templates.</param>
     public EngineFactory(string? directory = null, bool pluginTemplates = false)
     {
-        _ownsDirectory = directory == null;
+        if (directory == null)
+        {
+            _ownDirectory = new TempDirectory();
+            directory = _ownDirectory.Path;
+        }
+
         _pluginTemplates = pluginTemplates;
-        Directory = directory ?? CreateTemporaryDirectory();
+        Directory = directory;
         System.IO.Directory.CreateDirectory(Directory);
     }
 
@@ -54,11 +60,6 @@ internal sealed class EngineFactory : WebApplicationFactory<Program>
     public FakeVirtualCables VirtualCables { get; } = new();
 
     public string Token => Services.GetRequiredService<EngineAccess>().Token;
-
-    public static string CreateTemporaryDirectory()
-    {
-        return Path.Combine(Path.GetTempPath(), "micser-tests", Guid.NewGuid().ToString("N"));
-    }
 
     public async Task<ModuleDto> AddModuleAsync(HttpClient client, string type)
     {
@@ -95,17 +96,7 @@ internal sealed class EngineFactory : WebApplicationFactory<Program>
     public override async ValueTask DisposeAsync()
     {
         await base.DisposeAsync();
-        if (_ownsDirectory)
-        {
-            try
-            {
-                System.IO.Directory.Delete(Directory, recursive: true);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                // loaded user plugin assemblies stay locked until the process exits
-            }
-        }
+        _ownDirectory?.Dispose();
     }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)

@@ -1,3 +1,5 @@
+using Micser.Tests.Common;
+
 namespace Micser.DriverUtility.Tests;
 
 public class DriverPackageTests
@@ -5,37 +7,23 @@ public class DriverPackageTests
     [Test]
     public async Task Load_FolderWithInf_ReadsVersion()
     {
-        var directory = Directory.CreateTempSubdirectory("micser-driver-");
-        try
-        {
-            await File.WriteAllTextAsync(
-                Path.Combine(directory.FullName, "Micser.Vac.inf"),
-                "[Version]\r\nDriverVer = 10/03/2026,1.2.3.4\r\n"
-            );
+        using var directory = TempDirectory.Create();
+        await File.WriteAllTextAsync(
+            directory.Combine("Micser.Vac.inf"),
+            "[Version]\r\nDriverVer = 10/03/2026,1.2.3.4\r\n"
+        );
 
-            var package = DriverPackage.Load(directory.FullName);
+        var package = DriverPackage.Load(directory.Path);
 
-            await Assert.That(package?.Version).IsEqualTo(new Version(1, 2, 3, 4));
-            await Assert.That(package?.InfPath).IsEqualTo(Path.Combine(directory.FullName, "Micser.Vac.inf"));
-        }
-        finally
-        {
-            directory.Delete(true);
-        }
+        await Assert.That(package?.Version).IsEqualTo(new Version(1, 2, 3, 4));
+        await Assert.That(package?.InfPath).IsEqualTo(directory.Combine("Micser.Vac.inf"));
     }
 
     [Test]
     public async Task Load_FolderWithoutInf_ReturnsNull()
     {
-        var directory = Directory.CreateTempSubdirectory("micser-driver-");
-        try
-        {
-            await Assert.That(DriverPackage.Load(directory.FullName)).IsNull();
-        }
-        finally
-        {
-            directory.Delete(true);
-        }
+        using var directory = TempDirectory.Create();
+        await Assert.That(DriverPackage.Load(directory.Path)).IsNull();
     }
 
     [Test]

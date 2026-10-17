@@ -1,3 +1,5 @@
+using Micser.Tests.Common;
+
 namespace Micser.Shell.Tests;
 
 public class DesktopIntegrationTests
@@ -80,19 +82,16 @@ public class DesktopIntegrationTests
 
     private sealed class TempFolder : IDisposable
     {
-        private readonly string _path = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
+        private readonly TempDirectory _directory = new();
 
         public XdgAutostart Autostart(string path)
         {
-            return new XdgAutostart(path, Path.Combine(_path, "config", "autostart", "micser.desktop"));
+            return new XdgAutostart(path, _directory.Combine("config", "autostart", "micser.desktop"));
         }
 
         public void Dispose()
         {
-            if (Directory.Exists(_path))
-            {
-                Directory.Delete(_path, recursive: true);
-            }
+            _directory.Dispose();
         }
 
         public DesktopIntegration Integration(string appImagePath)
@@ -102,7 +101,7 @@ public class DesktopIntegrationTests
 
         public AppImageMenuEntry MenuEntry(string appImagePath)
         {
-            return new AppImageMenuEntry(appImagePath, Path.Combine(_path, "data"));
+            return new AppImageMenuEntry(appImagePath, _directory.Combine("data"));
         }
     }
 }

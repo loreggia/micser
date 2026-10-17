@@ -12,5 +12,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Plugins\Main\Micser.Plugins.Main.csproj" />
+    <ProjectReference Include="..\..\Common\Micser.Tests.Common.csproj" />
   </ItemGroup>
 </Project>
