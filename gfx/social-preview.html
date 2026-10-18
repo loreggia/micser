@@ -1,0 +1,81 @@
+<!doctype html>
+<!-- Source of social-preview.png (GitHub repo social preview, 1280x640). Screenshot at a 1280x640 viewport. -->
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      html,
+      body {
+        margin: 0;
+        width: 1280px;
+        height: 640px;
+        overflow: hidden;
+      }
+      body {
+        position: relative;
+        font-family: "Segoe UI Variable Display", "Segoe UI", "Inter", sans-serif;
+        color: #f2f5ee;
+        background:
+          radial-gradient(ellipse 700px 520px at 300px 320px, rgba(122, 176, 40, 0.22), transparent 70%),
+          radial-gradient(ellipse 600px 400px at 1180px 640px, rgba(200, 196, 20, 0.1), transparent 70%), #101510;
+      }
+      svg.bg {
+        position: absolute;
+        inset: 0;
+      }
+      .content {
+        position: absolute;
+        inset: 80px;
+        display: flex;
+        align-items: center;
+        gap: 72px;
+      }
+      .logo {
+        width: 360px;
+        flex: none;
+        filter: drop-shadow(0 12px 40px rgba(120, 180, 40, 0.35));
+      }
+      h1 {
+        margin: 0;
+        font-size: 128px;
+        font-weight: 700;
+        letter-spacing: -3px;
+        /* moves the M's ink edge onto the tagline's M (side bearing grows with font size) */
+        margin-left: -6.3px;
+        line-height: 1;
+      }
+      p {
+        margin: 20px 0 0;
+        font-size: 36px;
+        line-height: 1.3;
+        color: #c3cbb9;
+      }
+    </style>
+  </head>
+  <body>
+    <svg class="bg" width="1280" height="640" viewBox="0 0 1280 640">
+      <defs>
+        <linearGradient id="wire" x1="0" x2="1">
+          <stop offset="0" stop-color="#4a9a3c" />
+          <stop offset="1" stop-color="#c8c814" />
+        </linearGradient>
+      </defs>
+      <g fill="none" stroke="url(#wire)" stroke-width="2" opacity="0.18">
+        <path d="M -20 560 C 200 560, 260 470, 480 470 S 760 600, 980 560 S 1200 470, 1300 500" />
+        <path d="M -20 600 C 240 600, 320 520, 560 530 S 860 620, 1300 580" />
+        <path d="M -20 90 C 220 60, 360 140, 620 100 S 980 30, 1300 70" />
+      </g>
+      <g fill="#a8c832" opacity="0.35">
+        <circle cx="980" cy="560" r="5" />
+        <circle cx="620" cy="100" r="5" />
+      </g>
+    </svg>
+    <div class="content">
+      <img class="logo" src="logo.png" alt="" />
+      <div>
+        <h1>Micser</h1>
+        <p>Modular audio routing<br />for Windows and Linux</p>
+      </div>
+    </div>
+  </body>
+</html>
