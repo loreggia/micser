@@ -7,8 +7,9 @@ namespace Micser.Shell;
 
 /// <summary>
 /// Turns off WebKitGTK's hardware acceleration (accelerated compositing) on Linux. Avalonia's web view copies WebKit's window into an
-/// Avalonia bitmap anyway, and composited layers come out blurry: the graph's React Flow viewport has a fractional translation, at
-/// which WebKit resamples the layer and loses subpixel antialiasing. GTK runs on Avalonia's GLib thread, which the web view uses as well.
+/// Avalonia bitmap anyway, and composited layers come out blurry. A scrollable element (e.g. a module whose content overflows) gets a
+/// composited layer, and so does the graph's React Flow viewport above it, whose fractional translation makes WebKit resample it and
+/// lose subpixel antialiasing. GTK runs on Avalonia's GLib thread, which the web view uses as well.
 /// </summary>
 [SupportedOSPlatform("linux")]
 internal static class GtkWebViewCompositing
