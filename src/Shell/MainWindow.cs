@@ -232,6 +232,10 @@ internal sealed class MainWindow : Window
         {
             ConfigureWebView2(handle);
         }
+        else if (OperatingSystem.IsLinux() && e.TryGetPlatformHandle() is IGtkWebViewPlatformHandle gtk)
+        {
+            _ = GtkWebViewCompositing.DisableAsync(gtk.WebKitWebView);
+        }
     }
 
     [SupportedOSPlatform("windows")]
