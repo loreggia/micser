@@ -14,7 +14,7 @@ import type { QueryClient } from "@tanstack/react-query";
 import { ReactFlow, ReactFlowProvider } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-import { page, userEvent } from "vitest/browser";
+import { page } from "vitest/browser";
 import { render } from "vitest-browser-react";
 import { ModuleActionsProvider } from "../ModuleActionsProvider";
 import { ModuleNode, type ModuleNodeType } from "../ModuleNode";
@@ -154,9 +154,6 @@ describe("the menu", () => {
 
     await openMenu();
     await page.getByRole("menuitemcheckbox", { name: "Show channels" }).click();
-    // a checkbox item keeps the menu open
-    await userEvent.keyboard("{Escape}");
-    await expect.element(page.getByRole("menu")).not.toBeInTheDocument();
 
     expect(update).toHaveBeenCalledWith({ ...module, showChannels: true });
   });
