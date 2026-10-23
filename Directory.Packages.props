@@ -5,13 +5,13 @@
   <ItemGroup Label="AppHost">
     <PackageVersion Include="Aspire.Hosting.Browsers" Version="13.6.1-preview.1.26506.6" />
     <PackageVersion Include="Aspire.Hosting.JavaScript" Version="13.6.1" />
-    <PackageVersion Include="MessagePack" Version="2.5.303" />
+    <PackageVersion Include="MessagePack" Version="2.5.307" />
   </ItemGroup>
   <ItemGroup Label="Audio">
     <PackageVersion Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="10.0.13" />
     <PackageVersion Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.13" />
-    <PackageVersion Include="NAudio.Core" Version="3.1.0" />
-    <PackageVersion Include="NAudio.Wasapi" Version="3.1.0" />
+    <PackageVersion Include="NAudio.Core" Version="3.3.0" />
+    <PackageVersion Include="NAudio.Wasapi" Version="3.3.0" />
     <!-- RTKit on Linux; at least Avalonia’s version; the shell references it directly so engine and shell agree -->
     <PackageVersion Include="Tmds.DBus.Protocol" Version="0.95.1" />
   </ItemGroup>
@@ -26,10 +26,10 @@
     <PackageVersion Include="Serilog.Sinks.File" Version="7.0.0" />
   </ItemGroup>
   <ItemGroup Label="ServiceDefaults">
-    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.19.1" />
-    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.19.1" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.19.0" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.19.0" />
+    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.20.0" />
+    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.20.0" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.20.0" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.20.0" />
   </ItemGroup>
   <ItemGroup Label="Shell">
     <PackageVersion Include="Avalonia" Version="12.1.4" />
