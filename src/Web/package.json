@@ -10,7 +10,7 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@fluentui/react-components": "^9.74.9",
+    "@fluentui/react-components": "^9.74.10",
     "@fluentui/react-icons": "^2.0.344",
     "@microsoft/signalr": "^10.0.11",
     "@micser/web-sdk": "*",
