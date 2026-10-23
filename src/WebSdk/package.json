@@ -18,7 +18,7 @@
     "@microsoft/signalr": "^10.0.11",
     "@tanstack/react-query": "^5.104.2",
     "i18next": "^26.4.4",
-    "react": "^19.3.0",
+    "react": "^19.3.1",
     "react-i18next": "^17.0.16"
   },
   "devDependencies": {
