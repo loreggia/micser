@@ -12,10 +12,14 @@ public class ShutdownTests
         await using var factory = new EngineFactory();
         using var client = factory.CreateAuthorizedClient();
         var stopping = factory.Services.GetRequiredService<IHostApplicationLifetime>().ApplicationStopping;
+        var stopped = new TaskCompletionSource();
+        using var registration = stopping.Register(() => stopped.TrySetResult());
 
         using var response = await client.PostAsync("/api/engine/shutdown", null);
 
         await Assert.That(response.StatusCode).IsEqualTo(HttpStatusCode.Accepted);
+        // the endpoint stops the application once the response has completed
+        await stopped.Task.WaitAsync(TimeSpan.FromSeconds(10));
         await Assert.That(stopping.IsCancellationRequested).IsTrue();
     }
 

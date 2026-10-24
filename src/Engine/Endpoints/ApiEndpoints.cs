@@ -176,10 +176,14 @@ public static class ApiEndpoints
         engine
             .MapPost(
                 "/shutdown",
-                (IHostApplicationLifetime lifetime) =>
+                (HttpContext context, IHostApplicationLifetime lifetime) =>
                 {
-                    // after the response: the shutdown stops the server
-                    lifetime.StopApplication();
+                    // after the response: the shutdown stops the server and disposes the request's services
+                    context.Response.OnCompleted(() =>
+                    {
+                        lifetime.StopApplication();
+                        return Task.CompletedTask;
+                    });
                     return TypedResults.Accepted((string?)null);
                 }
             )
