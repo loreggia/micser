@@ -14,7 +14,7 @@
     "build:package": "vite build -c vite.package.config.ts && tsc -p tsconfig.package.json && node ../../scripts/pack-web-sdk.mts"
   },
   "peerDependencies": {
-    "@fluentui/react-components": "^9.74.10",
+    "@fluentui/react-components": "^9.74.11",
     "@microsoft/signalr": "^10.0.11",
     "@tanstack/react-query": "^5.104.2",
     "i18next": "^26.4.4",
