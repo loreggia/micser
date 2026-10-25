@@ -43,9 +43,9 @@ updates:
       security:
         applies-to: security-updates
         patterns: ["*"]
-        # changes the allowScripts entry, so it needs "npm run allow-scripts:auto"
+        # changes the pinned allowScripts entry, so it needs "npm approve-scripts esbuild"
         exclude-patterns: ["esbuild"]
-      # can move esbuild, which needs "npm run allow-scripts:auto"
+      # can move esbuild, which needs "npm approve-scripts esbuild"
       vite-and-vitest:
         patterns: ["vite", "@vitejs/*", "vitest", "@vitest/*", "vitest-browser-react"]
       playwright:
