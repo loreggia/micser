@@ -26,7 +26,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: 24
+          node-version-file: package.json
           cache: npm
 
       - name: Install
@@ -72,7 +72,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: 24
+          node-version-file: package.json
           cache: npm
 
       - name: Install
@@ -120,11 +120,11 @@ jobs:
         with:
           global-json-file: global.json
 
-      # npm 11.5.1 or later (Node 24) for trusted publishing
+      # trusted publishing needs npm 11.5.1 or later (npm-install installs the pinned npm 12)
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: 24
+          node-version-file: package.json
           cache: npm
           registry-url: https://registry.npmjs.org
 

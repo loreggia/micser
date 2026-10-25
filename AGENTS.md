@@ -15,8 +15,8 @@ dotnet test --project tests/Audio/Micser.Audio.Tests.csproj   # likewise tests/E
 # the PipeWire backend tests start a private daemon with virtual devices; they need pipewire, wireplumber 0.4 and dbus-run-session
 dotnet test --project tests/Audio/Micser.Audio.Tests.csproj --treenode-filter "/*/*/PipeWireBackendTests/*"
 
-npm run setup                # root; installs all workspaces, runs the allowed install scripts and installs the pre-commit hook
-npm run allow-scripts:auto   # after dependency changes: adds new packages with install scripts to the allowlists (denied)
+npm run setup                # root; installs all workspaces (running only the allowed install scripts) and installs the pre-commit hook
+npm approve-scripts --allow-scripts-pending   # packages whose install scripts aren't in allowScripts; "npm approve-scripts <pkg>" after review
 npm run build                # typecheck + vite build of src/Web and the plugins' widget bundles (src/Plugins/*/Web/dist)
 npm run typecheck            # tsc in every workspace
 npx playwright install chromium   # once, for the Vitest browser tests
@@ -75,7 +75,7 @@ General:
 - Audio, Engine, plugins, the shell and their tests target `net10.0` and run on Windows and Linux (see `docs/Linux.md`). Platform code is marked `[SupportedOSPlatform]` and called behind `OperatingSystem.Is*()` (CA1416 fails the build otherwise); device APIs go behind `IAudioBackend`. Only `DriverUtility` targets `net10.0-windows`.
 - Package versions are central in `Directory.Packages.props`, so `PackageReference` items carry no `Version`. `TreatWarningsAsErrors` is on for all projects.
 - Stick to the libraries in "Overview": no Newtonsoft, EF Core, Prism/Unity, xUnit or Moq.
-- npm runs no install scripts; after dependency changes, run `npm run allow-scripts:auto` (CI fails if it changes an allowlist). See "Development" for the npm setup.
+- npm runs only the install scripts in `allowScripts` (root `package.json`) and fails on others; review a new one, then add it with `npm approve-scripts <pkg>` or deny it with `npm deny-scripts <pkg>`. See "Development" for the npm setup.
 
 C#:
 

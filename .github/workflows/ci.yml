@@ -133,17 +133,11 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: 24
+          node-version-file: package.json
           cache: npm
 
       - name: Install
         uses: ./.github/actions/npm-install
-
-      # on both platforms: packages with install scripts can be platform-specific optional dependencies
-      - name: Check the install script allowlist is up to date
-        run: |
-          npm run allow-scripts:auto
-          git diff --exit-code -- "*package.json"
 
       - name: Get the Playwright version
         id: playwright
@@ -206,7 +200,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v7
         with:
-          node-version: 24
+          node-version-file: package.json
           cache: npm
 
       - name: Install

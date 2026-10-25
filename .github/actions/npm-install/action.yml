@@ -1,11 +1,17 @@
 name: Install npm packages
 description: >-
-  Restores node_modules from the cache and links the workspaces, or runs "npm run setup:ci" and caches node_modules. The
-  workspace links (node_modules/@micser) aren't cached: tar would store them as copies of the sources.
+  Installs the npm version pinned in package.json (volta.npm), then restores node_modules from the cache and links the
+  workspaces, or runs "npm run setup:ci" and caches node_modules. The workspace links (node_modules/@micser) aren't
+  cached: tar would store them as copies of the sources.
 
 runs:
   using: composite
   steps:
+    # setup-node installs the npm bundled with Node, which the engines range in package.json rejects
+    - name: Install npm
+      shell: pwsh
+      run: npm install -g "npm@$((Get-Content package.json -Raw | ConvertFrom-Json).volta.npm)"
+
     - name: Restore node_modules
       id: cache
       uses: actions/cache/restore@v6

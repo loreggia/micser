@@ -29,7 +29,7 @@ Both update themselves from the GitHub releases.
 ### Requirements
 
 - .NET SDK 10.0.100 or later (see `global.json`)
-- Node.js 24 or later (npm enforces it); with [Volta](https://volta.sh), the pinned version in `package.json` is used
+- Node.js 26 and npm 12 (npm enforces both; Node 26 ships npm 11, so `npm install -g npm@12`); with [Volta](https://volta.sh), the versions pinned in `package.json` are used
 - Windows: WebView2 Runtime (included in Windows 11)
 - Linux: PipeWire and WebKitGTK 4.1 to run the engine and the shell; [PowerShell](https://learn.microsoft.com/powershell/scripting/install/install-ubuntu) for `scripts/pack.ps1`
 
@@ -39,7 +39,7 @@ Both update themselves from the GitHub releases.
 dotnet build Micser.slnx
 dotnet test --solution Micser.slnx
 
-npm run setup          # npm install, then the allowed install scripts (lavamoat.allowScripts in package.json)
+npm run setup          # npm install, then local dotnet tool install (git hooks via Husky.Net)
 npm run build          # production build of the web UI (before dotnet publish of the engine, which serves it)
 npm run lint
 npm run format:check
@@ -124,4 +124,3 @@ Development and tests
 - [Vitest](https://vitest.dev/) and [Playwright](https://playwright.dev/) (web and end-to-end tests)
 - [TypeScript](https://www.typescriptlang.org/), [ESLint](https://eslint.org/) and [Prettier](https://prettier.io/)
 - [CSharpier](https://csharpier.com/) (C# and MSBuild formatting) and [Husky.Net](https://alirezanet.github.io/Husky.Net/) (pre-commit hook)
-- [LavaMoat allow-scripts](https://github.com/LavaMoat/LavaMoat/tree/main/packages/allow-scripts) (npm install script allowlist)
