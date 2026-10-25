@@ -288,8 +288,8 @@ internal sealed unsafe class PipeWireBackend : IAudioBackend, PipeWireBackend.IC
     }
 
     /// <summary>
-    /// Creates, changes and removes cables (see <see cref="PipeWireCable"/>), and waits until their devices are listed. While the
-    /// connection is lost, the cables are created once it's back.
+    /// Creates, changes and removes cables (see <see cref="PipeWireCable"/>), and waits until their devices are listed and the
+    /// devices of removed or replaced cables are gone. While the connection is lost, the cables are created once it's back.
     /// </summary>
     public void SetCables(IReadOnlyList<ChannelLayout> layouts)
     {
@@ -299,8 +299,9 @@ internal sealed unsafe class PipeWireBackend : IAudioBackend, PipeWireBackend.IC
             _cableLayouts = [.. layouts];
             if (!_isDisconnected && !_isDisposed)
             {
-                ApplyCables();
-                WaitForCableDevices();
+                var removedNodes = new HashSet<uint>();
+                ApplyCables(removedNodes);
+                WaitForCableDevices(removedNodes);
             }
         }
         finally
@@ -632,12 +633,28 @@ internal sealed unsafe class PipeWireBackend : IAudioBackend, PipeWireBackend.IC
     /// Makes the loaded cables match <see cref="_cableLayouts"/>: removes those beyond the count or with another layout, and loads
     /// missing ones. Loop lock held.
     /// </summary>
-    private void ApplyCables()
+    /// <param name="removedNodes">Gets the ids of the removed cables' nodes, which the daemon removes later.</param>
+    private void ApplyCables(HashSet<uint>? removedNodes = null)
     {
         for (var i = _cables.Count - 1; i >= 0; i--)
         {
             if (i >= _cableLayouts.Count || _cables[i].Layout != _cableLayouts[i])
             {
+                if (removedNodes != null)
+                {
+                    var names = new[]
+                    {
+                        PipeWireCable.InputName(_cables[i].Number),
+                        PipeWireCable.OutputName(_cables[i].Number),
+                    };
+                    lock (_stateLock)
+                    {
+                        removedNodes.UnionWith(
+                            _nodes.Where(pair => names.Contains(pair.Value.Name)).Select(pair => pair.Key)
+                        );
+                    }
+                }
+
                 _cables[i].Dispose();
                 _cables.RemoveAt(i);
             }
@@ -814,10 +831,11 @@ internal sealed unsafe class PipeWireBackend : IAudioBackend, PipeWireBackend.IC
     }
 
     /// <summary>
-    /// Waits until the devices of the loaded cables are listed, at most 3 s: the loopback module connects its streams one after the
-    /// other, so a roundtrip isn't enough. Loop lock held, not on the loop thread.
+    /// Waits until the devices of the loaded cables are listed and <paramref name="removedNodes"/> are gone, at most 3 s: the loopback
+    /// module connects its streams one after the other, and its own connection closes after it was destroyed, so a roundtrip isn't
+    /// enough. Loop lock held, not on the loop thread.
     /// </summary>
-    private void WaitForCableDevices()
+    private void WaitForCableDevices(HashSet<uint> removedNodes)
     {
         Roundtrip();
         var names = _cables
@@ -831,7 +849,8 @@ internal sealed unsafe class PipeWireBackend : IAudioBackend, PipeWireBackend.IC
         {
             lock (_stateLock)
             {
-                if (names.All(name => FindNode(name) != null))
+                // a replaced cable's old nodes have the names of the new ones
+                if (!removedNodes.Any(_nodes.ContainsKey) && names.All(name => FindNode(name) != null))
                 {
                     return;
                 }
@@ -915,6 +934,9 @@ internal sealed unsafe class PipeWireBackend : IAudioBackend, PipeWireBackend.IC
         {
             Raise(node.Name!, AudioDeviceChange.Removed);
         }
+
+        // for WaitForCableDevices
+        ThreadLoopSignal(_loop, false);
     }
 
     /// <summary>
