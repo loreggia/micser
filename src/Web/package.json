@@ -14,13 +14,13 @@
     "@fluentui/react-icons": "^2.0.344",
     "@microsoft/signalr": "^10.0.11",
     "@micser/web-sdk": "*",
-    "@tanstack/react-query": "^5.104.2",
+    "@tanstack/react-query": "^5.104.5",
     "@xyflow/react": "^12.12.0",
-    "i18next": "^26.4.4",
+    "i18next": "^26.5.5",
     "markdown-to-jsx": "^9.10.3",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
-    "react-i18next": "^17.0.16"
+    "react-i18next": "^17.1.2"
   },
   "devDependencies": {
     "@types/node": "^26.6.5",
