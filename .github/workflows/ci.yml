@@ -139,16 +139,19 @@ jobs:
       - name: Install
         uses: ./.github/actions/npm-install
 
-      - name: Get the Playwright version
+      - name: Get the Playwright version and runner image
         id: playwright
         shell: pwsh
-        run: '"version=$((npx playwright --version).Split('' '')[-1])" >> $env:GITHUB_OUTPUT'
+        run: |
+          "version=$((npx playwright --version).Split(' ')[-1])" >> $env:GITHUB_OUTPUT
+          "image=$env:ImageOS" >> $env:GITHUB_OUTPUT
 
       - name: Cache the Playwright browsers
         uses: actions/cache@v6
         with:
           path: ${{ runner.os == 'Windows' && '~/AppData/Local/ms-playwright' || '~/.cache/ms-playwright' }}
-          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+          # browsers built for one image (e.g. ubuntu24) don't run on another
+          key: playwright-${{ steps.playwright.outputs.image }}-${{ steps.playwright.outputs.version }}
 
       - name: Install Chromium for the browser tests
         run: npx playwright install ${{ runner.os == 'Linux' && '--with-deps' || '' }} chromium
@@ -206,16 +209,19 @@ jobs:
       - name: Install
         uses: ./.github/actions/npm-install
 
-      - name: Get the Playwright version
+      - name: Get the Playwright version and runner image
         id: playwright
         shell: pwsh
-        run: '"version=$((npx playwright --version).Split('' '')[-1])" >> $env:GITHUB_OUTPUT'
+        run: |
+          "version=$((npx playwright --version).Split(' ')[-1])" >> $env:GITHUB_OUTPUT
+          "image=$env:ImageOS" >> $env:GITHUB_OUTPUT
 
       - name: Cache the Playwright browsers
         uses: actions/cache@v6
         with:
           path: ${{ runner.os == 'Windows' && '~/AppData/Local/ms-playwright' || '~/.cache/ms-playwright' }}
-          key: playwright-${{ runner.os }}-${{ steps.playwright.outputs.version }}
+          # browsers built for one image (e.g. ubuntu24) don't run on another
+          key: playwright-${{ steps.playwright.outputs.image }}-${{ steps.playwright.outputs.version }}
 
       - name: Install Chromium
         if: runner.os == 'Windows'
