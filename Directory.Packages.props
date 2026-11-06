@@ -12,7 +12,7 @@
     <PackageVersion Include="NAudio.Core" Version="3.3.0" />
     <PackageVersion Include="NAudio.Wasapi" Version="3.3.0" />
     <!-- RTKit on Linux; at least Avalonia’s version; the shell references it directly so engine and shell agree -->
-    <PackageVersion Include="Tmds.DBus.Protocol" Version="0.95.1" />
+    <PackageVersion Include="Tmds.DBus.Protocol" Version="0.95.2" />
   </ItemGroup>
   <ItemGroup Label="Engine">
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.14" />
@@ -31,10 +31,10 @@
     <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.20.1" />
   </ItemGroup>
   <ItemGroup Label="Shell">
-    <PackageVersion Include="Avalonia" Version="12.1.4" />
+    <PackageVersion Include="Avalonia" Version="12.1.5" />
     <PackageVersion Include="Avalonia.Controls.WebView" Version="12.1.1" />
-    <PackageVersion Include="Avalonia.Desktop" Version="12.1.4" />
-    <PackageVersion Include="Avalonia.Themes.Fluent" Version="12.1.4" />
+    <PackageVersion Include="Avalonia.Desktop" Version="12.1.5" />
+    <PackageVersion Include="Avalonia.Themes.Fluent" Version="12.1.5" />
     <PackageVersion Include="Microsoft.Web.WebView2" Version="1.0.4314.35" />
     <PackageVersion Include="Velopack" Version="1.2.161" />
   </ItemGroup>
@@ -43,6 +43,6 @@
     <PackageVersion Include="Microsoft.AspNetCore.SignalR.Client" Version="10.0.14" />
     <PackageVersion Include="NSubstitute" Version="6.2.0" />
     <PackageVersion Include="NSubstitute.Analyzers.CSharp" Version="1.0.17" />
-    <PackageVersion Include="TUnit" Version="1.76.28" />
+    <PackageVersion Include="TUnit" Version="1.78.0" />
   </ItemGroup>
 </Project>
