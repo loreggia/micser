@@ -6,5 +6,5 @@
  */
 
 export type DeleteSubgraphParams = {
-deleteModules?: boolean;
+  deleteModules?: boolean;
 };

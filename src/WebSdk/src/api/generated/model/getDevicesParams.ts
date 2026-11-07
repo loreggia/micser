@@ -7,6 +7,6 @@
 import type { DeviceDirection } from './deviceDirection';
 
 export type GetDevicesParams = {
-direction?: DeviceDirection;
-includeInactive?: boolean;
+  direction?: DeviceDirection;
+  includeInactive?: boolean;
 };
