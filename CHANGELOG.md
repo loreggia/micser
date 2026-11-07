@@ -8,6 +8,10 @@ Collect changes under "Unreleased". Before tagging vX.Y.Z, rename that heading t
 from that section, and the release workflow fails without it.
 -->
 
+## 0.20.3 - 2026-11-07
+
+- Package / security updates
+
 ## 0.20.2 - 2026-10-28
 
 - Package / security updates
