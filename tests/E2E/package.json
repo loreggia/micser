@@ -8,7 +8,7 @@
   },
   "devDependencies": {
     "@micser/web-sdk": "*",
-    "@types/node": "^26.6.5",
+    "@types/node": "^26.6.6",
     "vite": "^8.3.5"
   }
 }
