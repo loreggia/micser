@@ -14,4 +14,6 @@ export const VoiceEffect = {
   Whisper: 'Whisper',
   Alien: 'Alien',
   Radio: 'Radio',
+  Monotone: 'Monotone',
+  NoteSnap: 'NoteSnap',
 } as const;

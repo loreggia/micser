@@ -53,6 +53,22 @@ public class VoiceChangerModuleTests
     }
 
     [Test]
+    public async Task TargetMode_MovesThePitchToTheTarget()
+    {
+        var module = new VoiceChangerModule();
+        // the formants move with the pitch (twice the frequency), so the lone sine stays under its envelope
+        module.SetState(new VoiceChangerState(Formant: 12f, Mode: VoicePitchMode.Target, TargetPitch: 300f));
+        var spectrum = new SpectrumModule();
+        var bench = new SignalTestBench(150, 0.5f, null, module, spectrum);
+        bench.Run(TimeSpan.FromSeconds(1));
+
+        var result = spectrum.GetSpectrum()!;
+        var peakFrequency = Array.IndexOf(result.Magnitudes, result.Magnitudes.Max()) * result.FrequencyResolution;
+
+        await Assert.That(peakFrequency).IsEqualTo(300f).Within(2 * result.FrequencyResolution);
+    }
+
+    [Test]
     public async Task Chipmunk_DoublesFrequency()
     {
         var module = new VoiceChangerModule();

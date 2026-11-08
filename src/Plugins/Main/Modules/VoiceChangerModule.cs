@@ -49,20 +49,48 @@ public enum VoiceEffect
     /// A telephone band (300 to 3400 Hz) with soft clipping on the output.
     /// </summary>
     Radio,
+
+    /// <summary>
+    /// Holds the pitch at the speaker's average (moved by the pitch shift or target), so the voice loses its intonation.
+    /// </summary>
+    Monotone,
+
+    /// <summary>
+    /// Moves the pitch to the nearest semitone, as in hard-tuned singing.
+    /// </summary>
+    NoteSnap,
+}
+
+public enum VoicePitchMode
+{
+    /// <summary>
+    /// Shifts the pitch by <see cref="VoiceChangerState.Pitch"/> semitones.
+    /// </summary>
+    Shift,
+
+    /// <summary>
+    /// Moves the speaker's average pitch to <see cref="VoiceChangerState.TargetPitch"/>, whatever the voice, keeping its intonation.
+    /// </summary>
+    Target,
 }
 
 /// <param name="Preset">The preset the parameters came from, <see cref="VoiceChangerPreset.Custom"/> once they were changed.</param>
 /// <param name="Pitch">Pitch shift in semitones; the formants stay unless <paramref name="Formant"/> moves them.</param>
 /// <param name="Formant">Formant shift in semitones: positive values sound smaller (female, child), negative larger (male, giant).</param>
+/// <param name="Mode">Whether the pitch is shifted by <paramref name="Pitch"/> or moved to <paramref name="TargetPitch"/>.</param>
+/// <param name="TargetPitch">The pitch in Hz that the speaker's average pitch moves to in <see cref="VoicePitchMode.Target"/> mode.</param>
 /// <param name="Breathiness">0 .. 1: replaces part of the harmonics with breath noise.</param>
 /// <param name="Wobble">0 .. 1: the depth of a slow vibrato and tremolo, as in a shaky, old voice.</param>
-/// <param name="Effect">A character effect: Robot and Whisper change the synthesis, Alien and Radio the whole output.</param>
+/// <param name="Effect">A character effect: Robot and Whisper change the synthesis, Monotone and NoteSnap the pitch, Alien and Radio the
+/// whole output.</param>
 /// <param name="Mix">0 (dry) .. 1 (only the changed voice); Alien and Radio apply to the mix.</param>
 /// <param name="Quality">1..10; higher values use larger FFTs and more overlap: better quality, more latency and CPU.</param>
 public sealed record VoiceChangerState(
     VoiceChangerPreset Preset = VoiceChangerPreset.Custom,
     [Range(-24f, 24f)] float Pitch = 0f,
     [Range(-12f, 12f)] float Formant = 0f,
+    VoicePitchMode Mode = VoicePitchMode.Shift,
+    [Range(60f, 600f)] float TargetPitch = 200f,
     [Range(0f, 1f)] float Breathiness = 0f,
     [Range(0f, 1f)] float Wobble = 0f,
     VoiceEffect Effect = VoiceEffect.None,
@@ -131,10 +159,19 @@ public class VoiceChangerModule : EffectModule, IStatefulModule<VoiceChangerStat
             VoiceEffect.Whisper => VoiceTexture.Whisper,
             _ => VoiceTexture.Voiced,
         };
+        var correction = effect switch
+        {
+            VoiceEffect.Monotone => PitchCorrection.Monotone,
+            VoiceEffect.NoteSnap => PitchCorrection.NoteSnap,
+            _ => PitchCorrection.None,
+        };
+        var target = state.Mode == VoicePitchMode.Target ? Math.Clamp(state.TargetPitch, 60f, 600f) : 0f;
         var shift =
             mix > 0f
             && (
-                state.Pitch != 0f
+                target > 0f
+                || correction != PitchCorrection.None
+                || state.Pitch != 0f
                 || state.Formant != 0f
                 || breathiness > 0f
                 || wobble > 0f
@@ -169,7 +206,9 @@ public class VoiceChangerModule : EffectModule, IStatefulModule<VoiceChangerStat
                 mix,
                 breathiness,
                 wobble,
-                texture
+                texture,
+                target,
+                correction
             );
             for (var c = 0; c < channelCount; c++)
             {

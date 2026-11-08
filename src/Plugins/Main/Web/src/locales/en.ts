@@ -245,6 +245,8 @@ export const en = {
     breathiness: "Breath",
     wobble: "Wobble",
     effect: "Effect",
+    mode: "Pitch mode",
+    targetPitch: "Target",
     semitones: "{{value}} st",
     presets: {
       Custom: "Custom",
@@ -265,12 +267,21 @@ export const en = {
       Whisper: "Whisper",
       Alien: "Alien",
       Radio: "Radio",
+      Monotone: "Monotone",
+      NoteSnap: "Snap to notes",
+    },
+    modes: {
+      Shift: "Shift by semitones",
+      Target: "Target pitch",
     },
     info: {
       preset:
         "A starting point for pitch, formant, breath, wobble and effect. Changing any of them afterwards makes it a custom setting.",
       effect:
-        "Robot speaks on a single note (move it with the pitch), Whisper replaces the voice with breath, Alien adds a metallic ring and Radio sounds like a telephone or walkie-talkie.",
+        "Robot speaks on a single note (move it with the pitch), Whisper replaces the voice with breath, Alien adds a metallic ring, Radio sounds like a telephone or walkie-talkie, Monotone flattens your intonation and Snap to notes pulls the pitch to the nearest note, as in hard-tuned singing.",
+      mode: "Shift moves the pitch by a fixed number of semitones. Target moves your average pitch to a frequency, so e.g. a female voice comes out at the same height whether your own voice is deep or high. It follows your average pitch, so for singing use Shift.",
+      targetPitch:
+        "The pitch your voice should have on average. Typical speaking voices are about 120 Hz for men, 210 Hz for women and 300 Hz for children. Your intonation is kept.",
       breathiness: "Replaces part of the voice with breath noise, e.g. for a breathy, airy or old voice.",
       wobble: "Makes the voice shake slightly in pitch and volume, like an old or nervous voice.",
       pitch:

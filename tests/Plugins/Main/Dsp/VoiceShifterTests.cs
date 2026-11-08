@@ -153,6 +153,57 @@ public class VoiceShifterTests
     }
 
     [Test]
+    [Arguments(110f)]
+    [Arguments(150f)]
+    [Arguments(250f)]
+    public async Task Target_MovesAnyVoiceToTheTargetPitch(float f0)
+    {
+        var output = Run(new VoiceShifter(2048), Vowel(f0, 1000f), new VoiceParameters(1f, 1f, 1f, TargetPitch: 220f));
+
+        // the strongest harmonic is one of 220 Hz, still near the formant
+        var peak = PeakFrequency(Spectrum(output));
+        await Assert.That(peak).IsEqualTo(1000f).Within(250f);
+        await Assert.That(DistanceToHarmonic(peak, 220f)).IsLessThan(8f);
+    }
+
+    [Test]
+    public async Task Monotone_FlattensTheIntonation()
+    {
+        // 200 Hz with a vibrato of one semitone at 2 Hz
+        var input = new float[BlockSize * 100];
+        var phase = 0.0;
+        for (var n = 0; n < input.Length; n++)
+        {
+            input[n] = 0.5f * (float)Math.Sin(phase);
+            var frequency = 200.0 * Math.Pow(2.0, Math.Sin(2 * Math.PI * 2.0 * n / SampleRate) / 12.0);
+            phase += 2 * Math.PI * frequency / SampleRate;
+        }
+
+        var output = Run(
+            new VoiceShifter(2048),
+            n => input[n],
+            new VoiceParameters(1f, 1f, 1f, Correction: PitchCorrection.Monotone)
+        );
+
+        await Assert.That(FrequencyRange(input)).IsGreaterThan(20f);
+        await Assert.That(FrequencyRange(output)).IsLessThan(0.4f * FrequencyRange(input));
+    }
+
+    [Test]
+    [Arguments(225f, 220f)]
+    [Arguments(228f, 233.08f)]
+    public async Task NoteSnap_MovesThePitchToTheNearestSemitone(float frequency, float note)
+    {
+        var output = Run(
+            new VoiceShifter(2048),
+            Sine(frequency),
+            new VoiceParameters(1f, 1f, 1f, Correction: PitchCorrection.NoteSnap)
+        );
+
+        await Assert.That(PeakFrequency(Spectrum(output))).IsEqualTo(note).Within(3f);
+    }
+
+    [Test]
     public async Task Robot_PlaysHarmonicsOfItsNote()
     {
         var output = Run(

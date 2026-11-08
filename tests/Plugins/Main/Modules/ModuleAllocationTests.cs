@@ -54,6 +54,8 @@ public class ModuleAllocationTests
             new VoiceChangerState(Effect: VoiceEffect.Whisper),
             new VoiceChangerState(Pitch: 4f, Effect: VoiceEffect.Alien),
             new VoiceChangerState(Effect: VoiceEffect.Radio),
+            new VoiceChangerState(Mode: VoicePitchMode.Target, TargetPitch: 250f, Effect: VoiceEffect.NoteSnap),
+            new VoiceChangerState(Pitch: 3f, Effect: VoiceEffect.Monotone),
         ],
     };
 

@@ -3,7 +3,8 @@ namespace Micser.Plugins.Main.Dsp;
 /// <summary>
 /// Shifts the pitch and the formants of a voice independently (short-time Fourier transform, phase vocoder). Each frame splits the spectrum
 /// into its envelope (the formants, a cepstral "true envelope") and the excitation (the harmonics), moves the harmonics by the pitch factor and
-/// the envelope by the formant factor. Breathiness, wobble and the <see cref="VoiceTexture"/> change the synthesis. The dry signal is delayed by the latency, so mixing it in doesn't comb-filter. Buffers are sized for
+/// the envelope by the formant factor. A <see cref="PitchDetector"/> lets the pitch aim at a target or follow a
+/// <see cref="PitchCorrection"/>. Breathiness, wobble and the <see cref="VoiceTexture"/> change the synthesis. The dry signal is delayed by the latency, so mixing it in doesn't comb-filter. Buffers are sized for
 /// the FFT size given to the constructor, so a change of the FFT size or the signal needs no new instance.
 /// </summary>
 /// <remarks>The phase vocoder follows <see cref="PitchShifter"/> (smbPitchShift.cpp by Stephan M. Bernsee).</remarks>
@@ -29,6 +30,12 @@ internal sealed class VoiceShifter
     /// Breath noise fades in up to this frequency, so it sounds like air rather than rumble.
     /// </summary>
     private const float NoiseFadeInHertz = 1000f;
+
+    /// <summary>
+    /// The time constant of the average pitch in seconds: long enough to keep the intonation of a sentence, short enough to follow a new
+    /// speaker.
+    /// </summary>
+    private const double AveragePitchSeconds = 1.5;
 
     /// <summary>
     /// The pitch deviation of full wobble, in semitones.
@@ -58,6 +65,7 @@ internal sealed class VoiceShifter
     private readonly float[] _anaFreq;
     private readonly float[] _anaMagn;
     private readonly float[] _cepstrum;
+    private readonly PitchDetector _detector;
     private readonly Fft _fft;
     private readonly float[] _inFifo;
     private readonly float[] _lastPhase;
@@ -72,11 +80,14 @@ internal sealed class VoiceShifter
     private readonly float[] _synMagn;
     private readonly float[] _window;
     private int _fftSize;
+    private float _averagePitch;
     private float _breathiness;
     private float _formantFactor = float.NaN;
+    private float _heldFactor = float.NaN;
     private double _lfoPhase;
     private float _mix = float.NaN;
     private int _oversampling;
+    private VoiceParameters _parameters;
     private float _wobble;
     private float _pitchFactor = float.NaN;
     private uint _random = RandomSeed;
@@ -84,17 +95,19 @@ internal sealed class VoiceShifter
     private int _rover;
 
     /// <summary>
-    /// The note of the <see cref="VoiceTexture.Robot"/> texture before the pitch factor, in Hz.
+    /// The note of the <see cref="VoiceTexture.Robot"/> texture before the pitch factor, in Hz; with a target pitch, the target.
     /// </summary>
     public const float RobotFrequency = 110f;
 
     private const uint RandomSeed = 0x9E3779B9;
 
     /// <param name="maxFftSize">The largest FFT size <see cref="Process"/> is called with.</param>
-    public VoiceShifter(int maxFftSize)
+    /// <param name="maxSampleRate">The highest sample rate at which the pitch is detected.</param>
+    public VoiceShifter(int maxFftSize, int maxSampleRate = 192000)
     {
         _maxFftSize = maxFftSize;
         _fft = new Fft(maxFftSize);
+        _detector = new PitchDetector(maxSampleRate);
         _inFifo = new float[maxFftSize];
         _outFifo = new float[maxFftSize];
         _outputAccum = new float[2 * maxFftSize];
@@ -138,6 +151,46 @@ internal sealed class VoiceShifter
         _lfoPhase = 0;
         _robotPhase = 0;
         _random = RandomSeed;
+        _detector.Reset();
+        _averagePitch = 0f;
+        _heldFactor = float.NaN;
+    }
+
+    /// <summary>
+    /// The pitch factor for a frame whose input has the pitch <paramref name="f0"/> (0 without one), from the shift or the target and the
+    /// correction.
+    /// </summary>
+    private float GetPitchFactor(in VoiceParameters parameters, float f0)
+    {
+        var baseFactor =
+            parameters.TargetPitch > 0f
+                ? (_averagePitch > 0f ? parameters.TargetPitch / _averagePitch : 1f)
+                : parameters.PitchFactor;
+        if (parameters.Correction == PitchCorrection.None)
+        {
+            return baseFactor;
+        }
+
+        // without a pitch (a pause, breath, a consonant), hold the last factor, so it doesn't jump back and forth
+        if (f0 <= 0f)
+        {
+            return float.IsNaN(_heldFactor) ? baseFactor : _heldFactor;
+        }
+
+        float factor;
+        if (parameters.Correction == PitchCorrection.Monotone)
+        {
+            factor = baseFactor * _averagePitch / f0;
+        }
+        else
+        {
+            // the nearest semitone of equal temperament (A4 = 440 Hz) to the shifted pitch
+            var semitones = 12f * MathF.Log2(f0 * baseFactor / 440f);
+            factor = 440f * MathF.Pow(2f, MathF.Round(semitones) / 12f) / f0;
+        }
+
+        _heldFactor = Math.Clamp(factor, 0.25f, 4f);
+        return _heldFactor;
     }
 
     /// <summary>
@@ -167,10 +220,11 @@ internal sealed class VoiceShifter
             }
         }
 
-        var (pitchFactor, formantFactor, mix, breathiness, wobble, texture) = parameters;
+        _parameters = parameters;
+        var (pitchFactor, formantFactor, mix, breathiness, wobble, _, targetPitch, _) = parameters;
         if (float.IsNaN(_pitchFactor))
         {
-            _pitchFactor = pitchFactor;
+            _pitchFactor = targetPitch > 0f ? 1f : pitchFactor;
             _formantFactor = formantFactor;
             _mix = mix;
             _breathiness = breathiness;
@@ -191,6 +245,7 @@ internal sealed class VoiceShifter
             // the input from one latency ago, still in the input FIFO
             var dry = _inFifo[_rover - latency];
             _inFifo[_rover] = samples[i];
+            _detector.Write(samples[i]);
             var wet = _outFifo[_rover - latency];
             currentMix += mixStep;
             samples[i] = dry + (currentMix * (wet - dry));
@@ -199,11 +254,10 @@ internal sealed class VoiceShifter
             if (_rover >= fftSize)
             {
                 _rover = latency;
-                _pitchFactor += (pitchFactor - _pitchFactor) * Smoothing;
                 _formantFactor += (formantFactor - _formantFactor) * Smoothing;
                 _breathiness += (breathiness - _breathiness) * Smoothing;
                 _wobble += (wobble - _wobble) * Smoothing;
-                ProcessFrame(fftSize, stepSize, sampleRate, texture);
+                ProcessFrame(fftSize, stepSize, sampleRate);
             }
         }
 
@@ -301,8 +355,31 @@ internal sealed class VoiceShifter
         return 2.0 * Math.PI * (x >> 8) / 16777216.0;
     }
 
-    private void ProcessFrame(int fftSize, int stepSize, float sampleRate, VoiceTexture texture)
+    /// <summary>
+    /// Moves <see cref="_pitchFactor"/> towards the factor for this frame, detecting the pitch when the parameters need it.
+    /// </summary>
+    private void UpdatePitchFactor(int stepSize, float sampleRate)
     {
+        var f0 = 0f;
+        if (_parameters.TargetPitch > 0f || _parameters.Correction != PitchCorrection.None)
+        {
+            f0 = _detector.Detect((int)sampleRate);
+            if (f0 > 0f)
+            {
+                // averaged on a log scale, as the ear hears pitch
+                var alpha = (float)(1.0 - Math.Exp(-stepSize / (sampleRate * AveragePitchSeconds)));
+                _averagePitch = _averagePitch > 0f ? _averagePitch * MathF.Pow(f0 / _averagePitch, alpha) : f0;
+            }
+        }
+
+        var factor = GetPitchFactor(_parameters, f0);
+        _pitchFactor += (factor - _pitchFactor) * Smoothing;
+    }
+
+    private void ProcessFrame(int fftSize, int stepSize, float sampleRate)
+    {
+        var texture = _parameters.Texture;
+        UpdatePitchFactor(stepSize, sampleRate);
         var halfSize = fftSize / 2;
         var oversampling = fftSize / stepSize;
         var freqPerBin = sampleRate / (double)fftSize;
@@ -340,7 +417,8 @@ internal sealed class VoiceShifter
         // the wobble modulates pitch and level at frame rate
         var lfo = Math.Sin(_lfoPhase);
         _lfoPhase = Math.IEEERemainder(_lfoPhase + (2.0 * Math.PI * WobbleRate * stepSize / sampleRate), 2.0 * Math.PI);
-        var pitch = _pitchFactor * MathF.Pow(2f, _wobble * WobbleSemitones * (float)lfo / 12f);
+        var wobbleFactor = MathF.Pow(2f, _wobble * WobbleSemitones * (float)lfo / 12f);
+        var pitch = _pitchFactor * wobbleFactor;
         var level = 1f - (_wobble * WobbleTremolo * (0.5f + (0.5f * (float)lfo)));
         var formant = _formantFactor;
 
@@ -364,7 +442,8 @@ internal sealed class VoiceShifter
         }
 
         // the robot's harmonics all follow one phase, so the bins of a harmonic add up coherently
-        var robotFrequency = RobotFrequency * pitch;
+        var robotFrequency =
+            (_parameters.TargetPitch > 0f ? _parameters.TargetPitch : RobotFrequency * _pitchFactor) * wobbleFactor;
         var robotPhase = _robotPhase;
         _robotPhase = Math.IEEERemainder(
             _robotPhase + (2.0 * Math.PI * robotFrequency * stepSize / sampleRate),

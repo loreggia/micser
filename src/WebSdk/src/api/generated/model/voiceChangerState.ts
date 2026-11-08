@@ -6,11 +6,14 @@
  */
 import type { VoiceChangerPreset } from './voiceChangerPreset';
 import type { VoiceEffect } from './voiceEffect';
+import type { VoicePitchMode } from './voicePitchMode';
 
 export interface VoiceChangerState {
   preset: VoiceChangerPreset;
   pitch: number;
   formant: number;
+  mode: VoicePitchMode;
+  targetPitch: number;
   breathiness: number;
   wobble: number;
   effect: VoiceEffect;

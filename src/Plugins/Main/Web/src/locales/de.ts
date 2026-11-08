@@ -253,6 +253,8 @@ export const de: Translations<typeof en> = {
     breathiness: "Atem",
     wobble: "Zittern",
     effect: "Effekt",
+    mode: "Tonhöhenmodus",
+    targetPitch: "Ziel",
     semitones: "{{value}} HT",
     presets: {
       Custom: "Benutzerdefiniert",
@@ -273,12 +275,21 @@ export const de: Translations<typeof en> = {
       Whisper: "Flüstern",
       Alien: "Außerirdischer",
       Radio: "Funk",
+      Monotone: "Monoton",
+      NoteSnap: "Auf Töne einrasten",
+    },
+    modes: {
+      Shift: "Um Halbtöne verschieben",
+      Target: "Zieltonhöhe",
     },
     info: {
       preset:
         "Ein Ausgangspunkt für Tonhöhe, Formant, Atem, Zittern und Effekt. Wird einer davon danach geändert, ist es eine benutzerdefinierte Einstellung.",
       effect:
-        "Roboter spricht auf einem einzigen Ton (mit der Tonhöhe verschiebbar), Flüstern ersetzt die Stimme durch Atem, Außerirdischer fügt einen metallischen Klang hinzu und Funk klingt wie ein Telefon oder Walkie-Talkie.",
+        "Roboter spricht auf einem einzigen Ton (mit der Tonhöhe verschiebbar), Flüstern ersetzt die Stimme durch Atem, Außerirdischer fügt einen metallischen Klang hinzu, Funk klingt wie ein Telefon oder Walkie-Talkie, Monoton macht deine Sprachmelodie flach und Auf Töne einrasten zieht die Tonhöhe auf den nächsten Ton, wie bei hart gestimmtem Gesang.",
+      mode: "Verschieben ändert die Tonhöhe um eine feste Zahl von Halbtönen. Zieltonhöhe bringt deine durchschnittliche Tonhöhe auf eine Frequenz, sodass z. B. eine Frauenstimme gleich hoch herauskommt, egal ob deine eigene Stimme tief oder hoch ist. Sie folgt deiner durchschnittlichen Tonhöhe, nimm zum Singen daher Verschieben.",
+      targetPitch:
+        "Die Tonhöhe, die deine Stimme im Durchschnitt haben soll. Typische Sprechstimmen liegen bei etwa 120 Hz für Männer, 210 Hz für Frauen und 300 Hz für Kinder. Deine Sprachmelodie bleibt erhalten.",
       breathiness:
         "Ersetzt einen Teil der Stimme durch Atemgeräusch, z. B. für eine hauchige, luftige oder ältere Stimme.",
       wobble: "Lässt die Stimme leicht in Tonhöhe und Lautstärke zittern, wie bei einer älteren oder nervösen Stimme.",

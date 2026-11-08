@@ -4202,6 +4202,8 @@
           "preset",
           "pitch",
           "formant",
+          "mode",
+          "targetPitch",
           "breathiness",
           "wobble",
           "effect",
@@ -4222,6 +4224,14 @@
             "type": "number",
             "format": "float",
             "default": 0
+          },
+          "mode": {
+            "$ref": "#/components/schemas/VoicePitchMode"
+          },
+          "targetPitch": {
+            "type": "number",
+            "format": "float",
+            "default": 200
           },
           "breathiness": {
             "type": "number",
@@ -4254,9 +4264,18 @@
           "Robot",
           "Whisper",
           "Alien",
-          "Radio"
+          "Radio",
+          "Monotone",
+          "NoteSnap"
         ],
         "default": "None"
+      },
+      "VoicePitchMode": {
+        "enum": [
+          "Shift",
+          "Target"
+        ],
+        "default": "Shift"
       }
     }
   },

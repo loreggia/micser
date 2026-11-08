@@ -13,6 +13,8 @@ from that section, and the release workflow fails without it.
 - New Voice changer module: changes a voice from male to female or back, into a child's, a monster's or a chipmunk's. It shifts the
   pitch and the character of the voice (formants) separately, so voices sound natural instead of sped up or slowed down. Breath,
   wobble and the robot, whisper, alien and radio effects make an old person's voice, a robot, a whisper, an alien or a walkie-talkie.
+  A target pitch mode moves your voice to the same height whether it is deep or high, and the monotone and snap-to-notes effects
+  flatten your intonation or pull it onto notes.
 - The Pitch module needs less CPU.
 
 ## 0.20.3 - 2026-11-07

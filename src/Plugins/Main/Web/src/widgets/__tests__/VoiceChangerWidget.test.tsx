@@ -9,6 +9,8 @@ const state: VoiceChangerState = {
   preset: "MaleToFemale",
   pitch: 6,
   formant: 3,
+  mode: "Shift",
+  targetPitch: 200,
   breathiness: 0.2,
   wobble: 0.1,
   effect: "None",
@@ -101,4 +103,40 @@ test("changing the formant makes it custom, changing the mix doesn't", async () 
   screen.getByRole("slider", { name: "Mix" }).element().focus();
   await userEvent.keyboard("{ArrowLeft}");
   expect(setState).toHaveBeenLastCalledWith({ ...state, mix: 0.79 });
+});
+
+test("target mode shows the target pitch instead of the shift", async () => {
+  const { screen } = await renderVoiceChanger({ mode: "Target", targetPitch: 210 });
+
+  await expect.element(screen.getByRole("combobox", { name: "Pitch mode" })).toHaveTextContent("Target pitch");
+  await expect.element(screen.getByText("210 Hz", { exact: true })).toBeVisible();
+  await expect.element(screen.getByRole("slider", { name: "Pitch" })).not.toBeInTheDocument();
+});
+
+test("changing the pitch mode makes it custom", async () => {
+  const { screen, setState } = await renderVoiceChanger();
+
+  await screen.getByRole("combobox", { name: "Pitch mode" }).click();
+  await screen.getByRole("option", { name: "Target pitch" }).click();
+
+  expect(setState).toHaveBeenCalledWith({ ...state, preset: "Custom", mode: "Target" });
+});
+
+test("a preset switches back to shifting by semitones", async () => {
+  const { screen, setState } = await renderVoiceChanger({ mode: "Target", targetPitch: 210 });
+
+  await screen.getByRole("combobox", { name: "Preset" }).click();
+  await screen.getByRole("option", { name: "Chipmunk" }).click();
+
+  expect(setState).toHaveBeenCalledWith({
+    ...state,
+    preset: "Chipmunk",
+    mode: "Shift",
+    targetPitch: 210,
+    pitch: 12,
+    formant: 12,
+    breathiness: 0,
+    wobble: 0,
+    effect: "None",
+  });
 });
