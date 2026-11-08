@@ -13,6 +13,7 @@ import { NoiseGateWidget } from "./widgets/NoiseGateWidget";
 import { PitchWidget } from "./widgets/PitchWidget";
 import { SpectrumWidget } from "./widgets/SpectrumWidget";
 import { StereoToolsWidget } from "./widgets/StereoToolsWidget";
+import { VoiceChangerWidget } from "./widgets/VoiceChangerWidget";
 
 export default definePlugin({
   name: "Main",
@@ -94,6 +95,12 @@ export default definePlugin({
       title: () => t("modules.pitch"),
       description: () => t("descriptions.pitch"),
       component: PitchWidget,
+    }),
+    defineWidget({
+      moduleType: "VoiceChanger",
+      title: () => t("modules.voiceChanger"),
+      description: () => t("descriptions.voiceChanger"),
+      component: VoiceChangerWidget,
     }),
     defineWidget({
       moduleType: "Spectrum",

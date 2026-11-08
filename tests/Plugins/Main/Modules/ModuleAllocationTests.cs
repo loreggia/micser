@@ -40,6 +40,23 @@ public class ModuleAllocationTests
             new FilterState(FilterType.HighPass, 200f, 24, 2f),
         ],
         [typeof(PitchState)] = [new PitchState(0.5f, 10), new PitchState(-0.3f, 1)],
+        [typeof(VoiceChangerState)] =
+        [
+            new VoiceChangerState(VoiceChangerPreset.MaleToFemale, 6f, 3f, Breathiness: 0.5f, Quality: 10),
+            new VoiceChangerState(
+                Pitch: -7f,
+                Formant: -4f,
+                Wobble: 1f,
+                Effect: VoiceEffect.Robot,
+                Mix: 0.5f,
+                Quality: 1
+            ),
+            new VoiceChangerState(Effect: VoiceEffect.Whisper),
+            new VoiceChangerState(Pitch: 4f, Effect: VoiceEffect.Alien),
+            new VoiceChangerState(Effect: VoiceEffect.Radio),
+            new VoiceChangerState(Mode: VoicePitchMode.Target, TargetPitch: 250f, Effect: VoiceEffect.NoteSnap),
+            new VoiceChangerState(Pitch: 3f, Effect: VoiceEffect.Monotone),
+        ],
     };
 
     public static IEnumerable<string> ModuleTypes()

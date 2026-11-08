@@ -25,6 +25,7 @@ public sealed class MainPlugin : IAudioPlugin
             .AddAudioModule<EqualizerModule, EqualizerState>("Equalizer")
             .AddAudioModule<FilterModule, FilterState>("Filter")
             .AddAudioModule<PitchModule, PitchState>("Pitch")
+            .AddAudioModule<VoiceChangerModule, VoiceChangerState>("VoiceChanger")
             .AddAudioModule<SpectrumModule, SpectrumState>("Spectrum");
     }
 }

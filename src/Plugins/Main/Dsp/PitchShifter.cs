@@ -16,6 +16,7 @@ internal sealed class PitchShifter
 {
     private readonly float[] _anaFreq;
     private readonly float[] _anaMagn;
+    private readonly Fft _fft;
     private readonly float[] _fftWorkspace;
     private readonly float[] _inFifo;
     private readonly float[] _lastPhase;
@@ -25,6 +26,7 @@ internal sealed class PitchShifter
     private readonly float[] _sumPhase;
     private readonly float[] _synFreq;
     private readonly float[] _synMagn;
+    private readonly float[] _window;
     private int _fftSize;
     private int _rover;
 
@@ -42,6 +44,8 @@ internal sealed class PitchShifter
         _anaMagn = new float[(maxFftSize / 2) + 1];
         _synFreq = new float[maxFftSize];
         _synMagn = new float[maxFftSize];
+        _window = new float[maxFftSize];
+        _fft = new Fft(maxFftSize);
     }
 
     /// <summary>
@@ -75,6 +79,7 @@ internal sealed class PitchShifter
         {
             Reset();
             _fftSize = fftSize;
+            HannWindow.Fill(_window.AsSpan(0, fftSize));
         }
 
         var halfSize = fftSize / 2;
@@ -111,57 +116,6 @@ internal sealed class PitchShifter
         }
     }
 
-    private static void Transform(Span<float> buffer, int fftSize, int sign)
-    {
-        for (var i = 2; i < (2 * fftSize) - 2; i += 2)
-        {
-            var j = 0;
-            for (var bitm = 2; bitm < 2 * fftSize; bitm <<= 1)
-            {
-                if ((i & bitm) != 0)
-                {
-                    j++;
-                }
-
-                j <<= 1;
-            }
-
-            if (i < j)
-            {
-                (buffer[i], buffer[j]) = (buffer[j], buffer[i]);
-                (buffer[i + 1], buffer[j + 1]) = (buffer[j + 1], buffer[i + 1]);
-            }
-        }
-
-        var stages = (int)((Math.Log(fftSize) / Math.Log(2.0)) + .5);
-        for (int k = 0, le = 2; k < stages; k++)
-        {
-            le <<= 1;
-            var le2 = le >> 1;
-            var ur = 1.0f;
-            var ui = 0.0f;
-            var arg = (float)Math.PI / (le2 >> 1);
-            var wr = (float)Math.Cos(arg);
-            var wi = (float)(sign * Math.Sin(arg));
-            for (var j = 0; j < le2; j += 2)
-            {
-                for (var i = j; i < 2 * fftSize; i += le)
-                {
-                    var tr = (buffer[i + le2] * ur) - (buffer[i + le2 + 1] * ui);
-                    var ti = (buffer[i + le2] * ui) + (buffer[i + le2 + 1] * ur);
-                    buffer[i + le2] = buffer[i] - tr;
-                    buffer[i + le2 + 1] = buffer[i + 1] - ti;
-                    buffer[i] += tr;
-                    buffer[i + 1] += ti;
-                }
-
-                var next = (ur * wr) - (ui * wi);
-                ui = (ur * wi) + (ui * wr);
-                ur = next;
-            }
-        }
-    }
-
     private void ProcessFrame(
         float pitchShift,
         int fftSize,
@@ -176,13 +130,12 @@ internal sealed class PitchShifter
         // windowing and re, im interleave
         for (var k = 0; k < fftSize; k++)
         {
-            var window = (-.5 * Math.Cos(2.0 * Math.PI * k / fftSize)) + .5;
-            _fftWorkspace[2 * k] = (float)(_inFifo[k] * window);
+            _fftWorkspace[2 * k] = _inFifo[k] * _window[k];
             _fftWorkspace[(2 * k) + 1] = 0.0f;
         }
 
         // analysis
-        Transform(_fftWorkspace, fftSize, -1);
+        _fft.Transform(_fftWorkspace, fftSize, inverse: false);
         for (var k = 0; k <= halfSize; k++)
         {
             double real = _fftWorkspace[2 * k];
@@ -236,13 +189,13 @@ internal sealed class PitchShifter
         }
 
         _fftWorkspace.AsSpan(fftSize + 2, fftSize - 2).Clear();
-        Transform(_fftWorkspace, fftSize, 1);
+        _fft.Transform(_fftWorkspace, fftSize, inverse: true);
 
         // windowing and overlap-add
+        var scale = 2f / (halfSize * oversampling);
         for (var k = 0; k < fftSize; k++)
         {
-            var window = (-.5 * Math.Cos(2.0 * Math.PI * k / fftSize)) + .5;
-            _outputAccum[k] += (float)(2.0 * window * _fftWorkspace[2 * k] / (halfSize * oversampling));
+            _outputAccum[k] += scale * _window[k] * _fftWorkspace[2 * k];
         }
 
         _outputAccum.AsSpan(0, stepSize).CopyTo(_outFifo);

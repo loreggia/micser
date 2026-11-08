@@ -16,6 +16,7 @@ export const de: Translations<typeof en> = {
     equalizer: "Equalizer",
     filter: "Filter",
     pitch: "Tonhöhe",
+    voiceChanger: "Stimmveränderer",
     spectrum: "Spektrum",
   },
   descriptions: {
@@ -41,6 +42,8 @@ export const de: Translations<typeof en> = {
     filter: "Entfernt die Frequenzen unter oder über einer Grenzfrequenz, z. B. tiefes Rumpeln eines Mikrofons.",
     pitch:
       "Verschiebt die Tonhöhe nach oben oder unten, ohne das Tempo zu ändern, z. B. für eine tiefere oder höhere Stimme.",
+    voiceChanger:
+      "Verändert eine Stimme, z. B. von männlich zu weiblich, in eine Kinder- oder Monsterstimme: verschiebt Tonhöhe und Klangcharakter (Formanten) getrennt.",
     spectrum:
       "Zeigt, welche Frequenzen der Ton enthält, von Bässen links bis zu Höhen rechts. Der Ton bleibt unverändert.",
   },
@@ -238,6 +241,63 @@ export const de: Translations<typeof en> = {
     info: {
       pitch:
         "Wie weit die Tonhöhe verschoben wird, in Halbtönen; 12 Halbtöne sind eine Oktave. Das Tempo bleibt gleich.",
+      quality: "Höhere Werte klingen sauberer, erhöhen aber die Latenz und brauchen mehr CPU.",
+    },
+  },
+  voiceChanger: {
+    preset: "Voreinstellung",
+    pitch: "Tonhöhe",
+    formant: "Formant",
+    mix: "Mischung",
+    quality: "Qualität",
+    breathiness: "Atem",
+    wobble: "Zittern",
+    effect: "Effekt",
+    mode: "Tonhöhenmodus",
+    targetPitch: "Ziel",
+    semitones: "{{value}} HT",
+    presets: {
+      Custom: "Benutzerdefiniert",
+      MaleToFemale: "Männlich zu weiblich",
+      FemaleToMale: "Weiblich zu männlich",
+      Child: "Kind",
+      Old: "Ältere Person",
+      Monster: "Monster",
+      Chipmunk: "Streifenhörnchen",
+      Robot: "Roboter",
+      Whisper: "Flüstern",
+      Alien: "Außerirdischer",
+      Radio: "Funk",
+    },
+    effects: {
+      None: "Kein Effekt",
+      Robot: "Roboter",
+      Whisper: "Flüstern",
+      Alien: "Außerirdischer",
+      Radio: "Funk",
+      Monotone: "Monoton",
+      NoteSnap: "Auf Töne einrasten",
+    },
+    modes: {
+      Shift: "Um Halbtöne verschieben",
+      Target: "Zieltonhöhe",
+    },
+    info: {
+      preset:
+        "Ein Ausgangspunkt für Tonhöhe, Formant, Atem, Zittern und Effekt. Wird einer davon danach geändert, ist es eine benutzerdefinierte Einstellung.",
+      effect:
+        "Roboter spricht auf einem einzigen Ton (mit der Tonhöhe verschiebbar), Flüstern ersetzt die Stimme durch Atem, Außerirdischer fügt einen metallischen Klang hinzu, Funk klingt wie ein Telefon oder Walkie-Talkie, Monoton macht deine Sprachmelodie flach und Auf Töne einrasten zieht die Tonhöhe auf den nächsten Ton, wie bei hart gestimmtem Gesang.",
+      mode: "Verschieben ändert die Tonhöhe um eine feste Zahl von Halbtönen. Zieltonhöhe bringt deine durchschnittliche Tonhöhe auf eine Frequenz, sodass z. B. eine Frauenstimme gleich hoch herauskommt, egal ob deine eigene Stimme tief oder hoch ist. Sie folgt deiner durchschnittlichen Tonhöhe, nimm zum Singen daher Verschieben.",
+      targetPitch:
+        "Die Tonhöhe, die deine Stimme im Durchschnitt haben soll. Typische Sprechstimmen liegen bei etwa 120 Hz für Männer, 210 Hz für Frauen und 300 Hz für Kinder. Deine Sprachmelodie bleibt erhalten.",
+      breathiness:
+        "Ersetzt einen Teil der Stimme durch Atemgeräusch, z. B. für eine hauchige, luftige oder ältere Stimme.",
+      wobble: "Lässt die Stimme leicht in Tonhöhe und Lautstärke zittern, wie bei einer älteren oder nervösen Stimme.",
+      pitch:
+        "Wie weit die Tonhöhe verschoben wird, in Halbtönen; 12 Halbtöne sind eine Oktave. Der Klangcharakter der Stimme bleibt gleich.",
+      formant:
+        "Verschiebt den Klangcharakter der Stimme (ihre Formanten), in Halbtönen: nach oben klingt sie kleiner, wie eine Frau oder ein Kind; nach unten größer, wie ein Mann oder ein Riese.",
+      mix: "Wie viel von der veränderten Stimme zu hören ist; der Rest ist die Originalstimme.",
       quality: "Höhere Werte klingen sauberer, erhöhen aber die Latenz und brauchen mehr CPU.",
     },
   },

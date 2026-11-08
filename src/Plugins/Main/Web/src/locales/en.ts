@@ -13,6 +13,7 @@ export const en = {
     equalizer: "Equalizer",
     filter: "Filter",
     pitch: "Pitch",
+    voiceChanger: "Voice changer",
     spectrum: "Spectrum",
   },
   descriptions: {
@@ -36,6 +37,8 @@ export const en = {
       "Changes the tone: boosts or cuts bass, mids or treble, e.g. to make a voice clearer or to correct headphones.",
     filter: "Removes the frequencies below or above a cutoff, e.g. low rumble from a microphone.",
     pitch: "Shifts the pitch up or down without changing the speed, e.g. to make a voice deeper or higher.",
+    voiceChanger:
+      "Changes a voice, e.g. from male to female, into a child's or a monster's: shifts its pitch and its character (formants) separately.",
     spectrum:
       "Shows which frequencies the audio contains, from bass on the left to treble on the right. The audio passes unchanged.",
   },
@@ -230,6 +233,62 @@ export const en = {
     quality: "Quality",
     info: {
       pitch: "How far the pitch is shifted, in semitones; 12 semitones are an octave. The speed stays the same.",
+      quality: "Higher values sound cleaner, but add latency and need more CPU.",
+    },
+  },
+  voiceChanger: {
+    preset: "Preset",
+    pitch: "Pitch",
+    formant: "Formant",
+    mix: "Mix",
+    quality: "Quality",
+    breathiness: "Breath",
+    wobble: "Wobble",
+    effect: "Effect",
+    mode: "Pitch mode",
+    targetPitch: "Target",
+    semitones: "{{value}} st",
+    presets: {
+      Custom: "Custom",
+      MaleToFemale: "Male to female",
+      FemaleToMale: "Female to male",
+      Child: "Child",
+      Old: "Old person",
+      Monster: "Monster",
+      Chipmunk: "Chipmunk",
+      Robot: "Robot",
+      Whisper: "Whisper",
+      Alien: "Alien",
+      Radio: "Radio",
+    },
+    effects: {
+      None: "No effect",
+      Robot: "Robot",
+      Whisper: "Whisper",
+      Alien: "Alien",
+      Radio: "Radio",
+      Monotone: "Monotone",
+      NoteSnap: "Snap to notes",
+    },
+    modes: {
+      Shift: "Shift by semitones",
+      Target: "Target pitch",
+    },
+    info: {
+      preset:
+        "A starting point for pitch, formant, breath, wobble and effect. Changing any of them afterwards makes it a custom setting.",
+      effect:
+        "Robot speaks on a single note (move it with the pitch), Whisper replaces the voice with breath, Alien adds a metallic ring, Radio sounds like a telephone or walkie-talkie, Monotone flattens your intonation and Snap to notes pulls the pitch to the nearest note, as in hard-tuned singing.",
+      mode: "Shift moves the pitch by a fixed number of semitones. Target moves your average pitch to a frequency, so e.g. a female voice comes out at the same height whether your own voice is deep or high. It follows your average pitch, so for singing use Shift.",
+      targetPitch:
+        "The pitch your voice should have on average. Typical speaking voices are about 120 Hz for men, 210 Hz for women and 300 Hz for children. Your intonation is kept.",
+      breathiness: "Replaces part of the voice with breath noise, e.g. for a breathy, airy or old voice.",
+      wobble: "Makes the voice shake slightly in pitch and volume, like an old or nervous voice.",
+      pitch:
+        "How far the pitch is shifted, in semitones; 12 semitones are an octave. The character of the voice stays the same.",
+      formant:
+        "Shifts the character of the voice (its formants), in semitones: up sounds smaller, like a woman or a child; down sounds larger, like a man or a giant.",
+      mix: "How much of the changed voice is heard; the rest is the original voice.",
       quality: "Higher values sound cleaner, but add latency and need more CPU.",
     },
   },
