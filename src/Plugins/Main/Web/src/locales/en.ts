@@ -242,17 +242,37 @@ export const en = {
     formant: "Formant",
     mix: "Mix",
     quality: "Quality",
+    breathiness: "Breath",
+    wobble: "Wobble",
+    effect: "Effect",
     semitones: "{{value}} st",
     presets: {
       Custom: "Custom",
       MaleToFemale: "Male to female",
       FemaleToMale: "Female to male",
       Child: "Child",
+      Old: "Old person",
       Monster: "Monster",
       Chipmunk: "Chipmunk",
+      Robot: "Robot",
+      Whisper: "Whisper",
+      Alien: "Alien",
+      Radio: "Radio",
+    },
+    effects: {
+      None: "No effect",
+      Robot: "Robot",
+      Whisper: "Whisper",
+      Alien: "Alien",
+      Radio: "Radio",
     },
     info: {
-      preset: "A starting point for pitch and formant. Changing either of them afterwards makes it a custom setting.",
+      preset:
+        "A starting point for pitch, formant, breath, wobble and effect. Changing any of them afterwards makes it a custom setting.",
+      effect:
+        "Robot speaks on a single note (move it with the pitch), Whisper replaces the voice with breath, Alien adds a metallic ring and Radio sounds like a telephone or walkie-talkie.",
+      breathiness: "Replaces part of the voice with breath noise, e.g. for a breathy, airy or old voice.",
+      wobble: "Makes the voice shake slightly in pitch and volume, like an old or nervous voice.",
       pitch:
         "How far the pitch is shifted, in semitones; 12 semitones are an octave. The character of the voice stays the same.",
       formant:

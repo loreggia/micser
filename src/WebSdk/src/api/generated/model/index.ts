@@ -102,3 +102,4 @@ export * from './updateCablesRequest';
 export * from './virtualCablesDto';
 export * from './voiceChangerPreset';
 export * from './voiceChangerState';
+export * from './voiceEffect';

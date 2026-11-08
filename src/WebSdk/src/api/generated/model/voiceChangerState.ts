@@ -5,11 +5,15 @@
  * OpenAPI spec version: 1.0.0
  */
 import type { VoiceChangerPreset } from './voiceChangerPreset';
+import type { VoiceEffect } from './voiceEffect';
 
 export interface VoiceChangerState {
   preset: VoiceChangerPreset;
   pitch: number;
   formant: number;
+  breathiness: number;
+  wobble: number;
+  effect: VoiceEffect;
   mix: number;
   quality: number;
 }

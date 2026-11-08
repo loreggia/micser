@@ -250,18 +250,38 @@ export const de: Translations<typeof en> = {
     formant: "Formant",
     mix: "Mischung",
     quality: "Qualität",
+    breathiness: "Atem",
+    wobble: "Zittern",
+    effect: "Effekt",
     semitones: "{{value}} HT",
     presets: {
       Custom: "Benutzerdefiniert",
       MaleToFemale: "Männlich zu weiblich",
       FemaleToMale: "Weiblich zu männlich",
       Child: "Kind",
+      Old: "Ältere Person",
       Monster: "Monster",
       Chipmunk: "Streifenhörnchen",
+      Robot: "Roboter",
+      Whisper: "Flüstern",
+      Alien: "Außerirdischer",
+      Radio: "Funk",
+    },
+    effects: {
+      None: "Kein Effekt",
+      Robot: "Roboter",
+      Whisper: "Flüstern",
+      Alien: "Außerirdischer",
+      Radio: "Funk",
     },
     info: {
       preset:
-        "Ein Ausgangspunkt für Tonhöhe und Formant. Wird einer davon danach geändert, ist es eine benutzerdefinierte Einstellung.",
+        "Ein Ausgangspunkt für Tonhöhe, Formant, Atem, Zittern und Effekt. Wird einer davon danach geändert, ist es eine benutzerdefinierte Einstellung.",
+      effect:
+        "Roboter spricht auf einem einzigen Ton (mit der Tonhöhe verschiebbar), Flüstern ersetzt die Stimme durch Atem, Außerirdischer fügt einen metallischen Klang hinzu und Funk klingt wie ein Telefon oder Walkie-Talkie.",
+      breathiness:
+        "Ersetzt einen Teil der Stimme durch Atemgeräusch, z. B. für eine hauchige, luftige oder ältere Stimme.",
+      wobble: "Lässt die Stimme leicht in Tonhöhe und Lautstärke zittern, wie bei einer älteren oder nervösen Stimme.",
       pitch:
         "Wie weit die Tonhöhe verschoben wird, in Halbtönen; 12 Halbtöne sind eine Oktave. Der Klangcharakter der Stimme bleibt gleich.",
       formant:

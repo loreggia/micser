@@ -9,6 +9,9 @@ const state: VoiceChangerState = {
   preset: "MaleToFemale",
   pitch: 6,
   formant: 3,
+  breathiness: 0.2,
+  wobble: 0.1,
+  effect: "None",
   mix: 0.8,
   quality: 5,
 };
@@ -30,16 +33,53 @@ test("shows the parameters", async () => {
   await expect.element(screen.getByRole("combobox", { name: "Preset" })).toHaveTextContent("Male to female");
   await expect.element(screen.getByText("+6 st", { exact: true })).toBeVisible();
   await expect.element(screen.getByText("+3 st", { exact: true })).toBeVisible();
+  await expect.element(screen.getByText("20%", { exact: true })).toBeVisible();
+  await expect.element(screen.getByText("10%", { exact: true })).toBeVisible();
   await expect.element(screen.getByText("80%", { exact: true })).toBeVisible();
+  await expect.element(screen.getByRole("combobox", { name: "Effect" })).toHaveTextContent("No effect");
 });
 
-test("a preset sets pitch and formant and keeps mix and quality", async () => {
+test("a preset sets its parameters and keeps mix and quality", async () => {
   const { screen, setState } = await renderVoiceChanger();
 
   await screen.getByRole("combobox", { name: "Preset" }).click();
   await screen.getByRole("option", { name: "Monster" }).click();
 
-  expect(setState).toHaveBeenCalledWith({ ...state, preset: "Monster", pitch: -12, formant: -6 });
+  expect(setState).toHaveBeenCalledWith({
+    ...state,
+    preset: "Monster",
+    pitch: -12,
+    formant: -6,
+    breathiness: 0,
+    wobble: 0,
+    effect: "None",
+  });
+});
+
+test("the robot preset sets the robot effect", async () => {
+  const { screen, setState } = await renderVoiceChanger();
+
+  await screen.getByRole("combobox", { name: "Preset" }).click();
+  await screen.getByRole("option", { name: "Robot" }).click();
+
+  expect(setState).toHaveBeenCalledWith({
+    ...state,
+    preset: "Robot",
+    pitch: 2,
+    formant: -2,
+    breathiness: 0,
+    wobble: 0,
+    effect: "Robot",
+  });
+});
+
+test("changing the effect makes it custom", async () => {
+  const { screen, setState } = await renderVoiceChanger();
+
+  await screen.getByRole("combobox", { name: "Effect" }).click();
+  await screen.getByRole("option", { name: "Radio" }).click();
+
+  expect(setState).toHaveBeenCalledWith({ ...state, preset: "Custom", effect: "Radio" });
 });
 
 test("custom keeps the parameters", async () => {

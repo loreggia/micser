@@ -4188,7 +4188,12 @@
           "FemaleToMale",
           "Child",
           "Monster",
-          "Chipmunk"
+          "Chipmunk",
+          "Old",
+          "Robot",
+          "Whisper",
+          "Alien",
+          "Radio"
         ],
         "default": "Custom"
       },
@@ -4197,6 +4202,9 @@
           "preset",
           "pitch",
           "formant",
+          "breathiness",
+          "wobble",
+          "effect",
           "mix",
           "quality"
         ],
@@ -4215,6 +4223,19 @@
             "format": "float",
             "default": 0
           },
+          "breathiness": {
+            "type": "number",
+            "format": "float",
+            "default": 0
+          },
+          "wobble": {
+            "type": "number",
+            "format": "float",
+            "default": 0
+          },
+          "effect": {
+            "$ref": "#/components/schemas/VoiceEffect"
+          },
           "mix": {
             "type": "number",
             "format": "float",
@@ -4226,6 +4247,16 @@
             "default": 6
           }
         }
+      },
+      "VoiceEffect": {
+        "enum": [
+          "None",
+          "Robot",
+          "Whisper",
+          "Alien",
+          "Radio"
+        ],
+        "default": "None"
       }
     }
   },

@@ -15,4 +15,9 @@ export const VoiceChangerPreset = {
   Child: 'Child',
   Monster: 'Monster',
   Chipmunk: 'Chipmunk',
+  Old: 'Old',
+  Robot: 'Robot',
+  Whisper: 'Whisper',
+  Alien: 'Alien',
+  Radio: 'Radio',
 } as const;

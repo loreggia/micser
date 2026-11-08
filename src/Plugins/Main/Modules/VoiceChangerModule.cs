@@ -19,31 +19,68 @@ public enum VoiceChangerPreset
     Child,
     Monster,
     Chipmunk,
+    Old,
+    Robot,
+    Whisper,
+    Alien,
+    Radio,
+}
+
+public enum VoiceEffect
+{
+    None,
+
+    /// <summary>
+    /// A monotone voice on one note: 110 Hz moved by the pitch shift.
+    /// </summary>
+    Robot,
+
+    /// <summary>
+    /// Breath noise shaped like the voice instead of its harmonics.
+    /// </summary>
+    Whisper,
+
+    /// <summary>
+    /// A ring modulator at 220 Hz on the output.
+    /// </summary>
+    Alien,
+
+    /// <summary>
+    /// A telephone band (300 to 3400 Hz) with soft clipping on the output.
+    /// </summary>
+    Radio,
 }
 
 /// <param name="Preset">The preset the parameters came from, <see cref="VoiceChangerPreset.Custom"/> once they were changed.</param>
 /// <param name="Pitch">Pitch shift in semitones; the formants stay unless <paramref name="Formant"/> moves them.</param>
 /// <param name="Formant">Formant shift in semitones: positive values sound smaller (female, child), negative larger (male, giant).</param>
-/// <param name="Mix">0 (dry) .. 1 (only the changed voice).</param>
+/// <param name="Breathiness">0 .. 1: replaces part of the harmonics with breath noise.</param>
+/// <param name="Wobble">0 .. 1: the depth of a slow vibrato and tremolo, as in a shaky, old voice.</param>
+/// <param name="Effect">A character effect: Robot and Whisper change the synthesis, Alien and Radio the whole output.</param>
+/// <param name="Mix">0 (dry) .. 1 (only the changed voice); Alien and Radio apply to the mix.</param>
 /// <param name="Quality">1..10; higher values use larger FFTs and more overlap: better quality, more latency and CPU.</param>
 public sealed record VoiceChangerState(
     VoiceChangerPreset Preset = VoiceChangerPreset.Custom,
     [Range(-24f, 24f)] float Pitch = 0f,
     [Range(-12f, 12f)] float Formant = 0f,
+    [Range(0f, 1f)] float Breathiness = 0f,
+    [Range(0f, 1f)] float Wobble = 0f,
+    VoiceEffect Effect = VoiceEffect.None,
     [Range(0f, 1f)] float Mix = 1f,
     [Range(1, 10)] int Quality = 6
 );
 
 /// <summary>
-/// Changes a voice by shifting its pitch and its formants independently (STFT-based, one shifter per channel). The parameters are
-/// replaced as a whole, so a preset applies in one block.
+/// Changes a voice by shifting its pitch and its formants independently (STFT-based, one shifter per channel), with breath, wobble and
+/// character effects. The parameters are replaced as a whole, so a preset applies in one block.
 /// </summary>
 public class VoiceChangerModule : EffectModule, IStatefulModule<VoiceChangerState>
 {
     private const int MaxFftSize = 4096;
     private int _appliedChannels;
 
-    // one per channel, grown with the channel count
+    // one each per channel, grown with the channel count
+    private VoicePostEffect[] _postEffects = [];
     private VoiceShifter[] _shifters = [];
     private VoiceChangerState _state = new();
 
@@ -84,12 +121,31 @@ public class VoiceChangerModule : EffectModule, IStatefulModule<VoiceChangerStat
     protected override void Process(AudioBuffer buffer)
     {
         var state = _state;
-        if ((state.Pitch == 0f && state.Formant == 0f) || state.Mix <= 0f)
+        var effect = state.Effect;
+        var mix = Math.Clamp(state.Mix, 0f, 1f);
+        var breathiness = Math.Clamp(state.Breathiness, 0f, 1f);
+        var wobble = Math.Clamp(state.Wobble, 0f, 1f);
+        var texture = effect switch
+        {
+            VoiceEffect.Robot => VoiceTexture.Robot,
+            VoiceEffect.Whisper => VoiceTexture.Whisper,
+            _ => VoiceTexture.Voiced,
+        };
+        var shift =
+            mix > 0f
+            && (
+                state.Pitch != 0f
+                || state.Formant != 0f
+                || breathiness > 0f
+                || wobble > 0f
+                || texture != VoiceTexture.Voiced
+            );
+        var post = effect is VoiceEffect.Alien or VoiceEffect.Radio;
+        if (!shift && !post)
         {
             return;
         }
 
-        var (fftSize, oversampling) = GetFftSettings(state.Quality, Format.SampleRate);
         var channelCount = buffer.ChannelCount;
         EnsureChannels(channelCount);
 
@@ -100,15 +156,30 @@ public class VoiceChangerModule : EffectModule, IStatefulModule<VoiceChangerStat
             for (var c = 0; c < channelCount; c++)
             {
                 _shifters[c].Reset();
+                _postEffects[c].Reset();
             }
         }
 
-        var pitch = GetFactor(Math.Clamp(state.Pitch, -24f, 24f));
-        var formant = GetFactor(Math.Clamp(state.Formant, -12f, 12f));
-        var mix = Math.Clamp(state.Mix, 0f, 1f);
+        if (shift)
+        {
+            var (fftSize, oversampling) = GetFftSettings(state.Quality, Format.SampleRate);
+            var parameters = new VoiceParameters(
+                GetFactor(Math.Clamp(state.Pitch, -24f, 24f)),
+                GetFactor(Math.Clamp(state.Formant, -12f, 12f)),
+                mix,
+                breathiness,
+                wobble,
+                texture
+            );
+            for (var c = 0; c < channelCount; c++)
+            {
+                _shifters[c].Process(parameters, fftSize, oversampling, Format.SampleRate, buffer.GetChannel(c));
+            }
+        }
+
         for (var c = 0; c < channelCount; c++)
         {
-            _shifters[c].Process(pitch, formant, mix, fftSize, oversampling, Format.SampleRate, buffer.GetChannel(c));
+            _postEffects[c].Process(effect, Format.SampleRate, buffer.GetChannel(c));
         }
     }
 
@@ -123,12 +194,16 @@ public class VoiceChangerModule : EffectModule, IStatefulModule<VoiceChangerStat
         }
 
         var shifters = new VoiceShifter[channelCount];
+        var postEffects = new VoicePostEffect[channelCount];
         _shifters.CopyTo(shifters, 0);
+        _postEffects.CopyTo(postEffects, 0);
         for (var c = _shifters.Length; c < channelCount; c++)
         {
             shifters[c] = new VoiceShifter(MaxFftSize);
+            postEffects[c] = new VoicePostEffect();
         }
 
         _shifters = shifters;
+        _postEffects = postEffects;
     }
 }

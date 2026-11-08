@@ -41,6 +41,18 @@ public class VoiceChangerModuleTests
     }
 
     [Test]
+    public async Task Radio_WithoutShift_StillFiltersTheOutput()
+    {
+        var module = new VoiceChangerModule();
+        module.SetState(new VoiceChangerState(Effect: VoiceEffect.Radio));
+        var bench = new SignalTestBench(100, 0.05f, null, module);
+
+        var output = bench.Run(TimeSpan.FromMilliseconds(500));
+
+        await Assert.That(SignalTestBench.Peak(output.AsSpan(output.Length / 2))).IsLessThan(0.05f / 4f);
+    }
+
+    [Test]
     public async Task Chipmunk_DoublesFrequency()
     {
         var module = new VoiceChangerModule();
