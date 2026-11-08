@@ -70,7 +70,7 @@ Both update themselves from the GitHub releases.
 
 ### Requirements
 
-- .NET SDK 10.0.100 or later (see `global.json`)
+- .NET SDK 10.0.403 or later (see `global.json`)
 - Node.js 26 and npm 12 (npm enforces both; Node 26 ships npm 11, so `npm install -g npm@12`); with [Volta](https://volta.sh), the versions pinned in `package.json` are used
 - Windows: WebView2 Runtime (included in Windows 11)
 - Linux: PipeWire and WebKitGTK 4.1 to run the engine and the shell; [PowerShell](https://learn.microsoft.com/powershell/scripting/install/install-ubuntu) for `scripts/pack.ps1`

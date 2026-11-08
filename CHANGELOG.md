@@ -8,7 +8,7 @@ Collect changes under "Unreleased". Before tagging vX.Y.Z, rename that heading t
 from that section, and the release workflow fails without it.
 -->
 
-## Unreleased
+## 0.21.0 - 2026-11-08
 
 - New Voice changer module: changes a voice from male to female or back, into a child's, a monster's or a chipmunk's. It shifts the
   pitch and the character of the voice (formants) separately, so voices sound natural instead of sped up or slowed down. Breath,
