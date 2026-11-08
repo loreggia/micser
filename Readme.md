@@ -49,6 +49,7 @@ Both update themselves from the GitHub releases.
     corrections)
   - high-pass and low-pass filter, compressor, limiter, noise gate, ducker (with a sidechain input), delay, pitch shifter and stereo tools
     (swap, mono, width, balance, polarity)
+  - voice changer that shifts pitch and formants separately, with presets (male to female and back, child, monster, chipmunk)
   - spectrum analyzer, and frequency response graphs for the equalizer and the filter
   - every module has a volume and mute, which can follow the system volume, so the volume keys also control routes into virtual cables
     and other devices; effects can be bypassed

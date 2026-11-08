@@ -13,6 +13,7 @@ export const en = {
     equalizer: "Equalizer",
     filter: "Filter",
     pitch: "Pitch",
+    voiceChanger: "Voice changer",
     spectrum: "Spectrum",
   },
   descriptions: {
@@ -36,6 +37,8 @@ export const en = {
       "Changes the tone: boosts or cuts bass, mids or treble, e.g. to make a voice clearer or to correct headphones.",
     filter: "Removes the frequencies below or above a cutoff, e.g. low rumble from a microphone.",
     pitch: "Shifts the pitch up or down without changing the speed, e.g. to make a voice deeper or higher.",
+    voiceChanger:
+      "Changes a voice, e.g. from male to female, into a child's or a monster's: shifts its pitch and its character (formants) separately.",
     spectrum:
       "Shows which frequencies the audio contains, from bass on the left to treble on the right. The audio passes unchanged.",
   },
@@ -230,6 +233,31 @@ export const en = {
     quality: "Quality",
     info: {
       pitch: "How far the pitch is shifted, in semitones; 12 semitones are an octave. The speed stays the same.",
+      quality: "Higher values sound cleaner, but add latency and need more CPU.",
+    },
+  },
+  voiceChanger: {
+    preset: "Preset",
+    pitch: "Pitch",
+    formant: "Formant",
+    mix: "Mix",
+    quality: "Quality",
+    semitones: "{{value}} st",
+    presets: {
+      Custom: "Custom",
+      MaleToFemale: "Male to female",
+      FemaleToMale: "Female to male",
+      Child: "Child",
+      Monster: "Monster",
+      Chipmunk: "Chipmunk",
+    },
+    info: {
+      preset: "A starting point for pitch and formant. Changing either of them afterwards makes it a custom setting.",
+      pitch:
+        "How far the pitch is shifted, in semitones; 12 semitones are an octave. The character of the voice stays the same.",
+      formant:
+        "Shifts the character of the voice (its formants), in semitones: up sounds smaller, like a woman or a child; down sounds larger, like a man or a giant.",
+      mix: "How much of the changed voice is heard; the rest is the original voice.",
       quality: "Higher values sound cleaner, but add latency and need more CPU.",
     },
   },

@@ -12,9 +12,9 @@ public class ModuleStateTests
         new MainPlugin().ConfigureServices(services);
         var definitions = services.Select(d => d.ImplementationInstance).OfType<AudioModuleDefinition>().ToArray();
 
-        await Assert.That(definitions).Count().IsEqualTo(14);
-        await Assert.That(definitions.Select(d => d.Type).Distinct()).Count().IsEqualTo(14);
-        await Assert.That(definitions.Select(d => d.StateType).Distinct()).Count().IsEqualTo(14);
+        await Assert.That(definitions).Count().IsEqualTo(15);
+        await Assert.That(definitions.Select(d => d.Type).Distinct()).Count().IsEqualTo(15);
+        await Assert.That(definitions.Select(d => d.StateType).Distinct()).Count().IsEqualTo(15);
     }
 
     [Test]
@@ -28,6 +28,7 @@ public class ModuleStateTests
         await Assert.That(new LimiterModule().GetState()).IsEqualTo(new LimiterState());
         await Assert.That(new FilterModule().GetState()).IsEqualTo(new FilterState());
         await Assert.That(new PitchModule().GetState()).IsEqualTo(new PitchState());
+        await Assert.That(new VoiceChangerModule().GetState()).IsEqualTo(new VoiceChangerState());
     }
 
     [Test]

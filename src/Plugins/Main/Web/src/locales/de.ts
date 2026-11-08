@@ -16,6 +16,7 @@ export const de: Translations<typeof en> = {
     equalizer: "Equalizer",
     filter: "Filter",
     pitch: "Tonhöhe",
+    voiceChanger: "Stimmveränderer",
     spectrum: "Spektrum",
   },
   descriptions: {
@@ -41,6 +42,8 @@ export const de: Translations<typeof en> = {
     filter: "Entfernt die Frequenzen unter oder über einer Grenzfrequenz, z. B. tiefes Rumpeln eines Mikrofons.",
     pitch:
       "Verschiebt die Tonhöhe nach oben oder unten, ohne das Tempo zu ändern, z. B. für eine tiefere oder höhere Stimme.",
+    voiceChanger:
+      "Verändert eine Stimme, z. B. von männlich zu weiblich, in eine Kinder- oder Monsterstimme: verschiebt Tonhöhe und Klangcharakter (Formanten) getrennt.",
     spectrum:
       "Zeigt, welche Frequenzen der Ton enthält, von Bässen links bis zu Höhen rechts. Der Ton bleibt unverändert.",
   },
@@ -238,6 +241,32 @@ export const de: Translations<typeof en> = {
     info: {
       pitch:
         "Wie weit die Tonhöhe verschoben wird, in Halbtönen; 12 Halbtöne sind eine Oktave. Das Tempo bleibt gleich.",
+      quality: "Höhere Werte klingen sauberer, erhöhen aber die Latenz und brauchen mehr CPU.",
+    },
+  },
+  voiceChanger: {
+    preset: "Voreinstellung",
+    pitch: "Tonhöhe",
+    formant: "Formant",
+    mix: "Mischung",
+    quality: "Qualität",
+    semitones: "{{value}} HT",
+    presets: {
+      Custom: "Benutzerdefiniert",
+      MaleToFemale: "Männlich zu weiblich",
+      FemaleToMale: "Weiblich zu männlich",
+      Child: "Kind",
+      Monster: "Monster",
+      Chipmunk: "Streifenhörnchen",
+    },
+    info: {
+      preset:
+        "Ein Ausgangspunkt für Tonhöhe und Formant. Wird einer davon danach geändert, ist es eine benutzerdefinierte Einstellung.",
+      pitch:
+        "Wie weit die Tonhöhe verschoben wird, in Halbtönen; 12 Halbtöne sind eine Oktave. Der Klangcharakter der Stimme bleibt gleich.",
+      formant:
+        "Verschiebt den Klangcharakter der Stimme (ihre Formanten), in Halbtönen: nach oben klingt sie kleiner, wie eine Frau oder ein Kind; nach unten größer, wie ein Mann oder ein Riese.",
+      mix: "Wie viel von der veränderten Stimme zu hören ist; der Rest ist die Originalstimme.",
       quality: "Höhere Werte klingen sauberer, erhöhen aber die Latenz und brauchen mehr CPU.",
     },
   },

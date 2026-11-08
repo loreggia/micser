@@ -77,6 +77,7 @@ public class ModuleApiTests
                 "Equalizer",
                 "Filter",
                 "Pitch",
+                "VoiceChanger",
                 "Spectrum",
             ]);
         await Assert.That(gain["inputs"]!.AsArray().Select(p => (string)p!)).IsEquivalentTo(["Input"]);
@@ -109,6 +110,7 @@ public class ModuleApiTests
                 "Equalizer",
                 "Filter",
                 "Pitch",
+                "VoiceChanger",
                 "Spectrum",
             ]);
         await Assert.That(types!.Single(t => t.Type == "Gain").ChannelCountInputs).IsEquivalentTo(["Input"]);
