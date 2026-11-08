@@ -1,16 +1,28 @@
 # Micser
 
-Micser is a modular audio routing application for Windows and Linux.
+Micser is a modular audio routing and effect application for Windows and Linux.
 
 The application consists of:
 
 - an audio engine that runs as a background process in the user's session and exposes a local HTTP API
 - a web UI (React) for routing audio graphically using widgets, hosted in a small tray application (Avalonia, with WebView2 on Windows
   and WebKitGTK on Linux)
+  - the UI closes when minimized to the system tray to minimize memory usage
 - virtual audio cables with a configurable number of devices: on Windows a driver (WIP, still requires an extended validation code signing
   certificate), on Linux PipeWire devices that the engine creates itself
 
 [![micser CI](https://github.com/loreggia/micser/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/loreggia/micser/actions/workflows/ci.yml?query=branch%3Amain)
+
+## Showcase
+
+![Loopback/Night Mode/Output](docs/screenshots/loopback-nightmode-output.png)
+_Loopback / Night Mode template / Output_
+
+![Single channel routing](docs/screenshots/single-channel-routing.png)
+_Single channel routing_
+
+![Themes](docs/screenshots/themes.png)
+_Different light and dark themes (including high-contrast options)_
 
 ## Installation
 
@@ -23,6 +35,33 @@ Grab the latest release from the [Releases](https://github.com/loreggia/micser/r
   ("Desktop"). On GNOME, the tray icon needs the AppIndicator extension.
 
 Both update themselves from the GitHub releases.
+
+## Features
+
+- **Graphical routing:** connect inputs, effects and outputs by dragging between their connectors; any output can feed several inputs and
+  vice versa. The audio keeps running while the UI is closed.
+- **Single channel routing:** show a module's channels to route each channel on its own, e.g. the channels of an audio interface that has
+  them all on one device. Effects can be set to a fixed channel layout (mono, stereo, quad, 5.1, 7.1 or up to 64 channels).
+- **Modules:**
+  - device input, loopback input (capture what a device plays) and device output
+  - gain
+  - equalizer with peaking, shelf and pass bands and a preamp, which can import Equalizer APO configurations (e.g. AutoEQ headphone
+    corrections)
+  - high-pass and low-pass filter, compressor, limiter, noise gate, ducker (with a sidechain input), delay, pitch shifter and stereo tools
+    (swap, mono, width, balance, polarity)
+  - spectrum analyzer, and frequency response graphs for the equalizer and the filter
+  - every module has a volume and mute, which can follow the system volume, so the volume keys also control routes into virtual cables
+    and other devices; effects can be bypassed
+  - knobs take typed values such as "2.5k", and info buttons explain each module and setting
+- **Subgraphs and templates:** group modules into subgraphs that can be collapsed, muted and bypassed as a whole, and save them as
+  templates to reuse. Built-in templates: "Footstep boost", "Night mode", "Music ducking" and "Voice chat mic". Subgraphs
+  created from a template can be updated when it changes.
+- **Virtual audio cables** to route audio between applications (built in on Linux, the Windows driver is still WIP).
+- **Plugins** add new modules and their widgets (see [Plugins](#plugins)).
+- **Configuration export and import**, e.g. as a backup or to move to another computer.
+- **Themes:** default, blue, purple and high contrast, each light or dark, or following the system.
+- **Languages:** English and German.
+- **Automatic updates** from the GitHub releases, with release notes in the app, and an optional start at login.
 
 ## Building
 
