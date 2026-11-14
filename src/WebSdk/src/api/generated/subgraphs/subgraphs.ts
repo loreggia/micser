@@ -131,7 +131,6 @@ export function useGetSubgraphs<TData = Awaited<ReturnType<typeof getSubgraphs>>
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSubgraphs>>, TError, TData>>, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
 export function useGetSubgraphs<TData = Awaited<ReturnType<typeof getSubgraphs>>, TError = unknown>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSubgraphs>>, TError, TData>>, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient
@@ -223,7 +222,8 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type CreateSubgraphMutationError = unknown
     export type CreateSubgraphMutationVariables = {data: CreateSubgraphRequest}
 
-    export const useCreateSubgraph = <TError = unknown,
+    /** Creates a subgraph and moves the modules into it. */
+export const useCreateSubgraph = <TError = unknown,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createSubgraph>>, TError,CreateSubgraphMutationVariables, TContext>, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof createSubgraph>>,
@@ -384,7 +384,8 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type DeleteSubgraphMutationError = void
     export type DeleteSubgraphMutationVariables = {id: string;params?: DeleteSubgraphParams}
 
-    export const useDeleteSubgraph = <TError = void,
+    /** Removes a subgraph. Its modules stay in the graph, or are removed with their connections if deleteModules is true. */
+export const useDeleteSubgraph = <TError = void,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteSubgraph>>, TError,DeleteSubgraphMutationVariables, TContext>, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof deleteSubgraph>>,
@@ -454,7 +455,8 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type UpdateSubgraphFromTemplateMutationError = unknown
     export type UpdateSubgraphFromTemplateMutationVariables = {id: string}
 
-    export const useUpdateSubgraphFromTemplate = <TError = unknown,
+    /** Makes the subgraph match its template's current revision. */
+export const useUpdateSubgraphFromTemplate = <TError = unknown,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateSubgraphFromTemplate>>, TError,UpdateSubgraphFromTemplateMutationVariables, TContext>, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof updateSubgraphFromTemplate>>,

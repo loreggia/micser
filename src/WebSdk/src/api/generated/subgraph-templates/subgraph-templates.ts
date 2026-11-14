@@ -133,7 +133,6 @@ export function useGetSubgraphTemplates<TData = Awaited<ReturnType<typeof getSub
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSubgraphTemplates>>, TError, TData>>, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
 export function useGetSubgraphTemplates<TData = Awaited<ReturnType<typeof getSubgraphTemplates>>, TError = unknown>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getSubgraphTemplates>>, TError, TData>>, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient
@@ -225,7 +224,8 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type SaveSubgraphTemplateMutationError = unknown
     export type SaveSubgraphTemplateMutationVariables = {data: SaveSubgraphTemplateRequest}
 
-    export const useSaveSubgraphTemplate = <TError = unknown,
+    /** Saves a subgraph as a new template, or over the template with the given id. */
+export const useSaveSubgraphTemplate = <TError = unknown,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof saveSubgraphTemplate>>, TError,SaveSubgraphTemplateMutationVariables, TContext>, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof saveSubgraphTemplate>>,
@@ -377,7 +377,8 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type DeleteSubgraphTemplateMutationError = void
     export type DeleteSubgraphTemplateMutationVariables = {id: string}
 
-    export const useDeleteSubgraphTemplate = <TError = void,
+    /** Removes a template; the subgraphs created from it stay. */
+export const useDeleteSubgraphTemplate = <TError = void,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof deleteSubgraphTemplate>>, TError,DeleteSubgraphTemplateMutationVariables, TContext>, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof deleteSubgraphTemplate>>,
@@ -462,7 +463,8 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type InstantiateSubgraphTemplateMutationError = unknown
     export type InstantiateSubgraphTemplateMutationVariables = {id: string;data: InstantiateSubgraphTemplateRequest}
 
-    export const useInstantiateSubgraphTemplate = <TError = unknown,
+    /** Creates a subgraph with the template's modules and connections. */
+export const useInstantiateSubgraphTemplate = <TError = unknown,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof instantiateSubgraphTemplate>>, TError,InstantiateSubgraphTemplateMutationVariables, TContext>, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof instantiateSubgraphTemplate>>,

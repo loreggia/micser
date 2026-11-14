@@ -111,6 +111,7 @@ export type ExportConfigurationQueryResult = NonNullable<Awaited<ReturnType<type
 export type ExportConfigurationQueryError = unknown
 
 
+/** The configuration as the engine saves it: modules, connections, subgraphs, the user's templates, settings and preferences. */
 export function useExportConfiguration<TData = Awaited<ReturnType<typeof exportConfiguration>>, TError = unknown>(
   options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportConfiguration>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
@@ -121,6 +122,7 @@ export function useExportConfiguration<TData = Awaited<ReturnType<typeof exportC
       >, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/** The configuration as the engine saves it: modules, connections, subgraphs, the user's templates, settings and preferences. */
 export function useExportConfiguration<TData = Awaited<ReturnType<typeof exportConfiguration>>, TError = unknown>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportConfiguration>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
@@ -131,11 +133,12 @@ export function useExportConfiguration<TData = Awaited<ReturnType<typeof exportC
       >, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/** The configuration as the engine saves it: modules, connections, subgraphs, the user's templates, settings and preferences. */
 export function useExportConfiguration<TData = Awaited<ReturnType<typeof exportConfiguration>>, TError = unknown>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportConfiguration>>, TError, TData>>, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
+/** The configuration as the engine saves it: modules, connections, subgraphs, the user's templates, settings and preferences. */
 export function useExportConfiguration<TData = Awaited<ReturnType<typeof exportConfiguration>>, TError = unknown>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof exportConfiguration>>, TError, TData>>, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient
@@ -215,7 +218,8 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type ImportConfigurationMutationError = HttpValidationProblemDetails
     export type ImportConfigurationMutationVariables = {data: ImportConfigurationBody}
 
-    export const useImportConfiguration = <TError = HttpValidationProblemDetails,
+    /** Replaces the configuration with an exported one, after backing up the current one next to the configuration file. Invalid entries are skipped. */
+export const useImportConfiguration = <TError = HttpValidationProblemDetails,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof importConfiguration>>, TError,ImportConfigurationMutationVariables, TContext>, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof importConfiguration>>,

@@ -132,7 +132,6 @@ export function useGetModuleTypes<TData = Awaited<ReturnType<typeof getModuleTyp
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getModuleTypes>>, TError, TData>>, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
 export function useGetModuleTypes<TData = Awaited<ReturnType<typeof getModuleTypes>>, TError = unknown>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getModuleTypes>>, TError, TData>>, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient
@@ -205,6 +204,7 @@ export type GetPortLayoutsQueryResult = NonNullable<Awaited<ReturnType<typeof ge
 export type GetPortLayoutsQueryError = unknown
 
 
+/** The channel layouts of all modules' ports in the last processed block; changes are pushed as PortLayoutsChanged. */
 export function useGetPortLayouts<TData = Awaited<ReturnType<typeof getPortLayouts>>, TError = unknown>(
   options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPortLayouts>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
@@ -215,6 +215,7 @@ export function useGetPortLayouts<TData = Awaited<ReturnType<typeof getPortLayou
       >, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/** The channel layouts of all modules' ports in the last processed block; changes are pushed as PortLayoutsChanged. */
 export function useGetPortLayouts<TData = Awaited<ReturnType<typeof getPortLayouts>>, TError = unknown>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPortLayouts>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
@@ -225,11 +226,12 @@ export function useGetPortLayouts<TData = Awaited<ReturnType<typeof getPortLayou
       >, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/** The channel layouts of all modules' ports in the last processed block; changes are pushed as PortLayoutsChanged. */
 export function useGetPortLayouts<TData = Awaited<ReturnType<typeof getPortLayouts>>, TError = unknown>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPortLayouts>>, TError, TData>>, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
+/** The channel layouts of all modules' ports in the last processed block; changes are pushed as PortLayoutsChanged. */
 export function useGetPortLayouts<TData = Awaited<ReturnType<typeof getPortLayouts>>, TError = unknown>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPortLayouts>>, TError, TData>>, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient
@@ -323,7 +325,6 @@ export function useGetModules<TData = Awaited<ReturnType<typeof getModules>>, TE
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getModules>>, TError, TData>>, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
 export function useGetModules<TData = Awaited<ReturnType<typeof getModules>>, TError = unknown>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getModules>>, TError, TData>>, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient
@@ -498,7 +499,6 @@ export function useGetModule<TData = Awaited<ReturnType<typeof getModule>>, TErr
  id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getModule>>, TError, TData>>, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
 export function useGetModule<TData = Awaited<ReturnType<typeof getModule>>, TError = void>(
  id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getModule>>, TError, TData>>, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient

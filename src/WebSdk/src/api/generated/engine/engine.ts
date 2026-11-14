@@ -131,7 +131,6 @@ export function useGetHealth<TData = Awaited<ReturnType<typeof getHealth>>, TErr
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHealth>>, TError, TData>>, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
 export function useGetHealth<TData = Awaited<ReturnType<typeof getHealth>>, TError = unknown>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getHealth>>, TError, TData>>, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient
@@ -225,7 +224,6 @@ export function useGetEngineStatus<TData = Awaited<ReturnType<typeof getEngineSt
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEngineStatus>>, TError, TData>>, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
 export function useGetEngineStatus<TData = Awaited<ReturnType<typeof getEngineStatus>>, TError = unknown>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getEngineStatus>>, TError, TData>>, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient
@@ -437,7 +435,8 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type RestartAudioMutationError = unknown
 
 
-    export const useRestartAudio = <TError = unknown,
+    /** Rebuilds the audio graph, which reopens all device streams with fresh buffers. */
+export const useRestartAudio = <TError = unknown,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof restartAudio>>, TError,void, TContext>, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof restartAudio>>,
@@ -507,7 +506,8 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type ShutdownEngineMutationError = unknown
 
 
-    export const useShutdownEngine = <TError = unknown,
+    /** Stops the engine process gracefully; used by the shell's exit command. */
+export const useShutdownEngine = <TError = unknown,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof shutdownEngine>>, TError,void, TContext>, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof shutdownEngine>>,
