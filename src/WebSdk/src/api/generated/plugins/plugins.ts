@@ -130,7 +130,6 @@ export function useGetPlugins<TData = Awaited<ReturnType<typeof getPlugins>>, TE
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlugins>>, TError, TData>>, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
 export function useGetPlugins<TData = Awaited<ReturnType<typeof getPlugins>>, TError = unknown>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPlugins>>, TError, TData>>, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient
@@ -210,7 +209,8 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type InstallPluginMutationError = unknown
     export type InstallPluginMutationVariables = {data: InstallPluginBody}
 
-    export const useInstallPlugin = <TError = unknown,
+    /** Stages a plugin package (a zip with plugin.json at its root) for installation when the engine restarts. */
+export const useInstallPlugin = <TError = unknown,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof installPlugin>>, TError,InstallPluginMutationVariables, TContext>, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof installPlugin>>,
@@ -280,7 +280,8 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type RemovePluginMutationError = void
     export type RemovePluginMutationVariables = {id: string}
 
-    export const useRemovePlugin = <TError = void,
+    /** Stages a user plugin for removal when the engine restarts, or cancels its staged installation. */
+export const useRemovePlugin = <TError = void,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof removePlugin>>, TError,RemovePluginMutationVariables, TContext>, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof removePlugin>>,

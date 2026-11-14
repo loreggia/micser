@@ -129,7 +129,6 @@ export function useGetPreferences<TData = Awaited<ReturnType<typeof getPreferenc
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPreferences>>, TError, TData>>, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
 export function useGetPreferences<TData = Awaited<ReturnType<typeof getPreferences>>, TError = unknown>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getPreferences>>, TError, TData>>, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient

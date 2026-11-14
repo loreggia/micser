@@ -109,6 +109,7 @@ export type GetCablesQueryResult = NonNullable<Awaited<ReturnType<typeof getCabl
 export type GetCablesQueryError = unknown
 
 
+/** The virtual audio cables the engine creates, and whether it creates them on this platform. */
 export function useGetCables<TData = Awaited<ReturnType<typeof getCables>>, TError = unknown>(
   options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCables>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
@@ -119,6 +120,7 @@ export function useGetCables<TData = Awaited<ReturnType<typeof getCables>>, TErr
       >, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/** The virtual audio cables the engine creates, and whether it creates them on this platform. */
 export function useGetCables<TData = Awaited<ReturnType<typeof getCables>>, TError = unknown>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCables>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
@@ -129,11 +131,12 @@ export function useGetCables<TData = Awaited<ReturnType<typeof getCables>>, TErr
       >, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/** The virtual audio cables the engine creates, and whether it creates them on this platform. */
 export function useGetCables<TData = Awaited<ReturnType<typeof getCables>>, TError = unknown>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCables>>, TError, TData>>, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
+/** The virtual audio cables the engine creates, and whether it creates them on this platform. */
 export function useGetCables<TData = Awaited<ReturnType<typeof getCables>>, TError = unknown>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getCables>>, TError, TData>>, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient
@@ -225,7 +228,8 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
     export type UpdateCablesMutationError = unknown
     export type UpdateCablesMutationVariables = {data: UpdateCablesRequest}
 
-    export const useUpdateCables = <TError = unknown,
+    /** Creates, changes and removes the virtual audio cables and saves them; 400 where the engine doesn't create them (Windows). */
+export const useUpdateCables = <TError = unknown,
     TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof updateCables>>, TError,UpdateCablesMutationVariables, TContext>, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient): UseMutationResult<
         Awaited<ReturnType<typeof updateCables>>,

@@ -133,7 +133,6 @@ export function useGetDevices<TData = Awaited<ReturnType<typeof getDevices>>, TE
  params?: GetDevicesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDevices>>, TError, TData>>, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
 export function useGetDevices<TData = Awaited<ReturnType<typeof getDevices>>, TError = unknown>(
  params?: GetDevicesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getDevices>>, TError, TData>>, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient

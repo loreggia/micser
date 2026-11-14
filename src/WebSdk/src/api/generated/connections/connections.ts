@@ -130,7 +130,6 @@ export function useGetConnections<TData = Awaited<ReturnType<typeof getConnectio
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getConnections>>, TError, TData>>, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-
 export function useGetConnections<TData = Awaited<ReturnType<typeof getConnections>>, TError = unknown>(
   options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof getConnections>>, TError, TData>>, request?: SecondParameter<typeof engineFetch>}
  , queryClient?: QueryClient
