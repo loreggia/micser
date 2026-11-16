@@ -2,7 +2,7 @@
 
 This file provides guidance to AI coding agents when working with code in this repository.
 
-Micser is an audio router for Windows and Linux: a headless engine runs a graph of audio modules, a web UI edits it, and a tray shell hosts the UI. `docs/Architecture.md` describes how it is built (components, layout, dependencies, audio engine, API, UI, plugins, shell, packaging, VAC driver, testing). Read the relevant section before structural changes, and keep it up to date when the architecture changes. This file only holds commands and working rules.
+Micser is an audio router for Windows and Linux: a headless engine runs a graph of audio modules, a web UI edits it, and a tray shell hosts the UI. `docs/Architecture.md` describes how it is built (components, layout, dependencies, audio engine, API, UI, plugins, shell, packaging, cable driver, testing). Read the relevant section before structural changes, and keep it up to date when the architecture changes. This file only holds commands and working rules.
 
 ## Commands
 
@@ -47,9 +47,10 @@ dotnet run --project tools/AudioHarness -- alloc [Pitch ...] [--types]   # what 
 ```
 
 ```sh
-./scripts/build-vac.ps1 -Platform x64,ARM64       # VAC driver: restores the WDK NuGet packages, builds src/Vac, runs InfVerif
-./scripts/deploy-vac-vm.ps1 -TestSeconds 600      # installs the test-signed driver in the Hyper-V VM "DriverTesting" and runs the cable latency test
-./scripts/codeql-vac.ps1                          # Microsoft CodeQL driver checks (WHCP suites); fails on findings in src/Vac
+./scripts/build-driver.ps1 -Platform x64,ARM64      # cable driver: restores the WDK NuGet packages, builds src/CableDriver, runs InfVerif
+./scripts/deploy-driver-vm.ps1 -TestSeconds 600     # installs the test-signed driver in the Hyper-V VM "DriverTesting" and runs the cable latency test
+./scripts/codeql-driver.ps1                         # Microsoft CodeQL driver checks (WHCP suites); fails on findings in src/CableDriver
+# in the VM: powershell -ExecutionPolicy Bypass -File C:\MicserCable\cables.ps1 count 3   (or "layout 2 6"; shows the cables without arguments)
 ```
 
 ```sh
@@ -124,10 +125,13 @@ Tests (see "Testing"):
 - .NET tests put temporary files in a `TempDirectory` (`Micser.Tests.Common`), which deletes them on dispose.
 - End-to-end tests set up state through `EngineApi` and check results there, not only in the DOM. A test that changes what `reset()` doesn't undo (plugins) uses `test.use({ ownEngine: true })`. Shell-only controls are tested with `FakeShell`.
 
-Driver (`src/Vac`, see "VAC driver"):
+Driver (`src/CableDriver`, see "Cable driver"):
 
-- It isn't in `Micser.slnx`; build it with `scripts/build-vac.ps1`. Its `Directory.Build.props` replaces the root one.
-- Code that runs at DISPATCH_LEVEL (stream position updates, `CCable`) stays in `#pragma code_seg()` and touches only nonpaged memory.
+- It isn't in `Micser.slnx`; build it with `scripts/build-driver.ps1`. Its `Directory.Build.props` replaces the root one.
+- Don't name it, or anything user-visible, "Virtual Audio Cable" or "VAC": that's another product's trademark. It is "Micser Cable".
+- Code that runs at DISPATCH_LEVEL (the stream timer callback and what it calls, `CCable`) stays in `#pragma code_seg()` and touches only nonpaged memory.
+- A cable device adds its circuits once and never calls `AcxDeviceRemoveCircuit` (that deletes them; a restarted device would add deleted circuits).
+- The control interface's codes and structure exist twice: `public.h` and `DriverUtility`'s `CableControl.cs`; change both.
 - A change to a cable's format also needs the endpoints' stored device format set again (`DriverUtility`, `CableEndpoints`).
 - Keep the INX ASCII: as UTF-16 without BOM, inf2cat didn't recognize the stamped INF.
 - Test it in the VM, never on the dev machine.

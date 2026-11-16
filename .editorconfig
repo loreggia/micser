@@ -18,10 +18,6 @@ trim_trailing_whitespace = false
 [*.{xml,csproj,vcxproj,proj,slnx,props,targets,config,nuspec,resx,xaml,axaml,manifest}]
 indent_size = 2
 
-# VAC driver, based on the Windows driver samples
-[src/Vac/**]
-trim_trailing_whitespace = false
-
 #### .NET Coding Conventions ####
 [*.cs]
 

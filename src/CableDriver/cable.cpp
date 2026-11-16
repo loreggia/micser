@@ -10,7 +10,7 @@ Abstract:
 
 --*/
 
-#include "definitions.h"
+#include "driver.h"
 #include "cable.h"
 
 #define CABLE_POOLTAG 'BCVM'

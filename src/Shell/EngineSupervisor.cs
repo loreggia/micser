@@ -18,7 +18,7 @@ internal enum EngineState
     Unavailable,
 
     /// <summary>
-    /// The engine is stopped while the shell changes the virtual audio cables (<see cref="EngineSupervisor.RunWithoutEngineAsync"/>).
+    /// The engine is stopped while the shell changes the virtual cables (<see cref="EngineSupervisor.RunWithoutEngineAsync"/>).
     /// </summary>
     Paused,
 }

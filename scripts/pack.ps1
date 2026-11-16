@@ -1,6 +1,6 @@
 # Builds the web UI, publishes engine and shell into one folder and packs a Velopack release into artifacts/releases: on Windows for
 # win-x64 (Setup.exe, the "win" channel), on Linux for linux-x64 (Micser.AppImage, the "linux" channel); vpk packs for the OS it runs on.
-# With -DriverPackage (a folder with the signed driver's INF, SYS and CAT), the release also carries the virtual audio cable driver and
+# With -DriverPackage (a folder with the signed driver's INF, SYS and CAT), the release also carries the cable driver and
 # DriverUtility in its driver folder; without it, the app hides the driver settings.
 # The version's section in CHANGELOG.md ("## X.Y.Z") becomes the release notes: in the package (vpk upload github uses them as the GitHub
 # release body, and the shell shows them for a downloaded update) and as ReleaseNotes.md in the app (shown for the installed version).

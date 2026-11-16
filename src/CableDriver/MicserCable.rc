@@ -1,0 +1,23 @@
+/*++
+
+Module Name:
+
+    MicserCable.rc
+
+Abstract:
+
+    Version resource.
+
+--*/
+
+#include <windows.h>
+
+#include <ntverp.h>
+
+#define VER_FILETYPE                VFT_DRV
+#define VER_FILESUBTYPE             VFT2_DRV_SOUND
+#define VER_FILEDESCRIPTION_STR     "Micser Cable Driver"
+#define VER_INTERNALNAME_STR        "MicserCable.sys"
+#define VER_ORIGINALFILENAME_STR    "MicserCable.sys"
+
+#include "common.ver"

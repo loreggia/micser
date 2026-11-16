@@ -5,13 +5,15 @@ using System.Runtime.InteropServices;
 namespace Micser.DriverUtility;
 
 /// <summary>
-/// The Windows audio endpoints of the cables. Windows keeps an endpoint's device format across device restarts, so after a cable's layout
-/// changed, its endpoints still have the old format, which the driver no longer offers, and can't be opened until the format is set again.
+/// The Windows audio endpoints of the cables. Windows keeps an endpoint's device format when the driver creates a cable's device again,
+/// so after a cable's layout changed, its endpoints still have the old format, which the driver no longer offers, and can't be opened
+/// until the format is set again.
 /// </summary>
 internal static class CableEndpoints
 {
     /// <summary>
-    /// The KS filter an endpoint belongs to, e.g. <c>{2}.\\?\root#media#0000#{6994ad04-...}\waverender1</c>. Observed, not documented.
+    /// The KS filter an endpoint belongs to, e.g. <c>{2}.\\?\micsercable#cable01#...#{6994ad04-...}\render</c>. Observed, not
+    /// documented.
     /// </summary>
     private static readonly PROPERTYKEY FilterKey = new(new Guid("233164c8-1b2c-4c7d-bc68-b671687a2567"), 1);
 
@@ -39,9 +41,9 @@ internal static class CableEndpoints
     }
 
     /// <summary>
-    /// The active endpoints of the cables of the device with the given instance ID (e.g. <c>ROOT\MEDIA\0000</c>).
+    /// The active endpoints of the cables.
     /// </summary>
-    public static List<CableEndpoint> Find(string deviceInstanceId)
+    public static List<CableEndpoint> Find()
     {
         var enumerator = CoreAudio.CreateDeviceEnumerator();
         var policy = CoreAudio.CreatePolicyConfig();
@@ -63,7 +65,7 @@ internal static class CableEndpoints
 
             if (
                 ReadString(properties, FilterKey) is not { } filter
-                || !TryParseFilterPath(filter, deviceInstanceId, out var cable, out var isCapture)
+                || !TryParseFilterPath(filter, out var cable, out var isCapture)
             )
             {
                 continue;
@@ -82,11 +84,18 @@ internal static class CableEndpoints
 
     /// <summary>
     /// Whether the endpoints of every cable exist and have the format of the cable's layout. <paramref name="layouts"/> has one entry per
-    /// cable.
+    /// cable; <paramref name="includes"/> limits the check to some cables.
     /// </summary>
-    public static bool AllMatch(IReadOnlyList<CableEndpoint> endpoints, IReadOnlyList<CableLayout> layouts)
+    public static bool AllMatch(
+        IReadOnlyList<CableEndpoint> endpoints,
+        IReadOnlyList<CableLayout> layouts,
+        Func<int, bool>? includes = null
+    )
     {
-        return Enumerable.Range(1, layouts.Count).All(cable => CableMatches(endpoints, cable, layouts[cable - 1]));
+        return Enumerable
+            .Range(1, layouts.Count)
+            .Where(cable => includes?.Invoke(cable) ?? true)
+            .All(cable => CableMatches(endpoints, cable, layouts[cable - 1]));
     }
 
     public static bool CableMatches(IReadOnlyList<CableEndpoint> endpoints, int cable, CableLayout layout)
@@ -97,16 +106,17 @@ internal static class CableEndpoints
 
     /// <summary>
     /// Sets the device format of every cable endpoint whose format doesn't match its cable's layout. Endpoints appear a moment after the
-    /// device (re)started, so this retries until all match or the timeout passes. Returns whether all match.
+    /// cable's device was created, so this retries until all match or the timeout passes. Returns whether all match.
+    /// <paramref name="includes"/> limits it to some cables.
     /// </summary>
-    public static bool Sync(string deviceInstanceId, IReadOnlyList<CableLayout> layouts, TimeSpan timeout)
+    public static bool Sync(IReadOnlyList<CableLayout> layouts, TimeSpan timeout, Func<int, bool>? includes = null)
     {
         var policy = CoreAudio.CreatePolicyConfig();
         var stopwatch = Stopwatch.StartNew();
         while (true)
         {
-            var endpoints = Find(deviceInstanceId).Where(e => e.Cable <= layouts.Count).ToList();
-            if (AllMatch(endpoints, layouts))
+            var endpoints = Find().Where(e => e.Cable <= layouts.Count && (includes?.Invoke(e.Cable) ?? true)).ToList();
+            if (AllMatch(endpoints, layouts, includes))
             {
                 return true;
             }
@@ -138,38 +148,41 @@ internal static class CableEndpoints
     }
 
     /// <summary>
-    /// Reads the cable number and side from an endpoint's filter path, if the filter belongs to the device.
+    /// Reads the cable number and side from an endpoint's filter path, if the filter belongs to a cable device. The cable devices are
+    /// MicserCable\CableNN, and their circuits' reference strings are Render and Capture (src/CableDriver/circuits.cpp).
     /// </summary>
-    public static bool TryParseFilterPath(string value, string deviceInstanceId, out int cable, out bool isCapture)
+    public static bool TryParseFilterPath(string value, out int cable, out bool isCapture)
     {
         cable = 0;
         isCapture = false;
 
-        // "{2}.\\?\root#media#0000#{interface class}\waverender1"
-        var device = @"\\?\" + deviceInstanceId.Replace('\\', '#') + "#";
-        var start = value.IndexOf(device, StringComparison.OrdinalIgnoreCase);
-        var separator = value.LastIndexOf('\\');
-        if (start < 0 || separator < start + device.Length)
+        // "{2}.\\?\micsercable#cable01#1&14041d6&6&01#{interface class}\render"
+        const string Device = @"\\?\micsercable#cable";
+        var start = value.IndexOf(Device, StringComparison.OrdinalIgnoreCase);
+        var number = start + Device.Length;
+        if (
+            start < 0
+            || value.Length < number + 3
+            || value[number + 2] != '#'
+            || !int.TryParse(value.AsSpan(number, 2), out var parsed)
+            || parsed < 1
+        )
         {
             return false;
         }
 
-        var reference = value[(separator + 1)..];
-        foreach (var (prefix, capture) in new[] { ("waverender", false), ("wavecapture", true) })
+        var reference = value[(value.LastIndexOf('\\') + 1)..];
+        if (reference.Equals("capture", StringComparison.OrdinalIgnoreCase))
         {
-            if (
-                reference.StartsWith(prefix, StringComparison.OrdinalIgnoreCase)
-                && int.TryParse(reference[prefix.Length..], out cable)
-                && cable > 0
-            )
-            {
-                isCapture = capture;
-                return true;
-            }
+            isCapture = true;
+        }
+        else if (!reference.Equals("render", StringComparison.OrdinalIgnoreCase))
+        {
+            return false;
         }
 
-        cable = 0;
-        return false;
+        cable = parsed;
+        return true;
     }
 
     private static (int? Channels, uint? Mask) ReadDeviceFormat(IPolicyConfig policy, string id)

@@ -16,7 +16,7 @@ Decisions so far: PipeWire's native API for audio, a cross-platform shell (tray 
 | One engine per session                | named semaphore `Local\Micser.Engine`                 | lock file in `$XDG_RUNTIME_DIR/micser`                                    | 1            |
 | Discovery file                        | `%LocalAppData%\Micser\engine.json` (private folder)  | `$XDG_RUNTIME_DIR/micser/engine.json`, mode 0600                          | 1            |
 | Configuration, user plugins, logs     | `%AppData%`, `%LocalAppData%`                         | `~/.config/Micser`, `~/.local/share/Micser` (`Environment.SpecialFolder`) | 1            |
-| Virtual cables                        | PortCls kernel driver, `DriverUtility` (elevated)     | PipeWire loopback modules, created by the engine                          | 3            |
+| Virtual cables                        | ACX kernel driver, `DriverUtility`                    | PipeWire loopback modules, created by the engine                          | 3            |
 | Shell                                 | Avalonia: tray, WebView2, `HKCU\...\Run`, named event | Avalonia: StatusNotifierItem tray, WebKitGTK, XDG autostart, Unix socket  | 4            |
 | Packaging and updates                 | Velopack, `Setup.exe`                                 | Velopack AppImage; menu entry and autostart switched in the settings      | 5            |
 

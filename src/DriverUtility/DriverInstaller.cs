@@ -11,9 +11,8 @@ namespace Micser.DriverUtility;
 /// </summary>
 internal static class DriverInstaller
 {
-    private const string DisplayName = "Micser Virtual Audio Cable";
-    private const string UninstallKeyPath =
-        @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\MicserVirtualAudioCable";
+    private const string DisplayName = "Micser Cable Driver";
+    private const string UninstallKeyPath = @"SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\MicserCableDriver";
 
     public static string InstallDirectory =>
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles), "Micser", "Driver");
@@ -23,21 +22,24 @@ internal static class DriverInstaller
     /// </summary>
     public static bool Install(DriverPackage package, int cableCount)
     {
-        using var existing = VacDevice.Find();
-        if (existing is { IsPresent: true })
+        using (var existing = CableDriverDevice.Find())
         {
-            Log.Info("The device exists, updating it");
-            var needReboot = Update(package);
-            existing.SetCableCount(cableCount);
-            return existing.Restart() | needReboot;
+            if (existing is { IsPresent: true })
+            {
+                Log.Info("The device exists, updating it");
+                var needReboot = Update(package);
+                SetCableCount(cableCount, needReboot);
+                return needReboot;
+            }
         }
 
-        // leftover devnodes from an earlier installation would get the driver too
-        VacDevice.RemoveAll();
+        // leftover devnodes from an earlier installation would get the driver too, and old cable devices would make Windows number the
+        // new ones' endpoint names
+        CableDriverDevice.RemoveAll();
 
         var installed = CopyToInstallDirectory(package);
-        Log.Info($"Creating the device {VacDevice.HardwareId} with {cableCount} cable(s)");
-        using var device = VacDevice.Create(installed.InfPath, cableCount);
+        Log.Info($"Creating the device {CableDriverDevice.HardwareId} with {cableCount} cable(s)");
+        using var device = CableDriverDevice.Create(installed.InfPath, cableCount);
 
         try
         {
@@ -47,7 +49,7 @@ internal static class DriverInstaller
         }
         catch
         {
-            VacDevice.RemoveAll();
+            CableDriverDevice.RemoveAll();
             throw;
         }
     }
@@ -58,7 +60,7 @@ internal static class DriverInstaller
     public static bool Uninstall()
     {
         Log.Info("Removing the device");
-        var needReboot = VacDevice.RemoveAll();
+        var needReboot = CableDriverDevice.RemoveAll();
         DeleteDriverPackages(keep: null);
 
         using (var key = Registry.LocalMachine.OpenSubKey(UninstallKeyPath, false))
@@ -82,6 +84,44 @@ internal static class DriverInstaller
         var needReboot = UpdateDriver(installed);
         WriteUninstallEntry(installed);
         return needReboot;
+    }
+
+    /// <summary>
+    /// Sets the cable count of the running driver. After an update, the control device comes back once Windows restarted the device.
+    /// </summary>
+    private static void SetCableCount(int cableCount, bool needReboot)
+    {
+        var stopwatch = Stopwatch.StartNew();
+        while (true)
+        {
+            var result = CableControl.TryGet() is { } config
+                ? CableControl.Set(
+                    config with
+                    {
+                        CableCount = Math.Clamp(cableCount, 1, CableDriverDevice.MaxCableCount),
+                    }
+                )
+                : CableSetResult.NotRunning;
+            if (result != CableSetResult.NotRunning)
+            {
+                return;
+            }
+
+            if (needReboot)
+            {
+                Log.Warning("The driver runs after the reboot; the cable count stays as it is.");
+                return;
+            }
+
+            if (stopwatch.Elapsed > TimeSpan.FromSeconds(10))
+            {
+                throw new InvalidOperationException(
+                    "The driver doesn't run after the update; the cable count stays as it is."
+                );
+            }
+
+            Thread.Sleep(250);
+        }
     }
 
     private static DriverPackage CopyToInstallDirectory(DriverPackage package)
@@ -119,7 +159,7 @@ internal static class DriverInstaller
             var name = Path.GetFileName(inf);
             if (
                 string.Equals(name, keep, StringComparison.OrdinalIgnoreCase)
-                || !File.ReadAllText(inf).Contains(VacDevice.HardwareId, StringComparison.OrdinalIgnoreCase)
+                || !File.ReadAllText(inf).Contains(CableDriverDevice.HardwareId, StringComparison.OrdinalIgnoreCase)
             )
             {
                 continue;
@@ -169,7 +209,7 @@ internal static class DriverInstaller
         if (
             !UpdateDriverForPlugAndPlayDevices(
                 0,
-                VacDevice.HardwareId,
+                CableDriverDevice.HardwareId,
                 package.InfPath,
                 INSTALLFLAG_FORCE,
                 out var needReboot
@@ -182,7 +222,7 @@ internal static class DriverInstaller
             );
         }
 
-        using var device = VacDevice.Find();
+        using var device = CableDriverDevice.Find();
         DeleteDriverPackages(keep: device?.GetDriverInfName());
         return needReboot;
     }

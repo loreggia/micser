@@ -43,7 +43,7 @@ internal sealed class WasapiBackend : IAudioBackend
     public event EventHandler? SystemResumed;
 
     /// <summary>
-    /// The VAC driver provides the cables on Windows; the shell installs and changes it.
+    /// The cable driver (src/CableDriver) provides the cables on Windows; the shell installs and changes it.
     /// </summary>
     public bool SupportsCables => false;
 

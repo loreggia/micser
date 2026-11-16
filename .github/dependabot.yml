@@ -2,7 +2,7 @@ version: 2
 
 updates:
   - package-ecosystem: "nuget"
-    # doesn't cover the WDK packages in src/Vac/packages.config: Dependabot only reads .NET projects, not .vcxproj
+    # doesn't cover the WDK packages in src/CableDriver/packages.config: Dependabot only reads .NET projects, not .vcxproj
     directory: "/"
     schedule:
       interval: "weekly"

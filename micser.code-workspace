@@ -49,8 +49,8 @@
       "path": "src/Shell",
     },
     {
-      "name": "Micser.Vac",
-      "path": "src/Vac",
+      "name": "Micser.CableDriver",
+      "path": "src/CableDriver",
     },
   ],
   "settings": {
@@ -62,10 +62,10 @@
     "editor.formatOnSaveMode": "file",
     "files.eol": "\n",
     "files.exclude": {
-      "src/Vac/packages": true,
+      "src/CableDriver/packages": true,
     },
     "files.watcherExclude": {
-      "src/Vac/packages": true,
+      "src/CableDriver/packages": true,
     },
     "i18n-ally.localesPaths": ["src/Web/src/locales", "src/WebSdk/src/i18n", "src/Plugins/Main/Web/src/locales"],
     "powershell.cwd": "root",
