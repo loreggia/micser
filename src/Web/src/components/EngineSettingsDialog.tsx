@@ -73,7 +73,7 @@ const systemTheme = "system";
 /**
  * Audio settings (applied with Apply, which rebuilds the graph) and restarts, display preferences and the language (applied right away),
  * configuration export and import, plugins (applied when the engine restarts), and, when running in the desktop shell, autostart and the
- * app menu entry, the version, updates and virtual audio cables.
+ * app menu entry, the version, updates and virtual cables.
  */
 export function EngineSettingsDialog({ open, settings, onClose }: EngineSettingsDialogProps) {
   const styles = useStyles();

@@ -150,7 +150,7 @@ export interface VirtualCablesSettingsProps {
 }
 
 /**
- * Installs, updates and removes the virtual audio cable driver (Windows) and sets the number of cables, through the desktop shell. Each
+ * Installs, updates and removes the cable driver (Windows) and sets the number of cables, through the desktop shell. Each
  * change asks for administrator rights and stops the audio engine meanwhile.
  */
 export function VirtualCablesSettings({ driver }: VirtualCablesSettingsProps) {
@@ -225,7 +225,7 @@ export interface EngineCablesSettingsProps {
 }
 
 /**
- * The virtual audio cables the engine creates itself (Linux, as PipeWire devices): the number of cables and each one's layout. Changes
+ * The virtual cables the engine creates itself (Linux, as PipeWire devices): the number of cables and each one's layout. Changes
  * apply right away, without interrupting other audio.
  */
 export function EngineCablesSettings({ cables }: EngineCablesSettingsProps) {

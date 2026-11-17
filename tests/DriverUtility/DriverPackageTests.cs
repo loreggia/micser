@@ -9,14 +9,14 @@ public class DriverPackageTests
     {
         using var directory = TempDirectory.Create();
         await File.WriteAllTextAsync(
-            directory.Combine("Micser.Vac.inf"),
+            directory.Combine("MicserCable.inf"),
             "[Version]\r\nDriverVer = 10/03/2026,1.2.3.4\r\n"
         );
 
         var package = DriverPackage.Load(directory.Path);
 
         await Assert.That(package?.Version).IsEqualTo(new Version(1, 2, 3, 4));
-        await Assert.That(package?.InfPath).IsEqualTo(directory.Combine("Micser.Vac.inf"));
+        await Assert.That(package?.InfPath).IsEqualTo(directory.Combine("MicserCable.inf"));
     }
 
     [Test]

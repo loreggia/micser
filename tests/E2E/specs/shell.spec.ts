@@ -173,7 +173,7 @@ test("without an AppImage, the settings offer autostart only", async ({ graph })
   await expect(dialog.getByRole("switch", { name: "Show Micser in the app menu" })).toHaveCount(0);
 });
 
-test.describe("virtual audio cables", () => {
+test.describe("virtual cables", () => {
   test("installs the driver with the chosen number of cables", async ({ graph }) => {
     const shell = await FakeShell.install(graph.page, {
       ...developmentShell,
@@ -235,7 +235,11 @@ test.describe("virtual audio cables", () => {
     const dialog = await openSettings(graph);
 
     await expect(dialog.getByRole("combobox", { name: "Channel layout of cable 1" })).toHaveText("7.1 surround");
-    await expect(dialog.getByText("Not applied yet; restart Windows if it asked for it.")).toHaveCount(1);
+    await expect(
+      dialog.getByText(
+        "Not applied yet: an app may still use the cable, or Windows needs the restart the driver installation asked for."
+      )
+    ).toHaveCount(1);
   });
 
   test("updates and uninstalls the driver", async ({ graph }) => {
@@ -261,7 +265,7 @@ test.describe("virtual audio cables", () => {
   test("shows a change in progress and an unreadable status", async ({ graph }) => {
     const shell = await FakeShell.install(graph.page, { ...developmentShell, driver: driver({}, true) });
     const dialog = await openSettings(graph);
-    await expect(dialog.getByText("Changing the virtual audio cables…")).toBeVisible();
+    await expect(dialog.getByText("Changing the virtual cables…")).toBeVisible();
     await expect(dialog.getByRole("button", { name: "Uninstall" })).toHaveCount(0);
 
     await shell.setState({ ...developmentShell, driver: driver(null) });

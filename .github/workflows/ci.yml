@@ -70,7 +70,7 @@ jobs:
       - name: Pack
         run: dotnet pack src/Audio --configuration Release --no-build --output artifacts/packages
 
-  vac:
+  driver:
     # the WDK NuGet packages need the WDK component of Visual Studio, which this image has
     runs-on: windows-2025-vs2026
 
@@ -82,40 +82,40 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v7
 
-      # the WDK and SDK packages (about 2 GB) that build-vac.ps1 restores
+      # the WDK and SDK packages (about 2 GB) that build-driver.ps1 restores
       - name: Cache the WDK packages
         uses: actions/cache@v6
         with:
-          path: src/Vac/packages
-          key: vac-packages-${{ hashFiles('src/Vac/packages.config') }}
+          path: src/CableDriver/packages
+          key: driver-packages-${{ hashFiles('src/CableDriver/packages.config') }}
 
       - name: Build and verify
-        run: ./scripts/build-vac.ps1 -Configuration Release -Platform ${{ matrix.platform }}
+        run: ./scripts/build-driver.ps1 -Configuration Release -Platform ${{ matrix.platform }}
 
-  vac-codeql:
-    # like the vac job
+  driver-codeql:
+    # like the driver job
     runs-on: windows-2025-vs2026
 
     steps:
       - name: Checkout
         uses: actions/checkout@v7
 
-      # the WDK and SDK packages (about 2 GB) that build-vac.ps1 restores
+      # the WDK and SDK packages (about 2 GB) that build-driver.ps1 restores
       - name: Cache the WDK packages
         uses: actions/cache@v6
         with:
-          path: src/Vac/packages
-          key: vac-packages-${{ hashFiles('src/Vac/packages.config') }}
+          path: src/CableDriver/packages
+          key: driver-packages-${{ hashFiles('src/CableDriver/packages.config') }}
 
       - name: CodeQL driver checks
-        run: ./scripts/codeql-vac.ps1
+        run: ./scripts/codeql-driver.ps1
 
       - name: Upload CodeQL results
         if: always()
         uses: actions/upload-artifact@v7
         with:
-          name: vac-codeql
-          path: artifacts/codeql/vac.sarif
+          name: driver-codeql
+          path: artifacts/codeql/driver.sarif
           if-no-files-found: ignore
 
   web:
@@ -254,7 +254,7 @@ jobs:
           retention-days: 14
 
   release:
-    needs: [dotnet, vac, vac-codeql, web, e2e]
+    needs: [dotnet, driver, driver-codeql, web, e2e]
     if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
 
     # id-token for publishing the SDK packages (trusted publishing on nuget.org and npmjs)

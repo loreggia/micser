@@ -1,0 +1,153 @@
+[Version]
+Signature   = "$Windows NT$"
+Class       = MEDIA
+Provider    = %ProviderName%
+ClassGUID   = {4d36e96c-e325-11ce-bfc1-08002be10318}
+DriverVer   = 01/01/2026, 1.0.0.0
+CatalogFile = MicserCable.cat
+PnpLockdown = 1
+
+[SourceDisksNames]
+222 = %DiskName%,"",222
+
+[SourceDisksFiles]
+MicserCable.sys = 222
+
+[SignatureAttributes]
+MicserCable.sys = SignatureAttributes.DRM
+
+[SignatureAttributes.DRM]
+DRMLevel = 1300
+
+[SignatureAttributes.PETrust]
+PETrust = true
+
+; ACX ships with Windows 11 22H2 (22621)
+[Manufacturer]
+%MfgName% = Micser,NT$ARCH$.10.0...22621
+
+[Micser.NT$ARCH$.10.0...22621]
+%Root.DeviceDesc% = Root, ROOT\MicserCable
+; a model per cable, so each cable device has a name of its own (see cabledevice.cpp)
+%Cable1.DeviceDesc%  = Cable, MicserCable\Cable01
+%Cable2.DeviceDesc%  = Cable, MicserCable\Cable02
+%Cable3.DeviceDesc%  = Cable, MicserCable\Cable03
+%Cable4.DeviceDesc%  = Cable, MicserCable\Cable04
+%Cable5.DeviceDesc%  = Cable, MicserCable\Cable05
+%Cable6.DeviceDesc%  = Cable, MicserCable\Cable06
+%Cable7.DeviceDesc%  = Cable, MicserCable\Cable07
+%Cable8.DeviceDesc%  = Cable, MicserCable\Cable08
+%Cable9.DeviceDesc%  = Cable, MicserCable\Cable09
+%Cable10.DeviceDesc% = Cable, MicserCable\Cable10
+%Cable11.DeviceDesc% = Cable, MicserCable\Cable11
+%Cable12.DeviceDesc% = Cable, MicserCable\Cable12
+%Cable13.DeviceDesc% = Cable, MicserCable\Cable13
+%Cable14.DeviceDesc% = Cable, MicserCable\Cable14
+%Cable15.DeviceDesc% = Cable, MicserCable\Cable15
+%Cable16.DeviceDesc% = Cable, MicserCable\Cable16
+
+[DestinationDirs]
+Root.CopyList = 13
+
+[Root.CopyList]
+MicserCable.sys
+
+;======================================================
+; Root device: no endpoints of its own. The driver creates a child device
+; per cable (MicserCable\CableNN) from the values in the hardware key.
+;======================================================
+[Root.NT]
+CopyFiles = Root.CopyList
+
+[Root.NT.Services]
+AddService = MicserCable,0x00000002,Root.Service
+
+[Root.Service]
+DisplayName   = %Root.SvcDesc%
+ServiceType   = 1
+StartType     = 3
+ErrorControl  = 1
+ServiceBinary = %13%\MicserCable.sys
+
+[Root.NT.HW]
+AddReg = Root.HW.AddReg
+
+[Root.HW.AddReg]
+; number of cables (1-16); 0x00010003 = DWORD, keep an existing value.
+; The layouts are "Cable<N>Channels" (2, 6 or 8; stereo without a value).
+HKR,,CableCount,0x00010003,1
+
+[Root.NT.Wdf]
+KmdfService = MicserCable,Root.WdfSect
+
+[Root.WdfSect]
+KmdfLibraryVersion = $KMDFVERSION$
+
+;======================================================
+; Cable device: a raw PDO of the root device (no function driver). Its
+; circuits register these interfaces with the reference strings Render and
+; Capture; the endpoints are named by the bridge pins ("Cable N Input").
+;======================================================
+[Cable.NT]
+
+[Cable.NT.Services]
+AddService = ,0x00000002
+
+[Cable.NT.Interfaces]
+AddInterface = %KSCATEGORY_AUDIO%,    %KSNAME_Render%,  Cable.I.Render
+AddInterface = %KSCATEGORY_RENDER%,   %KSNAME_Render%,  Cable.I.Render
+AddInterface = %KSCATEGORY_REALTIME%, %KSNAME_Render%,  Cable.I.Render
+AddInterface = %KSCATEGORY_AUDIO%,    %KSNAME_Capture%, Cable.I.Capture
+AddInterface = %KSCATEGORY_CAPTURE%,  %KSNAME_Capture%, Cable.I.Capture
+AddInterface = %KSCATEGORY_REALTIME%, %KSNAME_Capture%, Cable.I.Capture
+
+[Cable.I.Render]
+AddReg = Cable.I.AddReg
+
+[Cable.I.Capture]
+AddReg = Cable.I.AddReg
+
+[Cable.I.AddReg]
+HKR,,CLSID,,%Proxy.CLSID%
+HKR,EP\0,%PKEY_AudioEndpoint_Association%,,%KSNODETYPE_ANY%
+HKR,EP\0,%PKEY_AudioEndpoint_Supports_EventDriven_Mode%,0x00010001,0x1
+
+[Strings]
+; Non-localizable
+KSNAME_Render  = "Render"
+KSNAME_Capture = "Capture"
+
+Proxy.CLSID         = "{17CCA71B-ECD7-11D0-B908-00A0C9223196}"
+KSCATEGORY_AUDIO    = "{6994AD04-93EF-11D0-A3CC-00A0C9223196}"
+KSCATEGORY_RENDER   = "{65E8773E-8F56-11D0-A3B9-00A0C9223196}"
+KSCATEGORY_CAPTURE  = "{65E8773D-8F56-11D0-A3B9-00A0C9223196}"
+KSCATEGORY_REALTIME = "{EB115FFC-10C8-4964-831D-6DCB02E6F23F}"
+
+KSNODETYPE_ANY = "{00000000-0000-0000-0000-000000000000}"
+
+PKEY_AudioEndpoint_Association               = "{1DA5D803-D492-4EDD-8C23-E0C0FFEE7F0E},2"
+PKEY_AudioEndpoint_Supports_EventDriven_Mode = "{1DA5D803-D492-4EDD-8C23-E0C0FFEE7F0E},7"
+
+; Localizable
+ProviderName = "Micser"
+MfgName      = "Micser"
+DiskName     = "Micser Cable Driver Disk"
+
+Root.DeviceDesc = "Micser Cables"
+Root.SvcDesc    = "Micser Cable Driver"
+Cable1.DeviceDesc  = "Micser Cable 1"
+Cable2.DeviceDesc  = "Micser Cable 2"
+Cable3.DeviceDesc  = "Micser Cable 3"
+Cable4.DeviceDesc  = "Micser Cable 4"
+Cable5.DeviceDesc  = "Micser Cable 5"
+Cable6.DeviceDesc  = "Micser Cable 6"
+Cable7.DeviceDesc  = "Micser Cable 7"
+Cable8.DeviceDesc  = "Micser Cable 8"
+Cable9.DeviceDesc  = "Micser Cable 9"
+Cable10.DeviceDesc = "Micser Cable 10"
+Cable11.DeviceDesc = "Micser Cable 11"
+Cable12.DeviceDesc = "Micser Cable 12"
+Cable13.DeviceDesc = "Micser Cable 13"
+Cable14.DeviceDesc = "Micser Cable 14"
+Cable15.DeviceDesc = "Micser Cable 15"
+Cable16.DeviceDesc = "Micser Cable 16"

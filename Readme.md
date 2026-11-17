@@ -8,8 +8,8 @@ The application consists of:
 - a web UI (React) for routing audio graphically using widgets, hosted in a small tray application (Avalonia, with WebView2 on Windows
   and WebKitGTK on Linux)
   - the UI closes when minimized to the system tray to minimize memory usage
-- virtual audio cables with a configurable number of devices: on Windows a driver (WIP, still requires an extended validation code signing
-  certificate), on Linux PipeWire devices that the engine creates itself
+- virtual cables with a configurable number of devices: on Windows the Micser Cable driver (needs Windows 11 22H2 or later; WIP, still
+  requires an extended validation code signing certificate), on Linux PipeWire devices that the engine creates itself
 
 [![micser CI](https://github.com/loreggia/micser/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/loreggia/micser/actions/workflows/ci.yml?query=branch%3Amain)
 
@@ -59,7 +59,8 @@ Both update themselves from the GitHub releases.
 - **Subgraphs and templates:** group modules into subgraphs that can be collapsed, muted and bypassed as a whole, and save them as
   templates to reuse. Built-in templates: "Footstep boost", "Night mode", "Music ducking" and "Voice chat mic". Subgraphs
   created from a template can be updated when it changes.
-- **Virtual audio cables** to route audio between applications (built in on Linux, the Windows driver is still WIP).
+- **Virtual cables** to route audio between applications (built in on Linux; on Windows the driver needs Windows 11 22H2 or later and is
+  still WIP).
 - **Plugins** add new modules and their widgets (see [Plugins](#plugins)).
 - **Configuration export and import**, e.g. as a backup or to move to another computer.
 - **Themes:** default, blue, purple and high contrast, each light or dark, or following the system.
@@ -107,11 +108,11 @@ Pushing a tag `vX.Y.Z` builds the release on GitHub Actions and publishes it as 
 
 ### Driver
 
-The virtual audio cable driver (`src/Vac`) is not part of `Micser.slnx`. It needs Visual Studio with the Windows Driver Kit component and the Spectre-mitigated libraries; the WDK itself comes from NuGet.
+The cable driver (`src/CableDriver`, an ACX driver for Windows 11 22H2 or later) is not part of `Micser.slnx`. It needs Visual Studio with the Windows Driver Kit component and the Spectre-mitigated libraries; the WDK itself comes from NuGet.
 
 ```powershell
-./scripts/build-vac.ps1 -Platform x64,ARM64   # test-signed driver packages in src/Vac/bin
-./scripts/codeql-vac.ps1                      # Microsoft's CodeQL driver checks
+./scripts/build-driver.ps1 -Platform x64,ARM64   # test-signed driver packages in src/CableDriver/bin
+./scripts/codeql-driver.ps1                      # Microsoft's CodeQL driver checks
 ```
 
 ## Plugins
@@ -156,7 +157,7 @@ Web UI
 
 Driver
 
-- [Windows Driver Samples](https://github.com/Microsoft/Windows-driver-samples) (the VAC driver is based on SimpleAudioSample)
+- [Windows Driver Samples](https://github.com/Microsoft/Windows-driver-samples) (the cable driver follows the ACX AudioCodec and SdcaVad samples)
 - [Windows Driver Kit](https://learn.microsoft.com/windows-hardware/drivers/) and [CodeQL](https://codeql.github.com/) (driver build and checks)
 
 Development and tests

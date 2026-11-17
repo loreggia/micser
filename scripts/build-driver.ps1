@@ -1,5 +1,5 @@
-# Restores the WDK NuGet packages and builds the VAC driver package into src/Vac/bin/<platform>/<configuration>/Micser.Vac.
-# -RestoreOnly only restores the packages.
+# Restores the WDK NuGet packages and builds the cable driver package into
+# src/CableDriver/bin/<platform>/<configuration>/Micser.CableDriver. -RestoreOnly only restores the packages.
 param(
     [ValidateSet("Debug", "Release")][string]$Configuration = "Debug",
     [ValidateSet("x64", "ARM64")][string[]]$Platform = @("x64"),
@@ -11,7 +11,7 @@ $ErrorActionPreference = "Stop"
 $PSNativeCommandUseErrorActionPreference = $true
 
 $root = Split-Path $PSScriptRoot -Parent
-$vacDir = Join-Path $root "src/Vac"
+$driverDir = Join-Path $root "src/CableDriver"
 
 $nuget = (Get-Command nuget.exe -ErrorAction SilentlyContinue)?.Source
 if (-not $nuget) {
@@ -21,7 +21,7 @@ if (-not $nuget) {
         Invoke-WebRequest https://dist.nuget.org/win-x86-commandline/latest/nuget.exe -OutFile $nuget
     }
 }
-& $nuget restore (Join-Path $vacDir "packages.config") -PackagesDirectory (Join-Path $vacDir "packages") -NonInteractive
+& $nuget restore (Join-Path $driverDir "packages.config") -PackagesDirectory (Join-Path $driverDir "packages") -NonInteractive
 if ($RestoreOnly) {
     return
 }
@@ -31,13 +31,13 @@ $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.e
 $msbuild = & $vswhere -latest -requires Microsoft.Component.MSBuild -find "MSBuild\**\Bin\amd64\MSBuild.exe" | Select-Object -First 1
 if (-not $msbuild) { throw "64-bit MSBuild not found" }
 
-$wdkVersion = (([xml](Get-Content (Join-Path $vacDir "packages.config"))).packages.package | Where-Object id -eq "Microsoft.Windows.WDK.x64").version
-$infVerif = (Resolve-Path (Join-Path $vacDir "packages/Microsoft.Windows.WDK.x64.$wdkVersion/c/tools/10.*/x64/infverif.exe")).Path
+$wdkVersion = (([xml](Get-Content (Join-Path $driverDir "packages.config"))).packages.package | Where-Object id -eq "Microsoft.Windows.WDK.x64").version
+$infVerif = (Resolve-Path (Join-Path $driverDir "packages/Microsoft.Windows.WDK.x64.$wdkVersion/c/tools/10.*/x64/infverif.exe")).Path
 
 foreach ($p in $Platform) {
-    & $msbuild (Join-Path $vacDir "Micser.Vac.vcxproj") -nologo -m -v:m `
-        -p:Configuration=$Configuration -p:Platform=$p -p:VacDriverVersion=$Version
+    & $msbuild (Join-Path $driverDir "Micser.CableDriver.vcxproj") -nologo -m -v:m `
+        -p:Configuration=$Configuration -p:Platform=$p -p:CableDriverVersion=$Version
 
     # /w: declarative (DCH) driver rules
-    & $infVerif /w (Join-Path $vacDir "bin/$p/$Configuration/Micser.Vac/Micser.Vac.inf")
+    & $infVerif /w (Join-Path $driverDir "bin/$p/$Configuration/Micser.CableDriver/MicserCable.inf")
 }

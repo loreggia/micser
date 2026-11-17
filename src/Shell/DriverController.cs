@@ -38,7 +38,7 @@ internal enum DriverCommandResult
 }
 
 /// <summary>
-/// Installs and configures the virtual audio cable driver through the DriverUtility that Velopack installs in the app's driver folder.
+/// Installs and configures the cable driver through the DriverUtility that Velopack installs in the app's driver folder.
 /// Every change runs the utility elevated (one UAC prompt) while the engine is stopped. Runs on the UI thread, where its events are
 /// raised.
 /// </summary>
@@ -83,7 +83,12 @@ internal sealed class DriverController
 
     public Task<DriverCommandResult> InstallAsync(int cableCount)
     {
-        return RunAsync("install", "--count", cableCount.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        return RunAsync(
+            true,
+            "install",
+            "--count",
+            cableCount.ToString(System.Globalization.CultureInfo.InvariantCulture)
+        );
     }
 
     /// <summary>
@@ -95,8 +100,8 @@ internal sealed class DriverController
         Status = await ReadStatusAsync();
         if (Status is { Installed: true, Problem: null } && Status.Cables.Any(c => !c.FormatsMatch))
         {
-            Log.Information("Setting the formats of the virtual audio cables' endpoints.");
-            var (exitCode, error) = await RunUtilityAsync("sync-formats");
+            Log.Information("Setting the formats of the virtual cables' endpoints.");
+            var (exitCode, error) = await RunUtilityAsync(["sync-formats"]);
             if (exitCode != ExitSuccess)
             {
                 Log.Warning("Setting the cables' formats failed ({ExitCode}): {Error}", exitCode, error);
@@ -108,28 +113,37 @@ internal sealed class DriverController
         Changed?.Invoke(this, EventArgs.Empty);
     }
 
+    /// <summary>
+    /// Sets the number of cables. The driver applies it right away; any user may change the cables, so this needs no elevation.
+    /// </summary>
     public Task<DriverCommandResult> SetCableCountAsync(int cableCount)
     {
-        return RunAsync("set-count", cableCount.ToString(System.Globalization.CultureInfo.InvariantCulture));
+        return RunAsync(false, "set-count", cableCount.ToString(System.Globalization.CultureInfo.InvariantCulture));
     }
 
+    /// <summary>
+    /// Sets a cable's layout, without elevation like <see cref="SetCableCountAsync"/>.
+    /// </summary>
     /// <param name="layout">"stereo", "5.1" or "7.1".</param>
     public Task<DriverCommandResult> SetCableLayoutAsync(int cable, string layout)
     {
-        return RunAsync("set-layout", cable.ToString(System.Globalization.CultureInfo.InvariantCulture), layout);
+        return RunAsync(false, "set-layout", cable.ToString(System.Globalization.CultureInfo.InvariantCulture), layout);
     }
 
     public Task<DriverCommandResult> UninstallAsync()
     {
-        return RunAsync("uninstall");
+        return RunAsync(true, "uninstall");
     }
 
     public Task<DriverCommandResult> UpdateAsync()
     {
-        return RunAsync("update");
+        return RunAsync(true, "update");
     }
 
-    private async Task<DriverCommandResult> RunAsync(params string[] arguments)
+    /// <summary>
+    /// Runs a command that changes the driver or the cables. The engine stops meanwhile, so it doesn't hold a cable that goes away.
+    /// </summary>
+    private async Task<DriverCommandResult> RunAsync(bool elevated, params string[] arguments)
     {
         if (IsBusy)
         {
@@ -140,7 +154,9 @@ internal sealed class DriverController
         Changed?.Invoke(this, EventArgs.Empty);
         try
         {
-            var result = await _supervisor.RunWithoutEngineAsync(() => RunElevatedAsync(arguments));
+            var result = await _supervisor.RunWithoutEngineAsync(() =>
+                elevated ? RunElevatedAsync(arguments) : RunUnelevatedAsync(arguments)
+            );
             Log.Information("Driver {Command}: {Result}", arguments[0], result);
             return result;
         }
@@ -153,7 +169,7 @@ internal sealed class DriverController
 
     private async Task<DriverStatus?> ReadStatusAsync()
     {
-        var (exitCode, output) = await RunUtilityAsync("status", readOutput: true);
+        var (exitCode, output) = await RunUtilityAsync(["status"], readOutput: true);
         try
         {
             return exitCode == ExitSuccess ? JsonSerializer.Deserialize<DriverStatus>(output, StatusJson) : null;
@@ -169,19 +185,23 @@ internal sealed class DriverController
     /// Runs the utility without elevation. Returns its exit code (-1 if it didn't start) and its standard output, or its standard error
     /// unless <paramref name="readOutput"/>.
     /// </summary>
-    private async Task<(int ExitCode, string Text)> RunUtilityAsync(string command, bool readOutput = false)
+    private async Task<(int ExitCode, string Text)> RunUtilityAsync(string[] arguments, bool readOutput = false)
     {
         try
         {
-            using var process = Process.Start(
-                new ProcessStartInfo(_utilityPath, command)
-                {
-                    UseShellExecute = false,
-                    CreateNoWindow = true,
-                    RedirectStandardOutput = true,
-                    RedirectStandardError = true,
-                }
-            )!;
+            var startInfo = new ProcessStartInfo(_utilityPath)
+            {
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true,
+            };
+            foreach (var argument in arguments)
+            {
+                startInfo.ArgumentList.Add(argument);
+            }
+
+            using var process = Process.Start(startInfo)!;
             var output = process.StandardOutput.ReadToEndAsync();
             var error = process.StandardError.ReadToEndAsync();
             await process.WaitForExitAsync();
@@ -189,9 +209,25 @@ internal sealed class DriverController
         }
         catch (Exception ex) when (ex is Win32Exception or InvalidOperationException)
         {
-            Log.Warning(ex, "Running the driver utility ({Command}) failed.", command);
+            Log.Warning(ex, "Running the driver utility ({Command}) failed.", arguments[0]);
             return (-1, "");
         }
+    }
+
+    private async Task<DriverCommandResult> RunUnelevatedAsync(string[] arguments)
+    {
+        var (exitCode, error) = await RunUtilityAsync(arguments);
+        if (exitCode != ExitSuccess)
+        {
+            Log.Warning("The driver utility ({Command}) failed ({ExitCode}): {Error}", arguments[0], exitCode, error);
+        }
+
+        return exitCode switch
+        {
+            ExitSuccess => DriverCommandResult.Success,
+            ExitRebootRequired => DriverCommandResult.RebootRequired,
+            _ => DriverCommandResult.Failed,
+        };
     }
 
     private async Task<DriverCommandResult> RunElevatedAsync(string[] arguments)

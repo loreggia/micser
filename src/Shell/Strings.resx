@@ -58,7 +58,7 @@
     <value>Micser – starting the audio engine</value>
   </data>
   <data name="StatusPaused" xml:space="preserve">
-    <value>Micser – changing the virtual audio cables</value>
+    <value>Micser – changing the virtual cables</value>
   </data>
   <data name="StatusNotRunning" xml:space="preserve">
     <value>Micser – the audio engine isn't running</value>
@@ -70,10 +70,10 @@
     <value>Micser – stopping</value>
   </data>
   <data name="DriverRebootRequired" xml:space="preserve">
-    <value>Restart Windows to finish changing the virtual audio cables.</value>
+    <value>Restart Windows to finish changing the virtual cables.</value>
   </data>
   <data name="DriverFailed" xml:space="preserve">
-    <value>Changing the virtual audio cables failed. The log is in %PROGRAMDATA%\Micser\logs\driver-utility.log.</value>
+    <value>Changing the virtual cables failed. The log is in %PROGRAMDATA%\Micser\logs\driver-utility.log.</value>
   </data>
   <data name="WebView2Missing" xml:space="preserve">
     <value>Micser needs the Microsoft Edge WebView2 Runtime to show its window. Open the download page?</value>
@@ -82,7 +82,7 @@
     <value>The audio engine isn't running and couldn't be started. Its log is in %LOCALAPPDATA%\Micser\logs.</value>
   </data>
   <data name="PageChangingCables" xml:space="preserve">
-    <value>Changing the virtual audio cables…</value>
+    <value>Changing the virtual cables…</value>
   </data>
   <data name="PageStarting" xml:space="preserve">
     <value>Starting the audio engine…</value>

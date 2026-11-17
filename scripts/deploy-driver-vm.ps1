@@ -1,5 +1,5 @@
-# Builds the VAC driver and installs it in a Hyper-V test VM (test signing on) over PowerShell Direct. With -TestSeconds, it then runs
-# the AudioHarness latency measurement through cable 1 in the VM.
+# Builds the cable driver and installs it in a Hyper-V test VM (test signing on) over PowerShell Direct, with src/CableDriver/cables.ps1
+# in C:\MicserCable. With -TestSeconds, it then runs the AudioHarness latency measurement through cable 1 in the VM.
 #
 # The VM login is read from %USERPROFILE%\.micser-vm-cred.xml, created once with:
 #   Get-Credential | Export-Clixml "$env:USERPROFILE\.micser-vm-cred.xml"
@@ -14,18 +14,18 @@ $ErrorActionPreference = "Stop"
 $PSNativeCommandUseErrorActionPreference = $true
 
 $root = Split-Path $PSScriptRoot -Parent
-$vacDir = Join-Path $root "src/Vac"
-$binDir = Join-Path $vacDir "bin/x64/$Configuration"
+$driverDir = Join-Path $root "src/CableDriver"
+$binDir = Join-Path $driverDir "bin/x64/$Configuration"
 $harnessDir = Join-Path $root "artifacts/harness"
-$remoteDir = "C:\MicserVac"
-$hardwareId = "ROOT\MicserVac"
+$remoteDir = "C:\MicserCable"
+$hardwareId = "ROOT\MicserCable"
 
 if (-not $NoBuild) {
-    & (Join-Path $PSScriptRoot "build-vac.ps1") -Configuration $Configuration -Platform x64
+    & (Join-Path $PSScriptRoot "build-driver.ps1") -Configuration $Configuration -Platform x64
 }
 
-$wdkVersion = (([xml](Get-Content (Join-Path $vacDir "packages.config"))).packages.package | Where-Object id -eq "Microsoft.Windows.WDK.x64").version
-$devcon = (Resolve-Path (Join-Path $vacDir "packages/Microsoft.Windows.WDK.x64.$wdkVersion/c/tools/10.*/x64/devcon.exe")).Path
+$wdkVersion = (([xml](Get-Content (Join-Path $driverDir "packages.config"))).packages.package | Where-Object id -eq "Microsoft.Windows.WDK.x64").version
+$devcon = (Resolve-Path (Join-Path $driverDir "packages/Microsoft.Windows.WDK.x64.$wdkVersion/c/tools/10.*/x64/devcon.exe")).Path
 
 if ($TestSeconds -gt 0) {
     dotnet publish (Join-Path $root "tools/AudioHarness") -c Release -r win-x64 --self-contained -o $harnessDir
@@ -55,8 +55,8 @@ try {
         New-Item -ItemType Directory $dir | Out-Null
     } -ArgumentList $remoteDir
 
-    Copy-Item (Join-Path $binDir "Micser.Vac") -Destination $remoteDir -ToSession $session -Recurse
-    Copy-Item (Join-Path $binDir "MicserVac.cer"), $devcon -Destination $remoteDir -ToSession $session
+    Copy-Item (Join-Path $binDir "Micser.CableDriver") -Destination $remoteDir -ToSession $session -Recurse
+    Copy-Item (Join-Path $binDir "MicserCable.cer"), $devcon, (Join-Path $driverDir "cables.ps1") -Destination $remoteDir -ToSession $session
     if ($TestSeconds -gt 0) {
         Copy-Item $harnessDir -Destination "$remoteDir\harness" -ToSession $session -Recurse
     }
@@ -85,6 +85,17 @@ try {
         throw "devcon remove failed with exit code $removeExitCode"
     }
 
+    # Each install of the root device creates new cable devices (their instance paths contain the root device's), and Windows numbers
+    # endpoints of devices with the same name, also of ones that aren't present ("2- Micser Cable 1"). DriverUtility does the same.
+    Invoke-Command -Session $session -ScriptBlock {
+        $cables = @(Get-PnpDevice | Where-Object InstanceId -like "MICSERCABLE\*")
+        # an error instead of nothing when there are no endpoints
+        $endpoints = Get-PnpDevice -Class AudioEndpoint -ErrorAction SilentlyContinue | Where-Object {
+            (Get-PnpDeviceProperty -InstanceId $_.InstanceId -KeyName DEVPKEY_Device_Parent -ErrorAction SilentlyContinue).Data -like "MicserCable\*"
+        }
+        foreach ($device in @($endpoints) + $cables) { pnputil /remove-device $device.InstanceId | Out-Null }
+    }
+
     Invoke-Command -Session $session -ScriptBlock {
         param($dir, $hardwareId)
         $ErrorActionPreference = "Stop"
@@ -92,16 +103,16 @@ try {
         # the WDK test certificate is self-signed, so it has to be both a trusted root and a trusted publisher
         # -f creates the TrustedPublisher store, which a fresh Windows doesn't have yet
         foreach ($store in "Root", "TrustedPublisher") {
-            certutil -f -addstore $store "$dir\MicserVac.cer" | Out-Null
+            certutil -f -addstore $store "$dir\MicserCable.cer" | Out-Null
             if ($LASTEXITCODE -ne 0) { throw "certutil -addstore $store failed with exit code $LASTEXITCODE" }
         }
 
         $drivers = pnputil /enum-drivers | Out-String
-        foreach ($match in [regex]::Matches($drivers, "Published Name:\s+(oem\d+\.inf)\s+Original Name:\s+micser\.vac\.inf")) {
+        foreach ($match in [regex]::Matches($drivers, "Published Name:\s+(oem\d+\.inf)\s+Original Name:\s+micsercable\.inf")) {
             pnputil /delete-driver $match.Groups[1].Value /force | Out-Null
         }
 
-        & "$dir\devcon.exe" install "$dir\Micser.Vac\Micser.Vac.inf" $hardwareId
+        & "$dir\devcon.exe" install "$dir\Micser.CableDriver\MicserCable.inf" $hardwareId
         # 1 means a reboot is needed
         if ($LASTEXITCODE -gt 1) { throw "devcon install failed with exit code $LASTEXITCODE" }
         if ($LASTEXITCODE -eq 1) { Write-Warning "Reboot the VM to finish the driver installation." }
@@ -119,7 +130,7 @@ try {
             }
 
             & "$dir\harness\Micser.AudioHarness.exe" list
-            & "$dir\harness\Micser.AudioHarness.exe" latency Micser Micser --seconds $seconds
+            & "$dir\harness\Micser.AudioHarness.exe" latency "Cable 1 Input (Micser Cable 1)" "Cable 1 Output (Micser Cable 1)" --seconds $seconds
         } -ArgumentList $remoteDir, $TestSeconds
     }
 }

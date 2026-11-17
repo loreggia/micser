@@ -4,8 +4,6 @@ namespace Micser.DriverUtility.Tests;
 
 public class CableEndpointsTests
 {
-    private const string InstanceId = @"ROOT\MEDIA\0000";
-
     [Test]
     public async Task CableMatches_NeedsBothSidesWithTheLayoutsFormat()
     {
@@ -24,6 +22,9 @@ public class CableEndpointsTests
         await Assert.That(CableEndpoints.CableMatches(endpoints, 3, CableLayout.Stereo)).IsFalse();
         await Assert.That(CableEndpoints.AllMatch(endpoints, [CableLayout.Surround71])).IsTrue();
         await Assert.That(CableEndpoints.AllMatch(endpoints, [CableLayout.Surround71, CableLayout.Stereo])).IsFalse();
+        await Assert
+            .That(CableEndpoints.AllMatch(endpoints, [CableLayout.Surround71, CableLayout.Stereo], cable => cable != 2))
+            .IsTrue();
     }
 
     [Test]
@@ -43,11 +44,11 @@ public class CableEndpointsTests
     }
 
     [Test]
-    [Arguments(@"{2}.\\?\root#media#0000#{6994ad04-93ef-11d0-a3cc-00a0c9223196}\waverender1", 1, false)]
-    [Arguments(@"{2}.\\?\root#media#0000#{6994ad04-93ef-11d0-a3cc-00a0c9223196}\wavecapture12", 12, true)]
+    [Arguments(@"{2}.\\?\micsercable#cable01#1&14041d6&6&01#{6994ad04-93ef-11d0-a3cc-00a0c9223196}\render", 1, false)]
+    [Arguments(@"{2}.\\?\MICSERCABLE#CABLE12#1&14041d6&6&12#{6994ad04-93ef-11d0-a3cc-00a0c9223196}\Capture", 12, true)]
     public async Task TryParseFilterPath_ReadsCableAndSide(string path, int cable, bool isCapture)
     {
-        var parsed = CableEndpoints.TryParseFilterPath(path, InstanceId, out var parsedCable, out var parsedCapture);
+        var parsed = CableEndpoints.TryParseFilterPath(path, out var parsedCable, out var parsedCapture);
 
         await Assert.That(parsed).IsTrue();
         await Assert.That(parsedCable).IsEqualTo(cable);
@@ -55,13 +56,61 @@ public class CableEndpointsTests
     }
 
     [Test]
-    [Arguments(@"{2}.\\?\root#media#0001#{6994ad04-93ef-11d0-a3cc-00a0c9223196}\waverender1")]
-    [Arguments(@"{2}.\\?\root#media#0000#{6994ad04-93ef-11d0-a3cc-00a0c9223196}\topologyrender1")]
-    [Arguments(@"{2}.\\?\root#media#0000#{6994ad04-93ef-11d0-a3cc-00a0c9223196}\waverender")]
+    [Arguments(@"{2}.\\?\micsercable#cable01#1&14041d6&6&01#{6994ad04-93ef-11d0-a3cc-00a0c9223196}\topology")]
+    [Arguments(@"{2}.\\?\micsercable#cable00#1&14041d6&6&00#{6994ad04-93ef-11d0-a3cc-00a0c9223196}\render")]
+    [Arguments(@"{2}.\\?\micsercable#cable1#1&14041d6&6&01#{6994ad04-93ef-11d0-a3cc-00a0c9223196}\render")]
+    [Arguments(@"{2}.\\?\other#cable01#1&14041d6&6&01#{6994ad04-93ef-11d0-a3cc-00a0c9223196}\render")]
     [Arguments(@"{2}.\\?\hdaudio#func_01#{6994ad04-93ef-11d0-a3cc-00a0c9223196}\elineoutwave")]
     public async Task TryParseFilterPath_OtherFilters_AreIgnored(string path)
     {
-        await Assert.That(CableEndpoints.TryParseFilterPath(path, InstanceId, out _, out _)).IsFalse();
+        await Assert.That(CableEndpoints.TryParseFilterPath(path, out _, out _)).IsFalse();
+    }
+}
+
+public class CableConfigTests
+{
+    [Test]
+    public async Task NativeLayout_MatchesPublicH()
+    {
+        // MICSERCABLE_CONFIG: CableCount, Channels[16], ActiveCables
+        await Assert.That(System.Runtime.CompilerServices.Unsafe.SizeOf<MICSERCABLE_CONFIG>()).IsEqualTo(72);
+        await Assert
+            .That(System.Runtime.InteropServices.Marshal.OffsetOf<MICSERCABLE_CONFIG>("ActiveCables"))
+            .IsEqualTo(68);
+    }
+
+    [Test]
+    public async Task ToNative_AndBack_KeepsTheConfig()
+    {
+        CableLayout[] layouts =
+        [
+            CableLayout.Stereo,
+            CableLayout.Surround51,
+            .. Enumerable.Repeat(CableLayout.Surround71, 14),
+        ];
+        var config = new CableConfig(3, layouts);
+
+        var native = config.ToNative();
+        native.ActiveCables = 0b101;
+        var back = CableConfig.FromNative(native);
+
+        await Assert.That(back.CableCount).IsEqualTo(3);
+        await Assert.That(back.Layouts).IsEquivalentTo(layouts);
+        await Assert
+            .That(back.ActiveLayouts)
+            .IsEquivalentTo([CableLayout.Stereo, CableLayout.Surround51, CableLayout.Surround71]);
+        await Assert.That(back.ActiveCables).IsEqualTo(0b101u);
+        await Assert.That(back.Exists(1)).IsTrue();
+        await Assert.That(back.Exists(2)).IsFalse();
+        await Assert.That(back.Exists(3)).IsTrue();
+    }
+
+    [Test]
+    public async Task FromNative_UnsupportedChannels_AreStereo()
+    {
+        var native = new CableConfig(1, [(CableLayout)4]).ToNative();
+
+        await Assert.That(CableConfig.FromNative(native).Layouts[0]).IsEqualTo(CableLayout.Stereo);
     }
 }
 

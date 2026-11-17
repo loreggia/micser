@@ -117,11 +117,11 @@ export const de: Translations<typeof en> = {
     widgetsFailed: "Die Widgets des Plugins {{name}} konnten nicht geladen werden",
   },
   cables: {
-    title: "Virtuelle Audiokabel",
+    title: "Virtuelle Kabel",
     description:
-      "Jedes Kabel ist ein Wiedergabegerät („Cable N Input“), dessen Ton aus einem Aufnahmegerät („Cable N Output“) kommt, z. B. um die Ausgabe von Micser in anderen Apps als Mikrofon zu verwenden. Änderungen fragen nach Administratorrechten und stoppen das Audio kurz.",
+      "Jedes Kabel ist ein Wiedergabegerät („Cable N Input“), dessen Ton aus einem Aufnahmegerät („Cable N Output“) kommt, z. B. um die Ausgabe von Micser in anderen Apps als Mikrofon zu verwenden. Installieren, Aktualisieren und Entfernen des Treibers fragen nach Administratorrechten; alle Änderungen stoppen das Audio kurz.",
     count: "Anzahl der Kabel",
-    changing: "Die virtuellen Audiokabel werden geändert…",
+    changing: "Die virtuellen Kabel werden geändert…",
     statusUnreadable: "Der Treiberstatus konnte nicht gelesen werden.",
     install: "Installieren",
     driver: "Treiber {{version}}",
@@ -131,14 +131,15 @@ export const de: Translations<typeof en> = {
     uninstall: "Deinstallieren",
     cable: "Kabel {{number}}",
     layoutOf: "Kanallayout von Kabel {{number}}",
-    notApplied: "Noch nicht übernommen; starte Windows neu, falls es danach gefragt hat.",
+    notApplied:
+      "Noch nicht übernommen: Eine App verwendet das Kabel eventuell noch, oder Windows braucht den Neustart, nach dem die Treiberinstallation gefragt hat.",
     surroundHint:
       "Surround-Kabel geben alle Kanäle an Micser weiter. Apps, die ein Surround-Kabel in Stereo aufnehmen, erhalten den Downmix von Windows, der viel leiser ist; verwende daher Stereo für Kabel, die solche Apps aufnehmen.",
     engineDescription:
       "Jedes Kabel ist ein Wiedergabegerät („Micser Cable N Input“), dessen Ton aus einem Aufnahmegerät („Micser Cable N Output“) kommt, z. B. um die Ausgabe von Micser in anderen Apps als Mikrofon zu verwenden. Die Kabel bestehen, solange Micser läuft, und Änderungen gelten sofort.",
     engineSurroundHint:
       "Surround-Kabel geben alle Kanäle an Micser weiter. Apps, die ein Surround-Kabel in Stereo aufnehmen, erhalten einen Downmix; verwende daher Stereo für Kabel, die solche Apps aufnehmen.",
-    changeFailed: "Die virtuellen Audiokabel konnten nicht geändert werden",
+    changeFailed: "Die virtuellen Kabel konnten nicht geändert werden",
     layouts: {
       stereo: "Stereo",
       "5.1": "5.1-Surround",

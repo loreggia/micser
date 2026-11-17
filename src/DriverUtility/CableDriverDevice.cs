@@ -8,19 +8,25 @@ using static Micser.DriverUtility.NativeMethods;
 namespace Micser.DriverUtility;
 
 /// <summary>
-/// The root-enumerated VAC device. Owns the device information set it was found in or created with.
+/// The root-enumerated device of the cable driver. Owns the device information set it was found in or created with. The driver creates
+/// a child device per cable (MicserCable\CableNN), and Windows an endpoint device per side of each cable.
 /// </summary>
-internal sealed unsafe class VacDevice : IDisposable
+internal sealed unsafe class CableDriverDevice : IDisposable
 {
     public const string CableCountValue = "CableCount";
     public const string CableLayoutValueFormat = "Cable{0}Channels";
-    public const string HardwareId = @"ROOT\MicserVac";
+    public const string HardwareId = @"ROOT\MicserCable";
     public const int MaxCableCount = 16;
+
+    /// <summary>
+    /// The enumerator of the cable devices, which the driver creates (MicserCable\Cable01, ...).
+    /// </summary>
+    private const string CableEnumerator = "MicserCable";
 
     private readonly nint _deviceInfoSet;
     private SP_DEVINFO_DATA _deviceInfoData;
 
-    private VacDevice(nint deviceInfoSet, SP_DEVINFO_DATA deviceInfoData)
+    private CableDriverDevice(nint deviceInfoSet, SP_DEVINFO_DATA deviceInfoData)
     {
         _deviceInfoSet = deviceInfoSet;
         _deviceInfoData = deviceInfoData;
@@ -50,7 +56,7 @@ internal sealed unsafe class VacDevice : IDisposable
     /// <summary>
     /// Creates the devnode for an INF's device class. The driver is installed separately (<see cref="DriverInstaller"/>).
     /// </summary>
-    public static VacDevice Create(string infPath, int cableCount)
+    public static CableDriverDevice Create(string infPath, int cableCount)
     {
         var className = stackalloc char[64];
         if (!SetupDiGetINFClass(infPath, out var classGuid, className, 64, out _))
@@ -64,7 +70,10 @@ internal sealed unsafe class VacDevice : IDisposable
             throw LastError(nameof(SetupDiCreateDeviceInfoList));
         }
 
-        var device = new VacDevice(deviceInfoSet, new SP_DEVINFO_DATA { cbSize = (uint)sizeof(SP_DEVINFO_DATA) });
+        var device = new CableDriverDevice(
+            deviceInfoSet,
+            new SP_DEVINFO_DATA { cbSize = (uint)sizeof(SP_DEVINFO_DATA) }
+        );
         try
         {
             if (
@@ -120,7 +129,9 @@ internal sealed unsafe class VacDevice : IDisposable
                 throw LastError(nameof(SetupDiCreateDevRegKey));
             }
 
-            WriteCableCount(key, cableCount);
+            using var handle = new SafeRegistryHandle(key, true);
+            using var registryKey = RegistryKey.FromHandle(handle);
+            registryKey.SetValue(CableCountValue, Math.Clamp(cableCount, 1, MaxCableCount), RegistryValueKind.DWord);
             return device;
         }
         catch
@@ -133,10 +144,12 @@ internal sealed unsafe class VacDevice : IDisposable
     /// <summary>
     /// Finds the device, preferring a present one over a leftover devnode. Null when there is none.
     /// </summary>
-    public static VacDevice? Find()
+    public static CableDriverDevice? Find()
     {
-        VacDevice? found = null;
+        CableDriverDevice? found = null;
         ForEach(
+            "ROOT",
+            device => device.HasHardwareId(),
             device =>
             {
                 if (found == null || (!found.IsPresent && device.IsPresent))
@@ -153,28 +166,43 @@ internal sealed unsafe class VacDevice : IDisposable
             return null;
         }
 
-        return new VacDevice(deviceInfoSet, found._deviceInfoData);
+        return new CableDriverDevice(deviceInfoSet, found._deviceInfoData);
     }
 
     /// <summary>
-    /// Removes every devnode of the device, including leftovers. Returns whether a reboot is needed to finish.
+    /// Removes every devnode of the driver, including leftovers: the cables' endpoints, the cable devices and the root device. Without
+    /// that, a new installation would create new cable devices next to the old ones, and Windows would number the endpoint names
+    /// ("2- Micser Cable 1"). Returns whether a reboot is needed to finish.
     /// </summary>
     public static bool RemoveAll()
     {
         var needReboot = false;
-        ForEach(
-            device =>
+        void Uninstall(CableDriverDevice device)
+        {
+            if (!DiUninstallDevice(0, device._deviceInfoSet, ref device._deviceInfoData, 0, out var reboot))
             {
-                if (!DiUninstallDevice(0, device._deviceInfoSet, ref device._deviceInfoData, 0, out var reboot))
-                {
-                    throw LastError(nameof(DiUninstallDevice));
-                }
+                throw LastError(nameof(DiUninstallDevice));
+            }
 
-                needReboot |= reboot;
-            },
+            needReboot |= reboot;
+        }
+
+        // the endpoints are software devices whose parent is a cable device
+        ForEach(
+            "SWD",
+            device =>
+                device
+                    .GetStringProperty(ParentKey)
+                    ?.StartsWith(CableEnumerator + @"\", StringComparison.OrdinalIgnoreCase) == true,
+            Uninstall,
             out var deviceInfoSet
         );
+        SetupDiDestroyDeviceInfoList(deviceInfoSet);
 
+        ForEach(CableEnumerator, _ => true, Uninstall, out deviceInfoSet);
+        SetupDiDestroyDeviceInfoList(deviceInfoSet);
+
+        ForEach("ROOT", device => device.HasHardwareId(), Uninstall, out deviceInfoSet);
         SetupDiDestroyDeviceInfoList(deviceInfoSet);
         return needReboot;
     }
@@ -190,7 +218,7 @@ internal sealed unsafe class VacDevice : IDisposable
     }
 
     /// <summary>
-    /// The layout of each cable (index 0 is cable 1), as the driver reads it when the device starts.
+    /// The layout of each cable (index 0 is cable 1), as the driver keeps it.
     /// </summary>
     public IReadOnlyList<CableLayout> GetCableLayouts()
     {
@@ -200,15 +228,6 @@ internal sealed unsafe class VacDevice : IDisposable
                 .Range(1, GetCableCount())
                 .Select(cable => CableLayouts.FromChannels(ReadValue(GetCableLayoutValue(cable)))),
         ];
-    }
-
-    /// <summary>
-    /// The device instance ID, e.g. ROOT\MEDIA\0000; the cables' audio endpoints refer to it.
-    /// </summary>
-    public string GetInstanceId()
-    {
-        return GetStringProperty(InstanceIdKey)
-            ?? throw new InvalidOperationException("The device has no instance ID.");
     }
 
     /// <summary>
@@ -224,104 +243,39 @@ internal sealed unsafe class VacDevice : IDisposable
         return GetStringProperty(DriverVersionKey);
     }
 
-    /// <summary>
-    /// Restarts the device so the driver reads its settings again. Returns whether a reboot is needed instead, e.g. while an
-    /// application keeps a cable open.
-    /// </summary>
-    public bool Restart()
-    {
-        var parameters = new SP_PROPCHANGE_PARAMS
-        {
-            ClassInstallHeader = new SP_CLASSINSTALL_HEADER
-            {
-                cbSize = (uint)sizeof(SP_CLASSINSTALL_HEADER),
-                InstallFunction = DIF_PROPERTYCHANGE,
-            },
-            StateChange = DICS_PROPCHANGE,
-            Scope = DICS_FLAG_GLOBAL,
-        };
-
-        if (
-            !SetupDiSetClassInstallParams(
-                _deviceInfoSet,
-                ref _deviceInfoData,
-                ref parameters,
-                (uint)sizeof(SP_PROPCHANGE_PARAMS)
-            )
-        )
-        {
-            throw LastError(nameof(SetupDiSetClassInstallParams));
-        }
-
-        if (!SetupDiCallClassInstaller(DIF_PROPERTYCHANGE, _deviceInfoSet, ref _deviceInfoData))
-        {
-            throw LastError("SetupDiCallClassInstaller(DIF_PROPERTYCHANGE)");
-        }
-
-        var installParams = new SP_DEVINSTALL_PARAMS { cbSize = (uint)sizeof(SP_DEVINSTALL_PARAMS) };
-        return SetupDiGetDeviceInstallParams(_deviceInfoSet, ref _deviceInfoData, ref installParams)
-            && (installParams.Flags & (DI_NEEDREBOOT | DI_NEEDRESTART)) != 0;
-    }
-
-    public void SetCableCount(int count)
-    {
-        var key = SetupDiOpenDevRegKey(
-            _deviceInfoSet,
-            ref _deviceInfoData,
-            DICS_FLAG_GLOBAL,
-            0,
-            DIREG_DEV,
-            KEY_SET_VALUE
-        );
-        if (key == InvalidHandle)
-        {
-            throw LastError(nameof(SetupDiOpenDevRegKey));
-        }
-
-        WriteCableCount(key, count);
-    }
-
-    /// <summary>
-    /// Sets a cable's layout, which the driver reads when the device starts. The value stays when the cable count goes down.
-    /// </summary>
-    public void SetCableLayout(int cable, CableLayout layout)
-    {
-        var key = SetupDiOpenDevRegKey(
-            _deviceInfoSet,
-            ref _deviceInfoData,
-            DICS_FLAG_GLOBAL,
-            0,
-            DIREG_DEV,
-            KEY_SET_VALUE
-        );
-        if (key == InvalidHandle)
-        {
-            throw LastError(nameof(SetupDiOpenDevRegKey));
-        }
-
-        using var handle = new SafeRegistryHandle(key, true);
-        using var registryKey = RegistryKey.FromHandle(handle);
-        registryKey.SetValue(GetCableLayoutValue(cable), (int)layout, RegistryValueKind.DWord);
-    }
-
     private static string GetCableLayoutValue(int cable)
     {
         return string.Format(System.Globalization.CultureInfo.InvariantCulture, CableLayoutValueFormat, cable);
     }
 
-    private static void ForEach(Action<VacDevice> action, out nint deviceInfoSet)
+    /// <summary>
+    /// Calls <paramref name="action"/> for each devnode of an enumerator, present or not, that matches <paramref name="filter"/>.
+    /// </summary>
+    private static void ForEach(
+        string enumerator,
+        Func<CableDriverDevice, bool> filter,
+        Action<CableDriverDevice> action,
+        out nint deviceInfoSet
+    )
     {
-        deviceInfoSet = SetupDiGetClassDevs(0, "ROOT", 0, DIGCF_ALLCLASSES);
+        deviceInfoSet = SetupDiGetClassDevs(0, enumerator, 0, DIGCF_ALLCLASSES);
         if (deviceInfoSet == InvalidHandle)
         {
+            // an enumerator without devices
+            if (Marshal.GetLastPInvokeError() == ERROR_INVALID_DATA)
+            {
+                deviceInfoSet = SetupDiCreateDeviceInfoList(0, 0);
+                return;
+            }
+
             throw LastError(nameof(SetupDiGetClassDevs));
         }
 
         var data = new SP_DEVINFO_DATA { cbSize = (uint)sizeof(SP_DEVINFO_DATA) };
         for (uint i = 0; SetupDiEnumDeviceInfo(deviceInfoSet, i, ref data); i++)
         {
-            var device = new VacDevice(deviceInfoSet, data);
-            if (device.HasHardwareId())
+            var device = new CableDriverDevice(deviceInfoSet, data);
+            if (filter(device))
             {
                 action(device);
             }
@@ -332,13 +286,6 @@ internal sealed unsafe class VacDevice : IDisposable
     {
         var error = Marshal.GetLastPInvokeError();
         return new Win32Exception(error, $"{function} failed: {new Win32Exception(error).Message}");
-    }
-
-    private static void WriteCableCount(nint key, int count)
-    {
-        using var handle = new SafeRegistryHandle(key, true);
-        using var registryKey = RegistryKey.FromHandle(handle);
-        registryKey.SetValue(CableCountValue, Math.Clamp(count, 1, MaxCableCount), RegistryValueKind.DWord);
     }
 
     private object? ReadValue(string name)

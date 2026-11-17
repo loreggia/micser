@@ -10,22 +10,26 @@ Abstract:
 
 --*/
 
-#ifndef _MICSERVAC_CABLE_H_
-#define _MICSERVAC_CABLE_H_
+#ifndef _MICSERCABLE_CABLE_H_
+#define _MICSERCABLE_CABLE_H_
 
 #define CABLE_BUFFER_SIZE           0x20000     // 128 KiB, about 340 ms of 48 kHz stereo (the ring holds 32-bit samples)
 #define CABLE_SURROUND_BUFFER_SIZE  0x80000     // 512 KiB, about 340 ms of 48 kHz 7.1
 #define CABLE_TARGET_LATENCY_MS     10
 #define CABLE_MAX_LATENCY_MS        30
 
-// Number of cables, read from the device's hardware key ("Device Parameters").
+// Number of cables (1 to MAX_CABLES), DWORD in the root device's hardware key ("Device Parameters").
 #define CABLE_COUNT_VALUE           L"CableCount"
-#define MAX_CABLES                  16
 
 // Channel count of each cable (2, 6 or 8; stereo otherwise), DWORD values "Cable1Channels", ... in the same key. Both sides of a cable
-// use its layout, so the cable never mixes channels. Windows keeps an endpoint's device format across device restarts, so DriverUtility sets
-// the endpoints' format after changing a layout.
+// use its layout, so the cable never mixes channels. Windows keeps an endpoint's device format when the cable's device is created again,
+// so DriverUtility sets the endpoints' format after changing a layout.
 #define CABLE_CHANNELS_VALUE        L"Cable%uChannels"
+
+inline BOOLEAN IsValidCableChannels(_In_ ULONG Channels)
+{
+    return Channels == 2 || Channels == 6 || Channels == 8;
+}
 
 // The channel mask of a cable's layout: stereo, 5.1 (side speakers, Windows' usual 5.1) or 7.1.
 inline ULONG CableChannelMask(_In_ ULONG Channels)
@@ -75,4 +79,4 @@ private:
 
 typedef CCable* PCABLE;
 
-#endif // _MICSERVAC_CABLE_H_
+#endif // _MICSERCABLE_CABLE_H_

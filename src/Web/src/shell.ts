@@ -10,7 +10,7 @@ export interface CableStatus {
   formatsMatch: boolean;
 }
 
-/** The virtual audio cable driver, as Micser.DriverUtility reports it. */
+/** The cable driver, as Micser.DriverUtility reports it. */
 export interface DriverStatus {
   installed: boolean;
   /** The device's problem code, or null when it runs. */

@@ -1,3 +1,6 @@
+using System.Security.AccessControl;
+using System.Security.Principal;
+
 namespace Micser.DriverUtility;
 
 /// <summary>
@@ -12,6 +15,43 @@ internal static class Log
         "logs",
         "driver-utility.log"
     );
+
+    /// <summary>
+    /// Lets all users write the log: the elevated commands create it, and the cable commands run without elevation.
+    /// </summary>
+    public static void AllowUsers()
+    {
+        try
+        {
+            var directory = Directory.CreateDirectory(Path.GetDirectoryName(FilePath)!);
+            var users = new SecurityIdentifier(WellKnownSidType.BuiltinUsersSid, null);
+            var rule = new FileSystemAccessRule(
+                users,
+                FileSystemRights.Modify,
+                InheritanceFlags.ContainerInherit | InheritanceFlags.ObjectInherit,
+                PropagationFlags.None,
+                AccessControlType.Allow
+            );
+            var security = directory.GetAccessControl();
+            security.AddAccessRule(rule);
+            directory.SetAccessControl(security);
+
+            // a log created before keeps its own ACL
+            if (File.Exists(FilePath))
+            {
+                var file = new FileInfo(FilePath);
+                var fileSecurity = file.GetAccessControl();
+                fileSecurity.AddAccessRule(
+                    new FileSystemAccessRule(users, FileSystemRights.Modify, AccessControlType.Allow)
+                );
+                file.SetAccessControl(fileSecurity);
+            }
+        }
+        catch (SystemException ex)
+        {
+            Warning($"Letting all users write the log failed: {ex.Message}");
+        }
+    }
 
     public static void Error(string message)
     {

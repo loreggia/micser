@@ -1,5 +1,5 @@
-# Runs Microsoft's CodeQL driver checks (the WHCP "mustfix" and "recommended" suites) on the VAC driver and fails on any finding in
-# its own code. The SARIF file is written to artifacts/codeql/vac.sarif.
+# Runs Microsoft's CodeQL driver checks (the WHCP "mustfix" and "recommended" suites) on the cable driver and fails on any finding
+# in its own code. The SARIF file is written to artifacts/codeql/driver.sarif.
 param(
     [string]$CodeQL
 )
@@ -8,17 +8,14 @@ $ErrorActionPreference = "Stop"
 $PSNativeCommandUseErrorActionPreference = $true
 
 $root = Split-Path $PSScriptRoot -Parent
-$vacDir = Join-Path $root "src/Vac"
+$driverDir = Join-Path $root "src/CableDriver"
 $outDir = Join-Path $root "artifacts/codeql"
-$database = Join-Path $outDir "vac-db"
-$sarif = Join-Path $outDir "vac.sarif"
+$database = Join-Path $outDir "driver-db"
+$sarif = Join-Path $outDir "driver.sarif"
 $driversPack = "microsoft/windows-drivers@1.10.0"
 
 # Findings that don't apply, by rule ID.
-$excludedRules = @(
-    # PcAddAdapterDevice creates the FDO and clears DO_DEVICE_INITIALIZING itself; the driver never sees the FDO.
-    "cpp/drivers/init-not-cleared"
-)
+$excludedRules = @()
 
 if (-not $CodeQL) {
     $CodeQL = (Get-Command codeql -ErrorAction SilentlyContinue)?.Source
@@ -34,17 +31,17 @@ if (-not $CodeQL) {
 }
 
 # the database build below fails if the driver doesn't build
-& (Join-Path $PSScriptRoot "build-vac.ps1") -RestoreOnly
+& (Join-Path $PSScriptRoot "build-driver.ps1") -RestoreOnly
 
 # the driver suites reference microsoft/cpp-queries, which isn't downloaded with them
 & $CodeQL pack download $driversPack microsoft/cpp-queries@0.0.5
 
 $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
 $msbuild = & $vswhere -latest -requires Microsoft.Component.MSBuild -find "MSBuild\**\Bin\amd64\MSBuild.exe" | Select-Object -First 1
-$project = Join-Path $vacDir "Micser.Vac.vcxproj"
+$project = Join-Path $driverDir "Micser.CableDriver.vcxproj"
 New-Item -ItemType Directory -Force $outDir | Out-Null
 
-& $CodeQL database create $database --overwrite --language=cpp --source-root $vacDir `
+& $CodeQL database create $database --overwrite --language=cpp --source-root $driverDir `
     --command="`"$msbuild`" `"$project`" /t:Rebuild /p:Configuration=Release /p:Platform=x64 /nologo /v:m"
 
 & $CodeQL database analyze $database `
