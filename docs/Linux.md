@@ -2,7 +2,7 @@
 
 Micser runs on Windows. This document maps what it takes to run it on Linux as well, and the plan for doing so. The engine, the audio graph, the plugins, the web UI and all tests are portable (phase 1), on Linux the engine routes audio through PipeWire (phase 2) and creates the virtual cables itself (phase 3), the shell runs on both platforms with Avalonia (phase 4), and releases include an AppImage that updates itself (phase 5).
 
-Decisions so far: PipeWire's native API for audio, a cross-platform shell (tray + embedded web view) instead of browser-only, and one engine that targets `net10.0` on both platforms.
+Decisions so far: PipeWire's native API for audio, a cross-platform shell (tray + embedded web view) instead of browser-only, and one engine that targets `net11.0` on both platforms.
 
 ## Windows dependencies
 
@@ -24,12 +24,12 @@ The graph, the DSP (NAudio's `Dsp` namespace is in the portable `NAudio.Core`), 
 
 ## Phase 1: portable core (done)
 
-- `Micser.Audio`, `Micser.Engine`, `Micser.Plugins.Main` and their tests target `net10.0`. NAudio comes as `NAudio.Core` + `NAudio.Wasapi` (both `net9.0`), not the metapackage. NAudio marks the WASAPI API `[SupportedOSPlatform("windows")]`, so the platform analyzer (CA1416, an error with `TreatWarningsAsErrors`) keeps every WASAPI call behind a Windows check.
+- `Micser.Audio`, `Micser.Engine`, `Micser.Plugins.Main` and their tests target `net11.0`. NAudio comes as `NAudio.Core` + `NAudio.Wasapi` (both `net9.0`), not the metapackage. NAudio marks the WASAPI API `[SupportedOSPlatform("windows")]`, so the platform analyzer (CA1416, an error with `TreatWarningsAsErrors`) keeps every WASAPI call behind a Windows check.
 - Plugins are platform-neutral assemblies; the same plugin package loads on both.
 - **Backends.** `AudioDeviceService` keeps its public API and delegates to an internal `IAudioBackend`: `WasapiBackend` on Windows, `NullAudioBackend` (no devices) elsewhere. A backend opens `ICaptureDevice`/`IRenderDevice` endpoints (layout, sample rate, period; capture pushes interleaved floats, render pulls them). `CaptureStream` and `RenderStream` keep the platform-neutral part: ring buffer, adaptive target, drift control and resampling. `SystemVolume` delegates to the backend's implementation.
 - **Audio thread.** `BlockTimer` per platform: MMCSS and the waitable timer on Windows; on Linux `SCHED_FIFO` (priority 20, with `SCHED_RESET_ON_FORK`) if `RLIMIT_RTPRIO` allows it, otherwise RTKit (phase 2), and `clock_nanosleep` on the monotonic clock.
 - **Engine hosting.** The discovery file and the lock file go to `$XDG_RUNTIME_DIR/micser` (0700); the discovery file is 0600 (`PrivateFiles`). The log path `%LOCALAPPDATA%` in `appsettings.Production.json` is set by the engine where the OS doesn't set it.
-- **Build and CI.** `Micser.slnx` builds on Linux, `DriverUtility` (`net10.0-windows`, without WinForms or WPF) included. CI's `dotnet`, `web` and `e2e` jobs run on Linux as on Windows: they build the solution, run the portable .NET and shell tests, check the OpenAPI document and the API client, run the web tests and the end-to-end tests against a published engine. Releases need it (since phase 5).
+- **Build and CI.** `Micser.slnx` builds on Linux, `DriverUtility` (`net11.0-windows`, without WinForms or WPF) included. CI's `dotnet`, `web` and `e2e` jobs run on Linux as on Windows: they build the solution, run the portable .NET and shell tests, check the OpenAPI document and the API client, run the web tests and the end-to-end tests against a published engine. Releases need it (since phase 5).
 - Findings on the way:
   - The OpenAPI document differed by platform: the XML comment generator writes multi-line descriptions with the platform's line breaks. A document transformer now normalizes them to LF (`OpenApiConfiguration`).
   - `.husky/pre-commit` needs the executable bit for Git on Linux (`dotnet husky install` sets it).
@@ -65,7 +65,7 @@ The graph, the DSP (NAudio's `Dsp` namespace is in the portable `NAudio.Core`), 
 
 - `SpaPodTests` and `SpaAudioChannelsTests` run everywhere.
 - `PipeWireBackendTests` run against `PipeWireTestDaemon`: a private `pipewire` and WirePlumber (on a private D-Bus session from `dbus-run-session`) with their own runtime, configuration and state folders and without device monitors, so they only see virtual sinks and sources and never touch the session's audio. They cover listing, playing to a sink and capturing its monitor, surround channel order, hot-plug with faulting streams, the system volume and a daemon restart. They're skipped where `pipewire`, `wireplumber` 0.4 (Lua configuration), `dbus-run-session` or `pw-cli` are missing; CI's Linux `dotnet` job installs them.
-- `tools/AudioHarness` targets `net10.0`: `list`, routing and `latency` work on both platforms, `formats` (WASAPI formats) on Windows only.
+- `tools/AudioHarness` targets `net11.0`: `list`, routing and `latency` work on both platforms, `formats` (WASAPI formats) on Windows only.
 
 **Realtime priority** (`RealtimeKit`): `RLIMIT_RTPRIO` is 0 for users outside PipeWire's or JACK's realtime group, so `sched_setscheduler` fails there. The audio thread then asks RTKit (`org.freedesktop.RealtimeKit1` on the system bus, D-Bus through `Tmds.DBus.Protocol`), as PipeWire does for its own threads:
 
@@ -99,7 +99,7 @@ The shell (`src/Shell`, see [Shell](Architecture.md#shell)) is one Avalonia app 
 - **Bridge:** the page sends through `window.invokeCSharpAction`, the shell answers through `InvokeScript` and `window.micserShell.receive`; the same on both web engines. `FakeShell` follows it.
 - **Linux specifics:** the tray is a StatusNotifierItem with a D-Bus menu, autostart an XDG desktop entry (`~/.config/autostart/micser.desktop`), the single instance a lock file and a Unix socket in `$XDG_RUNTIME_DIR/micser`, where the shell also finds the engine's discovery file.
 - **Notifications:** none, on either platform. Avalonia's `TrayIcon` has no balloon or notification API, and `Avalonia.Labs.Notifications` 12.0.2 fails on Linux with Avalonia 12.1 (its D-Bus code calls `DBusConnection.AsConnection()`, which the `Tmds.DBus.Protocol` version Avalonia 12.1 ships no longer has). The WinForms shell's balloon tips (update downloaded, the result of a check from the tray, a newer driver) are dropped; the tray's update item and the UI show the same states.
-- **Tests:** `tests/Shell` targets `net10.0` and runs on Linux CI (the registry autostart tests only on Windows, the socket single-instance tests only elsewhere). The UI's end-to-end smoke specs also run on Playwright's WebKit, since the Linux shell renders with WebKitGTK.
+- **Tests:** `tests/Shell` targets `net11.0` and runs on Linux CI (the registry autostart tests only on Windows, the socket single-instance tests only elsewhere). The UI's end-to-end smoke specs also run on Playwright's WebKit, since the Linux shell renders with WebKitGTK.
 - **Not covered:** GNOME shows no tray icons without the AppIndicator extension (Ubuntu ships it, Fedora doesn't), so there the shell is reached through the window and a second start. Packaging (a desktop entry and icon for the app launcher) is phase 5.
 - Never pass the token on a command line: `/proc/<pid>/cmdline` is readable by other users. The shell loads `{url}/#token=…` in its own web view; "open in browser" would need a 0600 redirect file in the runtime folder.
 

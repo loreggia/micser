@@ -16,7 +16,7 @@ The engine provides `Micser.Audio` and its dependencies at runtime, so a plugin 
 ```
 
 The package version is the Micser version it was released with; build against the oldest Micser version the plugin supports. A plugin
-targets `net10.0`, so it loads on every platform the engine runs on.
+targets `net11.0`, so it loads on every platform the engine runs on.
 
 A plugin is a folder with a `plugin.json`, the assembly and, optionally, a widget bundle built with
 [`@micser/web-sdk`](https://www.npmjs.com/package/@micser/web-sdk). The built-in plugin

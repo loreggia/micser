@@ -198,7 +198,9 @@ dotnet_diagnostic.IDE0010.severity = none
 dotnet_diagnostic.IDE0072.severity = none
 
 # Suggestions only: auto property (also over fields used from the audio thread), conditional expression over if/else
-# assignment and return, collection expression over fluent calls such as ToArray()
+# assignment and return, collection initializer or expression (including [with(...)] over constructor arguments such as a comparer),
+# collection expression over fluent calls such as ToArray()
+dotnet_diagnostic.IDE0028.severity = suggestion
 dotnet_diagnostic.IDE0032.severity = suggestion
 dotnet_diagnostic.IDE0045.severity = suggestion
 dotnet_diagnostic.IDE0046.severity = suggestion

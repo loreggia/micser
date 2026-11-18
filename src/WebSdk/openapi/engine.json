@@ -1,5 +1,5 @@
 {
-  "openapi": "3.1.1",
+  "openapi": "3.2.0",
   "info": {
     "title": "Micser.Engine | v1",
     "version": "1.0.0"
@@ -1869,6 +1869,7 @@
           "useSystemVolume",
           "volume"
         ],
+        "type": "object",
         "properties": {
           "type": {
             "enum": [
@@ -1978,6 +1979,7 @@
           "useSystemVolume",
           "volume"
         ],
+        "type": "object",
         "properties": {
           "type": {
             "enum": [
@@ -2087,6 +2089,7 @@
           "useSystemVolume",
           "volume"
         ],
+        "type": "object",
         "properties": {
           "type": {
             "enum": [
@@ -2196,6 +2199,7 @@
           "useSystemVolume",
           "volume"
         ],
+        "type": "object",
         "properties": {
           "type": {
             "enum": [
@@ -2305,6 +2309,7 @@
           "useSystemVolume",
           "volume"
         ],
+        "type": "object",
         "properties": {
           "type": {
             "enum": [
@@ -2414,6 +2419,7 @@
           "useSystemVolume",
           "volume"
         ],
+        "type": "object",
         "properties": {
           "type": {
             "enum": [
@@ -2523,6 +2529,7 @@
           "useSystemVolume",
           "volume"
         ],
+        "type": "object",
         "properties": {
           "type": {
             "enum": [
@@ -2632,6 +2639,7 @@
           "useSystemVolume",
           "volume"
         ],
+        "type": "object",
         "properties": {
           "type": {
             "enum": [
@@ -2741,6 +2749,7 @@
           "useSystemVolume",
           "volume"
         ],
+        "type": "object",
         "properties": {
           "type": {
             "enum": [
@@ -2850,6 +2859,7 @@
           "useSystemVolume",
           "volume"
         ],
+        "type": "object",
         "properties": {
           "type": {
             "enum": [
@@ -2959,6 +2969,7 @@
           "useSystemVolume",
           "volume"
         ],
+        "type": "object",
         "properties": {
           "type": {
             "enum": [
@@ -3068,6 +3079,7 @@
           "useSystemVolume",
           "volume"
         ],
+        "type": "object",
         "properties": {
           "type": {
             "enum": [
@@ -3177,6 +3189,7 @@
           "useSystemVolume",
           "volume"
         ],
+        "type": "object",
         "properties": {
           "type": {
             "enum": [
@@ -3286,6 +3299,7 @@
           "useSystemVolume",
           "volume"
         ],
+        "type": "object",
         "properties": {
           "type": {
             "enum": [
@@ -3395,6 +3409,7 @@
           "useSystemVolume",
           "volume"
         ],
+        "type": "object",
         "properties": {
           "type": {
             "enum": [
@@ -4287,16 +4302,16 @@
       "name": "Configuration"
     },
     {
-      "name": "Engine"
-    },
-    {
-      "name": "Modules"
+      "name": "Connections"
     },
     {
       "name": "Devices"
     },
     {
-      "name": "Connections"
+      "name": "Engine"
+    },
+    {
+      "name": "Modules"
     },
     {
       "name": "Plugins"
@@ -4305,10 +4320,10 @@
       "name": "Preferences"
     },
     {
-      "name": "Subgraphs"
+      "name": "Subgraph templates"
     },
     {
-      "name": "Subgraph templates"
+      "name": "Subgraphs"
     }
   ]
 }
