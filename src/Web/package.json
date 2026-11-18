@@ -16,7 +16,7 @@
     "@micser/web-sdk": "*",
     "@tanstack/react-query": "^5.107.1",
     "@xyflow/react": "^12.12.1",
-    "i18next": "^27.1.1",
+    "i18next": "^27.1.2",
     "markdown-to-jsx": "^9.10.6",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",
