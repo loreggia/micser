@@ -369,7 +369,8 @@ The shell runs on Windows and Linux with Avalonia (`ShellApp`, code only, no XAM
 
 ## Development
 
-- **Orchestration.** `aspire start` (or `aspire run`) runs `tools/AppHost`; `aspire.config.json` at the root points to it.
+- **Orchestration.** `aspire start` (or `aspire run`) runs `tools/AppHost`; `aspire.config.json` at the root points to it and pins the Aspire SDK version.
+  - The AppHost is a `Microsoft.NET.Sdk` project. It declares `engine` and `shell` by project path (`AddDotnetProject`), without project references, and Aspire builds them before starting them. Like any engine, the dev engine exits if another one (an installed Micser) is running in the same session.
   - `engine` gets an Aspire-assigned port. The endpoint isn't proxied, because the engine's `Urls` setting would override `ASPNETCORE_URLS`, so the AppHost sets `Urls` itself. Its health check is `/api/health`.
   - `web` is the Vite dev server, with `MICSER_ENGINE_URL` set to the engine's endpoint. Aspire runs `npm install` in `src/Web` first, which installs the workspace at the root.
   - `shell` is started from the dashboard only, with `--ui` pointing to Vite.
