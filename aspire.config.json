@@ -1,6 +1,9 @@
 {
   "appHost": {
-    "language": "csharp",
-    "path": "tools/AppHost/Micser.AppHost.csproj"
+    "path": "tools/AppHost/Micser.AppHost.csproj",
+    "language": "csharp"
+  },
+  "sdk": {
+    "version": "17.0.0"
   }
 }

@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "aspire": {
+      "command": "aspire",
+      "args": ["agent", "mcp"]
+    }
+  }
+}

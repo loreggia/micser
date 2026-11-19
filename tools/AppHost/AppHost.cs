@@ -2,7 +2,7 @@ var builder = DistributedApplication.CreateBuilder(args);
 
 // not proxied, so the engine can bind the endpoint's URL itself: its "Urls" setting would override ASPNETCORE_URLS
 var engine = builder
-    .AddProject<Projects.Micser_Engine>("engine")
+    .AddDotnetProject("engine", "../../src/Engine/Micser.Engine.csproj")
     .WithHttpEndpoint(isProxied: false)
     .WithHttpHealthCheck("/api/health");
 engine.WithEnvironment("Urls", engine.GetEndpoint("http"));
@@ -18,7 +18,7 @@ var web = builder
 
 // the shell finds the engine through its discovery file and shows the Vite UI
 builder
-    .AddProject<Projects.Micser_Shell>("shell")
+    .AddDotnetProject("shell", "../../src/Shell/Micser.Shell.csproj")
     .WithArgs(context =>
     {
         context.Args.Add("--ui");
