@@ -8,6 +8,12 @@ Collect changes under "Unreleased". Before tagging vX.Y.Z, rename that heading t
 from that section, and the release workflow fails without it.
 -->
 
+## Unreleased
+
+- Micser now runs on .NET 11. On Intel and AMD PCs it needs a processor with SSE4.2 (x86-64-v2), which every PC that runs Windows 11
+  or a supported version of Windows 10 has.
+- Plugins: the plugin SDK (`Micser.Audio`) targets .NET 11.
+
 ## 0.21.1 - 2026-11-14
 
 - Package / security updates

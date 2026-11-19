@@ -5,17 +5,17 @@
     "csharpier": {
       "version": "1.3.0",
       "commands": ["csharpier"],
-      "rollForward": false
+      "rollForward": true
     },
     "husky": {
       "version": "0.9.1",
       "commands": ["husky"],
-      "rollForward": false
+      "rollForward": true
     },
     "vpk": {
       "version": "1.2.161",
       "commands": ["vpk"],
-      "rollForward": false
+      "rollForward": true
     }
   }
 }

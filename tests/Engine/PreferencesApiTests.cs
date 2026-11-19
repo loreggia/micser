@@ -1,4 +1,3 @@
-using System.Net.Http.Json;
 using Micser.Engine.Contracts;
 using Micser.Tests.Common;
 

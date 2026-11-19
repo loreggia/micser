@@ -73,7 +73,7 @@ General:
 
 - Keep the folder layout and dependency direction in "Layout" of `docs/Architecture.md`: new projects go into `src/` (shipping), `tests/` (mirroring `src/`) or `tools/` (dev-only). Code that several .NET test projects need goes into `tests/Common` (`Micser.Tests.Common`).
 - Nothing in `src/` compiles against a plugin, Main included (see "Plugins").
-- Audio, Engine, plugins, the shell and their tests target `net10.0` and run on Windows and Linux (see `docs/Linux.md`). Platform code is marked `[SupportedOSPlatform]` and called behind `OperatingSystem.Is*()` (CA1416 fails the build otherwise); device APIs go behind `IAudioBackend`. Only `DriverUtility` targets `net10.0-windows`.
+- Audio, Engine, plugins, the shell and their tests target `net11.0` and run on Windows and Linux (see `docs/Linux.md`). Platform code is marked `[SupportedOSPlatform]` and called behind `OperatingSystem.Is*()` (CA1416 fails the build otherwise); device APIs go behind `IAudioBackend`. Only `DriverUtility` targets `net11.0-windows`.
 - Package versions are central in `Directory.Packages.props`, so `PackageReference` items carry no `Version`. `TreatWarningsAsErrors` is on for all projects.
 - Stick to the libraries in "Overview": no Newtonsoft, EF Core, Prism/Unity, xUnit or Moq.
 - npm runs only the install scripts in `allowScripts` (root `package.json`) and fails on others; review a new one, then add it with `npm approve-scripts <pkg>` or deny it with `npm deny-scripts <pkg>`. See "Development" for the npm setup.

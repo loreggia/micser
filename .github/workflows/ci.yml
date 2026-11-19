@@ -41,7 +41,7 @@ jobs:
           dotnet tool restore
           dotnet csharpier check .
 
-      # the Windows-only DriverUtility (net10.0-windows) builds on Linux too, so the solution stays buildable there
+      # the Windows-only DriverUtility (net11.0-windows) builds on Linux too, so the solution stays buildable there
       - name: Build
         run: dotnet build Micser.slnx --configuration Release
 
