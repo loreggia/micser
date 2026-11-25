@@ -744,7 +744,7 @@ export function GraphEditor() {
         deleteKeyCode={["Delete", "Backspace"]}
         snapToGrid={preferences.snapToGrid}
         snapGrid={[gridSize, gridSize]}
-        colorMode={colorMode}
+        forceColorMode={colorMode}
         ariaLabelConfig={ariaLabelConfig}
         fitView
         minZoom={0.25}
