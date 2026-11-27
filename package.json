@@ -21,7 +21,7 @@
     "@playwright/test": "^1.65.1",
     "@types/node": "^26.6.6",
     "@vitejs/plugin-react": "^6.3.0",
-    "@vitest/browser-playwright": "^5.1.0",
+    "@vitest/browser-playwright": "^5.1.1",
     "eslint": "^10.14.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react-hooks": "^7.1.1",
